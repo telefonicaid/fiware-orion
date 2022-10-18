@@ -59,12 +59,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00.123Z",
-    "end": "2028-12-31T10:00:00.456"
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.798",
-    "end": "2027-12-31T10:00:00.120"
+    "startAt": "2017-12-31T10:00:00.798",
+    "endAt": "2027-12-31T10:00:00.120"
   },
   "expires": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026"
@@ -104,12 +104,12 @@ echo "05. Update R1 with all new timestamps"
 echo "====================================="
 payload='{
   "observationInterval": {
-    "start": "2019-12-31T10:00:00.123Z",
-    "end": "2020-12-31T10:00:00.456"
+    "startAt": "2019-12-31T10:00:00.123Z",
+    "endAt": "2020-12-31T10:00:00.456"
   },
   "managementInterval": {
-    "start": "2021-12-31T10:00:00.798",
-    "end": "2022-12-31T10:00:00.120"
+    "startAt": "2021-12-31T10:00:00.798",
+    "endAt": "2022-12-31T10:00:00.120"
   },
   "expires": "2023-12-31T10:00:01.234Z"
 }'
@@ -185,12 +185,12 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
 	"observationInterval" : {
-		"start" : 1546250400.123,
-		"end" : 1861869600.456
+		"startAt" : 1546250400.123,
+		"endAt" : 1861869600.456
 	},
 	"managementInterval" : {
-		"start" : 1514714400.79REGEX(\d+)
-		"end" : 1830247200.12
+		"startAt" : 1514714400.79REGEX(\d+)
+		"endAt" : 1830247200.12
 	}
 }
 bye
@@ -199,7 +199,7 @@ bye
 03. GET R1 via REST, make sure all timestamps have milliseconds
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 616
+Content-Length: 624
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -228,14 +228,14 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         }
     ],
     "managementInterval": {
-        "end": "2027-12-31T10:00:00.120Z",
-        "start": "2017-12-31T10:00:00.798Z"
+        "endAt": "2027-12-31T10:00:00.120Z",
+        "startAt": "2017-12-31T10:00:00.798Z"
     },
     "modifiedAt": "REGEX(.*\.\d\d\d)Z",
     "name": "Registration R1",
     "observationInterval": {
-        "end": "2028-12-31T10:00:00.456Z",
-        "start": "2018-12-31T10:00:00.123Z"
+        "endAt": "2028-12-31T10:00:00.456Z",
+        "startAt": "2018-12-31T10:00:00.123Z"
     },
     "type": "ContextSourceRegistration"
 }
@@ -244,7 +244,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. GET all registrations via REST, make sure all timestamps have milliseconds
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 618
+Content-Length: 626
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -274,14 +274,14 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             }
         ],
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.120Z",
-            "start": "2017-12-31T10:00:00.798Z"
+            "endAt": "2027-12-31T10:00:00.120Z",
+            "startAt": "2017-12-31T10:00:00.798Z"
         },
         "modifiedAt": "REGEX(.*\.\d\d\d)Z",
         "name": "Registration R1",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.456Z",
-            "start": "2018-12-31T10:00:00.123Z"
+            "endAt": "2028-12-31T10:00:00.456Z",
+            "startAt": "2018-12-31T10:00:00.123Z"
         },
         "type": "ContextSourceRegistration"
     }
@@ -298,7 +298,7 @@ Date: REGEX(.*)
 06. GET R1 and make sure modifiedAt changed and that all timestamps have milliseconds
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 616
+Content-Length: 624
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -327,14 +327,14 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         }
     ],
     "managementInterval": {
-        "end": "2022-12-31T10:00:00.120Z",
-        "start": "2021-12-31T10:00:00.798Z"
+        "endAt": "2022-12-31T10:00:00.120Z",
+        "startAt": "2021-12-31T10:00:00.798Z"
     },
     "modifiedAt": "REGEX(.*\.\d\d\d)Z",
     "name": "Registration R1",
     "observationInterval": {
-        "end": "2020-12-31T10:00:00.456Z",
-        "start": "2019-12-31T10:00:00.123Z"
+        "endAt": "2020-12-31T10:00:00.456Z",
+        "startAt": "2019-12-31T10:00:00.123Z"
     },
     "type": "ContextSourceRegistration"
 }

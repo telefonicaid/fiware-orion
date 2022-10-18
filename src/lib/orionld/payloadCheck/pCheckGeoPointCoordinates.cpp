@@ -44,7 +44,10 @@ extern "C"
 bool pCheckGeoPointCoordinates(KjNode* coordinatesP)
 {
   // Must be an array of Number, two or three members
-  int numbers = 0;
+  int     numbers   = 0;
+  double  latitude  = 0;
+  double  longitude = 0;
+
   for (KjNode* memberP = coordinatesP->value.firstChildP; memberP != NULL; memberP = memberP->next)
   {
     if ((memberP->type == KjInt) || (memberP->type == KjFloat))
@@ -54,11 +57,26 @@ bool pCheckGeoPointCoordinates(KjNode* coordinatesP)
       orionldError(OrionldBadRequestData, "Invalid GeoJSON", "all members of a 'Point' in 'coordinates' must be of type 'Number'", 400);
       return false;
     }
+
+    if      (numbers == 1)  longitude = (memberP->type == KjFloat)? memberP->value.f : memberP->value.i;
+    else if (numbers == 2)  latitude  = (memberP->type == KjFloat)? memberP->value.f : memberP->value.i;
   }
 
   if ((numbers != 2) && (numbers != 3))
   {
     orionldError(OrionldBadRequestData, "Invalid GeoJSON", "The 'coordinates' member for a 'Point' must be an array with two or three Numbers", 400);
+    return false;
+  }
+
+  if ((latitude < -90) || (latitude > 90))
+  {
+    orionldError(OrionldBadRequestData, "Invalid GeoJSON", "latitude outside of range -90 to 90", 400);
+    return false;
+  }
+
+  if ((longitude < -180) || (longitude > 180))
+  {
+    orionldError(OrionldBadRequestData, "Invalid GeoJSON", "longitude outside of range -180 to 180", 400);
     return false;
   }
 

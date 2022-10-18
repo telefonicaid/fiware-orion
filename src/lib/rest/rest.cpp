@@ -1319,7 +1319,8 @@ static MHD_Result connectionTreat
   //
   //  NOT NGSI-LD
   //
-
+  ++requestNo;
+  LM(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)

@@ -243,8 +243,8 @@ static bool ngsildRegistrationInformationToAPIv1Datamodel(KjNode* informationP, 
 //
 void ngsildTimeIntervalToAPIv1Datamodel(KjNode* tiP)
 {
-  KjNode* startP = kjLookup(tiP, "start");
-  KjNode* endP   = kjLookup(tiP, "end");
+  KjNode* startP = kjLookup(tiP, "startAt");
+  KjNode* endP   = kjLookup(tiP, "endAt");
   double  dateTime;
 
   dateTime        = parse8601Time(startP->value.s);
@@ -355,12 +355,12 @@ void ngsildExpiresToAPIv1Datamodel(KjNode* expiresP)
 //  "createdAt" : REGEX(.*),
 //  "modifiedAt" : REGEX(.*),
 //  "observationInterval" : {
-//    "start" : NumberLong(1546250400),
-//    "end" : NumberLong(1861869600)
+//    "startAt" : NumberLong(1546250400),
+//    "endAt" : NumberLong(1861869600)
 //  },
 //  "managementInterval" : {
-//    "start" : NumberLong(1514714400),
-//    "end" : NumberLong(1830247200)
+//    "startAt" : NumberLong(1514714400),
+//    "endAt" : NumberLong(1830247200)
 //  },
 //  "location" : {
 //    "type" : "Polygon",
@@ -544,7 +544,7 @@ bool orionldPatchRegistration(void)
 
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Registration ID must be a valid URI", orionldState.wildcard[0], 400);
 
-  if (pcheckRegistration(orionldState.requestTree, false, &propertyTree) == false)
+  if (pcheckRegistration(orionldState.requestTree, false, false, &propertyTree) == false)
   {
     LM_E(("pcheckRegistration FAILED"));
     return false;

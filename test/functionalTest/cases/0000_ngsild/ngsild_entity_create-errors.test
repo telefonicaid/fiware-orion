@@ -321,12 +321,12 @@ Date: REGEX(.*)
 02. POST /ngsi-ld/v1/entities, with an 'id' that is not a string - see error
 ============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 110
+Content-Length: 103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entity id",
+    "detail": "id",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -335,12 +335,12 @@ Date: REGEX(.*)
 03. POST /ngsi-ld/v1/entities, with a 'type' that is not a string - see error
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entity type",
+    "detail": "type",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -470,12 +470,12 @@ Date: REGEX(.*)
 14. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'id' and '@id' fields - see error
 ================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 102
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Entity:id",
+    "detail": "id",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -484,12 +484,12 @@ Date: REGEX(.*)
 15. POST /ngsi-ld/v1/entities, Attempt to create a entity with 'type' and '@type' fields - see error
 ====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Entity:type",
+    "detail": "type",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

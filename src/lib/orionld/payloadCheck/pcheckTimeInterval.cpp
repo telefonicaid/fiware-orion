@@ -42,24 +42,26 @@ extern "C"
 //
 bool pcheckTimeInterval(KjNode* timeIntervalNodeP, const char* fieldName)
 {
-  KjNode* startP = NULL;
-  KjNode* endP   = NULL;
-  int64_t start  = 0;
-  int64_t end    = 0;
+  KjNode* startAtP = NULL;
+  KjNode* endAtP   = NULL;
+  int64_t startAt  = 0;
+  int64_t endAt    = 0;
 
   for (KjNode* tiItemP = timeIntervalNodeP->value.firstChildP; tiItemP != NULL; tiItemP = tiItemP->next)
   {
-    if (strcmp(tiItemP->name, "start") == 0)
+    if (strcmp(tiItemP->name, "startAt") == 0)
     {
-      DUPLICATE_CHECK(startP, "start", tiItemP);
-      STRING_CHECK(tiItemP, "start");
-      DATETIME_CHECK(tiItemP->value.s, start, "start");
+      DUPLICATE_CHECK(startAtP, "startAt", tiItemP);
+      STRING_CHECK(tiItemP, "startAt");
+      EMPTY_STRING_CHECK(tiItemP, "startAt");
+      DATETIME_CHECK(tiItemP->value.s, startAt, "startAt");
     }
-    else if (strcmp(tiItemP->name, "end") == 0)
+    else if (strcmp(tiItemP->name, "endAt") == 0)
     {
-      DUPLICATE_CHECK(endP, "end", tiItemP);
-      STRING_CHECK(tiItemP, "end");
-      DATETIME_CHECK(tiItemP->value.s, end, "end");
+      DUPLICATE_CHECK(endAtP, "endAt", tiItemP);
+      STRING_CHECK(tiItemP, "endAt");
+      EMPTY_STRING_CHECK(tiItemP, "endAt");
+      DATETIME_CHECK(tiItemP->value.s, endAt, "endAt");
     }
     else
     {
@@ -68,27 +70,27 @@ bool pcheckTimeInterval(KjNode* timeIntervalNodeP, const char* fieldName)
     }
   }
 
-  if ((startP == NULL) && (endP == NULL))
+  if ((startAtP == NULL) && (endAtP == NULL))
   {
     orionldError(OrionldBadRequestData, "Empty Object", fieldName, 400);
     return false;
   }
 
-  if (startP == NULL)
+  if (startAtP == NULL)
   {
-    orionldError(OrionldBadRequestData, "Missing mandatory field", "start", 400);
+    orionldError(OrionldBadRequestData, "Missing mandatory field", "startAt", 400);
     return false;
   }
 
-  if (endP == NULL)
+  if (endAtP == NULL)
   {
-    orionldError(OrionldBadRequestData, "Missing mandatory field", "end", 400);
+    orionldError(OrionldBadRequestData, "Missing mandatory field", "endAt", 400);
     return false;
   }
 
-  if (start > end)
+  if (startAt > endAt)
   {
-    orionldError(OrionldBadRequestData, "Inconsistent TimeInterval", "TimeInterval ends before it starts", 400);
+    orionldError(OrionldBadRequestData, "Inconsistent TimeInterval (it ends before it starts)", fieldName, 400);
     return false;
   }
 

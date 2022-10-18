@@ -55,8 +55,8 @@ payload='{
           "type": "T2"
         }
       ],
-      "properties": [ "brandName" ],
-      "relationships": [ "isParked" ]
+      "propertyNames": [ "brandName" ],
+      "relationshipNames": [ "isParked" ]
     }
   ],
   "endpoint": "http://my.csource.org:1026"
@@ -83,8 +83,8 @@ payload='{
           "type": "T3"
         }
       ],
-      "properties": [ "speed" ],
-      "relationships": [ "isNotParked" ]
+      "propertyNames": [ "speed" ],
+      "relationshipNames": [ "isNotParked" ]
     }
   ],
   "endpoint": "http://my.csource.org:1026"

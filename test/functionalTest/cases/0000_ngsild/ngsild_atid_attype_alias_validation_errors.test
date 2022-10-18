@@ -416,12 +416,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00",
-    "end": "2027-12-31T10:00:00"
+    "startAt": "2017-12-31T10:00:00",
+    "endAt": "2027-12-31T10:00:00"
   },
   "location": {
     "type": "Polygon",
@@ -494,12 +494,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00",
-    "end": "2027-12-31T10:00:00"
+    "startAt": "2017-12-31T10:00:00",
+    "endAt": "2027-12-31T10:00:00"
   },
   "location": {
     "type": "Polygon",
@@ -572,12 +572,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00",
-    "end": "2027-12-31T10:00:00"
+    "startAt": "2017-12-31T10:00:00",
+    "endAt": "2027-12-31T10:00:00"
   },
   "location": {
     "type": "Polygon",
@@ -649,12 +649,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00",
-    "end": "2027-12-31T10:00:00"
+    "startAt": "2017-12-31T10:00:00",
+    "endAt": "2027-12-31T10:00:00"
   },
   "location": {
     "type": "Polygon",
@@ -1553,12 +1553,12 @@ Date: REGEX(*.)
 02. Attempt to create an entity using @type invalid - see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
-    "detail": "entity type",
+    "detail": "type",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1637,12 +1637,12 @@ Date: REGEX(*.)
 08. Attempt to create a subscription using @type invalid - see error
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
-    "detail": "entity type",
+    "detail": "type",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1693,12 +1693,12 @@ Date: REGEX(*.)
 12. Attempt to create a csourceRegistration using @type invalid - see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(*.)
 
 {
-    "detail": "entity type",
+    "detail": "type",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

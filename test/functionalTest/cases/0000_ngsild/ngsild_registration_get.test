@@ -64,12 +64,12 @@ payload='{
 		}
 	],
 	"observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
   "managementInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
 	"expires": "2029-10-31T10:00:25",
 	"endpoint": "http://my.csource.org:1026"
@@ -99,12 +99,12 @@ payload='{
 		}
 	],
 	"observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
   "managementInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
 	"expires": "2029-10-31T10:00:25",
 	"endpoint": "http://my.csource.org:1026"
@@ -149,7 +149,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 02. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 537
+Content-Length: 545
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -177,12 +177,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         }
     ],
     "managementInterval": {
-        "end": "2028-12-31T10:00:00.000Z",
-        "start": "2018-12-31T10:00:00.000Z"
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
     },
     "observationInterval": {
-        "end": "2028-12-31T10:00:00.000Z",
-        "start": "2018-12-31T10:00:00.000Z"
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
     },
     "type": "ContextSourceRegistration"
 }
@@ -191,7 +191,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 538
+Content-Length: 546
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -219,12 +219,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         }
     ],
     "managementInterval": {
-        "end": "2028-12-31T10:00:00.000Z",
-        "start": "2018-12-31T10:00:00.000Z"
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
     },
     "observationInterval": {
-        "end": "2028-12-31T10:00:00.000Z",
-        "start": "2018-12-31T10:00:00.000Z"
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
     },
     "type": "ContextSourceRegistration"
 }

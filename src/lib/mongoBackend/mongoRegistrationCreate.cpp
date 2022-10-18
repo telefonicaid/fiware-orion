@@ -232,8 +232,8 @@ static void setTimeInterval(const char* name, const OrionldTimeInterval* interva
 {
   mongo::BSONObjBuilder intervalObj;
 
-  intervalObj.append("start", intervalP->start);
-  intervalObj.append("end",   intervalP->end);
+  intervalObj.append("startAt", intervalP->start);
+  intervalObj.append("endAt",   intervalP->end);
 
   bobP->append(name, intervalObj.obj());
 }

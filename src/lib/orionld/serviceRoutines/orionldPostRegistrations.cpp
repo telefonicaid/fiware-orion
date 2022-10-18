@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,23 +22,86 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>                                              // std::string
-#include <vector>                                              // std::vector
-
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjString, kjFloat, ...
+}
 
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
-#include "rest/OrionError.h"                                   // OrionError
-#include "apiTypesV2/Registration.h"                           // Registration
-#include "mongoBackend/mongoRegistrationGet.h"                 // mongoRegistrationGet
-#include "mongoBackend/mongoRegistrationCreate.h"              // mongoRegistrationCreate
 
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
-#include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
-#include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own Interface
+#include "orionld/common/uuidGenerate.h"                       // uuidGenerate
+#include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_OBJECT
+#include "orionld/payloadCheck/pcheckRegistration.h"           // pcheckRegistration
+#include "orionld/payloadCheck/pCheckUri.h"                    // pcheckUri
+#include "orionld/legacyDriver/legacyPostRegistrations.h"      // legacyPostRegistrations
+#include "orionld/mongoc/mongocRegistrationExists.h"           // mongocRegistrationExists
+#include "orionld/mongoc/mongocRegistrationInsert.h"           // mongocRegistrationInsert
+#include "orionld/regCache/regCacheItemAdd.h"                  // regCacheItemAdd
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
+#include "orionld/dbModel/dbModelFromApiRegistration.h"        // dbModelFromApiRegistration
+#include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckRegistrationType -
+//
+bool pCheckRegistrationType(KjNode* regTypeP)
+{
+  if (regTypeP == NULL)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Registration", "Mandatory field 'type' is missing", 400);
+    return false;
+  }
+  else if (regTypeP->type != KjString)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Registration", "The 'type' field must be a JSON string", 400);
+    return false;
+  }
+  else if (regTypeP->value.s[0] == 0)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Registration", "The 'type' field cannot be an empty string", 400);
+    return false;
+  }
+  else if (strcmp(regTypeP->value.s, "ContextSourceRegistration") != 0)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Registration", "The 'type' field must have the value 'ContextSourceRegistration'", 400);
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckRegistrationId -
+//
+bool pCheckRegistrationId(KjNode* regIdP)
+{
+  if (regIdP->type != KjString)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Registration", "The 'id' field must be a JSON string", 400);
+    return false;
+  }
+  else if (regIdP->value.s[0] == 0)
+  {
+    orionldError(OrionldBadRequestData, "Invalid Registration", "The 'id' field cannot be an empty string", 400);
+    return false;
+  }
+  else if (pCheckUri(regIdP->value.s, "Registration::id", true) == false)
+    return false;
+
+  return true;
+}
 
 
 
@@ -48,62 +111,101 @@
 //
 bool orionldPostRegistrations(void)
 {
-  ngsiv2::Registration  reg;
-  std::string           regId;
-  OrionError            oError;
-  char*                 regIdP = NULL;
+  if ((experimental == false) || (orionldState.in.legacy != NULL))  // If Legacy header - use old implementation
+    return legacyPostRegistrations();
+
+  PCHECK_OBJECT(orionldState.requestTree, 0, NULL, "the payload data for a Registration must be a JSON Object", 400);
 
   //
-  // Registration ID given by user? - if so, we need to check for Registration already exists
+  // If createdAt and/or modifiedAt is/are present is the incoming payload body, they need to be ignored
   //
-  if (orionldState.payloadIdNode != NULL)
+  KjNode* createdAtP  = kjLookup(orionldState.requestTree, "createdAt");
+  KjNode* modifiedAtP = kjLookup(orionldState.requestTree, "modifiedAt");
+
+  if (createdAtP != NULL)
+    kjChildRemove(orionldState.requestTree, createdAtP);
+  if (modifiedAtP != NULL)
+    kjChildRemove(orionldState.requestTree, modifiedAtP);
+
+  KjNode*  regP            = orionldState.requestTree;
+  KjNode*  regIdP          = orionldState.payloadIdNode;
+  KjNode*  regTypeP        = orionldState.payloadTypeNode;
+  KjNode*  propertyTree    = NULL;  // Will be set by pcheckRegistration
+
+  if (pCheckRegistrationType(regTypeP) == false)
+    LM_RE(false, ("pCheckRegistrationType failed"));
+
+  char  registrationIdV[100];
+  char* registrationId = registrationIdV;
+
+  if (regIdP == NULL)
   {
-    char*   regId = orionldState.payloadIdNode->value.s;
-    int     statusCode;
-    char*   details;
+    LM(("REG: No id present, inventing one"));
+    // Invent a registration id
+    strncpy(registrationIdV, "urn:ngsi-ld:ContextSourceRegistration:", sizeof(registrationIdV) - 1);
+    uuidGenerate(&registrationIdV[38], sizeof(registrationIdV) - 38, false);
+    regIdP = kjString(orionldState.kjsonP, "id", registrationId);
+  }
+  else
+  {
+    if (pCheckRegistrationId(regIdP) == false)
+      LM_RE(false, ("pCheckRegistrationId failed"));
 
-    // mongoLdRegistrationGet takes the req semaphore
-    if (mongoLdRegistrationGet(NULL, regId, orionldState.tenantP, &statusCode, &details) == true)
-    {
-      orionldError(OrionldAlreadyExists, "Registration already exists", regId, 409);
-      return false;
-    }
+    registrationId = regIdP->value.s;
   }
 
-  //
-  // Fix context
-  //
-  if (orionldState.contextP != NULL)
-    reg.ldContext = orionldState.contextP->url;
-  else
-    reg.ldContext = coreContextUrl;
+  bool b = pcheckRegistration(regP, false, true, &propertyTree);
+  if (b == false)
+    LM_RE(false, ("pCheckRegistration FAILED"));
 
-  //
-  // Translate the incoming KjNode tree into a ngsiv2::Registration
-  //
-  if (kjTreeToRegistration(&reg, &regIdP) == false)
+  // Make sure it doesn't exist already
+  bool found;
+  if (mongocRegistrationExists(registrationId, &found) == false)
+    return false;
+
+  if (found == true)
   {
-    LM_E(("kjTreeToRegistration FAILED"));
-    // orionldError is invoked by kjTreeToRegistration
+    orionldError(OrionldAlreadyExists, "Registration already exists", registrationId, 409);
     return false;
   }
 
-
   //
-  // Create the Registration
+  // Add the registrationId as the first item to the payload -for the DB (the type we don't store in the database)
+  // Add also createdAt and modifiedAt
   //
-  std::vector<std::string>  servicePathV;
+  if (createdAtP == NULL)
+    createdAtP = kjFloat(orionldState.kjsonP, "createdAt",  orionldState.requestTime);
+  if (modifiedAtP == NULL)
+    modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
 
-  mongoRegistrationCreate(&reg,
-                          orionldState.tenantP,
-                          "/",
-                          &regId,
-                          &oError);
+  if ((createdAtP == NULL) || (modifiedAtP == NULL))
+  {
+    orionldError(OrionldInternalError, "Out of Memory", "allocating system timestamps", 500);
+    return false;
+  }
 
-  // FIXME: Check oError for failure!
-  orionldState.httpStatusCode = SccCreated;
+  // Put 'id', 'createdAt', and 'modifiedAt' first in the registration
+  regIdP->next      = createdAtP;
+  createdAtP->next  = modifiedAtP;
+  modifiedAtP->next = orionldState.requestTree->value.firstChildP;
 
-  httpHeaderLocationAdd("/ngsi-ld/v1/csourceRegistrations/", regIdP, orionldState.tenantP->tenant);
+  orionldState.requestTree->value.firstChildP = regIdP;
+
+  // Add the property tree in the end
+  kjChildAdd(orionldState.requestTree, propertyTree);
+
+  regCacheItemAdd(orionldState.tenantP, orionldState.requestTree, false);  // Clones the registration
+
+  // This is where "id" is changed to "_id"
+  kjTreeLog(orionldState.requestTree, "Before dbModelFromApiRegistration");
+  dbModelFromApiRegistration(orionldState.requestTree);
+  kjTreeLog(orionldState.requestTree, "After dbModelFromApiRegistration");
+
+  if (mongocRegistrationInsert(orionldState.requestTree, regIdP->value.s) == false)
+    return false;
+
+  orionldState.httpStatusCode = 201;
+  httpHeaderLocationAdd("/ngsi-ld/v1/csourceRegistrations/", regIdP->value.s, orionldState.tenantP->tenant);
 
   return true;
 }

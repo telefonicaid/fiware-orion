@@ -654,12 +654,12 @@ Date: REGEX(.*)
 16. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' with 'coordinates' that is a double array - see failure
 =====================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 191
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
+    "detail": "Non-Array in 'coordinates' for a 'Polygon'",
     "title": "Invalid GeoJSON",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -668,12 +668,12 @@ Date: REGEX(.*)
 17. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure
 ========================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 191
+Content-Length: 165
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
     "title": "Invalid GeoJSON",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -696,12 +696,12 @@ Date: REGEX(.*)
 19. Attempt to create an Entity with a GeoProperty that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure
 ===================================================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 191
+Content-Length: 141
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'",
+    "detail": "Non-Array in 'coordinates' for a 'Polygon'",
     "title": "Invalid GeoJSON",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

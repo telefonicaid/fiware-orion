@@ -55,5 +55,27 @@ extern const char* SubscriptionTemporalQPath;
 extern const char* SubscriptionScopePath;
 
 extern const char* RegistrationInformationEntitiesPath;
+extern const char* RegistrationInformationEntitiesItemPath;
+extern const char* RegistrationInformationEntitiesIdPath;
+extern const char* RegistrationInformationEntitiesIdPatternPath;
+extern const char* RegistrationInformationEntitiesTypePath;
+extern const char* RegistrationInformationPropertyNamesPath;
+extern const char* RegistrationInformationPropertyNameItemPath;
+extern const char* RegistrationInformationRelationshipNamesPath;
+extern const char* RegistrationInformationRelationshipNamesItemPath;
+
+extern const char* PostQueryEntitiesPath;
+extern const char* PostQueryEntitiesItemPath;
+extern const char* PostQueryEntitiesIdPath;
+extern const char* PostQueryEntitiesIdPatternPath;
+extern const char* PostQueryEntitiesTypePath;
+
+
+//
+// Arrays for functions shared between different services
+//
+extern const char* SubscriptionEntitiesPathV[];
+extern const char* RegistrationInformationEntitiesPathV[];
+extern const char* PostQueryEntitiesPathV[];
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_FIELDPATHS_H_

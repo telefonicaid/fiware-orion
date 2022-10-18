@@ -21,3 +21,6 @@
 * Issue #280   Added a URL parameter for GET /subscriptions/{subId}: ?options=fromDb  to get the subscription from DB and not subscription cache
 * Issue #280   Implemented retrieval of a subscription from the database instead of from the subscription cache:  GET /subscriptions/{subId}?options=fromDb
 * Issue #280   Implemented query of subscriptions from the database instead of from the subscription cache:  GET /subscriptionss?options=fromDb
+* Issue #280   Implemented the Registration cache, initial version
+* Issue #280   Implemented GET /csourceRegistrations/{regId} using mongoc AND the Registration cache
+* Issue #280   Implemented POST /csourceRegistrations using mongoc AND the Registration cache

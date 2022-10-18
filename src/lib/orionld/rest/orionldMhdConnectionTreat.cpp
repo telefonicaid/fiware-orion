@@ -323,12 +323,13 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
       {
         if (orionldState.payloadIdNode != NULL)
         {
-          LM_W(("Bad Input (duplicated attribute: 'Entity:id'"));
-          orionldError(OrionldBadRequestData, "Duplicated field", "Entity:id", 400);
+          LM_W(("Bad Input (duplicated attribute: 'id'"));
+          orionldError(OrionldBadRequestData, "Duplicated field", "id", 400);
           return false;
         }
 
-        STRING_CHECK(attrNodeP, "entity id");
+        attrNodeP->name = (char*) "id";
+        STRING_CHECK(attrNodeP, "id");
         URI_CHECK(attrNodeP->value.s, "id", true);
 
         orionldState.payloadIdNode = attrNodeP;
@@ -339,12 +340,13 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
       {
         if (orionldState.payloadTypeNode != NULL)
         {
-          LM_W(("Bad Input (duplicated attribute: 'Entity:type'"));
-          orionldError(OrionldBadRequestData, "Duplicated field", "Entity:type", 400);
+          LM_W(("Bad Input (duplicated attribute: 'type'"));
+          orionldError(OrionldBadRequestData, "Duplicated field", "type", 400);
           return false;
         }
 
-        STRING_CHECK(attrNodeP, "entity type");
+        attrNodeP->name = (char*) "type";
+        STRING_CHECK(attrNodeP, "type");
         URI_CHECK(attrNodeP->value.s, "type", false);
 
         orionldState.payloadTypeNode = attrNodeP;

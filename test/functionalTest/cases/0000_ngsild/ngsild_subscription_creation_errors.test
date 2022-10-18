@@ -578,12 +578,12 @@ Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub03
 21.1. Attempt to create a subscription with 'id' and '@id' fields
 =================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 109
+Content-Length: 102
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Entity:id",
+    "detail": "id",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -592,12 +592,12 @@ Date: REGEX(.*)
 21.2. Attempt to create a subscription with 'type' and '@type' fields
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 104
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Entity:type",
+    "detail": "type",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

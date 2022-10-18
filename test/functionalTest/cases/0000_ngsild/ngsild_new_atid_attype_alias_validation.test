@@ -36,7 +36,7 @@ brokerStart CB 0 IPv4 -experimental
 # 02. Creation of subscription using @id and @type
 # 03. Update of subscription using @id and @type
 # 04. Creation of registration using @id and @type
-# 05. Update of registration using @id and @type
+# 05. Update of registration without id and type in payload body
 # 06. Creation of entities with entityOperations using @id and @type
 # 06b. See urn:ngsi-ld:entity:E1 in DB and make sure the entity type is expanded
 # 07. Update of entities with entityOperations using @id and @type
@@ -136,27 +136,27 @@ payload='{
           "type": "Vehicle"
         }
       ],
-      "properties": [ "brandName", "speed" ],
-      "relationships": [ "isParked" ]
+      "propertyNames": [ "brandName", "speed" ],
+      "relationshipNames": [ "isParked" ]
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00",
-    "end": "2028-12-31T10:00:00"
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00",
-    "end": "2027-12-31T10:00:00"
+    "startAt": "2017-12-31T10:00:00",
+    "endAt": "2027-12-31T10:00:00"
   },
   "location": {
     "type": "Polygon",
     "coordinates": [
       [
-        [ 100.0, 0.0 ],
-        [ 101.0, 0.0 ],
-        [ 101.0, 1.0 ],
-        [ 100.0, 1.0 ],
-        [ 100.0, 0.0 ]
+        [ 80.0, 0.0 ],
+        [ 81.0, 0.0 ],
+        [ 81.0, 1.0 ],
+        [ 80.0, 1.0 ],
+        [ 80.0, 0.0 ]
       ]
     ]
   },
@@ -164,11 +164,11 @@ payload='{
     "type": "Polygon",
     "coordinates": [
       [
-        [ 200.0, 0.0 ],
-        [ 201.0, 0.0 ],
-        [ 201.0, 1.0 ],
-        [ 200.0, 1.0 ],
-        [ 200.0, 0.0 ]
+        [ 70.0, 0.0 ],
+        [ 71.0, 0.0 ],
+        [ 71.0, 1.0 ],
+        [ 70.0, 1.0 ],
+        [ 70.0, 0.0 ]
       ]
     ]
   },
@@ -176,11 +176,11 @@ payload='{
     "type": "Polygon",
     "coordinates": [
       [
-        [ 300.0, 0.0 ],
-        [ 301.0, 0.0 ],
-        [ 301.0, 1.0 ],
-        [ 300.0, 1.0 ],
-        [ 300.0, 0.0 ]
+        [ 60.0, 0.0 ],
+        [ 61.0, 0.0 ],
+        [ 61.0, 1.0 ],
+        [ 60.0, 1.0 ],
+        [ 60.0, 0.0 ]
       ]
     ]
   },
@@ -200,8 +200,8 @@ echo
 echo
 
 
-echo "05. Update of registration using @id and @type"
-echo "=============================================="
+echo "05. Update of registration without id and type in payload body"
+echo "=============================================================="
 payload='{
   "name": "New Name",
   "description": "Modified description of reg R1"
@@ -401,8 +401,8 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 
 
 
-05. Update of registration using @id and @type
-==============================================
+05. Update of registration without id and type in payload body
+==============================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 

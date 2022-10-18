@@ -1324,12 +1324,12 @@ Date: REGEX(.*)
 13. Attempt to PATCH the subscription with an 'entities' as an array of non-objects
 ===================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Subscription::entities",
+    "detail": "Subscription::entities[X]",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1338,12 +1338,12 @@ Date: REGEX(.*)
 14. Attempt to PATCH the subscription with an 'entities' as an array with an empty object
 =========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 118
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Subscription::entities",
+    "detail": "Subscription::entities[X]",
     "title": "Empty Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1352,12 +1352,12 @@ Date: REGEX(.*)
 15. Attempt to PATCH the subscription with an 'entities[X]::id' that is not a string
 ====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 116
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::id",
+    "detail": "Subscription::entities::id",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1366,12 +1366,12 @@ Date: REGEX(.*)
 16. Attempt to PATCH the subscription with an 'entities[X]::id' that is an empty string
 =======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::id",
+    "detail": "Subscription::entities::id",
     "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1380,12 +1380,12 @@ Date: REGEX(.*)
 17. Attempt to PATCH the subscription with an 'entities[X]::id' that is not a URI
 =================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 127
+Content-Length: 138
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::id",
+    "detail": "Subscription::entities::id",
     "title": "Invalid URI - no colon found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1394,12 +1394,12 @@ Date: REGEX(.*)
 18. Attempt to PATCH the subscription with a duplicated 'entities[X]::id'
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 115
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::id",
+    "detail": "Subscription::entities::id",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1408,12 +1408,12 @@ Date: REGEX(.*)
 19. Attempt to PATCH the subscription with an 'entities[X]::type' that is not a string
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 118
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::type",
+    "detail": "Subscription::entities::type",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1422,12 +1422,12 @@ Date: REGEX(.*)
 20. Attempt to PATCH the subscription with an 'entities[X]::type' that is an empty string
 =========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::type",
+    "detail": "Subscription::entities::type",
     "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1436,12 +1436,12 @@ Date: REGEX(.*)
 21. Attempt to PATCH the subscription with a duplicated 'entities[X]::type'
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 117
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::type",
+    "detail": "Subscription::entities::type",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1450,12 +1450,12 @@ Date: REGEX(.*)
 22. Attempt to PATCH the subscription with an 'entities[X]' that has no 'type'
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 124
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::type",
+    "detail": "Subscription::entities::type",
     "title": "Missing mandatory field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1464,12 +1464,12 @@ Date: REGEX(.*)
 23. Attempt to PATCH the subscription with an 'entities[X]::idPattern' that is not a string
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 134
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::idPattern",
+    "detail": "Subscription::entities::idPattern",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1478,12 +1478,12 @@ Date: REGEX(.*)
 24. Attempt to PATCH the subscription with an 'entities[X]::idPattern' that is an empty string
 ==============================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 118
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::idPattern",
+    "detail": "Subscription::entities::idPattern",
     "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1492,12 +1492,12 @@ Date: REGEX(.*)
 25. Attempt to PATCH the subscription with a duplicated 'entities[X]::idPattern'
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 122
+Content-Length: 133
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::idPattern",
+    "detail": "Subscription::entities::idPattern",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2276,12 +2276,12 @@ Date: REGEX(.*)
 94. Attempt to use 'id' and '@id' to a Subscription
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 115
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities[X]::id",
+    "detail": "Subscription::entities::id",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

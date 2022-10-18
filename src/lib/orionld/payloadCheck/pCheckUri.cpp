@@ -122,7 +122,11 @@ bool pCheckUri(const char* uri, const char* name, bool mustBeUri)
   }
   else if (*uri == 0)
   {
-    orionldError(OrionldBadRequestData, "Empty URI", name, 400);
+    if (mustBeUri == true)
+      orionldError(OrionldBadRequestData, "Empty URI", name, 400);
+    else
+      orionldError(OrionldBadRequestData, "Empty String", name, 400);
+
     return false;
   }
 

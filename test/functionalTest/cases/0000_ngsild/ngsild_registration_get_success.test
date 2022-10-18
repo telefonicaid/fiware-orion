@@ -73,38 +73,38 @@ do
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00",
-      "end": "2028-12-31T10:00:00"
+      "startAt": "2018-12-31T10:00:00",
+      "endAt": "2028-12-31T10:00:00"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00",
-      "end": "2027-12-31T10:00:00"
+      "startAt": "2017-12-31T10:00:00",
+      "endAt": "2027-12-31T10:00:00"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
-          [ 100.0, 0.0 ],
-          [ 101.0, 0.0 ],
-          [ 101.0, 1.0 ],
-          [ 100.0, 1.0 ],
-          [ 100.0, 0.0 ]
+          [ 80.0, 0.0 ],
+          [ 81.0, 0.0 ],
+          [ 81.0, 1.0 ],
+          [ 80.0, 1.0 ],
+          [ 80.0, 0.0 ]
         ]
       ]
     },
     "observationSpace": {
       "type": "Point",
-      "coordinates": [ 200.0, 0.0 ]
+      "coordinates": [ 80.0, 0.0 ]
     },
     "operationSpace": {
       "type": "Polygon",
       "coordinates": [
         [
-          [ 300.0, 0.0 ],
-          [ 301.0, 0.0 ],
-          [ 301.0, 1.0 ],
-          [ 300.0, 1.0 ],
-          [ 300.0, 0.0 ]
+          [ 80.0, 0.0 ],
+          [ 81.0, 0.0 ],
+          [ 81.0, 1.0 ],
+          [ 80.0, 1.0 ],
+          [ 80.0, 0.0 ]
         ]
       ]
     },
@@ -238,7 +238,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 03. GET  /ngsi-ld/v1/csourceRegistrations all data
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 18878
+Content-Length: 18848
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -271,35 +271,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -308,7 +308,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -317,23 +317,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -370,35 +370,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -407,7 +407,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -416,23 +416,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -469,35 +469,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -506,7 +506,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -515,23 +515,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -568,35 +568,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -605,7 +605,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -614,23 +614,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -667,35 +667,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -704,7 +704,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -713,23 +713,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -766,35 +766,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -803,7 +803,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -812,23 +812,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -865,35 +865,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -902,7 +902,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -911,23 +911,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -964,35 +964,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -1001,7 +1001,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -1010,23 +1010,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -1063,35 +1063,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -1100,7 +1100,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -1109,23 +1109,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -1162,35 +1162,35 @@ Date: REGEX(.*)
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -1199,7 +1199,7 @@ Date: REGEX(.*)
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -1208,23 +1208,23 @@ Date: REGEX(.*)
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]
@@ -1240,7 +1240,7 @@ Date: REGEX(.*)
 04. GET  /ngsi-ld/v1/csourceRegistrations limit:5 csourceRegistration
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 4046
+Content-Length: 4031
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1274,23 +1274,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -1298,17 +1298,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -1317,23 +1317,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -1370,23 +1370,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -1394,17 +1394,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -1413,23 +1413,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -1466,23 +1466,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -1490,17 +1490,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -1509,23 +1509,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -1562,23 +1562,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -1586,17 +1586,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -1605,23 +1605,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -1658,23 +1658,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -1682,17 +1682,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -1701,23 +1701,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -1732,7 +1732,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 05. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:0 csourceRegistration
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 4046
+Content-Length: 4031
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1766,23 +1766,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -1790,17 +1790,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -1809,23 +1809,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -1862,23 +1862,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -1886,17 +1886,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -1905,23 +1905,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -1958,23 +1958,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -1982,17 +1982,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2001,23 +2001,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2054,23 +2054,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2078,17 +2078,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2097,23 +2097,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2150,23 +2150,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2174,17 +2174,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2193,23 +2193,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2224,7 +2224,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 06. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:1 csourceRegistration
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 4046
+Content-Length: 4031
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2258,23 +2258,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2282,17 +2282,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2301,23 +2301,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2354,23 +2354,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2378,17 +2378,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2397,23 +2397,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2450,23 +2450,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2474,17 +2474,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2493,23 +2493,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2546,23 +2546,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2570,17 +2570,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2589,23 +2589,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2642,23 +2642,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2666,17 +2666,17 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2685,23 +2685,23 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2716,7 +2716,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 07. GET  /ngsi-ld/v1/csourceRegistrations with count
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 2430
+Content-Length: 2421
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2751,23 +2751,23 @@ NGSILD-Results-Count: 10
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2775,17 +2775,17 @@ NGSILD-Results-Count: 10
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2794,23 +2794,23 @@ NGSILD-Results-Count: 10
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2847,23 +2847,23 @@ NGSILD-Results-Count: 10
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2871,17 +2871,17 @@ NGSILD-Results-Count: 10
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2890,23 +2890,23 @@ NGSILD-Results-Count: 10
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -2943,23 +2943,23 @@ NGSILD-Results-Count: 10
             "coordinates": [
                 [
                     [
-                        100,
+                        80,
                         0
                     ],
                     [
-                        101,
+                        81,
                         0
                     ],
                     [
-                        101,
+                        81,
                         1
                     ],
                     [
-                        100,
+                        80,
                         1
                     ],
                     [
-                        100,
+                        80,
                         0
                     ]
                 ]
@@ -2967,17 +2967,17 @@ NGSILD-Results-Count: 10
             "type": "Polygon"
         },
         "managementInterval": {
-            "end": "2027-12-31T10:00:00.000Z",
-            "start": "2017-12-31T10:00:00.000Z"
+            "endAt": "2027-12-31T10:00:00.000Z",
+            "startAt": "2017-12-31T10:00:00.000Z"
         },
         "name": "reg_csr1a343",
         "observationInterval": {
-            "end": "2028-12-31T10:00:00.000Z",
-            "start": "2018-12-31T10:00:00.000Z"
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
         },
         "observationSpace": {
             "coordinates": [
-                200,
+                80,
                 0
             ],
             "type": "Point"
@@ -2986,23 +2986,23 @@ NGSILD-Results-Count: 10
             "coordinates": [
                 [
                     [
-                        300,
+                        80,
                         0
                     ],
                     [
-                        301,
+                        81,
                         0
                     ],
                     [
-                        301,
+                        81,
                         1
                     ],
                     [
-                        300,
+                        80,
                         1
                     ],
                     [
-                        300,
+                        80,
                         0
                     ]
                 ]
@@ -3028,7 +3028,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 09. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:5 and with options=sysAttrs
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1811
+Content-Length: 1808
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -3061,35 +3061,35 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       }
     ],
     "observationInterval": {
-      "start": "2018-12-31T10:00:00.000Z",
-      "end": "2028-12-31T10:00:00.000Z"
+      "startAt": "2018-12-31T10:00:00.000Z",
+      "endAt": "2028-12-31T10:00:00.000Z"
     },
     "managementInterval": {
-      "start": "2017-12-31T10:00:00.000Z",
-      "end": "2027-12-31T10:00:00.000Z"
+      "startAt": "2017-12-31T10:00:00.000Z",
+      "endAt": "2027-12-31T10:00:00.000Z"
     },
     "location": {
       "type": "Polygon",
       "coordinates": [
         [
           [
-            100,
+            80,
             0
           ],
           [
-            101,
+            81,
             0
           ],
           [
-            101,
+            81,
             1
           ],
           [
-            100,
+            80,
             1
           ],
           [
-            100,
+            80,
             0
           ]
         ]
@@ -3098,7 +3098,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "observationSpace": {
       "type": "Point",
       "coordinates": [
-        200,
+        80,
         0
       ]
     },
@@ -3107,23 +3107,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       "coordinates": [
         [
           [
-            300,
+            80,
             0
           ],
           [
-            301,
+            81,
             0
           ],
           [
-            301,
+            81,
             1
           ],
           [
-            300,
+            80,
             1
           ],
           [
-            300,
+            80,
             0
           ]
         ]

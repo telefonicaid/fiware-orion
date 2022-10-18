@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                       // KjNode
+#include "kjson/kjBuilder.h"                                    // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
@@ -43,37 +44,37 @@ extern "C"
 //
 // pcheckEntityInfo -
 //
-bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, const char* fieldPath)
+bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, const char** fieldPathV)
 {
   KjNode* idP         = NULL;
   KjNode* idPatternP  = NULL;
   KjNode* typeP       = NULL;
 
-  OBJECT_CHECK(entityInfoP, fieldPath);
-  EMPTY_OBJECT_CHECK(entityInfoP, fieldPath);
+  OBJECT_CHECK(entityInfoP, fieldPathV[1]);
+  EMPTY_OBJECT_CHECK(entityInfoP, fieldPathV[1]);
 
   for (KjNode* entityItemP = entityInfoP->value.firstChildP; entityItemP != NULL; entityItemP = entityItemP->next)
   {
     if ((strcmp(entityItemP->name, "id") == 0) || (strcmp(entityItemP->name, "@id") == 0))
     {
-      DUPLICATE_CHECK(idP, "entities[X]::id", entityItemP);
-      STRING_CHECK(entityItemP, "entities[X]::id");
-      EMPTY_STRING_CHECK(entityItemP, "entities[X]::id");
-      URI_CHECK(entityItemP->value.s, "entities[X]::id", true);
+      DUPLICATE_CHECK(idP, fieldPathV[2], entityItemP);
+      STRING_CHECK(entityItemP, fieldPathV[2]);
+      EMPTY_STRING_CHECK(entityItemP, fieldPathV[2]);
+      URI_CHECK(entityItemP->value.s, fieldPathV[2], true);
     }
     else if (strcmp(entityItemP->name, "idPattern") == 0)
     {
-      DUPLICATE_CHECK(idPatternP, "entities[X]::idPattern", entityItemP);
-      STRING_CHECK(entityItemP, "entities[X]::idPattern");
-      EMPTY_STRING_CHECK(entityItemP, "entities[X]::idPattern");
+      DUPLICATE_CHECK(idPatternP, fieldPathV[3], entityItemP);
+      STRING_CHECK(entityItemP, fieldPathV[3]);
+      EMPTY_STRING_CHECK(entityItemP, fieldPathV[3]);
       // FIXME: How check for valid REGEX???
     }
     else if ((strcmp(entityItemP->name, "type") == 0) || (strcmp(entityItemP->name, "@type") == 0))
     {
-      DUPLICATE_CHECK(typeP, "entities[X]::type", entityItemP);
-      STRING_CHECK(entityItemP, "entities[X]::type");
-      EMPTY_STRING_CHECK(entityItemP, "entities[X]::type");
-      URI_CHECK(entityItemP->value.s, "entities[X]::type", false);
+      DUPLICATE_CHECK(typeP, fieldPathV[4], entityItemP);
+      STRING_CHECK(entityItemP, fieldPathV[4]);
+      EMPTY_STRING_CHECK(entityItemP, fieldPathV[4]);
+      URI_CHECK(entityItemP->value.s, fieldPathV[4], false);
 
       //
       // Expand, unless already expanded
@@ -84,15 +85,19 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, const char* field
     }
     else
     {
-      orionldError(OrionldBadRequestData, "Invalid field for entities[X]", entityItemP->name, 400);
+      orionldError(OrionldBadRequestData, "Invalid field name in EntityInfo", entityItemP->name, 400);
       return false;
     }
   }
 
+  // If both "id" and "idPattern" are present - "idPattern" is ignored (removed)
+  if ((idP != NULL) && (idPatternP != NULL))
+    kjChildRemove(entityInfoP, idPatternP);
+
   // Only if Fully NGSI-LD compliant
   if ((typeMandatory == true) && (typeP == NULL))
   {
-    orionldError(OrionldBadRequestData, "Missing mandatory field", "entities[X]::type", 400);
+    orionldError(OrionldBadRequestData, "Missing mandatory field", fieldPathV[4], 400);
     return false;
   }
 

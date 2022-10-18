@@ -69,11 +69,11 @@ payload='{
         "type": "Polygon",
         "coordinates": [
             [
-                [ 100.0, 0.0 ],
-                [ 101.0, 0.0 ],
-                [ 101.0, 1.0 ],
-                [ 100.0, 1.0 ],
-                [ 100.0, 0.0 ]
+                [ 80.0, 0.0 ],
+                [ 81.0, 0.0 ],
+                [ 81.0, 1.0 ],
+                [ 80.0, 1.0 ],
+                [ 80.0, 0.0 ]
             ]
         ]
     },
@@ -81,11 +81,11 @@ payload='{
         "type": "Polygon",
         "coordinates": [
             [
-                [ 200.0, 0.0 ],
-                [ 201.0, 0.0 ],
-                [ 201.0, 1.0 ],
-                [ 200.0, 1.0 ],
-                [ 200.0, 0.0 ]
+                [ 80.0, 0.0 ],
+                [ 81.0, 0.0 ],
+                [ 81.0, 1.0 ],
+                [ 80.0, 1.0 ],
+                [ 80.0, 0.0 ]
             ]
         ]
     },
@@ -93,21 +93,21 @@ payload='{
         "type": "Polygon",
         "coordinates": [
             [
-                [ 300.0, 0.0 ],
-                [ 301.0, 0.0 ],
-                [ 301.0, 1.0 ],
-                [ 300.0, 1.0 ],
-                [ 300.0, 0.0 ]
+                [ 80.0, 0.0 ],
+                [ 81.0, 0.0 ],
+                [ 81.0, 1.0 ],
+                [ 80.0, 1.0 ],
+                [ 80.0, 0.0 ]
             ]
         ]
     },
 	"observationInterval": {
-        "start": "2018-12-31T10:00:00",
-        "end": "2028-12-31T10:00:00"
+        "startAt": "2018-12-31T10:00:00",
+        "endAt": "2028-12-31T10:00:00"
     },
     "managementInterval": {
-        "start": "2018-12-31T10:00:00",
-        "end": "2028-12-31T10:00:00"
+        "startAt": "2018-12-31T10:00:00",
+        "endAt": "2028-12-31T10:00:00"
     },
 	"expires": "2029-10-31T10:00:25",
 	"endpoint": "http://my.csource.org:1026"
@@ -183,7 +183,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 819
+Content-Length: 812
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -214,23 +214,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "coordinates": [
             [
                 [
-                    100,
+                    80,
                     0
                 ],
                 [
-                    101,
+                    81,
                     0
                 ],
                 [
-                    101,
+                    81,
                     1
                 ],
                 [
-                    100,
+                    80,
                     1
                 ],
                 [
-                    100,
+                    80,
                     0
                 ]
             ]
@@ -238,35 +238,35 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Polygon"
     },
     "managementInterval": {
-        "end": "2028-12-31T10:00:00.000Z",
-        "start": "2018-12-31T10:00:00.000Z"
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
     },
     "name": "REG1",
     "observationInterval": {
-        "end": "2028-12-31T10:00:00.000Z",
-        "start": "2018-12-31T10:00:00.000Z"
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
     },
     "observationSpace": {
         "coordinates": [
             [
                 [
-                    200,
+                    80,
                     0
                 ],
                 [
-                    201,
+                    81,
                     0
                 ],
                 [
-                    201,
+                    81,
                     1
                 ],
                 [
-                    200,
+                    80,
                     1
                 ],
                 [
-                    200,
+                    80,
                     0
                 ]
             ]
@@ -277,23 +277,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "coordinates": [
             [
                 [
-                    300,
+                    80,
                     0
                 ],
                 [
-                    301,
+                    81,
                     0
                 ],
                 [
-                    301,
+                    81,
                     1
                 ],
                 [
-                    300,
+                    80,
                     1
                 ],
                 [
-                    300,
+                    80,
                     0
                 ]
             ]

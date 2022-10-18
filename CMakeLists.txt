@@ -192,6 +192,7 @@ SET (ORION_LIBS
     orionld_common
     orionld_context
     orionld_contextCache
+    orionld_regCache
     orionld_notifications
     orionld_db
     orionld_mongoc
@@ -217,8 +218,8 @@ SET (ORION_LIBS
     cache
     mongoBackend
     orionld_context      # Should not be necessary ... kjTreeFromNotification gets undefined reference to 'orionldAliasLookup' without this ...
-    orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
     orionld_legacyDriver # legacyDriver uses payloadCheck functions
+    orionld_mongoBackend # mongoBackend uses functions in orionld_mongoBackend
     orionld_payloadCheck
     orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
     orionld_payloadCheck
@@ -368,6 +369,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/types)
   ADD_SUBDIRECTORY(src/lib/orionld/context)
   ADD_SUBDIRECTORY(src/lib/orionld/contextCache)
+  ADD_SUBDIRECTORY(src/lib/orionld/regCache)
   ADD_SUBDIRECTORY(src/lib/orionld/kjTree)
   ADD_SUBDIRECTORY(src/lib/orionld/db)
   ADD_SUBDIRECTORY(src/lib/orionld/dbModel)

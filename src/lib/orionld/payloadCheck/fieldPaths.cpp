@@ -54,4 +54,47 @@ const char* SubscriptionLangPath                       = "Subscription::lang";
 const char* SubscriptionTemporalQPath                  = "Subscription::temporalQ";
 const char* SubscriptionScopePath                      = "Subscription::scope";
 
-const char* RegistrationInformationEntitiesPath        = "Registration::information::entities";
+const char* RegistrationInformationEntitiesPath               = "Registration::information[X]::entities";
+const char* RegistrationInformationEntitiesItemPath           = "Registration::information[X]::entities[X]";
+const char* RegistrationInformationEntitiesIdPath             = "Registration::information[X]::entities[X]::id";
+const char* RegistrationInformationEntitiesIdPatternPath      = "Registration::information[X]::entities[X]::idPattern";
+const char* RegistrationInformationEntitiesTypePath           = "Registration::information[X]::entities[X]::type";
+const char* RegistrationInformationPropertyNamesPath          = "Registration::information[X]::propertyNames";
+const char* RegistrationInformationPropertyNameItemPath       = "Registration::information[X]::propertyNames[X]";
+const char* RegistrationInformationRelationshipNamesPath      = "Registration::information[X]::relationshipNames";
+const char* RegistrationInformationRelationshipNamesItemPath  = "Registration::information[X]::relationshipNames[X]";
+
+
+const char* PostQueryEntitiesPath            = "Query::entities";
+const char* PostQueryEntitiesItemPath        = "Query::entities[X]";
+const char* PostQueryEntitiesIdPath          = "Query::entities[X]::id";
+const char* PostQueryEntitiesIdPatternPath   = "Query::entities[X]::idPattern";
+const char* PostQueryEntitiesTypePath        = "Query::entities[X]::type";
+
+const char* SubscriptionEntitiesPathV[] =
+{
+  SubscriptionEntitiesPath,
+  SubscriptionEntitiesItemPath,
+  SubscriptionEntitiesIdPath,
+  SubscriptionEntitiesIdPatternPath,
+  SubscriptionEntitiesTypePath
+};
+
+const char* RegistrationInformationEntitiesPathV[] =
+{
+  RegistrationInformationEntitiesPath,
+  RegistrationInformationEntitiesItemPath,
+  RegistrationInformationEntitiesIdPath,
+  RegistrationInformationEntitiesIdPatternPath,
+  RegistrationInformationEntitiesTypePath
+};
+
+
+const char* PostQueryEntitiesPathV[] =
+{
+  PostQueryEntitiesPath,
+  PostQueryEntitiesItemPath,
+  PostQueryEntitiesIdPath,
+  PostQueryEntitiesIdPatternPath,
+  PostQueryEntitiesTypePath
+};

@@ -36,6 +36,6 @@ extern "C"
 //
 // pcheckEntityInfoArray -
 //
-extern bool pcheckEntityInfoArray(KjNode* entityInfoArrayP, bool typeMandatory, const char* fieldPath);
+extern bool pcheckEntityInfoArray(KjNode* entityInfoArrayP, bool typeMandatory, const char** fieldPathV);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKENTITYINFOARRAY_H_

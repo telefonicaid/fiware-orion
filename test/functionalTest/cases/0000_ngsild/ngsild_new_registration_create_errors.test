@@ -1,0 +1,5187 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error handling for the new Registration Creation
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# Fields to check:
+#
+#  id                      (optional uri string)
+#  type                    (mandatory string with defined value "ContextSourceRegistration")
+#  registrationName        (optional string)
+#  description             (optional string)
+#  information [ {         (mandatory non-empty array of objects)
+#    entities [ {          (optional Array of Object
+#      id                  (optional URI String)
+#      idPattern           (optional REGEX String)
+#      type                (mandatory String or Array-of-String)
+#    } ]
+#    propertyNames []      (optional Array of String
+#    relationshipNames []  (optional Array of String
+#  } ]
+#  tenant                  (optional uri string)
+#  observationInterval {   (optional object)
+#    startAt               (mandatory ISO8601 String)
+#    endAt                 (optional ISO8601 String)
+#  }
+#  managementInterval {    (optional object)
+#    startAt               (mandatory ISO8601 String)
+#    endAt                 (optional ISO8601 String)
+#  }
+#  location {              (optional GeoProperty)
+#  }
+#  observationSpace {      (optional GeoProperty)
+#  }
+#  operationSpace {        (optional GeoProperty)
+#  }
+#  expiresAt               (optional ISO8601 String)
+#  endpoint                (mandatory URL)
+#  contextSourceInfo [ {   (optional non-empty array of objects)
+#    key                   (mandatory String)
+#    value                 (mandatory String)
+#  } ]
+#  scope                   (optional String or Array of Strings)
+#  mode                    (String with 4 accepted values)
+#  operations              (optional Array of String, with ~40 accepted values)
+#  refreshRate             (optional ISO8601 Duration String - not implemented)
+#  management {            (optional non-empty object)
+#    localOnly             (optional bool)
+#    cacheDuration         (501)
+#    timeout               (optional Number)
+#    cooldown              (optional Number)
+#  }
+#  Attribute*              key: value - just anything
+#  
+#
+# There are only THREE mandatory toplevel fields:
+#   type
+#   information
+#   endpoint
+#
+
+#
+#  01. Attempt to create a registration with a payload data that is not a JSON object - see failure
+#
+#  02. Attempt to create a registration with an 'id' that is not a String - see failure
+#  03. Attempt to create a registration with an 'id' string that is empty -  see failure
+#  04. Attempt to create a registration with an 'id' that is not a valid URI - see failure
+#  05. Attempt to create a registration with a duplicated 'id' - see failure
+#
+#  06. Attempt to create a registration without 'type' - see failure
+#  07. Attempt to create a registration with a 'type' that is not a string - see failure
+#  08. Attempt to create a registration with a 'type' string that is empty -  see failure
+#  09. Attempt to create a registration with a 'type' string that is not 'ContextSourceRegistration' - see failure
+#  10. Attempt to create a registration with duplicate 'type' - see failure
+#
+#  09. Attempt to create a registration with a 'registrationName' that is not a string - see failure
+#  09. Attempt to create a registration with a 'registrationName' that is an empty string - see failure
+#  10. Attempt to create a registration with duplicate 'registrationName' - see failure
+#
+#  11. Attempt to create a registration with a 'description' that is not a string - see failure
+#  12. Attempt to create a registration with a 'description' that is an empty string - see failure
+#  13. Attempt to create a registration with duplicate 'description' - see failure
+#
+#  14. Attempt to create a registration without 'information' - see failure
+#  15. Attempt to create a registration with an 'information' that is not a JSON Array - see failure
+#  16. Attempt to create a registration with an 'information' that is an empty array - see failure
+#  17. Attempt to create a registration with duplicate 'information' - see failure
+#
+#  18. Attempt to create a registration with an 'information' that has a member that is not a JSON Object - see failure
+#  19. Attempt to create a registration with an 'information' that has a member that is an empty Object - see failure
+#
+#  20. Attempt to create a registration with an 'information::entities' that is not an array - see failure
+#  21. Attempt to create a registration with an 'information::entities' array that is empty - see failure
+#  22. Attempt to create a registration with an 'information::entities' array item that is not an object - see failure
+#
+#  23. Attempt to create a registration with an 'information::entities[0]::id' that is not a string - see failure
+#  24. Attempt to create a registration with an 'information::entities[0]::id' that is an empty string - see failure
+#  25. Attempt to create a registration with an 'information::entities[0]::id' that is not a valid URI - see failure
+#  26. Attempt to create a registration with duplicate 'information::entities[0]::id' - see failure
+#
+#  27. Attempt to create a registration with an 'information::entities[0]::idPattern' that is not a string - see failure
+#  28. Attempt to create a registration with an 'information::entities[0]::idPattern' that is an empty string - see failure
+#  29. Attempt to create a registration with duplicate 'information::entities[0]::idPattern' - see failure
+#
+#  30. Attempt to create a registration with no 'information::entities[0]::type' - see failure
+#  31. Attempt to create a registration with an 'information::entities[0]::type' that is not a string - see failure
+#  32. Attempt to create a registration with an 'information::entities[0]::type' that is an empty string - see failure
+#  33. Attempt to create a registration with duplicate 'information::entities[0]::type' - see failure
+#  34. Attempt to create a registration with foreign field 'information::entities[0]::xyz' - see failure
+#
+#  35. Attempt to create a registration with an 'information::propertyNames' that is not an array - see failure
+#  36. Attempt to create a registration with an 'information::propertyNames' that is an empty array - see failure
+#  37. Attempt to create a registration with an 'information::propertyNames' item that is not a string - see failure
+#  38. Attempt to create a registration with an 'information::propertyNames' item that is an empty string - see failure
+#  39. Attempt to create a registration with an 'information::propertyNames' item that is duplicated - see failure
+#
+#  40. Attempt to create a registration with an 'information::relationshipNames' that is not an array - see failure
+#  41. Attempt to create a registration with an 'information::relationshipNames' that is an empty array - see failure
+#  42. Attempt to create a registration with an 'information::relationshipNames' item that is not a string - see failure
+#  43. Attempt to create a registration with an 'information::relationshipNames' item that is an empty string - see failure
+#  44. Attempt to create a registration with an 'information::relationshipNames' item that is duplicated - see failure
+#  45. Attempt to create a registration with an invalid field 'information::xyz - see failure
+#
+#  46. Attempt to create a registration with an 'observationInterval' that is not a JSON Object - see failure
+#  47. Attempt to create a registration with an 'observationInterval' that is an empty JSON Object - see failure
+#  48. Attempt to create a registration with an 'observationInterval' that is missing the 'startAt' field - see failure
+#  49. Attempt to create a registration with an 'observationInterval' that is missing the 'endAt' field - see failure
+#  50. Attempt to create a registration with an 'observationInterval' with a duplicated 'startAt' field - see failure
+#  51. Attempt to create a registration with an 'observationInterval' with a duplicated 'endAt' field - see failure
+#  52. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a string - see failure
+#  53. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is an empty string - see failure
+#  54. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a valid DateTime - see failure
+#  55. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a string - see failure
+#  56. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is an empty string - see failure
+#  57. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a valid DateTime - see failure
+#  58. Attempt to create a registration with an 'observationInterval' with an invalid field 'xyz' - see failure
+#  59. Attempt to create a registration with a duplicated 'observationInterval' - see failure
+#  60. Attempt to create a registration with a 'observationInterval' whose start>end - see failure
+#
+#  61. Attempt to create a registration with an 'observationInterval' that is not a JSON Object - see failure
+#  62. Attempt to create a registration with an 'observationInterval' that is an empty JSON Object - see failure
+#  63. Attempt to create a registration with an 'observationInterval' that is missing the 'startAt' field - see failure
+#  64. Attempt to create a registration with an 'observationInterval' that is missing the 'endAt' field - see failure
+#  65. Attempt to create a registration with an 'observationInterval' with a duplicated 'startAt' field - see failure
+#  66. Attempt to create a registration with an 'observationInterval' with a duplicated 'endAt' field - see failure
+#  67. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a string - see failure
+#  68. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is an empty string - see failure
+#  69. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a valid DateTime - see failure
+#  70. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a string - see failure
+#  71. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is an empty string - see failure
+#  72. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a valid DateTime - see failure
+#  73. Attempt to create a registration with an 'observationInterval' with an invalid field 'xyz' - see failure
+#  74. Attempt to create a registration with a duplicated 'observationInterval' - see failure
+#  75. Attempt to create a registration with a 'observationInterval' whose start>end - see failure
+#
+#  76. Attempt to create a registration with a 'location' that is not a JSON Object - see failure
+#  77. Attempt to create a registration with a duplicated 'location' - see failure
+#  78. Attempt to create a registration with a 'location' that contains no 'type' field - see failure
+#  79. Attempt to create a registration with a 'location' with a 'type' that is not a string  - see failure
+#  80. Attempt to create a registration with a 'location' with a 'type' whose string is not a valid geometry name - see failure
+#  81. Attempt to create a registration with a 'location' that has a duplicated 'type' - see failure
+#  82. Attempt to create a registration with a 'location' that contains no 'coordinates' field - see failure
+#  83. Attempt to create a registration with a 'location' that has a duplicated 'coordinates' - see failure
+#  84. Attempt to create a registration with a 'location' that has a 'coordinates' field that is not an Array - see failure
+#  85. Attempt to create a registration with a 'location' that has a 'coordinates' field that is an empty Array - see failure
+#  86. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an empty array - see failure
+#  87. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of ONE Number - see failure
+#  88. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of FOUR Numbers - see failure
+#  89. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of a Number and a non-number - see failure
+#  90. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of two Numbers and a non-number - see failure
+#  91. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a latitude > 90 - see failure
+#  92. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a latitude < -90 - see failure
+#  93. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a longitude < -180 - see failure
+#  94. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a longitude > 180 - see failure
+#  95. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' that is not a double array - see failure
+#  96. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' where one of the Points is an empty array - see failure
+#  97. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' and one of its double array items is not a number - see failure
+#  98. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' that is not a double array - see failure
+#  99. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points not being an array - see failure
+# 100. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of only ONE Number - see failure
+# 101. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of a Number and a String - see failure
+# 102. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an empty array - see failure
+# 103. Attempt to create a registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a double array - see failure
+# 104. Attempt to create a registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a cuadruple array - see failure
+#
+# 105. Attempt to create a registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a double array - see failure
+# 106. Attempt to create a registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure
+# 107. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of three Numbers - see failure
+# 108. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure
+# 109. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array where first item != last item
+#
+# 110. Attempt to create a registration with an 'observationSpace' that is not a JSON Object - see failure
+# 111. Attempt to create a registration with an 'observationSpace' that is an empty JSON Object - see failure
+# 112. Attempt to create a registration with a duplicated 'observationSpace' - see failure
+#
+# 113. Attempt to create a registration with an 'operationSpace' that is not a JSON Object - see failure
+# 114. Attempt to create a registration with an 'operationSpace' that is an empty JSON Object - see failure
+# 115. Attempt to create a registration with a duplicated 'operationSpace' - see failure
+#
+# 116. Attempt to create a registration with an 'expiresAt' that is not a string - see failure
+# 117. Attempt to create a registration with an 'expiresAt' that is an empty string - see failure
+# 118. Attempt to create a registration with an 'expiresAt' that is not a valid DateTime - see failure
+# 119. Attempt to create a registration with a duplicated 'expiresAt' - see failure
+#
+# 120. Attempt to create a registration without 'endpoint' - see failure
+# 121. Attempt to create a registration with an 'endpoint' that is not a string - see failure
+# 122. Attempt to create a registration with an 'endpoint' that is an empty string - see failure
+# 123. Attempt to create a registration with an 'endpoint' that is not a valid URI - see failure
+#
+# 124. Attempt to create a registration with a duplicated 'endpoint' - see failure
+# 125. Attempt to create a registration with a duplicated Property - see failure
+#
+# 126. Attempt to create a registration with an 'tenant' that is not a string - see failure
+# 127. Attempt to create a registration with an 'tenant' that is an empty string - see failure
+# 128. Attempt to create a registration with an 'tenant' that is not valid - see failure
+# 129. Attempt to create a registration with a duplicated 'tenant' - see failure
+#
+# 130. Attempt to create a registration with a 'contextSourceInfo' that is not an Array
+# 131. Attempt to create a registration with a 'contextSourceInfo' that is an empty Array
+# 132. Attempt to create a registration with a 'contextSourceInfo' as an Array of non-object
+# 133. Attempt to create a registration with a 'contextSourceInfo' with an array with an empty object
+# 134. Attempt to create a registration with a 'contextSourceInfo' with an array item without 'key'
+# 135. Attempt to create a registration with a 'contextSourceInfo' with an array item without 'value'
+# 136. Attempt to create a registration with a 'contextSourceInfo' with an array item with foreign field 'xyz'
+# 137. Attempt to create a registration with a 'contextSourceInfo' with an array item with duplicated 'key'
+# 138. Attempt to create a registration with a 'contextSourceInfo' with an array item with duplicated 'value'
+# 139. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'key' that is not a string
+# 140. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'value' that is not a string
+# 141. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'key' that is an empty string
+# 142. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'value' that is an empty string
+#
+# 143. Attempt to create a registration with a 'scope' that is not a String nor an Array
+# 144. Attempt to create a registration with a 'scope' that is an empty String
+# 145. Attempt to create a registration with a 'scope' that is an invalid String for a scope
+# 146. Attempt to create a registration with a 'scope' that is an empty Array
+# 147. Attempt to create a registration with a 'scope' that is an Array with a non-string member
+# 148. Attempt to create a registration with a 'scope' that is an Array with a member that is an empty string
+# 149. Attempt to create a registration with a 'scope' that is an Array with a member that is an invalid String for a scope
+# 150. Attempt to create a registration with a duplicated 'scope'
+#
+# 151. Attempt to create a registration with a 'mode' that is not a String
+# 152. Attempt to create a registration with a 'mode' that is an empty String
+# 153. Attempt to create a registration with a 'mode' that is an invalid String
+# 154. Attempt to create a registration with a duplicated 'mode'
+#
+# 155. Attempt to create a registration with an 'operations' that is not an Array
+# 156. Attempt to create a registration with an 'operations' that is an empty Array
+# 157. Attempt to create a registration with an 'operations' that is an Array with a non-String item
+# 158. Attempt to create a registration with an 'operations' that is an Array with an item that is an empty String
+# 159. Attempt to create a registration with an 'operations' that is an Array with an item that is an non-operation String
+# 160. Attempt to create a registration with a duplicated 'operations' array
+#
+# 161. refreshRate is not implemented - 501
+#
+# 162. Attempt to create a registration with a 'management' that is not a JSON Object
+# 163. Attempt to create a registration with a 'management' that is an empty JSON Object
+# 164. Attempt to create a registration with a duplicated 'management'
+# 165. Attempt to create a registration with a 'management:localOnly' that is not a Boolean
+# 166. Attempt to create a registration with a duplicated 'management:localOnly'
+#
+# 167. Attempt to create a registration with a 'management:cacheDuration' - not implemented - 501
+#
+# 168. Attempt to create a registration with a 'management:timeout' that is not a Number
+# 169. Attempt to create a registration with a 'management:timeout' with the value 0
+# 170. Attempt to create a registration with a 'management:timeout' with a negative value
+# 171. Attempt to create a registration with a duplicated 'management:timeout'
+#
+# 172. Attempt to create a registration with a 'management:cooldown' that is not a Number
+# 173. Attempt to create a registration with a 'management:cooldown' with the value 0
+# 174. Attempt to create a registration with a 'management:cooldown' with a negative value
+#
+# 175. Attempt to create a registration with a duplicated 'management:cooldown'
+# 176. Attempt to create a registration with a foreign field 'management:cooldownx'
+#
+
+echo "01. Attempt to create a registration with a payload data that is not a JSON object - see failure"
+echo "================================================================================================"
+payload='[
+  "1"
+]'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create a registration with an 'id' that is not a String - see failure"
+echo "===================================================================================="
+payload='{
+  "id": 14
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Attempt to create a registration with an 'id' string that is empty -  see failure"
+echo "====================================================================================="
+payload='{
+  "id": ""
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to create a registration with an 'id' that is not a valid URI - see failure"
+echo "======================================================================================="
+payload='{
+  "id": "14"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to create a registration with a duplicated 'id' - see failure"
+echo "========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:registrations:R1",
+  "id": "urn:ngsi-ld:registrations:R1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "06. Attempt to create a registration without 'type' - see failure"
+echo "================================================================="
+payload='{
+  "id": "urn:ngsi-ld:registrations:R1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Attempt to create a registration with a 'type' that is not a string - see failure"
+echo "====================================================================================="
+payload='{
+  "type": 2
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Attempt to create a registration with a 'type' string that is empty -  see failure"
+echo "======================================================================================"
+payload='{
+  "type": ""
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Attempt to create a registration with a 'type' string that is not 'ContextSourceRegistration' - see failure"
+echo "==============================================================================================================="
+payload='{
+  "type": "abc"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "10. Attempt to create a registration with duplicate 'type' - see failure"
+echo "========================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "type": "ContextSourceRegistration"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "11. Attempt to create a registration with a 'description' that is not a string - see failure"
+echo "============================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "description": 1
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "12. Attempt to create a registration with a 'description' that is an empty string - see failure"
+echo "==============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "description": ""
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "13. Attempt to create a registration with duplicate 'description' - see failure"
+echo "==============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "description": "X",
+  "description": "X"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "14. Attempt to create a registration without 'information' - see failure"
+echo "========================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "15. Attempt to create a registration with an 'information' that is not a JSON Array - see failure"
+echo "================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": 12
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "16. Attempt to create a registration with an 'information' that is an empty array - see failure"
+echo "==============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": []
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "17. Attempt to create a registration with duplicate 'information' - see failure"
+echo "==============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "type": "T1" } ] } ],
+  "information": [ { "entities": [ { "type": "T1" } ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "18. Attempt to create a registration with an 'information' that has a member that is not a JSON Object - see failure"
+echo "===================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ 7 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "19. Attempt to create a registration with an 'information' that has a member that is an empty Object - see failure"
+echo "=================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "20. Attempt to create a registration with an 'information::entities' that is not an array - see failure"
+echo "======================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": 20 } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "21. Attempt to create a registration with an 'information::entities' array that is empty - see failure"
+echo "======================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "22. Attempt to create a registration with an 'information::entities' array item that is not an object - see failure"
+echo "==================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ 7 ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "23. Attempt to create a registration with an 'information::entities[0]::id' that is not a string - see failure"
+echo "=============================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "id": 12, "type": "T" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "24. Attempt to create a registration with an 'information::entities[0]::id' that is an empty string - see failure"
+echo "================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "id": "", "type": "T" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "25. Attempt to create a registration with an 'information::entities[0]::id' that is not a valid URI - see failure"
+echo "================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "id": "24", "type": "T" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "26. Attempt to create a registration with duplicate 'information::entities[0]::id' - see failure"
+echo "================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "id": "urn:25", "id": "urn:25", "type": "T" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "27. Attempt to create a registration with an 'information::entities[0]::idPattern' that is not a string - see failure"
+echo "====================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "idPattern": 26, "type": "T" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "28. Attempt to create a registration with an 'information::entities[0]::idPattern' that is an empty string - see failure"
+echo "========================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "idPattern": "", "type": "T" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "29. Attempt to create a registration with duplicate 'information::entities[0]::idPattern' - see failure"
+echo "======================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "idPattern": "E1.*", "idPattern": "E2.*", "type": "T" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "30. Attempt to create a registration with no 'information::entities[0]::type' - see failure"
+echo "==========================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "id": "urn:E1" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "31. Attempt to create a registration with an 'information::entities[0]::type' that is not a string - see failure"
+echo "================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "type": 7 }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "32. Attempt to create a registration with an 'information::entities[0]::type' that is an empty string - see failure"
+echo "==================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "type": "" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "33. Attempt to create a registration with duplicate 'information::entities[0]::type' - see failure"
+echo "=================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "type": "T1", "type": "T2" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "34. Attempt to create a registration with foreign field 'information::entities[0]::xyz' - see failure"
+echo "====================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "entities": [ { "type": "T1", "xyz": "T2" }] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "35. Attempt to create a registration with an 'information::propertyNames' that is not an array - see failure"
+echo "============================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": "123" } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "36. Attempt to create a registration with an 'information::propertyNames' that is an empty array - see failure"
+echo "=============================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "37. Attempt to create a registration with an 'information::propertyNames' item that is not a string - see failure"
+echo "================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1", true ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "38. Attempt to create a registration with an 'information::propertyNames' item that is an empty string - see failure"
+echo "===================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1", "" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "39. Attempt to create a registration with an 'information::propertyNames' item that is duplicated - see failure"
+echo "==============================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1", "P1" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "40. Attempt to create a registration with an 'information::relationshipNames' that is not an array - see failure"
+echo "================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "relationshipNames": "R1" } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "41. Attempt to create a registration with an 'information::relationshipNames' that is an empty array - see failure"
+echo "=================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "relationshipNames": [] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "42. Attempt to create a registration with an 'information::relationshipNames' item that is not a string - see failure"
+echo "====================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "relationshipNames": [ 13 ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "43. Attempt to create a registration with an 'information::relationshipNames' item that is an empty string - see failure"
+echo "========================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "relationshipNames": [ "R1", "", "R2" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "44. Attempt to create a registration with an 'information::relationshipNames' item that is duplicated - see failure"
+echo "==================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "relationshipNames": [ "R1", "R1" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "45. Attempt to create a registration with an invalid field 'information::xyz - see failure"
+echo "=========================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "xyz": 1 } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "46. Attempt to create a registration with an 'observationInterval' that is not a JSON Object - see failure"
+echo "=========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": 4
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "47. Attempt to create a registration with an 'observationInterval' that is an empty JSON Object - see failure"
+echo "============================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "48. Attempt to create a registration with an 'observationInterval' that is missing the 'startAt' field - see failure"
+echo "===================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "endAt": "2022-09-30T18:09:00Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "49. Attempt to create a registration with an 'observationInterval' that is missing the 'endAt' field - see failure"
+echo "=================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:00Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "50. Attempt to create a registration with an 'observationInterval' with a duplicated 'startAt' field - see failure"
+echo "=================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "51. Attempt to create a registration with an 'observationInterval' with a duplicated 'endAt' field - see failure"
+echo "================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "52. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a string - see failure"
+echo "============================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": 123,
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "53. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is an empty string - see failure"
+echo "==============================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "54. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a valid DateTime - see failure"
+echo "==================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "123",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "55. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a string - see failure"
+echo "==========================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:01Z",
+    "endAt": 123
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "56. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is an empty string - see failure"
+echo "=============================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:01Z",
+    "endAt": ""
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "57. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a valid DateTime - see failure"
+echo "==================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:01Z",
+    "endAt": "123"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "58. Attempt to create a registration with an 'observationInterval' with an invalid field 'xyz' - see failure"
+echo "============================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z",
+    "xyz": false
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "59. Attempt to create a registration with a duplicated 'observationInterval' - see failure"
+echo "=========================================================================================="
+payload='{
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z"
+  },
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "60. Attempt to create a registration with a 'observationInterval' whose start>end - see failure"
+echo "==============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationInterval": {
+    "startAt": "2022-09-30T18:09:01Z",
+    "endAt": "2022-09-30T18:09:00Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "61. Attempt to create a registration with an 'managementInterval' that is not a JSON Object - see failure"
+echo "========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": 4
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "62. Attempt to create a registration with an 'managementInterval' that is an empty JSON Object - see failure"
+echo "============================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "63. Attempt to create a registration with an 'managementInterval' that is missing the 'startAt' field - see failure"
+echo "==================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "endAt": "2022-09-30T18:09:00Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "64. Attempt to create a registration with an 'managementInterval' that is missing the 'endAt' field - see failure"
+echo "================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:00Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "65. Attempt to create a registration with an 'managementInterval' with a duplicated 'startAt' field - see failure"
+echo "================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "66. Attempt to create a registration with an 'managementInterval' with a duplicated 'endAt' field - see failure"
+echo "==============================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "67. Attempt to create a registration with an 'managementInterval' with a 'startAt' field that is not a string - see failure"
+echo "==========================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": 123,
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "68. Attempt to create a registration with an 'managementInterval' with a 'startAt' field that is an empty string - see failure"
+echo "=============================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "69. Attempt to create a registration with an 'managementInterval' with a 'startAt' field that is not a valid DateTime - see failure"
+echo "==================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "123",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "70. Attempt to create a registration with an 'managementInterval' with an 'endAt' field that is not a string - see failure"
+echo "=========================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:01Z",
+    "endAt": 123
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "71. Attempt to create a registration with an 'managementInterval' with an 'endAt' field that is an empty string - see failure"
+echo "============================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:01Z",
+    "endAt": ""
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "72. Attempt to create a registration with an 'managementInterval' with an 'endAt' field that is not a valid DateTime - see failure"
+echo "=================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:01Z",
+    "endAt": "123"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "73. Attempt to create a registration with an 'managementInterval' with an invalid field 'xyz' - see failure"
+echo "==========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z",
+    "xyz": false
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "74. Attempt to create a registration with a duplicated 'managementInterval' - see failure"
+echo "========================================================================================="
+payload='{
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z"
+  },
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:00Z",
+    "endAt": "2022-09-30T18:09:01Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "75. Attempt to create a registration with a 'managementInterval' whose start>end - see failure"
+echo "=============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "managementInterval": {
+    "startAt": "2022-09-30T18:09:01Z",
+    "endAt": "2022-09-30T18:09:00Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "76. Attempt to create a registration with a 'location' that is not a JSON Object - see failure"
+echo "=============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": 12
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "76. Attempt to create a registration with a 'location' that is an empty JSON Object - see failure"
+echo "================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": {}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "77. Attempt to create a registration with a duplicated 'location' - see failure"
+echo "==============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 1, 2 ] },
+  "location": { "type": "Point", "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "78. Attempt to create a registration with a 'location' that contains no 'type' field - see failure"
+echo "=================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "79. Attempt to create a registration with a 'location' with a 'type' that is not a string  - see failure"
+echo "========================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": true, "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "80. Attempt to create a registration with a 'location' with a 'type' whose string is not a valid geometry name - see failure"
+echo "============================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "no-geometry", "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "81. Attempt to create a registration with a 'location' that has a duplicated 'type' - see failure"
+echo "================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "type": "Point", "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "82. Attempt to create a registration with a 'location' that contains no 'coordinates' field - see failure"
+echo "========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point" }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "83. Attempt to create a registration with a 'location' that has a duplicated 'coordinates' - see failure"
+echo "========================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 1, 2 ], "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "84. Attempt to create a registration with a 'location' that has a 'coordinates' field that is not an Array - see failure"
+echo "========================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": true }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "85. Attempt to create a registration with a 'location' that has a 'coordinates' field that is an empty Array - see failure"
+echo "=========================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "86. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an empty array - see failure"
+echo "======================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "87. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of ONE Number - see failure"
+echo "==============================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 3.14 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "88. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of FOUR Numbers - see failure"
+echo "================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 1,2,3,4 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "89. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of a Number and a non-number - see failure"
+echo "=============================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 1, true ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "90. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of two Numbers and a non-number - see failure"
+echo "================================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 1, 2, true ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "91. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a latitude > 90 - see failure"
+echo "======================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 1, 90.1 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "92. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a latitude < -90 - see failure"
+echo "========================================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 1, -91 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "93. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a longitude < -180 - see failure"
+echo "=========================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ -180.01, 5 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "94. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a longitude > 180 - see failure"
+echo "========================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Point", "coordinates": [ 181, 5 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "95. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' that is not a double array - see failure"
+echo "================================================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "MultiPoint", "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "96. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' where one of the Points is an empty array - see failure"
+echo "==============================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "MultiPoint", "coordinates": [ [ 1, 2 ], [] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "97. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' and one of its double array items is not a number - see failure"
+echo "===================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "MultiPoint", "coordinates": [ [ 1, 2 ], [ 1, false ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "98. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' that is not a double array - see failure"
+echo "================================================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "LineString", "coordinates": [ 1, 2 ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "99. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points not being an array - see failure"
+echo "==============================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "LineString", "coordinates": [ [ 1, 2 ], true ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "100. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of only ONE Number - see failure"
+echo "============================================================================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "LineString", "coordinates": [ [ 1, 2 ], [ 1 ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "101. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of a Number and a String - see failure"
+echo "=================================================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "LineString", "coordinates": [ [ 1, 2 ], [ 1, "2" ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "102. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an empty array - see failure"
+echo "==============================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "LineString", "coordinates": [ [ 1, 2 ], [ ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "103. Attempt to create a registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a double array - see failure"
+echo "=================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "MultiLineString", "coordinates": [ [ 1, 2 ], [ 1, 2 ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "104. Attempt to create a registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a cuadruple array - see failure"
+echo "====================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "MultiLineString", "coordinates": [[ [ [ 1, 2 ], [ 1, 2 ] ] ]] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "105. Attempt to create a registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a double array - see failure"
+echo "=========================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Polygon", "coordinates": [ [ 1, 2 ], [ 1, 3 ] ] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "106. Attempt to create a registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure"
+echo "============================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Polygon", "coordinates": [[ [ [ 1, 2 ], [ 1, 3 ] ] ]] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "107. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of three Numbers - see failure"
+echo "========================================================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Polygon", "coordinates": [[ [ 1, 2, 3 ] ]] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "108. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure"
+echo "========================================================================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Polygon", "coordinates": [[ [ 1, 2, 3, 4, "5" ] ]] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "109. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array where first item != last item"
+echo "======================================================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "location": { "type": "Polygon", "coordinates": [[ [ 0, 1 ], [ -1, 1 ], [ -1, 0 ], [ 0, 2 ]  ]] }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "110. Attempt to create a registration with an 'observationSpace' that is not a JSON Object - see failure"
+echo "========================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationSpace": 110
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "111. Attempt to create a registration with an 'observationSpace' that is an empty JSON Object - see failure"
+echo "==========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationSpace": {}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "112. Attempt to create a registration with a duplicated 'observationSpace' - see failure"
+echo "========================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "observationSpace": { "type": "Point", "coordinates": [ 1, 2 ]},
+  "observationSpace": { "type": "Point", "coordinates": [ 1, 2 ]}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "113. Attempt to create a registration with an 'operationSpace' that is not a JSON Object - see failure"
+echo "======================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "operationSpace": 110
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "114. Attempt to create a registration with an 'operationSpace' that is an empty JSON Object - see failure"
+echo "========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "operationSpace": {}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "115. Attempt to create a registration with a duplicated 'operationSpace' - see failure"
+echo "======================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "operationSpace": { "type": "Point", "coordinates": [ 1, 2 ]},
+  "operationSpace": { "type": "Point", "coordinates": [ 1, 2 ]}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "116. Attempt to create a registration with an 'expiresAt' that is not a string - see failure"
+echo "============================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "expiresAt": 7
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "117. Attempt to create a registration with an 'expiresAt' that is an empty string - see failure"
+echo "==============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "expiresAt": ""
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "118. Attempt to create a registration with an 'expiresAt' that is not a valid DateTime - see failure"
+echo "===================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "expiresAt": "abc"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "119. Attempt to create a registration with a duplicated 'expiresAt' - see failure"
+echo "================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "expiresAt": "2022-10-02T18:00:00Z",
+  "expiresAt": "2022-10-02T18:00:00Z"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "120. Attempt to create a registration without 'endpoint' - see failure"
+echo "======================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "121. Attempt to create a registration with an 'endpoint' that is not a string - see failure"
+echo "==========================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": 77
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "122. Attempt to create a registration with an 'endpoint' that is an empty string - see failure"
+echo "=============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": ""
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "123. Attempt to create a registration with an 'endpoint' that is not a valid URI - see failure"
+echo "=============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "8"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "124. Attempt to create a registration with a duplicated 'endpoint' - see failure"
+echo "================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "endpoint": "http://a.b.c:8080/ok2"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "125. Attempt to create a registration with a duplicated Property - see failure"
+echo "=============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "P1": 12,
+  "P1": 13
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "126. Attempt to create a registration with an 'tenant' that is not a string - see failure"
+echo "========================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "tenant": 12
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "127. Attempt to create a registration with an 'tenant' that is an empty string - see failure"
+echo "============================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "tenant": ""
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "128. Attempt to create a registration with an 'tenant' that is not valid - see failure"
+echo "======================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "tenant": "123456789012345678901234567890123456789012345678901234567890"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "129. Attempt to create a registration with a duplicated 'tenant' - see failure"
+echo "=============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "tenant": "T1",
+  "tenant": "T1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "130. Attempt to create a registration with a 'contextSourceInfo' that is not an Array"
+echo "====================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": true 
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "131. Attempt to create a registration with a 'contextSourceInfo' that is an empty Array"
+echo "======================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": []
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "132. Attempt to create a registration with a 'contextSourceInfo' as an Array of non-object"
+echo "=========================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [ 1, "abc" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "133. Attempt to create a registration with a 'contextSourceInfo' with an array with an empty object"
+echo "==================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "134. Attempt to create a registration with a 'contextSourceInfo' with an array item without 'key'"
+echo "================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "value": "123"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "135. Attempt to create a registration with a 'contextSourceInfo' with an array item without 'value'"
+echo "==================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "123"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "136. Attempt to create a registration with a 'contextSourceInfo' with an array item with foreign field 'xyz'"
+echo "============================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "123",
+      "value": "123",
+      "xyz": "123"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "137. Attempt to create a registration with a 'contextSourceInfo' with an array item with duplicated 'key'"
+echo "========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "123",
+      "value": "123",
+      "key": "123"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "138. Attempt to create a registration with a 'contextSourceInfo' with an array item with duplicated 'value'"
+echo "==========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "123",
+      "value": "123",
+      "value": "123"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "139. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'key' that is not a string"
+echo "==================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": 123,
+      "value": "123"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "140. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'value' that is not a string"
+echo "====================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "123",
+      "value": 123
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "141. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'key' that is an empty string"
+echo "======================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "",
+      "value": "123"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "142. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'value' that is an empty string"
+echo "========================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "123",
+      "value": ""
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "143. Attempt to create a registration with a 'scope' that is not a String nor an Array"
+echo "======================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "scope": 7
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "144. Attempt to create a registration with a 'scope' that is an empty String"
+echo "============================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "scope": ""
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "145. Attempt to create a registration with a 'scope' that is an invalid String for a scope"
+echo "=========================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "scope": "too long and with spaces"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "146. Attempt to create a registration with a 'scope' that is an empty Array"
+echo "==========================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "scope": []
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "147. Attempt to create a registration with a 'scope' that is an Array with a non-string member"
+echo "=============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "scope": [ "/p1", true ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "148. Attempt to create a registration with a 'scope' that is an Array with a member that is an empty string"
+echo "==========================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "scope": [ "/p1", "" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "149. Attempt to create a registration with a 'scope' that is an Array with a member that is an invalid String for a scope"
+echo "========================================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "scope": [ "/p1", "too long and with spaces"]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "150. Attempt to create a registration with a duplicated 'scope'"
+echo "==============================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "scope": "/s1",
+  "scope": "/s2"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "151. Attempt to create a registration with a 'mode' that is not a String"
+echo "========================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "mode": 7
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "152. Attempt to create a registration with a 'mode' that is an empty String"
+echo "==========================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "mode": ""
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "153. Attempt to create a registration with a 'mode' that is an invalid String"
+echo "============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "mode": "7"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "154. Attempt to create a registration with a duplicated 'mode'"
+echo "=============================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "mode": "exclusive",
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "155. Attempt to create a registration with an 'operations' that is not an Array"
+echo "==============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "operations": 7
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "156. Attempt to create a registration with an 'operations' that is an empty Array"
+echo "================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "operations": []
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "157. Attempt to create a registration with an 'operations' that is an Array with a non-String item"
+echo "=================================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "operations": [ "mergeBatch", 14]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "158. Attempt to create a registration with an 'operations' that is an Array with an item that is an empty String"
+echo "================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "operations": [ "mergeBatch", "" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "159. Attempt to create a registration with an 'operations' that is an Array with an item that is an non-operation String"
+echo "========================================================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "operations": [ "mergeBatch", "federationOps2" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "160. Attempt to create a registration with a duplicated 'operations' array"
+echo "=========================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "operations": [ "mergeBatch", "federationOps" ],
+  "operations": [ "mergeBatch", "federationOps" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "161. refreshRate is not implemented - 501"
+echo "========================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "refreshRate": "P21D"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "162. Attempt to create a registration with a 'management' that is not a JSON Object"
+echo "==================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": true
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "163. Attempt to create a registration with a 'management' that is an empty JSON Object"
+echo "======================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {}
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "164. Attempt to create a registration with a duplicated 'management'"
+echo "===================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": { "localOnly": true },
+  "management": { "localOnly": true }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "165. Attempt to create a registration with a 'management:localOnly' that is not a Boolean"
+echo "========================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": { "localOnly": "true" }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "166. Attempt to create a registration with a duplicated 'management:localOnly'"
+echo "=============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "localOnly": true,
+    "localOnly": false
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "167. Attempt to create a registration with a 'management:cacheDuration' - not implemented - 501"
+echo "==============================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "cacheDuration": "P1D"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "168. Attempt to create a registration with a 'management:timeout' that is not a Number"
+echo "======================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "timeout": true
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "169. Attempt to create a registration with a 'management:timeout' with the value 0"
+echo "=================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "timeout": 0
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "170. Attempt to create a registration with a 'management:timeout' with a negative value"
+echo "======================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "timeout": -1.45
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "171. Attempt to create a registration with a duplicated 'management:timeout'"
+echo "============================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "timeout": 5,
+    "timeout": 6
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "172. Attempt to create a registration with a 'management:cooldown' that is not a Number"
+echo "======================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "cooldown": true
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "173. Attempt to create a registration with a 'management:cooldown' with the value 0"
+echo "==================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "cooldown": 0
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "174. Attempt to create a registration with a 'management:cooldown' with a negative value"
+echo "========================================================================================"
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "cooldown": -7
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "175. Attempt to create a registration with a duplicated 'management:cooldown'"
+echo "============================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "cooldown": 4,
+    "cooldown": 5
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "176. Attempt to create a registration with a foreign field 'management:cooldownx'"
+echo "================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "management": {
+    "cooldownx": 5
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create a registration with a payload data that is not a JSON object - see failure
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 158
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "the payload data for a Registration must be a JSON Object",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create a registration with an 'id' that is not a String - see failure
+====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 103
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create a registration with an 'id' string that is empty -  see failure
+=====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Empty URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to create a registration with an 'id' that is not a valid URI - see failure
+=======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Invalid URI - no colon found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to create a registration with a duplicated 'id' - see failure
+=========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 102
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create a registration without 'type' - see failure
+=================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Mandatory field 'type' is missing",
+    "title": "Invalid Registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to create a registration with a 'type' that is not a string - see failure
+=====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create a registration with a 'type' string that is empty -  see failure
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 100
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+09. Attempt to create a registration with a 'type' string that is not 'ContextSourceRegistration' - see failure
+===============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 168
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'type' field must have the value 'ContextSourceRegistration'",
+    "title": "Invalid Registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. Attempt to create a registration with duplicate 'type' - see failure
+========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "type",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+11. Attempt to create a registration with a 'description' that is not a string - see failure
+============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "description",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. Attempt to create a registration with a 'description' that is an empty string - see failure
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 107
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "description",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+13. Attempt to create a registration with duplicate 'description' - see failure
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "description",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+14. Attempt to create a registration without 'information' - see failure
+========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information",
+    "title": "Missing mandatory field for Registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. Attempt to create a registration with an 'information' that is not a JSON Array - see failure
+=================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+16. Attempt to create a registration with an 'information' that is an empty array - see failure
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 106
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+17. Attempt to create a registration with duplicate 'information' - see failure
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+18. Attempt to create a registration with an 'information' that has a member that is not a JSON Object - see failure
+====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information[X]",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+19. Attempt to create a registration with an 'information' that has a member that is an empty Object - see failure
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information[X]",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+20. Attempt to create a registration with an 'information::entities' that is not an array - see failure
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+21. Attempt to create a registration with an 'information::entities' array that is empty - see failure
+======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+22. Attempt to create a registration with an 'information::entities' array item that is not an object - see failure
+===================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+23. Attempt to create a registration with an 'information::entities[0]::id' that is not a string - see failure
+==============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+24. Attempt to create a registration with an 'information::entities[0]::id' that is an empty string - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+25. Attempt to create a registration with an 'information::entities[0]::id' that is not a valid URI - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 157
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Invalid URI - no colon found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+26. Attempt to create a registration with duplicate 'information::entities[0]::id' - see failure
+================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+27. Attempt to create a registration with an 'information::entities[0]::idPattern' that is not a string - see failure
+=====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 153
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+28. Attempt to create a registration with an 'information::entities[0]::idPattern' that is an empty string - see failure
+========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+29. Attempt to create a registration with duplicate 'information::entities[0]::idPattern' - see failure
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 152
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::idPattern",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+30. Attempt to create a registration with no 'information::entities[0]::type' - see failure
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+31. Attempt to create a registration with an 'information::entities[0]::type' that is not a string - see failure
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+32. Attempt to create a registration with an 'information::entities[0]::type' that is an empty string - see failure
+===================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+33. Attempt to create a registration with duplicate 'information::entities[0]::type' - see failure
+==================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+34. Attempt to create a registration with foreign field 'information::entities[0]::xyz' - see failure
+=====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "xyz",
+    "title": "Invalid field name in EntityInfo",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+35. Attempt to create a registration with an 'information::propertyNames' that is not an array - see failure
+============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::propertyNames",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+36. Attempt to create a registration with an 'information::propertyNames' that is an empty array - see failure
+==============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::propertyNames",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+37. Attempt to create a registration with an 'information::propertyNames' item that is not a string - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::propertyNames[X]",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+38. Attempt to create a registration with an 'information::propertyNames' item that is an empty string - see failure
+====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::propertyNames[X]",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+39. Attempt to create a registration with an 'information::propertyNames' item that is duplicated - see failure
+===============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "Duplicated Property Name",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+40. Attempt to create a registration with an 'information::relationshipNames' that is not an array - see failure
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 147
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationshipNames",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+41. Attempt to create a registration with an 'information::relationshipNames' that is an empty array - see failure
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationshipNames",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+42. Attempt to create a registration with an 'information::relationshipNames' item that is not a string - see failure
+=====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationshipNames[X]",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+43. Attempt to create a registration with an 'information::relationshipNames' item that is an empty string - see failure
+========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::relationshipNames[X]",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+44. Attempt to create a registration with an 'information::relationshipNames' item that is duplicated - see failure
+===================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 159
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "Duplicated Relationship Name",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+45. Attempt to create a registration with an invalid field 'information::xyz - see failure
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "xyz",
+    "title": "Invalid field for Registration::information[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+46. Attempt to create a registration with an 'observationInterval' that is not a JSON Object - see failure
+==========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationInterval",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+47. Attempt to create a registration with an 'observationInterval' that is an empty JSON Object - see failure
+=============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationInterval",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+48. Attempt to create a registration with an 'observationInterval' that is missing the 'startAt' field - see failure
+====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+49. Attempt to create a registration with an 'observationInterval' that is missing the 'endAt' field - see failure
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+50. Attempt to create a registration with an 'observationInterval' with a duplicated 'startAt' field - see failure
+==================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 107
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+51. Attempt to create a registration with an 'observationInterval' with a duplicated 'endAt' field - see failure
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+52. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a string - see failure
+============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+53. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is an empty string - see failure
+===============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 103
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+54. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a valid DateTime - see failure
+===================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+55. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a string - see failure
+===========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 106
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+56. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is an empty string - see failure
+==============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 101
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+57. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a valid DateTime - see failure
+===================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+58. Attempt to create a registration with an 'observationInterval' with an invalid field 'xyz' - see failure
+============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "xyz",
+    "title": "Invalid field for TimeInterval",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+59. Attempt to create a registration with a duplicated 'observationInterval' - see failure
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationInterval",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+60. Attempt to create a registration with a 'observationInterval' whose start>end - see failure
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 155
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationInterval",
+    "title": "Inconsistent TimeInterval (it ends before it starts)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+61. Attempt to create a registration with an 'managementInterval' that is not a JSON Object - see failure
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "managementInterval",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+62. Attempt to create a registration with an 'managementInterval' that is an empty JSON Object - see failure
+============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "managementInterval",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+63. Attempt to create a registration with an 'managementInterval' that is missing the 'startAt' field - see failure
+===================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+64. Attempt to create a registration with an 'managementInterval' that is missing the 'endAt' field - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+65. Attempt to create a registration with an 'managementInterval' with a duplicated 'startAt' field - see failure
+=================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 107
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+66. Attempt to create a registration with an 'managementInterval' with a duplicated 'endAt' field - see failure
+===============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+67. Attempt to create a registration with an 'managementInterval' with a 'startAt' field that is not a string - see failure
+===========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+68. Attempt to create a registration with an 'managementInterval' with a 'startAt' field that is an empty string - see failure
+==============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 103
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+69. Attempt to create a registration with an 'managementInterval' with a 'startAt' field that is not a valid DateTime - see failure
+===================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "startAt",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+70. Attempt to create a registration with an 'managementInterval' with an 'endAt' field that is not a string - see failure
+==========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 106
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+71. Attempt to create a registration with an 'managementInterval' with an 'endAt' field that is an empty string - see failure
+=============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 101
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+72. Attempt to create a registration with an 'managementInterval' with an 'endAt' field that is not a valid DateTime - see failure
+==================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endAt",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+73. Attempt to create a registration with an 'managementInterval' with an invalid field 'xyz' - see failure
+===========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "xyz",
+    "title": "Invalid field for TimeInterval",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+74. Attempt to create a registration with a duplicated 'managementInterval' - see failure
+=========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "managementInterval",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+75. Attempt to create a registration with a 'managementInterval' whose start>end - see failure
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "managementInterval",
+    "title": "Inconsistent TimeInterval (it ends before it starts)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+76. Attempt to create a registration with a 'location' that is not a JSON Object - see failure
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "location",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+76. Attempt to create a registration with a 'location' that is an empty JSON Object - see failure
+=================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "location",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+77. Attempt to create a registration with a duplicated 'location' - see failure
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "location",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+78. Attempt to create a registration with a 'location' that contains no 'type' field - see failure
+==================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "location",
+    "title": "Mandatory 'type' field missing for GeoJSON Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+79. Attempt to create a registration with a 'location' with a 'type' that is not a string  - see failure
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 159
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "the 'type' field of a GeoJSON object must be a JSON String",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+80. Attempt to create a registration with a 'location' with a 'type' whose string is not a valid geometry name - see failure
+============================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "no-geometry",
+    "title": "Invalid geometry",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+81. Attempt to create a registration with a 'location' that has a duplicated 'type' - see failure
+=================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "geo-location::type",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+82. Attempt to create a registration with a 'location' that contains no 'coordinates' field - see failure
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 189
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "location",
+    "title": "The value of an attribute of type GeoProperty must be valid GeoJson - 'coordinates' field missing",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+83. Attempt to create a registration with a 'location' that has a duplicated 'coordinates' - see failure
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "geo-location::coordinates",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+84. Attempt to create a registration with a 'location' that has a 'coordinates' field that is not an Array - see failure
+========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 177
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "the 'coordinates' field of a GeoJSON object must be a JSON Array (or String)",
+    "title": "Invalid Data Type",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+85. Attempt to create a registration with a 'location' that has a 'coordinates' field that is an empty Array - see failure
+==========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+86. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an empty array - see failure
+=======================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+87. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of ONE Number - see failure
+===============================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+88. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of FOUR Numbers - see failure
+=================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+89. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of a Number and a non-number - see failure
+==============================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+90. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' that is an array of two Numbers and a non-number - see failure
+=================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+91. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a latitude > 90 - see failure
+=======================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "latitude outside of range -90 to 90",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+92. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a latitude < -90 - see failure
+========================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "latitude outside of range -90 to 90",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+93. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a longitude < -180 - see failure
+==========================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "longitude outside of range -180 to 180",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+94. Attempt to create a registration with a 'location' that has a 'type==Point' with 'coordinates' having a longitude > 180 - see failure
+=========================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "longitude outside of range -180 to 180",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+95. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' that is not a double array - see failure
+================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 161
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'MultiPoint' must be a JSON Array of Arrays",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+96. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' with 'coordinates' where one of the Points is an empty array - see failure
+===============================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+97. Attempt to create a registration with a 'location' that has a 'type==MultiPoint' and one of its double array items is not a number - see failure
+====================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+98. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' that is not a double array - see failure
+================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+99. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points not being an array - see failure
+===============================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+100. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of only ONE Number - see failure
+============================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+101. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an array of a Number and a String - see failure
+==================================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+102. Attempt to create a registration with a 'location' that has a 'type==LineString' with 'coordinates' with one of its Points as an empty array - see failure
+===============================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The 'coordinates' member for a 'Point' must be an array with two or three Numbers",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+103. Attempt to create a registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a double array - see failure
+==================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "'coordinates' in a 'LineString' must be a JSON Array of at least two Arrays",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+104. Attempt to create a registration with a 'location' that has a 'type==MultiLineString' with 'coordinates' that is a cuadruple array - see failure
+=====================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+105. Attempt to create a registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a double array - see failure
+==========================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Non-Array in 'coordinates' for a 'Polygon'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+106. Attempt to create a registration with a 'location' that has a 'type==Polygon' with 'coordinates' that is a cuadruple array - see failure
+=============================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+107. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of three Numbers - see failure
+========================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "A Polygon must have at least 4 points",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+108. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array of four numbers and a non-number - see failure
+========================================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "all members of a 'Point' in 'coordinates' must be of type 'Number'",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+109. Attempt to create a registration with a 'location' that has a 'type==Polygon' and its triple array items is an array where first item != last item
+=======================================================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 162
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "In a Polygon, the first and the last position must be identical",
+    "title": "Invalid GeoJSON",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+110. Attempt to create a registration with an 'observationSpace' that is not a JSON Object - see failure
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationSpace",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+111. Attempt to create a registration with an 'observationSpace' that is an empty JSON Object - see failure
+===========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationSpace",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+112. Attempt to create a registration with a duplicated 'observationSpace' - see failure
+========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "observationSpace",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+113. Attempt to create a registration with an 'operationSpace' that is not a JSON Object - see failure
+======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "operationSpace",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+114. Attempt to create a registration with an 'operationSpace' that is an empty JSON Object - see failure
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "operationSpace",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+115. Attempt to create a registration with a duplicated 'operationSpace' - see failure
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "operationSpace",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+116. Attempt to create a registration with an 'expiresAt' that is not a string - see failure
+============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "expiresAt",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+117. Attempt to create a registration with an 'expiresAt' that is an empty string - see failure
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "expiresAt",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+118. Attempt to create a registration with an 'expiresAt' that is not a valid DateTime - see failure
+====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 115
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "expiresAt",
+    "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+119. Attempt to create a registration with a duplicated 'expiresAt' - see failure
+=================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "expiresAt",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+120. Attempt to create a registration without 'endpoint' - see failure
+======================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 132
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endpoint",
+    "title": "Missing mandatory field for Registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+121. Attempt to create a registration with an 'endpoint' that is not a string - see failure
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endpoint",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+122. Attempt to create a registration with an 'endpoint' that is an empty string - see failure
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 101
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endpoint",
+    "title": "Empty URI",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+123. Attempt to create a registration with an 'endpoint' that is not a valid URI - see failure
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endpoint",
+    "title": "Invalid URI - no colon found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+124. Attempt to create a registration with a duplicated 'endpoint' - see failure
+================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "endpoint",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+125. Attempt to create a registration with a duplicated Property - see failure
+==============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 165
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+    "title": "Duplicate Property in Registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+126. Attempt to create a registration with an 'tenant' that is not a string - see failure
+=========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 107
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "tenant",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+127. Attempt to create a registration with an 'tenant' that is an empty string - see failure
+============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 102
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "tenant",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+128. Attempt to create a registration with an 'tenant' that is not valid - see failure
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "123456789012345678901234567890123456789012345678901234567890",
+    "title": "Invalid tenant name (too long)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+129. Attempt to create a registration with a duplicated 'tenant' - see failure
+==============================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 175
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Multitenancy is not turned on - restart broker with -multiservice set",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+130. Attempt to create a registration with a 'contextSourceInfo' that is not an Array
+=====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "contextSourceInfo",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+131. Attempt to create a registration with a 'contextSourceInfo' that is an empty Array
+=======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "contextSourceInfo",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+132. Attempt to create a registration with a 'contextSourceInfo' as an Array of non-object
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::contextSourceInfo[X]",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+133. Attempt to create a registration with a 'contextSourceInfo' with an array with an empty object
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::contextSourceInfo[X]",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+134. Attempt to create a registration with a 'contextSourceInfo' with an array item without 'key'
+=================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "key",
+    "title": "Missing Mandatory Field in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+135. Attempt to create a registration with a 'contextSourceInfo' with an array item without 'value'
+===================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 150
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "value",
+    "title": "Missing Mandatory Field in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+136. Attempt to create a registration with a 'contextSourceInfo' with an array item with foreign field 'xyz'
+============================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "xyz",
+    "title": "Unrecognized field in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+137. Attempt to create a registration with a 'contextSourceInfo' with an array item with duplicated 'key'
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "key",
+    "title": "Duplicated field in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+138. Attempt to create a registration with a 'contextSourceInfo' with an array item with duplicated 'value'
+===========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "value",
+    "title": "Duplicated field in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+139. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'key' that is not a string
+===================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 140
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "key",
+    "title": "Non-String item in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+140. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'value' that is not a string
+=====================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "value",
+    "title": "Non-String item in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+141. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'key' that is an empty string
+======================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "key",
+    "title": "Empty String item in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+142. Attempt to create a registration with a 'contextSourceInfo' with an array item with 'value' that is an empty string
+========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 144
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "value",
+    "title": "Empty String item in Registration::contextSourceInfo[X]",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+143. Attempt to create a registration with a 'scope' that is not a String nor an Array
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 124
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid Scope",
+    "title": "Not a JSON String nor Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+144. Attempt to create a registration with a 'scope' that is an empty String
+============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid Scope",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+145. Attempt to create a registration with a 'scope' that is an invalid String for a scope
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 153
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "too long and with spaces",
+    "title": "Invalid scope (contains forbidden characters)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+146. Attempt to create a registration with a 'scope' that is an empty Array
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid Scope",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+147. Attempt to create a registration with a 'scope' that is an Array with a non-string member
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid Scope",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+148. Attempt to create a registration with a 'scope' that is an Array with a member that is an empty string
+===========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid Scope",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+149. Attempt to create a registration with a 'scope' that is an Array with a member that is an invalid String for a scope
+=========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 153
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "too long and with spaces",
+    "title": "Invalid scope (contains forbidden characters)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+150. Attempt to create a registration with a duplicated 'scope'
+===============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "scope",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+151. Attempt to create a registration with a 'mode' that is not a String
+========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "mode",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+152. Attempt to create a registration with a 'mode' that is an empty String
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 100
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "mode",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+153. Attempt to create a registration with a 'mode' that is an invalid String
+=============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "7",
+    "title": "Invalid Registration Mode",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+154. Attempt to create a registration with a duplicated 'mode'
+==============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "mode",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+155. Attempt to create a registration with an 'operations' that is not an Array
+===============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "operations",
+    "title": "Not a JSON Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+156. Attempt to create a registration with an 'operations' that is an empty Array
+=================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "operations",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+157. Attempt to create a registration with an 'operations' that is an Array with a non-String item
+==================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 164
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Int",
+    "title": "Invalid JSON type for Registration::operations array item (not a JSON String)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+158. Attempt to create a registration with an 'operations' that is an Array with an item that is an empty String
+================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "no detail",
+    "title": "Empty String in Registration::operations array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+159. Attempt to create a registration with an 'operations' that is an Array with an item that is an non-operation String
+========================================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "federationOps2",
+    "title": "Invalid value for Registration::operations array item",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+160. Attempt to create a registration with a duplicated 'operations' array
+==========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "operations",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+161. refreshRate is not implemented - 501
+=========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::refreshRate",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+162. Attempt to create a registration with a 'management' that is not a JSON Object
+===================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "management",
+    "title": "Not a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+163. Attempt to create a registration with a 'management' that is an empty JSON Object
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 106
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "management",
+    "title": "Empty Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+164. Attempt to create a registration with a duplicated 'management'
+====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "management",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+165. Attempt to create a registration with a 'management:localOnly' that is not a Boolean
+=========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::management::localOnly",
+    "title": "Not a JSON Boolean",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+166. Attempt to create a registration with a duplicated 'management:localOnly'
+==============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::management::localOnly",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+167. Attempt to create a registration with a 'management:cacheDuration' - not implemented - 501
+===============================================================================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::management::cacheDuration",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+168. Attempt to create a registration with a 'management:timeout' that is not a Number
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::management::timeout",
+    "title": "Not a JSON Number",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+169. Attempt to create a registration with a 'management:timeout' with the value 0
+==================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 163
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Must be Greater Than 0",
+    "title": "Non-supported value for Registration::management::timeout",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+170. Attempt to create a registration with a 'management:timeout' with a negative value
+=======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 163
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Must be Greater Than 0",
+    "title": "Non-supported value for Registration::management::timeout",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+171. Attempt to create a registration with a duplicated 'management:timeout'
+============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::management::timeout",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+172. Attempt to create a registration with a 'management:cooldown' that is not a Number
+=======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::management::cooldown",
+    "title": "Not a JSON Number",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+173. Attempt to create a registration with a 'management:cooldown' with the value 0
+===================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 164
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Must be Greater Than 0",
+    "title": "Non-supported value for Registration::management::cooldown",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+174. Attempt to create a registration with a 'management:cooldown' with a negative value
+========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 164
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Must be Greater Than 0",
+    "title": "Non-supported value for Registration::management::cooldown",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+175. Attempt to create a registration with a duplicated 'management:cooldown'
+=============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::management::cooldown",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+176. Attempt to create a registration with a foreign field 'management:cooldownx'
+=================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "cooldownx",
+    "title": "Unrecognized field in Registration::management",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
