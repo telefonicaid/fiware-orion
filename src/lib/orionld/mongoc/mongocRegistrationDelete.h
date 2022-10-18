@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEREGISTRATION_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEREGISTRATION_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONDELETE_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONDELETE_H_
 
 /*
 *
@@ -28,10 +28,10 @@
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldDeleteRegistration -
+// mongocRegistrationDelete -
 //
-extern bool orionldDeleteRegistration(void);
+extern bool mongocRegistrationDelete(const char* registrationId);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEREGISTRATION_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONDELETE_H_

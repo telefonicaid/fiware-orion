@@ -51,7 +51,7 @@ payload='[
   }
 ]'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
-contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 

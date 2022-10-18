@@ -52,7 +52,7 @@ payload='{
   "A3": "urn:ngsi-ld:attributes:A3"
 }'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
-urlA=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+urlA="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of context A: $urlA
 echo
 echo
@@ -66,7 +66,7 @@ payload='{
   "B3": "urn:ngsi-ld:attributes:B3"
 }'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
-urlB=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+urlB="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of context B: $urlB
 echo
 echo
@@ -80,7 +80,7 @@ payload='{
   "C3": "urn:ngsi-ld:attributes:C3"
 }'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
-urlC=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+urlC="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of context C: $urlC
 echo
 echo

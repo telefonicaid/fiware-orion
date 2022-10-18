@@ -57,7 +57,7 @@ payload='{
   "A3": "urn:ngsi-ld:attributes:A3"
 }'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
-contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
 echo
 echo
@@ -118,7 +118,7 @@ payload='[
   "https://fiware.github.io/data-models/context.jsonld"
 ]'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
-contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
 echo
 echo
@@ -148,7 +148,7 @@ payload='{
   }
 }'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
-contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
 echo
 echo
@@ -168,7 +168,7 @@ payload='[
   "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
 ]'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
-contextURL=$(echo "$_responseHeaders" | grep Location: | awk -F9999 '{ print $2 }' | tr -d "\r\n")
+contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
 echo
 echo

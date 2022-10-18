@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,12 +23,14 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/db/dbConfiguration.h"                          // dbRegistrationDelete
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
+#include "orionld/mongoc/mongocRegistrationExists.h"             // mongocRegistrationExists
+#include "orionld/mongoc/mongocRegistrationDelete.h"             // mongocRegistrationDelete
+#include "orionld/legacyDriver/legacyDeleteRegistration.h"       // legacyDeleteRegistration
+#include "orionld/regCache/regCacheItemRemove.h"                 // regCacheItemRemove
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"   // Own Interface
 
 
@@ -39,21 +41,31 @@
 //
 bool orionldDeleteRegistration(void)
 {
-  PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Context Source Registration Identifier", orionldState.wildcard[0], 400);
+  if (experimental == false)
+    return legacyDeleteRegistration();
 
-  if (dbRegistrationExists(orionldState.wildcard[0]) == false)
+  PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Registration Identifier", orionldState.wildcard[0], 400);
+
+  bool found = false;
+  bool b     = mongocRegistrationExists(orionldState.wildcard[0], &found);
+  if (b == false)
+    return false;
+  else if (found == false)
   {
-    orionldError(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0], 404);
+    orionldError(OrionldResourceNotFound, "Registration not found", orionldState.wildcard[0], 404);
     return false;
   }
-
-  if (dbRegistrationDelete(orionldState.wildcard[0]) == false)
+    
+  if (regCacheItemRemove(orionldState.tenantP, orionldState.wildcard[0]) == false)
   {
-    orionldError(OrionldResourceNotFound, "Context Source Registration not found", orionldState.wildcard[0], 404);
-    return false;
+    if (noCache == false)
+      LM_W(("The registration '%s' was successfully removed from DB but does not exist in sub-cache ... (sub-cache is enabled)"));
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  if (mongocRegistrationDelete(orionldState.wildcard[0]) == false)
+    return false;  // mongocRegistrationDelete calls orionldError, setting status code to 500 on error
+
+  orionldState.httpStatusCode = 204;
 
   return true;
 }

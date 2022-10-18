@@ -24,3 +24,4 @@
 * Issue #280   Implemented the Registration cache, initial version
 * Issue #280   Implemented GET /csourceRegistrations/{regId} using mongoc AND the Registration cache
 * Issue #280   Implemented POST /csourceRegistrations using mongoc AND the Registration cache
+* Issue #280   Implemented DELETE /csourceRegistrations/{registrationId} using mongoc AND the Registration cache

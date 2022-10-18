@@ -25,6 +25,7 @@ SET (SOURCES
     regCacheGet.cpp
     regCacheItemAdd.cpp
     regCacheItemLookup.cpp
+    regCacheItemRemove.cpp
 )
 
 # Include directories

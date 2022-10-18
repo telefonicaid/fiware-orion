@@ -454,13 +454,13 @@ Date: REGEX(.*)
 18. DELETE /ngsi-ld/v1/csourceRegistrations/R1
 ==============================================
 HTTP/1.1 404 Not Found
-Content-Length: 129
+Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "urn:R1",
-    "title": "Context Source Registration not found",
+    "title": "Registration not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 

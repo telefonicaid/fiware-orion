@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEREGISTRATION_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEREGISTRATION_H_
+#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREMOVE_H_
+#define SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREMOVE_H_
 
 /*
 *
@@ -25,13 +25,15 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldDeleteRegistration -
+// regCacheItemRemove -
 //
-extern bool orionldDeleteRegistration(void);
+extern bool regCacheItemRemove(OrionldTenant* tenantP, const char* regId);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDDELETEREGISTRATION_H_
+#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREMOVE_H_

@@ -38,6 +38,7 @@ SET (SOURCES
     legacyPatchEntity.cpp
     legacyPostRegistrations.cpp
     legacyGetRegistration.cpp
+    legacyDeleteRegistration.cpp
 )
 
 # Include directories
