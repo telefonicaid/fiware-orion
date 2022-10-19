@@ -1468,7 +1468,7 @@ static void fill_idNPtypeP
 #if 0
   bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
 #else
-  bgP->boPNP.append("$expr", outer_obj.obj());
+  bgP->boNPP.append("$expr", outer_obj.obj());
 #endif
   bgP->idNPtypeP = bgP->boNPP.obj();
 }
