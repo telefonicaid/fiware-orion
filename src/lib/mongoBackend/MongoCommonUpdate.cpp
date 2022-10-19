@@ -1563,7 +1563,7 @@ static void fill_idPtypeP
 #if 0
   bgP->boPP.appendCode("$where", bgP->functionIdPtypeP);
 #else
-  bgP->boPNP.append("$expr", outer_obj.obj());
+  bgP->boPP.append("$expr", outer_obj.obj());
 #endif
   bgP->idPtypeP = bgP->boPP.obj();
 }
