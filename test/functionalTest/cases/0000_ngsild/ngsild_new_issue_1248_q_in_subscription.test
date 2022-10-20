@@ -1,0 +1,446 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Q-Filter with string-list
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription with a 'q=status==occupied,free'
+# 02. See the subscription in mongo
+# 03. GET the subscription and see the Q-filter 
+# 04. Create a matching entity E1
+# 05. Create a non-matching entity E2
+# 06. Dump the accumulator and see the notification for E1
+#
+# 07. Create a subscription with a 'q=status==occupied2,status==free2'
+# 08. See the subscription in mongo
+# 09. GET the subscription and see the Q-filter 
+# 10. Create a matching entity E3
+# 11. Create a non-matching entity E4
+# 12. Dump the accumulator and see the notification for E3
+#
+
+echo "01. Create a subscription with a 'q=status==occupied,free'"
+echo "=========================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "status==%22occupied%22,%22free%22",
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "03. GET the subscription and see the Q-filter"
+echo "============================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "04. Create a matching entity E1"
+echo "==============================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "status": "occupied"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create a non-matching entity E2"
+echo "==================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T",
+  "status": "libre"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump the accumulator and see the notification for E1"
+echo "========================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. Create a subscription with a 'q=status==occupied2,free2'"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:S2",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "status==%22occupied2%22|status==%22free2%22",
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. See the subscription in mongo"
+echo "================================="
+mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subscriptions:S2"})'
+echo
+echo
+
+
+echo "09. GET the subscription and see the Q-filter"
+echo "============================================="
+orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S2?prettyPrint=yes&spaces=2' --noPayloadCheck
+echo
+echo
+
+
+echo "10. Create a matching entity E3"
+echo "==============================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E3",
+  "type": "T",
+  "status": "occupied2"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "11. Create a non-matching entity E4"
+echo "==================================="
+payload='{
+  "id": "urn:ngsi-ld:entities:E4",
+  "type": "T",
+  "status": "libre2"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "12. Dump the accumulator and see the notification for E3"
+echo "========================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with a 'q=status==occupied,free'
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+
+
+
+02. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/status.value==%22occupied%22,%22free%22",
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "https://uri=etsi=org/ngsi-ld/status.value==%22occupied%22,%22free%22",
+		"mq" : ""
+	},
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+03. GET the subscription and see the Q-filter
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 404
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "status==%22occupied%22,%22free%22",
+  "status": "active",
+  "isActive": true,
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:9997/notify",
+      "accept": "application/json"
+    },
+    "status": "ok"
+  },
+  "origin": "cache"
+}
+
+
+
+04. Create a matching entity E1
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
+
+
+
+05. Create a non-matching entity E2
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
+
+
+
+06. Dump the accumulator and see the notification for E1
+========================================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+Content-Length: 281
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "id": "urn:ngsi-ld:entities:E1",
+            "status": {
+                "type": "Property",
+                "value": "occupied"
+            },
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+07. Create a subscription with a 'q=status==occupied2,free2'
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S2
+
+
+
+08. See the subscription in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: mongodb:REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:S2",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/status.value==%22occupied2%22|https://uri=etsi=org/ngsi-ld/status.value==%22free2%22",
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
+	},
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+09. GET the subscription and see the Q-filter
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 414
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "id": "urn:ngsi-ld:subscriptions:S2",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "status==%22occupied2%22|status==%22free2%22",
+  "status": "active",
+  "isActive": true,
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:9997/notify",
+      "accept": "application/json"
+    },
+    "status": "ok"
+  },
+  "origin": "cache"
+}
+
+
+
+10. Create a matching entity E3
+===============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E3
+
+
+
+11. Create a non-matching entity E4
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E4
+
+
+
+12. Dump the accumulator and see the notification for E3
+========================================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
+Content-Length: 282
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "id": "urn:ngsi-ld:entities:E3",
+            "status": {
+                "type": "Property",
+                "value": "occupied2"
+            },
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subscriptions:S2",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
