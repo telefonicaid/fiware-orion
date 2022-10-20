@@ -1265,23 +1265,6 @@ static void fill_idPtypeNP
   const std::string&  typePatternQ
 )
 {
-#if 0
-  bgP->functionIdPtypeNP = std::string("function()") +
-         "{" +
-            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
-                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
-                    "return true; " +
-                "}" +
-            "}" +
-            "return false; " +
-         "}";
-  LM_T(LmtMongo, ("idTtypeNP function: %s", bgP->functionIdPtypeNP.c_str()));
-#else
   orion::BSONObjBuilder outer_obj;
   orion::BSONObjBuilder anyElementTrue;
   orion::BSONObjBuilder map_obj;
@@ -1360,7 +1343,7 @@ static void fill_idPtypeNP
 
   anyElementTrue.append("$map", map_obj.obj());
   outer_obj.append("$anyElementTrue", anyElementTrue.obj());
-#endif
+
   orion::BSONObjBuilder bobNeTrue;
   orion::BSONObjBuilder bobGtCurrentTime;
   orion::BSONObjBuilder bobNeStatus;
@@ -1373,11 +1356,7 @@ static void fill_idPtypeNP
   bgP->boPNP.append(typePatternQ, bobNeTrue.obj());
   bgP->boPNP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boPNP.append(CSUB_STATUS, bobNeStatus.obj());
-#if 0
-  bgP->boPNP.appendCode("$where", bgP->functionIdPtypeNP);
-#else
   bgP->boPNP.append("$expr", outer_obj.obj());
-#endif
   bgP->idPtypeNP = bgP->boPNP.obj();
 }
 
@@ -1396,21 +1375,6 @@ static void fill_idNPtypeP
   const std::string&  typePatternQ
 )
 {
-#if 0
-  bgP->functionIdNPtypeP = std::string("function()") +
-      "{" +
-         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"false\" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+" == \""+entityId+"\" && " +
-                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
-                 "return true; " +
-             "}" +
-         "}" +
-         "return false; " +
-      "}";
-  LM_T(LmtMongo, ("idNPtypeP function: %s", bgP->functionIdNPtypeP.c_str()));
-# else
   orion::BSONObjBuilder outer_obj;
   orion::BSONObjBuilder anyElementTrue;
   orion::BSONObjBuilder map_obj;
@@ -1454,7 +1418,7 @@ static void fill_idNPtypeP
 
   anyElementTrue.append("$map", map_obj.obj());
   outer_obj.append("$anyElementTrue", anyElementTrue.obj());
-#endif
+
   orion::BSONObjBuilder bobGtCurrentTime;
   orion::BSONObjBuilder bobNeStatus;
 
@@ -1465,11 +1429,7 @@ static void fill_idNPtypeP
   bgP->boNPP.append(typePatternQ, true);
   bgP->boNPP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boNPP.append(CSUB_STATUS, bobNeStatus.obj());
-#if 0
-  bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
-#else
   bgP->boNPP.append("$expr", outer_obj.obj());
-#endif
   bgP->idNPtypeP = bgP->boNPP.obj();
 }
 
@@ -1490,21 +1450,6 @@ static void fill_idPtypeP
   const std::string&  typePatternQ
 )
 {
-#if 0
-  bgP->functionIdPtypeP = std::string("function()") +
-      "{" +
-         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                 "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+") && " +
-                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
-                 "return true; " +
-             "}" +
-         "}" +
-         "return false; " +
-      "}";
-  LM_T(LmtMongo, ("idPtypeP function: %s", bgP->functionIdPtypeP.c_str()));
-#else
   orion::BSONObjBuilder outer_obj;
   orion::BSONObjBuilder anyElementTrue;
   orion::BSONObjBuilder map_obj;
@@ -1549,7 +1494,7 @@ static void fill_idPtypeP
 
   anyElementTrue.append("$map", map_obj.obj());
   outer_obj.append("$anyElementTrue", anyElementTrue.obj());
-#endif
+
   orion::BSONObjBuilder bobGtCurrentTime;
   orion::BSONObjBuilder bobNeStatus;
 
@@ -1560,11 +1505,7 @@ static void fill_idPtypeP
   bgP->boPP.append(typePatternQ, true);
   bgP->boPP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boPP.append(CSUB_STATUS, bobNeStatus.obj());
-#if 0
-  bgP->boPP.appendCode("$where", bgP->functionIdPtypeP);
-#else
   bgP->boPP.append("$expr", outer_obj.obj());
-#endif
   bgP->idPtypeP = bgP->boPP.obj();
 }
 
