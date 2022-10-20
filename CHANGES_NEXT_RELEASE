@@ -5,3 +5,4 @@
 - Upgrade Debian version from 11.2 to 11.3 in Dockerfile
 - Deprecated: GET /v2 operation
 - Remove: RPM package stuff
+- Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
