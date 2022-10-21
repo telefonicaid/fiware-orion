@@ -45,25 +45,25 @@ brokerStart CB
 echo "01. Create 2 registrations"
 echo "=========================="
 payload='{
-	"@context": [
-		"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
-	],
-	"id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
-	"type": "ContextSourceRegistration",
-	"description": "description of reg test 1",
-	"information": [
-		{
-			"entities": [
-				{
-					"id": "urn:ngsi-ld:Building:A456",
-					"type": "Building"
-				}
-			],
-			"properties": [ "size", "high" ],
-			"relationships": [ "isAvailable" ]
-		}
-	],
-	"observationInterval": {
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
+  "type": "ContextSourceRegistration",
+  "description": "description of reg test 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Building:A456",
+          "type": "Building"
+        }
+      ],
+      "properties": [ "size", "high" ],
+      "relationships": [ "isAvailable" ]
+    }
+  ],
+  "observationInterval": {
     "startAt": "2018-12-31T10:00:00",
     "endAt": "2028-12-31T10:00:00"
   },
@@ -71,8 +71,8 @@ payload='{
     "startAt": "2018-12-31T10:00:00",
     "endAt": "2028-12-31T10:00:00"
   },
-	"expires": "2029-10-31T10:00:25",
-	"endpoint": "http://my.csource.org:1026"
+  "expiresAt": "2029-10-31T10:00:25",
+  "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 REG_ID=urn:ngsi-ld:ContextSourceRegistration:csr1a342
@@ -80,25 +80,25 @@ echo
 echo
 
 payload='{
-	"@context": [
-		"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
-	],
-	"id": "urn:ngsi-ld:ContextSourceRegistration:csr1a343",
-	"type": "ContextSourceRegistration",
-	"description": "description of reg test 2",
-	"information": [
-		{
-			"entities": [
-				{
-					"id": "urn:ngsi-ld:Vehicle:A456",
-					"type": "Vehicle"
-				}
-			],
-			"properties": [ "brandName", "speed" ],
-			"relationships": [ "isParked" ]
-		}
-	],
-	"observationInterval": {
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a343",
+  "type": "ContextSourceRegistration",
+  "description": "description of reg test 2",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
     "startAt": "2018-12-31T10:00:00",
     "endAt": "2028-12-31T10:00:00"
   },
@@ -106,8 +106,8 @@ payload='{
     "startAt": "2018-12-31T10:00:00",
     "endAt": "2028-12-31T10:00:00"
   },
-	"expires": "2029-10-31T10:00:25",
-	"endpoint": "http://my.csource.org:1026"
+  "expiresAt": "2029-10-31T10:00:25",
+  "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 REG_ID2=urn:ngsi-ld:ContextSourceRegistration:csr1a343
@@ -149,7 +149,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 02. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 545
+Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -157,7 +157,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "description": "description of reg test 1",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2029-10-31T10:00:25.000Z",
+    "expiresAt": "2029-10-31T10:00:25.000Z",
     "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
     "information": [
         {
@@ -191,7 +191,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 546
+Content-Length: 548
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -199,7 +199,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "description": "description of reg test 2",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2029-10-31T10:00:25.000Z",
+    "expiresAt": "2029-10-31T10:00:25.000Z",
     "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a343",
     "information": [
         {

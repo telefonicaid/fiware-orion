@@ -66,7 +66,7 @@ payload='{
     "startAt": "2017-12-31T10:00:00.798",
     "endAt": "2027-12-31T10:00:00.120"
   },
-  "expires": "2028-12-31T10:00:01.234Z",
+  "expiresAt": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -111,7 +111,7 @@ payload='{
     "startAt": "2021-12-31T10:00:00.798",
     "endAt": "2022-12-31T10:00:00.120"
   },
-  "expires": "2023-12-31T10:00:01.234Z"
+  "expiresAt": "2023-12-31T10:00:01.234Z"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1 --payload "$payload" -X PATCH
 echo
@@ -199,7 +199,7 @@ bye
 03. GET R1 via REST, make sure all timestamps have milliseconds
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 624
+Content-Length: 626
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -208,7 +208,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "createdAt": "REGEX(.*\.\d\d\d)Z",
     "description": "Description of R1",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2028-12-31T10:00:01.234Z",
+    "expiresAt": "2028-12-31T10:00:01.234Z",
     "id": "urn:ngsi-ld:registrations:R1",
     "information": [
         {
@@ -244,7 +244,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. GET all registrations via REST, make sure all timestamps have milliseconds
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 626
+Content-Length: 628
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -254,7 +254,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "createdAt": "REGEX(.*\.\d\d\d)Z",
         "description": "Description of R1",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:01.234Z",
+        "expiresAt": "2028-12-31T10:00:01.234Z",
         "id": "urn:ngsi-ld:registrations:R1",
         "information": [
             {
@@ -298,7 +298,7 @@ Date: REGEX(.*)
 06. GET R1 and make sure modifiedAt changed and that all timestamps have milliseconds
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 624
+Content-Length: 626
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -307,7 +307,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "createdAt": "REGEX(.*\.\d\d\d)Z",
     "description": "Description of R1",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2023-12-31T10:00:01.234Z",
+    "expiresAt": "2023-12-31T10:00:01.234Z",
     "id": "urn:ngsi-ld:registrations:R1",
     "information": [
         {

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETREGISTRATIONS_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETREGISTRATIONS_H_
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETREGISTRATIONS_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETREGISTRATIONS_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,8 +30,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionldGetRegistrations -
+// legacyGetRegistrations -
 //
-extern bool orionldGetRegistrations(void);
+extern bool legacyGetRegistrations(void);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETREGISTRATIONS_H_
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETREGISTRATIONS_H_

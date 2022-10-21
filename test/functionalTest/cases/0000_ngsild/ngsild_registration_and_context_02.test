@@ -82,7 +82,7 @@ payload='{
     "type": "Point",
     "coordinates": [ 100.0, 0.0 ]
   },
-  "expires": "2028-12-31T10:00:01.234Z",
+  "expiresAt": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1
 }'
@@ -118,7 +118,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1
 02. GET the registration
 ========================
 HTTP/1.1 200 OK
-Content-Length: 706
+Content-Length: 708
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -127,7 +127,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "P1": 1,
     "description": "description of reg 1",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2028-12-31T10:00:01.234Z",
+    "expiresAt": "2028-12-31T10:00:01.234Z",
     "id": "urn:ngsi-ld:registrations:R1",
     "information": [
         {

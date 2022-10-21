@@ -31,6 +31,7 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove, kjString, kjObject, ...
 }
 
+#include "common/globals.h"                                      // parse8601Time
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
 #include "orionld/dbModel/dbModelFromApiRegistration.h"          // Own interface
 
@@ -118,15 +119,13 @@ bool dbModelFromApiRegInfo(KjNode* informationP, KjNode* endpointP)
         //
         //
         if ((idP != NULL) && (idPatternP != NULL))
-        {
           kjChildRemove(entitiesObjP, idPatternP);
-          idPatternP = NULL;
-        }
         else if (idPatternP != NULL)
+        {
           idPatternP->name = (char*) "id";
-
-        isPatternP = kjString(orionldState.kjsonP, "isPattern", (idPatternP != NULL)? "true" : "false");
-        kjChildAdd(entitiesObjP, isPatternP);
+          isPatternP = kjString(orionldState.kjsonP, "isPattern", "true");
+          kjChildAdd(entitiesObjP, isPatternP);
+        }
       }
     }
 
@@ -153,6 +152,33 @@ bool dbModelFromApiRegInfo(KjNode* informationP, KjNode* endpointP)
 
 // -----------------------------------------------------------------------------
 //
+// dbModelFromApiTimeInterval -
+//
+void dbModelFromApiTimeInterval(KjNode* intervalP)
+{
+  KjNode* startAtP = kjLookup(intervalP, "startAt");
+  KjNode* endAtP   = kjLookup(intervalP, "endAt");
+  double  ts;
+
+  if ((startAtP != NULL) && (startAtP->type == KjString))
+  {
+    ts = parse8601Time(startAtP->value.s);
+    startAtP->type    = KjFloat;
+    startAtP->value.f = ts;
+  }
+
+  if ((endAtP != NULL) && (endAtP->type == KjString))
+  {
+    ts = parse8601Time(endAtP->value.s);
+    endAtP->type    = KjFloat;
+    endAtP->value.f = ts;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // dbModelFromApiRegistration - modify the request tree to match the db model
 //
 // The tree is not 100% API
@@ -168,20 +194,36 @@ bool dbModelFromApiRegistration(KjNode* apiRegistration)
   // information::idPattern => contextRegistration::id + contextRegistration::isPattern == "true"
   // information::propertyNames => contextRegistration::attrs {}
   // information::relationshipNames => contextRegistration::attrs {}
-
-  KjNode* idP               = kjLookup(apiRegistration, "id");
-  KjNode* expiresAtP        = kjLookup(apiRegistration, "expiresAt");
-  KjNode* registrationNameP = kjLookup(apiRegistration, "registrationName");
-  KjNode* informationP      = kjLookup(apiRegistration, "information");
-  KjNode* endpointP         = kjLookup(apiRegistration, "endpoint");
-  KjNode* statusP           = kjString(orionldState.kjsonP, "status", "active");
+  // observationInterval::startAt => double
+  // observationInterval::endAt => double
+  //
+  KjNode* idP                   = kjLookup(apiRegistration, "id");
+  KjNode* registrationNameP     = kjLookup(apiRegistration, "registrationName");
+  KjNode* informationP          = kjLookup(apiRegistration, "information");
+  KjNode* endpointP             = kjLookup(apiRegistration, "endpoint");
+  KjNode* observationIntervalP  = kjLookup(apiRegistration, "observationInterval");
+  KjNode* managementIntervalP   = kjLookup(apiRegistration, "managementInterval");
+  KjNode* expiresAtP            = kjLookup(apiRegistration, "expiresAt");
+  KjNode* statusP               = kjString(orionldState.kjsonP, "status", "active");
 
   if (idP               != NULL) idP->name               = (char*) "_id";
-  if (expiresAtP        != NULL) expiresAtP->name        = (char*) "expiration";
   if (registrationNameP != NULL) registrationNameP->name = (char*) "name";
 
   kjChildRemove(apiRegistration, endpointP);
   dbModelFromApiRegInfo(informationP, endpointP);
+
+  if (observationIntervalP != NULL)
+    dbModelFromApiTimeInterval(observationIntervalP);
+  if (managementIntervalP != NULL)
+    dbModelFromApiTimeInterval(managementIntervalP);
+
+  if (expiresAtP != NULL)
+  {
+    expiresAtP->name    = (char*) "expiration";
+    expiresAtP->value.f = parse8601Time(expiresAtP->value.s);
+    expiresAtP->type    = KjFloat;
+  }
+
   kjChildAdd(apiRegistration, statusP);
 
   return true;

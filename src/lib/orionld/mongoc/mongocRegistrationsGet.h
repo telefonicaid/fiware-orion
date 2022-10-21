@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETREGISTRATIONS_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETREGISTRATIONS_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONSGET_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONSGET_H_
 
 /*
 *
@@ -26,12 +26,17 @@
 * Author: Ken Zangelin
 */
 
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
-// ----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 //
-// orionldGetRegistrations -
+// mongocRegistrationsGet -
 //
-extern bool orionldGetRegistrations(void);
+extern KjNode* mongocRegistrationsGet(int64_t* countP);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETREGISTRATIONS_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONSGET_H_

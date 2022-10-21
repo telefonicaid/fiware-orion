@@ -105,6 +105,24 @@ bool pCheckRegistrationId(KjNode* regIdP)
 
 
 
+extern void dbModelFromApiTimeInterval(KjNode* intervalP);
+// -----------------------------------------------------------------------------
+//
+// cacheModelFromApiRegistration -
+//
+void cacheModelFromApiRegistration(KjNode* apiRegistrationP)
+{
+  KjNode* observationIntervalP  = kjLookup(apiRegistrationP, "observationInterval");
+  KjNode* managementIntervalP   = kjLookup(apiRegistrationP, "managementInterval");
+
+  if (observationIntervalP != NULL)
+    dbModelFromApiTimeInterval(observationIntervalP);
+  if (managementIntervalP != NULL)
+    dbModelFromApiTimeInterval(managementIntervalP);
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostRegistrations -
@@ -191,13 +209,14 @@ bool orionldPostRegistrations(void)
 
   orionldState.requestTree->value.firstChildP = regIdP;
 
-  // Add the property tree in the end
+  // Add the property tree at the end
   kjChildAdd(orionldState.requestTree, propertyTree);
 
+  cacheModelFromApiRegistration(orionldState.requestTree);
   regCacheItemAdd(orionldState.tenantP, orionldState.requestTree, false);  // Clones the registration
 
-  // This is where "id" is changed to "_id"
   kjTreeLog(orionldState.requestTree, "Before dbModelFromApiRegistration");
+  // This is where "id" is changed to "_id"
   dbModelFromApiRegistration(orionldState.requestTree);
   kjTreeLog(orionldState.requestTree, "After dbModelFromApiRegistration");
 

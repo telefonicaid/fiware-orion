@@ -116,7 +116,7 @@ payload='{
       ]
     ]
   },
-  "expires": "2028-12-31T10:00:01.234Z",
+  "expiresAt": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1,
   "P2": "2",
@@ -377,7 +377,7 @@ payload='{
       ]
     ]
   },
-  "expires": "2028-12-31T10:00:00",
+  "expiresAt": "2028-12-31T10:00:00",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1,
   "P2": "2",
@@ -460,7 +460,7 @@ payload='{
       ]
     ]
   },
-  "expires": "2028-12-31T10:00:00",
+  "expiresAt": "2028-12-31T10:00:00",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1,
   "P2": "2",
@@ -637,7 +637,7 @@ bye
 03. GET the registration, with sysAttrs included
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 2009
+Content-Length: 2011
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -649,7 +649,7 @@ Date: REGEX(.*)
   "description": "description of reg 1",
   "createdAt": REGEX(.*),
   "modifiedAt": REGEX(.*),
-  "expires": "2028-12-31T10:00:01.234Z",
+  "expiresAt": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {

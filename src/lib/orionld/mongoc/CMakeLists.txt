@@ -64,6 +64,7 @@ SET (SOURCES
     mongocRegistrationExists.cpp
     mongocRegistrationInsert.cpp
     mongocRegistrationGet.cpp
+    mongocRegistrationsGet.cpp
     mongocRegistrationDelete.cpp
 )
 

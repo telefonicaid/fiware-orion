@@ -205,10 +205,13 @@ static void registrationAttributeAdd(KjNode* attrsNodeP, const char* shortName, 
 static bool ngsildRegistrationInformationToAPIv1Datamodel(KjNode* informationP, const char* providingApplication)
 {
   KjNode* infoItem0      = informationP->value.firstChildP;
-  KjNode* propertiesP    = kjLookup(infoItem0, "properties");
-  KjNode* relationshipsP = kjLookup(infoItem0, "relationships");
+  KjNode* propertiesP    = kjLookup(infoItem0, "propertyNames");
+  KjNode* relationshipsP = kjLookup(infoItem0, "relationshipNames");
   KjNode* attrsNodeP     = kjArray(orionldState.kjsonP, "attrs");
   KjNode* paNodeP        = kjString(orionldState.kjsonP, "providingApplication", providingApplication);
+
+  if (propertiesP    == NULL)  propertiesP    = kjLookup(infoItem0, "properties");
+  if (relationshipsP == NULL)  relationshipsP = kjLookup(infoItem0, "relationships");
 
   informationP->name = (char*) "contextRegistration";
 
@@ -260,9 +263,9 @@ void ngsildTimeIntervalToAPIv1Datamodel(KjNode* tiP)
 
 // -----------------------------------------------------------------------------
 //
-// ngsildExpiresToAPIv1Datamodel -
+// dbModelFromApiExpires -
 //
-void ngsildExpiresToAPIv1Datamodel(KjNode* expiresP)
+void dbModelFromApiExpires(KjNode* expiresP)
 {
   expiresP->value.f  = parse8601Time(expiresP->value.s);
   expiresP->type     = KjFloat;
@@ -429,7 +432,7 @@ static bool ngsildRegistrationToAPIv1Datamodel(KjNode* patchTree, KjNode* dbRegi
     }
     else if (strcmp(fragmentP->name, "information") == 0)
       informationP = fragmentP;
-    else if (strcmp(fragmentP->name, "expires") == 0)
+    else if ((strcmp(fragmentP->name, "expires") == 0) || (strcmp(fragmentP->name, "expiresAt") == 0))
       expiresP = fragmentP;
     else if (strcmp(fragmentP->name, "endpoint") == 0)
       endpointP = fragmentP;
@@ -491,7 +494,7 @@ static bool ngsildRegistrationToAPIv1Datamodel(KjNode* patchTree, KjNode* dbRegi
   if (managementIntervalP != NULL)
     ngsildTimeIntervalToAPIv1Datamodel(managementIntervalP);
   if (expiresP != NULL)
-    ngsildExpiresToAPIv1Datamodel(expiresP);
+    dbModelFromApiExpires(expiresP);
 
   return true;
 }

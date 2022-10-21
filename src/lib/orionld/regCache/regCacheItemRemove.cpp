@@ -48,7 +48,7 @@ extern "C"
 // The function would be much faster if the Registration id was part of RegCacheItem, but ...
 // that would require more RAM.
 // Or even, if we used a hash-table for faster lookups.
-// 
+//
 // BUT, looking up an individual registration for patching, deletion or whatever is FAR FROM the
 // main use of the registration cache.
 //

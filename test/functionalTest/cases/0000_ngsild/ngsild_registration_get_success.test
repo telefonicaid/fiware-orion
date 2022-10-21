@@ -108,7 +108,7 @@ do
         ]
       ]
     },
-    "expires": "2028-12-31T10:00:00",
+    "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "P1": '$csrNo',
     "P2": "String-'$csrNo'"
@@ -238,7 +238,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 03. GET  /ngsi-ld/v1/csourceRegistrations all data
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 18848
+Content-Length: 18868
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -251,7 +251,7 @@ Date: REGEX(.*)
     "description": "description of 1",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -350,7 +350,7 @@ Date: REGEX(.*)
     "description": "description of 10",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -449,7 +449,7 @@ Date: REGEX(.*)
     "description": "description of 2",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -548,7 +548,7 @@ Date: REGEX(.*)
     "description": "description of 3",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -647,7 +647,7 @@ Date: REGEX(.*)
     "description": "description of 4",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -746,7 +746,7 @@ Date: REGEX(.*)
     "description": "description of 5",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -845,7 +845,7 @@ Date: REGEX(.*)
     "description": "description of 6",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -944,7 +944,7 @@ Date: REGEX(.*)
     "description": "description of 7",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -1043,7 +1043,7 @@ Date: REGEX(.*)
     "description": "description of 8",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -1142,7 +1142,7 @@ Date: REGEX(.*)
     "description": "description of 9",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {
@@ -1240,7 +1240,7 @@ Date: REGEX(.*)
 04. GET  /ngsi-ld/v1/csourceRegistrations limit:5 csourceRegistration
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 4031
+Content-Length: 4041
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1251,7 +1251,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
         "information": [
             {
@@ -1347,7 +1347,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
         "information": [
             {
@@ -1443,7 +1443,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
         "information": [
             {
@@ -1539,7 +1539,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
         "information": [
             {
@@ -1635,7 +1635,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
         "information": [
             {
@@ -1732,7 +1732,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 05. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:0 csourceRegistration
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 4031
+Content-Length: 4041
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1743,7 +1743,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
         "information": [
             {
@@ -1839,7 +1839,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
         "information": [
             {
@@ -1935,7 +1935,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
         "information": [
             {
@@ -2031,7 +2031,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
         "information": [
             {
@@ -2127,7 +2127,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
         "information": [
             {
@@ -2224,7 +2224,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 06. GET  /ngsi-ld/v1/csourceRegistrations limit:5/offset:1 csourceRegistration
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 4031
+Content-Length: 4041
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2235,7 +2235,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
         "information": [
             {
@@ -2331,7 +2331,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
         "information": [
             {
@@ -2427,7 +2427,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-3",
         "description": "description of 3",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
         "information": [
             {
@@ -2523,7 +2523,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-4",
         "description": "description of 4",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
         "information": [
             {
@@ -2619,7 +2619,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
         "P2": "String-5",
         "description": "description of 5",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR5",
         "information": [
             {
@@ -2716,7 +2716,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 07. GET  /ngsi-ld/v1/csourceRegistrations with count
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 2421
+Content-Length: 2427
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2728,7 +2728,7 @@ NGSILD-Results-Count: 10
         "P2": "String-1",
         "description": "description of 1",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
         "information": [
             {
@@ -2824,7 +2824,7 @@ NGSILD-Results-Count: 10
         "P2": "String-10",
         "description": "description of 10",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
         "information": [
             {
@@ -2920,7 +2920,7 @@ NGSILD-Results-Count: 10
         "P2": "String-2",
         "description": "description of 2",
         "endpoint": "http://my.csource.org:1026",
-        "expires": "2028-12-31T10:00:00.000Z",
+        "expiresAt": "2028-12-31T10:00:00.000Z",
         "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
         "information": [
             {
@@ -3028,7 +3028,7 @@ Link: <http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://
 09. GET  /ngsi-ld/v1/csourceRegistrations GET limit:1/offset:5 and with options=sysAttrs
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1808
+Content-Length: 1810
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -3041,7 +3041,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "description": "description of 5",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
-    "expires": "2028-12-31T10:00:00.000Z",
+    "expiresAt": "2028-12-31T10:00:00.000Z",
     "endpoint": "http://my.csource.org:1026",
     "information": [
       {

@@ -620,16 +620,13 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
       if (pcheckGeoPropertyValue(operationSpaceP, NULL, NULL, nodeP->name) == false)
         return false;
     }
-    else if (strcmp(nodeP->name, "expires") == 0)
-    {
-      // Old name - give error?
-    }
-    else if (strcmp(nodeP->name, "expiresAt") == 0)
+    else if ((strcmp(nodeP->name, "expiresAt") == 0) || (strcmp(nodeP->name, "expires") == 0))
     {
       DUPLICATE_CHECK(expiresP, nodeP->name, nodeP);
       STRING_CHECK(nodeP, nodeP->name);
       EMPTY_STRING_CHECK(nodeP, nodeP->name);
       DATETIME_CHECK(expiresP->value.s, dateTime, nodeP->name);
+      nodeP->name = (char*) "expiresAt";
     }
     else if (strcmp(nodeP->name, "endpoint") == 0)
     {

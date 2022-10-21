@@ -46,11 +46,36 @@ extern "C"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// dbModelToApiTimestamp - from dbModelToApiRegistration.cpp
+//
+extern void dbModelToApiTimestamp(KjNode* tsP);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// apiModelFromDbInterval -
+//
+void apiModelFromDbInterval(KjNode* managementIntervalP)
+{
+  KjNode* startAtP = kjLookup(managementIntervalP, "startAt");
+  KjNode* endAtP   = kjLookup(managementIntervalP, "endAt");
+
+  if (startAtP != NULL)
+    dbModelToApiTimestamp(startAtP);
+  if (endAtP != NULL)
+    dbModelToApiTimestamp(endAtP);
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // apiModelFromCachedRegistration -
 //
-static void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, bool sysAttrs)
+void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, bool sysAttrs)
 {
   //
   // type (not part of the cached registration)
@@ -77,20 +102,10 @@ static void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cached
   {
     // System Attributes WANTED - turn them into ISO8601
     if (createdAtP != NULL)
-    {
-      char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
-      numberToDate(createdAtP->value.f, dateBuf, 64);
-      createdAtP->value.s = dateBuf;
-      createdAtP->type    = KjString;
-    }
+      dbModelToApiTimestamp(createdAtP);
 
     if (modifiedAtP != NULL)
-    {
-      char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
-      numberToDate(modifiedAtP->value.f, dateBuf, 64);
-      modifiedAtP->value.s = dateBuf;
-      modifiedAtP->type    = KjString;
-    }
+      dbModelToApiTimestamp(modifiedAtP);
   }
 
 
@@ -158,13 +173,7 @@ static void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cached
       }
     }
     else if (lastSuccessP != NULL)  // Change to ISO8601 string
-    {
-      char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
-      numberToDate(lastSuccessP->value.f, dateBuf, 64);
-
-      lastSuccessP->type    = KjString;
-      lastSuccessP->value.s = dateBuf;
-    }
+      dbModelToApiTimestamp(lastSuccessP);
   }
 
   if ((lastFailureP != NULL) && (lastFailureP->value.f < 1))
@@ -189,13 +198,7 @@ static void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cached
       }
     }
     else if (lastFailureP != NULL)  // Change to ISO8601 string
-    {
-      char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
-      numberToDate(lastFailureP->value.f, dateBuf, 64);
-
-      lastFailureP->type    = KjString;
-      lastFailureP->value.s = dateBuf;
-    }
+      dbModelToApiTimestamp(lastFailureP);
   }
 
 
@@ -270,7 +273,7 @@ static void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cached
   //
   // expires (expiresAt)
   //
-  KjNode* expiresP = kjLookup(regTree, "expires");
+  KjNode* expiresP = kjLookup(regTree, "expires");  // Just to change the name to "expiresAt"
 
   if (expiresP != NULL)
     expiresP->name = (char*) "expiresAt";
@@ -281,6 +284,18 @@ static void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cached
   //
   KjNode* originP = kjString(orionldState.kjsonP, "origin", "cache");
   kjChildAdd(regTree, originP);
+
+
+  //
+  // managementInterval + observationInterval
+  //
+  KjNode* managementIntervalP  = kjLookup(regTree, "managementInterval");
+  KjNode* observationIntervalP = kjLookup(regTree, "observationInterval");
+
+  if (managementIntervalP != NULL)
+    apiModelFromDbInterval(managementIntervalP);
+  if (observationIntervalP != NULL)
+    apiModelFromDbInterval(observationIntervalP);
 }
 
 

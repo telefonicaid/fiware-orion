@@ -55,7 +55,7 @@ bool orionldDeleteRegistration(void)
     orionldError(OrionldResourceNotFound, "Registration not found", orionldState.wildcard[0], 404);
     return false;
   }
-    
+
   if (regCacheItemRemove(orionldState.tenantP, orionldState.wildcard[0]) == false)
   {
     if (noCache == false)

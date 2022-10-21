@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -20,79 +20,105 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin and Gabriel Quaresma
+* Author: Ken Zangelin
 */
-#include <vector>                                             // std::vector
-
 extern "C"
 {
-#include "kjson/KjNode.h"                                     // KjNode
-#include "kjson/kjBuilder.h"                                  // kjObject, kjArray
-#include "kbase/kStringSplit.h"                               // kStringSplit
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjBuilder.h"                                     // kjObject, kjArray
+#include "kjson/kjClone.h"                                       // kjClone
 }
 
-#include "logMsg/logMsg.h"                                    // LM_*
-#include "logMsg/traceLevels.h"                               // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/defaultValues.h"
-#include "common/string.h"                                    // toString
-#include "rest/uriParamNames.h"                               // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
+#include "orionld/legacyDriver/legacyGetRegistrations.h"         // legacyGetRegistrations
+#include "orionld/mongoc/mongocRegistrationsGet.h"               // mongocRegistrationsGet
+#include "orionld/dbModel/dbModelToApiRegistration.h"            // dbModelToApiRegistration
+#include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
+#include "orionld/regCache/regCacheGet.h"                        // regCacheGet
+#include "orionld/serviceRoutines/orionldGetRegistrations.h"     // Own Interface
 
-#include "orionld/common/orionldState.h"                      // orionldState
-#include "orionld/common/orionldError.h"                      // orionldError
-#include "orionld/types/OrionldHeader.h"                      // orionldHeaderAdd
-#include "orionld/mongoBackend/mongoLdRegistrationsGet.h"     // mongoLdRegistrationsGet
-#include "orionld/kjTree/kjTreeFromRegistration.h"            // kjTreeFromRegistration
-#include "orionld/serviceRoutines/orionldGetRegistrations.h"  // Own Interface
+
+
+// ----------------------------------------------------------------------------
+//
+// apiModelFromCachedRegistration - FIXME: Move to dbModel library?
+//
+extern void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, bool sysAttrs);
 
 
 
 // ----------------------------------------------------------------------------
 //
 // orionldGetRegistrations -
-// URI params:
-// - id
-// - type
-// - idPattern
-// - attrs
-// - q
-// - csf
-// - georel
-// - geometry
-// - coordinates
-// - geoproperty
-// - timeproperty
-// - timerel
-// - time
-// - endTime
-// - limit
-// - offset
-// - options=count
 //
 bool orionldGetRegistrations(void)
 {
-  std::vector<ngsiv2::Registration>  registrationVec;
-  OrionError                         oe;
-  long long                          count;
+  if (experimental == false)
+    return legacyGetRegistrations();
 
-  if (!mongoLdRegistrationsGet(&registrationVec, orionldState.tenantP, &count, &oe))
+  if (orionldState.uriParamOptions.fromDb == true)
   {
-    orionldError(OrionldBadRequestData, "Bad Request", oe.details.c_str(), 400);
-    return false;
+    //
+    // GET Registrations with mongoc
+    //
+    // return orionldGetRegistrationsFromDb();
   }
 
-  if (orionldState.uriParams.count == true)
+  //
+  // Not Legacy, not "From DB" - Getting the registrations from the registration cache
+  //
+  RegCache* rcP = regCacheGet(orionldState.tenantP, false);
+
+  if (orionldState.uriParams.count == true)  // Empty loop over the registrations, just to count how many there are
+  {
+    int count  = 0;
+
+    if (rcP != NULL)
+    {
+      for (RegCacheItem* cRegP = rcP->regList; cRegP != NULL; cRegP = cRegP->next)
+      {
+        ++count;
+      }
+    }
+
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
-
-  orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
-
-  for (unsigned int ix = 0; ix < registrationVec.size(); ix++)
-  {
-    KjNode* registrationNodeP = kjTreeFromRegistration(&registrationVec[ix]);
-    kjChildAdd(orionldState.responseTree, registrationNodeP);
   }
 
-  orionldState.httpStatusCode = SccOk;
+  int        offset    = orionldState.uriParams.offset;
+  int        limit     = orionldState.uriParams.limit;
+  KjNode*    regArray  = kjArray(orionldState.kjsonP, NULL);
+  int        regs      = 0;
+  int        ix        = 0;
+
+  if ((limit != 0) && (rcP != NULL))
+  {
+    for (RegCacheItem* cRegP = rcP->regList; cRegP != NULL; cRegP = cRegP->next)
+    {
+      if (ix < offset)
+      {
+        ++ix;
+        continue;
+      }
+
+      KjNode* apiRegP = kjClone(orionldState.kjsonP, cRegP->regTree);  // Work on a cloned copy from the reg-cache
+      apiModelFromCachedRegistration(apiRegP, cRegP, orionldState.uriParamOptions.sysAttrs);
+      kjChildAdd(regArray, apiRegP);
+
+      ++ix;
+      ++regs;
+      if (regs >= limit)
+        break;
+    }
+  }
+  else
+    orionldState.noLinkHeader = true;  // Don't want the Link header if there is no payload body (empty array)
+
+  orionldState.httpStatusCode = 200;
+  orionldState.responseTree   = regArray;
 
   return true;
 }

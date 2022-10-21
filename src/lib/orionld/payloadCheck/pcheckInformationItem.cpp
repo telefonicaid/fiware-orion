@@ -103,6 +103,8 @@ bool pcheckInformationItem(KjNode* informationP)
         LM(("EXP: Expanding property name '%s' (property at %p)", propP->value.s, propP));
         propP->value.s = orionldAttributeExpand(orionldState.contextP, propP->value.s, true, NULL);
       }
+
+      infoItemP->name = (char*) "propertyNames";
     }
     else if ((strcmp(infoItemP->name, "relationshipNames") == 0) || (strcmp(infoItemP->name, "relationships") == 0))
     {
@@ -116,6 +118,8 @@ bool pcheckInformationItem(KjNode* informationP)
         LM(("EXP: Expanding relationship name '%s'", relP->value.s));
         relP->value.s = orionldAttributeExpand(orionldState.contextP, relP->value.s, true, NULL);
       }
+
+      infoItemP->name = (char*) "relationshipNames";
     }
     else
     {

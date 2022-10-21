@@ -197,8 +197,7 @@ MongoDB server version: REGEX(.*)
 		{
 			"entities" : [
 				{
-					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
-					"isPattern" : "false"
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
 				}
 			],
 			"attrs" : [ ],
@@ -305,8 +304,7 @@ MongoDB server version: 4.4.17
 		{
 			"entities" : [
 				{
-					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
-					"isPattern" : "false"
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
 				}
 			],
 			"attrs" : [ ],

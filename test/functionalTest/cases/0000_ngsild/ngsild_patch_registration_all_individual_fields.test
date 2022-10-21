@@ -104,7 +104,7 @@ payload='{
     "type": "Point",
     "coordinates": [ 30.0, 0.0 ]
   },
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1
 }'
@@ -298,7 +298,7 @@ echo
 echo "21. PATCH the registration with a new expires"
 echo "============================================="
 payload='{
-  "expires": "2021-12-31T18:19:20.210Z"
+  "expiresAt": "2021-12-31T18:19:20.210Z"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
 echo
@@ -410,7 +410,7 @@ payload='{
     "type": "Point",
     "coordinates": [ 31.0, 32.77 ]
   },
-  "expires": "2024-12-31T10:00:19.975Z",
+  "expiresAt": "2024-12-31T10:00:19.975Z",
   "endpoint": "http://my.other.csource.org:1099",
   "P1": [ 1, 2, 3, 4 ]
 }'
@@ -524,7 +524,7 @@ bye
 03. GET the registration to see the ORIGINAL
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 1029
+Content-Length: 1031
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -534,7 +534,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "R1",
   "description": "description of reg R1",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -597,7 +597,7 @@ Date: REGEX(.*)
 05. GET the registration and see the new name
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 1035
+Content-Length: 1037
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -607,7 +607,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "description of reg R1",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -670,7 +670,7 @@ Date: REGEX(.*)
 07. GET the registration and see the new description
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 1029
+Content-Length: 1031
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -680,7 +680,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -743,7 +743,7 @@ Date: REGEX(.*)
 09. GET the registration and see the new information array
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 975
+Content-Length: 977
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -753,7 +753,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -886,7 +886,7 @@ Date: REGEX(.*)
 12. GET the registration and see the new observationInterval
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 975
+Content-Length: 977
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -896,7 +896,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -958,7 +958,7 @@ Date: REGEX(.*)
 14. GET the registration and see the new managementInterval
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 975
+Content-Length: 977
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -968,7 +968,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1030,7 +1030,7 @@ Date: REGEX(.*)
 16. GET the registration and see the new location
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 974
+Content-Length: 976
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1040,7 +1040,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1102,7 +1102,7 @@ Date: REGEX(.*)
 18. GET the registration and see the new observationSpace
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 973
+Content-Length: 975
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1112,7 +1112,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1174,7 +1174,7 @@ Date: REGEX(.*)
 20. GET the registration and see the new operationSpace
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 972
+Content-Length: 974
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1184,7 +1184,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1246,7 +1246,7 @@ Date: REGEX(.*)
 22. GET the registration and see the new expires
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 972
+Content-Length: 974
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1256,7 +1256,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1318,7 +1318,7 @@ Date: REGEX(.*)
 24. GET the registration and see the new endpoint
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 970
+Content-Length: 972
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1328,7 +1328,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1390,7 +1390,7 @@ Date: REGEX(.*)
 26. GET the registration and see the new P1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 977
+Content-Length: 979
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1400,7 +1400,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1469,7 +1469,7 @@ Date: REGEX(.*)
 28. GET the registration and see no P7 (patch only replaces, it doesn't add)
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 977
+Content-Length: 979
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1479,7 +1479,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1613,7 +1613,7 @@ Date: REGEX(.*)
 31. GET the registration and see all the fields updated
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 1102
+Content-Length: 1104
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1623,7 +1623,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "R1-bis",
   "description": "description of reg R1-bis",
-  "expires": "2024-12-31T10:00:19.975Z",
+  "expiresAt": "2024-12-31T10:00:19.975Z",
   "endpoint": "http://my.other.csource.org:1099",
   "information": [
     {

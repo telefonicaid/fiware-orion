@@ -1,4 +1,4 @@
-# Copyright 2021 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,27 +21,31 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Creation of a registration with inline array context of only the core context
+Creation of a registration with inline key-value context 
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 
 #
-# 01. Create a registration with an inline context that is an array of only the core context
+# 01. Create a registration with an inline context that is a key-value object
 # 02. GET the registration
 # 03. See the registration in mongo
 #
 
-echo "01. Create a registration with an inline context that is an array of only the core context"
-echo "=========================================================================================="
+echo "01. Create a registration with an inline context that is a key-value object"
+echo "==========================================================================="
 payload='{
-  "@context": [
-    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
-  ],
+  "@context": {
+    "myT": "http://example.org/T1",
+    "myP1": "http://example.org/P1",
+    "myP2": "http://example.org/P2",
+    "myRel1": "http://example.org/Rel1",
+    "myRel2": "http://example.org/Rel2"
+  },
   "id": "urn:ngsi-ld:registrations:R1",
   "type": "ContextSourceRegistration",
   "name": "R1",
@@ -78,7 +82,7 @@ payload='{
     "type": "Point",
     "coordinates": [ 100.0, 0.0 ]
   },
-  "expiresAt": "2028-12-31T10:00:01.234Z",
+  "expires": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1
 }'
@@ -102,8 +106,8 @@ echo
 
 
 --REGEXPECT--
-01. Create a registration with an inline context that is an array of only the core context
-==========================================================================================
+01. Create a registration with an inline context that is a key-value object
+===========================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -114,7 +118,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1
 02. GET the registration
 ========================
 HTTP/1.1 200 OK
-Content-Length: 708
+Content-Length: 750
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -133,11 +137,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
                     "type": "Vehicle"
                 }
             ],
-            "properties": [
+            "propertyNames": [
                 "brandName",
                 "speed"
             ],
-            "relationships": [
+            "relationshipNames": [
                 "isParked"
             ]
         }
@@ -172,6 +176,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         ],
         "type": "Point"
     },
+    "origin": "cache",
+    "status": "active",
     "type": "ContextSourceRegistration"
 }
 
@@ -183,10 +189,10 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:registrations:R1",
-	"description" : "description of reg 1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
 	"name" : "R1",
-	"expiration" : 1861869601.234,
-	"servicePath" : "/",
+	"description" : "description of reg 1",
 	"contextRegistration" : [
 		{
 			"entities" : [
@@ -198,26 +204,20 @@ MongoDB server version: REGEX(.*)
 			"attrs" : [
 				{
 					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
-					"type" : "Property",
-					"isDomain" : "false"
+					"type" : "Property"
 				},
 				{
 					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
-					"type" : "Property",
-					"isDomain" : "false"
+					"type" : "Property"
 				},
 				{
 					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
-					"type" : "Relationship",
-					"isDomain" : "false"
+					"type" : "Relationship"
 				}
 			],
 			"providingApplication" : "http://my.csource.org:1026"
 		}
 	],
-	"format" : "JSON",
-	"createdAt" : REGEX(.*),
-	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
 		"startAt" : 1546250400.123,
 		"endAt" : 1861869600.456
@@ -247,9 +247,11 @@ MongoDB server version: REGEX(.*)
 			0
 		]
 	},
+	"expiration" : 1861869601.234,
 	"properties" : {
 		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1
-	}
+	},
+	"status" : "active"
 }
 bye
 

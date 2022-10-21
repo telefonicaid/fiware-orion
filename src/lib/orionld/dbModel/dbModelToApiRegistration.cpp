@@ -40,6 +40,37 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// dbModelToApiTimestamp -
+//
+void dbModelToApiTimestamp(KjNode* tsNodeP)
+{
+  char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
+  numberToDate(tsNodeP->value.f, dateBuf, 64);
+  tsNodeP->value.s = dateBuf;
+  tsNodeP->type    = KjString;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// dbModelToApiInterval -
+//
+void dbModelToApiInterval(KjNode* intervalP)
+{
+  KjNode* startAtP = kjLookup(intervalP, "startAt");
+  KjNode* endAtP   = kjLookup(intervalP, "endAt");
+
+  if (startAtP != NULL)
+    dbModelToApiTimestamp(startAtP);
+  if (endAtP != NULL)
+    dbModelToApiTimestamp(endAtP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // dbModelToApiRegistration - modify the DB Model tree into an API Registration
 //
 bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs)
@@ -61,13 +92,15 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs)
 
 
   //
-  // expires (expiresAt)
+  // expiration (expiresAt)
   //
-  KjNode* expiresP = kjLookup(dbRegP, "expires");
+  KjNode* expiresAtP = kjLookup(dbRegP, "expiration");
 
-  if (expiresP != NULL)
-    expiresP->name = (char*) "expiresAt";
-
+  if (expiresAtP != NULL)
+  {
+    expiresAtP->name = (char*) "expiresAt";
+    dbModelToApiTimestamp(expiresAtP);
+  }
 
   //
   // name (registrationName)
@@ -103,20 +136,9 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs)
   {
     // System Attributes WANTED - turn them into ISO8601
     if (createdAtP != NULL)
-    {
-      char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
-      numberToDate(createdAtP->value.f, dateBuf, 64);
-      createdAtP->value.s = dateBuf;
-      createdAtP->type    = KjString;
-    }
-
+      dbModelToApiTimestamp(createdAtP);
     if (modifiedAtP != NULL)
-    {
-      char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
-      numberToDate(modifiedAtP->value.f, dateBuf, 64);
-      modifiedAtP->value.s = dateBuf;
-      modifiedAtP->type    = KjString;
-    }
+      dbModelToApiTimestamp(modifiedAtP);
   }
 
 
@@ -214,6 +236,16 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs)
     }
   }
 
+  //
+  // managementInterval + observationInterval
+  //
+  KjNode* managementIntervalP  = kjLookup(dbRegP, "managementInterval");
+  KjNode* observationIntervalP = kjLookup(dbRegP, "observationInterval");
+
+  if (managementIntervalP != NULL)
+    dbModelToApiInterval(managementIntervalP);
+  if (observationIntervalP)
+    dbModelToApiInterval(observationIntervalP);
 
   //
   // properties

@@ -1,4 +1,4 @@
-# Copyright 2021 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -24,9 +24,10 @@
 Creation of a registration with inline array context of only the core context
 
 --SHELL-INIT--
+# Copied from ngsild_registration_and_context_01.test
 export BROKER=orionld
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 
@@ -60,11 +61,11 @@ payload='{
   ],
   "observationInterval": {
     "startAt": "2018-12-31T10:00:00.123Z",
-    "endAt": "2028-12-31T10:00:00.456"
+    "endAt": "2028-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "startAt": "2017-12-31T10:00:00.798",
-    "endAt": "2027-12-31T10:00:00.120"
+    "startAt": "2017-12-31T10:00:00.798Z",
+    "endAt": "2027-12-31T10:00:00.120Z"
   },
   "location": {
     "type": "Point",
@@ -114,7 +115,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1
 02. GET the registration
 ========================
 HTTP/1.1 200 OK
-Content-Length: 708
+Content-Length: 750
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -133,11 +134,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
                     "type": "Vehicle"
                 }
             ],
-            "properties": [
+            "propertyNames": [
                 "brandName",
                 "speed"
             ],
-            "relationships": [
+            "relationshipNames": [
                 "isParked"
             ]
         }
@@ -172,6 +173,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         ],
         "type": "Point"
     },
+    "origin": "cache",
+    "status": "active",
     "type": "ContextSourceRegistration"
 }
 
@@ -183,10 +186,10 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:registrations:R1",
-	"description" : "description of reg 1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
 	"name" : "R1",
-	"expiration" : 1861869601.234,
-	"servicePath" : "/",
+	"description" : "description of reg 1",
 	"contextRegistration" : [
 		{
 			"entities" : [
@@ -198,26 +201,20 @@ MongoDB server version: REGEX(.*)
 			"attrs" : [
 				{
 					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
-					"type" : "Property",
-					"isDomain" : "false"
+					"type" : "Property"
 				},
 				{
 					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
-					"type" : "Property",
-					"isDomain" : "false"
+					"type" : "Property"
 				},
 				{
 					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
-					"type" : "Relationship",
-					"isDomain" : "false"
+					"type" : "Relationship"
 				}
 			],
 			"providingApplication" : "http://my.csource.org:1026"
 		}
 	],
-	"format" : "JSON",
-	"createdAt" : REGEX(.*),
-	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
 		"startAt" : 1546250400.123,
 		"endAt" : 1861869600.456
@@ -247,9 +244,11 @@ MongoDB server version: REGEX(.*)
 			0
 		]
 	},
+	"expiration" : 1861869601.234,
 	"properties" : {
 		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1
-	}
+	},
+	"status" : "active"
 }
 bye
 

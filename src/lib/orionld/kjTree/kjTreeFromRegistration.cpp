@@ -125,7 +125,7 @@ KjNode* kjTreeFromRegistration(ngsiv2::Registration* registrationP)
       orionldError(OrionldInternalError, "unable to create a stringified date", NULL, 500);
       return NULL;
     }
-    nodeP = kjString(orionldState.kjsonP, "expires", dateExp);
+    nodeP = kjString(orionldState.kjsonP, "expiresAt", dateExp);
     kjChildAdd(topP, nodeP);
   }
 
