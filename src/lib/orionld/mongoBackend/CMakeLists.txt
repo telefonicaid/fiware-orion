@@ -18,7 +18,7 @@
 # For those usages not covered by this license please contact with
 # orionld at fiware dot org
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
     mongoEntityExists.cpp
