@@ -70,6 +70,7 @@ typedef struct RegCache
 {
   char*          tenant;
   RegCacheItem*  regList;
+  RegCacheItem*  last;
   RegCache*      next;
 } RegCache;
 

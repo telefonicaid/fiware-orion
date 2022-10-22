@@ -109,9 +109,16 @@ RegCacheItem* regCacheItemAdd(OrionldTenant* tenantP, KjNode* regP, bool fromDb)
   RegCache*     rcP  = regCacheGet(tenantP, true);  // OR: tenantP->regCache: no lookup needed + can skip the next-pointer + tenant-name in RegCache !!!
   RegCacheItem* rciP = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
 
-  // Insert the new RegCacheItem first in rcP's linked list of registrations
-  rciP->next   = rcP->regList;
-  rcP->regList = rciP;
+  //
+  // Insert the new RegCacheItem LAST in rcP's linked list of registrations
+  // MUST BE INSERTED LAST. If not, the pagination doesn'¡t work with the registration cache!!!
+  //
+  if (rcP->last == NULL)
+    rcP->regList = rciP;
+  else
+    rcP->last->next = rciP;
+
+  rcP->last = rciP;
 
   rciP->regTree = kjClone(NULL, regP);
 
