@@ -1,7 +1,6 @@
 name: Test compatiblity to mintaka
 
 on:
-  push:
   pull_request:
 
 jobs:
