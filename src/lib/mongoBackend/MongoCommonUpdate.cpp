@@ -1309,9 +1309,6 @@ static void fill_idPtypeNP
    *
    * {
    *   "entities.isPattern": "true",
-   *   "entities.isTypePattern": {
-   *     "$ne": true
-   *   },
    *   "expiration": {
    *     "$gt": 1666606572
    *   },
@@ -1381,19 +1378,6 @@ static void fill_idPtypeNP
    * }
    *
    * Note "missing" is a MongoDB keyword. See https://www.mongodb.com/docs/manual/reference/operator/aggregation/type/
-   *
-   * Note that we are using the construct:
-   *
-   *   "entities.isTypePattern": {
-   *     "$ne": true
-   *   }
-   *
-   * instead of just
-   *
-   *   "entities.isTypePattern": false
-   *
-   * as the former also matches documents without the entities.isTypePattern (i.e. legacy sub
-   * documents created before the isTypePattern feature was developed)
    */
 
   orion::BSONObjBuilder outer_obj;
@@ -1468,16 +1452,13 @@ static void fill_idPtypeNP
   anyElementTrue.append("$map", map_obj.obj());
   outer_obj.append("$anyElementTrue", anyElementTrue.obj());
 
-  orion::BSONObjBuilder bobNeTrue;
   orion::BSONObjBuilder bobGtCurrentTime;
   orion::BSONObjBuilder bobNeStatus;
 
-  bobNeTrue.append("$ne", true);
   bobGtCurrentTime.append("$gt", (long long) getCurrentTime());
   bobNeStatus.append("$ne", STATUS_INACTIVE);
 
   bgP->boPNP.append(entPatternQ, "true");
-  bgP->boPNP.append(typePatternQ, bobNeTrue.obj());
   bgP->boPNP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boPNP.append(CSUB_STATUS, bobNeStatus.obj());
   bgP->boPNP.append("$expr", outer_obj.obj());
