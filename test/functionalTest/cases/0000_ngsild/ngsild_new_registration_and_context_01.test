@@ -115,7 +115,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1
 02. GET the registration
 ========================
 HTTP/1.1 200 OK
-Content-Length: 750
+Content-Length: 762
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -154,7 +154,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "endAt": "2027-12-31T10:00:00.120Z",
         "startAt": "2017-12-31T10:00:00.798Z"
     },
-    "name": "R1",
     "observationInterval": {
         "endAt": "2028-12-31T10:00:00.456Z",
         "startAt": "2018-12-31T10:00:00.123Z"
@@ -174,6 +173,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Point"
     },
     "origin": "cache",
+    "registrationName": "R1",
     "status": "active",
     "type": "ContextSourceRegistration"
 }

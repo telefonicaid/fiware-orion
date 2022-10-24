@@ -25,4 +25,5 @@
 * Issue #280   Implemented GET /csourceRegistrations/{regId} using mongoc AND the Registration cache
 * Issue #280   Implemented POST /csourceRegistrations using mongoc AND the Registration cache
 * Issue #280   Implemented DELETE /csourceRegistrations/{registrationId} using mongoc AND the Registration cache
-* Issue #280   Implemented GET /csourceRegistrations using the Registration cache
+* Issue #280   Implemented GET /csourceRegistrations using the Registration cache (URL params still need implementation
+* Issue #280   Implemented GET /csourceRegistrations?attrs=A1,A2,...An

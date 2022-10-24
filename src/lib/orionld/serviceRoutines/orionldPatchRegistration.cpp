@@ -418,6 +418,7 @@ static bool ngsildRegistrationToAPIv1Datamodel(KjNode* patchTree, KjNode* dbRegi
   KjNode* observationIntervalP = NULL;
   KjNode* managementIntervalP  = NULL;
   KjNode* expiresP             = NULL;
+  KjNode* registrationNameP    = NULL;
 
   //
   // Loop over the patch-tree and modify it to make it compatible with the database model for APIv1
@@ -440,6 +441,8 @@ static bool ngsildRegistrationToAPIv1Datamodel(KjNode* patchTree, KjNode* dbRegi
       observationIntervalP = fragmentP;
     else if (strcmp(fragmentP->name, "managementInterval") == 0)
       managementIntervalP = fragmentP;
+    else if (strcmp(fragmentP->name, "registrationName") == 0)
+      registrationNameP = fragmentP;
   }
 
 
@@ -484,6 +487,9 @@ static bool ngsildRegistrationToAPIv1Datamodel(KjNode* patchTree, KjNode* dbRegi
 
   if (informationP != NULL)
     ngsildRegistrationInformationToAPIv1Datamodel(informationP, providingApplicationP->value.s);
+
+  if (registrationNameP != NULL)
+    registrationNameP->name = (char*) "name";
 
   //
   // The 'start' and 'end' of observationInterval and managementInterval come in as strings

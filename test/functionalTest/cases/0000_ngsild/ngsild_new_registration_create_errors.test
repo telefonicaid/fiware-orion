@@ -4512,15 +4512,15 @@ Date: REGEX(.*)
 
 129. Attempt to create a registration with a duplicated 'tenant' - see failure
 ==============================================================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 175
+HTTP/1.1 400 Bad Request
+Content-Length: 106
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Multitenancy is not turned on - restart broker with -multiservice set",
-    "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+    "detail": "tenant",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

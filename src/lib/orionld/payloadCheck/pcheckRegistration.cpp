@@ -140,7 +140,7 @@ const char* fwdOperations[] = {
   "replaceAttrs",
   "mergeBatch",
 
-  "fwdRetrieveEntity",
+  "retrieveEntity",
   "queryEntity",
   "queryBatch",
   "retrieveTemporal",
@@ -530,12 +530,9 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
         return false;
       }
     }
-    else if (strcmp(nodeP->name, "name") == 0)
+    else if ((strcmp(nodeP->name, "registrationName") == 0) || (strcmp(nodeP->name, "name") == 0))
     {
-      // Old name - give error?
-    }
-    else if (strcmp(nodeP->name, "registrationName") == 0)
-    {
+      nodeP->name = (char*) "registrationName";
       DUPLICATE_CHECK(nameP, "registrationName", nodeP);
       STRING_CHECK(nodeP, "registrationName");
       EMPTY_STRING_CHECK(nodeP, "registrationName");
@@ -564,12 +561,6 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
       if (pCheckTenant(nodeP->value.s) == false)
       {
         // pCheckTenant calls orionldError
-        return false;
-      }
-
-      if (multitenancy == false)
-      {
-        orionldError(OrionldOperationNotSupported, "Not Implemented", "Multitenancy is not turned on - restart broker with -multiservice set", 501);
         return false;
       }
     }

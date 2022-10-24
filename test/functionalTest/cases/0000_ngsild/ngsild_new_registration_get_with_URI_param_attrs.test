@@ -1,0 +1,491 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Getting registrations with the attrs=attrs1,attrs2,attrsX URI param
+
+--SHELL-INIT--
+# Copied from ngsild_registration_get_with_URI_param_attrs.test
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create 5 registrations with ID urn:ngsi-ld:reg01-05
+# 02. Get registration 02 using URI param attrs=attrs2
+# 03. Get registration 01, 03, and 05, using URI param attrs=attrs1,attrs3,attrs5
+# 04. Get registration 02 using URI param attrs=relationship3
+# 05. Get registration 02, 04, and 05, using URI param attrs=relationship2,relationship4,relationship5
+#
+
+echo "01. Create 5 registrations with ID urn:ngsi-ld:reg01-05"
+echo "======================================================="
+payload='{
+  "id": "urn:ngsi-ld:reg01",
+  "type": "ContextSourceRegistration",
+  "name": "reg_01",
+  "description": "description of reg 01",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "attrs1", "speed" ],
+      "relationships": [ "relationship1" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload"
+echo
+echo
+
+
+payload='{
+  "id": "urn:ngsi-ld:reg02",
+  "type": "ContextSourceRegistration",
+  "name": "reg_02",
+  "description": "description of reg 02",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "attrs2", "speed" ],
+      "relationships": [ "relationship2" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload"
+echo
+echo
+
+payload='{
+  "id": "urn:ngsi-ld:reg03",
+  "type": "ContextSourceRegistration",
+  "name": "reg_03",
+  "description": "description of reg 03",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "attrs3", "speed" ],
+      "relationships": [ "relationship3" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload"
+echo
+echo
+
+
+payload='{
+  "id": "urn:ngsi-ld:reg04",
+  "type": "ContextSourceRegistration",
+  "name": "reg_04",
+  "description": "description of reg 04",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "attrs4", "speed" ],
+      "relationships": [ "relationship4" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload"
+echo
+echo
+
+
+payload='{
+  "id": "urn:ngsi-ld:reg05",
+  "type": "ContextSourceRegistration",
+  "name": "reg_05",
+  "description": "description of reg 05",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "attrs5", "speed" ],
+      "relationships": [ "relationship5" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Get registration 02 using URI param attrs=attrs2"
+echo "===================================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?attrs=attrs2&prettyPrint=yes&spaces=2" --noPayloadCheck
+echo
+echo
+
+
+echo "03. Get registration 01, 03, and 05, using URI param attrs=attrs1,attrs3,attrs5"
+echo "==============================================================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?attrs=attrs1,attrs3,attrs5&prettyPrint=yes&spaces=2" --noPayloadCheck
+echo
+echo
+
+
+echo "04. Get registration 02 using URI param attrs=relationship3"
+echo "==========================================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?attrs=relationship3&prettyPrint=yes&spaces=2" --noPayloadCheck
+echo
+echo
+
+
+echo "05. Get registration 02, 04, and 05, using URI param attrs=relationship2,relationship4,relationship5"
+echo "===================================================================================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations?attrs=relationship2,relationship4,relationship5&prettyPrint=yes&spaces=2" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 5 registrations with ID urn:ngsi-ld:reg01-05
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg01
+
+
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg02
+
+
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg03
+
+
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg04
+
+
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg05
+
+
+
+02. Get registration 02 using URI param attrs=attrs2
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 574
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+  {
+    "id": "urn:ngsi-ld:reg02",
+    "registrationName": "reg_02",
+    "description": "description of reg 02",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:A456",
+            "type": "Vehicle"
+          }
+        ],
+        "propertyNames": [
+          "attrs2",
+          "speed"
+        ],
+        "relationshipNames": [
+          "relationship2"
+        ]
+      }
+    ],
+    "endpoint": "http://my.csource.org:1026",
+    "status": "active",
+    "type": "ContextSourceRegistration",
+    "origin": "cache"
+  }
+]
+
+
+
+03. Get registration 01, 03, and 05, using URI param attrs=attrs1,attrs3,attrs5
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 1716
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+  {
+    "id": "urn:ngsi-ld:reg01",
+    "registrationName": "reg_01",
+    "description": "description of reg 01",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:A456",
+            "type": "Vehicle"
+          }
+        ],
+        "propertyNames": [
+          "attrs1",
+          "speed"
+        ],
+        "relationshipNames": [
+          "relationship1"
+        ]
+      }
+    ],
+    "endpoint": "http://my.csource.org:1026",
+    "status": "active",
+    "type": "ContextSourceRegistration",
+    "origin": "cache"
+  },
+  {
+    "id": "urn:ngsi-ld:reg03",
+    "registrationName": "reg_03",
+    "description": "description of reg 03",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:A456",
+            "type": "Vehicle"
+          }
+        ],
+        "propertyNames": [
+          "attrs3",
+          "speed"
+        ],
+        "relationshipNames": [
+          "relationship3"
+        ]
+      }
+    ],
+    "endpoint": "http://my.csource.org:1026",
+    "status": "active",
+    "type": "ContextSourceRegistration",
+    "origin": "cache"
+  },
+  {
+    "id": "urn:ngsi-ld:reg05",
+    "registrationName": "reg_05",
+    "description": "description of reg 05",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:A456",
+            "type": "Vehicle"
+          }
+        ],
+        "propertyNames": [
+          "attrs5",
+          "speed"
+        ],
+        "relationshipNames": [
+          "relationship5"
+        ]
+      }
+    ],
+    "endpoint": "http://my.csource.org:1026",
+    "status": "active",
+    "type": "ContextSourceRegistration",
+    "origin": "cache"
+  }
+]
+
+
+
+04. Get registration 02 using URI param attrs=relationship3
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 574
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+  {
+    "id": "urn:ngsi-ld:reg03",
+    "registrationName": "reg_03",
+    "description": "description of reg 03",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:A456",
+            "type": "Vehicle"
+          }
+        ],
+        "propertyNames": [
+          "attrs3",
+          "speed"
+        ],
+        "relationshipNames": [
+          "relationship3"
+        ]
+      }
+    ],
+    "endpoint": "http://my.csource.org:1026",
+    "status": "active",
+    "type": "ContextSourceRegistration",
+    "origin": "cache"
+  }
+]
+
+
+
+05. Get registration 02, 04, and 05, using URI param attrs=relationship2,relationship4,relationship5
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1716
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+  {
+    "id": "urn:ngsi-ld:reg02",
+    "registrationName": "reg_02",
+    "description": "description of reg 02",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:A456",
+            "type": "Vehicle"
+          }
+        ],
+        "propertyNames": [
+          "attrs2",
+          "speed"
+        ],
+        "relationshipNames": [
+          "relationship2"
+        ]
+      }
+    ],
+    "endpoint": "http://my.csource.org:1026",
+    "status": "active",
+    "type": "ContextSourceRegistration",
+    "origin": "cache"
+  },
+  {
+    "id": "urn:ngsi-ld:reg04",
+    "registrationName": "reg_04",
+    "description": "description of reg 04",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:A456",
+            "type": "Vehicle"
+          }
+        ],
+        "propertyNames": [
+          "attrs4",
+          "speed"
+        ],
+        "relationshipNames": [
+          "relationship4"
+        ]
+      }
+    ],
+    "endpoint": "http://my.csource.org:1026",
+    "status": "active",
+    "type": "ContextSourceRegistration",
+    "origin": "cache"
+  },
+  {
+    "id": "urn:ngsi-ld:reg05",
+    "registrationName": "reg_05",
+    "description": "description of reg 05",
+    "information": [
+      {
+        "entities": [
+          {
+            "id": "urn:ngsi-ld:Vehicle:A456",
+            "type": "Vehicle"
+          }
+        ],
+        "propertyNames": [
+          "attrs5",
+          "speed"
+        ],
+        "relationshipNames": [
+          "relationship5"
+        ]
+      }
+    ],
+    "endpoint": "http://my.csource.org:1026",
+    "status": "active",
+    "type": "ContextSourceRegistration",
+    "origin": "cache"
+  }
+]
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

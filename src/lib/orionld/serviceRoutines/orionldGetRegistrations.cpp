@@ -27,6 +27,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjObject, kjArray
 #include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -39,6 +40,7 @@ extern "C"
 #include "orionld/dbModel/dbModelToApiRegistration.h"            // dbModelToApiRegistration
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
 #include "orionld/regCache/regCacheGet.h"                        // regCacheGet
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldGetRegistrations.h"     // Own Interface
 
 
@@ -48,6 +50,84 @@ extern "C"
 // apiModelFromCachedRegistration - FIXME: Move to dbModel library?
 //
 extern void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, bool sysAttrs);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// entityMatch -
+//
+// "information": [
+//   {
+//     "entities": [
+//       {
+//         "type": "",
+//         "id": "",
+//         "idPattern": ""
+//       }
+//     ],
+//     "propertyNames": [ "P1", "P2", ... ],
+//     "relationshipNames": [ "R1", "R2", ... ],
+//   }
+//
+bool entityMatch(RegCacheItem* cRegP, StringArray* idListP, const char* idPattern, StringArray* typeListP, StringArray* attrListP)
+{
+  KjNode* informationP = kjLookup(cRegP->regTree, "information");
+
+  if (informationP == NULL)
+    return false;  // Erroneous Registration - should never happen
+
+  LM(("RU: orionldState.uriParams.type: '%s'", orionldState.uriParams.type));
+  for (KjNode* infoItemP = informationP->value.firstChildP; infoItemP != NULL; infoItemP = infoItemP->next)
+  {
+    // KjNode* entitiesP          = kjLookup(infoItemP, "entities");
+    KjNode* propertyNamesP     = kjLookup(infoItemP, "propertyNames");
+    KjNode* relationshipNamesP = kjLookup(infoItemP, "relationshipNames");
+    bool    typeHit      = false;
+    bool    idHit        = false;
+    bool    idPatternHit = false;
+    bool    attrsHit     = false;
+
+    if (idListP->items   == 0)     idHit        = true;
+    if (idPattern        == NULL)  idPatternHit = true;
+    if (typeListP->items == 0)     typeHit      = true;
+    if (attrListP->items == 0)     attrsHit     = true;
+
+    LM(("RU: attrListP->items: %d", attrListP->items));
+    for (int ix = 0; ix < attrListP->items; ix++)
+    {
+      LM(("RU: Looking up '%s' in propertyNamesP and relationshipNamesP", attrListP->array[ix]));
+      // If any of the attr in attrListP is found in either propertyNamesP or relationshipNamesP, then it's a match
+      if (kjStringValueLookupInArray(propertyNamesP, attrListP->array[ix]) != NULL)
+      {
+        LM(("RU: Hit in propertyNames for '%s'", attrListP->array[ix]));
+        attrsHit = true;
+        break;
+      }
+      else if (kjStringValueLookupInArray(relationshipNamesP, attrListP->array[ix]) != NULL)
+      {
+        LM(("RU: Hit in relationshipNames for '%s'", attrListP->array[ix]));
+        attrsHit = true;
+        break;
+      }
+      else
+        LM(("RU: no hit for '%s'", attrListP->array[ix]));
+    }
+
+    if (typeHit && idHit && idPatternHit && attrsHit)
+    {
+      LM(("RU: ************ HIT ***********"));
+      return true;
+    }
+    LM(("RU: ************ NO HIT ***********"));
+    LM(("RU: typeHit:      %s", (typeHit      == true)? "TRUE" : "FALSE"));
+    LM(("RU: idHit:        %s", (idHit        == true)? "TRUE" : "FALSE"));
+    LM(("RU: idPatternHit: %s", (idPatternHit == true)? "TRUE" : "FALSE"));
+    LM(("RU: attrsHit:     %s", (attrsHit     == true)? "TRUE" : "FALSE"));
+  }
+
+  return false;
+}
 
 
 
@@ -73,7 +153,19 @@ bool orionldGetRegistrations(void)
   //
   RegCache* rcP = regCacheGet(orionldState.tenantP, false);
 
-  if (orionldState.uriParams.count == true)  // Empty loop over the registrations, just to count how many there are
+  //
+  // Empty loop over the registrations, just to count how many there are
+  //
+  // FIXME: THIS IS NOT HOW IT SHOULD WORK !!!
+  //        This query has URL-parameters to narrow down the result.
+  //        The count should NOT return the total number of registrations BUT
+  //        the total number of MATCHING registrations
+  //
+  // The counting mechanism needs to be part of the second loop (and this first loop needs to go away)
+  // - If count is set, instead of breaking when the "limit has been reached", the loop needs go on, but not
+  // add any more registrations to the outgoing data, just counting the hits.
+  //
+  if (orionldState.uriParams.count == true)
   {
     int count  = 0;
 
@@ -88,16 +180,23 @@ bool orionldGetRegistrations(void)
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
   }
 
-  int        offset    = orionldState.uriParams.offset;
-  int        limit     = orionldState.uriParams.limit;
-  KjNode*    regArray  = kjArray(orionldState.kjsonP, NULL);
-  int        regs      = 0;
-  int        ix        = 0;
+  int        offset      = orionldState.uriParams.offset;
+  int        limit       = orionldState.uriParams.limit;
+  KjNode*    regArray    = kjArray(orionldState.kjsonP, NULL);
+  int        regs        = 0;
+  int        ix          = 0;
 
   if ((limit != 0) && (rcP != NULL))
   {
     for (RegCacheItem* cRegP = rcP->regList; cRegP != NULL; cRegP = cRegP->next)
     {
+      // Filter: attrs
+      if ((orionldState.uriParams.attrs != NULL) || (orionldState.uriParams.id != NULL) || (orionldState.uriParams.idPattern != NULL) || (orionldState.uriParams.type != NULL))
+      {
+        if (entityMatch(cRegP, &orionldState.in.idList, orionldState.uriParams.idPattern, &orionldState.in.typeList,  &orionldState.in.attrList) == false)
+          continue;
+      }
+
       if (ix < offset)
       {
         ++ix;
