@@ -204,7 +204,6 @@ typedef void (*OrionExitFunction)(int exitCode, const std::string& reason);
 */
 extern char               fwdHost[];
 extern int                fwdPort;
-extern bool               ngsi9Only;
 extern bool               harakiri;
 extern int                startTime;
 extern int                statisticsTime;
