@@ -419,12 +419,10 @@ int mongoSubCacheItemInsert
   if (sub.hasField(CSUB_MQTTTOPIC))
   {
     cSubP->mqttInfo.fill(sub);
-    //cSubP->httpInfo.json = NULL;
   }
   else
   {
     cSubP->httpInfo.fill(sub);
-    //cSubP->mqttInfo.json = NULL;
   }
 
   //
