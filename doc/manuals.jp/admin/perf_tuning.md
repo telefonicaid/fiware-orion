@@ -40,6 +40,10 @@ Orion Context Broker は、データベース管理者に柔軟性を提供す�
 * [エンティティのコレクション](database_model.md#entities-collection)
     * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (これは複合インデックスであり、この場合のキー順は重要です)
     * `creDate`
+    * `_id.id`
+    * `_id.type`
+    * `_id.servicePath`
+    * `attrNames`
 
 さらに、クエリによっては *追加* インデックスが必要になるかもしれません。
 
@@ -54,8 +58,8 @@ Orion Context Broker は、データベース管理者に柔軟性を提供す�
 
 Orion Context Broker が実際に保証している唯一のインデックスは以下のものです。どちらも Orion の起動時またはエンティティの作成時に保証されます。
 
-* [ジオロケーション機能](../user/geolocation.md)の機能的な必要性のために、エンティティ・コレクション内にある `location.coords` フィールドの "2dsphere" インデックス
-* [一時的なエンティティ機能](../user/transient_entities.md)の機能的な必要性のために、エンティティ・コレクション内にある `expDate` フィールドに `expireAfterSeconds: 0` を持つインデックス
+* [ジオロケーション機能](../orion-api.md#geospatial-properties-of-entities)の機能的な必要性のために、エンティティ・コレクション内にある `location.coords` フィールドの "2dsphere" インデックス
+* [一時的なエンティティ機能](../orion-api.md#transient-entities)の機能的な必要性のために、エンティティ・コレクション内にある `expDate` フィールドに `expireAfterSeconds: 0` を持つインデックス
 
 [このドキュメント](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/extra/indexes_analysis.md)では、古い Orion バージョンをベースにしていますが、インデックスの影響についての分析を見つけることができますが、古くなった可能性があります。さらに、MongoDB の公式ドキュメントから、[複合インデックス](https://docs.mongodb.com/manual/core/index-compound/) および [インデックスを使用した結果の並べ替え](https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/) に関する有用な参考文献を見つけてください。
 

@@ -1069,7 +1069,7 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), modifiedAttrs, targetAltType, &subVec);
+  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attributes, modifiedAttrs, targetAltType, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   double now = getCurrentTime();
@@ -1265,21 +1265,84 @@ static void fill_idPtypeNP
   const std::string&  typePatternQ
 )
 {
-  bgP->functionIdPtypeNP = std::string("function()") +
-         "{" +
-            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "!this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
-                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
-                    "return true; " +
-                "}" +
-            "}" +
-            "return false; " +
-         "}";
-  LM_T(LmtMongo, ("idTtypeNP function: %s", bgP->functionIdPtypeNP.c_str()));
+  orion::BSONObjBuilder outer_obj;
+  orion::BSONObjBuilder anyElementTrue;
+  orion::BSONObjBuilder map_obj;
+  orion::BSONObjBuilder in;
+  orion::BSONArrayBuilder and_arr;
+  orion::BSONObjBuilder and_first;
+  orion::BSONObjBuilder and_second;
+  orion::BSONObjBuilder and_third;
+  orion::BSONObjBuilder and_fourth;
+  orion::BSONObjBuilder regex_obj;
+  orion::BSONArrayBuilder eq_arr;
+  orion::BSONObjBuilder eq_obj;
+  orion::BSONObjBuilder eq_obj_2;
+  orion::BSONObjBuilder eq_obj_3;
+  orion::BSONObjBuilder eq_obj_4;
+  orion::BSONObjBuilder eq_obj_5;
+  orion::BSONObjBuilder or_obj;
+  orion::BSONObjBuilder type_obj;
+  orion::BSONObjBuilder type_obj_1;
+  orion::BSONArrayBuilder eq_arr_2;
+  orion::BSONArrayBuilder eq_arr_3;
+  orion::BSONArrayBuilder eq_arr_4;
+  orion::BSONArrayBuilder eq_arr_5;
+  orion::BSONArrayBuilder eq_arr_6;
+  orion::BSONArrayBuilder or_arr;
+  orion::BSONArrayBuilder or_arr_1;
+
+  map_obj.append("input", "$entities");
+
+  regex_obj.append("input", entityId);
+  regex_obj.append("regex", "$$this.id");
+  regex_obj.append("options", "i");
+  and_first.append("$regexMatch", regex_obj.obj());
+  and_arr.append(and_first.obj());
+
+  eq_arr.append("$$this.isPattern");
+  eq_arr.append("true");
+  and_second.append("$eq", eq_arr.arr());
+  and_arr.append(and_second.obj());
+
+  eq_arr_2.append("$$this.type");
+  eq_arr_2.append(entityType);
+  eq_obj.append("$eq", eq_arr_2.arr());
+  or_arr.append(eq_obj.obj());
+
+  eq_arr_3.append("$$this.type");
+  eq_arr_3.append("");
+  eq_obj_2.append("$eq", eq_arr_3.arr());
+  or_arr.append(eq_obj_2.obj());
+
+  type_obj.append("$type", "$$this.type");
+  eq_arr_5.append(type_obj.obj());
+  eq_arr_5.append("missing");
+  eq_obj_3.append("$eq", eq_arr_5.arr());
+  or_arr.append(eq_obj_3.obj());
+
+  and_third.append("$or", or_arr.arr());
+  and_arr.append(and_third.obj());
+
+  eq_arr_4.append("$$this.isTypePattern");
+  eq_arr_4.append(false);
+  eq_obj_4.append("$eq", eq_arr_4.arr());
+  or_arr_1.append(eq_obj_4.obj());
+
+  type_obj_1.append("$type", "$$this.isTypePattern");
+  eq_arr_6.append(type_obj_1.obj());
+  eq_arr_6.append("missing");
+  eq_obj_5.append("$eq", eq_arr_6.arr());
+  or_arr_1.append(eq_obj_5.obj());
+  or_obj.append("$or", or_arr_1.arr());
+
+  and_arr.append(or_obj.obj());
+
+  in.append("$and", and_arr.arr());
+  map_obj.append("in", in.obj());
+
+  anyElementTrue.append("$map", map_obj.obj());
+  outer_obj.append("$anyElementTrue", anyElementTrue.obj());
 
   orion::BSONObjBuilder bobNeTrue;
   orion::BSONObjBuilder bobGtCurrentTime;
@@ -1293,8 +1356,7 @@ static void fill_idPtypeNP
   bgP->boPNP.append(typePatternQ, bobNeTrue.obj());
   bgP->boPNP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boPNP.append(CSUB_STATUS, bobNeStatus.obj());
-  bgP->boPNP.appendCode("$where", bgP->functionIdPtypeNP);
-
+  bgP->boPNP.append("$expr", outer_obj.obj());
   bgP->idPtypeNP = bgP->boPNP.obj();
 }
 
@@ -1313,19 +1375,49 @@ static void fill_idNPtypeP
   const std::string&  typePatternQ
 )
 {
-  bgP->functionIdNPtypeP = std::string("function()") +
-      "{" +
-         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"false\" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+" == \""+entityId+"\" && " +
-                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
-                 "return true; " +
-             "}" +
-         "}" +
-         "return false; " +
-      "}";
-  LM_T(LmtMongo, ("idNPtypeP function: %s", bgP->functionIdNPtypeP.c_str()));
+  orion::BSONObjBuilder outer_obj;
+  orion::BSONObjBuilder anyElementTrue;
+  orion::BSONObjBuilder map_obj;
+  orion::BSONObjBuilder in_obj;
+  orion::BSONArrayBuilder and_arr;
+  orion::BSONObjBuilder and_first;
+  orion::BSONObjBuilder and_second;
+  orion::BSONObjBuilder and_third;
+  orion::BSONObjBuilder and_fourth;
+  orion::BSONObjBuilder regex_obj;
+  orion::BSONArrayBuilder eq_arr;
+  orion::BSONArrayBuilder eq_arr_2;
+  orion::BSONArrayBuilder eq_arr_3;
+  orion::BSONArrayBuilder or_arr;
+  orion::BSONArrayBuilder or_arr_1;
+
+  eq_arr.append("$$this.isPattern");
+  eq_arr.append("false");
+  and_first.append("$eq", eq_arr.arr());
+  and_arr.append(and_first.obj());
+
+  eq_arr_2.append("$$this.isTypePattern");
+  eq_arr_2.append(true);
+  and_second.append("$eq", eq_arr_2.arr());
+  and_arr.append(and_second.obj());
+
+  eq_arr_3.append("$$this.id");
+  eq_arr_3.append(entityId);
+  and_third.append("$eq", eq_arr_3.arr());
+  and_arr.append(and_third.obj());
+
+  regex_obj.append("input", entityType);
+  regex_obj.append("regex", "$$this.type");
+  regex_obj.append("options", "i");
+  and_fourth.append("$regexMatch", regex_obj.obj());
+  and_arr.append(and_fourth.obj());
+
+  in_obj.append("$and", and_arr.arr());
+  map_obj.append("input", "$entities");
+  map_obj.append("in", in_obj.obj());
+
+  anyElementTrue.append("$map", map_obj.obj());
+  outer_obj.append("$anyElementTrue", anyElementTrue.obj());
 
   orion::BSONObjBuilder bobGtCurrentTime;
   orion::BSONObjBuilder bobNeStatus;
@@ -1337,8 +1429,7 @@ static void fill_idNPtypeP
   bgP->boNPP.append(typePatternQ, true);
   bgP->boNPP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boNPP.append(CSUB_STATUS, bobNeStatus.obj());
-  bgP->boNPP.appendCode("$where", bgP->functionIdNPtypeP);
-
+  bgP->boNPP.append("$expr", outer_obj.obj());
   bgP->idNPtypeP = bgP->boNPP.obj();
 }
 
@@ -1359,19 +1450,50 @@ static void fill_idPtypeP
   const std::string&  typePatternQ
 )
 {
-  bgP->functionIdPtypeP = std::string("function()") +
-      "{" +
-         "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-             "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                 "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISTYPEPATTERN+" && " +
-                 "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+") && " +
-                 "\""+entityType+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+")) {" +
-                 "return true; " +
-             "}" +
-         "}" +
-         "return false; " +
-      "}";
-  LM_T(LmtMongo, ("idPtypeP function: %s", bgP->functionIdPtypeP.c_str()));
+  orion::BSONObjBuilder outer_obj;
+  orion::BSONObjBuilder anyElementTrue;
+  orion::BSONObjBuilder map_obj;
+  orion::BSONObjBuilder in_obj;
+  orion::BSONArrayBuilder and_arr;
+  orion::BSONObjBuilder and_first;
+  orion::BSONObjBuilder and_second;
+  orion::BSONObjBuilder and_third;
+  orion::BSONObjBuilder and_fourth;
+  orion::BSONObjBuilder regex_obj;
+  orion::BSONObjBuilder regex_obj_2;
+  orion::BSONArrayBuilder eq_arr;
+  orion::BSONArrayBuilder eq_arr_2;
+  orion::BSONArrayBuilder or_arr;
+  orion::BSONArrayBuilder or_arr_1;
+
+  eq_arr.append("$$this.isPattern");
+  eq_arr.append("true");
+  and_first.append("$eq", eq_arr.arr());
+  and_arr.append(and_first.obj());
+
+  eq_arr_2.append("$$this.isTypePattern");
+  eq_arr_2.append(true);
+  and_second.append("$eq", eq_arr_2.arr());
+  and_arr.append(and_second.obj());
+
+  regex_obj.append("input", entityId);
+  regex_obj.append("regex", "$$this.id");
+  regex_obj.append("options", "i");
+  and_third.append("$regexMatch", regex_obj.obj());
+  and_arr.append(and_third.obj());
+
+  regex_obj_2.append("input", entityType);
+  regex_obj_2.append("regex", "$$this.type");
+  regex_obj_2.append("options", "i");
+  and_fourth.append("$regexMatch", regex_obj_2.obj());
+  and_arr.append(and_fourth.obj());
+
+  in_obj.append("$and", and_arr.arr());
+  map_obj.append("input", "$entities");
+  map_obj.append("in", in_obj.obj());
+
+  anyElementTrue.append("$map", map_obj.obj());
+  outer_obj.append("$anyElementTrue", anyElementTrue.obj());
 
   orion::BSONObjBuilder bobGtCurrentTime;
   orion::BSONObjBuilder bobNeStatus;
@@ -1383,8 +1505,7 @@ static void fill_idPtypeP
   bgP->boPP.append(typePatternQ, true);
   bgP->boPP.append(CSUB_EXPIRATION, bobGtCurrentTime.obj());
   bgP->boPP.append(CSUB_STATUS, bobNeStatus.obj());
-  bgP->boPP.appendCode("$where", bgP->functionIdPtypeP);
-
+  bgP->boPP.append("$expr", outer_obj.obj());
   bgP->idPtypeP = bgP->boPP.obj();
 }
 
@@ -1582,18 +1703,21 @@ static bool addTriggeredSubscriptions_noCache
         continue;
       }
 
-      /* Except in the case of ONANYCHANGE subscriptions (the ones with empty condValues), we check if
-       * condValues include some of the modifiedAttributes. In previous versions we defered this to DB
-       * as an additional element in the csubs query (in both pattern and no-pattern "$or branches"), eg:
-       *
-       * "conditions.value": { $in: [ "pressure" ] }
-       *
-       * However, it is difficult to check this condition *OR* empty array (for the case of ONANYCHANGE)
-       * at query level, so now do the check in the code.
-       */
-      if (!condValueAttrMatch(sub, modifiedAttrs))
+      // Depending of the alteration type, we use the list of attributes in the request or the list
+      // with effective modifications
+      if (targetAltType == ngsiv2::EntityUpdate)
       {
-        continue;
+        if (!condValueAttrMatch(sub, attributes))
+        {
+          continue;
+        }
+      }
+      else
+      {
+        if (!condValueAttrMatch(sub, modifiedAttrs))
+        {
+          continue;
+        }
       }
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
@@ -1613,8 +1737,14 @@ static bool addTriggeredSubscriptions_noCache
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
 
-      httpInfo.fill(sub);
-      mqttInfo.fill(sub);
+      if (sub.hasField(CSUB_MQTTTOPIC))
+      {
+        mqttInfo.fill(sub);
+      }
+      else
+      {
+        httpInfo.fill(sub);
+      }
 
       bool op = false;
       StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
@@ -2009,6 +2139,20 @@ static unsigned int processSubscriptions
     notification.httpInfo = tSubP->httpInfo;
     notification.mqttInfo = tSubP->mqttInfo;
     notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
+    if (notification.type == ngsiv2::HttpNotification)
+    {
+      if (tSubP->httpInfo.json != NULL)
+      {
+        notification.httpInfo.json = tSubP->httpInfo.json->clone();
+      }
+    }
+    else  // notification.type == ngsiv2::MqttNotification
+    {
+      if (tSubP->mqttInfo.json != NULL)
+      {
+        notification.mqttInfo.json = tSubP->mqttInfo.json->clone();
+      }
+    }
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
@@ -2024,6 +2168,12 @@ static unsigned int processSubscriptions
                                                                 notification,
                                                                 tSubP->blacklist,
                                                                 tSubP->covered);
+
+    // notification already consumed, it can be freed
+    // Only one of the release operations will do something, but it is simpler (and safer)
+    // than using notification type
+    notification.httpInfo.release();
+    notification.mqttInfo.release();
 
     if (notificationSent)
     {

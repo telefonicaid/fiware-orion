@@ -109,7 +109,7 @@ Broker が起動すると、サブスクリプション・キャッシュには�
 
 <a name="servicestenants"></a>
 ## サービス/テナント
-Orionは、Orion の単一のインスタンスで異なるデータベースで作業することができます。これはマルチテナント機能と呼ばれています。[Orion ユーザ・マニュアル](../user/multitenancy.md)に記載されています。
+Orionは、Orion の単一のインスタンスで異なるデータベースで作業することができます。これはマルチテナント機能と呼ばれています。[Orion API のマルチ・テナンシー](../orion-api.md#multi-tenancy)のセクションに記載されています。
 
 すべてのサービス、またはテナントは、[管理マニュアル](../admin/database_admin.md#multiservicemultitenant-database-separation)に記載されているように、同じ MongoDB インスタンス内に、独自の MongoDB データベースを持っています。
 

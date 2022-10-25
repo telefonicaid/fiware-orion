@@ -39,12 +39,12 @@ The list of available options is the following:
     runs in both IPv4 and IPv6). Cannot be used at the same time
     as -ipv4.
 -   **-multiservice**. Enables multiservice/multitenant mode (see [multi
-    service tenant section](../user/multitenancy.md)).
+    service tenant section](../orion-api.md#multi-tenancy)).
 -   **-db <db>**. The MongoDB database to use or
     (if `-multiservice` is
     in use) the prefix to per-service/tenant databases (see section on
     [service/tenant database
-    separation](../user/multitenancy.md). This field is restricted to 10 characters
+    separation](../orion-api.md#multi-tenancy). This field is restricted to 10 characters
     max length.
 -   **-dbhost <host>**. The MongoDB host and port to use, e.g. `-dbhost
     localhost:12345`.
@@ -118,7 +118,7 @@ The list of available options is the following:
     for forwarding messages and for notifications. Default timeout (if this parameter is not specified)
     is 5000 (5 seconds). Max value is 1800000 (30 minutes). This parameter can be defined individually for subscriptions. If defined on the subscription's
     JSON, the default parameter would be ignored. See section in the 
-    [NGSIv2 Implementation Notes](../user/ngsiv2_implementation_notes.md#timeout-subscriptions-option)
+    [`subscription.notification.http`](../orion-api.md#subscriptionnotificationhttp).
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
@@ -177,7 +177,7 @@ The list of available options is the following:
     Use this parameter to start the broker without metrics overhead.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
-    **-mqttMaxAge**. Max time (in minutes) that an unused MQTT connection is kept. Default: 60
+-   **-mqttMaxAge**. Max time (in minutes) that an unused MQTT connection is kept. Default: 60
 
 ## Configuration using environment variables
 

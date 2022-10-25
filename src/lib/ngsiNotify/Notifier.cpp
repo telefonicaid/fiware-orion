@@ -116,6 +116,113 @@ void Notifier::sendNotifyContextRequest
 
 /* ****************************************************************************
 *
+* setPayload -
+*
+* Return false if some problem occur
+*/
+static bool setPayload
+(
+  bool                             includePayload,
+  const std::string&               notifPayload,
+  const SubscriptionId&            subscriptionId,
+  Entity&                          en,
+  const std::string&               service,
+  const std::string&               token,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter,
+  std::string*                     payloadP,
+  std::string*                     mimeTypeP,
+  RenderFormat*                    renderFormatP
+)
+{
+  if (!includePayload)
+  {
+    *payloadP      = "";
+    *renderFormatP = NGSI_V2_CUSTOM;
+  }
+  else if (notifPayload.empty())
+  {
+    NotifyContextRequest   ncr;
+    ContextElementResponse cer;
+
+    cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
+    cer.entity.attributeVector.push_back(en.attributeVector);
+
+    cer.statusCode.code = SccOk;
+
+    ncr.subscriptionId  = subscriptionId;
+    ncr.contextElementResponseVector.push_back(&cer);
+
+    if (*renderFormatP == NGSI_V1_LEGACY)
+    {
+      *payloadP = ncr.toJsonV1(false, attrsFilter, blacklist, metadataFilter);
+    }
+    else
+    {
+      *payloadP = ncr.toJson(*renderFormatP, attrsFilter, blacklist, metadataFilter);
+    }
+
+    *mimeTypeP = "application/json";
+  }
+  else
+  {
+    if (!macroSubstitute(payloadP, notifPayload, en, service, token))
+    {
+      return false;
+    }
+
+    char* pload    = curl_unescape(payloadP->c_str(), payloadP->length());
+    *payloadP      = std::string(pload);
+    *renderFormatP = NGSI_V2_CUSTOM;
+    *mimeTypeP     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+    curl_free(pload);
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* setJsonPayload -
+*/
+static bool setJsonPayload
+(
+  orion::CompoundValueNode*  json,
+  const Entity&              en,
+  const std::string&         service,
+  const std::string&         token,
+  std::string*               payloadP,
+  std::string*               mimeTypeP
+)
+{
+  // Prepare a map for macro replacements. We firstly tried to pass Entity object to
+  // orion::CompoundValueNode()::toJson(), but the include Entity.h in CompoundValueNode.h
+  // makes compiler to cry (maybe some kind of circular dependency problem?)
+  std::map<std::string, std::string> replacements;
+  replacements.insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
+  replacements.insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
+  replacements.insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
+  replacements.insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
+  replacements.insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    // Note that if some attribute is named service, servicePath or authToken (although it would be
+    // an anti-pattern), the attribute takes precedence
+    replacements[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
+  }
+
+  *payloadP = json->toJson(&replacements);
+  *mimeTypeP = "application/json";  // this can be overriden by headers field
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * buildSenderParamsCustom -
 */
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
@@ -174,7 +281,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     // 2. URL
     //
     std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-    if (macroSubstitute(&url, notifUrl, en) == false)
+    if (macroSubstitute(&url, notifUrl, en, tenant, xauthToken) == false)
     {
       // Warning already logged in macroSubstitute()
       return paramsV;  // empty vector
@@ -184,51 +291,25 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-    bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
-    std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
-    if (!includePayload)
+    orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
+
+    if (json == NULL)
     {
-      payload      = "";
-      renderFormat = NGSI_V2_CUSTOM;
-    }
-    else if (notifPayload.empty())
-    {
-      NotifyContextRequest   ncr;
-      ContextElementResponse cer;
-
-      cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
-      cer.entity.attributeVector.push_back(en.attributeVector);
-
-      cer.statusCode.code = SccOk;
-
-      ncr.subscriptionId  = subscriptionId;
-      ncr.contextElementResponseVector.push_back(&cer);
-
-      if (renderFormat == NGSI_V1_LEGACY)
-      {
-        payload = ncr.toJsonV1(false, attrsFilter, blacklist, metadataFilter);
-      }
-      else
-      {
-        payload  = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
-      }
-
-      mimeType = "application/json";
+     bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
+     std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
+     if (!setPayload(includePayload, notifPayload, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
+     {
+       // Warning already logged in macroSubstitute()
+       return paramsV;  // empty vector
+     }
     }
     else
     {
-      if (macroSubstitute(&payload, notifPayload, en) == false)
-      {
-        // Warning already logged in macroSubstitute()
-        return paramsV;  // empty vector
-      }
-
-      char* pload  = curl_unescape(payload.c_str(), payload.length());
-      payload      = std::string(pload);
+      setJsonPayload(json, en, tenant, xauthToken, &payload, &mimeType);
       renderFormat = NGSI_V2_CUSTOM;
-      mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
-      curl_free(pload);
     }
+
+
 
     //
     // 4. URI Params (Query Strings) (only in the case of HTTP notifications)
@@ -240,7 +321,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         std::string key   = it->first;
         std::string value = it->second;
 
-        if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
+        if ((macroSubstitute(&key, it->first, en, tenant, xauthToken) == false) || (macroSubstitute(&value, it->second, en, tenant, xauthToken) == false))
         {
           // Warning already logged in macroSubstitute()
           return paramsV;  // empty vector
@@ -266,7 +347,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         std::string key   = it->first;
         std::string value = it->second;
 
-        if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
+        if ((macroSubstitute(&key, it->first, en, tenant, xauthToken) == false) || (macroSubstitute(&value, it->second, en, tenant, xauthToken) == false))
         {
           // Warning already logged in macroSubstitute()
           return paramsV;  // empty vector
@@ -331,7 +412,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     // 8. Topic (only in the case of MQTT notifications)
     if (notification.type == ngsiv2::MqttNotification)
     {
-      if (macroSubstitute(&topic, notification.mqttInfo.topic, en) == false)
+      if (macroSubstitute(&topic, notification.mqttInfo.topic, en, tenant, xauthToken) == false)
       {
         // Warning already logged in macroSubstitute()
         return paramsV;  // empty vector

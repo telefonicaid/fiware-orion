@@ -25,7 +25,6 @@ __author__ = 'fermin'
 import getopt
 import getpass
 import socket
-import time
 from sys import argv, exit
 from pymongo import MongoClient, DESCENDING
 from bson.objectid import ObjectId
@@ -35,25 +34,19 @@ from subprocess import call
 MAX_PER_IP = 4
 
 def usage():
-    print '%s --db <database> [--with-restart <status_file>] [--dry-run] [-v]' % basename
+    print '%s --db <database> [--dry-run] [-v]' % basename
 
 def msg(s):
     if verbose:
         print s
 
-def log_status_restart():
-    now = time.strftime('%d-%m-%Y %H:%M:%S')
-    with open(status_file, 'a') as file:
-        file.write('%s - contextBroker restart by %s\n' %(now, basename))
-
 # Argument parsing
 basename = __file__
 DB = None
-with_restart = False
 dry_run = False
 verbose = False
 try:
-   opts, args = getopt.getopt(argv[1:], 'v', ['db=', 'with-restart=', 'dry-run'])
+   opts, args = getopt.getopt(argv[1:], 'v', ['db=', 'dry-run'])
 except getopt.GetoptError as err:
    print str(err)
    usage()
@@ -61,9 +54,6 @@ except getopt.GetoptError as err:
 for o, a in opts:
    if o == '--db':
        DB = a
-   elif o == '--with-restart':
-       with_restart = True
-       status_file = a
    elif o == '--dry-run':
        dry_run = True
    elif o == '-v':
@@ -75,13 +65,8 @@ if DB == None:
     print 'ERROR: missing db name'
     exit(1)
 
-if with_restart and getpass.getuser() != 'root':
-    print 'ERROR: only root can launch this script using --with-restart'
-    exit(1)
-
 COL = 'csubs'
 msg('INFO: parameter DB: %s' % DB)
-msg('INFO: parameter with_restart %s' % str(with_restart))
 msg('INFO: parameter dry_run: %s' % str(dry_run))
 
 client = MongoClient('localhost', 27017)
@@ -124,16 +109,10 @@ msg('INFO: documents to delete: %d' % len(to_delete))
 # Removing documents
 n = 0
 if not dry_run:
-    need_restart = False
     for csub_id in to_delete:
         n += 1
         print 'INFO: csub to be removed: %s' % csub_id
         if not dry_run:
             # FIXME: a bulk delete would be more efficient
             db[COL].remove({'_id': ObjectId(csub_id)})
-            need_restart = True
     msg('INFO: processed %d documents' % n)
-
-    if need_restart and with_restart:
-        call(['/etc/init.d/contextBroker', 'restart'])
-        log_status_restart()

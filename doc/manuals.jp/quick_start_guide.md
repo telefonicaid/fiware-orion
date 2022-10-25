@@ -3,7 +3,8 @@
 Orion Context Broker クイックスタートガイド
 Orion Context Broker へようこそ！この簡単なガイドでは、簡単な方法で [FIWARE Lab](https://lab.fiware.org) (FIWARE Foundation が所有し、管理) の Orion Context Broker グローバルインスタンスで作業するためのいくつかの初期ステップについて説明します。
 
-Orion Context Broker は、[FIWARE NGSI バージョン2 API](http://fiware-ges.github.io/orion/api/v2/stable/) を実装しています。そのような API の良い学習リソースは、[NGSI version 2 Cookbook](http://fiware-ges.github.io/orion/api/v2/stable/cookbook/) です。
+Orion Context Broker は [Orion API FIWARE NGSIv2](orion-api.md) を実装します。
+この API の優れた学習リソースは、[API ウォークスルー](user/walkthrough_apiv2.md)です。
 
 まず、FIWARE Lab にアカウントが必要です。もし、アカウントがなければ、[次のリンク](https://account.lab.fiware.org/sign_up)で登録してください。無料ですが、有効なメールアドレスが必要です。このアカウントを使用すると、Orion への REST API コールで使用する有効な認証トークンを取得できます。そのトークンを取得するには、`token_script.sh` スクリプトを取得し、パラメータとして `orion-gi` を使用して実行します (`orion-gi` は FIWARE インフラストラクチャの Orion グローバル・インスタンスを意味します)。スクリプトで要求されたら、FIWARE Lab のユーザとパスワードを入力してください。**電子メールのドメインを含む完全なユーザ名を使用する必要があります**。例えば、電子メールが "foo@gmail.com" の場合は "foo" だけでなく、"foo@gmail.com" です :
 

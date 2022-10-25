@@ -4,6 +4,8 @@ Folder for acceptance tests of Orion Context Broker NGSIv2, implemented using [B
 
 ## Quick way
 
+First of all, the contextBroker binary (compiled in DEBUG mode) must be available in the system PATH.
+
 Installing and setting up the environment from (almost :) the scratch in your local machine (running tests on Orion
 running in an external machine is advanced stuff, look to BB_FABRIC_USER, CB_FABRIC_PASS or CB_FABRIC_CERT and CB_FABRIC_SUDO
 parameters).
@@ -97,9 +99,6 @@ file in the same directory that contains the “steps” directory.
       each file will be composed of lines with ssh commands, that will be executed.
          Example of configuration file into `PATH_TO_SETTING_FOLDER`:
          ```
-            # replace values in configuration.json
-            sed -i "s/\"CB_RUNNING_MODE\".*/\"CB_RUNNING_MODE\": \"RPM\"/" configuration.json
-            
             # copy properties.json.base to properties.json
             cp -R properties.json.base properties.json
             
@@ -120,11 +119,6 @@ file in the same directory that contains the “steps” directory.
        * UPDATE_PROPERTIES_JSON: determine whether you are create/update `properties.json` automatically or manually (used to jenkins).
            - true: read external file (the file is mandatory) in `PATH_TO_SETTING_FOLDER` (with ssh commands) and execute these automatically (used to create `properties.json`) 
            - false: it does nothing and the creation of `properties.json` will be by user in jenkins console.
-       * CB_RUNNING_MODE: is used to determine how is compiled ContextBroker.
-           ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.io/en/master/admin/build_source/index.html`.
-           - RPM: CB is installed as RPM, so service tooling will be used to start and stop
-           - CLI: plain CB command line interface will be used to start contextBroker, the contextBroker binary (compiled in DEBUG mode) 
-             must be available in the system PATH.   
 - `properties.json` (MANDATORY) will be create/update in `root path` automatically from settings folder (see `configuration.json` file) or manually.
 - Run behave (see available params with the -h option).
 ```

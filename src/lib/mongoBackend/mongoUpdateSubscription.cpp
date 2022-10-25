@@ -76,6 +76,11 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     {
       unsetB->append(CSUB_PAYLOAD, 1);
     }
+
+    if (sub.notification.httpInfo.json == NULL)
+    {
+      unsetB->append(CSUB_JSON, 1);
+    }
   }
   else  // MqttNotification
   {
@@ -93,6 +98,11 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
     {
       unsetB->append(CSUB_PAYLOAD, 1);
+    }
+
+    if (sub.notification.mqttInfo.json == NULL)
+    {
+      unsetB->append(CSUB_JSON, 1);
     }
   }
 

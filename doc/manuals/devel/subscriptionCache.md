@@ -106,7 +106,7 @@ All this is to ensure that the values are correct in the case of having more tha
 
 ## Services/tenants
 
-Orion is capable of working with different databases in a single instance of Orion. This is called multitenancy capabilities (described in [the Orion user manual](../user/multitenancy.md)). 
+Orion is capable of working with different databases in a single instance of Orion. This is called multitenancy capabilities (described in [the Orion user manual](../orion-api.md#multi-tenancy)).
 
 Every Service (or Tenant) has its own MongoDB database (in the same MongoDB instance), as described in [the administration manual](../admin/database_admin.md#multiservicemultitenant-database-separation). 
 

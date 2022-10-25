@@ -87,5 +87,8 @@ HttpStatusCode mongoUpdateContextSubscription
     }
   }
 
+  // free sub memory associated to subscription
+  sub.release();
+
   return SccOk;
 }

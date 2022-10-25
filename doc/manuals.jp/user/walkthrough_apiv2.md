@@ -22,7 +22,8 @@
 
 このウォークスルーでは、読者が Orion Context Broker に慣れ親しんでプロセスを楽しむのに役立つと期待される実践的アプローチを採用しています。
 
-ウォークスルーは NGSIv2 仕様に基づいています。[ここ](http://telefonicaid.github.io/fiware-orion/api/v2/stable)で Apiary 形式で確認できます。また、[NGSIv2 実装ノート](ngsiv2_implementation_notes.md)を見てください。
+このウォークスルーは、[ここ](../orion-api.md) にある Orion API 仕様 (NGSIv2 仕様の順番に基づいています)
+に基づいています。
 
 メイン・セクションは [コンテキスト管理](#context-management)です。コンテキスト管理 (車の温度などのエンティティに関する情報) のための Context Broker の基本的な機能について説明します。[コンテキスト・アベイラビリティ管理](#context-availability-management) (エンティティ自体についてではなく、その情報の提供者についての情報) は、このドキュメントの一部としても記述されています。
 
@@ -113,7 +114,7 @@ broker にリクエストを発行するには、`curl` コマンド・ライン
 -   POST の場合 :
 
 ```
-curl localhost:1026/<operation_url> -s -S [headers]' -d @- <<EOF
+curl localhost:1026/<operation_url> -s -S [headers] -d @- <<EOF
 [payload]
 EOF
 ```
@@ -237,7 +238,7 @@ curl localhost:1026/v2/entities -s -S -H 'Content-Type: application/json' -d @- 
 EOF
 ```
 
-属性値の JSON データ型 (数値、文字列、ブール値など) に対応する単純な値以外に、複雑な構造体やカスタム・メタデータを使用できます。これは高度なトピックで、それぞれ、[このセクション](structured_attribute_valued.md#structured-attribute-values)と[他のセクション](metadata.md#custom-attribute-metadata)で説明します。
+属性値の JSON データ型 (数値、文字列、ブール値など) に対応する単純な値以外に、複雑な構造体やカスタム・メタデータを使用できます。これは高度なトピックで、それぞれ、[このセクション](../orion-api.md#json-attribute-representation)と[他のセクション](../orion-api.md#context-metadata)で説明します。
 
 [トップ](#top)
 
@@ -454,14 +455,14 @@ curl localhost:1026/v2/entities?type=Room -s -S  -H 'Accept: application/json' |
 curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
-* URL パラメータ `q` を使用して、属性フィルタを使用してフィルタ処理できます。完全な説明については、[NGSv2 sepecficaiton](http://telefonicaid.github.io/fiware-orion/api/v2/stable)の "Simple Query Language" のセクションを参照してください。たとえば、温度が 22を超えるすべてのエンティティ (この場合は Room1 を取得) を取得するには、次のものを使用します :
+* URL パラメータ `q` を使用して、属性フィルタを使用してフィルタ処理できます。完全な説明については、Orion API 仕様の [シンプル・クエリ言語のセクションを](../orion-api.md#simple-query-language)参照してください。たとえば、温度が 22を超えるすべてのエンティティ (この場合は Room1 を取得) を取得するには、次のものを使用します :
 ```
 curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  -H 'Accept: application/json' | python -mjson.tool
 ```
 
-* 地理的な場所でフィルタリングすることができます。これは高度なトピックで、[このセクション](geolocation.md#)で説明します
+* 地理的な場所でフィルタリングすることができます。これは高度なトピックで、[このセクション](../orion-api.md#geographical-queries)で説明します
 
-最終的なコメントとして、この例は非常にシンプル (2つのエンティティのみ) ですが、Orion は実際のデプロイでは数百万のエンティティを管理できます。したがって、デフォルトでは、20個のエンティティしか返されません。このチュートリアルでは問題ありませんが、実際の使用シナリオではおそらくありません。大量のエンティティをページ単位で取得する方法については、[このマニュアルのページネーション](pagination.md#pagination)に関するセクションを参照してください。
+最終的なコメントとして、この例は非常にシンプル (2つのエンティティのみ) ですが、Orion は実際のデプロイでは数百万のエンティティを管理できます。したがって、デフォルトでは、20個のエンティティしか返されません。このチュートリアルでは問題ありませんが、実際の使用シナリオではおそらくありません。大量のエンティティをページ単位で取得する方法については、Orion API 仕様の[ページネーションのセクション](../orion-api.md#pagination)を参照してください。
 
 [トップ](#top)
 
@@ -501,9 +502,9 @@ curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Content-
 
 最後に、`PUT /v2/entities/{id}/attrs` オペレーションは、指定されたエンティティのすべての属性を置き換える、つまり既存のエンティティを削除するために使用できます。
 
-エンティティ作成の場合と同様に、属性値の JSON データ型 (数値、文字列、ブール値など) に対応する単純な値は別として、複雑な構造やカスタム・メタデータを使用することもできます。これらは高度なトピックで、[このセクション](structured_attribute_valued.md#structured-attribute-values)と[別のセクション](metadata.md#custom-attribute-metadata)でそれぞれ説明します。
+エンティティ作成の場合と同様に、属性値の JSON データ型 (数値、文字列、ブール値など) に対応する単純な値は別として、複雑な構造やカスタム・メタデータを使用することもできます。これらは高度なトピックで、[このセクション](../orion-api.md#json-attribute-representation)と[別のセクション](../orion-api.md#context-metadata)でそれぞれ説明します。
 
-属性の追加/削除の詳細について は、マニュアルの [このセクション](update_action_types.md)を参照してください。
+属性の追加/削除の詳細については、[Orion API 仕様](../orion-api.md)を参照してください。
 
 このウォークスルーの例では、`26.5` などの特定の値で属性を更新します。ただし、*"温度を2.5度上げる"* などの
 更新を行うこともできます。この種の更新は高度なトピックであり、[このドキュメント](update_operators.md)
@@ -559,7 +560,7 @@ EOF
 -   `condition` 要素は、サブスクリプションの "トリガー" を定義します。この `attrs` フィールドには、属性名のリストが含まれています。これらの名前は、" トリガする属性 "、すなわち、[エンティティの作成](#entity-creation)または [更新](#update-entity)によって作成/変更が通知をトリガする属性を定義します
 -  ルールは、`condition.attrs` リストの属性の少なくとも1つが変更された場合 (ある種の "OR" 条件など)、通知が送信されます。たとえば、この場合、Room1 の気圧が変化すると、Room1 の温度値が通知されますが、気圧自体は通知されません。気圧を通知したい場合は、`notification.attrs` リスト内に "気圧" を含める必要があります。または、"エンティティのすべての属性" を意味する空の属性ベクトルを使用する必要があります。ここでの、気圧の値が変化するたびに温度の値が通知されるこの例はあまり有用ではないかもしれません。この例は、サブスクリプションの巨大な柔軟性を示すためにのみ、この方法が選択されています
 -   エンティティ属性の変更時に通知トリガーを作成するには、`condition.attrs` を空のままにしておくことができます (属性の名前に関係なく)
--   通知には、通知をトリガする更新オペレーションを処理した後の属性値が含まれます。ただし、Orion に以前の値も含めさせることができ ます。これはメタデータを使用して実現されます。[次のドキュメント](metadata.md#metadata-in-notifications)を見てください
+-   通知には、通知をトリガする更新オペレーションを処理した後の属性値が含まれます。ただし、Orion に以前の値も含めさせることができ ます。これは `previousValue` 組み込みメタデータを使用して実現されます。[次のドキュメント](../orion-api.md#builtin-metadata)を見てください
 -   また、"_いくつか_の属性を除くすべての属性に通知する" サブスクリプション (一種のブラック・リスト機能) を設定することもできます。この場合、`notifications` 内の `attrs` の代わり `exceptAttrs` を使用してください
 
 そのリクエストに対応するレスポンスは、201 HTTP レスポンス・コードとして作成されたものを使用します。サブスクリプション ID (サブスクリプションの更新とキャンセルに使用される24桁16進数) を保持する Location ヘッダが含まれています。このチュートリアルの後半で必要になるので、書き留めておいてください。
@@ -618,11 +619,10 @@ Orion Context Broker は、POST HTTP メソッド (サブスクリプション�
 -   Room1 の気圧を765に更新 : broker が賢明であるため、updateContext リクエストの前の値も765なので、実際の更新は行われず、したがって通知は送信されません
 -   リクエスト URL に `?options=forcedUpdate` を追加し、Room1 の気圧を765に更新 :
     この場合、`forcedUpdate` URI オプションにより、Broker は通知を送信します。
-    [ここ](ngsiv2_implementation_notes.md#forcedupdate-option) に
-    `forcedUpdate` URI オプションの詳細が記述されています。
+    [Orion API 仕様](../orion-api.md)に `forcedUpdate` URI オプションの詳細があります
 -   Room2 の気圧を740に更新 : サブスクリプションは Room1 で Room2 ではないため、何も起こりません
 
-サブスクリプションは、`GET /v2/subscriptions` (リスト全体を提供し、リストが大きすぎる場合はページネーションが必要です) または `GET /v2/subscriptions/{subId}` (サブスクリプションを1つだけ取得する) を使用して取得できます。さらに、サブスクリプションは `PATCH /v2/subscription/{subId}` オペレーションを使用して更新することができます。最後に、サブスクリプションは `DELETE /v2/subscriptions/{subId}` オペレーションを使って削除できます。
+サブスクリプションは、`GET /v2/subscriptions` (リスト全体を提供し、リストが大きすぎる場合は[ページネーション](../orion-api.md#pagination)が必要です) または `GET /v2/subscriptions/{subId}` (サブスクリプションを1つだけ取得する) を使用して取得できます。さらに、サブスクリプションは `PATCH /v2/subscription/{subId}` オペレーションを使用して更新することができます。最後に、サブスクリプションは `DELETE /v2/subscriptions/{subId}` オペレーションを使って削除できます。
 
 いくつかの暫定的な考慮事項 :
 
@@ -636,7 +636,7 @@ curl localhost:1026/v2/subscriptions/57458eb60962ef754e7c0998 -s -S \
 EOF
 ```
 
-* 通知はいくつかの方法でカスタマイズできます。まず、`notification` の中の `attrsFormat` フィールド内のフィールドを使用して、通知のエンティティ表現形式を調整できます。次に、カスタム通知 HTTP verb (PUT など)、カスタム HTTP ヘッダ、カスタム URL クエリパラメータ、カスタムペイロード (必ずしも JSON ではなく) を使用できます。[NGSI v2 仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)の "Notification Messages" と "Custom Notifications" を見てください。
+* 通知はいくつかの方法でカスタマイズできます。まず、`notification` の中の `attrsFormat` フィールド内のフィールドを使用して、通知のエンティティ表現形式を調整できます。次に、カスタム通知 HTTP verb (PUT など)、カスタム HTTP ヘッダ、カスタム URL クエリパラメータ、カスタムペイロード (必ずしも JSON ではなく) を使用できます。Orion API 仕様の [通知メッセージ](../orion-api.md#notification-messages) と [カスタム通知](../orion-api.md#custom-notifications) を見てください。
 * このセクションで説明されている HTTP 通知に加えて、Orion は MQTT 通知もサポートしています。
   このトピックについては、[このドキュメント](mqtt_notifications.md) で詳しく説明されています。
 
@@ -695,8 +695,7 @@ curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Typ
 ```
 
 範囲フィルター (等式フィルター, ジオフィルターなど) 以外にも、より多くの可能性があります。
-これは高度なトピックです。[NGSIv2仕様](http://telefonicaid.github.io/fiware-orion/api/v2/stable/)
-の "サブスクリプション" セクションを参照してください。
+これは高度なトピックです。Orion API 仕様の[サブスクリプション条件のセクション](../orion-api.md#subscriptionsubjectcondition)を参照してください。
 
 [トップ](#top)
 
@@ -768,7 +767,7 @@ curl localhost:1026/v2/types?options=values -s -S -H 'Accept: application/json' 
 ]
 
 ```
-[ページネーション・メカニズム](pagination.md#pagination)は、上記で述べた `GET /v2/types` オペレーションでも機能することに注意してください。
+[ページネーション・メカニズム](../orion-api.md#pagination)は、上記で述べた `GET /v2/types` オペレーションでも機能することに注意してください。
 
 さらに、次のオペレーションを使用して、単一の型の詳細情報を取得することもできます :
 
@@ -867,9 +866,9 @@ curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d
 EOF
 ```
 
-`append` と `update` 以外にも、`delete`, `appendStrict` などのアクション・タイプがあります 。詳細は [このセクション](update_action_types.md)を参照してください。
+`append` と `update` 以外にも、`delete`, `appendStrict` などのアクション・タイプがあります 。詳細は、Orion API 仕様の[このセクション](../orion-api.md#update-post-v2opupdate)を参照してください。
 
-最後に、`POST /v2/op/query` は、ペイロードに指定されたクエリ条件に一致するエンティティを取得できます。これは `GET /v2/entities` に非常によく似ています (実際には、レスポンス・ペイロードは同じで、同じ方法でページネーションもサポートしています)。しかし `POST /v2/op/query` は、`GET /v2/entities` ができないクエリ (例えば、異なる型のエンティティのリスト) を表現することができます。
+最後に、`POST /v2/op/query` は、ペイロードに指定されたクエリ条件に一致するエンティティを取得できます。これは `GET /v2/entities` に非常によく似ています (実際には、レスポンス・ペイロードは同じで、同じ方法で[ページネーション](../orion-api.md#pagination)もサポートしています)。しかし `POST /v2/op/query` は、`GET /v2/entities` ができないクエリ (例えば、異なる型のエンティティのリスト) を表現することができます。
 
 例えば、温度が 40より大きく、40.31, -3.75 の座標から 20km のところにある Room 型、または車のすべてのエンティティの属性温度と気圧を取得するには、次のオペレーションを使用できます :
 

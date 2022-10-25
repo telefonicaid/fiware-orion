@@ -19,7 +19,7 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=11.2-slim
+ARG  IMAGE_TAG=11.3-slim
 FROM debian:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -128,7 +128,6 @@ RUN \
            /opt/fiware-orion && \
     # remove the same packages we installed at the beginning to build Orion
     apt-get -y remove --purge \
-      curl \
       cmake \
       libssl-dev \
       git \
@@ -170,3 +169,8 @@ LABEL "org.opencontainers.image.source"=https://github.com/${GITHUB_ACCOUNT}/${G
 RUN sed -i -r "/^(root|nobody)/!d" /etc/passwd /etc/shadow /etc/group \
     && sed -i -r 's#^(.*):[^:]*$#\1:/sbin/nologin#' /etc/passwd
 USER nobody
+
+HEALTHCHECK --interval=60s --timeout=5s --start-period=10s \
+            # Note we cannot use GET /version for healthchecking as that operation is working even in the case
+            # the database is down. In this sense, GET /v2/entities is better, as it touches database
+            CMD curl --fail -X GET http://localhost:1026/v2/entities?limit=1 || exit 1

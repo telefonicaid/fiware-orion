@@ -29,6 +29,7 @@
 #include <map>
 
 #include "mongoDriver/BSONObj.h"
+#include "parse/CompoundValueNode.h"
 
 namespace ngsiv2
 {
@@ -42,9 +43,10 @@ struct MqttInfo
   std::string   topic;
   unsigned int  qos;  // 0, 1 or 2
 
-  bool          custom;
-  std::string   payload;
-  bool          includePayload;
+  bool                       custom;
+  std::string                payload;  // either payload or json is used
+  orion::CompoundValueNode*  json;  // either payload or json is used
+  bool                       includePayload;
 
   bool          providedAuth;
   std::string   user;
@@ -55,6 +57,7 @@ struct MqttInfo
 
   std::string  toJson();
   void         fill(const orion::BSONObj& bo);
+  void         release();
 };
 }
 
