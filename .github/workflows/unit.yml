@@ -1,7 +1,7 @@
 name: Unit Test
 
 on:
-  push:
+  pull_request:
 
 env:
   IMAGE_NAME: localhost:5000/orion-ld-test:latest
