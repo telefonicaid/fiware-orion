@@ -85,6 +85,8 @@ class Entity
                       bool                             blacklist,
                       const std::vector<std::string>&  metadataFilter);
 
+  std::string  toJson(RenderFormat                     renderFormat);
+
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);

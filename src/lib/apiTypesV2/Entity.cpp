@@ -299,6 +299,20 @@ std::string Entity::toJson
 
 /* ****************************************************************************
 *
+* Entity::toJson -
+*
+* Simplified version of toJson without filters
+*/
+std::string Entity::toJson(RenderFormat renderFormat)
+{
+  std::vector<std::string>  nullFilter;
+  return toJson(renderFormat, nullFilter, false, nullFilter);
+}
+
+
+
+/* ****************************************************************************
+*
 * Entity::toJsonValues -
 */
 std::string Entity::toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs)
