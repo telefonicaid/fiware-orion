@@ -167,12 +167,11 @@ static bool updateForward
     // FIXME #3485: this part is not removed by the moment, in the case it may be useful in the
     // context of issue #3485
 
-    std::vector<std::string>  nullFilter;
-    Entity*                   eP = upcrP->entityVector[0];
+    Entity* eP = upcrP->entityVector[0];
 
     eP->renderId = false;
 
-    TIMED_RENDER(payload = eP->toJson(NGSI_V2_NORMALIZED, nullFilter, false, nullFilter));
+    TIMED_RENDER(payload = eP->toJson(NGSI_V2_NORMALIZED));
 
     resource = prefix + "/entities/" + eP->id + "/attrs";
     verb     = "PATCH";
