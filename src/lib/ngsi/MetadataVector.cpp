@@ -229,3 +229,20 @@ Metadata* MetadataVector::lookupByName(const std::string& _name) const
 
   return NULL;
 }
+
+
+
+/* ****************************************************************************
+*
+* MetadataVector::toBson -
+*/
+void MetadataVector::toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType)
+{
+  for (unsigned int ix = 0; ix < this->vec.size(); ++ix)
+  {
+    this->vec[ix]->appendToBsoN(md, mdNames, useDefaultType);
+
+    LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
+                      this->vec[ix]->name.c_str(), this->vec[ix]->type.c_str(), this->vec[ix]->toStringValue().c_str()));
+  }
+}

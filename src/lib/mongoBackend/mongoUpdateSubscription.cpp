@@ -72,6 +72,24 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     unsetB->append(CSUB_USER,      1);
     unsetB->append(CSUB_PASSWD,    1);
 
+    if  (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Text)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+    }
+    else if (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Json)
+    {
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
+    }
+    else  // (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
+    {
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_JSON, 1);
+    }
+
+#if 0
+    // FIXME PR: remove block
     if ((sub.notification.httpInfo.includePayload) && (sub.notification.httpInfo.payload.empty()))
     {
       unsetB->append(CSUB_PAYLOAD, 1);
@@ -81,6 +99,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     {
       unsetB->append(CSUB_JSON, 1);
     }
+#endif
   }
   else  // MqttNotification
   {
@@ -95,6 +114,24 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_PASSWD, 1);
     }
 
+    if  (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+    }
+    else if (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Json)
+    {
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
+    }
+    else  // (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_PAYLOAD, 1);
+    }
+
+#if 0
+    // FIXME PR: remove block
     if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
     {
       unsetB->append(CSUB_PAYLOAD, 1);
@@ -104,6 +141,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     {
       unsetB->append(CSUB_JSON, 1);
     }
+#endif
   }
 
   setNotificationInfo(sub, setB);

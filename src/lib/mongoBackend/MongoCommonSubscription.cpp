@@ -35,6 +35,7 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/compoundValueBson.h"
 
+#include "mongoDriver/BSONObjBuilder.h"
 #include "mongoDriver/BSONArrayBuilder.h"
 
 
@@ -120,37 +121,67 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
     LM_T(LmtMongo, ("Subscription qs: %s", qsObj.toString().c_str()));
   }
 
-  if (!httpInfo.includePayload)
+  if (httpInfo.payloadType == ngsiv2::CustomPayloadType::Text)
   {
-    b->appendNull(CSUB_PAYLOAD);
-    LM_T(LmtMongo, ("Subscription payload: null"));
+    if (!httpInfo.includePayload)
+    {
+      b->appendNull(CSUB_PAYLOAD);
+      LM_T(LmtMongo, ("Subscription payload: null"));
+    }
+    else if (!httpInfo.payload.empty())
+    {
+      b->append(CSUB_PAYLOAD, httpInfo.payload);
+      LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
+    }
   }
-  else if (!httpInfo.payload.empty())
+  else if (httpInfo.payloadType == ngsiv2::CustomPayloadType::Json)
   {
-    b->append(CSUB_PAYLOAD, httpInfo.payload);
-    LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
+    if (httpInfo.json != NULL)
+    {
+      std::string logStr;
+      if (httpInfo.json->isObject())
+      {
+        orion::BSONObjBuilder jsonBuilder;
+        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
+        logStr = jsonBuilderObj.toString();
+        b->append(CSUB_JSON, jsonBuilderObj);
+      }
+      else  // httpInfo.json->isVector();
+      {
+        orion::BSONArrayBuilder jsonBuilder;
+        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
+        logStr = jsonBuilderArr.toString();
+        b->append(CSUB_JSON, jsonBuilderArr);
+      }
+      LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
+    }
   }
+  else  // httpInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi
+  {
+    // id and type (both optional in this case)
+    orion::BSONObjBuilder bob;
+    if (!httpInfo.ngsi.id.empty())
+    {
+      bob.append(ENT_ENTITY_ID, httpInfo.ngsi.id);
+    }
+    if (!httpInfo.ngsi.type.empty())
+    {
+      bob.append(ENT_ENTITY_TYPE, httpInfo.ngsi.type);
+    }
 
-  if (httpInfo.json != NULL)
-  {
-    std::string logStr;
-    if (httpInfo.json->isObject())
-    {
-      orion::BSONObjBuilder jsonBuilder;
-      compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
-      orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
-      logStr = jsonBuilderObj.toString();
-      b->append(CSUB_JSON, jsonBuilderObj);
-    }
-    else  // httpInfo.json->isVector();
-    {
-      orion::BSONArrayBuilder jsonBuilder;
-      compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
-      orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
-      logStr = jsonBuilderArr.toString();
-      b->append(CSUB_JSON, jsonBuilderArr);
-    }
-    LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
+    // attributes
+    // (-1 as date as creDate and modDate are not used in this case)
+    orion::BSONObjBuilder    attrsToAdd;  // not actually used
+    orion::BSONArrayBuilder  attrNamesToAdd;
+    httpInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd, V2);
+
+    // note that although metadata is not needed in the ngsi field logic,
+    // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic
+    bob.append(ENT_ATTRS, attrsToAdd.obj());
+
+    b->append(CSUB_NGSI, bob.obj());
   }
 }
 
@@ -162,37 +193,67 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
 */
 static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBuilder* b)
 {
-  if (!mqttInfo.includePayload)
+  if (mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
   {
-    b->appendNull(CSUB_PAYLOAD);
-    LM_T(LmtMongo, ("Subscription payload: null"));
+    if (!mqttInfo.includePayload)
+    {
+      b->appendNull(CSUB_PAYLOAD);
+      LM_T(LmtMongo, ("Subscription payload: null"));
+    }
+    else if (!mqttInfo.payload.empty())
+    {
+      b->append(CSUB_PAYLOAD, mqttInfo.payload);
+      LM_T(LmtMongo, ("Subscription payload: %s", mqttInfo.payload.c_str()));
+    }
   }
-  else if (!mqttInfo.payload.empty())
+  else if (mqttInfo.payloadType == ngsiv2::CustomPayloadType::Json)
   {
-    b->append(CSUB_PAYLOAD, mqttInfo.payload);
-    LM_T(LmtMongo, ("Subscription payload: %s", mqttInfo.payload.c_str()));
+    if (mqttInfo.json != NULL)
+    {
+      std::string logStr;
+      if (mqttInfo.json->isObject())
+      {
+        orion::BSONObjBuilder jsonBuilder;
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
+        logStr = jsonBuilderObj.toString();
+        b->append(CSUB_JSON, jsonBuilderObj);
+      }
+      else  // httpInfo.json->isVector();
+      {
+        orion::BSONArrayBuilder jsonBuilder;
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
+        logStr = jsonBuilderArr.toString();
+        b->append(CSUB_JSON, jsonBuilderArr);
+      }
+      LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
+    }
   }
+  else  // mqttInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi
+  {
+    // id and type (both optional in this case)
+    orion::BSONObjBuilder bob;
+    if (!mqttInfo.ngsi.id.empty())
+    {
+      bob.append(ENT_ENTITY_ID, mqttInfo.ngsi.id);
+    }
+    if (!mqttInfo.ngsi.type.empty())
+    {
+      bob.append(ENT_ENTITY_TYPE, mqttInfo.ngsi.type);
+    }
 
-  if (mqttInfo.json != NULL)
-  {
-    std::string logStr;
-    if (mqttInfo.json->isObject())
-    {
-      orion::BSONObjBuilder jsonBuilder;
-      compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
-      orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
-      logStr = jsonBuilderObj.toString();
-      b->append(CSUB_JSON, jsonBuilderObj);
-    }
-    else  // httpInfo.json->isVector();
-    {
-      orion::BSONArrayBuilder jsonBuilder;
-      compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
-      orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
-      logStr = jsonBuilderArr.toString();
-      b->append(CSUB_JSON, jsonBuilderArr);
-    }
-    LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
+    // attributes
+    // (-1 as date as creDate and modDate are not used in this case)
+    orion::BSONObjBuilder    attrsToAdd;  // not actually used
+    orion::BSONArrayBuilder  attrNamesToAdd;
+    mqttInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd, V2);
+
+    // note that although metadata is not needed in the ngsi field logic,
+    // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic
+    bob.append(ENT_ATTRS, attrsToAdd.obj());
+
+    b->append(CSUB_NGSI, bob.obj());
   }
 }
 

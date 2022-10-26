@@ -872,17 +872,8 @@ void subCacheItemInsert
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 
-  cSubP->httpInfo = httpInfo;
-  if (httpInfo.json != NULL)
-  {
-    cSubP->httpInfo.json = httpInfo.json->clone();
-  }
-
-  cSubP->mqttInfo = mqttInfo;
-  if (mqttInfo.json != NULL)
-  {
-    cSubP->mqttInfo.json = mqttInfo.json->clone();
-  }
+  cSubP->httpInfo.fill(httpInfo);
+  cSubP->mqttInfo.fill(mqttInfo);
 
   //
   // String filters

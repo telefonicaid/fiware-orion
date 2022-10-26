@@ -35,6 +35,8 @@
 #include "parse/CompoundValueNode.h"
 
 #include "mongoDriver/BSONObj.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 
@@ -93,6 +95,8 @@ typedef struct Metadata
   void         fill(const struct Metadata& md);
   std::string  toStringValue(void) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
+
+  void         appendToBsoN(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);
 
   std::string  check(ApiVersion apiVersion);
 } Metadata;

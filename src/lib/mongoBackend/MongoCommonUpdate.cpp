@@ -109,29 +109,6 @@ inline std::string correlatorRoot(const std::string& fullCorrelator)
 
 /* ****************************************************************************
 *
-* isNotCustomMetadata -
-*
-* Check that the parameter is a not custom metadata, i.e. one metadata without
-* an special semantic to be interpreted by the context broker itself
-*
-* NGSIv2 builtin metadata (dateCreated, dateModified, etc.) are considered custom
-*
-* FIXME P6: this function probably could be removed. By the moment we leave it
-* and we decide what to do in some time (if we add a new custom metadata it could be
-* a convenient placeholder). If kept, it should be moved to another place
-* "closer" to metadata
-*/
-static bool isNotCustomMetadata(std::string md)
-{
-  // After removing ID and deprecating location, all metadata are custom so
-  // we always return false
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * hasMetadata -
 *
 * Check if a metadata is included in a (request) ContextAttribute.
@@ -348,130 +325,6 @@ static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, 
 
 /* ****************************************************************************
 *
-* appendMetadata -
-*/
-static void appendMetadata
-(
-  orion::BSONObjBuilder*    mdBuilder,
-  orion::BSONArrayBuilder*  mdNamesBuilder,
-  const Metadata*    mdP,
-  bool               useDefaultType
-)
-{
-  std::string type = mdP->type;
-
-  if (!mdP->typeGiven && useDefaultType)
-  {
-    if ((mdP->compoundValueP == NULL) || (mdP->compoundValueP->valueType != orion::ValueTypeVector))
-    {
-      type = defaultType(mdP->valueType);
-    }
-    else
-    {
-      type = defaultType(orion::ValueTypeVector);
-    }
-  }
-
-  mdNamesBuilder->append(mdP->name);
-  std::string effectiveName = dbEncode(mdP->name);
-
-  // FIXME P8: this code probably should be refactored to be clearer and cleaner
-  if (!type.empty())
-  {
-    orion::BSONObjBuilder bob;
-    bob.append(ENT_ATTRS_MD_TYPE, type);
-    switch (mdP->valueType)
-    {
-    case orion::ValueTypeString:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->stringValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeNumber:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->numberValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeBoolean:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->boolValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeNull:
-      bob.appendNull(ENT_ATTRS_MD_VALUE);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeObject:
-      if (mdP->compoundValueP->valueType == orion::ValueTypeVector)
-      {
-        orion::BSONArrayBuilder ba;
-        compoundValueBson(mdP->compoundValueP->childV, ba);
-        bob.append(ENT_ATTRS_MD_VALUE, ba.arr());
-        mdBuilder->append(effectiveName, bob.obj());
-      }
-      else
-      {
-        orion::BSONObjBuilder bo;
-        compoundValueBson(mdP->compoundValueP->childV, bo);
-        bob.append(ENT_ATTRS_MD_VALUE, bo.obj());
-        mdBuilder->append(effectiveName, bob.obj());
-      }
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown metadata type: %d)", mdP->valueType));
-    }
-  }
-  else
-  {
-    orion::BSONObjBuilder bob;
-    switch (mdP->valueType)
-    {
-    case orion::ValueTypeString:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->stringValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeNumber:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->numberValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeBoolean:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->boolValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeNull:
-      bob.appendNull(ENT_ATTRS_MD_VALUE);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeObject:
-      if (mdP->compoundValueP->isVector())
-      {
-        orion::BSONArrayBuilder ba;
-        compoundValueBson(mdP->compoundValueP->childV, ba);
-        bob.append(ENT_ATTRS_MD_VALUE, ba.arr());
-        mdBuilder->append(effectiveName, bob.obj());
-      }
-      else
-      {
-        orion::BSONObjBuilder bo;
-        bob.append(ENT_ATTRS_MD_VALUE, bo.obj());
-        mdBuilder->append(effectiveName, bob.obj());
-      }
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown metadata type)"));
-    }
-  }
-}
-
-/* ****************************************************************************
-*
 * isSomeCalculatedOperatorUsed -
 *
 * Returns true if some calculated operator ($inc, etc.) is in use, so the
@@ -601,13 +454,7 @@ static bool mergeAttrInfo
   {
     Metadata* mdP = caP->metadataVector[ix];
 
-    /* Skip not custom metadata */
-    if (isNotCustomMetadata(mdP->name))
-    {
-      continue;
-    }
-
-    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == V2);
+    mdP->appendToBsoN(&mdBuilder, &mdNamesBuilder, apiVersion == V2);
   }
 
 
@@ -637,7 +484,7 @@ static bool mergeAttrInfo
       {
         if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
-          appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false);
+          md.appendToBsoN(&mdBuilder, &mdNamesBuilder, false);
         }
       }
 
@@ -708,49 +555,6 @@ static bool mergeAttrInfo
   }
 
   return actualUpdate;
-}
-
-
-
-/* ****************************************************************************
-*
-* contextAttributeCustomMetadataToBson -
-*
-* Generates the BSON for metadata vector to be inserted in database for a given atribute.
-* If there is no custom metadata, then it returns false (true otherwise).
-*/
-static bool contextAttributeCustomMetadataToBson
-(
-  orion::BSONObj*                 md,
-  orion::BSONArray*               mdNames,
-  const ContextAttribute*  ca,
-  bool                     useDefaultType
-)
-{
-  orion::BSONObjBuilder    mdToAdd;
-  orion::BSONArrayBuilder  mdNamesToAdd;
-
-  for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix)
-  {
-    const Metadata* md = ca->metadataVector[ix];
-
-    if (!isNotCustomMetadata(md->name))
-    {
-      appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
-      LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                      md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
-    }
-  }
-
-  *md      = mdToAdd.obj();
-  *mdNames = mdNamesToAdd.arr();
-
-  if (md->nFields() > 0)
-  {
-    return true;
-  }
-
-  return false;
 }
 
 
@@ -830,14 +634,15 @@ static bool updateAttribute
     caP->valueBson(std::string(ENT_ATTRS_VALUE), &newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
-    orion::BSONObj    md;
-    orion::BSONArray  mdNames;
+    orion::BSONObjBuilder    md;
+    orion::BSONArrayBuilder  mdNames;
 
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
+    caP->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+    if (mdNames.arrSize() > 0)
     {
-      newAttr.append(ENT_ATTRS_MD, md);
+      newAttr.append(ENT_ATTRS_MD, md.obj());
     }
-    newAttr.append(ENT_ATTRS_MDNAMES, mdNames);
+    newAttr.append(ENT_ATTRS_MDNAMES, mdNames.arr());
 
     toSet->append(effectiveName, newAttr.obj());
     attrNamesAdd->append(caP->name);
@@ -930,14 +735,15 @@ static bool appendAttribute
   }
 
   /* 3. Metadata */
-  orion::BSONObj   md;
-  orion::BSONArray mdNames;
+  orion::BSONObjBuilder   md;
+  orion::BSONArrayBuilder mdNames;
 
-  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
+  caP->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+  if (mdNames.arrSize() > 0)
   {
-    toSet->append(composedName + "." + ENT_ATTRS_MD, md);
+    toSet->append(composedName + "." + ENT_ATTRS_MD, md.obj());
   }
-  toSet->append(composedName + "." + ENT_ATTRS_MDNAMES, mdNames);
+  toSet->append(composedName + "." + ENT_ATTRS_MDNAMES, mdNames.arr());
 
   /* 4. Dates */
   double now = getCurrentTime();
@@ -2136,8 +1942,8 @@ static unsigned int processSubscriptions
 
     // Build notification object. We use topic empty-ness to know the type
     ngsiv2::Notification notification;
-    notification.httpInfo = tSubP->httpInfo;
-    notification.mqttInfo = tSubP->mqttInfo;
+    notification.httpInfo.fill(tSubP->httpInfo);
+    notification.mqttInfo.fill(tSubP->mqttInfo);
     notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
     if (notification.type == ngsiv2::HttpNotification)
     {
@@ -2322,12 +2128,9 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
   for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix)
   {
     Metadata* mdReq = caReq->metadataVector[ix];
+    Metadata* md    = new Metadata(mdReq);
 
-    if (!isNotCustomMetadata(mdReq->name))
-    {
-      Metadata* md = new Metadata(mdReq);
-      caRes->metadataVector.push_back(md);
-    }
+    caRes->metadataVector.push_back(md);
   }
 }
 
@@ -3022,13 +2825,14 @@ static bool createEntity
                     attrsV[ix]->getValue().c_str()));
 
     /* Custom metadata */
-    orion::BSONObj   md;
-    orion::BSONArray mdNames;
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == V2))
+    orion::BSONObjBuilder   md;
+    orion::BSONArrayBuilder mdNames;
+    attrsV[ix]->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+    if (mdNames.arrSize() > 0)
     {
-      bsonAttr.append(ENT_ATTRS_MD, md);
+      bsonAttr.append(ENT_ATTRS_MD, md.obj());
     }
-    bsonAttr.append(ENT_ATTRS_MDNAMES, mdNames);
+    bsonAttr.append(ENT_ATTRS_MDNAMES, mdNames.arr());
 
     attrsToAdd.append(effectiveName, bsonAttr.obj());
     attrNamesToAdd.append(attrsV[ix]->name);

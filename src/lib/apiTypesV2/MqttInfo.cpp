@@ -41,7 +41,7 @@ namespace ngsiv2
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), includePayload(true), providedAuth(false)
+MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
 {
 }
 
@@ -51,7 +51,7 @@ MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), includePayload(true), 
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo(const std::string& _url) : url(_url), qos(0), custom(false), json(NULL), includePayload(true), providedAuth(false)
+MqttInfo::MqttInfo(const std::string& _url) : url(_url), qos(0), custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
 {
 }
 
@@ -77,18 +77,29 @@ std::string MqttInfo::toJson()
 
   if (custom)
   {
-    if (!this->includePayload)
+    switch (payloadType)
     {
-      jh.addNull("payload");
-    }
-    else if (!this->payload.empty())
-    {
-      jh.addString("payload", this->payload);
-    }
+    case Text:
+      if (!this->includePayload)
+      {
+        jh.addNull("payload");
+      }
+      else if (!this->payload.empty())
+      {
+        jh.addString("payload", this->payload);
+      }
+      break;
 
-    if (this->json != NULL)
-    {
-      jh.addRaw("json", this->json->toJson());
+    case Json:
+      if (this->json != NULL)
+      {
+        jh.addRaw("json", this->json->toJson());
+      }
+      break;
+
+    case Ngsi:
+      jh.addRaw("ngsi", this->ngsi.toJson(NGSI_V2_NORMALIZED, true));
+      break;
     }
   }
 
@@ -124,8 +135,20 @@ void MqttInfo::fill(const orion::BSONObj& bo)
 
   if (this->custom)
   {
+    unsigned int n = 0;
+    if (bo.hasField(CSUB_PAYLOAD)) n++;
+    if (bo.hasField(CSUB_JSON))    n++;
+    if (bo.hasField(CSUB_NGSI))    n++;
+    if (n > 1)
+    {
+      LM_E(("custom notification must not have more than one payload related field"));
+      return;
+    }
+
     if (bo.hasField(CSUB_PAYLOAD))
     {
+      payloadType = ngsiv2::CustomPayloadType::Text;
+
       if (getFieldF(bo, CSUB_PAYLOAD).isNull())
       {
         // We initialize also this->payload in this case, although its value is irrelevant
@@ -146,6 +169,8 @@ void MqttInfo::fill(const orion::BSONObj& bo)
 
     if (bo.hasField(CSUB_JSON))
     {
+      payloadType = ngsiv2::CustomPayloadType::Json;
+
       orion::BSONElement be = getFieldF(bo, CSUB_JSON);
       if (be.type() == orion::Object)
       {
@@ -170,7 +195,50 @@ void MqttInfo::fill(const orion::BSONObj& bo)
     {
       this->json = NULL;
     }
+
+    if (bo.hasField(CSUB_NGSI))
+    {
+      payloadType = ngsiv2::CustomPayloadType::Ngsi;
+
+      orion::BSONObj ngsiObj = getObjectFieldF(bo, CSUB_NGSI);
+      if (ngsiObj.hasField(ENT_ENTITY_ID))
+      {
+        this->ngsi.id = getStringFieldF(ngsiObj, ENT_ENTITY_ID);
+      }
+      if (ngsiObj.hasField(ENT_ENTITY_TYPE))
+      {
+        this->ngsi.type = getStringFieldF(ngsiObj, ENT_ENTITY_TYPE);
+      }
+      if (ngsiObj.hasField(ENT_ATTRS))
+      {
+        this->ngsi.attributeVector.fill(getObjectFieldF(ngsiObj, ENT_ATTRS));
+      }
+    }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* MqttInfo::fill -
+*/
+void MqttInfo::fill(const MqttInfo& _mqttInfo)
+{
+  this->url            = _mqttInfo.url;
+  this->topic          = _mqttInfo.topic;
+  this->qos            = _mqttInfo.qos;
+  this->custom         = _mqttInfo.custom;
+  this->payload        = _mqttInfo.payload;
+  this->payloadType    = _mqttInfo.payloadType;
+  this->includePayload = _mqttInfo.includePayload;
+  this->providedAuth   = _mqttInfo.providedAuth;
+  this->user           = _mqttInfo.user;
+  this->passwd         = _mqttInfo.passwd;
+
+  this->json = _mqttInfo.json == NULL ? NULL : _mqttInfo.json->clone();
+
+  this->ngsi.fill(_mqttInfo.ngsi, false, true);  // clone compounds enabled
 }
 
 
@@ -188,5 +256,6 @@ void MqttInfo::release()
     delete json;
     json = NULL;
   }
+  ngsi.release();
 }
 }

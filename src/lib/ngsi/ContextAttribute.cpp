@@ -925,8 +925,12 @@ void ContextAttribute::filterAndOrderMetadata
 *
 * toJson -
 *
+* renderMedatata false is used by ngsi rendering logic in custom notifications
+*
+* renderNgsiField true is used in custom notification payloads, which have some small differences
+* with regards to conventional rendering
 */
-std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter)
+std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField)
 {
   JsonObjectHelper jh;
 
@@ -998,9 +1002,12 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
 
   //
-  // metadata
+  // metadata (note that ngsi field in custom notifications doesn't include metadata)
   //
-  jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
+  if (!renderNgsiField)
+  {
+    jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
+  }
 
   return jh.str();
 }

@@ -124,8 +124,12 @@ ContextElementResponse::ContextElementResponse
 
   //
   // Attribute vector
-  // FIXME P5: constructor for orion::BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
+  entity.attributeVector.fill(getObjectFieldF(entityDoc, ENT_ATTRS), attrL, includeEmpty, locAttr, apiVersion);
+
+#if 0
+  // FIXME PR: cleanup this block
+
   orion::BSONObj         attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
@@ -267,6 +271,7 @@ ContextElementResponse::ContextElementResponse
 
     entity.attributeVector.push_back(caP);
   }
+#endif
 
   /* Set creDate and modDate at entity level */
   if (entityDoc.hasField(ENT_CREATION_DATE))
