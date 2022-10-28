@@ -46,7 +46,6 @@ namespace ngsiv2
 */
 HttpInfo::HttpInfo() : verb(NOVERB), json(NULL), payloadType(Text), custom(false), includePayload(true), timeout(0)
 {
-
 }
 
 

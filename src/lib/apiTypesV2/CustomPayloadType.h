@@ -38,7 +38,6 @@ typedef enum CustomPayloadType
   Json,
   Ngsi
 } CustomPayloadType;
-
 }
 
 #endif  // SRC_LIB_APITYPESV2_CUSTOMPAYLOADTYPE_H_
