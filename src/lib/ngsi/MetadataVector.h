@@ -57,7 +57,7 @@ public:
   Metadata*       lookupByName(const std::string& _name) const;
   void            release(void);
   void            fill(MetadataVector* mV);
-   
+
   Metadata* operator[](unsigned int ix) const;
 
   void            toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);

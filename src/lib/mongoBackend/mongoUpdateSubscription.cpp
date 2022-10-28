@@ -87,19 +87,6 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_PAYLOAD, 1);
       unsetB->append(CSUB_JSON, 1);
     }
-
-#if 0
-    // FIXME PR: remove block
-    if ((sub.notification.httpInfo.includePayload) && (sub.notification.httpInfo.payload.empty()))
-    {
-      unsetB->append(CSUB_PAYLOAD, 1);
-    }
-
-    if (sub.notification.httpInfo.json == NULL)
-    {
-      unsetB->append(CSUB_JSON, 1);
-    }
-#endif
   }
   else  // MqttNotification
   {
@@ -129,19 +116,6 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_JSON, 1);
       unsetB->append(CSUB_PAYLOAD, 1);
     }
-
-#if 0
-    // FIXME PR: remove block
-    if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
-    {
-      unsetB->append(CSUB_PAYLOAD, 1);
-    }
-
-    if (sub.notification.mqttInfo.json == NULL)
-    {
-      unsetB->append(CSUB_JSON, 1);
-    }
-#endif
   }
 
   setNotificationInfo(sub, setB);
