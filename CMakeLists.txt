@@ -42,7 +42,7 @@ execute_process(COMMAND            echo $USER
                 OUTPUT_VARIABLE    USER)
 
 
-execute_process(COMMAND            sh ../scripts/build/osDistro.sh
+execute_process(COMMAND            sh ${CMAKE_SOURCE_DIR}/scripts/build/osDistro.sh
                 OUTPUT_VARIABLE    DISTRO)
 
 # TRACES: To remove LM_T
