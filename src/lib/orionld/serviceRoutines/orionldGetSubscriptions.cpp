@@ -143,7 +143,7 @@ static bool orionldGetSubscriptionsFromDb(void)
 //
 bool orionldGetSubscriptions(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyGetSubscriptions();
 
   if (orionldState.uriParamOptions.fromDb == true)

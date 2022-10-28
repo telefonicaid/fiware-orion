@@ -43,8 +43,8 @@ typedef struct RegDeltas
 {
   uint32_t timesSent;
   uint32_t timesFailed;
-  uint32_t lastSuccess;
-  uint32_t lastFailure;
+  double   lastSuccess;
+  double   lastFailure;
 } RegDeltas;
 
 

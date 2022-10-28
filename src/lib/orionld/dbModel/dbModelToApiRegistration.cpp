@@ -31,6 +31,8 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjArray, kjString, kjChildAdd, kjChildRemove, ...
 }
 
+#include "logMsg/logMsg.h"                                       // LM
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
@@ -44,6 +46,9 @@ extern "C"
 //
 void dbModelToApiTimestamp(KjNode* tsNodeP)
 {
+  if (tsNodeP->type == KjString)
+    return;
+
   char* dateBuf = kaAlloc(&orionldState.kalloc, 64);
   numberToDate(tsNodeP->value.f, dateBuf, 64);
   tsNodeP->value.s = dateBuf;

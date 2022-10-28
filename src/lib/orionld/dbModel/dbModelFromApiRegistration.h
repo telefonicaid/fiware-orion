@@ -30,6 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+
 
 
 // -----------------------------------------------------------------------------
@@ -38,7 +40,8 @@ extern "C"
 //
 extern bool dbModelFromApiRegistration
 (
-  KjNode* apiRegistration
+  KjNode*       apiRegistration,
+  RegCacheItem* rciP
 );
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELFROMAPIREGISTRATION_H_

@@ -511,7 +511,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
     {
       if (idCanBePresent == false)
       {
-        orionldError(OrionldBadRequestData, "Invalid field for Registration Update", "id", 400);
+        orionldError(OrionldBadRequestData, "Invalid field for Registration Update", nodeP->name, 400);
         return false;
       }
 

@@ -312,6 +312,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPatchRegistration)
   {
+    serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
   }
   else if (serviceP->serviceRoutine == orionldDeleteRegistration)
   {

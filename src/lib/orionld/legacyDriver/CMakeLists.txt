@@ -40,6 +40,7 @@ SET (SOURCES
     legacyGetRegistration.cpp
     legacyGetRegistrations.cpp
     legacyDeleteRegistration.cpp
+    legacyPatchRegistration.cpp
 )
 
 # Include directories

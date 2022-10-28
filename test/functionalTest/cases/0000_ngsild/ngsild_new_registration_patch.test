@@ -1,0 +1,2961 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+New PATCH Registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# FIXME: Once some forwarding is implemented, provoke some forwarded requests, including misses
+#        between Steps 08 and 09, and check also counters and the other two timestamps (lastSuccess+lastFailure)
+#
+# 01. Create a registration with all fields AND properties P1-P3
+# 02. See the registration in the database (and save 'modifiedAt')
+# 03. Attempt to PATCH the registration id - see error
+# 04. Attempt to PATCH the registration @id - see error
+# 05. Attempt to PATCH with duplicated registration id - see error
+# 06. Attempt to PATCH with duplicated registration @id - see error
+# 07. Attempt to PATCH with both registration id and @id - see error
+# 08. PATCH 'registrationName' - pushing counters and timestamps to the DB
+# 09. Make sure modifiedAt has changed since step 02
+# 10. See the registration in the database - make sure 'name' has changed
+# 11. PATCH 'description'
+# 12. See the registration in the database - make sure 'description' has changed
+# 13. PATCH 'tenant'
+# 14. See the registration in the database - make sure 'tenant' has changed
+# 15. PATCH 'observationInterval'
+# 16. See the registration in the database - make sure 'observationInterval' has changed
+# 17. PATCH 'location'
+# 18. See the registration in the database - make sure 'location' has changed
+# 19. PATCH 'observationSpace'
+# 20. See the registration in the database - make sure 'observationSpace' has changed
+# 21. PATCH 'operationSpace'
+# 22. See the registration in the database - make sure 'operationSpace' has changed
+# 23. PATCH 'expiresAt'
+# 24. See the registration in the database - make sure 'expiresAt' has changed
+# 25. PATCH 'contextSourceInfo'
+# 26. See the registration in the database - make sure 'contextSourceInfo' has changed
+# 27. PATCH 'scope'
+# 28. See the registration in the database - make sure 'scope' has changed
+# 29. Attempt to PATCH 'mode' - see error, the 'mode' can't be modified
+# 30. PATCH 'operations'
+# 31. See the registration in the database - make sure 'operations' has changed
+# 32. PATCH 'management'
+# 33. See the registration in the database - make sure 'management' has changed
+# 34. PATCH 'P1' (already existing registration attribute
+# 35. See the registration in the database - make sure 'properties.P1' has changed
+# 36. PATCH 'P5' (adding a registration attribute
+# 37. See the registration in the database - make sure 'properties.P5' has been added
+# 38. PATCH 'endpoint' (changing all items of the contextRegistration array)
+# 39. See the registration in the database - make sure all 'providingApplication' have been modified
+# 40. PATCH 'information' (replace old 'contextRegistration')
+# 41. See the registration in the database - make sure all 'information' have been overwritten but that the old 'providingApplication' is intact
+# 42. PATCH 'information' AND 'endpoint'
+# 43. See the registration in the database - make sure 'information' and 'endpoint' (contextRegistration + providingApplication) are correctly updated
+# 44. GET the registration (from the reg-cache) - make sure all fields are correct also in the reg-cache
+#
+
+echo "01. Create a registration with all fields AND properties P1-P3"
+echo "=============================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "registrationName": "R1",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        },
+        {
+          "type": "Device"
+        }
+      ],
+      "propertyNames": [ "brandName", "speed" ],
+      "relationshipNames": [ "isParked" ]
+    }
+  ],
+  "tenant": "T1",
+  "observationInterval": {
+    "startAt": "2018-12-30T10:00:00.123",
+    "endAt": "2019-12-31T10:00:00.456"
+  },
+  "managementInterval": {
+    "startAt": "2017-12-31T10:00:00.789",
+    "endAt": "2018-12-31T10:00:00.012"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [ 10.0, 0.0 ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [ 20.0, 0.0 ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [ 30.0, 0.0 ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "endpoint": "http://my.csource.org:1026",
+  "contextSourceInfo" : [
+    {
+      "key": "K1",
+      "value": "V1"
+    }
+  ],
+  "scope": "/abc",
+  "mode": "inclusive",
+  "operations": [ "createEntity" ],
+  "management": {
+    "localOnly": true
+  },
+  "P1": 1,
+  "P2": "2",
+  "P3": [ 3 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See the registration in the database (and save 'modifiedAt')"
+echo "================================================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+modifiedAt2=$(mongoCmd2 ftest "db.registrations.find({}, { modifiedAt: 1, _id: 0 })" | grep modifiedAt | awk -F: '{ print $2 }' | awk '{ print $1 }')
+echo
+echo
+
+
+echo "03. Attempt to PATCH the registration id - see error"
+echo "===================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R2"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04. Attempt to PATCH the registration @id - see error"
+echo "====================================================="
+payload='{
+  "@id": "urn:ngsi-ld:ContextSourceRegistration:R2"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. Attempt to PATCH with duplicated registration id - see error"
+echo "================================================================"
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. Attempt to PATCH with duplicated registration @id - see error"
+echo "================================================================="
+payload='{
+  "@id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "@id": "urn:ngsi-ld:ContextSourceRegistration:R1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. Attempt to PATCH with both registration id and @id - see error"
+echo "=================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "@id": "urn:ngsi-ld:ContextSourceRegistration:R1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08. PATCH 'registrationName' - pushing counters and timestamps to the DB"
+echo "========================================================================"
+payload='{
+  "registrationName": "R1-Step08"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "09. Make sure modifiedAt has changed since step 02"
+echo "=================================================="
+modifiedAt8=$(mongoCmd2 ftest "db.registrations.find({}, { modifiedAt: 1, _id: 0 })" | grep modifiedAt | awk -F: '{ print $2 }' | awk '{ print $1 }')
+if [ "$modifiedAt8" != "$modifiedAt2" ]
+then
+  echo "modifiedAt has changed"
+else
+  echo "modifiedAt stayed the same"
+  echo "Step 02: $modifiedAt2"
+  echo "Step 08: $modifiedAt8"
+fi
+echo
+echo
+
+
+echo "10. See the registration in the database - make sure 'name' has changed"
+echo "======================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "11. PATCH 'description'"
+echo "======================="
+payload='{
+  "description": "description of reg R1-Step11"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+
+echo "12. See the registration in the database - make sure 'description' has changed"
+echo "=============================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "13. PATCH 'tenant'"
+echo "=================="
+payload='{
+  "tenant": "T13"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "14. See the registration in the database - make sure 'tenant' has changed"
+echo "========================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "15. PATCH 'observationInterval'"
+echo "==============================="
+payload='{
+  "observationInterval": {
+    "startAt": "2028-12-15T15:15:15.151",
+    "endAt": "2029-12-15T15:15:15.151"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "16. See the registration in the database - make sure 'observationInterval' has changed"
+echo "======================================================================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "15b. PATCH 'managementInterval'"
+echo "==============================="
+payload='{
+  "managementInterval": {
+    "startAt": "2028-12-15T15:15:15.015",
+    "endAt": "2029-12-15T15:15:15.015"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "16b. See the registration in the database - make sure 'managementInterval' has changed"
+echo "======================================================================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "17. PATCH 'location'"
+echo "===================="
+payload='{
+  "location": {
+    "type": "Point",
+    "coordinates": [ 11, 1 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "18. See the registration in the database - make sure 'location' has changed"
+echo "==========================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "19. PATCH 'observationSpace'"
+echo "============================"
+payload='{
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [ 21, 1 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "20. See the registration in the database - make sure 'observationSpace' has changed"
+echo "==================================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "21. PATCH 'operationSpace'"
+echo "=========================="
+payload='{
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [ 31, 1 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "22. See the registration in the database - make sure 'operationSpace' has changed"
+echo "================================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "23. PATCH 'expiresAt'"
+echo "====================="
+payload='{
+  "expiresAt": "2028-12-31T11:12:13.142Z"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "24. See the registration in the database - make sure 'expiresAt' has changed"
+echo "============================================================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "25. PATCH 'contextSourceInfo'"
+echo "============================="
+payload='{
+  "contextSourceInfo" : [
+    {
+      "key": "K2",
+      "value": "V2"
+    },
+    {
+      "key": "K3",
+      "value": "V3"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "26. See the registration in the database - make sure 'contextSourceInfo' has changed"
+echo "===================================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "27. PATCH 'scope'"
+echo "================="
+payload='{
+  "scope" : [ "/s1", "/s2" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "28. See the registration in the database - make sure 'scope' has changed"
+echo "========================================================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "29. Attempt to PATCH 'mode' - see error, the 'mode' can't be modified"
+echo "====================================================================="
+payload='{
+  "mode" : "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "30. PATCH 'operations'"
+echo "======================"
+payload='{
+  "operations": [ "federationOps", "createEntity", "updateEntity", "mergeEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "31. See the registration in the database - make sure 'operations' has changed"
+echo "============================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "32. PATCH 'management'"
+echo "======================"
+payload='{
+  "management": {
+    "localOnly": false,
+    "timeout": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "33. See the registration in the database - make sure 'management' has changed"
+echo "============================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "34. PATCH 'P1' (already existing registration attribute"
+echo "======================================================="
+payload='{
+  "P1": 34
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+ 
+echo "35. See the registration in the database - make sure 'properties.P1' has changed"
+echo "================================================================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "36. PATCH 'P5' (adding a registration attribute"
+echo "==============================================="
+payload='{
+  "P5": { "step": 36 }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "37. See the registration in the database - make sure 'properties.P5' has been added"
+echo "==================================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "38. PATCH 'endpoint' (changing all items of the contextRegistration array)"
+echo "=========================================================================="
+payload='{
+  "endpoint" : "http://a.b.c/new-endpoint"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "39. See the registration in the database - make sure all 'providingApplication' have been modified"
+echo "=================================================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "40. PATCH 'information' (replace old 'contextRegistration')"
+echo "==========================================================="
+payload='{
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:V40",
+          "type": "Vehicle"
+        },
+        {
+          "type": "Device"
+        },
+        {
+          "idPattern": "urn:E.*",
+          "type": "Building"
+        }
+      ],
+      "propertyNames": [ "P41", "P42" ],
+      "relationshipNames": [ "R41" ]
+    },
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:V9",
+          "type": "Vehicle"
+        },
+        {
+          "type": "Building"
+        }
+      ],
+      "propertyNames": [ "P31", "P41" ],
+      "relationshipNames": [ "R21" ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "41. See the registration in the database - make sure all 'information' have been overwritten but that the old 'providingApplication' is intact"
+echo "=============================================================================================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "42. PATCH 'information' AND 'endpoint'"
+echo "======================================"
+payload='{
+  "endpoint": "http://a.b.c/endpoint43",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:V43",
+          "type": "Vehicle43"
+        },
+        {
+          "type": "Device43"
+        },
+        {
+          "idPattern": "urn:E43.*",
+          "type": "Building43"
+        }
+      ],
+      "propertyNames": [ "P43" ]
+    },
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:V43",
+          "type": "Vehicle43"
+        },
+        {
+          "type": "Building43"
+        }
+      ],
+      "propertyNames": [ "P43" ],
+      "relationshipNames": [ "R43" ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "43. See the registration in the database - make sure 'information' and 'endpoint' (contextRegistration + providingApplication) are correctly updated"
+echo "===================================================================================================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "44. GET the registration (from the reg-cache) - make sure all fields are correct also in the reg-cache"
+echo "======================================================================================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?options=sysAttrs
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with all fields AND properties P1-P3
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+
+
+
+02. See the registration in the database (and save 'modifiedAt')
+================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1",
+	"description" : "description of reg R1",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T1",
+	"observationInterval" : {
+		"startAt" : 1546164000.123,
+		"endAt" : 1577786400.456
+	},
+	"managementInterval" : {
+		"startAt" : 1514714400.789,
+		"endAt" : 1546250400.012
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			10,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+03. Attempt to PATCH the registration id - see error
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:ContextSourceRegistration:R2",
+    "title": "Mismatch in Registration Id",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to PATCH the registration @id - see error
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 151
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:ContextSourceRegistration:R2",
+    "title": "Mismatch in Registration Id",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to PATCH with duplicated registration id - see error
+================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 102
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to PATCH with duplicated registration @id - see error
+=================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 102
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to PATCH with both registration id and @id - see error
+==================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 102
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "id",
+    "title": "Duplicated field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. PATCH 'registrationName' - pushing counters and timestamps to the DB
+========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. Make sure modifiedAt has changed since step 02
+==================================================
+modifiedAt has changed
+
+
+10. See the registration in the database - make sure 'name' has changed
+=======================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T1",
+	"observationInterval" : {
+		"startAt" : 1546164000.123,
+		"endAt" : 1577786400.456
+	},
+	"managementInterval" : {
+		"startAt" : 1514714400.789,
+		"endAt" : 1546250400.012
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			10,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+11. PATCH 'description'
+=======================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+12. See the registration in the database - make sure 'description' has changed
+==============================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T1",
+	"observationInterval" : {
+		"startAt" : 1546164000.123,
+		"endAt" : 1577786400.456
+	},
+	"managementInterval" : {
+		"startAt" : 1514714400.789,
+		"endAt" : 1546250400.012
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			10,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+13. PATCH 'tenant'
+==================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+14. See the registration in the database - make sure 'tenant' has changed
+=========================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1546164000.123,
+		"endAt" : 1577786400.456
+	},
+	"managementInterval" : {
+		"startAt" : 1514714400.789,
+		"endAt" : 1546250400.012
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			10,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+15. PATCH 'observationInterval'
+===============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+16. See the registration in the database - make sure 'observationInterval' has changed
+======================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1514714400.789,
+		"endAt" : 1546250400.012
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			10,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+15b. PATCH 'managementInterval'
+===============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+16b. See the registration in the database - make sure 'managementInterval' has changed
+======================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			10,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+17. PATCH 'location'
+====================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+18. See the registration in the database - make sure 'location' has changed
+===========================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+19. PATCH 'observationSpace'
+============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+20. See the registration in the database - make sure 'observationSpace' has changed
+===================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+21. PATCH 'operationSpace'
+==========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+22. See the registration in the database - make sure 'operationSpace' has changed
+=================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.141,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+23. PATCH 'expiresAt'
+=====================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+24. See the registration in the database - make sure 'expiresAt' has changed
+============================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K1",
+			"value" : "V1"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+25. PATCH 'contextSourceInfo'
+=============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+26. See the registration in the database - make sure 'contextSourceInfo' has changed
+====================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : "/abc",
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+27. PATCH 'scope'
+=================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+28. See the registration in the database - make sure 'scope' has changed
+========================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+29. Attempt to PATCH 'mode' - see error, the 'mode' can't be modified
+=====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "mode",
+    "title": "Attempt to modify a write-once registration attribute",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+30. PATCH 'operations'
+======================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+31. See the registration in the database - make sure 'operations' has changed
+=============================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"federationOps",
+		"createEntity",
+		"updateEntity",
+		"mergeEntity"
+	],
+	"management" : {
+		"localOnly" : true
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+32. PATCH 'management'
+======================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+33. See the registration in the database - make sure 'management' has changed
+=============================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"federationOps",
+		"createEntity",
+		"updateEntity",
+		"mergeEntity"
+	],
+	"management" : {
+		"localOnly" : false,
+		"timeout" : 2
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+34. PATCH 'P1' (already existing registration attribute
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+35. See the registration in the database - make sure 'properties.P1' has changed
+================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"federationOps",
+		"createEntity",
+		"updateEntity",
+		"mergeEntity"
+	],
+	"management" : {
+		"localOnly" : false,
+		"timeout" : 2
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 34,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+36. PATCH 'P5' (adding a registration attribute
+===============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+37. See the registration in the database - make sure 'properties.P5' has been added
+===================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"federationOps",
+		"createEntity",
+		"updateEntity",
+		"mergeEntity"
+	],
+	"management" : {
+		"localOnly" : false,
+		"timeout" : 2
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 34,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		],
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
+			"step" : 36
+		}
+	},
+	"status" : "active"
+}
+bye
+
+
+38. PATCH 'endpoint' (changing all items of the contextRegistration array)
+==========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+39. See the registration in the database - make sure all 'providingApplication' have been modified
+==================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://a.b.c/new-endpoint"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"federationOps",
+		"createEntity",
+		"updateEntity",
+		"mergeEntity"
+	],
+	"management" : {
+		"localOnly" : false,
+		"timeout" : 2
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 34,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		],
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
+			"step" : 36
+		}
+	},
+	"status" : "active"
+}
+bye
+
+
+40. PATCH 'information' (replace old 'contextRegistration')
+===========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+41. See the registration in the database - make sure all 'information' have been overwritten but that the old 'providingApplication' is intact
+==============================================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:V40",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device"
+				},
+				{
+					"id" : "urn:E.*",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Building",
+					"isPattern" : "true"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P41",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P42",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/R41",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://a.b.c/new-endpoint"
+		},
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:V9",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Building"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P31",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P41",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/R21",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://a.b.c/new-endpoint"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"federationOps",
+		"createEntity",
+		"updateEntity",
+		"mergeEntity"
+	],
+	"management" : {
+		"localOnly" : false,
+		"timeout" : 2
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 34,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		],
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
+			"step" : 36
+		}
+	},
+	"status" : "active"
+}
+bye
+
+
+42. PATCH 'information' AND 'endpoint'
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+43. See the registration in the database - make sure 'information' and 'endpoint' (contextRegistration + providingApplication) are correctly updated
+====================================================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-Step08",
+	"description" : "description of reg R1-Step11",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:V43",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle43"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device43"
+				},
+				{
+					"id" : "urn:E43.*",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Building43",
+					"isPattern" : "true"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P43",
+					"type" : "Property"
+				}
+			],
+			"providingApplication" : "http://a.b.c/endpoint43"
+		},
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:V43",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle43"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Building43"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P43",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/R43",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://a.b.c/endpoint43"
+		}
+	],
+	"tenant" : "T13",
+	"observationInterval" : {
+		"startAt" : 1860506115.151,
+		"endAt" : 1892042115.151
+	},
+	"managementInterval" : {
+		"startAt" : 1860506115.015,
+		"endAt" : 1892042115.015
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			11,
+			1
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			21,
+			1
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			1
+		]
+	},
+	"expiration" : 1861873933.142,
+	"contextSourceInfo" : [
+		{
+			"key" : "K2",
+			"value" : "V2"
+		},
+		{
+			"key" : "K3",
+			"value" : "V3"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"federationOps",
+		"createEntity",
+		"updateEntity",
+		"mergeEntity"
+	],
+	"management" : {
+		"localOnly" : false,
+		"timeout" : 2
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 34,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : [
+			3
+		],
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
+			"step" : 36
+		}
+	},
+	"status" : "active"
+}
+bye
+
+
+44. GET the registration (from the reg-cache) - make sure all fields are correct also in the reg-cache
+======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1364
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": 34,
+    "P2": "2",
+    "P3": [
+        3
+    ],
+    "P5": {
+        "step": 36
+    },
+    "contextSourceInfo": [
+        {
+            "key": "K2",
+            "value": "V2"
+        },
+        {
+            "key": "K3",
+            "value": "V3"
+        }
+    ],
+    "createdAt": "202REGEX(.*)",
+    "description": "description of reg R1-Step11",
+    "endpoint": "http://a.b.c/endpoint43",
+    "expiresAt": "2028-12-31T11:12:13.142Z",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Vehicle:V43",
+                    "type": "Vehicle43"
+                },
+                {
+                    "type": "Device43"
+                },
+                {
+                    "idPattern": "urn:E43.*",
+                    "type": "Building43"
+                }
+            ],
+            "propertyNames": [
+                "P43"
+            ]
+        },
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Vehicle:V43",
+                    "type": "Vehicle43"
+                },
+                {
+                    "type": "Building43"
+                }
+            ],
+            "propertyNames": [
+                "P43"
+            ],
+            "relationshipNames": [
+                "R43"
+            ]
+        }
+    ],
+    "location": {
+        "coordinates": [
+            11,
+            1
+        ],
+        "type": "Point"
+    },
+    "management": {
+        "localOnly": false,
+        "timeout": 2
+    },
+    "managementInterval": {
+        "endAt": "2029-12-15T15:15:15.015Z",
+        "startAt": "2028-12-15T15:15:15.015Z"
+    },
+    "mode": "inclusive",
+    "modifiedAt": "202REGEX(.*)",
+    "observationInterval": {
+        "endAt": "2029-12-15T15:15:15.151Z",
+        "startAt": "2028-12-15T15:15:15.151Z"
+    },
+    "observationSpace": {
+        "coordinates": [
+            21,
+            1
+        ],
+        "type": "Point"
+    },
+    "operationSpace": {
+        "coordinates": [
+            31,
+            1
+        ],
+        "type": "Point"
+    },
+    "operations": [
+        "federationOps",
+        "createEntity",
+        "updateEntity",
+        "mergeEntity"
+    ],
+    "origin": "cache",
+    "registrationName": "R1-Step08",
+    "scope": [
+        "/s1",
+        "/s2"
+    ],
+    "status": "active",
+    "tenant": "T13",
+    "type": "ContextSourceRegistration"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

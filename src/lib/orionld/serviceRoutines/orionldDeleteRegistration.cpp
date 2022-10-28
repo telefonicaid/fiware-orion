@@ -41,7 +41,7 @@
 //
 bool orionldDeleteRegistration(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyDeleteRegistration();
 
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Registration Identifier", orionldState.wildcard[0], 400);

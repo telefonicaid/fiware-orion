@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPATCHREGISTRATION_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPATCHREGISTRATION_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONREPLACE_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONREPLACE_H_
 
 /*
 *
@@ -26,12 +26,17 @@
 * Author: Ken Zangelin
 */
 
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
-// ----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 //
-// orionldPatchRegistration -
+// mongocRegistrationReplace -
 //
-extern bool orionldPatchRegistration(void);
+extern bool mongocRegistrationReplace(const char* registrationId, KjNode* dbRegistrationP);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDPATCHREGISTRATION_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONREPLACE_H_

@@ -137,7 +137,7 @@ bool entityMatch(RegCacheItem* cRegP, StringArray* idListP, const char* idPatter
 //
 bool orionldGetRegistrations(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyGetRegistrations();
 
   if (orionldState.uriParamOptions.fromDb == true)

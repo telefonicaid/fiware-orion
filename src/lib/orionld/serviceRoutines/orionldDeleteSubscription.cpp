@@ -45,7 +45,7 @@
 //
 bool orionldDeleteSubscription(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyDeleteSubscription();
 
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Subscription Identifier", orionldState.wildcard[0], 400);

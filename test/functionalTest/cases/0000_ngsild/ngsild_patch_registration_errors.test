@@ -32,7 +32,7 @@ brokerStart CB
 
 #
 # 01. Create a registration with all fields
-# 02. Attempt to PATCH the registration with a Registration ID - see failure
+# 02. Attempt to PATCH the registration with a non-matching Registration ID - see failure
 # 03. Attempt to PATCH the registration with a payload data that is not a JSON object - see failure
 # 04. Attempt to PATCH the registration with a 'type' that is not a string - see failure
 # 05. Attempt to PATCH the registration with a 'type' string that is not 'ContextSourceRegistration' - see failure
@@ -220,8 +220,8 @@ echo
 echo
 
 
-echo "02. Attempt to PATCH the registration with a Registration ID - see failure"
-echo "=========================================================================="
+echo "02. Attempt to PATCH the registration with a non-matching Registration ID - see failure"
+echo "======================================================================================="
 payload='{
   "id": "urn:ngsi-ld:ContextSourceRegistration:R2"
 }'
@@ -1386,16 +1386,16 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 
 
 
-02. Attempt to PATCH the registration with a Registration ID - see failure
-==========================================================================
+02. Attempt to PATCH the registration with a non-matching Registration ID - see failure
+=======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 151
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "id",
-    "title": "Invalid field for Registration Update",
+    "detail": "urn:ngsi-ld:ContextSourceRegistration:R2",
+    "title": "Mismatch in Registration Id",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

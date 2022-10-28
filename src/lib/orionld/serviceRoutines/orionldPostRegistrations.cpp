@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/legacyDriver/legacyPostRegistrations.h"      // legacyPostRegistrations
 #include "orionld/mongoc/mongocRegistrationExists.h"           // mongocRegistrationExists
 #include "orionld/mongoc/mongocRegistrationInsert.h"           // mongocRegistrationInsert
+#include "orionld/regCache/RegCache.h"                         // RegCacheItem
 #include "orionld/regCache/regCacheItemAdd.h"                  // regCacheItemAdd
 #include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/dbModel/dbModelFromApiRegistration.h"        // dbModelFromApiRegistration
@@ -108,9 +109,9 @@ bool pCheckRegistrationId(KjNode* regIdP)
 extern void dbModelFromApiTimeInterval(KjNode* intervalP);
 // -----------------------------------------------------------------------------
 //
-// cacheModelFromApiRegistration -
+// apiModelToCacheRegistration -
 //
-void cacheModelFromApiRegistration(KjNode* apiRegistrationP)
+void apiModelToCacheRegistration(KjNode* apiRegistrationP)
 {
   KjNode* observationIntervalP  = kjLookup(apiRegistrationP, "observationInterval");
   KjNode* managementIntervalP   = kjLookup(apiRegistrationP, "managementInterval");
@@ -212,12 +213,12 @@ bool orionldPostRegistrations(void)
   // Add the property tree at the end
   kjChildAdd(orionldState.requestTree, propertyTree);
 
-  cacheModelFromApiRegistration(orionldState.requestTree);
+  apiModelToCacheRegistration(orionldState.requestTree);
   regCacheItemAdd(orionldState.tenantP, orionldState.requestTree, false);  // Clones the registration
 
   kjTreeLog(orionldState.requestTree, "Before dbModelFromApiRegistration");
   // This is where "id" is changed to "_id"
-  dbModelFromApiRegistration(orionldState.requestTree);
+  dbModelFromApiRegistration(orionldState.requestTree, NULL);
   kjTreeLog(orionldState.requestTree, "After dbModelFromApiRegistration");
 
   if (mongocRegistrationInsert(orionldState.requestTree, regIdP->value.s) == false)

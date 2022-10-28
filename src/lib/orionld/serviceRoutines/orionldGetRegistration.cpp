@@ -31,7 +31,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
@@ -306,7 +305,7 @@ void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, b
 //
 bool orionldGetRegistration(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyGetRegistration();
 
   // Is orionldState.wildcard[0] a valid id for a registration?

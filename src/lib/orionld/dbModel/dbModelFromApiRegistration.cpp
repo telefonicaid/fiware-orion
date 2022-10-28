@@ -33,6 +33,7 @@ extern "C"
 
 #include "common/globals.h"                                      // parse8601Time
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/dbModel/dbModelFromApiRegistration.h"          // Own interface
 
 
@@ -92,8 +93,25 @@ void dbModelFromApiRegInfoAttrs(KjNode* attrsP, KjNode* attrNamesV, const char* 
 //     }
 //   ]
 //
-bool dbModelFromApiRegInfo(KjNode* informationP, KjNode* endpointP)
+bool dbModelFromApiRegInfo(KjNode* informationP, KjNode* endpointP, RegCacheItem* rciP)
 {
+  char* endpoint = NULL;
+
+  if (endpointP != NULL)
+    endpoint = endpointP->value.s;
+  else if (rciP != NULL)
+  {
+    endpointP = kjLookup(rciP->regTree, "endpoint");
+    if (endpointP != NULL)
+      endpoint = endpointP->value.s;
+  }
+
+  if (endpoint == NULL)
+  {
+    LM_E(("Internal Error (no endpoint (providing application) found)"));
+    return false;
+  }
+
   informationP->name = (char*) "contextRegistration";
 
   for (KjNode* infoObjP = informationP->value.firstChildP; infoObjP != NULL; infoObjP = infoObjP->next)
@@ -102,7 +120,7 @@ bool dbModelFromApiRegInfo(KjNode* informationP, KjNode* endpointP)
     KjNode* propertyNamesP         = kjLookup(infoObjP, "propertyNames");
     KjNode* relationshipNamesP     = kjLookup(infoObjP, "relationshipNames");
     KjNode* attrsP                 = kjArray(orionldState.kjsonP, "attrs");
-    KjNode* providingApplicationP  = kjString(orionldState.kjsonP, "providingApplication", endpointP->value.s);
+    KjNode* providingApplicationP  = kjString(orionldState.kjsonP, "providingApplication", endpoint);
     KjNode* isPatternP;
 
     if (entitiesP != NULL)
@@ -184,7 +202,7 @@ void dbModelFromApiTimeInterval(KjNode* intervalP)
 // The tree is not 100% API
 //   - all timestamps are floats already
 //
-bool dbModelFromApiRegistration(KjNode* apiRegistration)
+bool dbModelFromApiRegistration(KjNode* apiRegistration, RegCacheItem* rciP)
 {
   // id => _id
   // expiresAt => expiration  (Floating point)
@@ -209,8 +227,12 @@ bool dbModelFromApiRegistration(KjNode* apiRegistration)
   if (idP               != NULL) idP->name               = (char*) "_id";
   if (registrationNameP != NULL) registrationNameP->name = (char*) "name";
 
-  kjChildRemove(apiRegistration, endpointP);
-  dbModelFromApiRegInfo(informationP, endpointP);
+  if ((endpointP != NULL) || (informationP != NULL))
+  {
+    if (endpointP != NULL)
+      kjChildRemove(apiRegistration, endpointP);
+    dbModelFromApiRegInfo(informationP, endpointP, rciP);
+  }
 
   if (observationIntervalP != NULL)
     dbModelFromApiTimeInterval(observationIntervalP);

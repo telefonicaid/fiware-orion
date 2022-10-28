@@ -88,7 +88,7 @@ bool pcheckTimeInterval(KjNode* timeIntervalNodeP, const char* fieldName)
     return false;
   }
 
-  if (startAt > endAt)
+  if ((startAtP != NULL) && (endAtP != NULL) && (startAt > endAt))
   {
     orionldError(OrionldBadRequestData, "Inconsistent TimeInterval (it ends before it starts)", fieldName, 400);
     return false;
