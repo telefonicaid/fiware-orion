@@ -41,9 +41,10 @@ execute_process(COMMAND            echo $USER
                 COMMAND            tr 'a-z' 'A-Z'
                 OUTPUT_VARIABLE    USER)
 
-
-execute_process(COMMAND            sh ../scripts/build/osDistro.sh
+if (NOT DISTRO)
+execute_process(COMMAND            sh ${CMAKE_SOURCE_DIR}/scripts/build/osDistro.sh
                 OUTPUT_VARIABLE    DISTRO)
+endif (NOT DISTRO)
 
 # TRACES: To remove LM_T
 #           [ and 15 log macros more, of which only LM_T is used by the broker.
