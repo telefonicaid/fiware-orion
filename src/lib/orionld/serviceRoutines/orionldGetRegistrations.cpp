@@ -73,14 +73,14 @@ extern void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cached
 bool entityMatch(RegCacheItem* cRegP, StringArray* idListP, const char* idPattern, StringArray* typeListP, StringArray* attrListP)
 {
   KjNode* informationP = kjLookup(cRegP->regTree, "information");
+  int     idPatternLen = (idPattern != NULL)? strlen(idPattern) : -1;
 
   if (informationP == NULL)
     return false;  // Erroneous Registration - should never happen
 
-  LM(("RU: orionldState.uriParams.type: '%s'", orionldState.uriParams.type));
   for (KjNode* infoItemP = informationP->value.firstChildP; infoItemP != NULL; infoItemP = infoItemP->next)
   {
-    // KjNode* entitiesP          = kjLookup(infoItemP, "entities");
+    KjNode* entitiesP          = kjLookup(infoItemP, "entities");
     KjNode* propertyNamesP     = kjLookup(infoItemP, "propertyNames");
     KjNode* relationshipNamesP = kjLookup(infoItemP, "relationshipNames");
     bool    typeHit      = false;
@@ -93,37 +93,92 @@ bool entityMatch(RegCacheItem* cRegP, StringArray* idListP, const char* idPatter
     if (typeListP->items == 0)     typeHit      = true;
     if (attrListP->items == 0)     attrsHit     = true;
 
-    LM(("RU: attrListP->items: %d", attrListP->items));
-    for (int ix = 0; ix < attrListP->items; ix++)
+    //
+    // Match on attributes
+    //
+    if ((propertyNamesP == NULL) && (relationshipNamesP == NULL))
+      attrsHit = true;
+    else
     {
-      LM(("RU: Looking up '%s' in propertyNamesP and relationshipNamesP", attrListP->array[ix]));
-      // If any of the attr in attrListP is found in either propertyNamesP or relationshipNamesP, then it's a match
-      if (kjStringValueLookupInArray(propertyNamesP, attrListP->array[ix]) != NULL)
+      for (int ix = 0; ix < attrListP->items; ix++)
       {
-        LM(("RU: Hit in propertyNames for '%s'", attrListP->array[ix]));
-        attrsHit = true;
-        break;
+        // If any of the attr in attrListP is found in either propertyNamesP or relationshipNamesP, then it's a match
+        if ((propertyNamesP != NULL) && (kjStringValueLookupInArray(propertyNamesP, attrListP->array[ix]) != NULL))
+        {
+          attrsHit = true;
+          break;
+        }
+        else if ((relationshipNamesP != NULL) && (kjStringValueLookupInArray(relationshipNamesP, attrListP->array[ix]) != NULL))
+        {
+          attrsHit = true;
+          break;
+        }
       }
-      else if (kjStringValueLookupInArray(relationshipNamesP, attrListP->array[ix]) != NULL)
+    }
+
+
+    if (entitiesP == NULL)
+    {
+      idHit        = true;
+      typeHit      = true;
+      idPatternHit = true;
+    }
+    else
+    {
+      //
+      // Match on entityId
+      //
+      for (int ix = 0; ix < idListP->items; ix++)
       {
-        LM(("RU: Hit in relationshipNames for '%s'", attrListP->array[ix]));
-        attrsHit = true;
-        break;
+        // Does any of the Entity ID's match?
+        for (KjNode* entityInfoP = entitiesP->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
+        {
+          KjNode* idP = kjLookup(entityInfoP, "id");
+
+          if ((idP != NULL) && (strcmp(idP->value.s, idListP->array[ix]) == 0))
+          {
+            idHit = true;
+            break;
+          }
+        }
       }
-      else
-        LM(("RU: no hit for '%s'", attrListP->array[ix]));
+
+      //
+      // Match on entity type
+      //
+      for (int ix = 0; ix < typeListP->items; ix++)
+      {
+        // Does any of the Entity types match?
+        for (KjNode* entityInfoP = entitiesP->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
+        {
+          KjNode* typeP = kjLookup(entityInfoP, "type");
+
+          if ((typeP != NULL) && (strcmp(typeP->value.s, typeListP->array[ix]) == 0))
+          {
+            typeHit = true;
+            break;
+          }
+        }
+      }
+
+      if (idPattern != NULL)
+      {
+        // Does any of the Entity ID's match?
+        for (KjNode* entityInfoP = entitiesP->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
+        {
+          KjNode* idP = kjLookup(entityInfoP, "id");
+
+          if ((idP != NULL) && (strncmp(idP->value.s, idPattern, idPatternLen) == 0))
+          {
+            idPatternHit = true;
+            break;
+          }
+        }
+      }
     }
 
     if (typeHit && idHit && idPatternHit && attrsHit)
-    {
-      LM(("RU: ************ HIT ***********"));
       return true;
-    }
-    LM(("RU: ************ NO HIT ***********"));
-    LM(("RU: typeHit:      %s", (typeHit      == true)? "TRUE" : "FALSE"));
-    LM(("RU: idHit:        %s", (idHit        == true)? "TRUE" : "FALSE"));
-    LM(("RU: idPatternHit: %s", (idPatternHit == true)? "TRUE" : "FALSE"));
-    LM(("RU: attrsHit:     %s", (attrsHit     == true)? "TRUE" : "FALSE"));
   }
 
   return false;
@@ -186,14 +241,32 @@ bool orionldGetRegistrations(void)
   int        regs        = 0;
   int        ix          = 0;
 
+
+  //
+  // idPattern ...
+  //
+  // FIXME: Implement REGEX.
+  //        For now, I only support REGEX ending with .*
+  //        Meaning, I cut the last two characters (assuming they're ".*") and performa a strncmp
+  //
+  int    idPatternLen = -1;
+  char*  idPattern    = orionldState.uriParams.idPattern;
+
+  if (idPattern != NULL)
+  {
+    LM_W(("The idPattern URL parameter isn't implemented for GET Registrations (pattern ending in .* is assumed)"));
+    idPatternLen = strlen(idPattern) - 2;
+    idPattern[idPatternLen] = 0;  // CUT OFF the ".*"
+  }
+
   if ((limit != 0) && (rcP != NULL))
   {
     for (RegCacheItem* cRegP = rcP->regList; cRegP != NULL; cRegP = cRegP->next)
     {
-      // Filter: attrs
+      // Filter: attrs || id || idPattern || type
       if ((orionldState.uriParams.attrs != NULL) || (orionldState.uriParams.id != NULL) || (orionldState.uriParams.idPattern != NULL) || (orionldState.uriParams.type != NULL))
       {
-        if (entityMatch(cRegP, &orionldState.in.idList, orionldState.uriParams.idPattern, &orionldState.in.typeList,  &orionldState.in.attrList) == false)
+        if (entityMatch(cRegP, &orionldState.in.idList, idPattern, &orionldState.in.typeList,  &orionldState.in.attrList) == false)
           continue;
       }
 
