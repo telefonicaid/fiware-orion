@@ -79,8 +79,8 @@ static void attrsToAlias(OrionldContext* contextP, char* attrV[], int attrs)
 // An NGSI-LD Registration looks like this:
 //
 // {
-//   "id": "urn:ngsi-ld:ContextSourceRegistration:csr01",
 //   "type": "ContextSourceRegistration",
+//   "id": "urn:ngsi-ld:ContextSourceRegistration:csr01",
 //   "information": [
 //     {
 //       "entities": [

@@ -186,6 +186,14 @@ bool entityMatch(RegCacheItem* cRegP, StringArray* idListP, const char* idPatter
 
 
 
+// -----------------------------------------------------------------------------
+//
+// regTypeAndOrigin - from orionldGetRegistration.cpp (FIXME: move to its own modulee)
+//
+extern void regTypeAndOrigin(KjNode* regP, bool fromCache);
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldGetRegistrations -
@@ -278,6 +286,8 @@ bool orionldGetRegistrations(void)
 
       KjNode* apiRegP = kjClone(orionldState.kjsonP, cRegP->regTree);  // Work on a cloned copy from the reg-cache
       apiModelFromCachedRegistration(apiRegP, cRegP, orionldState.uriParamOptions.sysAttrs);
+      regTypeAndOrigin(apiRegP, true);
+
       kjChildAdd(regArray, apiRegP);
 
       ++ix;

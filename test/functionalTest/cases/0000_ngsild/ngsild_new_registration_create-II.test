@@ -633,6 +633,7 @@ Date: REGEX(.*)
 
 {
   "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "type": "ContextSourceRegistration",
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
   "createdAt": "REGEX(.*)",
   "modifiedAt": "REGEX(.*)",
@@ -747,7 +748,6 @@ Date: REGEX(.*)
   "expiresAt": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "status": "active",
-  "type": "ContextSourceRegistration",
   "P1": 1,
   "P2": "2",
   "P3": true,

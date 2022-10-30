@@ -2836,7 +2836,7 @@ bye
 44. GET the registration (from the reg-cache) - make sure all fields are correct also in the reg-cache
 ======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1364
+Content-Length: 1309
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

@@ -90,6 +90,7 @@ Date: REGEX(.*)
 [
   {
     "@context": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)",
     "information": [
       {
@@ -109,7 +110,6 @@ Date: REGEX(.*)
     ],
     "endpoint": "http://context-provider:3000/static/tweets",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "origin": "cache"
   }
 ]

@@ -173,14 +173,14 @@ echo
 
 echo "04. GET the registration (from cache)"
 echo "====================================="
-orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
 echo
 echo
 
 
 echo "05. GET the registration (from db)"
 echo "=================================="
-orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?options=fromDb
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?options=fromDb&prettyPrint=yes" --noPayloadCheck
 echo
 echo
 
@@ -442,371 +442,373 @@ Fiware-Correlator: REGEX(.*)
 04. GET the registration (from cache)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 1408
+Content-Length: 2702
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "P1": 1,
-    "P2": "2",
-    "P3": true,
-    "P4": 4.5,
-    "P5": {
-        "object": 6
-    },
-    "P6": [
-        7,
-        8
-    ],
-    "contextSourceInfo": [
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "R1",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
         {
-            "key": "H1",
-            "value": "H1 value"
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
         },
         {
-            "key": "H2",
-            "value": "H2 value"
+          "id": "urn:ngsi-ld:Vehicle:A457",
+          "type": "Vehicle"
         }
-    ],
-    "description": "description of reg 1",
-    "endpoint": "http://my.csource.org:1026",
-    "expiresAt": "2028-12-31T10:00:01.234Z",
-    "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
-    "information": [
+      ],
+      "propertyNames": [
+        "brandName",
+        "speed"
+      ],
+      "relationshipNames": [
+        "isParked"
+      ]
+    },
+    {
+      "entities": [
         {
-            "entities": [
-                {
-                    "id": "urn:ngsi-ld:Vehicle:A456",
-                    "type": "Vehicle"
-                },
-                {
-                    "id": "urn:ngsi-ld:Vehicle:A457",
-                    "type": "Vehicle"
-                }
-            ],
-            "propertyNames": [
-                "brandName",
-                "speed"
-            ],
-            "relationshipNames": [
-                "isParked"
-            ]
+          "idPattern": "urn:ngsi-ld:Vehicle:A.*",
+          "type": "Vehicle"
         },
         {
-            "entities": [
-                {
-                    "idPattern": "urn:ngsi-ld:Vehicle:A.*",
-                    "type": "Vehicle"
-                },
-                {
-                    "type": "Vehicle"
-                }
-            ],
-            "propertyNames": [
-                "brandName2",
-                "speed2"
-            ],
-            "relationshipNames": [
-                "isParked2",
-                "isParked3"
-            ]
+          "type": "Vehicle"
         }
-    ],
-    "location": {
-        "coordinates": [
-            [
-                [
-                    80,
-                    0
-                ],
-                [
-                    81,
-                    0
-                ],
-                [
-                    81,
-                    1
-                ],
-                [
-                    80,
-                    1
-                ],
-                [
-                    80,
-                    0
-                ]
-            ]
+      ],
+      "propertyNames": [
+        "brandName2",
+        "speed2"
+      ],
+      "relationshipNames": [
+        "isParked2",
+        "isParked3"
+      ]
+    }
+  ],
+  "tenant": "T1",
+  "observationInterval": {
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456Z"
+  },
+  "managementInterval": {
+    "endAt": "2027-12-31T10:00:00.120Z",
+    "startAt": "2017-12-31T10:00:00.798Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          80,
+          0
         ],
-        "type": "Polygon"
-    },
-    "management": {
-        "cooldown": 60000,
-        "localOnly": true,
-        "timeout": 5000
-    },
-    "managementInterval": {
-        "endAt": "2027-12-31T10:00:00.120Z",
-        "startAt": "2017-12-31T10:00:00.798Z"
-    },
-    "mode": "inclusive",
-    "observationInterval": {
-        "endAt": "2028-12-31T10:00:00.456Z",
-        "startAt": "2018-12-31T10:00:00.123Z"
-    },
-    "observationSpace": {
-        "coordinates": [
-            [
-                [
-                    70,
-                    0
-                ],
-                [
-                    71,
-                    0
-                ],
-                [
-                    71,
-                    1
-                ],
-                [
-                    70,
-                    1
-                ],
-                [
-                    70,
-                    0
-                ]
-            ]
+        [
+          81,
+          0
         ],
-        "type": "Polygon"
-    },
-    "operationSpace": {
-        "coordinates": [
-            [
-                [
-                    60,
-                    0
-                ],
-                [
-                    61,
-                    0
-                ],
-                [
-                    61,
-                    1
-                ],
-                [
-                    60,
-                    1
-                ],
-                [
-                    60,
-                    0
-                ]
-            ]
+        [
+          81,
+          1
         ],
-        "type": "Polygon"
+        [
+          80,
+          1
+        ],
+        [
+          80,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          70,
+          0
+        ],
+        [
+          71,
+          0
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          70,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          60,
+          0
+        ],
+        [
+          61,
+          0
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          60,
+          0
+        ]
+      ]
+    ]
+  },
+  "expiresAt": "2028-12-31T10:00:01.234Z",
+  "endpoint": "http://my.csource.org:1026",
+  "contextSourceInfo": [
+    {
+      "key": "H1",
+      "value": "H1 value"
     },
-    "operations": [
-        "createEntity",
-        "deleteEntity"
-    ],
-    "origin": "cache",
-    "registrationName": "R1",
-    "scope": [
-        "/s1",
-        "/s2"
-    ],
-    "status": "active",
-    "tenant": "T1",
-    "type": "ContextSourceRegistration"
+    {
+      "key": "H2",
+      "value": "H2 value"
+    }
+  ],
+  "scope": [
+    "/s1",
+    "/s2"
+  ],
+  "mode": "inclusive",
+  "operations": [
+    "createEntity",
+    "deleteEntity"
+  ],
+  "management": {
+    "localOnly": true,
+    "timeout": 5000,
+    "cooldown": 60000
+  },
+  "status": "active",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ],
+  "origin": "cache"
 }
+
 
 
 05. GET the registration (from db)
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 1411
+Content-Length: 2705
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "P1": 1,
-    "P2": "2",
-    "P3": true,
-    "P4": 4.5,
-    "P5": {
-        "object": 6
-    },
-    "P6": [
-        7,
-        8
-    ],
-    "contextSourceInfo": [
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "R1",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
         {
-            "key": "H1",
-            "value": "H1 value"
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
         },
         {
-            "key": "H2",
-            "value": "H2 value"
+          "id": "urn:ngsi-ld:Vehicle:A457",
+          "type": "Vehicle"
         }
-    ],
-    "description": "description of reg 1",
-    "endpoint": "http://my.csource.org:1026",
-    "expiresAt": "2028-12-31T10:00:01.234Z",
-    "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
-    "information": [
+      ],
+      "propertyNames": [
+        "brandName",
+        "speed"
+      ],
+      "relationshipNames": [
+        "isParked"
+      ]
+    },
+    {
+      "entities": [
         {
-            "entities": [
-                {
-                    "id": "urn:ngsi-ld:Vehicle:A456",
-                    "type": "Vehicle"
-                },
-                {
-                    "id": "urn:ngsi-ld:Vehicle:A457",
-                    "type": "Vehicle"
-                }
-            ],
-            "propertyNames": [
-                "brandName",
-                "speed"
-            ],
-            "relationshipNames": [
-                "isParked"
-            ]
+          "idPattern": "urn:ngsi-ld:Vehicle:A.*",
+          "type": "Vehicle"
         },
         {
-            "entities": [
-                {
-                    "idPattern": "urn:ngsi-ld:Vehicle:A.*",
-                    "type": "Vehicle"
-                },
-                {
-                    "type": "Vehicle"
-                }
-            ],
-            "propertyNames": [
-                "brandName2",
-                "speed2"
-            ],
-            "relationshipNames": [
-                "isParked2",
-                "isParked3"
-            ]
+          "type": "Vehicle"
         }
-    ],
-    "location": {
-        "coordinates": [
-            [
-                [
-                    80,
-                    0
-                ],
-                [
-                    81,
-                    0
-                ],
-                [
-                    81,
-                    1
-                ],
-                [
-                    80,
-                    1
-                ],
-                [
-                    80,
-                    0
-                ]
-            ]
+      ],
+      "propertyNames": [
+        "brandName2",
+        "speed2"
+      ],
+      "relationshipNames": [
+        "isParked2",
+        "isParked3"
+      ]
+    }
+  ],
+  "tenant": "T1",
+  "observationInterval": {
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456Z"
+  },
+  "managementInterval": {
+    "endAt": "2027-12-31T10:00:00.120Z",
+    "startAt": "2017-12-31T10:00:00.798Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          80,
+          0
         ],
-        "type": "Polygon"
-    },
-    "management": {
-        "cooldown": 60000,
-        "localOnly": true,
-        "timeout": 5000
-    },
-    "managementInterval": {
-        "endAt": "2027-12-31T10:00:00.120Z",
-        "startAt": "2017-12-31T10:00:00.798Z"
-    },
-    "mode": "inclusive",
-    "observationInterval": {
-        "endAt": "2028-12-31T10:00:00.456Z",
-        "startAt": "2018-12-31T10:00:00.123Z"
-    },
-    "observationSpace": {
-        "coordinates": [
-            [
-                [
-                    70,
-                    0
-                ],
-                [
-                    71,
-                    0
-                ],
-                [
-                    71,
-                    1
-                ],
-                [
-                    70,
-                    1
-                ],
-                [
-                    70,
-                    0
-                ]
-            ]
+        [
+          81,
+          0
         ],
-        "type": "Polygon"
-    },
-    "operationSpace": {
-        "coordinates": [
-            [
-                [
-                    60,
-                    0
-                ],
-                [
-                    61,
-                    0
-                ],
-                [
-                    61,
-                    1
-                ],
-                [
-                    60,
-                    1
-                ],
-                [
-                    60,
-                    0
-                ]
-            ]
+        [
+          81,
+          1
         ],
-        "type": "Polygon"
+        [
+          80,
+          1
+        ],
+        [
+          80,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          70,
+          0
+        ],
+        [
+          71,
+          0
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          70,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          60,
+          0
+        ],
+        [
+          61,
+          0
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          60,
+          0
+        ]
+      ]
+    ]
+  },
+  "expiresAt": "2028-12-31T10:00:01.234Z",
+  "contextSourceInfo": [
+    {
+      "key": "H1",
+      "value": "H1 value"
     },
-    "operations": [
-        "createEntity",
-        "deleteEntity"
-    ],
-    "origin": "database",
-    "registrationName": "R1",
-    "scope": [
-        "/s1",
-        "/s2"
-    ],
-    "status": "active",
-    "tenant": "T1",
-    "type": "ContextSourceRegistration"
+    {
+      "key": "H2",
+      "value": "H2 value"
+    }
+  ],
+  "scope": [
+    "/s1",
+    "/s2"
+  ],
+  "mode": "inclusive",
+  "operations": [
+    "createEntity",
+    "deleteEntity"
+  ],
+  "management": {
+    "localOnly": true,
+    "timeout": 5000,
+    "cooldown": 60000
+  },
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ],
+  "origin": "database"
 }
+
 
 
 --TEARDOWN--

@@ -246,6 +246,7 @@ Date: REGEX(.*)
 [
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -340,13 +341,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 1,
     "P2": "String-1",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -441,13 +442,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 2,
     "P2": "String-2",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -542,13 +543,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 3,
     "P2": "String-3",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -643,13 +644,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 4,
     "P2": "String-4",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR5",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -744,13 +745,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 5,
     "P2": "String-5",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR6",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -845,13 +846,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 6,
     "P2": "String-6",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR7",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -946,13 +947,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 7,
     "P2": "String-7",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR8",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -1047,13 +1048,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 8,
     "P2": "String-8",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR9",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -1148,13 +1149,13 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 9,
     "P2": "String-9",
     "origin": "cache"
   },
   {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -1249,7 +1250,6 @@ Date: REGEX(.*)
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 10,
     "P2": "String-10",
     "origin": "cache"
@@ -3092,6 +3092,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 [
   {
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR6",
     "createdAt": REGEX(.*),
     "modifiedAt": REGEX(.*),
@@ -3186,7 +3187,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "expiresAt": "2028-12-31T10:00:00",
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "P1": 6,
     "P2": "String-6",
     "origin": "cache"

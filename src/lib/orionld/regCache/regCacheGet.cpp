@@ -54,6 +54,7 @@ RegCache* regCacheGet(OrionldTenant* tenantP, bool createIfNotFound)
   rcP = (RegCache*) malloc(sizeof(RegCache));
   rcP->tenant  = tenantP->tenant;
   rcP->regList = NULL;
+  rcP->last    = NULL;
   rcP->next    = regCacheList;
 
   regCacheList = rcP;

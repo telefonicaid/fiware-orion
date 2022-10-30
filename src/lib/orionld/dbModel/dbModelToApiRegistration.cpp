@@ -90,13 +90,6 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs)
 
 
   //
-  // type
-  //
-  KjNode* typeP = kjString(orionldState.kjsonP, "type", "ContextSourceRegistration");
-  kjChildAdd(dbRegP, typeP);
-
-
-  //
   // expiration (expiresAt)
   //
   KjNode* expiresAtP = kjLookup(dbRegP, "expiration");
@@ -114,13 +107,6 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs)
 
   if (nameP != NULL)
     nameP->name = (char*) "registrationName";
-
-
-  //
-  // origin
-  //
-  KjNode* originP = kjString(orionldState.kjsonP, "origin", "database");
-  kjChildAdd(dbRegP, originP);
 
 
   //

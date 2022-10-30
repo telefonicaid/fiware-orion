@@ -26,6 +26,7 @@
 
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                   // kaStrdup
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjChildRemove, ...
@@ -73,7 +74,10 @@ static void kjStringPatch(KjNode* container, const char* fieldName, char* string
   if (nodeP != NULL)
   {
     if (deletion == false)
-      nodeP->value.s = stringValue;
+    {
+      nodeP->type    = KjString;
+      nodeP->value.s = kaStrdup(&orionldState.kalloc, stringValue);
+    }
     else
       kjChildRemove(container, nodeP);
   }
@@ -98,7 +102,10 @@ static void kjIntegerPatch(KjNode* container, const char* fieldName, long long i
   KjNode* nodeP = kjLookup(container, fieldName);
 
   if (nodeP != NULL)
+  {
+    nodeP->type    = KjInt;
     nodeP->value.i = iValue;
+  }
   else
   {
     nodeP = kjInteger(orionldState.kjsonP, fieldName, iValue);
@@ -117,7 +124,10 @@ static void kjFloatPatch(KjNode* container, const char* fieldName, double dValue
   KjNode* nodeP = kjLookup(container, fieldName);
 
   if (nodeP != NULL)
+  {
+    nodeP->type    = KjFloat;
     nodeP->value.f = dValue;
+  }
   else
   {
     nodeP = kjFloat(orionldState.kjsonP, fieldName, dValue);
@@ -136,7 +146,10 @@ static void kjBooleanPatch(KjNode* container, const char* fieldName, bool bValue
   KjNode* nodeP = kjLookup(container, fieldName);
 
   if (nodeP != NULL)
+  {
+    nodeP->type    = KjBoolean;
     nodeP->value.b = bValue;
+  }
   else
   {
     nodeP = kjBoolean(orionldState.kjsonP, fieldName, bValue);
@@ -179,11 +192,11 @@ static void kjDateTimePatch(KjNode* container, const char* fieldName, char* date
   KjNode* nodeP  = kjLookup(container, fieldName);
   double  dValue = parse8601Time(dateTime);
 
-  LM(("RP: In kjDateTimePatch: '%s' at %p", fieldName, nodeP));
-  LM(("RP: timestamp: %f", dValue));
-
   if (nodeP != NULL)
+  {
+    nodeP->type    = KjFloat;
     nodeP->value.f = dValue;
+  }
   else
   {
     nodeP = kjFloat(orionldState.kjsonP, fieldName, dValue);
@@ -442,8 +455,6 @@ static bool dbRegistrationPatch(KjNode* dbRegP, KjNode* regPatch, KjNode* proper
   //
   for (KjNode* patchItemP = regPatch->value.firstChildP; patchItemP != NULL; patchItemP = patchItemP->next)
   {
-    LM(("Patching '%s'", patchItemP->name));
-
     if ((strcmp(patchItemP->name, "registrationName") == 0) ||
         (strcmp(patchItemP->name, "name")             == 0))
     {
@@ -507,8 +518,6 @@ static bool dbRegistrationPatch(KjNode* dbRegP, KjNode* regPatch, KjNode* proper
 
     for (KjNode* regPropertyP = propertyTree->value.firstChildP; regPropertyP != NULL; regPropertyP = regPropertyP->next)
     {
-      LM(("PATCHING a Registration Property: '%s'", regPropertyP->name));
-
       if ((regPropertyP->type == KjArray) || (regPropertyP->type == KjObject))
         kjCompoundPatch(propertiesP, regPropertyP->name, regPropertyP);
       else if (regPropertyP->type == KjString)

@@ -220,6 +220,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 [
   {
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:reg01",
     "registrationName": "reg_01",
     "description": "description of reg 01",
@@ -242,7 +243,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "origin": "cache"
   }
 ]
@@ -259,6 +259,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 [
   {
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:reg01",
     "registrationName": "reg_01",
     "description": "description of reg 01",
@@ -281,10 +282,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "origin": "cache"
   },
   {
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:reg03",
     "registrationName": "reg_03",
     "description": "description of reg 03",
@@ -307,10 +308,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "origin": "cache"
   },
   {
+    "type": "ContextSourceRegistration",
     "id": "urn:ngsi-ld:reg05",
     "registrationName": "reg_05",
     "description": "description of reg 05",
@@ -333,7 +334,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "endpoint": "http://my.csource.org:1026",
     "status": "active",
-    "type": "ContextSourceRegistration",
     "origin": "cache"
   }
 ]

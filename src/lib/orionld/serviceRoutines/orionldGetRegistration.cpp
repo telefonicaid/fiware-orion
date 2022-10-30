@@ -41,6 +41,7 @@ extern "C"
 #include "orionld/legacyDriver/legacyGetRegistration.h"        // legacyGetRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
+#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/serviceRoutines/orionldGetRegistration.h"    // Own Interface
 
 
@@ -76,13 +77,6 @@ void apiModelFromDbInterval(KjNode* managementIntervalP)
 //
 void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, bool sysAttrs)
 {
-  //
-  // type (not part of the cached registration)
-  //
-  KjNode* typeP = kjString(orionldState.kjsonP, "type", "ContextSourceRegistration");
-  kjChildAdd(regTree, typeP);
-
-
   //
   // System Attributes
   //
@@ -279,13 +273,6 @@ void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, b
 
 
   //
-  // origin
-  //
-  KjNode* originP = kjString(orionldState.kjsonP, "origin", "cache");
-  kjChildAdd(regTree, originP);
-
-
-  //
   // managementInterval + observationInterval
   //
   KjNode* managementIntervalP  = kjLookup(regTree, "managementInterval");
@@ -295,6 +282,24 @@ void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, b
     apiModelFromDbInterval(managementIntervalP);
   if (observationIntervalP != NULL)
     apiModelFromDbInterval(observationIntervalP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// regTypeAndOrigin -
+//
+void regTypeAndOrigin(KjNode* regP, bool fromCache)
+{
+  // Add "type": "ContextSourceRegistration" in the start of the registration
+  KjNode* typeP = kjString(orionldState.kjsonP, "type", "ContextSourceRegistration");
+  typeP->next = regP->value.firstChildP;
+  regP->value.firstChildP = typeP;
+
+  // Add "origin": "database" at the end
+  KjNode* originP = kjString(orionldState.kjsonP, "origin", (fromCache == true)? "cache" : "database");
+  kjChildAdd(regP, originP);
 }
 
 
@@ -321,7 +326,7 @@ bool orionldGetRegistration(void)
       orionldState.responseTree    = kjClone(orionldState.kjsonP, cachedRegP->regTree);  // Work on a cloned copy from the reg-cache
 
       apiModelFromCachedRegistration(orionldState.responseTree, cachedRegP, orionldState.uriParamOptions.sysAttrs);
-
+      regTypeAndOrigin(orionldState.responseTree, true);
       return true;
     }
   }
@@ -336,6 +341,7 @@ bool orionldGetRegistration(void)
       orionldState.httpStatusCode  = 200;
       orionldState.responseTree    = dbRegP;
 
+      regTypeAndOrigin(orionldState.responseTree, false);
       return true;
     }
   }
