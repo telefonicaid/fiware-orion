@@ -78,7 +78,7 @@ void dbModelToApiInterval(KjNode* intervalP)
 //
 // dbModelToApiRegistration - modify the DB Model tree into an API Registration
 //
-bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs)
+bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs, bool forCache)
 {
   //
   // _id (id)
@@ -123,7 +123,7 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs)
     if (modifiedAtP != NULL)
       kjChildRemove(dbRegP, modifiedAtP);
   }
-  else
+  else if (forCache == false)
   {
     // System Attributes WANTED - turn them into ISO8601
     if (createdAtP != NULL)

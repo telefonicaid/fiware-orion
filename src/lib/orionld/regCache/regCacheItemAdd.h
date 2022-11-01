@@ -39,6 +39,6 @@ extern "C"
 //
 // regCacheItemAdd -
 //
-extern RegCacheItem* regCacheItemAdd(OrionldTenant* tenantP, KjNode* regP, bool fromDb);
+extern RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb);
 
 #endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMADD_H_

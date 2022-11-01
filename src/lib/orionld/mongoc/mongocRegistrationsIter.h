@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHEGET_H_
-#define SRC_LIB_ORIONLD_REGCACHE_REGCACHEGET_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONSITER_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONSITER_H_
 
 /*
 *
@@ -25,20 +25,15 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheIterFunc
 
-#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regCacheGet -
+// mongocRegistrationsIter -
 //
-extern RegCache* regCacheGet(OrionldTenant* tenantP, bool createIfNotFound);
+extern int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback);
 
-#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEGET_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCREGISTRATIONSITER_H_

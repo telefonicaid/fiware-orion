@@ -995,7 +995,7 @@ MHD_Result orionldMhdConnectionTreat(void)
         else
         {
           // Add tenant to the tenant cache
-          orionldState.tenantP = orionldTenantCreate(orionldState.tenantName);
+          orionldState.tenantP = orionldTenantCreate(orionldState.tenantName, false);
         }
       }
     }

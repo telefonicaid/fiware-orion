@@ -36,6 +36,6 @@ extern "C"
 //
 // dbModelToApiRegistration - modify the DB Model tree into an API Registration
 //
-extern bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs);
+extern bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs, bool forCache);
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIREGISTRATION_H_

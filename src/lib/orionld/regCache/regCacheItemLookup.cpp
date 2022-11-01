@@ -29,7 +29,6 @@ extern "C"
 }
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/regCache/regCacheGet.h"                        // regCacheGet
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
@@ -38,14 +37,12 @@ extern "C"
 //
 // regCacheItemLookup -
 //
-RegCacheItem* regCacheItemLookup(OrionldTenant* tenantP, const char* regId)
+RegCacheItem* regCacheItemLookup(RegCache* regCache, const char* regId)
 {
-  RegCache* rcP = regCacheGet(tenantP, false);
-
-  if (rcP == NULL)
+  if (regCache == NULL)
     return NULL;
 
-  RegCacheItem* rciP = rcP->regList;
+  RegCacheItem* rciP = regCache->regList;
 
   while (rciP != NULL)
   {

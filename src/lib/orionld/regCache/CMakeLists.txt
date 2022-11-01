@@ -22,10 +22,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     RegCache.cpp
-    regCacheGet.cpp
     regCacheItemAdd.cpp
     regCacheItemLookup.cpp
     regCacheItemRemove.cpp
+    regCacheCreate.cpp
 )
 
 # Include directories

@@ -659,7 +659,7 @@ bool orionldPatchRegistration(void)
   //   7. Replace the old cached registration
   //   8. Return 204 if all OK
   //
-  RegCacheItem* rciP        = regCacheItemLookup(orionldState.tenantP, registrationId);
+  RegCacheItem* rciP        = regCacheItemLookup(orionldState.tenantP->regCache, registrationId);
   KjNode*       regPatch    = orionldState.requestTree;
   KjNode*       dbRegP      = mongocRegistrationGet(registrationId);
 
@@ -716,7 +716,7 @@ bool orionldPatchRegistration(void)
   //
   // Replace the old cached registration
   //
-  dbModelToApiRegistration(dbRegP, true);
+  dbModelToApiRegistration(dbRegP, true, true);
   apiModelToCacheRegistration(dbRegP);
   kjFree(rciP->regTree);
   rciP->regTree = kjClone(NULL, dbRegP);

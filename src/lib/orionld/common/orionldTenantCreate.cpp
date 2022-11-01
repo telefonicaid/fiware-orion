@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/mongoc/mongocIdIndexCreate.h"                // mongocIdIndexCreate
 #include "orionld/troe/pgDatabasePrepare.h"                    // pgDatabasePrepare
+#include "orionld/regCache/regCacheCreate.h"                   // regCacheCreate
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/tenantList.h"                         // tenantList
 #include "orionld/common/orionldTenantCreate.h"                // Own interface
@@ -48,7 +49,7 @@ extern "C"
 // This function, except for the init phase, is running with the tenant semaphore taken
 // (when called from orionldTenantGet)
 //
-OrionldTenant* orionldTenantCreate(const char* tenantName)
+OrionldTenant* orionldTenantCreate(const char* tenantName, bool scanRegs)
 {
   if ((tenantName == NULL) || (tenantName[0] == 0))
   {
@@ -69,7 +70,7 @@ OrionldTenant* orionldTenantCreate(const char* tenantName)
   snprintf(tenantP->registrations,   sizeof(tenantP->registrations) - 1,   "%s-%s.registrations", dbName, tenantName);
   snprintf(tenantP->troeDbName,      sizeof(tenantP->troeDbName) - 1,      "%s_%s",               dbName, tenantName);
 
-  // Add new tenant to tenant list
+  // Add the new tenant to tenant list
   tenantP->next = tenantList;  // It's OK if the tenant list is empty (tenantList == NULL)
   tenantList    = tenantP;
 
@@ -82,6 +83,8 @@ OrionldTenant* orionldTenantCreate(const char* tenantName)
     if (pgDatabasePrepare(tenantP->troeDbName) != true)
       LM_E(("Database Error (unable to prepare a new TRoE database for tenant '%s')", orionldState.tenantP->troeDbName));
   }
+
+  tenantP->regCache = regCacheCreate(tenantP, scanRegs);
 
   return tenantP;
 }

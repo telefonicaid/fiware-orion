@@ -29,9 +29,7 @@ extern "C"
 #include "kjson/kjFree.h"                                        // kjFree
 }
 
-#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
-#include "orionld/regCache/regCacheGet.h"                        // regCacheGet
 #include "orionld/regCache/regCacheItemRemove.h"                 // Own interface
 
 
@@ -52,10 +50,8 @@ extern "C"
 // BUT, looking up an individual registration for patching, deletion or whatever is FAR FROM the
 // main use of the registration cache.
 //
-bool regCacheItemRemove(OrionldTenant* tenantP, const char* regId)
+bool regCacheItemRemove(RegCache* rcP, const char* regId)
 {
-  RegCache* rcP = regCacheGet(tenantP, false);
-
   if (rcP == NULL)
     return false;
 

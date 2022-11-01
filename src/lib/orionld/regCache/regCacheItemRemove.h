@@ -25,8 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
 
 
 
@@ -34,6 +33,6 @@
 //
 // regCacheItemRemove -
 //
-extern bool regCacheItemRemove(OrionldTenant* tenantP, const char* regId);
+extern bool regCacheItemRemove(RegCache* rcP, const char* regId);
 
 #endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREMOVE_H_

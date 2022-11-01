@@ -318,7 +318,7 @@ bool orionldGetRegistration(void)
 
   if (orionldState.uriParamOptions.fromDb == false)
   {
-    RegCacheItem* cachedRegP = regCacheItemLookup(orionldState.tenantP, orionldState.wildcard[0]);
+    RegCacheItem* cachedRegP = regCacheItemLookup(orionldState.tenantP->regCache, orionldState.wildcard[0]);
 
     if (cachedRegP != NULL)
     {
@@ -336,7 +336,7 @@ bool orionldGetRegistration(void)
 
     if (dbRegP != NULL)
     {
-      dbModelToApiRegistration(dbRegP, orionldState.uriParamOptions.sysAttrs);
+      dbModelToApiRegistration(dbRegP, orionldState.uriParamOptions.sysAttrs, false);
 
       orionldState.httpStatusCode  = 200;
       orionldState.responseTree    = dbRegP;

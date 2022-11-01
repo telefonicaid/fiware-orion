@@ -33,9 +33,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/regCache/regCacheGet.h"                        // regCacheGet
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
-#include "orionld/regCache/regCacheItemAdd.h"                   // Own interface
+#include "orionld/regCache/regCacheItemAdd.h"                    // Own interface
 
 
 
@@ -97,16 +96,15 @@ static void regStringAdd(KjNode* regP, const char* name, const char* value)
 //
 // regCacheItemAdd -
 //
-RegCacheItem* regCacheItemAdd(OrionldTenant* tenantP, KjNode* regP, bool fromDb)
+RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
 {
   // <DEBUG>
   KjNode* idP = kjLookup(regP, "id");
   if (idP == NULL)
     idP = kjLookup(regP, "_id");
-  LM(("RC: Adding registration '%s' to the registration cache of tenant '%s'", (idP != NULL)? idP->value.s : "unknown", tenantP->tenant));
+  LM(("RC: Adding registration '%s' to the registration cache of tenant '%s'", (idP != NULL)? idP->value.s : "unknown", rcP->tenant));
   // </DEBUG>
 
-  RegCache*     rcP  = regCacheGet(tenantP, true);  // OR: tenantP->regCache: no lookup needed + can skip the next-pointer + tenant-name in RegCache !!!
   RegCacheItem* rciP = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
 
   //
@@ -125,11 +123,11 @@ RegCacheItem* regCacheItemAdd(OrionldTenant* tenantP, KjNode* regP, bool fromDb)
   // Counters and timestamps - create if they don't exist
   if (fromDb == false)
   {
-    regCounterAdd(rciP->regTree, "timesSent");
-    regCounterAdd(rciP->regTree, "timesFailed");
+    regCounterAdd(rciP->regTree,   "timesSent");
+    regCounterAdd(rciP->regTree,   "timesFailed");
     regTimestampAdd(rciP->regTree, "lastSuccess");
     regTimestampAdd(rciP->regTree, "lastFailure");
-    regStringAdd(rciP->regTree, "status", "active");
+    regStringAdd(rciP->regTree,    "status", "active");
   }
 
   return rciP;

@@ -120,6 +120,8 @@ void apiModelToCacheRegistration(KjNode* apiRegistrationP)
     dbModelFromApiTimeInterval(observationIntervalP);
   if (managementIntervalP != NULL)
     dbModelFromApiTimeInterval(managementIntervalP);
+
+  // createdAt+modifiedAt to KjFloat
 }
 
 
@@ -214,7 +216,7 @@ bool orionldPostRegistrations(void)
   kjChildAdd(orionldState.requestTree, propertyTree);
 
   apiModelToCacheRegistration(orionldState.requestTree);
-  regCacheItemAdd(orionldState.tenantP, orionldState.requestTree, false);  // Clones the registration
+  regCacheItemAdd(orionldState.tenantP->regCache, orionldState.requestTree, false);  // Clones the registration
 
   kjTreeLog(orionldState.requestTree, "Before dbModelFromApiRegistration");
   // This is where "id" is changed to "_id"

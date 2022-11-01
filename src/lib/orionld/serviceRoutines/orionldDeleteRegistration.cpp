@@ -56,7 +56,7 @@ bool orionldDeleteRegistration(void)
     return false;
   }
 
-  if (regCacheItemRemove(orionldState.tenantP, orionldState.wildcard[0]) == false)
+  if (regCacheItemRemove(orionldState.tenantP->regCache, orionldState.wildcard[0]) == false)
   {
     if (noCache == false)
       LM_W(("The registration '%s' was successfully removed from DB but does not exist in sub-cache ... (sub-cache is enabled)"));

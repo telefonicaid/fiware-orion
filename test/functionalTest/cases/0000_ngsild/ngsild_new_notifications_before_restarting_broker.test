@@ -223,4 +223,4 @@ Ngsild-Attribute-Format: Normalized
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
-#dbDrop CB
+dbDrop CB

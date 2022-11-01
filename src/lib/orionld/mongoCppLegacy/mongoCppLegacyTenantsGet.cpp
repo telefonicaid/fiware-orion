@@ -81,7 +81,7 @@ bool mongoCppLegacyTenantsGet(void)
           char* tenantName = &name[dbNameLen + 1];
 
           if (orionldTenantLookup(tenantName) == NULL)
-            orionldTenantCreate(tenantName);
+            orionldTenantCreate(tenantName, false);
         }
       }
     }

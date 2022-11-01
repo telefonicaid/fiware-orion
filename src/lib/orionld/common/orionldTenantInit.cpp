@@ -30,6 +30,8 @@
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant, tenantList, tenantCache
 #include "orionld/common/orionldState.h"                         // dbName (CLI param - default is "orion")
 #include "orionld/common/tenantList.h"                           // tenantList, tenantSem, tenant0, tenantCache
+#include "orionld/regCache/regCacheCreate.h"                     // regCacheCreate
+#include "orionld/common/orionldTenantInit.h"                    // Own interface
 
 
 

@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
@@ -34,6 +33,6 @@
 //
 // regCacheItemLookup -
 //
-extern RegCacheItem* regCacheItemLookup(OrionldTenant* tenantP, const char* regId);
+extern RegCacheItem* regCacheItemLookup(RegCache* regCache, const char* regId);
 
 #endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMLOOKUP_H_

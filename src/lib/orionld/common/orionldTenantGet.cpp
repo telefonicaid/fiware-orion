@@ -63,7 +63,7 @@ OrionldTenant* orionldTenantGet(const char* tenantName)
   tenantP = orionldTenantLookup(tenantName);  // Second lookup - this time sem-protected
 
   if (tenantP == NULL)
-    tenantP = orionldTenantCreate(tenantName);
+    tenantP = orionldTenantCreate(tenantName, false);
 
   tenantCache = tenantP;  // No real need to semaphore-protect tenantCache, but hey, it comes practically for free! :)
 

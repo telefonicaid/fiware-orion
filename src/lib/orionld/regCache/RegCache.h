@@ -71,8 +71,14 @@ typedef struct RegCache
   char*          tenant;
   RegCacheItem*  regList;
   RegCacheItem*  last;
-  RegCache*      next;
 } RegCache;
+
+
+// -----------------------------------------------------------------------------
+//
+// RegCacheIterFunc -
+//
+typedef int (*RegCacheIterFunc)(RegCache* rcP, KjNode* dbRegP);
 
 
 

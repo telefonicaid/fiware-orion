@@ -28,6 +28,13 @@
 #include <semaphore.h>                                           // sem_t
 
 
+// -----------------------------------------------------------------------------
+//
+// Forward declaration (can't include RegCache.h - it already includes this file)
+//
+struct RegCache;
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -42,6 +49,7 @@ typedef struct OrionldTenant
   char                   avSubscriptions[88];  // mongo reg subscriptions collection path.     E.g. "orion-openiot.casubs"
   char                   registrations[88];    // mongo registrations collection path.         E.g. "orion-openiot.registrations"
   char                   troeDbName[72];       // TRoE database name                           E.g. "orion_openiot"
+  struct RegCache*       regCache;
   struct OrionldTenant*  next;                 // Pointer to the next one in the linked list
 } OrionldTenant;
 

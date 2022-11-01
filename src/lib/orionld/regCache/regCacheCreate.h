@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHECREATE_H_
+#define SRC_LIB_ORIONLD_REGCACHE_REGCACHECREATE_H_
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -27,37 +30,15 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
-#include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem, regCacheList
-#include "orionld/regCache/regCacheGet.h"                        // Own interface
 
 
 // -----------------------------------------------------------------------------
 //
-// regCacheGet - creates a new reg-cache if not found (adds it to reg-cache-list and returns a pointer to the new reg-cache)
+// regCacheCreate -
 //
-RegCache* regCacheGet(OrionldTenant* tenantP, bool createIfNotFound)
-{
-  RegCache* rcP = regCacheList;
+extern RegCache* regCacheCreate(OrionldTenant* tenantP, bool scanRegs);
 
-  while (rcP != NULL)
-  {
-    if (strcmp(rcP->tenant, tenantP->tenant) == 0)
-      return rcP;
-    rcP = rcP->next;
-  }
-
-  if (createIfNotFound == false)
-    return NULL;
-
-  rcP = (RegCache*) malloc(sizeof(RegCache));
-  rcP->tenant  = tenantP->tenant;
-  rcP->regList = NULL;
-  rcP->last    = NULL;
-  rcP->next    = regCacheList;
-
-  regCacheList = rcP;
-
-  return rcP;
-}
+#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHECREATE_H_

@@ -39,7 +39,6 @@ extern "C"
 #include "orionld/mongoc/mongocRegistrationsGet.h"               // mongocRegistrationsGet
 #include "orionld/dbModel/dbModelToApiRegistration.h"            // dbModelToApiRegistration
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
-#include "orionld/regCache/regCacheGet.h"                        // regCacheGet
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldGetRegistrations.h"     // Own Interface
 
@@ -214,7 +213,7 @@ bool orionldGetRegistrations(void)
   //
   // Not Legacy, not "From DB" - Getting the registrations from the registration cache
   //
-  RegCache* rcP = regCacheGet(orionldState.tenantP, false);
+  RegCache* rcP = orionldState.tenantP->regCache;
 
   //
   // Empty loop over the registrations, just to count how many there are
@@ -296,7 +295,8 @@ bool orionldGetRegistrations(void)
         break;
     }
   }
-  else
+
+  if (regArray->value.firstChildP == NULL)
     orionldState.noLinkHeader = true;  // Don't want the Link header if there is no payload body (empty array)
 
   orionldState.httpStatusCode = 200;
