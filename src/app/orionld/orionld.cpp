@@ -132,6 +132,7 @@ extern "C"
 
 #include "orionld/mongoc/mongocServerVersionGet.h"            // mongocServerVersionGet
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
+#include "orionld/regCache/regCacheInit.h"                    // regCacheInit
 #include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
 #include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
@@ -798,6 +799,7 @@ static void libLogFunction
 }
 
 
+
 // char* SUB_CACHE_DISABLED = NULL;
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
@@ -1068,10 +1070,14 @@ int main(int argC, char* argV[])
   // mongocInit calls mongocGeoIndexInit - tenant0 must be ready for that
   orionldTenantInit();
   orionldState.tenantP = &tenant0;
+
   mongocInit(dbURI, dbHost, dbUser, dbPwd, dbAuthDb, rplSet, dbAuthMechanism, dbSSL, dbCertFile);
 
-  // Now that the DB is ready to be used, we can populate the regCaches for the different tenants
-  tenant0.regCache = regCacheCreate(&tenant0, true);
+  //
+  // Now that the DB is ready to be used, we can populate the regCache for the different tenants
+  // Note that regCacheInit uses the tenantList, so orionldTenantInit must be called before regCacheInit
+  //
+  regCacheInit();
 
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 

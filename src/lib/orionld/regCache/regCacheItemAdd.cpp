@@ -98,13 +98,6 @@ static void regStringAdd(KjNode* regP, const char* name, const char* value)
 //
 RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
 {
-  // <DEBUG>
-  KjNode* idP = kjLookup(regP, "id");
-  if (idP == NULL)
-    idP = kjLookup(regP, "_id");
-  LM(("RC: Adding registration '%s' to the registration cache of tenant '%s'", (idP != NULL)? idP->value.s : "unknown", rcP->tenant));
-  // </DEBUG>
-
   RegCacheItem* rciP = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
 
   //

@@ -93,7 +93,7 @@ bool mongocTenantsGet(void)
         char* tenantName = &nameP->value.s[dbNameLen + 1];
 
         if (orionldTenantLookup(tenantName) == NULL)
-          orionldTenantCreate(tenantName, true);
+          orionldTenantCreate(tenantName, false);
       }
     }
   }

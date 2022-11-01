@@ -71,7 +71,7 @@ RegCache* regCacheCreate(OrionldTenant* tenantP, bool scanRegs)
   if (rcP == NULL)
     LM_RE(NULL, ("Out of memory (attempt to create a registration cache)"));
 
-  rcP->tenant   = tenantP->tenant;
+  rcP->tenantP  = tenantP;
   rcP->regList  = NULL;
   rcP->last     = NULL;
 

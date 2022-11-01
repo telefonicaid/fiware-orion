@@ -62,13 +62,15 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
 
   mongocConnectionGet();
 
-  if (orionldState.mongoc.registrationsP == NULL)
-    orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "registrations");
+  //
+  // Can't use the "orionldState.mongoc.registrationsP" here, as we'll deal with not one single tenant but all of them
+  //
+  mongoc_collection_t* regsCollectionP = mongoc_client_get_collection(orionldState.mongoc.client, rcP->tenantP->mongoDbName, "registrations");
 
   //
   // Run the query
   //
-  mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.registrationsP, &mongoFilter, NULL, readPrefs);
+  mongoCursorP = mongoc_collection_find_with_opts(regsCollectionP, &mongoFilter, NULL, readPrefs);
   if (mongoCursorP == NULL)
   {
     orionldError(OrionldInternalError, "Database Error", "mongoc_collection_find_with_opts ERROR", 500);
@@ -99,6 +101,7 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
     orionldError(OrionldInternalError, "Database Error", mongoError.message, 500);
   }
 
+  mongoc_collection_destroy(regsCollectionP);
   mongoc_cursor_destroy(mongoCursorP);
   mongoc_read_prefs_destroy(readPrefs);
   bson_destroy(&mongoFilter);

@@ -1,0 +1,444 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Initial population of registration cache on a tenant != default tenant
+
+--SHELL-INIT--
+# Copied from ngsild_registration_get.test
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+brokerStart CB 0 IPv4 -experimental -multiservice
+
+--SHELL--
+
+#
+# 01. Create 2 registrations on tenant t1
+# 02. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
+# 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
+# 04. Restart the broker (reg-cache re-read at startup)
+# 05. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
+# 06. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
+# 07. GET all registrations
+#
+
+echo "01. Create 2 registrations on tenant t1"
+echo "======================================="
+payload='{
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
+  "type": "ContextSourceRegistration",
+  "description": "description of reg test 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Building:A456",
+          "type": "Building"
+        }
+      ],
+      "properties": [ "size", "high" ],
+      "relationships": [ "isAvailable" ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
+  },
+  "expiresAt": "2029-10-31T10:00:25",
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --tenant t1
+REG_ID=urn:ngsi-ld:ContextSourceRegistration:csr1a342
+echo
+echo
+
+payload='{
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a343",
+  "type": "ContextSourceRegistration",
+  "description": "description of reg test 2",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
+  },
+  "managementInterval": {
+    "startAt": "2018-12-31T10:00:00",
+    "endAt": "2028-12-31T10:00:00"
+  },
+  "expiresAt": "2029-10-31T10:00:25",
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --tenant t1
+REG_ID2=urn:ngsi-ld:ContextSourceRegistration:csr1a343
+echo
+echo
+
+
+echo "02. GET /ngsi-ld/v1/csourceRegistrations/REG_ID"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/$REG_ID --tenant t1
+echo
+echo
+
+
+echo "03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/$REG_ID2 --tenant t1
+echo
+echo
+
+
+echo "04. Restart the broker (reg-cache re-read at startup)"
+echo "====================================================="
+brokerStop CB
+brokerStart CB 0 IPv4 -experimental -multiservice
+sleep 1
+echo
+echo
+
+
+echo "05. GET /ngsi-ld/v1/csourceRegistrations/REG_ID"
+echo "==============================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/$REG_ID --tenant t1
+echo
+echo
+
+
+echo "06. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/$REG_ID2 --tenant t1
+echo
+echo
+
+
+echo "07. GET all registrations"
+echo "========================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --tenant t1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 2 registrations on tenant t1
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a342
+NGSILD-Tenant: t1
+
+
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:csr1a343
+NGSILD-Tenant: t1
+
+
+
+02. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 584
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "description of reg test 1",
+    "endpoint": "http://my.csource.org:1026",
+    "expiresAt": "2029-10-31T10:00:25",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Building:A456",
+                    "type": "Building"
+                }
+            ],
+            "propertyNames": [
+                "size",
+                "high"
+            ],
+            "relationshipNames": [
+                "isAvailable"
+            ]
+        }
+    ],
+    "managementInterval": {
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
+    },
+    "observationInterval": {
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "ContextSourceRegistration"
+}
+
+
+03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 585
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "description of reg test 2",
+    "endpoint": "http://my.csource.org:1026",
+    "expiresAt": "2029-10-31T10:00:25",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a343",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Vehicle:A456",
+                    "type": "Vehicle"
+                }
+            ],
+            "propertyNames": [
+                "brandName",
+                "speed"
+            ],
+            "relationshipNames": [
+                "isParked"
+            ]
+        }
+    ],
+    "managementInterval": {
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
+    },
+    "observationInterval": {
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "ContextSourceRegistration"
+}
+
+
+04. Restart the broker (reg-cache re-read at startup)
+=====================================================
+
+
+05. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 589
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "description of reg test 1",
+    "endpoint": "http://my.csource.org:1026",
+    "expiresAt": "2029-10-31T10:00:25.000Z",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Building:A456",
+                    "type": "Building"
+                }
+            ],
+            "propertyNames": [
+                "size",
+                "high"
+            ],
+            "relationshipNames": [
+                "isAvailable"
+            ]
+        }
+    ],
+    "managementInterval": {
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
+    },
+    "observationInterval": {
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "ContextSourceRegistration"
+}
+
+
+06. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
+================================================
+HTTP/1.1 200 OK
+Content-Length: 590
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "description of reg test 2",
+    "endpoint": "http://my.csource.org:1026",
+    "expiresAt": "2029-10-31T10:00:25.000Z",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a343",
+    "information": [
+        {
+            "entities": [
+                {
+                    "id": "urn:ngsi-ld:Vehicle:A456",
+                    "type": "Vehicle"
+                }
+            ],
+            "propertyNames": [
+                "brandName",
+                "speed"
+            ],
+            "relationshipNames": [
+                "isParked"
+            ]
+        }
+    ],
+    "managementInterval": {
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
+    },
+    "observationInterval": {
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "ContextSourceRegistration"
+}
+
+
+07. GET all registrations
+=========================
+HTTP/1.1 200 OK
+Content-Length: 1182
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "description": "description of reg test 1",
+        "endpoint": "http://my.csource.org:1026",
+        "expiresAt": "2029-10-31T10:00:25.000Z",
+        "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a342",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "id": "urn:ngsi-ld:Building:A456",
+                        "type": "Building"
+                    }
+                ],
+                "propertyNames": [
+                    "size",
+                    "high"
+                ],
+                "relationshipNames": [
+                    "isAvailable"
+                ]
+            }
+        ],
+        "managementInterval": {
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
+        },
+        "observationInterval": {
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "ContextSourceRegistration"
+    },
+    {
+        "description": "description of reg test 2",
+        "endpoint": "http://my.csource.org:1026",
+        "expiresAt": "2029-10-31T10:00:25.000Z",
+        "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a343",
+        "information": [
+            {
+                "entities": [
+                    {
+                        "id": "urn:ngsi-ld:Vehicle:A456",
+                        "type": "Vehicle"
+                    }
+                ],
+                "propertyNames": [
+                    "brandName",
+                    "speed"
+                ],
+                "relationshipNames": [
+                    "isParked"
+                ]
+            }
+        ],
+        "managementInterval": {
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
+        },
+        "observationInterval": {
+            "endAt": "2028-12-31T10:00:00.000Z",
+            "startAt": "2018-12-31T10:00:00.000Z"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "ContextSourceRegistration"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB t1

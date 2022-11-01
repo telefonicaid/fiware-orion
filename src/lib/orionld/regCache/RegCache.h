@@ -68,7 +68,7 @@ typedef struct RegCacheItem
 //
 typedef struct RegCache
 {
-  char*          tenant;
+  OrionldTenant* tenantP;
   RegCacheItem*  regList;
   RegCacheItem*  last;
 } RegCache;
