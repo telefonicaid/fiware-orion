@@ -1,7 +1,5 @@
 # FIWARE NGSIv2 Orion API Specification
  
-<!-- TOC -->
-
 - [Preface](#preface)
 - [Specification](#specification)
     - [Introduction](#introduction)
@@ -142,8 +140,6 @@
     - [Registration implementation differences](#registration-implementation-differences)
     - [`GET /v2` operation](#get-v2-operation)
     - [Deprecated features](#deprecated-features)
-
-<!-- /TOC -->
 
 # Preface
 
