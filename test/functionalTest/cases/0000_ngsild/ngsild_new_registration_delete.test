@@ -293,9 +293,9 @@ NGSILD-Tenant: t1
 
 12. See ALL registrations in mongo, tenant T1 - see R1
 ======================================================
-MongoDB shell version v4.4.17
-connecting to: mongodb://localhost:27017/ftest-t1?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.17
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
 	"createdAt" : REGEX(.*),
@@ -356,9 +356,9 @@ Date: REGEX(.*)
 
 15. See ALL registrations in mongo, tenant T1 - see None
 ========================================================
-MongoDB shell version v4.4.17
-connecting to: mongodb://localhost:27017/ftest-t1?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.17
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 bye
 
 
