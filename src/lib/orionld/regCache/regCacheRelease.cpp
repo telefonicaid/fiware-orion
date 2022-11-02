@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTCREATE_H_
-#define SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTCREATE_H_
-
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +22,36 @@
 *
 * Author: Ken Zangelin
 */
-#include <time.h>                                              // time, gmtime_r
+#include <stdlib.h>                                              // free
+
+extern "C"
+{
+#include "kjson/kjFree.h"                                        // kjFree
+}
+
+#include "orionld/regCache/RegCache.h"                           // RegCache
+#include "orionld/regCache/regCacheRelease.h"                    // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldTenantCreate
+// regCacheRelease -
 //
-extern OrionldTenant* orionldTenantCreate(const char* tenantName, bool scanRegs, bool regCache);
+void regCacheRelease(RegCache* regCacheP)
+{
+  RegCacheItem* regP = regCacheP->regList;
+  RegCacheItem* next;
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDTENANTCREATE_H_
+  while (regP != NULL)
+  {
+    next = regP->next;
+
+    kjFree(regP->regTree);
+    free(regP);
+
+    regP = next;
+  }
+
+  free(regCacheP);
+}

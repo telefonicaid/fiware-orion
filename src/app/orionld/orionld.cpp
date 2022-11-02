@@ -124,6 +124,7 @@ extern "C"
 #include "orionld/db/dbInit.h"                                // dbInit
 #include "orionld/mqtt/mqttRelease.h"                         // mqttRelease
 #include "orionld/regCache/regCacheCreate.h"                  // regCacheCreate
+#include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
 #include "orionld/troe/troeInit.h"                            // troeInit
 
 #include "orionld/version.h"
@@ -557,9 +558,16 @@ void exitFunc(void)
   while (tenantP != NULL)
   {
     OrionldTenant* next = tenantP->next;
+
+    if (tenantP->regCache != NULL)
+      regCacheRelease(tenantP->regCache);
+
     free(tenantP);
     tenantP = next;
   }
+
+  if (tenant0.regCache != NULL)
+      regCacheRelease(tenant0.regCache);
 
   // Disconnect from all MQTT brokers and free the connections
   mqttRelease();

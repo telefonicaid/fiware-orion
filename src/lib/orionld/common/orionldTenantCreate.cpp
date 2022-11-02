@@ -49,7 +49,7 @@ extern "C"
 // This function, except for the init phase, is running with the tenant semaphore taken
 // (when called from orionldTenantGet)
 //
-OrionldTenant* orionldTenantCreate(const char* tenantName, bool scanRegs)
+OrionldTenant* orionldTenantCreate(const char* tenantName, bool scanRegs, bool regCache)
 {
   if ((tenantName == NULL) || (tenantName[0] == 0))
   {
@@ -84,7 +84,8 @@ OrionldTenant* orionldTenantCreate(const char* tenantName, bool scanRegs)
       LM_E(("Database Error (unable to prepare a new TRoE database for tenant '%s')", orionldState.tenantP->troeDbName));
   }
 
-  tenantP->regCache = regCacheCreate(tenantP, scanRegs);
+  if (regCache == true)
+    tenantP->regCache = regCacheCreate(tenantP, scanRegs);
 
   return tenantP;
 }
