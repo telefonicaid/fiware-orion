@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <cinttypes>                  /* PRId64, PRIu64                      */
+
 #include <cstdlib>                    /* C++ free                            */
 
 #include "logMsg/logMsg.h"            /* lmVerbose, lmDebug, ...             */
@@ -172,8 +174,8 @@ static int limits(PaiArgument* paList, PaiArgument* aP)
                        aP->name, i64Val, aP->min, aP->max));
     if ((lower && (i64Val < aP->min)) || (upper && (i64Val > aP->max)))
     {
-      snprintf(valS, sizeof(valS), "%ld", i64Val);
-      snprintf(w, sizeof(w), "%ld <= %ld <= %ld (%s)",
+      snprintf(valS, sizeof(valS), "%" PRId64, i64Val);
+      snprintf(w, sizeof(w), "%" PRId64 " <= %" PRId64 " <= %" PRId64 " (%s)",
                aP->min,
                i64Val,
                aP->max,
@@ -186,8 +188,8 @@ static int limits(PaiArgument* paList, PaiArgument* aP)
                        aP->name, ui64Val, aP->min, aP->max));
     if ((lower && (uiVal < (uint64_t) aP->min)) || (upper && (uiVal > (uint64_t) aP->max)))
     {
-      snprintf(valS, sizeof(valS), "%lu", ui64Val);
-      snprintf(w, sizeof(w), "%lu <= %lu <= %lu (%s)",
+      snprintf(valS, sizeof(valS), "%" PRIu64, ui64Val);
+      snprintf(w, sizeof(w), "%" PRId64 " <= %" PRId64 " <= %" PRId64 " (%s)",
                aP->min,
                ui64Val,
                aP->max,

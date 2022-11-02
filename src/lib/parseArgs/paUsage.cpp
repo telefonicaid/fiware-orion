@@ -22,6 +22,7 @@
 *
 * Author: developer
 */
+#include <cinttypes>                  /* PRId64, PRIu64                      */
 #include <stdlib.h>                   /* system                              */
 #include <unistd.h>                   /* getpid                              */
 #include <string>                     /* std::string                         */
@@ -166,10 +167,10 @@ static void getApVals
     break;
 
   case PaInt64:
-    snprintf(defVal,  defValLen,  "%ld", aP->def);
-    snprintf(minVal,  minValLen,  "%ld", aP->min);
-    snprintf(maxVal,  maxValLen,  "%ld", aP->max);
-    snprintf(realVal, realValLen, "%ld", *((int64_t*) aP->varP));
+    snprintf(defVal,  defValLen,  "%" PRId64, aP->def);
+    snprintf(minVal,  minValLen,  "%" PRId64, aP->min);
+    snprintf(maxVal,  maxValLen,  "%" PRId64, aP->max);
+    snprintf(realVal, realValLen, "%" PRId64, *((int64_t*) aP->varP));
     break;
 
   case PaIntU:
@@ -180,10 +181,10 @@ static void getApVals
     break;
 
   case PaIntU64:
-    snprintf(defVal,  defValLen,  "%lu", aP->def);
-    snprintf(minVal,  minValLen,  "%lu", aP->min);
-    snprintf(maxVal,  maxValLen,  "%lu", aP->max);
-    snprintf(realVal, realValLen, "%lu", *((uint64_t*) aP->varP));
+    snprintf(defVal,  defValLen,  "%" PRIu64, aP->def);
+    snprintf(minVal,  minValLen,  "%" PRIu64, aP->min);
+    snprintf(maxVal,  maxValLen,  "%" PRIu64, aP->max);
+    snprintf(realVal, realValLen, "%" PRIu64, *((uint64_t*) aP->varP));
     break;
 
   case PaShort:

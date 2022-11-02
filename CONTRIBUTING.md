@@ -20,23 +20,28 @@ Before we get started, here are a few things we expect from you (and that you sh
 -   When adding content, please consider if it is widely valuable. Please don't add references or links to things you or
     your employer have created as others will do so if they appreciate it.
 
+
 ## How to contribute
 
-If you'd like to contribute, start by searching through the [issues](https://github.com/ging/fiware-idm/issues) and
-[pull requests](https://github.com/ging/fiware-idm/pulls) to see whether someone else has raised a similar idea or
+If you'd like to contribute, start by searching through the [issues](https://github.com/FIWARE/context.Orion-LD/issues) and
+[pull requests](https://github.com/FIWARE/context.Orion-LD/pulls) to see whether someone else has raised a similar idea or
 question.
 
 If you don't see your idea listed, and you think it fits into the goals of this guide, do one of the following:
 
--   **If your contribution is minor,** such as a typo fix, open a pull request.
--   **If your contribution is major,** such as a new guide, start by opening an issue first. That way, other people can
+-   **If your contribution is minor,** such as a bug fix, open a pull request.
+-   **If your contribution is major,** such as a new feature, start by opening an issue. That way, other people can
     weigh in on the discussion before you do any work.
 
-## Community
+In order to contribute to the functionality of Orion-LD, you will need to be able to compile and test Orion-LD.
+This is the "source document" to help you in this task:
+* [installation guide](https://github.com/FIWARE/context.Orion-LD/blob/develop/doc/manuals-ld/installation-guide.md)
 
-Discussions about the Open Source Guides take place on this repository's
-[Issues](https://github.com/ging/fiware-idm/issues) and [Pull Requests](https://github.com/ging/fiware-idm/pulls)
-sections. Anybody is welcome to join these conversations.
-
-Wherever possible, do not take these conversations to private channels, including contacting the maintainers directly.
-Keeping communication public means everybody can benefit and learn from the conversation.
+To understand a bit more about Orion-LD, there are a few documents that should help:
+-   [Quick Start Guide](doc/manuals-ld/quick-start-guide.md)
+-   [Guide to the context](doc/manuals-ld/the-context.md)
+-   [Guide to NGSI-LD entities and attributes](doc/manuals-ld/entities-and-attributes.md)
+-   [External Libraries](doc/manuals-ld/external-libraries.md)
+-   [Temporal Representation](doc/manuals-ld/troe.md)
+-   [The Broker as Context Server](doc/manuals-ld/contextServer.md)
+-   [State of the Implementation](doc/manuals-ld/implementationState.md)

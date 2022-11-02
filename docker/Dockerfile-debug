@@ -11,21 +11,8 @@ WORKDIR ${PATH_TO_SRC}
 
 RUN make debug install
 
-RUN mkdir -p /var/{log,run}/orionld
+ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build:/usr/lib/x86_64-linux-gnu/
 
-ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build:/usr/local/lib
-RUN echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
-
-COPY --from=build-stage /etc/ssl/ /etc/ssl/
-COPY --from=build-stage /opt/orion/ldcontexts/ /opt/orion/ldcontexts/
-COPY --from=build-stage /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
-COPY --from=build-stage /usr/lib /usr/lib
-COPY --from=build-stage /usr/bin/ /usr/bin/
-COPY --from=build-stage /usr/lib64/ /usr/lib64/
-COPY --from=build-stage /usr/local/ /usr/local/
-COPY --from=build-stage /opt/paho.mqtt.c/build/output /opt/paho.mqtt.c/build/output
-
-
-ENTRYPOINT ["orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
+ENTRYPOINT ["orionld", "-fg", "-multiservice" ]
 
 EXPOSE 1026
