@@ -24,15 +24,7 @@ set -e
 yum makecache --refresh
 yum -y install gmp
 
-#
-# gnutls-devel is not available in the ubi-repos, so we install it from the centos8 repos
-# https://rpmfind.net/linux/rpm2html/search.php?query=pkgconfig
-#
-# - That seems like an old comment. It's installed from:
-#   https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-devel-3.6.16-4.el8.x86_64.rpm
-#
-
-yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/pkgconf-pkg-config-1.4.2-1.el8.x86_64.rpm
+yum -y install https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/pkgconf-pkg-config-1.4.2-1.el8.x86_64.rpm
 
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-dane-3.6.16-4.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-utils-3.6.16-4.el8.x86_64.rpm
