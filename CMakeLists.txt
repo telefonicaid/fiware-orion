@@ -26,6 +26,7 @@ cmake_minimum_required(VERSION 3.5)
 
 find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread filesystem system regex)
+pkg_check_modules(LIBMONGOC REQUIRED libmongoc-1.0)
 
 #
 # DEBUG or RELEASE build ?
@@ -283,7 +284,7 @@ SET (DYNAMIC_LIBS
     resolv
     paho-mqtt3c
     pq             # for TRoE & Postgres
-    libmongoc-1.0.so
+    ${LIBMONGOC_LIBRARIES}
     libbson-1.0.so
 )
 
@@ -304,7 +305,7 @@ endif (UNIT_TEST)
 #
 include_directories("/usr/include")
 include_directories("/usr/local/include/libbson-1.0")
-include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("${LIBMONGOC_INCLUDE_DIRS}")
 include_directories("${PROJECT_SOURCE_DIR}/..")
 include_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/prom/include")
 include_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/promhttp/include")
@@ -326,6 +327,7 @@ link_directories("${PROJECT_SOURCE_DIR}/../kbase")
 link_directories("${PROJECT_SOURCE_DIR}/../khash")
 link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/prom/build")
 link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/promhttp/build")
+link_directories("${LIBMONGOC_LIBRARY_DIRS}")
 
 #
 # Enabling test harness
