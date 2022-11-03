@@ -6,4 +6,3 @@
 - Deprecated: GET /v2 operation
 - Remove: RPM package stuff
 - Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
-- Fix: moved API documentation to index in RTD
