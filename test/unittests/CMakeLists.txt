@@ -198,46 +198,14 @@ add_definitions(-DUNIT_TEST)
 # ------------------------------------------------------------
 
 ADD_EXECUTABLE(unitTest ${SOURCES})
+TARGET_LINK_LIBRARIES(unitTest
+  ${STATIC_LIBS}
+  ${Boost_LIBRARIES}
+  ${DYNAMIC_LIBS}
+)
 
-MESSAGE("unitTest distro: '${DISTRO}'")
-
-# The following ones are distros that we have checked are built correctly
-
-IF(${DISTRO} MATCHES "CentOS_6.*")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} MATCHES "Debian_8.*")
-  # It seems that Debian 8.x doesn't like -mt libraries for unit tests... not sure about other Debian versions
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} MATCHES "Debian_9.*")
-  # Debian9 just like Debian8 doesn't like -mt libraries for unit tests
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} MATCHES "Debian_.*")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-
-# The following ones are distros that haven't been checked since the refactoring in
-# PR #2062. They should be "promoted" as soon as we have positive feedback about
-# them or fixed (maybe based in the version of this file previous to
-# the aforementioned PR)
-
-ELSEIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
+IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
   # Pending to check after the refactor
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")  
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")  
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS"))
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")  
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")  
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
-
-# Finally this is a "best effort" option to try to build on distros that don't have a
-# specify switch
-
-ELSE()
-  # Pending to check after the refactor
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 ENDIF()
+
