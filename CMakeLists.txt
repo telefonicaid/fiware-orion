@@ -24,6 +24,8 @@
 PROJECT(orionld)
 cmake_minimum_required(VERSION 3.5)
 
+find_package(PkgConfig REQUIRED)
+
 #
 # DEBUG or RELEASE build ?
 #
