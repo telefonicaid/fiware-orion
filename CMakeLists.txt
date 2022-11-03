@@ -28,6 +28,7 @@ find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread filesystem system regex)
 pkg_check_modules(LIBMONGOC REQUIRED libmongoc-1.0)
 pkg_check_modules(LIBBSON REQUIRED libbson-1.0)
+pkg_check_modules(LIBMICROHTTPD REQUIRED libmicrohttpd)
 
 #
 # DEBUG or RELEASE build ?
@@ -259,7 +260,6 @@ SET (ORION_LIBS
 
 # Static libs common to orionld and unitTest binaries
 SET (COMMON_STATIC_LIBS
-    microhttpd.a
     mongoclient.a
     kjson.a
     khash.a

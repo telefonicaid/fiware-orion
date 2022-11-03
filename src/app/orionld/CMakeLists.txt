@@ -46,6 +46,7 @@ link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
 link_directories("${Boost_LIBRARY_DIRS}")
+link_directories("${LIBMICROHTTPD_LIBRARY_DIRS}")
 
 # Executable declaration
 # ------------------------------------------------------------
@@ -55,6 +56,7 @@ TARGET_LINK_LIBRARIES(orionld
   ${DYNAMIC_LIBS}
   -lmongoclient
   ${Boost_LIBRARIES}
+  ${LIBMICROHTTPD_LIBRARIES}
 )
 
 IF (${DISTRO} MATCHES "Ubuntu.*")
