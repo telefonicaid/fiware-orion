@@ -22,7 +22,6 @@
 
 set -e
 yum makecache --refresh
-yum -y install gmp
 
 yum -y install https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/pkgconf-pkg-config-1.4.2-1.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/p11-kit-devel-0.23.22-1.el8.x86_64.rpm
