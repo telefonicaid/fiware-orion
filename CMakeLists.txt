@@ -27,6 +27,7 @@ cmake_minimum_required(VERSION 3.5)
 find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread filesystem system regex)
 pkg_check_modules(LIBMONGOC REQUIRED libmongoc-1.0)
+pkg_check_modules(LIBBSON REQUIRED libbson-1.0)
 
 #
 # DEBUG or RELEASE build ?
@@ -285,7 +286,7 @@ SET (DYNAMIC_LIBS
     paho-mqtt3c
     pq             # for TRoE & Postgres
     ${LIBMONGOC_LIBRARIES}
-    libbson-1.0.so
+    ${LIBBSON_LIBRARIES}
 )
 
 #
@@ -304,7 +305,7 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
-include_directories("/usr/local/include/libbson-1.0")
+include_directories("${LIBBSON_INCLUDE_DIRS}")
 include_directories("${LIBMONGOC_INCLUDE_DIRS}")
 include_directories("${PROJECT_SOURCE_DIR}/..")
 include_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/prom/include")
