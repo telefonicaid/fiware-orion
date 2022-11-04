@@ -29,6 +29,7 @@ find_package(Boost REQUIRED COMPONENTS thread filesystem system regex)
 pkg_check_modules(LIBMONGOC REQUIRED libmongoc-1.0)
 pkg_check_modules(LIBBSON REQUIRED libbson-1.0)
 pkg_check_modules(LIBMICROHTTPD REQUIRED libmicrohttpd)
+pkg_check_modules(GNUTLS REQUIRED gnutls)
 
 #
 # DEBUG or RELEASE build ?
@@ -271,7 +272,7 @@ SET (DYNAMIC_LIBS
     prom
     promhttp
     curl
-    gnutls
+    ${GNUTLS_LIBRARIES}
     pthread
     gcrypt
     ssl
@@ -329,6 +330,7 @@ link_directories("${PROJECT_SOURCE_DIR}/../khash")
 link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/prom/build")
 link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/promhttp/build")
 link_directories("${LIBMONGOC_LIBRARY_DIRS}")
+link_directories("${GNUTLS_LIBRARY_DIRS}")
 
 #
 # Enabling test harness
