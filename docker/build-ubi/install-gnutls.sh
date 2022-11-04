@@ -37,4 +37,4 @@ yum install -y gnutls gnutls-dane gnutls-utils # gnutls-devel gnutls-c++
 #yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-dane-3.6.16-5.el8.x86_64.rpm
 #yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-utils-3.6.16-5.el8.x86_64.rpm
 #yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-c++-3.6.16-5.el8.x86_64.rpm
-#yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-devel-3.6.16-5.el8.x86_64.rpm
+yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-devel-3.6.16-4.el8.x86_64.rpm
