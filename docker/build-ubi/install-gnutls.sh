@@ -31,7 +31,7 @@ yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Pac
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/libidn2-devel-2.2.0-1.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/libtasn1-devel-4.13-3.el8.x86_64.rpm
 
-yum install -y gnutls gnutls-dane gnutls-devel gnutls-utils gnutls-c++
+yum install -y gnutls gnutls-dane gnutls-utils # gnutls-devel gnutls-c++
 
 #yum -y install http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/gnutls-3.6.16-5.el8.x86_64.rpm
 #yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-dane-3.6.16-5.el8.x86_64.rpm
