@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification HTTP with NGSI payload basic CRUD
+Custom notification HTTP with NGSI basic CRUD with partial payloads
 
 --SHELL-INIT--
 dbInit CB
@@ -63,10 +63,8 @@ payload='{
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
         "id": "E1",
-        "type": "T1",
         "A": {
-          "value": 1,
-          "type": "Number"
+          "value": 1
         }
       }
     }
@@ -116,8 +114,6 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
-        "id": "E2",
-        "type": "T2",
         "B": {
           "value": 2,
           "type": "Number"
@@ -146,11 +142,7 @@ payload='{
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
         "id": "E3",
-        "type": "T3",
-        "C": {
-          "value": 3,
-          "type": "Number"
-        }
+        "type": "T3"
       }
     }
   }
@@ -229,7 +221,6 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
-        "id": "E4",
         "type": "T4",
         "D": {
           "value": 4,
@@ -242,6 +233,7 @@ payload='{
 orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
 echo
 echo
+
 
 echo "14. Get sub1 to see changes"
 echo "==========================="
@@ -264,7 +256,7 @@ Date: REGEX(.*)
 02. Get sub1 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 335
+Content-Length: 323
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -281,8 +273,7 @@ Date: REGEX(.*)
                     "type": "Number",
                     "value": 1
                 },
-                "id": "E1",
-                "type": "T1"
+                "id": "E1"
             },
             "url": "http://127.0.0.1:9997/notify"
         },
@@ -357,7 +348,7 @@ Date: REGEX(.*)
 06. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 335
+Content-Length: 313
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -373,9 +364,7 @@ Date: REGEX(.*)
                 "B": {
                     "type": "Number",
                     "value": 2
-                },
-                "id": "E2",
-                "type": "T2"
+                }
             },
             "url": "http://127.0.0.1:9997/notify"
         },
@@ -407,7 +396,7 @@ Date: REGEX(.*)
 08. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 335
+Content-Length: 303
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -420,10 +409,6 @@ Date: REGEX(.*)
         "covered": false,
         "httpCustom": {
             "ngsi": {
-                "C": {
-                    "type": "Number",
-                    "value": 3
-                },
                 "id": "E3",
                 "type": "T3"
             },
@@ -545,7 +530,7 @@ Date: REGEX(.*)
 14. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 335
+Content-Length: 325
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -562,7 +547,6 @@ Date: REGEX(.*)
                     "type": "Number",
                     "value": 4
                 },
-                "id": "E4",
                 "type": "T4"
             },
             "url": "http://127.0.0.1:9997/notify"

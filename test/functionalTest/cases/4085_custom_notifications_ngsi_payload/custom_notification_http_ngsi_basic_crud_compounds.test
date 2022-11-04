@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification HTTP with NGSI partial payload basic CRUD
+Custom notification HTTP with NGSI payload basic CRUD with compounds
 
 --SHELL-INIT--
 dbInit CB
@@ -30,25 +30,25 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create custom sub1 with ngsi field
+# 01. Create custom sub1 with ngsi field with attribute using JSON object
 # 02. Get sub1 to see it
 # 03. Update sub1 to remove ngsi field
 # 04. Get sub1 to see changes
-# 05. Update sub1 to add ngsi field back again
+# 05. Update sub1 to add ngsi field with attribute using JSON array
 # 06. Get sub1 to see changes
-# 07. Update sub1 to modify ngsi field
+# 07. Update sub1 to modify ngsi field with attribute using JSON object
 # 08. Get sub1 to see changes
 # 09. Update sub1 to remove ngsi field
 # 10. Get sub1 to see changes
 # 11. Create custom sub2 without ngsi field
 # 12. Get sub2 to see it
-# 13. Update custom sub2 to add ngsi field
+# 13. Update custom sub2 to add ngsi field with attribute using JSON array
 # 14. Get sub2 to see changes
 #
 
 
-echo "01. Create custom sub1 with ngsi field"
-echo "======================================"
+echo "01. Create custom sub1 with ngsi field with attribute using JSON object"
+echo "======================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -63,8 +63,16 @@ payload='{
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
         "id": "E1",
+        "type": "T1",
         "A": {
-          "value": 1
+          "value": {
+            "x": {
+              "x1": "a",
+              "x2": "b"
+            },
+            "y": [ "y1", "y2" ]
+          },
+          "type": "StructuredValue"
         }
       }
     }
@@ -107,16 +115,25 @@ echo
 echo
 
 
-echo "05. Update sub1 to add ngsi field back again"
-echo "============================================"
+echo "05. Update sub1 to add ngsi field with attribute using JSON array"
+echo "================================================================="
 payload='{
   "notification": {
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
+        "id": "E2",
+        "type": "T2",
         "B": {
-          "value": 2,
-          "type": "Number"
+          "value": [
+            "22",
+            {
+              "x" : [ "x1", "x2" ],
+              "y" : 3
+            },
+            [ "z1", "z2" ]
+          ],
+          "type": "StructuredValue"
         }
       }
     }
@@ -134,15 +151,25 @@ echo
 echo
 
 
-echo "07. Update sub1 to modify ngsi field"
-echo "===================================="
+echo "07. Update sub1 to modify ngsi field with attribute using JSON object"
+echo "====================================================================="
 payload='{
   "notification": {
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
         "id": "E3",
-        "type": "T3"
+        "type": "T3",
+        "C": {
+          "value": {
+            "x": {
+              "x1": 1,
+              "x2": 2
+            },
+            "y": [ true, "zzz" ]
+          },
+          "type": "StructuredValue"
+        }
       }
     }
   }
@@ -214,17 +241,25 @@ echo
 echo
 
 
-echo "13. Update custom sub2 to add ngsi field"
-echo "========================================"
+echo "13. Update custom sub2 to add ngsi field with attribute using JSON array"
+echo "========================================================================"
 payload='{
   "notification": {
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
+        "id": "E4",
         "type": "T4",
         "D": {
-          "value": 4,
-          "type": "Number"
+          "value": [
+            "42",
+            {
+              "a" : [ 4, null ],
+              "b" : false
+            },
+            [ true, "foo" ]
+          ],
+          "type": "StructuredValue"
         }
       }
     }
@@ -234,7 +269,6 @@ orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
 echo
 echo
 
-
 echo "14. Get sub1 to see changes"
 echo "==========================="
 orionCurl --url /v2/subscriptions/$SUB_ID
@@ -243,8 +277,8 @@ echo
 
 
 --REGEXPECT--
-01. Create custom sub1 with ngsi field
-======================================
+01. Create custom sub1 with ngsi field with attribute using JSON object
+=======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -256,7 +290,7 @@ Date: REGEX(.*)
 02. Get sub1 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 323
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -270,10 +304,20 @@ Date: REGEX(.*)
         "httpCustom": {
             "ngsi": {
                 "A": {
-                    "type": "Number",
-                    "value": 1
+                    "type": "StructuredValue",
+                    "value": {
+                        "x": {
+                            "x1": "a",
+                            "x2": "b"
+                        },
+                        "y": [
+                            "y1",
+                            "y2"
+                        ]
+                    }
                 },
-                "id": "E1"
+                "id": "E1",
+                "type": "T1"
             },
             "url": "http://127.0.0.1:9997/notify"
         },
@@ -337,8 +381,8 @@ Date: REGEX(.*)
 }
 
 
-05. Update sub1 to add ngsi field back again
-============================================
+05. Update sub1 to add ngsi field with attribute using JSON array
+=================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -348,7 +392,7 @@ Date: REGEX(.*)
 06. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 313
+Content-Length: 385
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -362,9 +406,24 @@ Date: REGEX(.*)
         "httpCustom": {
             "ngsi": {
                 "B": {
-                    "type": "Number",
-                    "value": 2
-                }
+                    "type": "StructuredValue",
+                    "value": [
+                        "22",
+                        {
+                            "x": [
+                                "x1",
+                                "x2"
+                            ],
+                            "y": 3
+                        },
+                        [
+                            "z1",
+                            "z2"
+                        ]
+                    ]
+                },
+                "id": "E2",
+                "type": "T2"
             },
             "url": "http://127.0.0.1:9997/notify"
         },
@@ -385,8 +444,8 @@ Date: REGEX(.*)
 }
 
 
-07. Update sub1 to modify ngsi field
-====================================
+07. Update sub1 to modify ngsi field with attribute using JSON object
+=====================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -396,7 +455,7 @@ Date: REGEX(.*)
 08. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 303
+Content-Length: 381
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -409,6 +468,19 @@ Date: REGEX(.*)
         "covered": false,
         "httpCustom": {
             "ngsi": {
+                "C": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "x": {
+                            "x1": 1,
+                            "x2": 2
+                        },
+                        "y": [
+                            true,
+                            "zzz"
+                        ]
+                    }
+                },
                 "id": "E3",
                 "type": "T3"
             },
@@ -519,8 +591,8 @@ Date: REGEX(.*)
 }
 
 
-13. Update custom sub2 to add ngsi field
-========================================
+13. Update custom sub2 to add ngsi field with attribute using JSON array
+========================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -530,7 +602,7 @@ Date: REGEX(.*)
 14. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 325
+Content-Length: 387
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -544,9 +616,23 @@ Date: REGEX(.*)
         "httpCustom": {
             "ngsi": {
                 "D": {
-                    "type": "Number",
-                    "value": 4
+                    "type": "StructuredValue",
+                    "value": [
+                        "42",
+                        {
+                            "a": [
+                                4,
+                                null
+                            ],
+                            "b": false
+                        },
+                        [
+                            true,
+                            "foo"
+                        ]
+                    ]
                 },
+                "id": "E4",
                 "type": "T4"
             },
             "url": "http://127.0.0.1:9997/notify"
