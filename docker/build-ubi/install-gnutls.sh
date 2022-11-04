@@ -23,18 +23,20 @@
 set -e
 yum makecache --refresh
 yum -y install gmp gnutls gnutls-utils
-# gnutls-devel is not available in the ubi-repos, so we install it from the centos8 reposhttps://rpmfind.net/linux/rpm2html/search.php?query=pkgconfig
+
+#
+# gnutls-devel is not available in the ubi-repos, need to find it elsewhere
+#
 
 yum -y install https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/gmp-c++-6.1.2-10.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/gmp-devel-6.1.2-10.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/nettle-devel-3.4.1-7.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/p11-kit-devel-0.23.22-1.el8.x86_64.rpm
-yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-c++-3.6.16-4.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/nettle-devel-3.4.1-7.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/libidn2-devel-2.2.0-1.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/libtasn1-devel-4.13-3.el8.x86_64.rpm
-yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-c++-3.6.16-4.el8.x86_64.rpm
-yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/gnutls-devel-3.6.16-4.el8.x86_64.rpm
+yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-c++-3.6.16-5.el8_6.x86_64.rpm
+yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-devel-3.6.16-5.el8_6.x86_64.rpm
 
 #yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/gmp-devel-6.1.2-10.el8.x86_64.rpm
 #yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/pkgconf-pkg-config-1.4.2-1.el8.x86_64.rpm
