@@ -37,9 +37,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"   // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // Own interface
 
 
@@ -209,7 +209,7 @@ KjNode* mongoCppLegacyEntityTypesFromRegistrationsGet(bool details)
     mongo::BSONObj  bsonObj = cursorP->nextSafe();
     char*           title;
     char*           details;
-    KjNode*         regNode = dbDataToKjTree(&bsonObj, false, &title, &details);
+    KjNode*         regNode = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &details);
 
     if (regNode == NULL)
       LM_E(("%s: %s", title, details));

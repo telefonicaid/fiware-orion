@@ -43,7 +43,13 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/db/dbConfiguration.h"                          // dbEntityAttributeLookup, dbEntityAttributesDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeLookup.h"              // mongoCppLegacyEntityAttributeLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeInstanceLookup.h"      // mongoCppLegacyEntityAttributeInstanceLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeWithDatasetsLookup.h"  // mongoCppLegacyEntityAttributeWithDatasetsLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"             // mongoCppLegacyEntityAttributesDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"                 // mongoCppLegacyEntityFieldReplace
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldDelete.h"                  // mongoCppLegacyEntityFieldDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyDatasetGet.h"                         // mongoCppLegacyDatasetGet
 #include "orionld/legacyDriver/legacyDeleteAttribute.h"          // Own Interface
 
 
@@ -68,7 +74,7 @@ static bool deleteAttributeDatasetId(const char* entityId, const char* attrNameE
   if (datasetId == NULL)
   {
     snprintf(fieldPath, sizeof(fieldPath), "@datasets.%s", attrNameExpandedEq);
-    if (dbEntityFieldDelete(entityId, fieldPath) == false)
+    if (mongoCppLegacyEntityFieldDelete(entityId, fieldPath) == false)
     {
       orionldError(OrionldResourceNotFound, "Attribute datasets not found", attrNameExpanded, 404);
       return false;
@@ -83,12 +89,12 @@ static bool deleteAttributeDatasetId(const char* entityId, const char* attrNameE
   //
   // Remove a single dataset instance
   //   1. Get the @datasets for 'attrNameExpandedEq':
-  //      KjTree* datasetsP = dbDatasetGet(entityId, attrName, attrNameExpandedEq);
+  //      KjTree* datasetsP = mongoCppLegacyDatasetGet(entityId, attrName, attrNameExpandedEq);
   //   2. Lookup the matching object (not found? 404)
   //   3. Remove the matching object from datasetsP
   //   4. Replace @datasets.attrNameExpandedEq with what's left in datasetsP
   //      mongoCppLegacyEntityFieldReplace(entityId, fieldPath, datasetsP);
-  KjNode* datasetsP = dbDatasetGet(entityId, attrNameExpandedEq, datasetId);
+  KjNode* datasetsP = mongoCppLegacyDatasetGet(entityId, attrNameExpandedEq, datasetId);
 
   if (datasetsP == NULL)
   {
@@ -122,7 +128,7 @@ static bool deleteAttributeDatasetId(const char* entityId, const char* attrNameE
       return false;
     }
 
-    dbEntityFieldReplace(entityId, datasetPath, datasetsP);
+    mongoCppLegacyEntityFieldReplace(entityId, datasetPath, datasetsP);
   }
   else
   {
@@ -139,7 +145,7 @@ static bool deleteAttributeDatasetId(const char* entityId, const char* attrNameE
     }
 
     // It matched - the entire item in @datasets is removed
-    dbEntityFieldDelete(entityId, datasetPath);
+    mongoCppLegacyEntityFieldDelete(entityId, datasetPath);
   }
 
   orionldState.httpStatusCode = 204;
@@ -202,7 +208,7 @@ bool legacyDeleteAttribute(void)
   //
   if (orionldState.uriParams.datasetId != NULL)
   {
-    if (dbEntityAttributeInstanceLookup(entityId, attrNameExpandedEq, orionldState.uriParams.datasetId) == NULL)
+    if (mongoCppLegacyEntityAttributeInstanceLookup(entityId, attrNameExpandedEq, orionldState.uriParams.datasetId) == NULL)
     {
       orionldError(OrionldResourceNotFound, "Entity/Attribute/datasetId not found", attrNameExpanded, 404);
       return false;
@@ -211,7 +217,7 @@ bool legacyDeleteAttribute(void)
   else if (orionldState.uriParams.deleteAll == true)
   {
     // GET attribute AND its dataset
-    orionldState.dbAttrWithDatasetsP = dbEntityAttributeWithDatasetsLookup(entityId, attrNameExpandedEq);
+    orionldState.dbAttrWithDatasetsP = mongoCppLegacyEntityAttributeWithDatasetsLookup(entityId, attrNameExpandedEq);
     if (orionldState.dbAttrWithDatasetsP == NULL)
     {
       orionldError(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded, 404);
@@ -220,7 +226,7 @@ bool legacyDeleteAttribute(void)
   }
   else
   {
-    if (dbEntityAttributeLookup(entityId, attrNameExpanded) == NULL)
+    if (mongoCppLegacyEntityAttributeLookup(entityId, attrNameExpanded) == NULL)
     {
       orionldError(OrionldResourceNotFound, "Entity/Attribute not found", attrNameExpanded, 404);
       return false;
@@ -238,9 +244,9 @@ bool legacyDeleteAttribute(void)
   }
 
   char* attrNameV[1] = { attrNameExpandedEq };
-  if (dbEntityAttributesDelete(entityId, attrNameV, 1) == false)
+  if (mongoCppLegacyEntityAttributesDelete(entityId, attrNameV, 1) == false)
   {
-    LM_W(("dbEntityAttributesDelete failed"));
+    LM_W(("mongoCppLegacyEntityAttributesDelete failed"));
     orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", attrNameExpanded, 404);
     return false;
   }

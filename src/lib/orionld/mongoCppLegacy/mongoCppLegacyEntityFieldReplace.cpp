@@ -32,10 +32,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
+
+#include "orionld/common/orionldState.h"                              // orionldState, dbName, mongoEntitiesCollectionP
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"     // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"  // Own interface
 
 
@@ -62,14 +62,14 @@ bool mongoCppLegacyEntityFieldReplace(const char* entityId, const char* fieldNam
   {
     mongo::BSONObj payloadAsBsonObj;
 
-    dbDataFromKjTree(fieldValeNodeP, &payloadAsBsonObj);
+    mongoCppLegacyKjTreeToBsonObj(fieldValeNodeP, &payloadAsBsonObj);
     update = BSON("$set" << BSON(fieldName << payloadAsBsonObj << "modDate" << orionldState.requestTime));
   }
   else
   {
     mongo::BSONArray payloadAsBsonArray;
 
-    dbDataFromKjTree(fieldValeNodeP, &payloadAsBsonArray);
+    mongoCppLegacyKjTreeToBsonObj(fieldValeNodeP, &payloadAsBsonArray);
     update = BSON("$set" << BSON(fieldName << payloadAsBsonArray << "modDate" << orionldState.requestTime));
   }
 

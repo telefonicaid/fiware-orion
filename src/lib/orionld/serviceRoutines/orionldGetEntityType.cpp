@@ -36,11 +36,11 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
-#include "orionld/db/dbConfiguration.h"                          // dbEntityTypeGet
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/mongoc/mongocEntityTypeGet.h"                  // mongocEntityTypeGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypeGet.h"  // mongoCppLegacyEntityTypeGet
 #include "orionld/serviceRoutines/orionldGetEntityType.h"        // Own Interface
 
 
@@ -135,28 +135,27 @@ bool orionldGetEntityType(void)
 
   //
   // If the broker is started with '-experimental', then mongocEntityTypeGet is to be used instead of mongoCppEntityTypeGet.
-  // [ dbEntityTypeGet points to mongoCppEntityTypeGet ]
   // - Except if the HTTP Header 'legacy' is used
   //
   if ((experimental == true) && (orionldState.in.legacy == NULL))
     entityTypeV = mongocEntityTypeGet(&pd, typeExpanded, &entities);
   else
-    entityTypeV = dbEntityTypeGet(&pd, typeExpanded, &entities);
+    entityTypeV = mongoCppLegacyEntityTypeGet(&pd, typeExpanded, &entities);
 
   if (entityTypeV == NULL)
   {
-    // dbEntityTypeGet has filled in 'pd'
+    // xxxEntityTypeGet has filled in 'pd'
     return false;
   }
   else if (entities == 0)
   {
-    LM_E(("dbEntityTypeGet: no entities found"));
+    LM_E(("xxxEntityTypeGet: no entities found"));
     orionldError(OrionldResourceNotFound, "Entity Type Not Found", typeExpanded, 404);
     return false;
   }
 
   //
-  // The output  from dbEntityTypeGet is as follows:
+  // The output  from xxxEntityTypeGet is as follows:
   // [
   //   {
   //     "https://uri.etsi.org/ngsi-ld/default-context/P1": "Property",

@@ -70,6 +70,7 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityArrayErrorPurge.h"              // kjEntityArrayErrorPurge
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"   // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/legacyDriver/legacyPostBatchCreate.h"          // Own Interface
 
 
@@ -188,7 +189,7 @@ bool legacyPostBatchCreate(void)
   //
   // This is a CREATE operation, so, those entities that already exist ... give error
   //
-  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
+  KjNode* idTypeAndCreDateFromDb = mongoCppLegacyEntityListLookupWithIdTypeCreDate(idArray, false);
 
   if (idTypeAndCreDateFromDb != NULL)
   {

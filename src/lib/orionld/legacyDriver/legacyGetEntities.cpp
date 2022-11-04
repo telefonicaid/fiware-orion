@@ -57,6 +57,7 @@ extern "C"
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity2
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesAttributeLookup.h"  // mongoCppLegacyEntitiesAttributeLookup
 #include "orionld/legacyDriver/legacyGetEntities.h"            // Own Interface
 
 
@@ -446,7 +447,7 @@ bool legacyGetEntities(void)
         dotForEq(geoPropertyNameExpanded);
       }
 
-      KjNode* dbEntityArray = dbEntitiesAttributeLookup(entityArray, entities, geoPropertyNameExpanded);
+      KjNode* dbEntityArray = mongoCppLegacyEntitiesAttributeLookup(entityArray, entities, geoPropertyNameExpanded);
       if (dbEntityArray != NULL)
       {
         orionldState.geoPropertyNodes = kjArray(orionldState.kjsonP, NULL);

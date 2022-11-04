@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjEntityNormalizedToSimplified.h"     // kjEntityNormalizedToSimplified
 #include "orionld/payloadCheck/pcheckQuery.h"                  // pcheckQuery
-#include "orionld/db/dbConfiguration.h"                        // dbEntitiesQuery
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"  // mongoCppLegacyEntitiesQuery
 #include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity2
 #include "orionld/legacyDriver/legacyPostQuery.h"              // Own Interface
 
@@ -77,7 +77,7 @@ bool legacyPostQuery(void)
   int*     countP = (orionldState.uriParams.count == true)? &count : NULL;
   KjNode*  dbEntityArray;
 
-  if ((dbEntityArray = dbEntitiesQuery(entitiesP, attrsP, qTree, geoqP, limit, offset, countP)) == NULL)
+  if ((dbEntityArray = mongoCppLegacyEntitiesQuery(entitiesP, attrsP, qTree, geoqP, limit, offset, countP)) == NULL)
   {
     // Not an error - just "nothing found" - return an empty array
     orionldState.responsePayload = (char*) "[]";

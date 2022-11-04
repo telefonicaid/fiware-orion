@@ -53,6 +53,7 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"   // mongoCppLegacyEntityLookup
 #include "orionld/legacyDriver/legacyPatchEntity.h"              // Own Interface
 
 
@@ -85,7 +86,7 @@ bool legacyPatchEntity(void)
 
   // 3. Get the entity from mongo
   KjNode* dbEntityP;
-  if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
+  if ((dbEntityP = mongoCppLegacyEntityLookup(entityId)) == NULL)
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;

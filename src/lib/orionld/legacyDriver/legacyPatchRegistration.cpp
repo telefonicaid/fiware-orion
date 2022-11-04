@@ -39,7 +39,8 @@ extern "C"
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/numberToDate.h"                        // numberToDate
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
-#include "orionld/db/dbConfiguration.h"                         // dbRegistrationGet, dbRegistrationReplace
+#include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationGet.h"      // mongoCppLegacyRegistrationGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationReplace.h"  // mongoCppLegacyRegistrationReplace
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_URI
 #include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
 #include "orionld/kjTree/kjChildAddOrReplace.h"                 // kjChildAddOrReplace
@@ -574,7 +575,7 @@ bool legacyPatchRegistration(void)
     return false;
   }
 
-  KjNode* dbRegistrationP = dbRegistrationGet(registrationId);
+  KjNode* dbRegistrationP = mongoCppLegacyRegistrationGet(registrationId);
 
   if (dbRegistrationP == NULL)
   {
@@ -660,7 +661,7 @@ bool legacyPatchRegistration(void)
   //
   // Overwrite the current Registration in the database
   //
-  dbRegistrationReplace(registrationId, dbRegistrationP);
+  mongoCppLegacyRegistrationReplace(registrationId, dbRegistrationP);
 
   // All OK? 204
   orionldState.httpStatusCode = SccNoContent;

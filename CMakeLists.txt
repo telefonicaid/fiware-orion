@@ -197,6 +197,7 @@ SET (ORION_LIBS
     orionld_notifications
     orionld_db
     orionld_mongoc
+    orionld_legacyDriver # legacyDriver uses mongoCppLegacy
     orionld_mongoCppLegacy
     orionld_db
     orionld_mongoBackend

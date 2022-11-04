@@ -35,8 +35,7 @@ extern "C"
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
-
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"   // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionMatchEntityIdAndAttributes.h"   // Own interface
 
 
@@ -113,7 +112,7 @@ void mongoCppLegacySubscriptionMatchEntityIdAndAttributes
 
     bsonObj = cursorP->nextSafe();
 
-    subscriptionTree = dbDataToKjTree(&bsonObj, false, &title, &detail);
+    subscriptionTree = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &detail);
     if (subscriptionTree == NULL)
     {
       LM_E(("Internal Error (unable to create KjNode tree from mongo::BSONObj '%s')", bsonObj.toString().c_str()));

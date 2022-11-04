@@ -57,7 +57,10 @@ extern "C"
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
 #include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
-#include "orionld/db/dbConfiguration.h"                          // dbRegistrationLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeLookup.h"   // mongoCppLegacyEntityAttributeLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"      // mongoCppLegacyEntityFieldReplace
+#include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationLookup.h"      // mongoCppLegacyRegistrationLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyDatasetGet.h"              // mongoCppLegacyDatasetGet
 #include "orionld/legacyDriver/legacyPatchAttribute.h"           // Own Interface
 
 
@@ -90,7 +93,7 @@ do {                                                                  \
 //
 bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, char* attrName, char* attrNameExpandedEq, const char* datasetId)
 {
-  KjNode* datasetNodeP = dbDatasetGet(entityId, attrNameExpandedEq, datasetId);
+  KjNode* datasetNodeP = mongoCppLegacyDatasetGet(entityId, attrNameExpandedEq, datasetId);
   if (datasetNodeP == NULL)
   {
     orionldError(OrionldResourceNotFound, "attribute dataset not found", datasetId, 404);
@@ -155,7 +158,7 @@ bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, cha
   snprintf(attrDatasetFieldPath, sizeof(attrDatasetFieldPath), "@datasets.%s", attrNameExpandedEq);
 
   // And finally, ask the mongo driver to do the update
-  dbEntityFieldReplace(entityId, attrDatasetFieldPath, datasetNodeP);
+  mongoCppLegacyEntityFieldReplace(entityId, attrDatasetFieldPath, datasetNodeP);
   //
   // All good, nothing is returned for this request
   //
@@ -638,7 +641,7 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
 //
 static KjNode* attributeFromDb(char* entityId, char* attrName, char* attrNameExpanded, char* attrNameExpandedEq)
 {
-  KjNode* dbEntityP = dbEntityAttributeLookup(entityId, attrNameExpanded);
+  KjNode* dbEntityP = mongoCppLegacyEntityAttributeLookup(entityId, attrNameExpanded);
 
   if (dbEntityP == NULL)
   {
@@ -802,7 +805,7 @@ bool legacyPatchAttribute(void)
     // The request is simply forwarded to the matching Context Provider
     //
     int     matchingRegs;
-    KjNode* regArray = dbRegistrationLookup(entityId, attrNameExpanded, &matchingRegs);
+    KjNode* regArray = mongoCppLegacyRegistrationLookup(entityId, attrNameExpanded, &matchingRegs);
 
     if (regArray != NULL)
     {

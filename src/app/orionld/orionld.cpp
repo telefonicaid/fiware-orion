@@ -1087,7 +1087,7 @@ int main(int argC, char* argV[])
   //
   regCacheInit();
 
-  orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
+  orionldServiceInit(restServiceVV, 9);
 
   if (mongocOnly == false)
   {
@@ -1128,20 +1128,7 @@ int main(int argC, char* argV[])
     orionldStartup = false;
   }
 
-  //
-  // If the Env Var ORIONLD_CACHED_CONTEXT_DIRECTORY is set, then at startup, the broker will read all context files
-  // inside that directory and add them to the linked list of "downloaded" contexts.
-  //
-  // The main reason behind this "feature" is that functional tests take a lot less time to execute.
-  //
-  // Another reason may be to "shadow" the important default and core contexts, also for testing
-  //
-  // Actually, another interesting usage is that a functional test case could create a context before starting the broker and
-  // use that conext during the test.
-  //
-
-  if (mongocOnly == false)
-    dbInit(dbHost, dbName);
+  dbInit(dbHost, dbName);  // Move to be next to mongocInit ?
 
   //
   // Given that contextBrokerInit() may create thread (in the threadpool notification mode,

@@ -35,7 +35,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"          // mongoCppLegacyDataToKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"       // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionReplace.h"   // Own interface
 
 
@@ -48,7 +49,7 @@ bool mongoCppLegacySubscriptionReplace(const char* subscriptionId, KjNode* dbSub
 {
   mongo::BSONObj  payloadAsBsonObj;
 
-  dbDataFromKjTree(dbSubscriptionP, &payloadAsBsonObj);
+  mongoCppLegacyKjTreeToBsonObj(dbSubscriptionP, &payloadAsBsonObj);
 
   //
   // Populate filter - only Subscription ID for this operation

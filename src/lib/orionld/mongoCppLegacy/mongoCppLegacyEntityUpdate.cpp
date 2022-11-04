@@ -35,7 +35,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"   // mongoCppLegacyDataToKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"   // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h"   // Own interface
 
 
@@ -48,7 +49,7 @@ bool mongoCppLegacyEntityUpdate(const char* entityId, KjNode* requestTree)
 {
   mongo::BSONObj         payloadAsBsonObj;
 
-  dbDataFromKjTree(requestTree, &payloadAsBsonObj);
+  mongoCppLegacyKjTreeToBsonObj(requestTree, &payloadAsBsonObj);
 
 
   //

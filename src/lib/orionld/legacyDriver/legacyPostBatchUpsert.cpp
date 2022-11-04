@@ -74,6 +74,8 @@ extern "C"
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
 #include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
 #include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesDelete.h"                      // mongoCppLegacyEntitiesDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"   // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/legacyDriver/legacyPostBatchUpsert.h"        // Own Interface
 
 
@@ -285,7 +287,7 @@ bool legacyPostBatchUpsert(void)
   //     whose Entity::Id is part of the array "idArray".
   //     The result is "idTypeAndCredateFromDb" - an array of "tiny" entities with { id, type and creDate }
   //
-  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, false);
+  KjNode* idTypeAndCreDateFromDb = mongoCppLegacyEntityListLookupWithIdTypeCreDate(idArray, false);
 
   orionldState.batchEntities = idTypeAndCreDateFromDb;  // So that TRoE knows what entities existed prior to the upsert call
 
@@ -404,7 +406,7 @@ bool legacyPostBatchUpsert(void)
   if (orionldState.uriParamOptions.update == false)
   {
     if ((removeArray != NULL) && (removeArray->value.firstChildP != NULL))
-      dbEntitiesDelete(removeArray);
+      mongoCppLegacyEntitiesDelete(removeArray);
   }
 
 

@@ -38,6 +38,6 @@ extern "C"
 //
 // dbEntityLookup -
 //
-extern DbEntityLookupFunction dbEntityLookup;
+// extern DbEntityLookupFunction dbEntityLookup;
 
 #endif  // SRC_LIB_ORIONLD_DB_DBENTITYLOOKUP_H_

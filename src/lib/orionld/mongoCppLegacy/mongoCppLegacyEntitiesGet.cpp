@@ -38,7 +38,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"   // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesGet.h"    // Own interface
 
 
@@ -70,7 +70,7 @@ KjNode* mongoCppLegacyEntitiesGet(char** fieldV, int fields, bool entityIdPresen
     mongo::BSONObj  bsonObj = cursorP->nextSafe();
     char*           title;
     char*           details;
-    KjNode*         kjTree = dbDataToKjTree(&bsonObj, false, &title, &details);
+    KjNode*         kjTree = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &details);
 
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));
