@@ -45,6 +45,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/mongoRegistrationAux.h"                 // mongoSetXxx
+#include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/mongoBackend/mongoLdRegistrationAux.h"       // mongoSetLdXxx
 #include "mongoBackend/mongoRegistrationGet.h"                 // Own interface
 
@@ -63,25 +64,23 @@ void mongoRegistrationGet
   OrionError*            oeP
 )
 {
-  bool         reqSemTaken = false;
-  std::string  err;
-  mongo::OID   oid;
-  StatusCode   sc;
+  bool            reqSemTaken = false;
+  std::string     err;
+  StatusCode      sc;
+  mongo::BSONObj  q;
 
-  if (safeGetRegId(regId.c_str(), &oid, &sc) == false)
-  {
-    oeP->fill(sc);
-    return;
-  }
+  mongo::OID oid;
+
+  if (safeGetRegId(regId.c_str(), &oid, &sc) == true)
+    q = BSON("_id" << oid);
+  else
+    q = BSON("_id" << regId);
 
   reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Mongo Get Registration"));
 
   std::auto_ptr<mongo::DBClientCursor>  cursor;
-  mongo::BSONObj                        q;
-
-  q = BSON("_id" << oid);
 
   TIME_STAT_MONGO_READ_WAIT_START();
   mongo::DBClientBase* connection = getMongoConnection();
@@ -200,6 +199,7 @@ void mongoRegistrationsGet
   mongo::DBClientBase* connection = getMongoConnection();
   if (!collectionRangedQuery(connection, tenantP->registrations, q, limit, offset, &cursor, countP, &err))
   {
+    LM_E(("collectionRangedQuery failed"));
     releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);

@@ -61,6 +61,13 @@ SET (SOURCES
     mongocEntityTypesFromRegistrationsGet.cpp
     mongocEntityTypeGet.cpp
     mongocSubscriptionsGet.cpp
+    mongocRegistrationExists.cpp
+    mongocRegistrationInsert.cpp
+    mongocRegistrationGet.cpp
+    mongocRegistrationsGet.cpp
+    mongocRegistrationDelete.cpp
+    mongocRegistrationReplace.cpp
+    mongocRegistrationsIter.cpp
 )
 
 # Include directories

@@ -39,6 +39,31 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
+// kjValueInArrayLookup - FIXME: Move to kjTree lib (or kjson library!)
+//
+// ALSO
+//   I think I have a similar function somewhere ...
+//
+KjNode* kjValueInArrayLookup(KjNode* arrayItemP, const char* value)
+{
+  while (arrayItemP != NULL)
+  {
+    if (arrayItemP->type == KjString)
+    {
+      if (strcmp(arrayItemP->value.s, value) == 0)
+        return arrayItemP;
+    }
+
+    arrayItemP = arrayItemP->next;
+  }
+
+  return NULL;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
 // pcheckInformationItem -
 //
 // The "information" field can have only three members:
@@ -51,6 +76,7 @@ extern "C"
 //
 bool pcheckInformationItem(KjNode* informationP)
 {
+  LM(("EXP: In pcheckInformationItem"));
   KjNode* entitiesP      = NULL;
   KjNode* propertiesP    = NULL;
   KjNode* relationshipsP = NULL;
@@ -62,37 +88,71 @@ bool pcheckInformationItem(KjNode* informationP)
       DUPLICATE_CHECK(entitiesP, RegistrationInformationEntitiesPath, infoItemP);
       ARRAY_CHECK(entitiesP, RegistrationInformationEntitiesPath);
       EMPTY_ARRAY_CHECK(entitiesP, RegistrationInformationEntitiesPath);
-      if (pcheckEntityInfoArray(entitiesP, true, RegistrationInformationEntitiesPath) == false)
+      if (pcheckEntityInfoArray(entitiesP, true, RegistrationInformationEntitiesPathV) == false)
         return false;
     }
-    else if (strcmp(infoItemP->name, "properties") == 0)
+    else if ((strcmp(infoItemP->name, "propertyNames") == 0) || (strcmp(infoItemP->name, "properties") == 0))
     {
-      DUPLICATE_CHECK(propertiesP, "properties", infoItemP);
-      ARRAY_CHECK(infoItemP, "information[X]::properties");
-      EMPTY_ARRAY_CHECK(infoItemP, "information[X]::properties");
+      DUPLICATE_CHECK(propertiesP, infoItemP->name, infoItemP);
+      ARRAY_CHECK(infoItemP, RegistrationInformationPropertyNamesPath);
+      EMPTY_ARRAY_CHECK(infoItemP, RegistrationInformationPropertyNamesPath);
       for (KjNode* propP = infoItemP->value.firstChildP; propP != NULL; propP = propP->next)
       {
-        STRING_CHECK(propP, "information[X]::properties[X]");
-        EMPTY_STRING_CHECK(propP, "information[X]::properties[X]");
+        STRING_CHECK(propP, RegistrationInformationPropertyNameItemPath);
+        EMPTY_STRING_CHECK(propP, RegistrationInformationPropertyNameItemPath);
+        LM(("EXP: Expanding property name '%s' (property at %p)", propP->value.s, propP));
         propP->value.s = orionldAttributeExpand(orionldState.contextP, propP->value.s, true, NULL);
       }
+
+      infoItemP->name = (char*) "propertyNames";
     }
-    else if (strcmp(infoItemP->name, "relationships") == 0)
+    else if ((strcmp(infoItemP->name, "relationshipNames") == 0) || (strcmp(infoItemP->name, "relationships") == 0))
     {
-      DUPLICATE_CHECK(relationshipsP, "relationships", infoItemP);
-      ARRAY_CHECK(infoItemP, "information[X]::relationships");
-      EMPTY_ARRAY_CHECK(infoItemP, "information[X]::relationships");
+      DUPLICATE_CHECK(relationshipsP, infoItemP->name, infoItemP);
+      ARRAY_CHECK(infoItemP, RegistrationInformationRelationshipNamesPath);
+      EMPTY_ARRAY_CHECK(infoItemP, RegistrationInformationRelationshipNamesPath);
       for (KjNode* relP = infoItemP->value.firstChildP; relP != NULL; relP = relP->next)
       {
-        STRING_CHECK(relP, "information[X]::relationships[X]");
-        EMPTY_STRING_CHECK(relP, "information[X]::relationships[X]");
+        STRING_CHECK(relP, RegistrationInformationRelationshipNamesItemPath);
+        EMPTY_STRING_CHECK(relP, RegistrationInformationRelationshipNamesItemPath);
+        LM(("EXP: Expanding relationship name '%s'", relP->value.s));
         relP->value.s = orionldAttributeExpand(orionldState.contextP, relP->value.s, true, NULL);
       }
+
+      infoItemP->name = (char*) "relationshipNames";
     }
     else
     {
-      orionldError(OrionldBadRequestData, "Invalid field for information[X]", infoItemP->name, 400);
+      orionldError(OrionldBadRequestData, "Invalid field for Registration::information[X]", infoItemP->name, 400);
       return false;
+    }
+  }
+
+  if (propertiesP != NULL)
+  {
+    // Check for duplicates
+    for (KjNode* propertyP = propertiesP->value.firstChildP; propertyP != NULL; propertyP = propertyP->next)
+    {
+      // Start looking for duplicates from the nextcoming name in the array (no need to look back - already done)
+      if (kjValueInArrayLookup(propertyP->next, propertyP->value.s) != NULL)
+      {
+        orionldError(OrionldBadRequestData, "Duplicated Property Name", propertyP->value.s, 400);
+        return false;
+      }
+    }
+  }
+
+  if (relationshipsP != NULL)
+  {
+    // Check for duplicates
+    for (KjNode* relationshipP = relationshipsP->value.firstChildP; relationshipP != NULL; relationshipP = relationshipP->next)
+    {
+      // Start looking for duplicates from the nextcoming name in the array (no need to look back - already done)
+      if (kjValueInArrayLookup(relationshipP->next, relationshipP->value.s) != NULL)
+      {
+        orionldError(OrionldBadRequestData, "Duplicated Relationship Name", relationshipP->value.s, 400);
+        return false;
+      }
     }
   }
 

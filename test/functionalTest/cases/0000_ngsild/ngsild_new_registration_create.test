@@ -1,0 +1,816 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of a NEW registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -multiservice
+
+--SHELL--
+
+#
+# 01. Create a registration with ALL fields
+# 02. See the registration in mongo
+# 03. GET the registration via the NGSIv2 API (see only a part of it)
+# 04. GET the registration (from cache)
+# 05. GET the registration (from db)
+#
+
+echo "01. Create a registration with ALL fields"
+echo "========================================="
+payload='{
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "registrationName": "R1",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        },
+        {
+          "id": "urn:ngsi-ld:Vehicle:A457",
+          "type": "Vehicle",
+          "idPattern": "urn:E.*"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    },
+    {
+      "entities": [
+        {
+          "idPattern": "urn:ngsi-ld:Vehicle:A.*",
+          "type": "Vehicle"
+        },
+        {
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [ "brandName2", "speed2" ],
+      "relationshipNames": [ "isParked2", "isParked3" ]
+    }
+  ],
+  "tenant": "T1",
+  "observationInterval": {
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456"
+  },
+  "managementInterval": {
+    "endAt": "2027-12-31T10:00:00.120",
+    "startAt": "2017-12-31T10:00:00.798Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 80.0, 0.0 ],
+        [ 81.0, 0.0 ],
+        [ 81.0, 1.0 ],
+        [ 80.0, 1.0 ],
+        [ 80.0, 0.0 ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 70.0, 0.0 ],
+        [ 71.0, 0.0 ],
+        [ 71.0, 1.0 ],
+        [ 70.0, 1.0 ],
+        [ 70.0, 0.0 ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [ 60.0, 0.0 ],
+        [ 61.0, 0.0 ],
+        [ 61.0, 1.0 ],
+        [ 60.0, 1.0 ],
+        [ 60.0, 0.0 ]
+      ]
+    ]
+  },
+  "expires": "2028-12-31T10:00:01.234Z",
+  "endpoint": "http://my.csource.org:1026",
+  "contextSourceInfo": [
+    {
+      "key": "H1",
+      "value": "H1 value"
+    },
+    {
+      "key": "H2",
+      "value": "H2 value"
+    }
+  ],
+  "scope": ["/s1", "/s2"],
+  "mode": "inclusive",
+  "operations": ["createEntity", "deleteEntity"],
+  "management": {
+    "localOnly": true,
+    "timeout": 5000,
+    "cooldown": 60000
+  },
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [ 7, 8 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "02. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "03. GET the registration via the NGSIv2 API (see only a part of it)"
+echo "==================================================================="
+orionCurl --url /v2/registrations/urn:ngsi-ld:ContextSourceRegistration:R1
+echo
+echo
+
+
+echo "04. GET the registration (from cache)"
+echo "====================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "05. GET the registration (from db)"
+echo "=================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?options=fromDb&prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with ALL fields
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+
+
+
+02. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1",
+	"description" : "description of reg 1",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				},
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A457",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		},
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A.*",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle",
+					"isPattern" : "true"
+				},
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName2",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed2",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked2",
+					"type" : "Relationship"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked3",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"tenant" : "T1",
+	"observationInterval" : {
+		"startAt" : 1546250400.123,
+		"endAt" : 1861869600.456
+	},
+	"managementInterval" : {
+		"endAt" : 1830247200.12,
+		"startAt" : 1514714400.7979999
+	},
+	"location" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					80,
+					0
+				],
+				[
+					81,
+					0
+				],
+				[
+					81,
+					1
+				],
+				[
+					80,
+					1
+				],
+				[
+					80,
+					0
+				]
+			]
+		]
+	},
+	"observationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					70,
+					0
+				],
+				[
+					71,
+					0
+				],
+				[
+					71,
+					1
+				],
+				[
+					70,
+					1
+				],
+				[
+					70,
+					0
+				]
+			]
+		]
+	},
+	"operationSpace" : {
+		"type" : "Polygon",
+		"coordinates" : [
+			[
+				[
+					60,
+					0
+				],
+				[
+					61,
+					0
+				],
+				[
+					61,
+					1
+				],
+				[
+					60,
+					1
+				],
+				[
+					60,
+					0
+				]
+			]
+		]
+	},
+	"expiration" : 1861869601.234,
+	"contextSourceInfo" : [
+		{
+			"key" : "H1",
+			"value" : "H1 value"
+		},
+		{
+			"key" : "H2",
+			"value" : "H2 value"
+		}
+	],
+	"scope" : [
+		"/s1",
+		"/s2"
+	],
+	"mode" : "inclusive",
+	"operations" : [
+		"createEntity",
+		"deleteEntity"
+	],
+	"management" : {
+		"localOnly" : true,
+		"timeout" : 5000,
+		"cooldown" : 60000
+	},
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1,
+		"https://uri.etsi.org/ngsi-ld/default-context/P2" : "2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3" : true,
+		"https://uri.etsi.org/ngsi-ld/default-context/P4" : 4.5,
+		"https://uri.etsi.org/ngsi-ld/default-context/P5" : {
+			"object" : 6
+		},
+		"https://uri.etsi.org/ngsi-ld/default-context/P6" : [
+			7,
+			8
+		]
+	},
+	"status" : "active"
+}
+bye
+
+
+03. GET the registration via the NGSIv2 API (see only a part of it)
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 653
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+
+{
+    "dataProvided": {
+        "attrs": [
+            "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+            "https://uri.etsi.org/ngsi-ld/default-context/speed",
+            "https://uri.etsi.org/ngsi-ld/default-context/isParked"
+        ],
+        "entities": [
+            {
+                "id": "urn:ngsi-ld:Vehicle:A456",
+                "type": "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+            },
+            {
+                "id": "urn:ngsi-ld:Vehicle:A457",
+                "type": "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+            }
+        ]
+    },
+    "description": "description of reg 1",
+    "expires": "2028-12-31T10:00:01.234Z",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+    "provider": {
+        "http": {
+            "url": "http://my.csource.org:1026"
+        },
+        "legacyForwarding": true,
+        "supportedForwardingMode": "all"
+    },
+    "status": "active"
+}
+
+
+04. GET the registration (from cache)
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 2702
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "R1",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        },
+        {
+          "id": "urn:ngsi-ld:Vehicle:A457",
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [
+        "brandName",
+        "speed"
+      ],
+      "relationshipNames": [
+        "isParked"
+      ]
+    },
+    {
+      "entities": [
+        {
+          "idPattern": "urn:ngsi-ld:Vehicle:A.*",
+          "type": "Vehicle"
+        },
+        {
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [
+        "brandName2",
+        "speed2"
+      ],
+      "relationshipNames": [
+        "isParked2",
+        "isParked3"
+      ]
+    }
+  ],
+  "tenant": "T1",
+  "observationInterval": {
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456Z"
+  },
+  "managementInterval": {
+    "endAt": "2027-12-31T10:00:00.120Z",
+    "startAt": "2017-12-31T10:00:00.798Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          80,
+          0
+        ],
+        [
+          81,
+          0
+        ],
+        [
+          81,
+          1
+        ],
+        [
+          80,
+          1
+        ],
+        [
+          80,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          70,
+          0
+        ],
+        [
+          71,
+          0
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          70,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          60,
+          0
+        ],
+        [
+          61,
+          0
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          60,
+          0
+        ]
+      ]
+    ]
+  },
+  "expiresAt": "2028-12-31T10:00:01.234Z",
+  "endpoint": "http://my.csource.org:1026",
+  "contextSourceInfo": [
+    {
+      "key": "H1",
+      "value": "H1 value"
+    },
+    {
+      "key": "H2",
+      "value": "H2 value"
+    }
+  ],
+  "scope": [
+    "/s1",
+    "/s2"
+  ],
+  "mode": "inclusive",
+  "operations": [
+    "createEntity",
+    "deleteEntity"
+  ],
+  "management": {
+    "localOnly": true,
+    "timeout": 5000,
+    "cooldown": 60000
+  },
+  "status": "active",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ],
+  "origin": "cache"
+}
+
+
+
+05. GET the registration (from db)
+==================================
+HTTP/1.1 200 OK
+Content-Length: 2705
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "R1",
+  "description": "description of reg 1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        },
+        {
+          "id": "urn:ngsi-ld:Vehicle:A457",
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [
+        "brandName",
+        "speed"
+      ],
+      "relationshipNames": [
+        "isParked"
+      ]
+    },
+    {
+      "entities": [
+        {
+          "idPattern": "urn:ngsi-ld:Vehicle:A.*",
+          "type": "Vehicle"
+        },
+        {
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [
+        "brandName2",
+        "speed2"
+      ],
+      "relationshipNames": [
+        "isParked2",
+        "isParked3"
+      ]
+    }
+  ],
+  "tenant": "T1",
+  "observationInterval": {
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456Z"
+  },
+  "managementInterval": {
+    "endAt": "2027-12-31T10:00:00.120Z",
+    "startAt": "2017-12-31T10:00:00.798Z"
+  },
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          80,
+          0
+        ],
+        [
+          81,
+          0
+        ],
+        [
+          81,
+          1
+        ],
+        [
+          80,
+          1
+        ],
+        [
+          80,
+          0
+        ]
+      ]
+    ]
+  },
+  "observationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          70,
+          0
+        ],
+        [
+          71,
+          0
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          70,
+          0
+        ]
+      ]
+    ]
+  },
+  "operationSpace": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          60,
+          0
+        ],
+        [
+          61,
+          0
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          60,
+          0
+        ]
+      ]
+    ]
+  },
+  "expiresAt": "2028-12-31T10:00:01.234Z",
+  "contextSourceInfo": [
+    {
+      "key": "H1",
+      "value": "H1 value"
+    },
+    {
+      "key": "H2",
+      "value": "H2 value"
+    }
+  ],
+  "scope": [
+    "/s1",
+    "/s2"
+  ],
+  "mode": "inclusive",
+  "operations": [
+    "createEntity",
+    "deleteEntity"
+  ],
+  "management": {
+    "localOnly": true,
+    "timeout": 5000,
+    "cooldown": 60000
+  },
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "P2": "2",
+  "P3": true,
+  "P4": 4.5,
+  "P5": {
+    "object": 6
+  },
+  "P6": [
+    7,
+    8
+  ],
+  "origin": "database"
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

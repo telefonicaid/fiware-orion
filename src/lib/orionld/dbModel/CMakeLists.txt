@@ -42,6 +42,8 @@ SET (SOURCES
     dbModelToApiGeorel.cpp
     dbModelToApiCoordinates.cpp
     dbModelToApiGeoQ.cpp
+    dbModelFromApiRegistration.cpp
+    dbModelToApiRegistration.cpp
 )
 
 # Include directories

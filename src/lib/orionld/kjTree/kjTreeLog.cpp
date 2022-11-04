@@ -53,7 +53,7 @@ void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int 
   int bufSize = kjFastRenderSize(tree);
 
   // Too big trees will not be rendered - this is just tracing
-  if (bufSize < 2048)
+  if (bufSize < 10 * 1024)
   {
     char* buf = kaAlloc(&orionldState.kalloc, bufSize + 512);
 
@@ -64,4 +64,6 @@ void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int 
       LM(("%s[%d]: %s: %s", fileName, lineNo, msg, buf));
     }
   }
+  else
+    LM(("%s[%d]: %s: %s", fileName, lineNo, msg, "Tree too big to be rendered"));
 }

@@ -31,7 +31,7 @@
 
 // -----------------------------------------------------------------------------
 //
-// numberToDate -
+// numberToDate - print a unix timestamp as an ISO8601 timestamp into a char buffer
 //
 extern bool numberToDate(double fromEpoch, char* date, int dateLen);
 

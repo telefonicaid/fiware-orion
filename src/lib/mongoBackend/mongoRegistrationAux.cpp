@@ -51,7 +51,15 @@
 */
 void mongoSetRegistrationId(ngsiv2::Registration* regP, const mongo::BSONObj* rP)
 {
-  regP->id = getFieldF(rP, "_id").OID().toString();
+  if (!rP->hasField("_id"))
+    return;
+
+  mongo::BSONElement _id = rP->getField("_id");
+
+  if (_id.type() == mongo::String)
+    regP->id = _id.String().c_str();
+  else if (_id.type() == mongo::jstOID)
+    regP->id = _id.OID().toString().c_str();
 }
 
 
@@ -127,7 +135,8 @@ static void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj* c
       }
       else
       {
-        entity.id = getStringFieldF(&ce, REG_ENTITY_ID);  // Mandatory if isPattern
+        if (ce.hasField("id"))
+          entity.id = getStringFieldF(&ce, REG_ENTITY_ID);  // Mandatory if isPattern
       }
     }
     else
@@ -200,15 +209,24 @@ static void mongoSetAttributes(ngsiv2::Registration* regP, const mongo::BSONObj*
 * If we have more than one, then the Registration is made in API V1 as this is not
 * possible in V2 and we cannot respond to the request using the current implementation of V2.
 * This function will be changed to work in a different way once issue #3044 is dealt with.
+*
+* That's old news:
+*   NGSI-LD also supports more than one item in the array, so,. changing this to return only the first item.
+*   "Better to get something than to get nothing ..."
 */
 bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj* rP, bool arrayAllowed)
 {
   std::vector<mongo::BSONElement> crV = getFieldF(rP, REG_CONTEXT_REGISTRATION).Array();
 
+#if 0
+  //
+  // See the comment about "old news"
+  //
   if (crV.size() > 1)
   {
     return false;
   }
+#endif
 
   //
   // Extract the first (and only) CR from the contextRegistration vector

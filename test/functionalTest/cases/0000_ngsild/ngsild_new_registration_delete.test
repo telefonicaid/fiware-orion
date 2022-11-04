@@ -1,0 +1,395 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Deletion of a NEW registration
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -multiservice
+
+--SHELL--
+
+#
+# 01. Create a registration R1
+# 02. See ALL registrations in mongo - see R1
+# 03. GET R1 from reg-cache
+# 04. DELETE R1
+# 05. See ALL registrations in mongo - see None
+# 06. Attempt to GET R1 from reg-cache - see 404 Not Found
+# 07. Attempt to GET R1 from database - see 404 Not Found
+#
+# 11. Create a registration R1, tenant T1
+# 12. See ALL registrations in mongo, tenant T1 - see R1
+# 13. GET R1 from reg-cache, tenant T1, with sysAttrs
+# 14. DELETE R1, tenant T1
+# 15. See ALL registrations in mongo, tenant T1 - see None
+# 16. Attempt to GET R1 from reg-cache, tenant T1 - see 404 Not Found
+# 17. Attempt to GET R1 from database, tenant T1 - see 404 Not Found
+#
+
+echo "01. Create a registration R1"
+echo "============================"
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Vehicle"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See ALL registrations in mongo - see R1"
+echo "==========================================="
+mongoCmd2 ftest "db.registrations.find().pretty()"
+echo
+echo
+
+
+echo "03. GET R1 from reg-cache"
+echo "========================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+echo
+echo
+
+
+echo "04. DELETE R1"
+echo "============="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X DELETE
+echo
+echo
+
+
+echo "05. See ALL registrations in mongo - see None"
+echo "============================================="
+mongoCmd2 ftest "db.registrations.find().pretty()"
+echo
+echo
+
+
+echo "06. Attempt to GET R1 from reg-cache - see 404 Not Found"
+echo "========================================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+echo
+echo
+
+
+echo "07. Attempt to GET R1 from database - see 404 Not Found"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?options=fromDb
+echo
+echo
+
+
+echo "11. Create a registration R1, tenant T1"
+echo "======================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Vehicle"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" -H "NGSILD-Tenant: T1"
+echo
+echo
+
+
+echo "12. See ALL registrations in mongo, tenant T1 - see R1"
+echo "======================================================"
+mongoCmd2 ftest-t1 "db.registrations.find().pretty()"
+echo
+echo
+
+
+echo "13. GET R1 from reg-cache, tenant T1, with sysAttrs"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?options=sysAttrs -H "NGSILD-Tenant: T1"
+echo
+echo
+
+
+echo "14. DELETE R1, tenant T1"
+echo "========================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X DELETE -H "NGSILD-Tenant: T1"
+echo
+echo
+
+
+echo "15. See ALL registrations in mongo, tenant T1 - see None"
+echo "========================================================"
+mongoCmd2 ftest-t1 "db.registrations.find().pretty()"
+echo
+echo
+
+
+echo "16. Attempt to GET R1 from reg-cache, tenant T1 - see 404 Not Found"
+echo "==================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -H "NGSILD-Tenant: T1"
+echo
+echo
+
+
+echo "17. Attempt to GET R1 from database, tenant T1 - see 404 Not Found"
+echo "=================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?options=fromDb -H "NGSILD-Tenant: T1"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration R1
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+
+
+
+02. See ALL registrations in mongo - see R1
+===========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [ ],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"properties" : {
+		
+	},
+	"status" : "active"
+}
+bye
+
+
+03. GET R1 from reg-cache
+=========================
+HTTP/1.1 200 OK
+Content-Length: 209
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "endpoint": "http://my.csource.org:1026",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "type": "Vehicle"
+                }
+            ]
+        }
+    ],
+    "origin": "cache",
+    "status": "active",
+    "type": "ContextSourceRegistration"
+}
+
+
+04. DELETE R1
+=============
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. See ALL registrations in mongo - see None
+=============================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+bye
+
+
+06. Attempt to GET R1 from reg-cache - see 404 Not Found
+========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:ContextSourceRegistration:R1",
+    "title": "Registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+07. Attempt to GET R1 from database - see 404 Not Found
+=======================================================
+HTTP/1.1 404 Not Found
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:ContextSourceRegistration:R1",
+    "title": "Registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+11. Create a registration R1, tenant T1
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+NGSILD-Tenant: t1
+
+
+
+12. See ALL registrations in mongo, tenant T1 - see R1
+======================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [ ],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"properties" : {
+		
+	},
+	"status" : "active"
+}
+bye
+
+
+13. GET R1 from reg-cache, tenant T1, with sysAttrs
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 288
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "createdAt": "202REGEX(.*)",
+    "endpoint": "http://my.csource.org:1026",
+    "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "type": "Vehicle"
+                }
+            ]
+        }
+    ],
+    "modifiedAt": "202REGEX(.*)",
+    "origin": "cache",
+    "status": "active",
+    "type": "ContextSourceRegistration"
+}
+
+
+14. DELETE R1, tenant T1
+========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+15. See ALL registrations in mongo, tenant T1 - see None
+========================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+bye
+
+
+16. Attempt to GET R1 from reg-cache, tenant T1 - see 404 Not Found
+===================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:ContextSourceRegistration:R1",
+    "title": "Registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+17. Attempt to GET R1 from database, tenant T1 - see 404 Not Found
+==================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:ContextSourceRegistration:R1",
+    "title": "Registration not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

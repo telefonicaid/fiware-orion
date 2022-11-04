@@ -30,7 +30,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/payloadCheck/PCHECK.h"                          // PCHECK_*
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckEntityInfo.h"               // pcheckEntityInfo
 
 
@@ -42,12 +42,13 @@ extern "C"
 // This function is used by the "POST Query" request, where the entity type is NOT mandatory.
 // It is also used for Subscriptions and Registrations, where entity type IS mandatory.
 //
-bool pcheckEntityInfoArray(KjNode* entityInfoArrayP, bool typeMandatory, const char* fieldPath)
+bool pcheckEntityInfoArray(KjNode* entityInfoArrayP, bool typeMandatory, const char** fieldPathV)
 {
   for (KjNode* entityInfoP = entityInfoArrayP->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
   {
-    PCHECK_OBJECT(entityInfoP, 0, NULL, fieldPath, 400);  // FIXME: add ::[X] to fieldPath
-    if (pcheckEntityInfo(entityInfoP, typeMandatory, fieldPath) == false)
+    PCHECK_OBJECT(entityInfoP, 0, NULL, fieldPathV[1], 400);
+
+    if (pcheckEntityInfo(entityInfoP, typeMandatory, fieldPathV) == false)
       return false;
   }
 

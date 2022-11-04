@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/common/orionldState.h"                         // orionldState, dbName
 #include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
@@ -92,7 +93,7 @@ bool mongocTenantsGet(void)
         char* tenantName = &nameP->value.s[dbNameLen + 1];
 
         if (orionldTenantLookup(tenantName) == NULL)
-          orionldTenantCreate(tenantName);
+          orionldTenantCreate(tenantName, false, false);
       }
     }
   }

@@ -50,9 +50,10 @@ bool pcheckInformation(KjNode* informationArrayP)
     return false;
   }
 
-  for (KjNode* informationP = informationArrayP->value.firstChildP; informationArrayP != NULL; informationArrayP = informationArrayP->next)
+  for (KjNode* informationP = informationArrayP->value.firstChildP; informationP != NULL; informationP = informationP->next)
   {
     OBJECT_CHECK(informationP, "information[X]");
+    EMPTY_OBJECT_CHECK(informationP, "information[X]");
 
     if (pcheckInformationItem(informationP) == false)
       return false;

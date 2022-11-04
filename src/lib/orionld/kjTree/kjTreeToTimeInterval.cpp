@@ -50,12 +50,12 @@ bool kjTreeToTimeInterval(KjNode* kNodeP, OrionldTimeInterval* intervalP)
 
   for (KjNode* intervalItemP = kNodeP->value.firstChildP; intervalItemP != NULL; intervalItemP = intervalItemP->next)
   {
-    if (SCOMPARE6(intervalItemP->name, 's', 't', 'a', 'r', 't', 0))
+    if (strcmp(intervalItemP->name, "startAt") == 0)
     {
-      DUPLICATE_CHECK(startP, "TimeInterval::start", intervalItemP);
-      STRING_CHECK(startP, "TimeInterval::start");
+      DUPLICATE_CHECK(startP, "TimeInterval::startAt", intervalItemP);
+      STRING_CHECK(startP, "TimeInterval::startAt");
     }
-    else if (SCOMPARE4(intervalItemP->name, 'e', 'n', 'd', 0))
+    else if (strcmp(intervalItemP->name, "endAt") == 0)
     {
       DUPLICATE_CHECK(endP, "TimeInterval::end", intervalItemP);
       STRING_CHECK(endP, "TimeInterval::end");

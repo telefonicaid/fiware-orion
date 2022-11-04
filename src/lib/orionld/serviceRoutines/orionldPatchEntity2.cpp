@@ -365,7 +365,7 @@ void orionldAlterationsPresent(OrionldAlteration* altP)
 //
 bool orionldPatchEntity2(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
   {
     orionldError(OrionldResourceNotFound, "Service Not Found", orionldState.urlPath, 404);
     return false;

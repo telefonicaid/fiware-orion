@@ -91,8 +91,8 @@ payload='{
           "type": "T1"
         }
       ],
-      "properties": [ "P1", "P3" ],
-      "relationships": [ "R3" ]
+      "propertyNames": [ "P1", "P3" ],
+      "relationshipNames": [ "R3" ]
     }
   ],
   "endpoint": "http://my.csource.org:1026"
@@ -114,8 +114,8 @@ payload='{
           "type": "T1"
         }
       ],
-      "properties": [ "P4" ],
-      "relationships": [ "R4" ]
+      "propertyNames": [ "P4" ],
+      "relationshipNames": [ "R4" ]
     }
   ],
   "endpoint": "http://my.csource.org:1026"

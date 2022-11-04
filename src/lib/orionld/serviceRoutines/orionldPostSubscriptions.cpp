@@ -65,7 +65,7 @@ extern "C"
 //
 bool orionldPostSubscriptions(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyPostSubscriptions();  // this will be removed!! (after thorough testing)
 
   KjNode*  subP            = orionldState.requestTree;

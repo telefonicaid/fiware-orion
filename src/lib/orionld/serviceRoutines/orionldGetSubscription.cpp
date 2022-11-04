@@ -174,7 +174,7 @@ static bool orionldGetSubscriptionFromDb(void)
 //
 bool orionldGetSubscription(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyGetSubscription();
 
   // Is orionldState.wildcard[0] a valid id for a subscription?

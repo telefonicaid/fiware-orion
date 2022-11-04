@@ -59,12 +59,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00.123Z",
-    "end": "2028-12-31T10:00:00.456"
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.798",
-    "end": "2027-12-31T10:00:00.120"
+    "startAt": "2017-12-31T10:00:00.798",
+    "endAt": "2027-12-31T10:00:00.120"
   },
   "location": {
     "type": "Point",
@@ -78,7 +78,7 @@ payload='{
     "type": "Point",
     "coordinates": [ 100.0, 0.0 ]
   },
-  "expires": "2028-12-31T10:00:01.234Z",
+  "expiresAt": "2028-12-31T10:00:01.234Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1
 }'
@@ -114,7 +114,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1
 02. GET the registration
 ========================
 HTTP/1.1 200 OK
-Content-Length: 698
+Content-Length: 708
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -123,7 +123,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "P1": 1,
     "description": "description of reg 1",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2028-12-31T10:00:01.234Z",
+    "expiresAt": "2028-12-31T10:00:01.234Z",
     "id": "urn:ngsi-ld:registrations:R1",
     "information": [
         {
@@ -150,13 +150,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Point"
     },
     "managementInterval": {
-        "end": "2027-12-31T10:00:00.120Z",
-        "start": "2017-12-31T10:00:00.798Z"
+        "endAt": "2027-12-31T10:00:00.120Z",
+        "startAt": "2017-12-31T10:00:00.798Z"
     },
     "name": "R1",
     "observationInterval": {
-        "end": "2028-12-31T10:00:00.456Z",
-        "start": "2018-12-31T10:00:00.123Z"
+        "endAt": "2028-12-31T10:00:00.456Z",
+        "startAt": "2018-12-31T10:00:00.123Z"
     },
     "observationSpace": {
         "coordinates": [
@@ -219,12 +219,12 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : 1546250400.123,
-		"end" : 1861869600.456
+		"startAt" : 1546250400.123,
+		"endAt" : 1861869600.456
 	},
 	"managementInterval" : {
-		"start" : 1514714400.7979999,
-		"end" : 1830247200.12
+		"startAt" : 1514714400.7979999,
+		"endAt" : 1830247200.12
 	},
 	"location" : {
 		"type" : "Point",

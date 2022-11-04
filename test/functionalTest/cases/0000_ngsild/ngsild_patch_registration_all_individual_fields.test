@@ -85,26 +85,26 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.123",
-    "end": "2019-12-31T10:00:00.456"
+    "startAt": "2018-12-30T10:00:00.123",
+    "endAt": "2019-12-31T10:00:00.456"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789",
-    "end": "2018-12-31T10:00:00.012"
+    "startAt": "2017-12-31T10:00:00.789",
+    "endAt": "2018-12-31T10:00:00.012"
   },
   "location": {
     "type": "Point",
-    "coordinates": [ 100.0, 0.0 ]
+    "coordinates": [ 10.0, 0.0 ]
   },
   "observationSpace": {
     "type": "Point",
-    "coordinates": [ 200.0, 0.0 ]
+    "coordinates": [ 20.0, 0.0 ]
   },
   "operationSpace": {
     "type": "Point",
-    "coordinates": [ 300.0, 0.0 ]
+    "coordinates": [ 30.0, 0.0 ]
   },
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1
 }'
@@ -199,8 +199,8 @@ echo "11. PATCH the registration with a new observationInterval"
 echo "========================================================="
 payload='{
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   }
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
@@ -219,8 +219,8 @@ echo "13. PATCH the registration with a new managementInterval"
 echo "========================================================"
 payload='{
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   }
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
@@ -298,7 +298,7 @@ echo
 echo "21. PATCH the registration with a new expires"
 echo "============================================="
 payload='{
-  "expires": "2021-12-31T18:19:20.210Z"
+  "expiresAt": "2021-12-31T18:19:20.210Z"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
 echo
@@ -391,12 +391,12 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2023-12-30T21:22:23.123Z",
-    "end": "2024-12-30T21:22:23.456Z"
+    "startAt": "2023-12-30T21:22:23.123Z",
+    "endAt": "2024-12-30T21:22:23.456Z"
   },
   "managementInterval": {
-    "start": "2025-12-09T01:02:03.456Z",
-    "end": "2025-12-09T01:02:03.457Z"
+    "startAt": "2025-12-09T01:02:03.456Z",
+    "endAt": "2025-12-09T01:02:03.457Z"
   },
   "location": {
     "type": "Point",
@@ -410,7 +410,7 @@ payload='{
     "type": "Point",
     "coordinates": [ 31.0, 32.77 ]
   },
-  "expires": "2024-12-31T10:00:00.123Z",
+  "expiresAt": "2024-12-31T10:00:19.975Z",
   "endpoint": "http://my.other.csource.org:1099",
   "P1": [ 1, 2, 3, 4 ]
 }'
@@ -486,31 +486,31 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : REGEX(.*),
-		"end" : REGEX(.*)
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
 	},
 	"managementInterval" : {
-		"start" : REGEX(.*),
-		"end" : REGEX(.*)
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
 	},
 	"location" : {
 		"type" : "Point",
 		"coordinates" : [
-			100,
+			10,
 			0
 		]
 	},
 	"observationSpace" : {
 		"type" : "Point",
 		"coordinates" : [
-			200,
+			20,
 			0
 		]
 	},
 	"operationSpace" : {
 		"type" : "Point",
 		"coordinates" : [
-			300,
+			30,
 			0
 		]
 	},
@@ -524,7 +524,7 @@ bye
 03. GET the registration to see the ORIGINAL
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 1024
+Content-Length: 1031
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -534,7 +534,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "R1",
   "description": "description of reg R1",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -554,31 +554,31 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.123Z",
-    "end": "2019-12-31T10:00:00.456Z"
+    "startAt": "2018-12-30T10:00:00.123Z",
+    "endAt": "2019-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2018-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
     "coordinates": [
-      100,
+      10,
       0
     ]
   },
   "observationSpace": {
     "type": "Point",
     "coordinates": [
-      200,
+      20,
       0
     ]
   },
   "operationSpace": {
     "type": "Point",
     "coordinates": [
-      300,
+      30,
       0
     ]
   },
@@ -597,7 +597,7 @@ Date: REGEX(.*)
 05. GET the registration and see the new name
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 1030
+Content-Length: 1037
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -607,7 +607,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "description of reg R1",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -627,31 +627,31 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.123Z",
-    "end": "2019-12-31T10:00:00.456Z"
+    "startAt": "2018-12-30T10:00:00.123Z",
+    "endAt": "2019-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2018-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
     "coordinates": [
-      100,
+      10,
       0
     ]
   },
   "observationSpace": {
     "type": "Point",
     "coordinates": [
-      200,
+      20,
       0
     ]
   },
   "operationSpace": {
     "type": "Point",
     "coordinates": [
-      300,
+      30,
       0
     ]
   },
@@ -670,7 +670,7 @@ Date: REGEX(.*)
 07. GET the registration and see the new description
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 1024
+Content-Length: 1031
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -680,7 +680,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -700,31 +700,31 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.123Z",
-    "end": "2019-12-31T10:00:00.456Z"
+    "startAt": "2018-12-30T10:00:00.123Z",
+    "endAt": "2019-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2018-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
     "coordinates": [
-      100,
+      10,
       0
     ]
   },
   "observationSpace": {
     "type": "Point",
     "coordinates": [
-      200,
+      20,
       0
     ]
   },
   "operationSpace": {
     "type": "Point",
     "coordinates": [
-      300,
+      30,
       0
     ]
   },
@@ -743,7 +743,7 @@ Date: REGEX(.*)
 09. GET the registration and see the new information array
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 970
+Content-Length: 977
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -753,7 +753,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -772,31 +772,31 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2018-12-30T10:00:00.123Z",
-    "end": "2019-12-31T10:00:00.456Z"
+    "startAt": "2018-12-30T10:00:00.123Z",
+    "endAt": "2019-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2018-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
     "coordinates": [
-      100,
+      10,
       0
     ]
   },
   "observationSpace": {
     "type": "Point",
     "coordinates": [
-      200,
+      20,
       0
     ]
   },
   "operationSpace": {
     "type": "Point",
     "coordinates": [
-      300,
+      30,
       0
     ]
   },
@@ -841,31 +841,31 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : REGEX(.*),
-		"end" : REGEX(.*)
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
 	},
 	"managementInterval" : {
-		"start" : REGEX(.*),
-		"end" : REGEX(.*)
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
 	},
 	"location" : {
 		"type" : "Point",
 		"coordinates" : [
-			100,
+			10,
 			0
 		]
 	},
 	"observationSpace" : {
 		"type" : "Point",
 		"coordinates" : [
-			200,
+			20,
 			0
 		]
 	},
 	"operationSpace" : {
 		"type" : "Point",
 		"coordinates" : [
-			300,
+			30,
 			0
 		]
 	},
@@ -886,7 +886,7 @@ Date: REGEX(.*)
 12. GET the registration and see the new observationInterval
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 970
+Content-Length: 977
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -896,7 +896,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -915,31 +915,31 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2018-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Point",
     "coordinates": [
-      100,
+      10,
       0
     ]
   },
   "observationSpace": {
     "type": "Point",
     "coordinates": [
-      200,
+      20,
       0
     ]
   },
   "operationSpace": {
     "type": "Point",
     "coordinates": [
-      300,
+      30,
       0
     ]
   },
@@ -958,7 +958,7 @@ Date: REGEX(.*)
 14. GET the registration and see the new managementInterval
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 970
+Content-Length: 977
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -968,7 +968,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -987,31 +987,31 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
     "coordinates": [
-      100,
+      10,
       0
     ]
   },
   "observationSpace": {
     "type": "Point",
     "coordinates": [
-      200,
+      20,
       0
     ]
   },
   "operationSpace": {
     "type": "Point",
     "coordinates": [
-      300,
+      30,
       0
     ]
   },
@@ -1030,7 +1030,7 @@ Date: REGEX(.*)
 16. GET the registration and see the new location
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 968
+Content-Length: 976
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1040,7 +1040,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1059,12 +1059,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1076,14 +1076,14 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "observationSpace": {
     "type": "Point",
     "coordinates": [
-      200,
+      20,
       0
     ]
   },
   "operationSpace": {
     "type": "Point",
     "coordinates": [
-      300,
+      30,
       0
     ]
   },
@@ -1102,7 +1102,7 @@ Date: REGEX(.*)
 18. GET the registration and see the new observationSpace
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 966
+Content-Length: 975
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1112,7 +1112,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1131,12 +1131,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1155,7 +1155,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "operationSpace": {
     "type": "Point",
     "coordinates": [
-      300,
+      30,
       0
     ]
   },
@@ -1174,7 +1174,7 @@ Date: REGEX(.*)
 20. GET the registration and see the new operationSpace
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 964
+Content-Length: 974
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1184,7 +1184,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2028-12-31T11:12:13.141Z",
+  "expiresAt": "2028-12-31T11:12:13.141Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1203,12 +1203,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1246,7 +1246,7 @@ Date: REGEX(.*)
 22. GET the registration and see the new expires
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 964
+Content-Length: 974
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1256,7 +1256,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1275,12 +1275,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1318,7 +1318,7 @@ Date: REGEX(.*)
 24. GET the registration and see the new endpoint
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 962
+Content-Length: 972
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1328,7 +1328,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1347,12 +1347,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1390,7 +1390,7 @@ Date: REGEX(.*)
 26. GET the registration and see the new P1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 969
+Content-Length: 979
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1400,7 +1400,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1419,12 +1419,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1469,7 +1469,7 @@ Date: REGEX(.*)
 28. GET the registration and see no P7 (patch only replaces, it doesn't add)
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 969
+Content-Length: 979
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1479,7 +1479,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expires": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2021-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1498,12 +1498,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2028-12-30T11:12:13.567Z",
-    "end": "2028-12-31T10:01:02.459Z"
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
   },
   "managementInterval": {
-    "start": "2025-12-30T10:00:00.111Z",
-    "end": "2026-12-31T10:00:00.222Z"
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
   },
   "location": {
     "type": "Point",
@@ -1567,12 +1567,12 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : REGEX(.*),
-		"end" : REGEX(.*)
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
 	},
 	"managementInterval" : {
-		"start" : REGEX(.*),
-		"end" : REGEX(.*)
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
 	},
 	"location" : {
 		"type" : "Point",
@@ -1613,7 +1613,7 @@ Date: REGEX(.*)
 31. GET the registration and see all the fields updated
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 1094
+Content-Length: 1104
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1623,7 +1623,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "R1-bis",
   "description": "description of reg R1-bis",
-  "expires": "2024-12-31T10:00:00.123Z",
+  "expiresAt": "2024-12-31T10:00:19.975Z",
   "endpoint": "http://my.other.csource.org:1099",
   "information": [
     {
@@ -1645,12 +1645,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2023-12-30T21:22:23.123Z",
-    "end": "2024-12-30T21:22:23.456Z"
+    "startAt": "2023-12-30T21:22:23.123Z",
+    "endAt": "2024-12-30T21:22:23.456Z"
   },
   "managementInterval": {
-    "start": "2025-12-09T01:02:03.456Z",
-    "end": "2025-12-09T01:02:03.457Z"
+    "startAt": "2025-12-09T01:02:03.456Z",
+    "endAt": "2025-12-09T01:02:03.457Z"
   },
   "location": {
     "type": "Point",
@@ -1692,7 +1692,7 @@ MongoDB server version: REGEX(.*)
 	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
 	"description" : "description of reg R1-bis",
 	"name" : "R1-bis",
-	"expiration" : 1735639200.123,
+	"expiration" : 1735639219.975,
 	"servicePath" : "/",
 	"contextRegistration" : [
 		{
@@ -1727,12 +1727,12 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : 1703971343.123,
-		"end" : 1735593743.456
+		"startAt" : 1703971343.123,
+		"endAt" : 1735593743.456
 	},
 	"managementInterval" : {
-		"start" : 1765242123.456,
-		"end" : 1765242123.457
+		"startAt" : 1765242123.456,
+		"endAt" : 1765242123.457
 	},
 	"location" : {
 		"type" : "Point",

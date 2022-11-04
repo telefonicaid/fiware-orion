@@ -123,6 +123,8 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
 #include "orionld/db/dbInit.h"                                // dbInit
 #include "orionld/mqtt/mqttRelease.h"                         // mqttRelease
+#include "orionld/regCache/regCacheCreate.h"                  // regCacheCreate
+#include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
 #include "orionld/troe/troeInit.h"                            // troeInit
 
 #include "orionld/version.h"
@@ -131,6 +133,7 @@ extern "C"
 
 #include "orionld/mongoc/mongocServerVersionGet.h"            // mongocServerVersionGet
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
+#include "orionld/regCache/regCacheInit.h"                    // regCacheInit
 #include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
 #include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
@@ -555,9 +558,16 @@ void exitFunc(void)
   while (tenantP != NULL)
   {
     OrionldTenant* next = tenantP->next;
+
+    if (tenantP->regCache != NULL)
+      regCacheRelease(tenantP->regCache);
+
     free(tenantP);
     tenantP = next;
   }
+
+  if (tenant0.regCache != NULL)
+      regCacheRelease(tenant0.regCache);
 
   // Disconnect from all MQTT brokers and free the connections
   mqttRelease();
@@ -797,6 +807,7 @@ static void libLogFunction
 }
 
 
+
 // char* SUB_CACHE_DISABLED = NULL;
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
@@ -1014,11 +1025,6 @@ int main(int argC, char* argV[])
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
 
   //
-  // Initialize Tenant list
-  //
-  orionldTenantInit();
-
-  //
   // The database for Temporal Representation of Entities must be initialized before mongodb
   // as callbacks to create tenants (== postgres databases) and their tables are called from the
   // initialization routines of mongodb - if postgres is not initialized, this will fail.
@@ -1042,7 +1048,7 @@ int main(int argC, char* argV[])
 
   //
   // Initialize the KBASE library
-  // This call redirects all log messahes from the K-libs to the brokers log file.
+  // This call redirects all log messages from the K-libs to the brokers log file.
   //
   kInit(libLogFunction);
 
@@ -1067,8 +1073,20 @@ int main(int argC, char* argV[])
   gethostname(orionldHostName, sizeof(orionldHostName));
   orionldHostNameLen = strlen(orionldHostName);
 
-  orionldStateInit(NULL);  // This is the "global instance" of orionldState
+  orionldStateInit(NULL);
+
+  // mongocInit calls mongocGeoIndexInit - tenant0 must be ready for that
+  orionldTenantInit();
+  orionldState.tenantP = &tenant0;
+
   mongocInit(dbURI, dbHost, dbUser, dbPwd, dbAuthDb, rplSet, dbAuthMechanism, dbSSL, dbCertFile);
+
+  //
+  // Now that the DB is ready to be used, we can populate the regCache for the different tenants
+  // Note that regCacheInit uses the tenantList, so orionldTenantInit must be called before regCacheInit
+  //
+  regCacheInit();
+
   orionldServiceInit(restServiceVV, 9, getenv("ORIONLD_CACHED_CONTEXT_DIRECTORY"));
 
   if (mongocOnly == false)

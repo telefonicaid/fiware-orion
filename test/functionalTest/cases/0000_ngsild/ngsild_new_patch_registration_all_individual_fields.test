@@ -1,0 +1,1790 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error handling of PATCH of a registration
+
+--SHELL-INIT--
+# Copied from ngsild_patch_registration_all_individual_fields.test
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create a registration with all fields AND properties P1-P6
+# 02. See the registration in the database
+# 03. GET the registration to see the ORIGINAL
+# 04. PATCH the registration with a new name
+# 05. GET the registration and see the new name
+# 06. PATCH the registration with a new description
+# 07. GET the registration and see the new description
+# 08. PATCH the registration with a new information array
+# 09. GET the registration and see the new information array
+# 10. See the registration in the DB - especially - see long names for type:T, prop:P1 and rel:R1
+# 11. PATCH the registration with a new observationInterval
+# 12. GET the registration and see the new observationInterval
+# 13. PATCH the registration with a new managementInterval
+# 14. GET the registration and see the new managementInterval
+# 15. PATCH the registration with a new location
+# 16. GET the registration and see the new location
+# 17. PATCH the registration with a new observationSpace
+# 18. GET the registration and see the new observationSpace
+# 19. PATCH the registration with a new operationSpace
+# 20. GET the registration and see the new operationSpace
+# 21. PATCH the registration with a new expires
+# 22. GET the registration and see the new expires
+# 23. PATCH the registration with a new endpoint
+# 24. GET the registration and see the new endpoint
+# 25. PATCH the registration with a new P1
+# 26. GET the registration and see the new P1
+# 27. PATCH the registration with a new and previously non-existing P7
+# 28. GET the registration and see P7 (patch adds if didn't exist - see clause 5.5.8 in the NGSi-LD API spec)
+# 29. See the registration in the database
+# 30. PATCH all the fields of the registration
+# 31. GET the registration and see all the fields updated
+# 32. See the registration in the database
+#
+
+echo "01. Create a registration with all fields"
+echo "========================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "name": "R1",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [ "brandName", "speed" ],
+      "relationshipNames": [ "isParked" ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2018-12-30T10:00:00.123",
+    "endAt": "2019-12-31T10:00:00.456"
+  },
+  "managementInterval": {
+    "startAt": "2017-12-31T10:00:00.789",
+    "endAt": "2018-12-31T10:00:00.012"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [ 10.0, 0.0 ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [ 20.0, 0.0 ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [ 30.0, 0.0 ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See the registration in the database"
+echo "========================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "03. GET the registration to see the ORIGINAL"
+echo "============================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "04. PATCH the registration with a new name"
+echo "=========================================="
+payload='{
+  "name": "New Name"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. GET the registration and see the new name"
+echo "============================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "06. PATCH the registration with a new description"
+echo "================================================="
+payload='{
+  "description": "New Description"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. GET the registration and see the new description"
+echo "===================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "08. PATCH the registration with a new information array"
+echo "======================================================="
+payload='{
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ],
+      "relationshipNames": [ "R1" ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "09. GET the registration and see the new information array"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "10. See the registration in the DB - especially - see long names for type:T, prop:P1 and rel:R1"
+echo "==============================================================================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+echo "11. PATCH the registration with a new observationInterval"
+echo "========================================================="
+payload='{
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "12. GET the registration and see the new observationInterval"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "13. PATCH the registration with a new managementInterval"
+echo "========================================================"
+payload='{
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "14. GET the registration and see the new managementInterval"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "15. PATCH the registration with a new location"
+echo "=============================================="
+payload='{
+  "location": {
+    "type": "Point",
+    "coordinates": [ 1, 2 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "16. GET the registration and see the new location"
+echo "================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "17. PATCH the registration with a new observationSpace"
+echo "======================================================"
+payload='{
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [ 1, 2 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "18. GET the registration and see the new observationSpace"
+echo "========================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "19. PATCH the registration with a new operationSpace"
+echo "===================================================="
+payload='{
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [ 1, 2 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "20. GET the registration and see the new operationSpace"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "21. PATCH the registration with a new expires"
+echo "============================================="
+payload='{
+  "expiresAt": "2021-12-31T18:19:20.210Z"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "22. GET the registration and see the new expires"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "23. PATCH the registration with a new endpoint"
+echo "=============================================="
+payload='{
+  "endpoint": "http://localhost:1026/go"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "24. GET the registration and see the new endpoint"
+echo "================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "25. PATCH the registration with a new P1"
+echo "========================================"
+payload='{
+  "P1": "New P1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "26. GET the registration and see the new P1"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "27. PATCH the registration with a new and previously non-existing P7"
+echo "===================================================================="
+payload='{
+  "P7": "New reg-property"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "28. GET the registration and see P7 (patch adds if didn't exist - see clause 5.5.8 in the NGSi-LD API spec)"
+echo "==========================================================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "29. See the registration in the database"
+echo "========================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "30. PATCH all the fields of the registration"
+echo "============================================"
+payload='{
+  "name": "R1-bis",
+  "description": "description of reg R1-bis",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:E30",
+          "type": "T2"
+        },
+        {
+          "id": "urn:ngsi-ld:E31",
+          "type": "T3"
+        }
+      ],
+      "propertyNames": [ "P1", "P2", "P3" ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2023-12-30T21:22:23.123Z",
+    "endAt": "2024-12-30T21:22:23.456Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-09T01:02:03.456Z",
+    "endAt": "2025-12-09T01:02:03.457Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [ 51.0, 52.16 ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [ 41.0, 42.99 ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [ 31.0, 32.77 ]
+  },
+  "expiresAt": "2024-12-31T10:00:19.975Z",
+  "endpoint": "http://my.other.csource.org:1099",
+  "P1": [ 1, 2, 3, 4 ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "31. GET the registration and see all the fields updated"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "32. See the registration in the database"
+echo "========================================"
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with all fields
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+
+
+
+02. See the registration in the database
+========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1",
+	"description" : "description of reg R1",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:Vehicle:A456",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/brandName",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/speed",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/isParked",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"observationInterval" : {
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
+	},
+	"managementInterval" : {
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			10,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : REGEX(.*),
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1
+	},
+	"status" : "active"
+}
+bye
+
+
+03. GET the registration to see the ORIGINAL
+============================================
+HTTP/1.1 200 OK
+Content-Length: 1093
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "R1",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [
+        "brandName",
+        "speed"
+      ],
+      "relationshipNames": [
+        "isParked"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2018-12-30T10:00:00.123Z",
+    "endAt": "2019-12-31T10:00:00.456Z"
+  },
+  "managementInterval": {
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      10,
+      0
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      20,
+      0
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      30,
+      0
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "endpoint": "http://my.csource.org:1026",
+  "status": "active",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+04. PATCH the registration with a new name
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET the registration and see the new name
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 1099
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "description of reg R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [
+        "brandName",
+        "speed"
+      ],
+      "relationshipNames": [
+        "isParked"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2018-12-30T10:00:00.123Z",
+    "endAt": "2019-12-31T10:00:00.456Z"
+  },
+  "managementInterval": {
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      10,
+      0
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      20,
+      0
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      30,
+      0
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+06. PATCH the registration with a new description
+=================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET the registration and see the new description
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 1093
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "propertyNames": [
+        "brandName",
+        "speed"
+      ],
+      "relationshipNames": [
+        "isParked"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2018-12-30T10:00:00.123Z",
+    "endAt": "2019-12-31T10:00:00.456Z"
+  },
+  "managementInterval": {
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      10,
+      0
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      20,
+      0
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      30,
+      0
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+08. PATCH the registration with a new information array
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. GET the registration and see the new information array
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 1039
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2018-12-30T10:00:00.123Z",
+    "endAt": "2019-12-31T10:00:00.456Z"
+  },
+  "managementInterval": {
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      10,
+      0
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      20,
+      0
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      30,
+      0
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+10. See the registration in the DB - especially - see long names for type:T, prop:P1 and rel:R1
+===============================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "New Name",
+	"description" : "New Description",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:E1",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P1",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/R1",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"observationInterval" : {
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
+	},
+	"managementInterval" : {
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			10,
+			0
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			20,
+			0
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			30,
+			0
+		]
+	},
+	"expiration" : REGEX(.*),
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : 1
+	},
+	"status" : "active"
+}
+bye
+
+
+11. PATCH the registration with a new observationInterval
+=========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+12. GET the registration and see the new observationInterval
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 1039
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2018-12-31T10:00:00.012Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      10,
+      0
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      20,
+      0
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      30,
+      0
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+13. PATCH the registration with a new managementInterval
+========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+14. GET the registration and see the new managementInterval
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 1039
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      10,
+      0
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      20,
+      0
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      30,
+      0
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+15. PATCH the registration with a new location
+==============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+16. GET the registration and see the new location
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 1038
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      20,
+      0
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      30,
+      0
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+17. PATCH the registration with a new observationSpace
+======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+18. GET the registration and see the new observationSpace
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 1037
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      30,
+      0
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+19. PATCH the registration with a new operationSpace
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+20. GET the registration and see the new operationSpace
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 1036
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "expiresAt": "2028-12-31T11:12:13.141Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+21. PATCH the registration with a new expires
+=============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+22. GET the registration and see the new expires
+================================================
+HTTP/1.1 200 OK
+Content-Length: 1036
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+23. PATCH the registration with a new endpoint
+==============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+24. GET the registration and see the new endpoint
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 1034
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "status": "active",
+  "endpoint": "http://localhost:1026/go",
+  "P1": 1,
+  "origin": "cache"
+}
+
+
+
+25. PATCH the registration with a new P1
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+26. GET the registration and see the new P1
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 1041
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "status": "active",
+  "endpoint": "http://localhost:1026/go",
+  "P1": "New P1",
+  "origin": "cache"
+}
+
+
+
+27. PATCH the registration with a new and previously non-existing P7
+====================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+28. GET the registration and see P7 (patch adds if didn't exist - see clause 5.5.8 in the NGSi-LD API spec)
+===========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1069
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "New Name",
+  "description": "New Description",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "P1"
+      ],
+      "relationshipNames": [
+        "R1"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2028-12-30T11:12:13.567Z",
+    "endAt": "2028-12-31T10:01:02.459Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-30T10:00:00.111Z",
+    "endAt": "2026-12-31T10:00:00.222Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      1,
+      2
+    ]
+  },
+  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "status": "active",
+  "endpoint": "http://localhost:1026/go",
+  "P1": "New P1",
+  "P7": "New reg-property",
+  "origin": "cache"
+}
+
+
+
+29. See the registration in the database
+========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "New Name",
+	"description" : "New Description",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:E1",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P1",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/R1",
+					"type" : "Relationship"
+				}
+			],
+			"providingApplication" : "http://localhost:1026/go"
+		}
+	],
+	"observationInterval" : {
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
+	},
+	"managementInterval" : {
+		"startAt" : REGEX(.*),
+		"endAt" : REGEX(.*)
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			1,
+			2
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			1,
+			2
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			1,
+			2
+		]
+	},
+	"expiration" : REGEX(.*),
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : "New P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P7" : "New reg-property"
+	},
+	"status" : "active"
+}
+bye
+
+
+30. PATCH all the fields of the registration
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+31. GET the registration and see all the fields updated
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 1190
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "registrationName": "R1-bis",
+  "description": "description of reg R1-bis",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:E30",
+          "type": "T2"
+        },
+        {
+          "id": "urn:ngsi-ld:E31",
+          "type": "T3"
+        }
+      ],
+      "propertyNames": [
+        "P1",
+        "P2",
+        "P3"
+      ]
+    }
+  ],
+  "observationInterval": {
+    "startAt": "2023-12-30T21:22:23.123Z",
+    "endAt": "2024-12-30T21:22:23.456Z"
+  },
+  "managementInterval": {
+    "startAt": "2025-12-09T01:02:03.456Z",
+    "endAt": "2025-12-09T01:02:03.457Z"
+  },
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      51,
+      52.16
+    ]
+  },
+  "observationSpace": {
+    "type": "Point",
+    "coordinates": [
+      41,
+      42.99
+    ]
+  },
+  "operationSpace": {
+    "type": "Point",
+    "coordinates": [
+      31,
+      32.77
+    ]
+  },
+  "expiresAt": "2024-12-31T10:00:19.975Z",
+  "status": "active",
+  "endpoint": "http://my.other.csource.org:1099",
+  "P1": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "P7": "New reg-property",
+  "origin": "cache"
+}
+
+
+
+32. See the registration in the database
+========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"name" : "R1-bis",
+	"description" : "description of reg R1-bis",
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:ngsi-ld:E30",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2"
+				},
+				{
+					"id" : "urn:ngsi-ld:E31",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T3"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P1",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P2",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P3",
+					"type" : "Property"
+				}
+			],
+			"providingApplication" : "http://my.other.csource.org:1099"
+		}
+	],
+	"observationInterval" : {
+		"startAt" : 1703971343.123,
+		"endAt" : 1735593743.456
+	},
+	"managementInterval" : {
+		"startAt" : 1765242123.456,
+		"endAt" : 1765242123.457
+	},
+	"location" : {
+		"type" : "Point",
+		"coordinates" : [
+			51,
+			52.16
+		]
+	},
+	"observationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			41,
+			42.99
+		]
+	},
+	"operationSpace" : {
+		"type" : "Point",
+		"coordinates" : [
+			31,
+			32.77
+		]
+	},
+	"expiration" : 1735639219.975,
+	"properties" : {
+		"https://uri.etsi.org/ngsi-ld/default-context/P1" : [
+			1,
+			2,
+			3,
+			4
+		],
+		"https://uri.etsi.org/ngsi-ld/default-context/P7" : "New reg-property"
+	},
+	"status" : "active"
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

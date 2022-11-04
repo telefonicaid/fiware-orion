@@ -32,11 +32,11 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
-#include "orionld/mongoc/mongocEntityReplace.h"                  // mongocEntityReplace
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
+#include "orionld/mongoc/mongocEntityReplace.h"                  // mongocEntityReplace
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
@@ -228,7 +228,7 @@ static KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, con
 //
 bool orionldPutEntity(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
   {
     orionldError(OrionldResourceNotFound, "Service Not Found", orionldState.urlPath, 404);
     return false;

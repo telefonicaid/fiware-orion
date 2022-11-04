@@ -73,14 +73,14 @@ bool pCheckGeoPolygonCoordinates(KjNode* coordinatesP)
       if (memberP->type != KjArray)
       {
         LM_W(("Bad Input (a member of Polygon must be a JSON Array)"));
-        orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'", 400);
+        orionldError(OrionldBadRequestData, "Invalid GeoJSON", "Non-Array in 'coordinates' for a 'Polygon'", 400);
         return false;
       }
 
       if (pCheckGeoPointCoordinates(memberP) == false)
       {
-        LM_W(("Bad Input (one of the points of one of therings is not a valid point"));
-        orionldError(OrionldBadRequestData, "Invalid GeoJSON", "'coordinates' in a 'Polygon' must be a JSON Array of 'Rings' that are JSON Arrays of 'Point'", 400);
+        // orionldError called by pCheckGeoPointCoordinates
+        LM_W(("Bad Input (one of the points of one of the rings is not a valid point"));
         return false;
       }
 

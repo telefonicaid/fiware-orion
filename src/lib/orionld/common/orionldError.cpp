@@ -60,7 +60,7 @@ void orionldError
   orionldState.pd.detail  = (detail != NULL)? kaStrdup(&orionldState.kalloc, detail) : NULL;
   orionldState.pd.status  = status;
 
-  orionldState.httpStatusCode = status;  // FIXME: To Remove - Use orionldState.pd.status instead
+  orionldState.httpStatusCode = status;  // FIXME: To Remove - Use orionldState.pd.status instead?
 
   LM_E(("***** ERROR %s: %s (status code: %d)", title, detail, status));
 }

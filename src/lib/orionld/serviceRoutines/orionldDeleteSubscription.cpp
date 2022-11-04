@@ -23,7 +23,6 @@
 * Author: Ken Zangelin and Gabriel Quaresma
 */
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
 #include "common/globals.h"                                      // noCache
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup, ...
@@ -46,7 +45,7 @@
 //
 bool orionldDeleteSubscription(void)
 {
-  if (experimental == false)
+  if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyDeleteSubscription();
 
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Subscription Identifier", orionldState.wildcard[0], 400);

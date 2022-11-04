@@ -46,34 +46,34 @@ brokerStart CB
 echo "01. Create 1 registration with ALL fields"
 echo "========================================="
 payload='{
-	"@context": [
-		"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
-	],
-	"id": "urn:ngsi-ld:ContextSourceRegistration:REG1",
-	"type": "ContextSourceRegistration",
-	"name": "REG1",
-	"description": "Description of REG1",
-	"information": [
-		{
-			"entities": [
-				{
-					"id": "urn:ngsi-ld:Building:A456",
-					"type": "Building"
-				}
-			],
-			"properties": [ "size", "high" ],
-			"relationships": [ "isAvailable" ]
-		}
-	],
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:REG1",
+  "type": "ContextSourceRegistration",
+  "name": "REG1",
+  "description": "Description of REG1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Building:A456",
+          "type": "Building"
+        }
+      ],
+      "properties": [ "size", "high" ],
+      "relationships": [ "isAvailable" ]
+    }
+  ],
     "location": {
         "type": "Polygon",
         "coordinates": [
             [
-                [ 100.0, 0.0 ],
-                [ 101.0, 0.0 ],
-                [ 101.0, 1.0 ],
-                [ 100.0, 1.0 ],
-                [ 100.0, 0.0 ]
+                [ 80.0, 0.0 ],
+                [ 81.0, 0.0 ],
+                [ 81.0, 1.0 ],
+                [ 80.0, 1.0 ],
+                [ 80.0, 0.0 ]
             ]
         ]
     },
@@ -81,11 +81,11 @@ payload='{
         "type": "Polygon",
         "coordinates": [
             [
-                [ 200.0, 0.0 ],
-                [ 201.0, 0.0 ],
-                [ 201.0, 1.0 ],
-                [ 200.0, 1.0 ],
-                [ 200.0, 0.0 ]
+                [ 80.0, 0.0 ],
+                [ 81.0, 0.0 ],
+                [ 81.0, 1.0 ],
+                [ 80.0, 1.0 ],
+                [ 80.0, 0.0 ]
             ]
         ]
     },
@@ -93,53 +93,54 @@ payload='{
         "type": "Polygon",
         "coordinates": [
             [
-                [ 300.0, 0.0 ],
-                [ 301.0, 0.0 ],
-                [ 301.0, 1.0 ],
-                [ 300.0, 1.0 ],
-                [ 300.0, 0.0 ]
+                [ 80.0, 0.0 ],
+                [ 81.0, 0.0 ],
+                [ 81.0, 1.0 ],
+                [ 80.0, 1.0 ],
+                [ 80.0, 0.0 ]
             ]
         ]
     },
-	"observationInterval": {
-        "start": "2018-12-31T10:00:00",
-        "end": "2028-12-31T10:00:00"
+  "observationInterval": {
+        "startAt": "2018-12-31T10:00:00",
+        "endAt": "2028-12-31T10:00:00"
     },
     "managementInterval": {
-        "start": "2018-12-31T10:00:00",
-        "end": "2028-12-31T10:00:00"
+        "startAt": "2018-12-31T10:00:00",
+        "endAt": "2028-12-31T10:00:00"
     },
-	"expires": "2029-10-31T10:00:25",
-	"endpoint": "http://my.csource.org:1026"
+  "expiresAt": "2029-10-31T10:00:25",
+  "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 REG_ID=urn:ngsi-ld:ContextSourceRegistration:REG1
 echo
 echo
 
+
 echo "02. Create 1 registration without name, observationInterval and managementInterval"
 echo "=================================================================================="
 payload='{
-	"@context": [
-		"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
-	],
-	"id": "urn:ngsi-ld:ContextSourceRegistration:REG2",
-	"type": "ContextSourceRegistration",
-	"description": "Description of REG2",
-	"information": [
-		{
-			"entities": [
-				{
-					"id": "urn:ngsi-ld:Vehicle:A456",
-					"type": "Vehicle"
-				}
-			],
-			"properties": [ "brandName", "speed" ],
-			"relationships": [ "isParked" ]
-		}
-	],
-	"expires": "2029-10-31T10:00:25",
-	"endpoint": "http://my.csource.org:1026"
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  ],
+  "id": "urn:ngsi-ld:ContextSourceRegistration:REG2",
+  "type": "ContextSourceRegistration",
+  "description": "Description of REG2",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:ngsi-ld:Vehicle:A456",
+          "type": "Vehicle"
+        }
+      ],
+      "properties": [ "brandName", "speed" ],
+      "relationships": [ "isParked" ]
+    }
+  ],
+  "expiresAt": "2029-10-31T10:00:25",
+  "endpoint": "http://my.csource.org:1026"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 REG_ID2=urn:ngsi-ld:ContextSourceRegistration:REG2
@@ -183,7 +184,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 03. GET /ngsi-ld/v1/csourceRegistrations/REG_ID
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 819
+Content-Length: 814
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -191,7 +192,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "description": "Description of REG1",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2029-10-31T10:00:25.000Z",
+    "expiresAt": "2029-10-31T10:00:25.000Z",
     "id": "urn:ngsi-ld:ContextSourceRegistration:REG1",
     "information": [
         {
@@ -214,23 +215,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "coordinates": [
             [
                 [
-                    100,
+                    80,
                     0
                 ],
                 [
-                    101,
+                    81,
                     0
                 ],
                 [
-                    101,
+                    81,
                     1
                 ],
                 [
-                    100,
+                    80,
                     1
                 ],
                 [
-                    100,
+                    80,
                     0
                 ]
             ]
@@ -238,35 +239,35 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Polygon"
     },
     "managementInterval": {
-        "end": "2028-12-31T10:00:00.000Z",
-        "start": "2018-12-31T10:00:00.000Z"
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
     },
     "name": "REG1",
     "observationInterval": {
-        "end": "2028-12-31T10:00:00.000Z",
-        "start": "2018-12-31T10:00:00.000Z"
+        "endAt": "2028-12-31T10:00:00.000Z",
+        "startAt": "2018-12-31T10:00:00.000Z"
     },
     "observationSpace": {
         "coordinates": [
             [
                 [
-                    200,
+                    80,
                     0
                 ],
                 [
-                    201,
+                    81,
                     0
                 ],
                 [
-                    201,
+                    81,
                     1
                 ],
                 [
-                    200,
+                    80,
                     1
                 ],
                 [
-                    200,
+                    80,
                     0
                 ]
             ]
@@ -277,23 +278,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "coordinates": [
             [
                 [
-                    300,
+                    80,
                     0
                 ],
                 [
-                    301,
+                    81,
                     0
                 ],
                 [
-                    301,
+                    81,
                     1
                 ],
                 [
-                    300,
+                    80,
                     1
                 ],
                 [
-                    300,
+                    80,
                     0
                 ]
             ]
@@ -307,7 +308,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. GET /ngsi-ld/v1/csourceRegistrations/REG_ID2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 345
+Content-Length: 347
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -315,7 +316,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "description": "Description of REG2",
     "endpoint": "http://my.csource.org:1026",
-    "expires": "2029-10-31T10:00:25.000Z",
+    "expiresAt": "2029-10-31T10:00:25.000Z",
     "id": "urn:ngsi-ld:ContextSourceRegistration:REG2",
     "information": [
         {

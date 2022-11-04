@@ -60,22 +60,22 @@ payload='{
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00.123Z",
-    "end": "2028-12-31T10:00:00.456Z"
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2027-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2027-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Polygon",
     "coordinates": [
       [
-        [ 100.0, 0.0 ],
-        [ 101.0, 0.0 ],
-        [ 101.0, 1.0 ],
-        [ 100.0, 1.0 ],
-        [ 100.0, 0.0 ]
+        [ 80.0, 0.0 ],
+        [ 81.0, 0.0 ],
+        [ 81.0, 1.0 ],
+        [ 80.0, 1.0 ],
+        [ 80.0, 0.0 ]
       ]
     ]
   },
@@ -83,11 +83,11 @@ payload='{
     "type": "Polygon",
     "coordinates": [
       [
-        [ 200.0, 0.0 ],
-        [ 201.0, 0.0 ],
-        [ 201.0, 1.0 ],
-        [ 200.0, 1.0 ],
-        [ 200.0, 0.0 ]
+        [ 80.0, 0.0 ],
+        [ 81.0, 0.0 ],
+        [ 81.0, 1.0 ],
+        [ 80.0, 1.0 ],
+        [ 80.0, 0.0 ]
       ]
     ]
   },
@@ -95,15 +95,15 @@ payload='{
     "type": "Polygon",
     "coordinates": [
       [
-        [ 300.0, 0.0 ],
-        [ 301.0, 0.0 ],
-        [ 301.0, 1.0 ],
-        [ 300.0, 1.0 ],
-        [ 300.0, 0.0 ]
+        [ 80.0, 0.0 ],
+        [ 81.0, 0.0 ],
+        [ 81.0, 1.0 ],
+        [ 80.0, 1.0 ],
+        [ 80.0, 0.0 ]
       ]
     ]
   },
-  "expires": "2028-12-31T10:00:00.123Z",
+  "expiresAt": "2028-12-31T10:00:00.123Z",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1,
   "P2": "2",
@@ -227,35 +227,35 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : 1546250400.123,
-		"end" : 1861869600.456
+		"startAt" : 1546250400.123,
+		"endAt" : 1861869600.456
 	},
 	"managementInterval" : {
-		"start" : 1514714400.789,
-		"end" : 1830247200.012
+		"startAt" : 1514714400.789,
+		"endAt" : 1830247200.012
 	},
 	"location" : {
 		"type" : "Polygon",
 		"coordinates" : [
 			[
 				[
-					100,
+					80,
 					0
 				],
 				[
-					101,
+					81,
 					0
 				],
 				[
-					101,
+					81,
 					1
 				],
 				[
-					100,
+					80,
 					1
 				],
 				[
-					100,
+					80,
 					0
 				]
 			]
@@ -266,23 +266,23 @@ MongoDB server version: REGEX(.*)
 		"coordinates" : [
 			[
 				[
-					200,
+					80,
 					0
 				],
 				[
-					201,
+					81,
 					0
 				],
 				[
-					201,
+					81,
 					1
 				],
 				[
-					200,
+					80,
 					1
 				],
 				[
-					200,
+					80,
 					0
 				]
 			]
@@ -293,23 +293,23 @@ MongoDB server version: REGEX(.*)
 		"coordinates" : [
 			[
 				[
-					300,
+					80,
 					0
 				],
 				[
-					301,
+					81,
 					0
 				],
 				[
-					301,
+					81,
 					1
 				],
 				[
-					300,
+					80,
 					1
 				],
 				[
-					300,
+					80,
 					0
 				]
 			]
@@ -335,7 +335,7 @@ bye
 03. GET the registration
 ========================
 HTTP/1.1 200 OK
-Content-Length: 1821
+Content-Length: 1816
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -344,7 +344,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
   "type": "ContextSourceRegistration",
   "description": "description of reg R1",
-  "expires": "2028-12-31T10:00:00.123Z",
+  "expiresAt": "2028-12-31T10:00:00.123Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -364,35 +364,35 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00.123Z",
-    "end": "2028-12-31T10:00:00.456Z"
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2027-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2027-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Polygon",
     "coordinates": [
       [
         [
-          100,
+          80,
           0
         ],
         [
-          101,
+          81,
           0
         ],
         [
-          101,
+          81,
           1
         ],
         [
-          100,
+          80,
           1
         ],
         [
-          100,
+          80,
           0
         ]
       ]
@@ -403,23 +403,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "coordinates": [
       [
         [
-          200,
+          80,
           0
         ],
         [
-          201,
+          81,
           0
         ],
         [
-          201,
+          81,
           1
         ],
         [
-          200,
+          80,
           1
         ],
         [
-          200,
+          80,
           0
         ]
       ]
@@ -430,23 +430,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "coordinates": [
       [
         [
-          300,
+          80,
           0
         ],
         [
-          301,
+          81,
           0
         ],
         [
-          301,
+          81,
           1
         ],
         [
-          300,
+          80,
           1
         ],
         [
-          300,
+          80,
           0
         ]
       ]
@@ -516,35 +516,35 @@ MongoDB server version: REGEX(.*)
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"observationInterval" : {
-		"start" : 1546250400.123,
-		"end" : 1861869600.456
+		"startAt" : 1546250400.123,
+		"endAt" : 1861869600.456
 	},
 	"managementInterval" : {
-		"start" : 1514714400.789,
-		"end" : 1830247200.012
+		"startAt" : 1514714400.789,
+		"endAt" : 1830247200.012
 	},
 	"location" : {
 		"type" : "Polygon",
 		"coordinates" : [
 			[
 				[
-					100,
+					80,
 					0
 				],
 				[
-					101,
+					81,
 					0
 				],
 				[
-					101,
+					81,
 					1
 				],
 				[
-					100,
+					80,
 					1
 				],
 				[
-					100,
+					80,
 					0
 				]
 			]
@@ -555,23 +555,23 @@ MongoDB server version: REGEX(.*)
 		"coordinates" : [
 			[
 				[
-					200,
+					80,
 					0
 				],
 				[
-					201,
+					81,
 					0
 				],
 				[
-					201,
+					81,
 					1
 				],
 				[
-					200,
+					80,
 					1
 				],
 				[
-					200,
+					80,
 					0
 				]
 			]
@@ -582,23 +582,23 @@ MongoDB server version: REGEX(.*)
 		"coordinates" : [
 			[
 				[
-					300,
+					80,
 					0
 				],
 				[
-					301,
+					81,
 					0
 				],
 				[
-					301,
+					81,
 					1
 				],
 				[
-					300,
+					80,
 					1
 				],
 				[
-					300,
+					80,
 					0
 				]
 			]
@@ -625,7 +625,7 @@ bye
 06. GET the registration, see 'name' and the new value for 'description'
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 1852
+Content-Length: 1847
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -635,7 +635,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "Modified description of reg R1",
-  "expires": "2028-12-31T10:00:00.123Z",
+  "expiresAt": "2028-12-31T10:00:00.123Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -655,35 +655,35 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00.123Z",
-    "end": "2028-12-31T10:00:00.456Z"
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2027-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2027-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Polygon",
     "coordinates": [
       [
         [
-          100,
+          80,
           0
         ],
         [
-          101,
+          81,
           0
         ],
         [
-          101,
+          81,
           1
         ],
         [
-          100,
+          80,
           1
         ],
         [
-          100,
+          80,
           0
         ]
       ]
@@ -694,23 +694,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "coordinates": [
       [
         [
-          200,
+          80,
           0
         ],
         [
-          201,
+          81,
           0
         ],
         [
-          201,
+          81,
           1
         ],
         [
-          200,
+          80,
           1
         ],
         [
-          200,
+          80,
           0
         ]
       ]
@@ -721,23 +721,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "coordinates": [
       [
         [
-          300,
+          80,
           0
         ],
         [
-          301,
+          81,
           0
         ],
         [
-          301,
+          81,
           1
         ],
         [
-          300,
+          80,
           1
         ],
         [
-          300,
+          80,
           0
         ]
       ]
@@ -768,7 +768,7 @@ Date: REGEX(.*)
 08. GET the registration, see the new value for 'endpoint'
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 1853
+Content-Length: 1848
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -778,7 +778,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "Modified description of reg R1",
-  "expires": "2028-12-31T10:00:00.123Z",
+  "expiresAt": "2028-12-31T10:00:00.123Z",
   "endpoint": "http://new.csource.org:0707",
   "information": [
     {
@@ -798,35 +798,35 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     }
   ],
   "observationInterval": {
-    "start": "2018-12-31T10:00:00.123Z",
-    "end": "2028-12-31T10:00:00.456Z"
+    "startAt": "2018-12-31T10:00:00.123Z",
+    "endAt": "2028-12-31T10:00:00.456Z"
   },
   "managementInterval": {
-    "start": "2017-12-31T10:00:00.789Z",
-    "end": "2027-12-31T10:00:00.012Z"
+    "startAt": "2017-12-31T10:00:00.789Z",
+    "endAt": "2027-12-31T10:00:00.012Z"
   },
   "location": {
     "type": "Polygon",
     "coordinates": [
       [
         [
-          100,
+          80,
           0
         ],
         [
-          101,
+          81,
           0
         ],
         [
-          101,
+          81,
           1
         ],
         [
-          100,
+          80,
           1
         ],
         [
-          100,
+          80,
           0
         ]
       ]
@@ -837,23 +837,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "coordinates": [
       [
         [
-          200,
+          80,
           0
         ],
         [
-          201,
+          81,
           0
         ],
         [
-          201,
+          81,
           1
         ],
         [
-          200,
+          80,
           1
         ],
         [
-          200,
+          80,
           0
         ]
       ]
@@ -864,23 +864,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "coordinates": [
       [
         [
-          300,
+          80,
           0
         ],
         [
-          301,
+          81,
           0
         ],
         [
-          301,
+          81,
           1
         ],
         [
-          300,
+          80,
           1
         ],
         [
-          300,
+          80,
           0
         ]
       ]

@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/q/qLex.h"                                      // qLex
 #include "orionld/q/qParse.h"                                    // qParse
+#include "orionld/payloadCheck/fieldPaths.h"                     // PostQueryEntitiesPath, ...
 #include "orionld/payloadCheck/pcheckEntityInfoArray.h"          // pcheckEntityInfoArray
 #include "orionld/payloadCheck/pcheckAttrs.h"                    // pcheckAttrs
 #include "orionld/payloadCheck/pcheckQ.h"                        // pcheckQ
@@ -53,13 +54,13 @@ extern "C"
 //
 static bool pcheckQueryEntities(KjNode* entitiesP)
 {
-  ARRAY_CHECK(entitiesP, "Query::entities");
-  EMPTY_ARRAY_CHECK(entitiesP, "Query::entities");
+  ARRAY_CHECK(entitiesP, PostQueryEntitiesPath);
+  EMPTY_ARRAY_CHECK(entitiesP, PostQueryEntitiesPath);
 
   for (KjNode* entitySelectorP = entitiesP->value.firstChildP; entitySelectorP != NULL; entitySelectorP = entitySelectorP->next)
   {
-    OBJECT_CHECK(entitySelectorP, "Query::entities[X]");
-    EMPTY_OBJECT_CHECK(entitySelectorP, "Query::entities[X]");
+    OBJECT_CHECK(entitySelectorP, PostQueryEntitiesItemPath);
+    EMPTY_OBJECT_CHECK(entitySelectorP, PostQueryEntitiesItemPath);
 
     KjNode* typeP       = NULL;
     KjNode* idP         = NULL;
@@ -69,20 +70,20 @@ static bool pcheckQueryEntities(KjNode* entitiesP)
     {
       if (strcmp(selectorItemP->name, "id") == 0)
       {
-        DUPLICATE_CHECK(idP, "Query::entities[X]::id", selectorItemP);
-        STRING_CHECK(idP, "Query::entities[X]::id");
-        URI_CHECK(idP->value.s, "Query::entities[X]::id", true);
+        DUPLICATE_CHECK(idP, PostQueryEntitiesIdPath, selectorItemP);
+        STRING_CHECK(idP, PostQueryEntitiesIdPath);
+        URI_CHECK(idP->value.s, PostQueryEntitiesIdPath, true);
       }
       else if (strcmp(selectorItemP->name, "type") == 0)
       {
-        DUPLICATE_CHECK(typeP, "Query::entities[X]::type", selectorItemP);
-        STRING_CHECK(typeP, "Query::entities[X]::type");
-        URI_CHECK(typeP->value.s, "Query::entities[X]::type", false);
+        DUPLICATE_CHECK(typeP, PostQueryEntitiesTypePath, selectorItemP);
+        STRING_CHECK(typeP, PostQueryEntitiesTypePath);
+        URI_CHECK(typeP->value.s, PostQueryEntitiesTypePath, false);
       }
       else if (strcmp(selectorItemP->name, "idPattern") == 0)
       {
-        DUPLICATE_CHECK(idPatternP, "Query::entities[X]::idPattern", selectorItemP);
-        STRING_CHECK(idPatternP, "Query::entities[X]::idPattern");
+        DUPLICATE_CHECK(idPatternP, PostQueryEntitiesIdPatternPath, selectorItemP);
+        STRING_CHECK(idPatternP, PostQueryEntitiesIdPatternPath);
       }
       else
       {
@@ -93,7 +94,7 @@ static bool pcheckQueryEntities(KjNode* entitiesP)
 
     if (typeP == NULL)
     {
-      orionldError(OrionldBadRequestData, "Mandatory field missing", "Query::entities[X]::type", 400);
+      orionldError(OrionldBadRequestData, "Mandatory field missing", PostQueryEntitiesTypePath, 400);
       return false;
     }
   }
@@ -193,7 +194,7 @@ bool pcheckQuery(KjNode* tree, KjNode** entitiesPP, KjNode** attrsPP, QNode** qT
     return false;
   }
 
-  if ((entitiesP != NULL) && (pcheckEntityInfoArray(entitiesP, false, "Query::entities") == false))
+  if ((entitiesP != NULL) && (pcheckEntityInfoArray(entitiesP, false, PostQueryEntitiesPathV) == false))
     return false;
   if ((attrsP != NULL) && (pcheckAttrs(attrsP) == false))
     return false;

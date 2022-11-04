@@ -148,8 +148,8 @@ void mongoSetLdObservationInterval(ngsiv2::Registration* reg, const mongo::BSONO
     mongo::BSONObj obj;
     getObjectFieldF(&obj, &r, REG_OBSERVATION_INTERVAL);
 
-    reg->observationInterval.start  = getNumberFieldAsDoubleF(&obj, REG_INTERVAL_START);
-    reg->observationInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(&obj, REG_INTERVAL_END) : -1;
+    reg->observationInterval.start  = getNumberFieldAsDoubleF(&obj, "startAt");
+    reg->observationInterval.end    = obj.hasField("endAt") ? getNumberFieldAsDoubleF(&obj, "endAt") : -1;
   }
   else
   {
@@ -171,8 +171,8 @@ void mongoSetLdManagementInterval(ngsiv2::Registration* reg, const mongo::BSONOb
     mongo::BSONObj obj;
     getObjectFieldF(&obj, &r, REG_MANAGEMENT_INTERVAL);
 
-    reg->managementInterval.start  = getNumberFieldAsDoubleF(&obj, REG_INTERVAL_START);
-    reg->managementInterval.end    = obj.hasField(REG_INTERVAL_END) ? getNumberFieldAsDoubleF(&obj, REG_INTERVAL_END) : -1;
+    reg->managementInterval.start  = getNumberFieldAsDoubleF(&obj, "startAt");
+    reg->managementInterval.end    = obj.hasField("endAt") ? getNumberFieldAsDoubleF(&obj, "endAt") : -1;
   }
   else
   {

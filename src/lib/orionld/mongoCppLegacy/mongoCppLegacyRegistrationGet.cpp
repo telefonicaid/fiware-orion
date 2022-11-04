@@ -76,16 +76,29 @@ KjNode* mongoCppLegacyRegistrationGet(const char* registrationId)
 
   cursorP = connectionP->query(orionldState.tenantP->registrations, query);
 
-  mongo::BSONObj  bsonObj = cursorP->nextSafe();
+  mongo::BSONObj  bsonObj;
+  bool            ok = true;
+  try
+  {
+    bsonObj = cursorP->nextSafe();
+  }
+  catch (const std::exception &e)
+  {
+    LM_E(("Database Error (%s)", e.what()));
+    ok = false;
+  }
 
-  char*    title;
-  char*    details;
-  KjNode*  registrationP;
+  KjNode* registrationP = NULL;
+  if (ok)
+  {
+    char*    title;
+    char*    details;
 
-  registrationP = dbDataToKjTree(&bsonObj, false, &title, &details);
+    registrationP = dbDataToKjTree(&bsonObj, false, &title, &details);
 
-  if (registrationP == NULL)
-    LM_E(("%s: %s", title, details));
+    if (registrationP == NULL)
+      LM_E(("%s: %s", title, details));
+  }
 
   releaseMongoConnection(connectionP);
 

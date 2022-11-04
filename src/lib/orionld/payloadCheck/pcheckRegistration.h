@@ -38,7 +38,7 @@ extern "C"
 //
 // This function makes sure that the incoming payload is OK
 // - all types are as they should
-// - the values with special needs are correct (if DataTikme for example)
+// - the values with special needs are correct (DateTime for example)
 // - no field is duplicated
 // - etc
 //
@@ -54,6 +54,6 @@ extern "C"
 // as a KjNode tree, until we are able to perform this check.
 // The output parameter 'propertyTreeP' is used for this purpose.
 //
-extern bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, KjNode**  propertyTreeP);
+extern bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creation, KjNode**  propertyTreeP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKREGISTRATION_H_
