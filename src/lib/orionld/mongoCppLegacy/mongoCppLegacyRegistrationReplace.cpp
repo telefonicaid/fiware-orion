@@ -33,10 +33,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState
-
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree, dbDataFromKjTree
+
+#include "orionld/common/orionldState.h"                                // orionldState
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"       // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationReplace.h"   // Own interface
 
 
@@ -50,7 +50,7 @@ bool mongoCppLegacyRegistrationReplace(const char* registrationId, KjNode* dbReg
   mongo::BSONObj  payloadAsBsonObj;
   bool            ok = true;
 
-  dbDataFromKjTree(dbRegistrationP, &payloadAsBsonObj);
+  mongoCppLegacyKjTreeToBsonObj(dbRegistrationP, &payloadAsBsonObj);
 
   //
   // Populate filter - only Registration ID for this operation

@@ -69,6 +69,7 @@ extern "C"
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
 #include "orionld/kjTree/kjEntityArrayErrorPurge.h"            // kjEntityArrayErrorPurge
 #include "orionld/payloadCheck/pCheckEntity.h"                 // pCheckEntity
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"   // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/legacyDriver/legacyPostBatchUpdate.h"        // Own Interface
 
 
@@ -154,8 +155,8 @@ bool legacyPostBatchUpdate(void)
   // 02. Check whether some ID from idArray does not exist - that would be an error for Batch Update
   //     Check also that the entity type is the same, if given in the request
   //
-  KjNode* idTypeAndCreDateFromDb = dbEntityListLookupWithIdTypeCreDate(idArray, true);  // true: include attrNames array
-  kjTreeLog(idTypeAndCreDateFromDb, "TYPES: From dbEntityListLookupWithIdTypeCreDate");
+  KjNode* idTypeAndCreDateFromDb = mongoCppLegacyEntityListLookupWithIdTypeCreDate(idArray, true);  // true: include attrNames array
+  kjTreeLog(idTypeAndCreDateFromDb, "TYPES: From mongoCppLegacyEntityListLookupWithIdTypeCreDate");
   KjNode* entityP;
 
   if (idTypeAndCreDateFromDb == NULL)

@@ -36,7 +36,8 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
 #include "orionld/common/entityErrorPush.h"                    // entityErrorPush
-#include "orionld/db/dbConfiguration.h"                        // dbEntitiesDelete, dbEntityListLookupWithIdTypeCreDate
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesDelete.h"                      // mongoCppLegacyEntitiesDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"   // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_STRING, PCHECK_URI
 #include "orionld/legacyDriver/legacyPostBatchDelete.h"        // Own interface
 
@@ -80,7 +81,7 @@ bool legacyPostBatchDelete(void)
   //
   // First get the entities from database to check which exist
   //
-  KjNode* dbEntities = dbEntityListLookupWithIdTypeCreDate(orionldState.requestTree, false);
+  KjNode* dbEntities = mongoCppLegacyEntityListLookupWithIdTypeCreDate(orionldState.requestTree, false);
 
   //
   // Now loop in the array of entities from database and compare each id with the id from requestTree
@@ -151,11 +152,11 @@ bool legacyPostBatchDelete(void)
   //
   // Call batch delete function
   //
-  if ((orionldState.requestTree->value.firstChildP != NULL) && (dbEntitiesDelete(orionldState.requestTree) == false))
+  if ((orionldState.requestTree->value.firstChildP != NULL) && (mongoCppLegacyEntitiesDelete(orionldState.requestTree) == false))
   {
-    LM_E(("Database Error (dbEntitiesDelete returned error)"));
+    LM_E(("Database Error (mongoCppLegacyEntitiesDelete returned error)"));
     orionldState.httpStatusCode = 500;
-    orionldError(OrionldBadRequestData, "Database Error", "dbEntitiesDelete", 400);
+    orionldError(OrionldBadRequestData, "Database Error", "mongoCppLegacyEntitiesDelete", 400);
 
     return false;
   }

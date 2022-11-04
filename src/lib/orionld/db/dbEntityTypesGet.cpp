@@ -41,7 +41,8 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"         // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjStringValueLookupInArray.h"             // kjStringValueLookupInArray
 #include "orionld/kjTree/kjStringArraySortedInsert.h"              // kjStringArraySortedInsert
-#include "orionld/db/dbConfiguration.h"                            // dbEntityTypesFromRegistrationsGet, dbEntitiesGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesGet.h"                      // mongoCppLegacyEntitiesGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // mongoCppLegacyEntityTypesFromRegistrationsGet
 #include "orionld/mongoc/mongocEntitiesGet.h"                      // mongocEntitiesGet
 #include "orionld/mongoc/mongocEntityTypesFromRegistrationsGet.h"  // mongocEntityTypesFromRegistrationsGet
 #include "orionld/db/dbEntityTypesGet.h"                           // Own interface
@@ -325,8 +326,9 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP, bool details)
   //
   // Need to use local function pointers to not alter the global state of the broker
   //
-  DbEntitiesGet                     entitiesGet                     = dbEntitiesGet;
-  DbEntityTypesFromRegistrationsGet entityTypesFromRegistrationsGet = dbEntityTypesFromRegistrationsGet;
+  DbEntitiesGet                     entitiesGet                     = mongoCppLegacyEntitiesGet;
+  DbEntityTypesFromRegistrationsGet entityTypesFromRegistrationsGet = mongoCppLegacyEntityTypesFromRegistrationsGet;
+
   if (experimental == true)
   {
     if (orionldState.in.legacy == NULL)

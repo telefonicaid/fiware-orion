@@ -66,7 +66,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                               // dotForEq
 #include "orionld/common/eqForDot.h"                               // eqForDot
 #include "orionld/common/tenantList.h"                             // tenant0
-#include "orionld/db/dbConfiguration.h"                            // dbDataFromKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"     // mongoCppLegacyDataToKjTree
 #include "orionld/kjTree/kjSort.h"                                 // kjSort
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"                // kjTreeFromCompoundValue
@@ -3244,7 +3244,7 @@ static bool createEntity
   {
     mongo::BSONObj  datasetsObj;
 
-    dbDataFromKjTree(orionldState.datasets, &datasetsObj);
+    mongoCppLegacyKjTreeToBsonObj(orionldState.datasets, &datasetsObj);
     insertedDoc.append(orionldState.datasets->name, datasetsObj);
   }
 

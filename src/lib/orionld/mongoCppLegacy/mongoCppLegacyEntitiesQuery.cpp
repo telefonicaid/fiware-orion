@@ -39,8 +39,8 @@ extern "C"
 #include "orionld/common/SCOMPARE.h"                               // SCOMPARE
 #include "orionld/q/QNode.h"                                       // QNode
 #include "orionld/q/qTreeToBsonObj.h"                              // qTreeToBsonObj
-#include "orionld/db/dbConfiguration.h"                            // dbDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"     // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesQuery.h"    // Own interface
 
 
@@ -551,9 +551,9 @@ KjNode* mongoCppLegacyEntitiesQuery(KjNode* entityInfoArrayP, KjNode* attrsP, QN
         char*           details;
         KjNode*         entityP;
 
-        entityP = dbDataToKjTree(&bsonObj, false, &title, &details);
+        entityP = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &details);
         if (entityP == NULL)
-          LM_E(("dbDataToKjTree: %s: %s", title, details));
+          LM_E(("mongoCppLegacyDataToKjTree: %s: %s", title, details));
 
         kjChildAdd(arrayP, entityP);
       }

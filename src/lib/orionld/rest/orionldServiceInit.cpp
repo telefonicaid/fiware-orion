@@ -518,7 +518,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 //
 // This function converts the OrionLdRestServiceSimplified vectors to OrionLdRestService vectors
 //
-void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems, char* cachedContextDir)
+void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems)
 {
   bzero(orionldRestServiceV, sizeof(orionldRestServiceV));
 

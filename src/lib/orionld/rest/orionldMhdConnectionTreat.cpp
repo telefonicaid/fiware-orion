@@ -65,7 +65,7 @@ extern "C"
 #include "orionld/prometheus/promCounterIncrease.h"              // promCounterIncrease
 #include "orionld/mongoc/mongocTenantExists.h"                   // mongocTenantExists
 #include "orionld/mongoc/mongocGeoIndexCreate.h"                 // mongocGeoIndexCreate
-#include "orionld/db/dbConfiguration.h"                          // dbGeoIndexCreate
+#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"  // mongoCppLegacyGeoIndexCreate
 #include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
 #include "orionld/kjTree/kjNodeDecouple.h"                       // kjNodeDecouple
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
@@ -554,7 +554,7 @@ static void dbGeoIndexes(void)
       if (experimental)
         mongocGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
       else
-        dbGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
+        mongoCppLegacyGeoIndexCreate(orionldState.tenantP, orionldState.geoAttrV[ix]->name);
     }
   }
   // sem_give

@@ -47,7 +47,8 @@ extern "C"
 #include "orionld/kjTree/kjStringArraySortedInsert.h"              // kjStringArraySortedInsert
 #include "orionld/mongoc/mongocEntitiesGet.h"                      // mongocEntitiesGet
 #include "orionld/mongoc/mongocEntityTypesFromRegistrationsGet.h"  // mongocEntityTypesFromRegistrationsGet
-#include "orionld/db/dbConfiguration.h"                            // dbEntityTypesFromRegistrationsGet, dbEntitiesGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesGet.h"                      // mongoCppLegacyEntitiesGet
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypesFromRegistrationsGet.h"  // mongoCppLegacyEntityTypesFromRegistrationsGet
 #include "orionld/db/dbEntityAttributesGet.h"                      // Own interface
 
 
@@ -82,7 +83,7 @@ static KjNode* getEntityAttributesResponse(KjNode* sortedArrayP)
 //
 // PARAMETERS
 // - outArray: The result of the operation
-// - local:    The output from dbEntitiesGet(attrNames), which is an array of the attrNames field of matching entities, e.g.:
+// - local:    The output from xxxEntitiesGet(attrNames), which is an array of the attrNames field of matching entities, e.g.:
 //               [
 //                 { "attrNames": ["https://uri.etsi.org/ngsi-ld/default-context/P1","https://uri.etsi.org/ngsi-ld/default-context/P2"] },
 //                 { "attrNames": ["https://uri.etsi.org/ngsi-ld/default-context/P2","https://uri.etsi.org/ngsi-ld/default-context/R1"] },
@@ -146,7 +147,7 @@ static void localAttrNamesExtract(KjNode* outArray, KjNode* local)
 //
 // PARAMETERS
 // - outArray: The result of the operation
-// - remote:   The output from dbEntityTypesFromRegistrationsGet(details=true), which is an array of
+// - remote:   The output from xxxEntityTypesFromRegistrationsGet(details=true), which is an array of
 //             [
 //               {
 //                "id": "urn:ngsi-ld:entity:E1",
@@ -210,8 +211,8 @@ static KjNode* dbEntityAttributesGetWithoutDetails(OrionldProblemDetails* pdP)
   //
   // Need to use local function pointers to not alter the global state of the broker
   //
-  DbEntitiesGet                     entitiesGet                     = dbEntitiesGet;
-  DbEntityTypesFromRegistrationsGet entityTypesFromRegistrationsGet = dbEntityTypesFromRegistrationsGet;
+  DbEntitiesGet                     entitiesGet                     = mongoCppLegacyEntitiesGet;
+  DbEntityTypesFromRegistrationsGet entityTypesFromRegistrationsGet = mongoCppLegacyEntityTypesFromRegistrationsGet;
   if (experimental == true)
   {
     if (orionldState.in.legacy == NULL)
@@ -416,7 +417,7 @@ static KjNode* attributeLookup(KjNode* attrV, char* attrLongName)
 //   { ... }
 // ]
 //
-// The output from dbEntitiesGet looks like this;
+// The output from xxxEntitiesGet looks like this;
 // [
 //     {
 //         "_id": {
@@ -475,7 +476,7 @@ static KjNode* dbEntityAttributesGetWithDetails(OrionldProblemDetails* pdP, char
   //
   // Need to use local function pointers to not alter the global state of the broker
   //
-  DbEntitiesGet                     entitiesGet                     = dbEntitiesGet;
+  DbEntitiesGet                     entitiesGet                     = mongoCppLegacyEntitiesGet;
   if (experimental == true)
   {
     if (orionldState.in.legacy == NULL)

@@ -35,7 +35,10 @@ extern "C"
 #include "ngsi/ContextElement.h"                               // ContextElement
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h" // mongoCppLegacyEntityLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityUpdate.h" // mongoCppLegacyEntityUpdate
 #include "orionld/common/orionldState.h"                       // orionldState
+
 
 
 // -----------------------------------------------------------------------------
@@ -518,7 +521,7 @@ static bool expandAttrNames(KjNode* treeP, char** detailsP)
 //
 // subscriptionMatchCallback -
 //
-// This is the callback function for dbSubscriptionMatchEntityIdAndAttributes().
+// This is the callback function for mongoCppLegacySubscriptionMatchEntityIdAndAttributes().
 // Its purpose is to fill the notification vector 'orionldState.notificationInfo'
 // which is used by the function orionldNotify() to send notifications.
 //
@@ -723,7 +726,7 @@ static bool subscriptionMatchCallback
 //
 bool orionldNotifyForAttrList(const char* entityId, KjNode* currentEntityTree, KjNode* incomingRequestTree)
 {
-  dbSubscriptionMatchEntityIdAndAttributes(entityId, currentEntityTree, incomingRequestTree, subscriptionMatchCallback);
+  mongoCppLegacySubscriptionMatchEntityIdAndAttributes(entityId, currentEntityTree, incomingRequestTree, subscriptionMatchCallback);
   return true;
 }
 
@@ -746,7 +749,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   // 3. Write to mongo
   //
   char*   entityId           = orionldState.wildcard[0];
-  KjNode* currentEntityTree  = dbEntityLookup(entityId);
+  KjNode* currentEntityTree  = mongoCppLegacyEntityLookup(entityId);
   char*   title;
   char*   details;
 
@@ -825,7 +828,7 @@ bool orionldPostEntityOverwrite(ConnectionInfo* ciP)
   kjModDateSet(currentEntityTree);
 
   // Write to database
-  dbEntityUpdate(entityId, currentEntityTree);
+  mongoCppLegacyEntityUpdate(entityId, currentEntityTree);
 
   //
   // All OK - set HTTP STatus Code

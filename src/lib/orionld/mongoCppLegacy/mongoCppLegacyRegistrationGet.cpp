@@ -36,7 +36,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"   // mongoCppLegacyDataToKjTree
 
 
 
@@ -94,7 +94,7 @@ KjNode* mongoCppLegacyRegistrationGet(const char* registrationId)
     char*    title;
     char*    details;
 
-    registrationP = dbDataToKjTree(&bsonObj, false, &title, &details);
+    registrationP = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &details);
 
     if (registrationP == NULL)
       LM_E(("%s: %s", title, details));

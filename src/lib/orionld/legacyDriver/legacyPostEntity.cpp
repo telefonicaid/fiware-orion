@@ -57,8 +57,6 @@ extern "C"
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
-#include "orionld/db/dbEntityLookup.h"                           // dbEntityLookup
-#include "orionld/db/dbEntityUpdate.h"                           // dbEntityUpdate
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
@@ -66,6 +64,9 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"            // mongoCppLegacyEntityLookup
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"  // mongoCppLegacyEntityAttributesDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"      // mongoCppLegacyEntityFieldReplace
 #include "orionld/legacyDriver/legacyPostEntity.h"               // Own Interface
 
 
@@ -202,7 +203,7 @@ bool legacyPostEntity(void)
 
   // Get the entity from mongo
   KjNode* dbEntityP;
-  if ((dbEntityP = dbEntityLookup(entityId)) == NULL)
+  if ((dbEntityP = mongoCppLegacyEntityLookup(entityId)) == NULL)
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;
@@ -441,12 +442,12 @@ bool legacyPostEntity(void)
   }
 
   // 9. Remove those attributes that need to be removed before adding attributes to the entity
-  // dbEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
+  // mongoCppLegacyEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
 
   // 10.1 Update the @datasets field, if necessary
   if (datasetsP != NULL)
   {
-    if (dbEntityFieldReplace(entityId, "@datasets", datasetsP) == false)
+    if (mongoCppLegacyEntityFieldReplace(entityId, "@datasets", datasetsP) == false)
     {
       orionldError(OrionldInternalError, "Error updating @datasets for entity", entityId, 500);
       return false;
@@ -465,7 +466,7 @@ bool legacyPostEntity(void)
     PERFORMANCE(dbStart);
 
     if (attrNameIx > 0)
-      dbEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
+      mongoCppLegacyEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
 
     status = mongoUpdateContext(&ucr,
                                 &ucResponse,

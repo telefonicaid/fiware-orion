@@ -36,36 +36,6 @@ extern "C"
 //
 // Function pointers for the DB interface
 //
-DbEntityLookupFunction                    dbEntityLookup;
-DbEntityRetrieveFunction                  dbEntityRetrieve;
-DbEntityLookupManyFunction                dbEntityLookupMany;
-DbEntityAttributeLookupFunction           dbEntityAttributeLookup;
-DbEntitiesAttributeLookupFunction         dbEntitiesAttributeLookup;
-DbEntityAttributeInstanceLookupFunction   dbEntityAttributeInstanceLookup;
-DbEntityAttributeWithDatasetsLookup       dbEntityAttributeWithDatasetsLookup;
-DbEntityAttributesDeleteFunction          dbEntityAttributesDelete;
-DbEntityTypeGet                           dbEntityTypeGet;
-DbEntityUpdateFunction                    dbEntityUpdate;
-DbEntityFieldReplaceFunction              dbEntityFieldReplace;
-DbEntityFieldDeleteFunction               dbEntityFieldDelete;
-DbEntityDeleteFunction                    dbEntityDelete;
-DbEntitiesDeleteFunction                  dbEntitiesDelete;
-DbDataToKjTreeFunction                    dbDataToKjTree;
-DbDataFromKjTreeFunction                  dbDataFromKjTree;
-DbSubscriptionMatchEntityIdAndAttributes  dbSubscriptionMatchEntityIdAndAttributes;
-DbEntityListLookupWithIdTypeCreDate       dbEntityListLookupWithIdTypeCreDate;
-DbRegistrationLookup                      dbRegistrationLookup;
-DbRegistrationExists                      dbRegistrationExists;
-DbRegistrationDelete                      dbRegistrationDelete;
-DbSubscriptionGet                         dbSubscriptionGet;
-DbSubscriptionReplace                     dbSubscriptionReplace;
-DbSubscriptionDelete                      dbSubscriptionDelete;
-DbRegistrationGet                         dbRegistrationGet;
-DbRegistrationReplace                     dbRegistrationReplace;
-DbEntityTypesFromRegistrationsGet         dbEntityTypesFromRegistrationsGet;
-DbEntitiesGet                             dbEntitiesGet;
-DbGeoIndexCreate                          dbGeoIndexCreate;
-DbIdIndexCreate                           dbIdIndexCreate;
-DbEntitiesQuery                           dbEntitiesQuery;
-DbDatasetGet                              dbDatasetGet;
-DbTenantExists                            dbTenantExists;
+// To be implemented with all mongoc functions
+// Just, need some time to clean things up first
+//

@@ -673,7 +673,7 @@ static void mqttDisconnectFromInfo(MqttInfo* miP)
 // 2. Make sure the payload data is a correct Subscription fragment
 //    - No values can be NULL
 //    - Expand attribute names ans entity types if present
-// 3. GET the subscription from mongo, by calling dbSubscriptionGet(orionldState.wildcard[0])
+// 3. GET the subscription from mongo, by calling mongocSubscriptionLookup(orionldState.wildcard[0])
 // 4. If not found - 404
 //
 // 5. Go over the fragment (incoming payload data) and modify the 'subscription from mongo':
@@ -682,7 +682,7 @@ static void mqttDisconnectFromInfo(MqttInfo* miP)
 //    * the target member value is replaced by value given in the Fragment, if non-null values.
 //    * If null values in the Fragment, then remove in the target
 //
-// 6. Call dbSubscriptionReplace(char* subscriptionId, KjNode* subscriptionTree) to replace the old sub with the new
+// 6. Call mongocSubscriptionReplace(char* subscriptionId, KjNode* subscriptionTree) to replace the old sub with the new
 //    Or, dbSubscriptionUpdate(char* subscriptionId, KjNode* toAddP, KjNode* toRemoveP, KjNode* toUpdate)
 //
 bool orionldPatchSubscription(void)
@@ -799,7 +799,7 @@ bool orionldPatchSubscription(void)
 
   //
   // After calling dbModelFromApiSubscription, the incoming payload data has beed structured just as the
-  // API v1 database model and the original tree (obtained calling dbSubscriptionGet()) can easily be
+  // API v1 database model and the original tree (obtained by calling mongocSubscriptionLookup()) can easily be
   // modified.
   // ngsildSubscriptionPatch() performs that modification.
   //

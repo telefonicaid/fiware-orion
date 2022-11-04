@@ -31,7 +31,8 @@
 #include "orionld/common/orionldState.h"               // orionldState
 #include "orionld/common/orionldError.h"               // orionldError
 #include "orionld/payloadCheck/PCHECK.h"               // PCHECK_URI
-#include "orionld/db/dbConfiguration.h"                // dbRegistrationDelete
+#include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionGet.h"      // mongoCppLegacySubscriptionGet
+#include "orionld/mongoCppLegacy/mongoCppLegacySubscriptionDelete.h"   // mongoCppLegacySubscriptionDelete
 #include "orionld/legacyDriver/legacyDeleteSubscription.h"   // Own Interface
 
 
@@ -44,13 +45,13 @@ bool legacyDeleteSubscription(void)
 {
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Invalid Subscription Identifier", orionldState.wildcard[0], 400);
 
-  if (dbSubscriptionGet(orionldState.wildcard[0]) == NULL)
+  if (mongoCppLegacySubscriptionGet(orionldState.wildcard[0]) == NULL)
   {
     orionldError(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0], 404);
     return false;
   }
 
-  if (dbSubscriptionDelete(orionldState.wildcard[0]) == false)
+  if (mongoCppLegacySubscriptionDelete(orionldState.wildcard[0]) == false)
   {
     orionldError(OrionldResourceNotFound, "Subscription not found", orionldState.wildcard[0], 404);
     return false;

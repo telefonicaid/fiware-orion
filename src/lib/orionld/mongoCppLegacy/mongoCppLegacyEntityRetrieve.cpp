@@ -46,10 +46,10 @@ extern "C"
 #include "orionld/common/eqForDot.h"                                // eqForDot
 #include "orionld/common/performance.h"                             // PERFORMANCE
 #include "orionld/common/langStringExtract.h"                       // langValueFix
-#include "orionld/db/dbConfiguration.h"                             // dbDataToKjTree
 #include "orionld/context/orionldContextItemAliasLookup.h"          // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"             // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjChildPrepend.h"                          // kjChildPrepend
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"      // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityRetrieve.h"    // Own interface
 
 
@@ -472,7 +472,7 @@ KjNode* mongoCppLegacyEntityRetrieve
     char*           title;
     char*           details;
 
-    dbTree = dbDataToKjTree(&bsonObj, false, &title, &details);
+    dbTree = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &details);
     if (dbTree == NULL)
       LM_E(("%s: %s", title, details));
     break;

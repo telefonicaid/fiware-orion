@@ -35,8 +35,8 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"   // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityTypeGet.h"  // Own interface
 
 
@@ -174,7 +174,7 @@ KjNode* mongoCppLegacyEntityTypeGet(OrionldProblemDetails* pdP, const char* type
     mongo::BSONObj  bsonObj = cursorP->nextSafe();
     char*           title;
     char*           details;
-    KjNode*         kjTree = dbDataToKjTree(&bsonObj, false, &title, &details);
+    KjNode*         kjTree = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &details);
 
     if (kjTree == NULL)
     {

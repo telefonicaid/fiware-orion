@@ -37,7 +37,7 @@ extern "C"
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/db/dbConfiguration.h"                          // dbDataToKjTree
+#include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"   // mongoCppLegacyDataToKjTree
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeWithDatasetsLookup.h"   // Own interface
 
 
@@ -82,7 +82,7 @@ KjNode* mongoCppLegacyEntityAttributeWithDatasetsLookup(const char* entityId, co
     char*           title;
     char*           details;
 
-    kjTree = dbDataToKjTree(&bsonObj, false, &title, &details);
+    kjTree = mongoCppLegacyDataToKjTree(&bsonObj, false, &title, &details);
     if (kjTree == NULL)
       LM_E(("%s: %s", title, details));
   }
