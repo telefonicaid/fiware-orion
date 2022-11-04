@@ -61,7 +61,7 @@ using ngsiv2::EntID;
 * setNotificationInfo -
 *
 * This function does the cleanup ($unset) corresponding to a potential change
-* of notificaiton type. Then, it calls the setNotificationInfo() in MongoCommonSubscription.h/cpp
+* of notification type. Then, it calls the setNotificationInfo() in MongoCommonSubscription.h/cpp
 */
 void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, orion::BSONObjBuilder* unsetB)
 {
@@ -76,6 +76,11 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     {
       unsetB->append(CSUB_JSON, 1);
       unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.httpInfo.includePayload) && (sub.notification.httpInfo.payload.empty()))
+      {
+        unsetB->append(CSUB_PAYLOAD, 1);
+      }
     }
     else if (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Json)
     {
@@ -105,6 +110,11 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     {
       unsetB->append(CSUB_JSON, 1);
       unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
+      {
+        unsetB->append(CSUB_PAYLOAD, 1);
+      }
     }
     else if (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Json)
     {
