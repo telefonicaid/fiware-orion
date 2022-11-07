@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification HTTP with NGSI payload mapping constant type
+Custom notification HTTP with NGSI payload mapping attribute constant compound value
 
 --SHELL-INIT--
 dbInit CB
@@ -31,15 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub1 with constant ngsi attribute A and B mapping to compound values
+# 01. Create custom sub1 with constant ngsi attribute A and B with compound values
 # 02. Create entity E1
 # 03. Update entity E1
-# 04. Dump accumulator and see two notifications with A and B mapping to compound values
+# 04. Dump accumulator and see two notifications with A and B with compound values
 #
 
 
-echo "01. Create custom sub1 with constant ngsi attribute A and B mapping to compound values"
-echo "======================================================================================"
+echo "01. Create custom sub1 with constant ngsi attribute A and B with compound values"
+echo "================================================================================"
 payload='{
   "subject": {
     "entities": [
@@ -114,21 +114,21 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs?options=forcedUpdate -X PATCH --payload "$payload"
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
 echo
 echo
 
 
-echo "04. Dump accumulator and see two notifications with A and B mapping to compound values"
-echo "======================================================================================"
+echo "04. Dump accumulator and see two notifications with A and B with compound values"
+echo "================================================================================"
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom sub1 with constant ngsi attribute A and B mapping to compound values
-======================================================================================
+01. Create custom sub1 with constant ngsi attribute A and B with compound values
+================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -155,8 +155,8 @@ Date: REGEX(.*)
 
 
 
-04. Dump accumulator and see two notifications with A and B mapping to compound values
-======================================================================================
+04. Dump accumulator and see two notifications with A and B with compound values
+================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 314
