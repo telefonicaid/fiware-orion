@@ -37,6 +37,7 @@
 #include "common/macroSubstitute.h"
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/Subscription.h"
+#include "apiTypesV2/CustomPayloadType.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
@@ -223,6 +224,59 @@ static bool setJsonPayload
 
 /* ****************************************************************************
 *
+* setNgsiPayload -
+*
+* Return false if some problem occur
+*/
+static bool setNgsiPayload
+(
+  const Entity&                    ngsi,
+  const SubscriptionId&            subscriptionId,
+  Entity&                          en,
+  const std::string&               service,
+  const std::string&               token,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter,
+  std::string*                     payloadP
+)
+{
+  NotifyContextRequest   ncr;
+  ContextElementResponse cer;
+
+  std::string effectiveId = ngsi.id.empty()? en.id : ngsi.id;
+  std::string effectiveType = ngsi.type.empty()? en.type : ngsi.type;
+
+  cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
+
+  // First we add attributes in the ngsi field
+  for (unsigned int ix = 0; ix < ngsi.attributeVector.size(); ix++)
+  {
+    cer.entity.attributeVector.push_back(new ContextAttribute(ngsi.attributeVector[ix], false, true));
+  }
+  // Next, other attributes in the original entity not already added
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    if (cer.entity.attributeVector.get(en.attributeVector[ix]->name) < 0)
+    {
+      cer.entity.attributeVector.push_back(new ContextAttribute(en.attributeVector[ix], false, true));
+    }
+  }
+
+  cer.statusCode.code = SccOk;
+
+  ncr.subscriptionId  = subscriptionId;
+  ncr.contextElementResponseVector.push_back(&cer);
+
+ *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter);
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * buildSenderParamsCustom -
 */
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
@@ -291,9 +345,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 3. Payload
     //
-    orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
+    ngsiv2::CustomPayloadType customPayloadType = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payloadType : notification.mqttInfo.payloadType);
 
-    if (json == NULL)
+    if (customPayloadType == ngsiv2::CustomPayloadType::Text)
     {
      bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
      std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
@@ -303,12 +357,24 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
        return paramsV;  // empty vector
      }
     }
-    else
+    else if (customPayloadType == ngsiv2::CustomPayloadType::Json)
     {
+      orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
       setJsonPayload(json, en, tenant, xauthToken, &payload, &mimeType);
       renderFormat = NGSI_V2_CUSTOM;
     }
-
+    else  // customPayloadType == ngsiv2::CustomPayloadType::Ngsi
+    {
+      // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
+      const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
+      if (!setNgsiPayload(ngsi, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload))
+      {
+        // Warning already logged in macroSubstitute()
+        return paramsV;  // empty vector
+      }
+      renderFormat = NGSI_V2_CUSTOM;
+      mimeType = "application/json";
+    }
 
 
     //

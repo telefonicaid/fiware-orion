@@ -1945,20 +1945,6 @@ static unsigned int processSubscriptions
     notification.httpInfo.fill(tSubP->httpInfo);
     notification.mqttInfo.fill(tSubP->mqttInfo);
     notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
-    if (notification.type == ngsiv2::HttpNotification)
-    {
-      if (tSubP->httpInfo.json != NULL)
-      {
-        notification.httpInfo.json = tSubP->httpInfo.json->clone();
-      }
-    }
-    else  // notification.type == ngsiv2::MqttNotification
-    {
-      if (tSubP->mqttInfo.json != NULL)
-      {
-        notification.mqttInfo.json = tSubP->mqttInfo.json->clone();
-      }
-    }
 
     notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
                                                                 tSubP->attrL,
