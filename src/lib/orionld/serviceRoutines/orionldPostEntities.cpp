@@ -25,8 +25,6 @@
 #include <unistd.h>                                              // NULL, gethostname
 #include <curl/curl.h>                                           // curl
 
-#include "logMsg/logMsg.h"                                       // LM_*
-
 extern "C"
 {
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
@@ -38,13 +36,14 @@ extern "C"
 #include "kjson/kjRender.h"                                      // kjFastRender
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // PERFORMANCE
-#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/types/RegistrationMode.h"                      // registrationMode
+#include "orionld/common/curlToBrokerStrerror.h"                 // curlToBrokerStrerror
 #include "orionld/legacyDriver/legacyPostEntities.h"             // legacyPostEntities
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                 // pCheckEntityId
@@ -53,426 +52,16 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
-#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityInsert.h"                   // mongocEntityInsert
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 #include "orionld/forwarding/forwardRequestSend.h"               // forwardRequestSend
 #include "orionld/forwarding/forwardingRelease.h"                // forwardingRelease
+#include "orionld/forwarding/forwardingSuccess.h"                // forwardingSuccess
+#include "orionld/forwarding/forwardingFailure.h"                // forwardingFailure
+#include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"     // fwdPendingLookupByCurlHandle
+#include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
-
-
-
-char userAgentHeaderNoLF[64];     // "User-Agent: orionld/" + ORIONLD_VERSION - initialized in orionldServiceInit()
-char hostHeader[256];
-
-
-void forwardingSuccess(KjNode* responseBody, ForwardPending* fwdPendingP)
-{
-  KjNode* successV = kjLookup(responseBody, "success");
-
-  if (successV == NULL)
-  {
-    successV = kjArray(orionldState.kjsonP, "success");
-    kjChildAdd(responseBody, successV);
-  }
-
-  for (KjNode* attrNameP = fwdPendingP->body->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
-  {
-    if (strcmp(attrNameP->name, "id") == 0)
-      continue;
-    if (strcmp(attrNameP->name, "type") == 0)
-      continue;
-
-    char*   alias  = orionldContextItemAliasLookup(orionldState.contextP, attrNameP->name, NULL, NULL);
-    KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
-    kjChildAdd(successV, aNameP);
-  }
-}
-
-
-//
-// 207 response for Entity Creation:
-//
-// {
-//   "entityId": "xxx",
-//   "success": [
-//     {
-//       "attributes": [ "", ""],
-//     }
-//   ],
-//   "failure": [
-//     {
-//       "attributes": [ "", ""],
-//       "statusCode": 404,
-//       "title: "xxx",
-//       "detail: "yyy"
-//     }
-// }
-//
-void forwardingFailure(KjNode* responseBody, ForwardPending* fwdPendingP, OrionldResponseErrorType errorCode, const char* title, const char* detail, int httpStatus)
-{
-  KjNode* failureV = kjLookup(responseBody, "failure");
-
-  if (failureV == NULL)
-  {
-    failureV = kjArray(orionldState.kjsonP, "failure");
-    kjChildAdd(responseBody, failureV);
-  }
-
-  KjNode* regIdP      = (fwdPendingP != NULL)? kjLookup(fwdPendingP->regP->regTree, "id") : NULL;
-  KjNode* regIdNodeP  = (regIdP != NULL)? kjString(orionldState.kjsonP, "registrationId", regIdP->value.s) : NULL;
-  KjNode* error       = kjObject(orionldState.kjsonP, NULL);
-  KjNode* attrV       = kjArray(orionldState.kjsonP, "attributes");
-  KjNode* statusCodeP = kjInteger(orionldState.kjsonP, "statusCode", httpStatus);
-  KjNode* titleP      = kjString(orionldState.kjsonP, "title", title);
-  KjNode* detailP     = kjString(orionldState.kjsonP, "detail", detail);
-
-  if (regIdNodeP != NULL)
-    kjChildAdd(error, regIdNodeP);
-
-  kjChildAdd(error, attrV);
-  kjChildAdd(error, statusCodeP);
-  kjChildAdd(error, titleP);
-  kjChildAdd(error, detailP);
-
-  for (KjNode* attrNameP = fwdPendingP->body->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
-  {
-    if (strcmp(attrNameP->name, "id") == 0)
-      continue;
-    if (strcmp(attrNameP->name, "type") == 0)
-      continue;
-
-    char*   alias  = orionldContextItemAliasLookup(orionldState.contextP, attrNameP->name, NULL, NULL);
-    KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
-    kjChildAdd(attrV, aNameP);
-  }
-
-  kjChildAdd(failureV, error);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// fwdPendingLookupByCurlHandle -
-//
-ForwardPending* fwdPendingLookupByCurlHandle(ForwardPending* fwdPendingList, CURL* easyHandle)
-{
-  ForwardPending* fwdPendingP = fwdPendingList;
-
-  while (fwdPendingP != NULL)
-  {
-    if (fwdPendingP->curlHandle == easyHandle)
-      return fwdPendingP;
-
-    fwdPendingP = fwdPendingP->next;
-  }
-
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// Matching with "information"
-//
-// "information": [
-//   {
-//     "entities": [
-//       {
-//         "id": "urn:E1",
-//         "idPattern": "xxx",   # Can't be present in an exclusive registration
-//         "type": "T"
-//       }
-//     ],
-//     "propertyNames": [ "P1", "P2" ]
-//     "relationshipNames": [ "R1", "R2" ]
-//   }
-// ]
-//
-//
-bool regMatchEntityInfo(KjNode* entityInfoP, const char* entityId, const char* entityType)
-{
-  KjNode* idP         = kjLookup(entityInfoP, "id");
-  // KjNode* idPatternP  = kjLookup(entityInfoP, "idPattern");
-  KjNode* typeP       = kjLookup(entityInfoP, "type");
-
-  //
-  // "type" is mandatory for all 'entityInfo'
-  // "id" is mandatory for 'exclusive' registrations
-  //
-  //
-  if (typeP == NULL)
-  {
-    LM(("RM: No match due to invalid registration (no type in EntityInfo)"));
-    return false;
-  }
-
-  if (strcmp(typeP->value.s, entityType) != 0)
-  {
-    LM(("RM: No match due to entity type ('%s' in reg, '%s' in entity creation)", typeP->value.s, entityType));
-    return false;
-  }
-
-  if (idP != NULL)
-  {
-    if (strcmp(idP->value.s, entityId) != 0)
-    {
-      LM(("RM: No match due to entity id ('%s' in reg, '%s' in entity creation)", idP->value.s, entityId));
-      return false;
-    }
-  }
-
-  // FIXME: idPattern
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// regMatchAttributes -
-//
-KjNode* regMatchAttributes(RegCacheItem* regP, KjNode* propertyNamesP, KjNode* relationshipNamesP, KjNode* incomingP)
-{
-  KjNode* attrObject = NULL;
-
-  //
-  // Registration of entire entity?
-  // Only 'inclusive' registrations can do that
-  //
-  if ((propertyNamesP == NULL) && (relationshipNamesP == NULL))
-  {
-    KjNode* body = kjClone(orionldState.kjsonP, incomingP);
-
-    // Add entity type and id
-    KjNode* idP   = kjClone(orionldState.kjsonP, orionldState.payloadIdNode);
-    KjNode* typeP = kjClone(orionldState.kjsonP, orionldState.payloadTypeNode);
-
-    kjChildAdd(body, idP);
-    kjChildAdd(body, typeP);
-
-    return body;
-  }
-
-  KjNode* attrP = incomingP->value.firstChildP;
-  KjNode* next;
-  while (attrP != NULL)
-  {
-    next = attrP->next;
-
-    KjNode* matchP = NULL;
-
-    if (propertyNamesP != NULL)
-      matchP = kjStringValueLookupInArray(propertyNamesP, attrP->name);
-    if ((matchP == NULL) && (relationshipNamesP != NULL))
-      matchP = kjStringValueLookupInArray(relationshipNamesP, attrP->name);
-
-    if (matchP == NULL)
-    {
-      attrP = next;
-      continue;
-    }
-
-    //
-    // 'inclusive' registrations must CLONE the attribute
-    // The other two (exclusive, redirect) STEAL the attribute
-    //
-    if (regP->mode == RegModeInclusive)
-      matchP = kjClone(orionldState.kjsonP, attrP);
-    else
-    {
-      matchP = attrP;
-      kjChildRemove(incomingP, attrP);
-    }
-
-    if (attrObject == NULL)
-      attrObject = kjObject(orionldState.kjsonP, NULL);
-
-    kjChildAdd(attrObject, matchP);
-
-    attrP = next;
-  }
-
-  if (attrObject == NULL)
-    LM(("RM: No match due to no matching attributes"));
-
-  return attrObject;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// regMatchInformationItem -
-//
-KjNode* regMatchInformationItem(RegCacheItem* regP, KjNode* infoP, const char* entityId, const char* entityType, KjNode* incomingP)
-{
-  KjNode* entities = kjLookup(infoP, "entities");
-
-  if (entities != NULL)
-  {
-    bool match = false;
-    for (KjNode* entityInfoP = entities->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
-    {
-      if (regMatchEntityInfo(entityInfoP, entityId, entityType) == true)
-      {
-        match = true;
-        break;
-      }
-    }
-
-    if (match == false)
-      return NULL;
-  }
-
-  KjNode* propertyNamesP     = kjLookup(infoP, "propertyNames");
-  KjNode* relationshipNamesP = kjLookup(infoP, "relationshipNames");
-  KjNode* attrUnionP         = regMatchAttributes(regP, propertyNamesP, relationshipNamesP, incomingP);
-
-  return attrUnionP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// regMatchInformationArray -
-//
-ForwardPending* regMatchInformationArray(RegCacheItem* regP, const char* entityId, const char* entityType, KjNode* incomingP)
-{
-  KjNode* informationV = kjLookup(regP->regTree, "information");
-
-  for (KjNode* infoP = informationV->value.firstChildP; infoP != NULL; infoP = infoP->next)
-  {
-    KjNode* attrUnion = regMatchInformationItem(regP, infoP, entityId, entityType, incomingP);
-
-    if (attrUnion == NULL)
-      continue;
-
-    // If we get this far, then it's a match
-    KjNode* entityIdP   = kjString(orionldState.kjsonP,  "id",   entityId);
-    KjNode* entityTypeP = kjString(orionldState.kjsonP,  "type", entityType);
-
-    kjChildAdd(attrUnion, entityIdP);
-    kjChildAdd(attrUnion, entityTypeP);
-
-    ForwardPending* fwdPendingP    = (ForwardPending*) kaAlloc(&orionldState.kalloc, sizeof(ForwardPending));
-
-    fwdPendingP->regP = regP;
-    fwdPendingP->body = attrUnion;
-
-    return fwdPendingP;
-  }
-
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// regMatchOperation -
-//
-// FIXME: the operations should be a bitmask in RegCacheItem - no kjLookup, no string comparisons
-//
-bool regMatchOperation(RegCacheItem* regP, const char* op)
-{
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// regMatchForEntityCreation -
-//
-// To match for Entity Creation, a registration needs:
-// - "mode" != "auxiliary"
-// - "operations" must include "createEntity
-// - "information" must match by entity id+type and attributes if present in the registration
-//
-ForwardPending* regMatchForEntityCreation(const char* entityId, const char* entityType, KjNode* incomingP)
-{
-  ForwardPending* fwdPendingHead = NULL;
-  ForwardPending* fwdPendingTail = NULL;
-
-  for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
-  {
-    KjNode* regModeP = kjLookup(regP->regTree, "mode");  // FIXME: mode needs to be part of RegCacheItem (as an enum)
-
-    // FIXME: Set the regP->mode at creation/update time
-    regP->mode = (regModeP != NULL)? registrationMode(regModeP->value.s) : RegModeInclusive;
-    if (regP->mode == RegModeAuxiliary)
-      continue;
-
-    if (regMatchOperation(regP, "createEntity") == false)  // FIXME: "createEntity" should be an enum value
-      continue;
-
-    ForwardPending* fwdPendingP = regMatchInformationArray(regP, entityId, entityType, incomingP);
-    if (fwdPendingP == NULL)
-      continue;
-
-    // Add fwdPendingP to the linked list
-    if (fwdPendingHead == NULL)
-      fwdPendingHead = fwdPendingP;
-    else
-      fwdPendingTail->next = fwdPendingP;
-
-    fwdPendingTail       = fwdPendingP;
-    fwdPendingTail->next = NULL;
-  }
-
-  return fwdPendingHead;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// curlToBrokerStrerror -
-//
-const char* curlToBrokerStrerror(CURL* curlHandle, int curlErrorCode, int* statusCodeP)
-{
-  if (curlErrorCode == 5)
-  {
-    *statusCodeP = 504;
-    return "Unable to resolve proxy";
-  }
-  else if (curlErrorCode == 6)
-  {
-    *statusCodeP = 504;
-    return "Unable to resolve host name of registrant";
-  }
-  else if (curlErrorCode == 7)
-  {
-    *statusCodeP = 504;
-    return "Unable to connect to registrant";
-  }
-  else if (curlErrorCode == 22)
-  {
-    long httpStatus;
-    curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &httpStatus);
-
-    *statusCodeP = httpStatus;
-    if (httpStatus == 409)
-      return "Entity already exists";
-    else
-    {
-      LM_W(("Forwarded request response is of HTTP Status %d", httpStatus));
-      return "Entity was not created externally, and it did not previously exist";
-    }
-  }
-  else
-  {
-    *statusCodeP = 500;
-    return "Other CURL Error";
-  }
-}
 
 
 
@@ -521,10 +110,6 @@ bool orionldPostEntities(void)
       // Send the forwarded request and await all responses
       if (fwdPendingP->regP != NULL)
       {
-        KjNode* endpointP = kjLookup(fwdPendingP->regP->regTree, "endpoint");
-        LM(("RM: Forwarding to %s", endpointP->value.s));
-        kjTreeLog(fwdPendingP->body, "RM: body to be forwarded");
-
         if (forwardRequestSend(fwdPendingP, dateHeader) == 0)
         {
           ++forwards;
@@ -533,8 +118,6 @@ bool orionldPostEntities(void)
         else
           fwdPendingP->error = true;
       }
-      else
-        LM(("RM: regP == NULL - it's the local stuff"));
     }
 
     int stillRunning = 1;
@@ -542,7 +125,6 @@ bool orionldPostEntities(void)
 
     while (stillRunning != 0)
     {
-      LM(("Calling curl_multi_perform"));
       CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
       if (cm != 0)
       {
@@ -550,7 +132,6 @@ bool orionldPostEntities(void)
         forwards = 0;
         break;
       }
-      LM(("curl_multi_perform OK"));
 
       if (stillRunning != 0)
       {
@@ -710,7 +291,6 @@ bool orionldPostEntities(void)
     CURLMsg* msgP;
     int      msgsLeft;
 
-    LM(("Reading the responses of the forwarded requests"));
     while ((msgP = curl_multi_info_read(orionldState.curlFwdMultiP, &msgsLeft)) != NULL)
     {
       if (msgP->msg != CURLMSG_DONE)

@@ -24,6 +24,15 @@ SET (SOURCES
     forwardingInit.cpp
     forwardRequestSend.cpp
     forwardingRelease.cpp
+    forwardingSuccess.cpp
+    forwardingFailure.cpp
+    fwdPendingLookupByCurlHandle.cpp
+    regMatchEntityInfo.cpp
+    regMatchInformationItem.cpp
+    regMatchInformationArray.cpp
+    regMatchAttributes.cpp
+    regMatchOperation.cpp
+    regMatchForEntityCreation.cpp
 )
 
 # Include directories
