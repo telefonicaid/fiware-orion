@@ -49,10 +49,11 @@ typedef struct NotifyContextRequest
                          const std::vector<std::string>&  attrsFilter,
                          bool                             blacklist,
                          const std::vector<std::string>&  metadataFilter);
-  std::string   toJson(RenderFormat                     renderFormat,
-                       const std::vector<std::string>&  attrsFilter,
-                       bool                             blacklist,
-                       const std::vector<std::string>&  metadataFilter);
+  std::string   toJson(RenderFormat                         renderFormat,
+                       const std::vector<std::string>&      attrsFilter,
+                       bool                                 blacklist,
+                       const std::vector<std::string>&      metadataFilter,
+                       std::map<std::string, std::string>*  replacementsP = NULL);
   std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
   void          release(void);
   NotifyContextRequest* clone(void);

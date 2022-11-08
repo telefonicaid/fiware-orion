@@ -186,15 +186,16 @@ std::string ContextElementResponse::toJsonV1
 */
 std::string ContextElementResponse::toJson
 (
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter
+  RenderFormat                         renderFormat,
+  const std::vector<std::string>&      attrsFilter,
+  bool                                 blacklist,
+  const std::vector<std::string>&      metadataFilter,
+  std::map<std::string, std::string>*  replacementsP
 )
 {
   std::string out;
 
-  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
+  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false, replacementsP);
 
   return out;
 }

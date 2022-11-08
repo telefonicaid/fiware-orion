@@ -930,7 +930,7 @@ void ContextAttribute::filterAndOrderMetadata
 * renderNgsiField true is used in custom notification payloads, which have some small differences
 * with regards to conventional rendering
 */
-std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField)
+std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, std::map<std::string, std::string>* replacementsP)
 {
   JsonObjectHelper jh;
 
@@ -963,7 +963,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     // of DB entities) may lead to NULL, so the check is needed
     if (childToRenderP != NULL)
     {
-      jh.addRaw("value", childToRenderP->toJson());
+      jh.addRaw("value", childToRenderP->toJson(replacementsP));
     }
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -979,7 +979,26 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else if (valueType == orion::ValueTypeString)
   {
-    jh.addString("value", stringValue);
+    // FIXME PR: duplicated code in CompoundValueNode.cpp
+    if ((replacementsP != NULL) && (stringValue.rfind("${", 0) == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
+    {
+      // len("${") + len("}") = 3
+      std::string macroName = stringValue.substr(2, stringValue.size() - 3);
+      std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
+      if (iter == replacementsP->end())
+      {
+        // macro doesn't exist in the replacement map, so we use null al failsafe
+        jh.addNull("value");
+      }
+      else
+      {
+        jh.addRaw("value", iter->second);
+      }
+    }
+    else
+    {
+      jh.addString("value", stringValue);
+    }
   }
   else if (valueType == orion::ValueTypeBoolean)
   {

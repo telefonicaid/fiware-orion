@@ -241,6 +241,23 @@ static bool setNgsiPayload
   std::string*                     payloadP
 )
 {
+  // Prepare a map for macro replacements. We firstly tried to pass Entity object to
+  // orion::CompoundValueNode()::toJson(), but the include Entity.h in CompoundValueNode.h
+  // makes compiler to cry (maybe some kind of circular dependency problem?)
+  // FIXME PR: duplicated code in setJsonPayload()
+  std::map<std::string, std::string> replacements;
+  replacements.insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
+  replacements.insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
+  replacements.insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
+  replacements.insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
+  replacements.insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    // Note that if some attribute is named service, servicePath or authToken (although it would be
+    // an anti-pattern), the attribute takes precedence
+    replacements[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
+  }
+
   NotifyContextRequest   ncr;
   ContextElementResponse cer;
 
@@ -268,7 +285,7 @@ static bool setNgsiPayload
   ncr.subscriptionId  = subscriptionId;
   ncr.contextElementResponseVector.push_back(&cer);
 
- *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter);
+ *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, &replacements);
 
   return true;
 }

@@ -80,11 +80,12 @@ class Entity
                         bool                             comma,
                         bool                             omitAttributeValues = false);
 
-  std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      bool                             blacklist,
-                      const std::vector<std::string>&  metadataFilter,
-                      bool                             renderNgsiField = false);
+  std::string  toJson(RenderFormat                         renderFormat,
+                      const std::vector<std::string>&      attrsFilter,
+                      bool                                 blacklist,
+                      const std::vector<std::string>&      metadataFilter,
+                      bool                                 renderNgsiField = false,
+                      std::map<std::string, std::string>*  replacementsP    = NULL);
 
   std::string  toJson(RenderFormat                     renderFormat,
                       bool                             renderNgsiField = false);
@@ -135,7 +136,8 @@ class Entity
   std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonNormalized(const std::vector<ContextAttribute*>&  orderedAttrs,
                                const std::vector<std::string>&        metadataFilter,
-                               bool                                   renderNgsiField = false);
+                               bool                                   renderNgsiField = false,
+                               std::map<std::string, std::string>*    replacementsP    = NULL);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_
