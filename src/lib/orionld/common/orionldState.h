@@ -382,6 +382,7 @@ typedef struct OrionldConnectionState
   //
   CURLM*                  multiP;                // curl multi api
   CURL**                  easyV;
+  CURLM*                  curlFwdMultiP;
   int                     easySize;
   int                     easyIx;
   struct curl_slist**     curlHeadersV;
@@ -576,8 +577,10 @@ extern bool              experimental;             // From orionld.cpp
 extern bool              mongocOnly;               // From orionld.cpp
 extern char              allowedOrigin[64];        // From orionld.cpp (CORS)
 extern int               maxAge;                   // From orionld.cpp (CORS)
-extern char              userAgentHeader[64];      // From notificationSend.cpp
-extern size_t            userAgentHeaderLen;       // From notificationSend.cpp
+extern char              userAgentHeader[64];      // From notificationSend.cpp - move to orionld.cpp
+extern size_t            userAgentHeaderLen;       // From notificationSend.cpp - move to orionld.cpp
+extern char              userAgentHeaderNoLF[64];  // move to orionld.cpp (from orionldPostEntities.cpp)
+extern char              hostHeader[256];          // move to orionld.cpp (from orionldPostEntities.cpp)
 extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
 extern int               cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB

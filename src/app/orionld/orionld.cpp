@@ -139,6 +139,7 @@ extern "C"
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
 #include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
+#include "orionld/forwarding/forwardingInit.h"                // forwardingInit
 
 using namespace orion;
 
@@ -1136,6 +1137,9 @@ int main(int argC, char* argV[])
   // Otherwise, we have empirically checked that CB may randomly crash
   //
   contextBrokerInit(dbName, multitenancy);
+
+  if (forwarding)
+    forwardingInit();
 
   if (https)
   {

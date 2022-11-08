@@ -1,0 +1,404 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarding of POST Entities requests - entity distributed in mix of CB + 3 CPs using EXCLUSIVE Registrations
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+brokerStart CB  0 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+brokerStart CP2 0 IPv4 -experimental
+brokerStart CP3 0 IPv4 -experimental
+
+--SHELL--
+#
+# Mix CB + CP1-3
+#   01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2
+#   02. Create an exclusive registration R2 in CB for CP2 of entity type T, id 'urn:E1' and properties P3+P4
+#   03. Create an exclusive registration R3 in CB for CP3 of entity type T, id 'urn:E1' and properties P5+P6
+#   04. POST /entities on CB of an entity urn:E1 with attr P1,P3,P6 (matching R1-3), and one attribute 'A1' to stay in CB
+#   05. GET all entities in CB, locally - see urn:E1 with attr A1
+#   06. GET all entities in CP1, see urn:E1 with attr P1
+#   07. GET all entities in CP2, see urn:E1 with attr P3
+#   08. GET all entities in CP3, see urn:E1 with attr P6
+#
+# 100% to CP1
+#   11. Create an exclusive registration R4 in CB for CP1 of entity type T, id 'urn:E2' and properties P1+P2
+#   12. Create Entity urn:E2 with attrs P1+P2 - it's forwarded in its entirety to CP1
+#   13. GET entity E2 from CP1, see urn:E2 with attr P1
+#   14. GET all entities in CB, locally - see only urn:E1 with attr A1
+#
+
+echo "01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2"
+echo "========================================================================================================"
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "exclusive",
+  "contextSourceInfo": [
+    {
+      "key": "X1",
+      "value": "x1"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an exclusive registration R2 in CB for CP2 of entity type T, id 'urn:E1' and properties P3+P4"
+echo "========================================================================================================"
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P3", "P4" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an exclusive registration R3 in CB for CP3 of entity type T, id 'urn:E1' and properties P5+P6"
+echo "========================================================================================================"
+payload='{
+  "id": "urn:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P5", "P6" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP3_PORT'",
+  "mode": "exclusive",
+  "contextSourceInfo": [
+    {
+      "key": "X3",
+      "value": "x3"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "04. POST /entities on CB of an entity urn:E1 with attr P1,P3,P6 (matching R1-3), and one attribute 'A1' to stay in CB"
+echo "====================================================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "For CP1",
+  "P3": "For CP2",
+  "P6": "For CP3",
+  "A1": "For CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GET all entities in CB, locally - see urn:E1 with attr A1"
+echo "============================================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=concise&local=true"
+echo
+echo
+
+
+echo "06. GET all entities in CP1, see urn:E1 with attr P1"
+echo "===================================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=concise&local=true" --port $CP1_PORT
+echo
+echo
+
+
+echo "07. GET all entities in CP2, see urn:E1 with attr P3"
+echo "===================================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=concise&local=true" --port $CP2_PORT
+echo
+echo
+
+
+echo "08. GET all entities in CP3, see urn:E1 with attr P6"
+echo "===================================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=concise&local=true" --port $CP3_PORT
+echo
+echo
+
+
+echo "11. Create an exclusive registration R4 in CB for CP1 of entity type T, id 'urn:E2' and properties P1+P2"
+echo "========================================================================================================"
+payload='{
+  "id": "urn:R4",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E2",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "exclusive",
+  "contextSourceInfo": [
+    {
+      "key": "X1",
+      "value": "x1"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "12. Create Entity urn:E2 with attrs P1+P2 - it's forwarded in its entirety to CP1"
+echo "================================================================================="
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P1": "For CP1",
+  "P2": "For CP1"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "13. GET entity E2 from CP1, see urn:E2 with attr P1"
+echo "==================================================="
+orionCurl --url "/ngsi-ld/v1/entities/urn:E2?options=concise" --port $CP1_PORT
+echo
+echo
+
+
+echo "14. GET all entities in CB, locally - see only urn:E1 with attr A1"
+echo "=================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=concise&local=true"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2
+========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create an exclusive registration R2 in CB for CP2 of entity type T, id 'urn:E1' and properties P3+P4
+========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+03. Create an exclusive registration R3 in CB for CP3 of entity type T, id 'urn:E1' and properties P5+P6
+========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R3
+
+
+
+04. POST /entities on CB of an entity urn:E1 with attr P1,P3,P6 (matching R1-3), and one attribute 'A1' to stay in CB
+=====================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+05. GET all entities in CB, locally - see urn:E1 with attr A1
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 42
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "A1": "For CB",
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+06. GET all entities in CP1, see urn:E1 with attr P1
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 43
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P1": "For CP1",
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+07. GET all entities in CP2, see urn:E1 with attr P3
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 43
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P3": "For CP2",
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+08. GET all entities in CP3, see urn:E1 with attr P6
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 43
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P6": "For CP3",
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+11. Create an exclusive registration R4 in CB for CP1 of entity type T, id 'urn:E2' and properties P1+P2
+========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R4
+
+
+
+12. Create Entity urn:E2 with attrs P1+P2 - it's forwarded in its entirety to CP1
+=================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+13. GET entity E2 from CP1, see urn:E2 with attr P1
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 56
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "For CP1",
+    "P2": "For CP1",
+    "id": "urn:E2",
+    "type": "T"
+}
+
+
+14. GET all entities in CB, locally - see only urn:E1 with attr A1
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 42
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "A1": "For CB",
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3

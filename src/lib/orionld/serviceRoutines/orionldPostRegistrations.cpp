@@ -44,7 +44,6 @@ extern "C"
 #include "orionld/mongoc/mongocRegistrationInsert.h"           // mongocRegistrationInsert
 #include "orionld/regCache/RegCache.h"                         // RegCacheItem
 #include "orionld/regCache/regCacheItemAdd.h"                  // regCacheItemAdd
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/dbModel/dbModelFromApiRegistration.h"        // dbModelFromApiRegistration
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own interface
 
@@ -218,10 +217,8 @@ bool orionldPostRegistrations(void)
   apiModelToCacheRegistration(orionldState.requestTree);
   regCacheItemAdd(orionldState.tenantP->regCache, orionldState.requestTree, false);  // Clones the registration
 
-  kjTreeLog(orionldState.requestTree, "Before dbModelFromApiRegistration");
   // This is where "id" is changed to "_id"
   dbModelFromApiRegistration(orionldState.requestTree, NULL);
-  kjTreeLog(orionldState.requestTree, "After dbModelFromApiRegistration");
 
   if (mongocRegistrationInsert(orionldState.requestTree, regIdP->value.s) == false)
     return false;

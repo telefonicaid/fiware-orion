@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-#define SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDPENDING_H_
+#define SRC_LIB_ORIONLD_FORWARDING_FORWARDPENDING_H_
 
 /*
 *
@@ -25,28 +25,29 @@
 *
 * Author: Ken Zangelin
 */
+#include <curl/curl.h>                                           // CURL
 
-
-
-// -----------------------------------------------------------------------------
-//
-// RegistrationMode -
-//
-typedef enum RegistrationMode
+extern "C"
 {
-  RegModeNone      = 0,
-  RegModeExclusive = 1,
-  RegModeRedirect  = 2,
-  RegModeInclusive = 3,
-  RegModeAuxiliary = 4
-} RegistrationMode;
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// registrationMode - FIXME: move to its own module
+// ForwardPending -
 //
-extern RegistrationMode registrationMode(const char* stringMode);
+typedef struct ForwardPending
+{
+  RegCacheItem*           regP;
+  KjNode*                 body;
+  bool                    error;
+  CURL*                   curlHandle;
+  struct curl_slist*      curlHeaders;
+  struct ForwardPending*  next;
+} ForwardPending;
 
-#endif  // SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDPENDING_H_

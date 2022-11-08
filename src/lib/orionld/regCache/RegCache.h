@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+#include "orionld/types/RegistrationMode.h"                      // RegistrationMode
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 
 
@@ -57,6 +58,7 @@ typedef struct RegCacheItem
 {
   KjNode*               regTree;
   RegDeltas             deltas;
+  RegistrationMode      mode;     // FIXME: Set in creation/patch
   struct RegCacheItem*  next;
 } RegCacheItem;
 

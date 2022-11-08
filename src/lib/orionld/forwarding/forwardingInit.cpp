@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-#define SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,28 +22,23 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdio.h>                                               // snprintf
+#include <unistd.h>                                              // gethostname
+
+#include "orionld/common/orionldState.h"                         // hostHeader
+#include "orionld/forwarding/forwardingInit.h"                   // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// RegistrationMode -
+// forwardingInit -
 //
-typedef enum RegistrationMode
+void forwardingInit(void)
 {
-  RegModeNone      = 0,
-  RegModeExclusive = 1,
-  RegModeRedirect  = 2,
-  RegModeInclusive = 3,
-  RegModeAuxiliary = 4
-} RegistrationMode;
+  char hostName[128];
 
-
-
-// -----------------------------------------------------------------------------
-//
-// registrationMode - FIXME: move to its own module
-//
-extern RegistrationMode registrationMode(const char* stringMode);
-
-#endif  // SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+  if (gethostname(hostName, sizeof(hostName) - 1) == -1)
+    snprintf(hostHeader, sizeof(hostHeader), "Host: unknown");
+  snprintf(hostHeader, sizeof(hostHeader), "Host: %s", hostName);
+}

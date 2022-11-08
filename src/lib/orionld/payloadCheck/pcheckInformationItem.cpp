@@ -76,7 +76,6 @@ KjNode* kjValueInArrayLookup(KjNode* arrayItemP, const char* value)
 //
 bool pcheckInformationItem(KjNode* informationP)
 {
-  LM(("EXP: In pcheckInformationItem"));
   KjNode* entitiesP      = NULL;
   KjNode* propertiesP    = NULL;
   KjNode* relationshipsP = NULL;
@@ -100,7 +99,6 @@ bool pcheckInformationItem(KjNode* informationP)
       {
         STRING_CHECK(propP, RegistrationInformationPropertyNameItemPath);
         EMPTY_STRING_CHECK(propP, RegistrationInformationPropertyNameItemPath);
-        LM(("EXP: Expanding property name '%s' (property at %p)", propP->value.s, propP));
         propP->value.s = orionldAttributeExpand(orionldState.contextP, propP->value.s, true, NULL);
       }
 
@@ -115,7 +113,6 @@ bool pcheckInformationItem(KjNode* informationP)
       {
         STRING_CHECK(relP, RegistrationInformationRelationshipNamesItemPath);
         EMPTY_STRING_CHECK(relP, RegistrationInformationRelationshipNamesItemPath);
-        LM(("EXP: Expanding relationship name '%s'", relP->value.s));
         relP->value.s = orionldAttributeExpand(orionldState.contextP, relP->value.s, true, NULL);
       }
 

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-#define SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,28 +22,32 @@
 *
 * Author: Ken Zangelin
 */
+#include <curl/curl.h>                                           // curl
+
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/forwardingRelease.h"                // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// RegistrationMode -
+// forwardingRelease -
 //
-typedef enum RegistrationMode
+void forwardingRelease(ForwardPending* fwdPendingList)
 {
-  RegModeNone      = 0,
-  RegModeExclusive = 1,
-  RegModeRedirect  = 2,
-  RegModeInclusive = 3,
-  RegModeAuxiliary = 4
-} RegistrationMode;
+  ForwardPending* fwdPendingP = fwdPendingList;
 
+  while (fwdPendingP != NULL)
+  {
+    if (fwdPendingP->curlHandle != NULL)
+      curl_easy_cleanup(fwdPendingP->curlHandle);
 
+    if (fwdPendingP->curlHeaders != NULL)
+      curl_slist_free_all(fwdPendingP->curlHeaders);
 
-// -----------------------------------------------------------------------------
-//
-// registrationMode - FIXME: move to its own module
-//
-extern RegistrationMode registrationMode(const char* stringMode);
+    fwdPendingP = fwdPendingP->next;
+  }
 
-#endif  // SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+  curl_multi_cleanup(orionldState.curlFwdMultiP);
+}

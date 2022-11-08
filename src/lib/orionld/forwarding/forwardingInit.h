@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-#define SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDINGINIT_H_
+#define SRC_LIB_ORIONLD_FORWARDING_FORWARDINGINIT_H_
 
 /*
 *
@@ -30,23 +30,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// RegistrationMode -
+// forwardingInit -
 //
-typedef enum RegistrationMode
-{
-  RegModeNone      = 0,
-  RegModeExclusive = 1,
-  RegModeRedirect  = 2,
-  RegModeInclusive = 3,
-  RegModeAuxiliary = 4
-} RegistrationMode;
+extern void forwardingInit(void);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// registrationMode - FIXME: move to its own module
-//
-extern RegistrationMode registrationMode(const char* stringMode);
-
-#endif  // SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDINGINIT_H_
