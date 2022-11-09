@@ -51,7 +51,6 @@ extern "C"
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityInsert.h"                   // mongocEntityInsert
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
@@ -61,7 +60,34 @@ extern "C"
 #include "orionld/forwarding/forwardingFailure.h"                // forwardingFailure
 #include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"     // fwdPendingLookupByCurlHandle
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
+#include "orionld/forwarding/forwardingListsMerge.h"             // forwardingListsMerge
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
+
+
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// purgeRedirectedAttributes -
+//
+// After the redirected registrations are dealt with, we need to chop attributes off the body.
+// And after that continue with Inclusive registrations (and local DB)
+//
+void purgeRedirectedAttributes(ForwardPending* redirectList, KjNode* body)
+{
+  for (ForwardPending* fwdPendingP = redirectList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
+  {
+    for (KjNode* attrP = fwdPendingP->body->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    {
+      KjNode* bodyAttrP = kjLookup(body, attrP->name);
+
+      if (bodyAttrP != NULL)
+        kjChildRemove(body, bodyAttrP);
+    }
+  }
+}
 
 
 
@@ -90,8 +116,8 @@ bool orionldPostEntities(void)
     return false;
 
   int              forwards       = 0;
-  ForwardPending*  fwdPendingList = NULL;
   KjNode*          responseBody   = NULL;
+  ForwardPending*  fwdPendingList = NULL;
 
   if (forwarding)
   {
@@ -103,7 +129,50 @@ bool orionldPostEntities(void)
     char dateHeader[70];
     snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-    fwdPendingList = regMatchForEntityCreation(entityId, entityType, orionldState.requestTree);
+    //
+    // NOTE:  Need to be very careful here that we treat first all EXCLUSIVE registrations, as they "chop off" attributes to be forwarded
+    //        The other two (redirect, inclusive) don't, BUT only the remaining attributes AFTER the Exclusive regs have chopped off
+    //        attributes shall be forwarded for redirect+inclusive registrations.
+    //        Auxiliary registrations aren't allowed to receive create/update forwardes messages
+    //
+    // The fix is as follows:
+    //   ForwardPending* exclusiveList = regMatchForEntityCreation(RegModeExclusive, entityId, entityType, orionldState.requestTree); (chopping attrs off)
+    //   ForwardPending* redirectList  = regMatchForEntityCreation(RegModeRedirect, entityId, entityType, orionldState.requestTree);
+    //
+    //   purgeRedirectedAttributes(redirectList, orionldState.requestTree);
+    //
+    //   ForwardPending* inclusiveList = regMatchForEntityCreation(RegModeInclusive, entityId, entityType, orionldState.requestTree);
+    //
+    //   fwdPendingList = forwardingListsMerge(exclusiveList, redirectList);
+    //   fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
+    //
+    //   - Loop over fwdPendingList
+    //
+    // Example:
+    // - The Entity to be created (and distributed) has "id" "urn:E1", "type": "T" and 10 Properties P1-P10
+    // - Exclusive registration R1 of urn:E1/T+P1
+    // - Exclusive registration R2 of urn:E1/T+P2
+    // - Redirect  registration R3 of urn:E1/T+P3+P4+P5 (or just T+P3+P4+P5)
+    // - Redirect  registration R4 of urn:E1/T+P4+P5+P6
+    // - Inclusive registration R5 of urn:E1/T+P7+P8+P9+P10 (not possible to include P1-P6)
+    //
+    // The entity will be distributed like this:
+    // - P1 on R1::endpoint
+    // - P2 on R2::endpoint
+    // - P3-P5 on R3::endpoint
+    // - P4-P6 on R4::endpoint
+    // - P7-P10 on R5::endpoint
+    // - P7-P10 on local broker
+    //
+    ForwardPending* exclusiveList = regMatchForEntityCreation(RegModeExclusive, entityId, entityType, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
+    ForwardPending* redirectList  = regMatchForEntityCreation(RegModeRedirect, entityId, entityType, orionldState.requestTree);
+
+    if (redirectList != NULL)
+      purgeRedirectedAttributes(redirectList, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
+
+    ForwardPending* inclusiveList = regMatchForEntityCreation(RegModeInclusive, entityId, entityType, orionldState.requestTree);
+    fwdPendingList = forwardingListsMerge(exclusiveList, redirectList);
+    fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
 
     for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
     {
@@ -144,7 +213,7 @@ bool orionldPostEntities(void)
       }
 
       if ((++loops >= 10) && ((loops % 5) == 0))
-        LM_W(("curl_multi_perform doesn't seem to finish ..."));
+        LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
     }
 
     // Anything left for a local entity?
@@ -155,8 +224,6 @@ bool orionldPostEntities(void)
 
       kjChildAdd(orionldState.requestTree, entityIdP);
       kjChildAdd(orionldState.requestTree, entityTypeP);
-
-      kjTreeLog(orionldState.requestTree, "RM: Left of incoming entity (for local creation)");
     }
     else
       orionldState.requestTree = NULL;  // Meaning: nothing left for local DB
@@ -232,7 +299,7 @@ bool orionldPostEntities(void)
       }
     }
 
-    KjNode* dbEntityP = orionldState.requestTree;  // More adecuate to talk about DB-Entity from here on
+    KjNode* dbEntityP = orionldState.requestTree;  // More adequate to talk about DB-Entity from here on
 
     // datasets?
     if (orionldState.datasets != NULL)

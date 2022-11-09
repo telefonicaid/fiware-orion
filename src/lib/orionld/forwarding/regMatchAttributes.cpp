@@ -84,16 +84,27 @@ KjNode* regMatchAttributes(RegCacheItem* regP, KjNode* propertyNamesP, KjNode* r
     }
 
     //
-    // 'inclusive' registrations must CLONE the attribute
-    // The other two (exclusive, redirect) STEAL the attribute
+    // 'inclusive' and 'redirect' registrations must CLONE the attribute (as all ForwardPending items have their own body)
+    // The third one (exclusive) STEALS the attribute.
+    // However ... once all exclusive registrations are done chopping off attributes, the entity will stay intact.
+    // That's interesting!!!
+    // So:
+    // 1. Treat only exclusive regs - chop off
+    // 2. Treat all other regs - all of them can point to the very same payload body (what's left in orionldState.requestTree)
+    //    - Only, what if registrations have different @context ... ?  The short-names can differ
+    //      Might need all those clones anyway!    Pity ...
     //
-    if (regP->mode == RegModeInclusive)
-      matchP = kjClone(orionldState.kjsonP, attrP);
-    else
+    // Actually, as the regs can have different attributes registered, the payload may differ in that respect as well.
+    //
+    // FORGET ALL ABOUT THIS (I'm keeping the comment though, as it's important info), we MUST CLONE
+    //
+    if (regP->mode == RegModeExclusive)
     {
       matchP = attrP;
       kjChildRemove(incomingP, attrP);
     }
+    else
+      matchP = kjClone(orionldState.kjsonP, attrP);
 
     if (attrObject == NULL)
       attrObject = kjObject(orionldState.kjsonP, NULL);

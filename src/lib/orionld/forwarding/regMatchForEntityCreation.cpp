@@ -47,7 +47,7 @@ extern "C"
 // - "operations" must include "createEntity
 // - "information" must match by entity id+type and attributes if present in the registration
 //
-ForwardPending* regMatchForEntityCreation(const char* entityId, const char* entityType, KjNode* incomingP)
+ForwardPending* regMatchForEntityCreation(RegistrationMode regMode, const char* entityId, const char* entityType, KjNode* incomingP)
 {
   ForwardPending* fwdPendingHead = NULL;
   ForwardPending* fwdPendingTail = NULL;
@@ -59,6 +59,8 @@ ForwardPending* regMatchForEntityCreation(const char* entityId, const char* enti
     // FIXME: Set the regP->mode at creation/update time
     regP->mode = (regModeP != NULL)? registrationMode(regModeP->value.s) : RegModeInclusive;
     if (regP->mode == RegModeAuxiliary)
+      continue;
+    if ((regP->mode & regMode) == 0)
       continue;
 
     if (regMatchOperation(regP, "createEntity") == false)  // FIXME: "createEntity" should be an enum value

@@ -101,6 +101,9 @@ function dbInit()
   elif [ "$role" == "CP5" ]
   then
     baseDbName=${CP5_DB_NAME}
+  elif [ "$role" == "CP6" ]
+  then
+    baseDbName=${CP6_DB_NAME}
   else
     baseDbName=$1
   fi
@@ -402,6 +405,11 @@ function localBrokerStart()
     mkdir -p $CP5_LOG_DIR
     port=$CP5_PORT
     CB_START_CMD="$CB_START_CMD_PREFIX -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
+  elif [ "$role" == "CP6" ]
+  then
+    mkdir -p $CP6_LOG_DIR
+    port=$CP6_PORT
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP6_PORT -pidpath $CP6_PID_FILE -dbhost $dbHost:$dbPort -db $CP6_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP6_LOG_DIR $extraParams"
   fi
 
   # In case the PID file still exists ... (happens after crashes)
@@ -508,6 +516,9 @@ function localBrokerStop
   elif [ "$role" == "CP5" ]
   then
     port=$CP5_PORT
+  elif [ "$role" == "CP6" ]
+  then
+    port=$CP6_PORT
   fi
 
   # Test to see if we have a broker running on $port if so kill it!
@@ -673,6 +684,10 @@ function brokerStop
   then
     pidFile=$CP5_PID_FILE
     port=$CP5_PORT
+  elif [ "$role" == "CP6" ]
+  then
+    pidFile=$CP6_PID_FILE
+    port=$CP6_PORT
   fi
 
   logMsg "killing broker by sending /exit/harakiri request"

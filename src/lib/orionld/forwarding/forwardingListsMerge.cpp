@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-#define SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,28 +22,31 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/forwardingListsMerge.h"             // Own interface
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// RegistrationMode -
+// forwardingListsMerge -
 //
-typedef enum RegistrationMode
+ForwardPending* forwardingListsMerge(ForwardPending* list1, ForwardPending* list2)
 {
-  RegModeNone      = 0,
-  RegModeExclusive = 1,
-  RegModeRedirect  = 2,
-  RegModeInclusive = 4,
-  RegModeAuxiliary = 8
-} RegistrationMode;
+  if (list2 == NULL)
+    return list1;
+  else if (list1 == NULL)
+    return list2;
 
+  //
+  // Both lists are non-NULL
+  // Find the last item in list1 and make its next pointer point to the first in list2
+  //
+  ForwardPending* lastInList1 = list1;
+  while (lastInList1->next != NULL)
+    lastInList1 = lastInList1->next;
 
+  lastInList1->next = list2;
 
-// -----------------------------------------------------------------------------
-//
-// registrationMode - FIXME: move to its own module
-//
-extern RegistrationMode registrationMode(const char* stringMode);
-
-#endif  // SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+  return list1;
+}

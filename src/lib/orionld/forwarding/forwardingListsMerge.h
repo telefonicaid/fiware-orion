@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
-#define SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDINGLISTSMERGE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_FORWARDINGLISTSMERGE_H_
 
 /*
 *
@@ -25,28 +25,15 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 
 
 
 // -----------------------------------------------------------------------------
 //
-// RegistrationMode -
+// forwardingListsMerge -
 //
-typedef enum RegistrationMode
-{
-  RegModeNone      = 0,
-  RegModeExclusive = 1,
-  RegModeRedirect  = 2,
-  RegModeInclusive = 4,
-  RegModeAuxiliary = 8
-} RegistrationMode;
+extern ForwardPending* forwardingListsMerge(ForwardPending* exclusiveList, ForwardPending* nonExclusiveList);
 
 
-
-// -----------------------------------------------------------------------------
-//
-// registrationMode - FIXME: move to its own module
-//
-extern RegistrationMode registrationMode(const char* stringMode);
-
-#endif  // SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDINGLISTSMERGE_H_

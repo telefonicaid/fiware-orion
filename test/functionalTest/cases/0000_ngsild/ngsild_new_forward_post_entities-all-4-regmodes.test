@@ -1,0 +1,554 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarding of POST Entities requests - entity distributed using registrations of all 3 modes
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+dbInit CP4
+dbInit CP5
+dbInit CP6
+brokerStart CB  0 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+brokerStart CP2 0 IPv4 -experimental
+brokerStart CP3 0 IPv4 -experimental
+brokerStart CP4 0 IPv4 -experimental
+brokerStart CP5 0 IPv4 -experimental
+brokerStart CP6 0 IPv4 -experimental
+
+--SHELL--
+#
+# Test:
+# - The Entity to be created (and distributed) has "id" "urn:E1", "type": "T" and 10 Properties P1-P12
+# - Exclusive registration R1 of urn:E1/T+P1
+# - Exclusive registration R2 of urn:E1/T+P2
+# - Redirect  registration R3 of urn:E1/T+P3+P4+P5 (or just T+P3+P4+P5)
+# - Redirect  registration R4 of urn:E1/T+P4+P5+P6
+# - Inclusive registration R5 of urn:E1/T+P7+P8+P9+P10 (not possible to include P1-P6 as they're in exclusive/redirect regs already)
+# - Auxiliary registration R6 of urn:E1/T+P11+P12  (no forward is made for auxiliary registrations)
+#
+# The entity is distributed like this:
+# - P1 on R1::endpoint
+# - P2 on R2::endpoint
+# - P3-P5 on R3::endpoint
+# - P4-P6 on R4::endpoint
+# - P7-P10 on R5::endpoint
+# - P7-P12 on local broker
+# - Nothing on R6::endpoint
+#
+# 01. Exclusive registration R1 of urn:E1/T+P1
+# 02. Exclusive registration R2 of urn:E1/T+P2
+# 03. Redirect registration R3 of urn:E1/T+P3+P4+P5 (or just T+P3+P4+P5)
+# 04. Redirect registration R4 of urn:E1/T+P4+P5+P6
+# 05. Inclusive registration R5 of urn:E1/T+P7+P8+P9+P10
+# 06. Auxiliary registration R6 of urn:E1/T+P11+P12
+# 07. Create urn:E1/T+P1-P12 on CB - provoke 5 forwarded requests
+# 08. GET urn:E1 in CP1 (R1) - see P1 only
+# 09. GET urn:E1 in CP2 (R2) - see P2 only
+# 10. GET urn:E1 in CP3 (R3) - see P3-P5
+# 11. GET urn:E1 in CP4 (R4) - see P4-P6
+# 12. GET urn:E1 in CP5 (R5) - see P7-P10
+# 13. GET urn:E1 in CP6 (R6) - see 404 Not Found
+# 14. GET all entities in CB - see E1 with P7-P12
+# 15. Just for fun, GET the individual urn:E1 in CB (remember, this request implements the old PoC of forwarding)
+#
+
+echo "01. Exclusive registration R1 of urn:E1/T+P1"
+echo "============================================"
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Exclusive registration R2 of urn:E1/T+P2"
+echo "============================================"
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P2" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Redirect registration R3 of urn:E1/T+P3+P4+P5 (or just T+P3+P4+P5)"
+echo "======================================================================"
+payload='{
+  "id": "urn:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P3", "P4", "P5" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP3_PORT'",
+  "mode": "redirect"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Redirect registration R4 of urn:E1/T+P4+P5+P6"
+echo "================================================="
+payload='{
+  "id": "urn:R4",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P4", "P5", "P6" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP4_PORT'",
+  "mode": "redirect"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Inclusive registration R5 of urn:E1/T+P7+P8+P9+P10"
+echo "======================================================"
+payload='{
+  "id": "urn:R5",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P7", "P8", "P9", "P10" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP5_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "06. Auxiliary registration R6 of urn:E1/T+P11+P12"
+echo "================================================="
+payload='{
+  "id": "urn:R6",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P11", "P12" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP4_PORT'",
+  "mode": "auxiliary"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Create urn:E1/T+P1-P12 on CB - provoke 5 forwarded requests"
+echo "==============================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "For CP1",
+  "P2": "For CP2",
+  "P3": "For CP3",
+  "P4": "For CP3+CP4",
+  "P5": "For CP3+CP4",
+  "P6": "For CP4",
+  "P7": "For CP5+CB",
+  "P8": "For CP5+CB",
+  "P9": "For CP5+CB",
+  "P10": "For CP5+CB",
+  "P11": "For CB",
+  "P12": "For CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. GET urn:E1 in CP1 (R1) - see P1 only"
+echo "========================================"
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise" --port $CP1_PORT
+echo
+echo
+
+
+echo "09. GET urn:E1 in CP2 (R2) - see P2 only"
+echo "========================================"
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise" --port $CP2_PORT
+echo
+echo
+
+
+echo "10. GET urn:E1 in CP3 (R3) - see P3-P5"
+echo "======================================"
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise" --port $CP3_PORT
+echo
+echo
+
+
+echo "11. GET urn:E1 in CP4 (R4) - see P4-P6"
+echo "======================================"
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise" --port $CP4_PORT
+echo
+echo
+
+
+echo "12. GET urn:E1 in CP5 (R5) - see P7-P10"
+echo "======================================="
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise" --port $CP5_PORT
+echo
+echo
+
+
+echo "13. GET urn:E1 in CP6 (R6) - see 404 Not Found"
+echo "=============================================="
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise" --port $CP6_PORT
+echo
+echo
+
+
+echo "14. GET all entities in CB - see E1 with P7-P12"
+echo "==============================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=concise&local=true"
+echo
+echo
+
+
+echo "15. Just for fun, GET the individual urn:E1 in CB (remember, this request implements the old PoC of forwarding)"
+echo "==============================================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise"
+echo
+echo
+
+
+--REGEXPECT--
+01. Exclusive registration R1 of urn:E1/T+P1
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Exclusive registration R2 of urn:E1/T+P2
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+03. Redirect registration R3 of urn:E1/T+P3+P4+P5 (or just T+P3+P4+P5)
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R3
+
+
+
+04. Redirect registration R4 of urn:E1/T+P4+P5+P6
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R4
+
+
+
+05. Inclusive registration R5 of urn:E1/T+P7+P8+P9+P10
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R5
+
+
+
+06. Auxiliary registration R6 of urn:E1/T+P11+P12
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R6
+
+
+
+07. Create urn:E1/T+P1-P12 on CB - provoke 5 forwarded requests
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+08. GET urn:E1 in CP1 (R1) - see P1 only
+========================================
+HTTP/1.1 200 OK
+Content-Length: 41
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "For CP1",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+09. GET urn:E1 in CP2 (R2) - see P2 only
+========================================
+HTTP/1.1 200 OK
+Content-Length: 41
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P2": "For CP2",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+10. GET urn:E1 in CP3 (R3) - see P3-P5
+======================================
+HTTP/1.1 200 OK
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P3": "For CP3",
+    "P4": "For CP3+CP4",
+    "P5": "For CP3+CP4",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+11. GET urn:E1 in CP4 (R4) - see P4-P6
+======================================
+HTTP/1.1 200 OK
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P4": "For CP3+CP4",
+    "P5": "For CP3+CP4",
+    "P6": "For CP4",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+12. GET urn:E1 in CP5 (R5) - see P7-P10
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 99
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P10": "For CP5+CB",
+    "P7": "For CP5+CB",
+    "P8": "For CP5+CB",
+    "P9": "For CP5+CB",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+13. GET urn:E1 in CP6 (R6) - see 404 Not Found
+==============================================
+HTTP/1.1 404 Not Found
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+14. GET all entities in CB - see E1 with P7-P12
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P10": "For CP5+CB",
+        "P11": "For CB",
+        "P12": "For CB",
+        "P7": "For CP5+CB",
+        "P8": "For CP5+CB",
+        "P9": "For CP5+CB",
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+15. Just for fun, GET the individual urn:E1 in CB (remember, this request implements the old PoC of forwarding)
+===============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 674
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "For CP1"
+    },
+    "P10": {
+        "type": "Property",
+        "value": "For CP5+CB"
+    },
+    "P11": "For CB",
+    "P12": "For CB",
+    "P2": {
+        "type": "Property",
+        "value": "For CP2"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "For CP3"
+    },
+    "P4": {
+        "type": "Property",
+        "value": "For CP3+CP4"
+    },
+    "P5": {
+        "type": "Property",
+        "value": "For CP3+CP4"
+    },
+    "P6": {
+        "type": "Property",
+        "value": "For CP4"
+    },
+    "P7": {
+        "type": "Property",
+        "value": "For CP5+CB"
+    },
+    "P8": {
+        "type": "Property",
+        "value": "For CP5+CB"
+    },
+    "P9": {
+        "type": "Property",
+        "value": "For CP5+CB"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+brokerStop CP4
+brokerStop CP5
+brokerStop CP6
+#dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+dbDrop CP4
+dbDrop CP5
+dbDrop CP6

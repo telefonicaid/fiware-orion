@@ -26,6 +26,7 @@ SET (SOURCES
     forwardingRelease.cpp
     forwardingSuccess.cpp
     forwardingFailure.cpp
+    forwardingListsMerge.cpp
     fwdPendingLookupByCurlHandle.cpp
     regMatchEntityInfo.cpp
     regMatchInformationItem.cpp
