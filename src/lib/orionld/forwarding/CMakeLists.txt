@@ -22,6 +22,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     forwardingInit.cpp
+    FwdOperation.cpp
     forwardRequestSend.cpp
     forwardingRelease.cpp
     forwardingSuccess.cpp

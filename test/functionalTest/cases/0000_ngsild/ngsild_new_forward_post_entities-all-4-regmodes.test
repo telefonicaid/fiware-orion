@@ -94,6 +94,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP1_PORT'",
+  "operations": [ "createEntity" ],
   "mode": "exclusive"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -118,6 +119,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP2_PORT'",
+  "operations": [ "createEntity" ],
   "mode": "exclusive"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -142,6 +144,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP3_PORT'",
+  "operations": [ "createEntity" ],
   "mode": "redirect"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -166,6 +169,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP4_PORT'",
+  "operations": [ "createEntity" ],
   "mode": "redirect"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -189,7 +193,8 @@ payload='{
       "properties": [ "P7", "P8", "P9", "P10" ]
     }
   ],
-  "endpoint": "http://localhost:'$CP5_PORT'"
+  "endpoint": "http://localhost:'$CP5_PORT'",
+  "operations": [ "createEntity" ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo

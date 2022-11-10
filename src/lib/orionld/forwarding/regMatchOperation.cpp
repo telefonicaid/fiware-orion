@@ -22,7 +22,17 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
+}
+
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/forwarding/regMatchOperation.h"                // Own interface
 
 
 
@@ -34,5 +44,22 @@
 //
 bool regMatchOperation(RegCacheItem* regP, const char* op)
 {
-  return true;
+  KjNode* operations = kjLookup(regP->regTree, "operations");
+
+  if (operations == NULL)
+  {
+    LM_W(("Registration without operations - that can't be"));
+    kjTreeLog(regP->regTree, "Registration in reg-cache");
+    return false;
+  }
+
+  for (KjNode* operationP = operations->value.firstChildP; operationP != NULL; operationP = operationP->next)
+  {
+    if (operationP->type != KjString)
+      continue;
+    if (strcmp(operationP->value.s, op) == 0)
+      return true;
+  }
+
+  return false;
 }

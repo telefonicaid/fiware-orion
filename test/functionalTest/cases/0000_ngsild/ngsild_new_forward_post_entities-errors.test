@@ -63,6 +63,7 @@ payload='{
   ],
   "endpoint": "http://localhost:'$CP1_PORT'",
   "mode": "exclusive",
+  "operations": [ "createEntity" ],
   "contextSourceInfo": [
     {
       "key": "X1",
@@ -92,7 +93,8 @@ payload='{
     }
   ],
   "endpoint": "http://globalhost:'$CP2_PORT'",
-  "mode": "exclusive"
+  "mode": "exclusive",
+  "operations": [ "createEntity" ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
@@ -117,6 +119,7 @@ payload='{
   ],
   "endpoint": "http://localhost:'$CP3_PORT'",
   "mode": "exclusive",
+  "operations": [ "createEntity" ],
   "contextSourceInfo": [
     {
       "key": "X3",
@@ -147,6 +150,7 @@ payload='{
   ],
   "endpoint": "http://localhost:'$CP4_PORT'",
   "mode": "exclusive",
+  "operations": [ "createEntity" ],
   "contextSourceInfo": [
     {
       "key": "X3",
