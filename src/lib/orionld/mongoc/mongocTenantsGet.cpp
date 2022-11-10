@@ -70,11 +70,11 @@ bool mongocTenantsGet(void)
   bson_destroy(&reply);
 
   if (responseP == NULL)
-    return false;
+    LM_RE(false, ("unable to create KjNode tree from reply of mongoc_client_read_command_with_opts(admin, listDatabases), even though it returned true ..."));
 
   KjNode* databasesP = kjLookup(responseP, "databases");
   if (databasesP == NULL)
-    return false;
+    LM_RE(false, ("no 'databases' element found in reply from mongoc_client_read_command_with_opts(admin, listDatabases)"));
 
   for (KjNode* dbP = databasesP->value.firstChildP; dbP != NULL; dbP = dbP->next)
   {
