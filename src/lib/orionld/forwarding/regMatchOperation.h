@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
 
 
 
@@ -33,6 +34,6 @@
 //
 // regMatchOperation -
 //
-extern bool regMatchOperation(RegCacheItem* regP, const char* op);
+extern bool regMatchOperation(RegCacheItem* regP, FwdOperation op);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHOPERATION_H_

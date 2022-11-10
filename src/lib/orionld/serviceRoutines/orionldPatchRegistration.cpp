@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
+#include "orionld/types/RegistrationMode.h"                    // registrationMode
 #include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pcheckRegistration.h"           // pcheckRegistration
@@ -50,6 +51,7 @@ extern "C"
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
 #include "orionld/mongoc/mongocRegistrationReplace.h"          // mongocRegistrationReplace
+#include "orionld/forwarding/FwdOperation.h"                   // fwdOperationMask
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"  // Own Interface
 
 
@@ -689,15 +691,24 @@ bool orionldPatchRegistration(void)
     kjChildRemove(regPatch, nodeP);
 
 
-  //
-  // Update counters+timestamps of dbRegP from the cached registration (that may have newer values)
-  //
   if (rciP != NULL)
   {
+    //
+    // Update counters+timestamps of dbRegP from the cached registration (that may have newer values)
+    //
     if (rciP->deltas.timesSent   > 0)  regCounter(dbRegP,   "timesSent",   rciP->deltas.timesSent);
     if (rciP->deltas.timesFailed > 0)  regCounter(dbRegP,   "timesFailed", rciP->deltas.timesFailed);
     if (rciP->deltas.lastSuccess > 0)  regTimestamp(dbRegP, "lastSuccess", rciP->deltas.lastSuccess);
     if (rciP->deltas.lastFailure > 0)  regTimestamp(dbRegP, "lastFailure", rciP->deltas.lastFailure);
+
+    //
+    // Update the regTree fields that are "mirrored in RegCacheItem
+    //
+    KjNode* operationsP = kjLookup(regPatch, "operations");
+    KjNode* modeP       = kjLookup(regPatch, "mode");
+
+    rciP->opMask  = fwdOperationMask(operationsP);
+    rciP->mode    = (modeP != NULL)? registrationMode(modeP->value.s) : RegModeInclusive;
   }
 
   //

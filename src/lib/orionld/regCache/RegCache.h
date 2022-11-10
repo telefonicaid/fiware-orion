@@ -58,7 +58,8 @@ typedef struct RegCacheItem
 {
   KjNode*               regTree;
   RegDeltas             deltas;
-  RegistrationMode      mode;     // FIXME: Set in creation/patch
+  RegistrationMode      mode;
+  uint64_t              opMask;
   struct RegCacheItem*  next;
 } RegCacheItem;
 

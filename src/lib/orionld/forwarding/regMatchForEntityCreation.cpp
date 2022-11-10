@@ -54,21 +54,29 @@ ForwardPending* regMatchForEntityCreation(RegistrationMode regMode, const char* 
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-    KjNode* regModeP = kjLookup(regP->regTree, "mode");  // FIXME: mode needs to be part of RegCacheItem (as an enum)
-
-    // FIXME: Set the regP->mode at creation/update time
-    regP->mode = (regModeP != NULL)? registrationMode(regModeP->value.s) : RegModeInclusive;
     if (regP->mode == RegModeAuxiliary)
+    {
+      LM(("No Reg Match due to Auxiliary Registration"));
       continue;
+    }
     if ((regP->mode & regMode) == 0)
+    {
+      LM(("No Reg Match due to regMode"));
       continue;
+    }
 
-    if (regMatchOperation(regP, "createEntity") == false)  // FIXME: "createEntity" should be an enum value
+    if (regMatchOperation(regP, FwdCreateEntity) == false)  // FIXME: "createEntity" should be an enum value
+    {
+      LM(("No Reg Match due to Operation"));
       continue;
+    }
 
     ForwardPending* fwdPendingP = regMatchInformationArray(regP, entityId, entityType, incomingP);
     if (fwdPendingP == NULL)
+    {
+      LM(("No Reg Match due to Information Array"));
       continue;
+    }
 
     // Add fwdPendingP to the linked list
     if (fwdPendingHead == NULL)

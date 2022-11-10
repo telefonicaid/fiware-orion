@@ -29,3 +29,5 @@
 * Issue #280   Implemented PATCH /csourceRegistrations/{registrationId} using mongoc AND the Registration cache
 * Issue #280   Implemented GET /csourceRegistrations using the Registration cache (URL params still need implementation
 * Issue #280   Implemented GET /csourceRegistrations URL params attrs, id, idPattern (well, partially), and type
+* Issue #280   Implemented the new forwarding for POST /entities
+

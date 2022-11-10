@@ -86,8 +86,11 @@ bool pCheckRegistrationOperations(KjNode* operationsP)
 
     if (fwdOperationFromString(fwdOpP->value.s) == FwdNone)
     {
-      orionldError(OrionldBadRequestData, "Invalid value for Registration::operations array item", fwdOpP->value.s, 400);
-      return false;
+      if (fwdOperationAliasFromString(fwdOpP->value.s) == FwdNone)
+      {
+        orionldError(OrionldBadRequestData, "Invalid value for Registration::operations array item", fwdOpP->value.s, 400);
+        return false;
+      }
     }
   }
 

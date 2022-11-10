@@ -23,10 +23,13 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                             // strcmp
+#include <stdint.h>                                             // types: uint64_t, ...
 
 extern "C"
 {
 #include "kbase/kMacros.h"                                      // K_VEC_SIZE
+#include "kjson/KjNode.h"                                       // KjNode
+#include "kjson/kjLookup.h"                                     // kjLookup
 }
 
 #include "orionld/forwarding/FwdOperation.h"                    // Own interface
@@ -37,7 +40,7 @@ extern "C"
 //
 // fwdOperations -
 //
-const char* fwdOperations[] = {
+const char* fwdOperations[37] = {
   "none",
   "createEntity",
   "updateEntity",
@@ -76,14 +79,34 @@ const char* fwdOperations[] = {
   "updateSubscription",
   "retrieveSubscription",
   "querySubscription",
-  "deleteSubscription",
+  "deleteSubscription"
+};
 
-  // Aliases for pre-defined groups of operations
+
+// -----------------------------------------------------------------------------
+//
+// fwdOperationAlias -
+//
+// Aliases for pre-defined groups of operations
+//
+const char* fwdOperationAlias[5] = {
+  "none",
   "federationOps",
   "updateOps",
   "retrieveOps",
   "redirectionOps"
 };
+
+
+
+#define M(x) (1LL << x)
+uint64_t federationOpsMask   = M(FwdRetrieveEntity)       | M(FwdQueryEntity)       | M(FwdCreateSubscription) | M(FwdUpdateSubscription) |
+                               M(FwdRetrieveSubscription) | M(FwdQuerySubscription) | M(FwdDeleteSubscription);
+uint64_t updateOpsMask       = M(FwdUpdateEntity)         | M(FwdUpdateAttrs)       | M(FwdReplaceEntity)      | M(FwdReplaceAttrs);
+uint64_t retrieveOpsMask     = M(FwdRetrieveEntity)       | M(FwdQueryEntity);
+uint64_t redirectionOpsMask  = M(FwdCreateEntity)         | M(FwdUpdateEntity)      | M(FwdAppendAttrs)        | M(FwdUpdateAttrs)        |
+                               M(FwdDeleteAttrs)          | M(FwdDeleteEntity)      | M(FwdMergeEntity)        | M(FwdReplaceEntity)      |
+                               M(FwdReplaceAttrs)         | M(FwdRetrieveEntity)    | M(FwdQueryEntity);
 
 
 
@@ -114,4 +137,57 @@ FwdOperation fwdOperationFromString(const char* fwdOp)
   }
 
   return FwdNone;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// fwdOperationAliasFromString -
+//
+FwdOperation fwdOperationAliasFromString(const char* fwdOp)
+{
+  for (long unsigned int ix = 1; ix < K_VEC_SIZE(fwdOperationAlias); ix++)
+  {
+    if (strcmp(fwdOp, fwdOperationAlias[ix]) == 0)
+      return (FwdOperation) ix;
+  }
+
+  return FwdNone;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// fwdOperationMask -
+//
+uint64_t fwdOperationMask(KjNode* operationsP)
+{
+  if (operationsP == NULL)
+    return federationOpsMask;
+
+  uint64_t mask = 0;
+  for (KjNode* operationP = operationsP->value.firstChildP; operationP != NULL; operationP = operationP->next)
+  {
+    char* op = operationP->value.s;
+
+    if      (strcmp(op, "federationOps")  == 0)      mask |= federationOpsMask;
+    else if (strcmp(op, "updateOps")      == 0)      mask |= updateOpsMask;
+    else if (strcmp(op, "retrieveOps")    == 0)      mask |= retrieveOpsMask;
+    else if (strcmp(op, "redirectionOps") == 0)      mask |= redirectionOpsMask;
+    else
+    {
+      for (unsigned int ix = 1; ix < K_VEC_SIZE(fwdOperations); ix++)
+      {
+        if (strcmp(op, fwdOperations[ix]) == 0)
+        {
+          mask |= (1 << ix);
+          break;
+        }
+      }
+    }
+  }
+
+  return mask;
 }

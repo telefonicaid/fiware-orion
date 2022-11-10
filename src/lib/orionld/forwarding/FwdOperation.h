@@ -25,7 +25,10 @@
 *
 * Author: Ken Zangelin
 */
-
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 // -----------------------------------------------------------------------------
@@ -98,5 +101,21 @@ extern const char* fwdOperationToString(FwdOperation op);
 // fwdOperationFromString -
 //
 extern FwdOperation fwdOperationFromString(const char* fwdOp);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// fwdOperationAliasFromString -
+//
+extern FwdOperation fwdOperationAliasFromString(const char* fwdOp);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// fwdOperationMask -
+//
+extern uint64_t fwdOperationMask(KjNode* operationsP);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_FWDOPERATION_H_

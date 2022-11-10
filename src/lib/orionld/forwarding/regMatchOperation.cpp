@@ -31,6 +31,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/forwarding/regMatchOperation.h"                // Own interface
 
@@ -40,9 +41,7 @@ extern "C"
 //
 // regMatchOperation -
 //
-// FIXME: the operations should be a bitmask in RegCacheItem - no kjLookup, no string comparisons
-//
-bool regMatchOperation(RegCacheItem* regP, const char* op)
+bool regMatchOperation(RegCacheItem* regP, FwdOperation op)
 {
   KjNode* operations = kjLookup(regP->regTree, "operations");
 
@@ -53,13 +52,6 @@ bool regMatchOperation(RegCacheItem* regP, const char* op)
     return false;
   }
 
-  for (KjNode* operationP = operations->value.firstChildP; operationP != NULL; operationP = operationP->next)
-  {
-    if (operationP->type != KjString)
-      continue;
-    if (strcmp(operationP->value.s, op) == 0)
-      return true;
-  }
-
-  return false;
+  uint64_t opShifted = (1L << op);
+  return ((regP->opMask & opShifted) == opShifted);
 }

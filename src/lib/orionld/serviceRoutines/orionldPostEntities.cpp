@@ -174,59 +174,63 @@ bool orionldPostEntities(void)
     fwdPendingList = forwardingListsMerge(exclusiveList, redirectList);
     fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
 
-    for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
+    if (fwdPendingList != NULL)
     {
-      // Send the forwarded request and await all responses
-      if (fwdPendingP->regP != NULL)
+      for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
       {
-        if (forwardRequestSend(fwdPendingP, dateHeader) == 0)
+        // Send the forwarded request and await all responses
+        if (fwdPendingP->regP != NULL)
         {
-          ++forwards;
-          fwdPendingP->error = false;
+          LM(("Sending forwarded request"));
+          if (forwardRequestSend(fwdPendingP, dateHeader) == 0)
+          {
+            ++forwards;
+            fwdPendingP->error = false;
+          }
+          else
+            fwdPendingP->error = true;
         }
-        else
-          fwdPendingP->error = true;
-      }
-    }
-
-    int stillRunning = 1;
-    int loops        = 0;
-
-    while (stillRunning != 0)
-    {
-      CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
-      if (cm != 0)
-      {
-        LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
-        forwards = 0;
-        break;
       }
 
-      if (stillRunning != 0)
+      int stillRunning = 1;
+      int loops        = 0;
+
+      while (stillRunning != 0)
       {
-        cm = curl_multi_wait(orionldState.curlFwdMultiP, NULL, 0, 1000, NULL);
-        if (cm != CURLM_OK)
+        CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
+        if (cm != 0)
         {
-          LM_E(("Internal Error (curl_multi_wait: error %d", cm));
+          LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
+          forwards = 0;
           break;
         }
+
+        if (stillRunning != 0)
+        {
+          cm = curl_multi_wait(orionldState.curlFwdMultiP, NULL, 0, 1000, NULL);
+          if (cm != CURLM_OK)
+          {
+            LM_E(("Internal Error (curl_multi_wait: error %d", cm));
+            break;
+          }
+        }
+
+        if ((++loops >= 10) && ((loops % 5) == 0))
+          LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
       }
 
-      if ((++loops >= 10) && ((loops % 5) == 0))
-        LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
-    }
+      // Anything left for a local entity?
+      if (orionldState.requestTree->value.firstChildP != NULL)
+      {
+        KjNode* entityIdP   = kjString(orionldState.kjsonP,  "id",   entityId);
+        KjNode* entityTypeP = kjString(orionldState.kjsonP,  "type", entityType);
 
-    // Anything left for a local entity?
-    if (orionldState.requestTree->value.firstChildP != NULL)
-    {
-      KjNode* entityIdP   = kjString(orionldState.kjsonP,  "id",   entityId);
-      KjNode* entityTypeP = kjString(orionldState.kjsonP,  "type", entityType);
-
-      kjChildAdd(orionldState.requestTree, entityIdP);
-      kjChildAdd(orionldState.requestTree, entityTypeP);
+        kjChildAdd(orionldState.requestTree, entityIdP);
+        kjChildAdd(orionldState.requestTree, entityTypeP);
+      }
+      else
+        orionldState.requestTree = NULL;  // Meaning: nothing left for local DB
     }
-    else
-      orionldState.requestTree = NULL;  // Meaning: nothing left for local DB
 
     //
     // After sending all forwarded requests, we let the local DB access run

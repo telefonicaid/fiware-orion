@@ -33,7 +33,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
+#include "orionld/forwarding/FwdOperation.h"                     // fwdOperationMask
 #include "orionld/regCache/regCacheItemAdd.h"                    // Own interface
 
 
@@ -98,7 +100,7 @@ static void regStringAdd(KjNode* regP, const char* name, const char* value)
 //
 RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
 {
-  RegCacheItem* rciP = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
+  RegCacheItem* rciP   = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
 
   //
   // Insert the new RegCacheItem LAST in rcP's linked list of registrations
@@ -112,6 +114,17 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
   rcP->last = rciP;
 
   rciP->regTree = kjClone(NULL, regP);
+
+  //
+  // Some fields are "mirrored" inside RegCacheItem, for faster access
+  // FIXME: Make a function of these 4 lines (it will grow)
+  //        The exact same thing is done in orionldPatchRegistration
+  //
+  KjNode* operationsP = kjLookup(regP, "operations");
+  KjNode* modeP       = kjLookup(regP, "mode");
+
+  rciP->opMask  = fwdOperationMask(operationsP);
+  rciP->mode    = (modeP != NULL)? registrationMode(modeP->value.s) : RegModeInclusive;
 
   // Counters and timestamps - create if they don't exist
   if (fromDb == false)

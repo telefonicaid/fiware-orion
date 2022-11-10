@@ -214,7 +214,6 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
     curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_SSL_VERIFYHOST, 0L);                 // DO NOT verify the certificate's name against host
   }
 
-  LM(("FWD: Setting CURLOPT_HTTPHEADER, headers at %p", headers));
   curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_HTTPHEADER, headers);
 
   //
