@@ -291,3 +291,129 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en,
 
   return true;
 }
+
+
+
+/* ****************************************************************************
+*
+* strintValueOrNull -
+*/
+static std::string strintValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key)
+{
+  std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
+  if (iter == replacementsP->end())
+  {
+    return "null";
+  }
+  else
+  {
+    // replacementP contents are prepared for "full replacement" case, so string values use
+    // double quotes. But in this case we are in a "partial replacement" case, so we have
+    // to remove them if we find them
+    std::string value = iter->second;
+    if (value[0] == '"')
+    {
+      return value.substr(1, value.size()-2);
+    }
+    else
+    {
+      return value;
+    }
+  }
+}
+
+
+
+// FIXME PR: to be unified
+bool macroSubstitute(std::string* to, const std::string& from, std::map<std::string, std::string>* replacementsP)
+{
+  // Initial size check: is the string to convert too big?
+  //
+  // If the string to convert is bigger than the maximum allowed buffer size (outReqMsgMaxSize),
+  // then there is an important probability that the resulting string after substitution is also > outReqMsgMaxSize.
+  //
+  // This check avoids to copy 8MB to later only throw it away and return an error
+  // That is the advantage.
+  //
+  // There is an inconvenience as well.
+  //
+  // The inconvenience is for buffers that are larger before substitution than they are after substitution.
+  // Those buffers aren't let through this check, and end up in an error.
+  //
+  // We assume that this second case is more than rare
+  //
+  if (from.size() > outReqMsgMaxSize)
+  {
+    LM_E(("Runtime Error (too large initial string, before substitution)"));
+    *to = "";
+    return false;
+  }
+
+  // Look for macros (using a hash map to count how many times each macro appears)
+  std::map<std::string, unsigned int>  macroNames;  // holds all the positions that each sub occur inside 'from'
+  size_t                               macroStart = from.find("${", 0);
+
+  while (macroStart != std::string::npos)
+  {
+    size_t macroEnd = from.find("}", macroStart);
+
+    if (macroEnd == std::string::npos)
+    {
+      LM_W(("macro end not found, syntax error, aborting substitution"));
+      *to = "";
+      return false;
+    }
+
+    std::string macroName = from.substr(macroStart + 2, macroEnd - (macroStart + 2));
+    if (macroNames.find(macroName) != macroNames.end())
+    {
+      macroNames[macroName]++;
+    }
+    else
+    {
+      macroNames[macroName] = 1;
+    }
+
+    macroStart = from.find("${", macroEnd + 1);
+  }
+
+  // Calculate resulting size (if > outReqMsgMaxSize, then reject)
+  unsigned long  toReduce = 0;
+  unsigned long  toAdd    = 0;
+
+  for (std::map<std::string, unsigned int>::iterator it = macroNames.begin(); it != macroNames.end(); ++it)
+  {
+    std::string   macroName = it->first;
+    unsigned int  times     = it->second;
+
+    // The +3 is due to "${" and "}"
+    toReduce += (macroName.length() + 3) * times;
+    toAdd += strintValueOrNull(replacementsP, macroName).length() * times;
+  }
+
+  if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
+  {
+    LM_E(("Runtime Error (too large final string, after substitution)"));
+    *to = "";
+    return false;
+  }
+
+  // Macro replace
+  *to = from;
+  for (std::map<std::string, unsigned int>::iterator it = macroNames.begin(); it != macroNames.end(); ++it)
+  {
+    std::string macroName = it->first;
+    unsigned int times    = it->second;
+
+    std::string macro = "${" + macroName + "}";
+    std::string value = strintValueOrNull(replacementsP, macroName);
+
+    // We have to do the replace operation as many times as macro occurrences
+    for (unsigned int ix = 0; ix < times; ix++)
+    {
+      to->replace(to->find(macro), macro.length(), value);
+    }
+  }
+
+  return true;
+}
