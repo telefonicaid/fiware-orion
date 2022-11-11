@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>                                               // regfree
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -83,6 +85,15 @@ bool regCacheItemRemove(RegCache* rcP, const char* regId)
 
       // Free the reg-cache item to be deleted (call regCacheItemRelease(rciP)?)
       kjFree(rciP->regTree);
+
+      // In case we have any regex's, free them
+      for (RegIdPattern* ripP = rciP->idPatternRegexList; ripP != NULL; ripP = ripP->next)
+      {
+        regfree(&ripP->regex);
+        // ripP needs to be freed as well ...  regCacheItemRegexRelease()
+      }
+
+      // And finally, free the entire struct
       free(rciP);
 
       return true;

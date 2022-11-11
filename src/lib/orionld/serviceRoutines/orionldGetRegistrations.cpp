@@ -46,7 +46,7 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// apiModelFromCachedRegistration - FIXME: Move to dbModel library?
+// apiModelFromCachedRegistration - FIXME: Move to dbModel library, or elsewhere?
 //
 extern void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, bool sysAttrs);
 

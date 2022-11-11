@@ -181,7 +181,6 @@ bool orionldPostEntities(void)
         // Send the forwarded request and await all responses
         if (fwdPendingP->regP != NULL)
         {
-          LM(("Sending forwarded request"));
           if (forwardRequestSend(fwdPendingP, dateHeader) == 0)
           {
             ++forwards;

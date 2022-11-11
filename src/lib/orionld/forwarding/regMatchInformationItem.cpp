@@ -50,7 +50,7 @@ KjNode* regMatchInformationItem(RegCacheItem* regP, KjNode* infoP, const char* e
     bool match = false;
     for (KjNode* entityInfoP = entities->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
     {
-      if (regMatchEntityInfo(entityInfoP, entityId, entityType) == true)
+      if (regMatchEntityInfo(regP, entityInfoP, entityId, entityType) == true)
       {
         match = true;
         break;

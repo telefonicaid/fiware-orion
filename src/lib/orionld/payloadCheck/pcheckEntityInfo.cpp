@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>                                               // regcomp, regfree
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                       // KjNode
@@ -37,6 +39,30 @@ extern "C"
 #include "orionld/context/orionldContextItemExpand.h"           // orionldContextItemExpand
 #include "orionld/context/orionldContextItemAlreadyExpanded.h"  // orionldContextItemAlreadyExpanded
 #include "orionld/payloadCheck/pcheckEntityInfo.h"              // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// regexCheck -
+//
+static bool regexCheck(const char* pattern)
+{
+  regex_t regex;
+  bool    r;
+
+  r = regcomp(&regex, pattern, REG_EXTENDED);
+
+  regfree(&regex);
+
+  if (r != 0)
+  {
+    LM_W(("Invalid regex '%s' - error %d from regcomp", r));
+    return false;
+  }
+
+  return true;
+}
 
 
 
@@ -67,7 +93,16 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, const char** fiel
       DUPLICATE_CHECK(idPatternP, fieldPathV[3], entityItemP);
       STRING_CHECK(entityItemP, fieldPathV[3]);
       EMPTY_STRING_CHECK(entityItemP, fieldPathV[3]);
-      // FIXME: How check for valid REGEX???
+
+      //
+      // It is not ideal to do the regexcomp TWICE, but it makes the implementation a little simpler - less bugs
+      // Really, how often are registrations created/patched?
+      //
+      if (regexCheck(idPatternP->value.s) == false)
+      {
+        orionldError(OrionldBadRequestData, "Invalid REGEX in EntityInfo::idPattern", idPatternP->value.s, 400);
+        return false;
+      }
     }
     else if ((strcmp(entityItemP->name, "type") == 0) || (strcmp(entityItemP->name, "@type") == 0))
     {
