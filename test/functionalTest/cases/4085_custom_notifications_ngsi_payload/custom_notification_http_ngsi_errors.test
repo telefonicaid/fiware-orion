@@ -30,6 +30,8 @@ brokerStart CB
 --SHELL--
 
 #
+# FIXME PR: add case with replacement with unbalanced ${
+#
 # 01. Create custom subscription with payload and ngsi field, see error
 # 02. Create custom subscription with json and ngsi field, see error
 # 03. Create custom subscription with ngsi field with metadata, see error

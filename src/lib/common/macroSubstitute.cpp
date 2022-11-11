@@ -296,9 +296,9 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en,
 
 /* ****************************************************************************
 *
-* strintValueOrNull -
+* stringValueOrNull -
 */
-static std::string strintValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key)
+static std::string stringValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key)
 {
   std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
   if (iter == replacementsP->end())
@@ -388,7 +388,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += strintValueOrNull(replacementsP, macroName).length() * times;
+    toAdd += stringValueOrNull(replacementsP, macroName).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -406,7 +406,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = strintValueOrNull(replacementsP, macroName);
+    std::string value = stringValueOrNull(replacementsP, macroName);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)

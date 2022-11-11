@@ -261,8 +261,81 @@ static bool setNgsiPayload
   NotifyContextRequest   ncr;
   ContextElementResponse cer;
 
-  std::string effectiveId = ngsi.id.empty()? en.id : ngsi.id;
-  std::string effectiveType = ngsi.type.empty()? en.type : ngsi.type;
+  std::string effectiveId;
+  if (ngsi.id.empty())
+  {
+    effectiveId = en.id;
+  }
+  else
+  {
+    // FIXME PR: duplicated code in CompoundValueNode.cpp
+    if ((ngsi.id.rfind("${") == 0) && (ngsi.id.rfind("}", ngsi.id.size()) == ngsi.id.size() - 1))
+    {
+      // "Full replacement" case. In this case, the result is not always a string
+      // len("${") + len("}") = 3
+      std::string macroName = ngsi.id.substr(2, ngsi.id.size() - 3);
+      std::map<std::string, std::string>::iterator iter = replacements.find(macroName);
+      if (iter == replacements.end())
+      {
+        // macro doesn't exist in the replacement map, so we use en.id as failsave
+        effectiveId = en.id;
+      }
+      else
+      {
+        // Note we have to remove double quotes here
+        effectiveId = iter->second.substr(1, iter->second.size()-2);
+      }
+    }
+    else
+    {
+      // "Partial replacement" case. In this case, the result is always a string
+      std::string effectiveValue;
+      if (!macroSubstitute(&effectiveValue, ngsi.id, &replacements))
+      {
+        // error already logged in macroSubstitute, using en.id itself as failsafe
+        effectiveValue = en.id;
+      }
+      effectiveId = effectiveValue;
+    }
+  }
+
+  std::string effectiveType;
+  if (ngsi.type.empty())
+  {
+    effectiveType = en.type;
+  }
+  else
+  {
+    // FIXME PR: duplicated code in CompoundValueNode.cpp
+    if ((ngsi.type.rfind("${") == 0) && (ngsi.type.rfind("}", ngsi.type.size()) == ngsi.type.size() - 1))
+    {
+      // "Full replacement" case. In this case, the result is not always a string
+      // len("${") + len("}") = 3
+      std::string macroName = ngsi.type.substr(2, ngsi.type.size() - 3);
+      std::map<std::string, std::string>::iterator iter = replacements.find(macroName);
+      if (iter == replacements.end())
+      {
+        // macro doesn't exist in the replacement map, so we use en.id as failsave
+        effectiveType = en.type;
+      }
+      else
+      {
+        // Note we have to remove double quotes here
+        effectiveType = iter->second.substr(1, iter->second.size()-2);
+      }
+    }
+    else
+    {
+      // "Partial replacement" case. In this case, the result is always a string
+      std::string effectiveValue;
+      if (!macroSubstitute(&effectiveValue, ngsi.type, &replacements))
+      {
+        // error already logged in macroSubstitute, using en.id itself as failsafe
+        effectiveValue = en.type;
+      }
+      effectiveType = effectiveValue;
+    }
+  }
 
   cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
 
