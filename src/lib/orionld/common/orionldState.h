@@ -52,6 +52,7 @@ extern "C"
 
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/OrionldResponseBuffer.h"                // OrionldResponseBuffer
+#include "orionld/kjTree/kjTreeLog.h"                            // Because it is so often used but then removed again ...
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldPrefixCache.h"                    // OrionldPrefixCache

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITY_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITY_H_
+#ifndef SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETENTITY_H_
+#define SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETENTITY_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,8 +30,8 @@
 
 // ----------------------------------------------------------------------------
 //
-// orionldGetEntity -
+// legacyGetEntity -
 //
-extern bool orionldGetEntity(void);
+extern bool legacyGetEntity(void);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITY_H_
+#endif  // SRC_LIB_ORIONLD_LEGACYDRIVER_LEGACYGETENTITY_H_

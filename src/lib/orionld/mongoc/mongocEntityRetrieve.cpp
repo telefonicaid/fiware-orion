@@ -371,6 +371,9 @@ static bool datamodelAttributeFix(KjNode* attrP, const char* entityId, bool sysA
 //
 // FIXME: Only do DB stuff - for dbModel stuff use dbModelToApiEntity()
 //
+// This function is solely used by legacyGetEntity() which is being deprecated.
+// As soon as legacyGetEntity is gone, this function will disappear as well (same PR).
+//
 // PARAMETERS
 //   entityId        ID of the entity to be retrieved
 //   attrs           array of attribute names, terminated by a NULL pointer

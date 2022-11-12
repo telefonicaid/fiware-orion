@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 
 
@@ -39,6 +40,13 @@ extern "C"
 //
 // regMatchForEntityCreation -
 //
-extern ForwardPending* regMatchForEntityCreation(RegistrationMode regMode, const char* entityId, const char* entityType, KjNode* incomingP);
+extern ForwardPending* regMatchForEntityCreation
+(
+  RegistrationMode regMode,
+  FwdOperation     operation,
+  const char*      entityId,
+  const char*      entityType,
+  KjNode*          incomingP
+);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHFORENTITYCREATION_H_

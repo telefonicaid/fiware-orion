@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITY_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITY_H_
+#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCAUXATTRIBUTESFILTER_H_
+#define SRC_LIB_ORIONLD_MONGOC_MONGOCAUXATTRIBUTESFILTER_H_
 
 /*
 *
@@ -25,13 +25,21 @@
 *
 * Author: Ken Zangelin
 */
+#include <bson/bson.h>                                           // bson_t, ...
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/types/StringArray.h"                           // StringArray
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldGetEntity -
+// mongocAuxAttributesFilter - 
 //
-extern bool orionldGetEntity(void);
+extern bool mongocAuxAttributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP, const char* geojsonGeometry);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITY_H_
+#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCAUXATTRIBUTESFILTER_H_

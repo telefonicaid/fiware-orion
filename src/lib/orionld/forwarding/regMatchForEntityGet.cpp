@@ -25,17 +25,15 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
-#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArray.h"         // regMatchInformationArray
-#include "orionld/forwarding/regMatchForEntityCreation.h"        // Own interface
+#include "orionld/forwarding/regMatchForEntityGet.h"             // Own interface
 
 
 
@@ -44,17 +42,18 @@ extern "C"
 // regMatchForEntityCreation -
 //
 // To match for Entity Creation, a registration needs:
-// - "mode" != "auxiliary"
-// - "operations" must include "createEntity
-// - "information" must match by entity id+type and attributes if present in the registration
+// - "operations" must include "retrieveEntity"
+// - "information" must match by
+//   - entity id and
+//   - attributes if present in the registration (and 'attrs' URL param)
 //
-ForwardPending* regMatchForEntityCreation
+ForwardPending* regMatchForEntityRetrieval
 (
   RegistrationMode regMode,
   FwdOperation     operation,
   const char*      entityId,
-  const char*      entityType,
-  KjNode*          incomingP
+  StringList*      attrs,
+  
 )
 {
   ForwardPending* fwdPendingHead = NULL;

@@ -48,7 +48,7 @@ bool orionldDeleteEntity(void)
   // Make sure the Entity ID is a valid URI
   PCHECK_URI(entityId, true, 0, "Invalid Entity ID", "Must be a valid URI", 400);
 
-  if (mongocEntityLookup(entityId) == NULL)
+  if (mongocEntityLookup(entityId, NULL, NULL) == NULL)  // FIXME: Overkill to extract the entire entity from the DB
   {
     orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
     return false;
