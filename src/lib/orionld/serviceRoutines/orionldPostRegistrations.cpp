@@ -214,7 +214,7 @@ bool orionldPostRegistrations(void)
   // Add the property tree at the end
   kjChildAdd(orionldState.requestTree, propertyTree);
 
-  apiModelToCacheRegistration(orionldState.requestTree);  // FIXME: Try to do it without this function 
+  apiModelToCacheRegistration(orionldState.requestTree);  // FIXME: Try to do it without this function
   regCacheItemAdd(orionldState.tenantP->regCache, orionldState.requestTree, false);  // Clones the registration
 
   // This is where "id" is changed to "_id"
