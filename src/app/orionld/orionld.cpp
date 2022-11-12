@@ -809,7 +809,7 @@ static void libLogFunction
 }
 
 
-
+#ifdef DEBUG
 // -----------------------------------------------------------------------------
 //
 // regCachePresent -
@@ -849,6 +849,7 @@ void regCachePresent(void)
     }
   }
 }
+#endif
 
 
 
