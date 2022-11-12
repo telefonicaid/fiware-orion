@@ -32,8 +32,8 @@ extern "C"
 }
 
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/regCache/regCacheItemRegexRelease.h"           // regCacheItemRegexRelease
 #include "orionld/regCache/regCacheItemRemove.h"                 // Own interface
-
 
 
 // -----------------------------------------------------------------------------
@@ -87,11 +87,7 @@ bool regCacheItemRemove(RegCache* rcP, const char* regId)
       kjFree(rciP->regTree);
 
       // In case we have any regex's, free them
-      for (RegIdPattern* ripP = rciP->idPatternRegexList; ripP != NULL; ripP = ripP->next)
-      {
-        regfree(&ripP->regex);
-        // ripP needs to be freed as well ...  regCacheItemRegexRelease()
-      }
+      regCacheItemRegexRelease(rciP);
 
       // And finally, free the entire struct
       free(rciP);

@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHERITEMREGEXELEASE_H_
+#define SRC_LIB_ORIONLD_REGCACHE_REGCACHERITEMREGEXELEASE_H_
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -22,40 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdlib.h>                                            // free
-
-extern "C"
-{
-#include "kjson/kjFree.h"                                      // kjFree
-}
-
-#include "orionld/regCache/RegCache.h"                         // RegCache
-#include "orionld/regCache/regCacheItemRegexRelease.h"         // regCacheItemRegexRelease
-#include "orionld/regCache/regCacheRelease.h"                  // Own interface
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regCacheRelease -
+// regCacheItemRegexRelease - free any old REGEX in the rciP->idPatternRegexList
 //
-void regCacheRelease(RegCache* regCacheP)
-{
-  RegCacheItem* rciP = regCacheP->regList;
-  RegCacheItem* next;
+extern void regCacheItemRegexRelease(RegCacheItem* rciP);
 
-  while (rciP != NULL)
-  {
-    next = rciP->next;
-
-    kjFree(rciP->regTree);
-    if (rciP->idPatternRegexList != NULL)
-      regCacheItemRegexRelease(rciP);
-
-    free(rciP);
-
-    rciP = next;
-  }
-
-  free(regCacheP);
-}
+#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHERITEMREGEXELEASE_H_

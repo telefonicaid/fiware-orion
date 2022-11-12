@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/regCache/RegCache.h"                         // RegCacheItem
 #include "orionld/regCache/regCacheItemLookup.h"               // regCacheItemLookup
 #include "orionld/regCache/regCacheIdPatternRegexCompile.h"    // regCacheIdPatternRegexCompile
+#include "orionld/regCache/regCacheItemRegexRelease.h"         // regCacheItemRegexRelease
 #include "orionld/dbModel/dbModelFromApiRegistration.h"        // dbModelFromApiRegistration
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
@@ -701,21 +702,7 @@ bool orionldPatchRegistration(void)
     KjNode* informationP = kjLookup(regPatch, "information");
 
     if (informationP != NULL)
-    {
-      // Free any old REGEX in the rciP->idPatternRegexList
-      // This is done also in regCacheItemRemove, so, create a function for it [ regCacheItemRegexRelease(RegIdPattern* ripP) ]
-
-      RegIdPattern* ripP = rciP->idPatternRegexList;
-      RegIdPattern* next;
-      while (ripP != NULL)
-      {
-        next = ripP->next;
-
-        regfree(&ripP->regex);
-        free(ripP);
-        ripP = next;
-      }
-    }
+      regCacheItemRegexRelease(rciP);
   }
 
   //
@@ -754,8 +741,6 @@ bool orionldPatchRegistration(void)
 
   if (informationP != NULL)
   {
-    rciP->idPatternRegexList = NULL;
-
     if (regCacheIdPatternRegexCompile(rciP, informationP) == false)
       LM_X(1, ("Internal Error (if this happens it's a bug of Orion-LD - the idPattern was checked in pcheckEntityInfo and all OK"));
   }
