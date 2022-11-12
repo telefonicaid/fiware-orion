@@ -22,15 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdlib.h>                                              // free
+#include <stdlib.h>                                            // free
 
 extern "C"
 {
-#include "kjson/kjFree.h"                                        // kjFree
+#include "kjson/kjFree.h"                                      // kjFree
 }
 
-#include "orionld/regCache/RegCache.h"                           // RegCache
-#include "orionld/regCache/regCacheRelease.h"                    // Own interface
+#include "orionld/regCache/RegCache.h"                         // RegCache
+#include "orionld/regCache/regCacheItemRegexRelease.h"         // regCacheItemRegexRelease
+#include "orionld/regCache/regCacheRelease.h"                  // Own interface
 
 
 
@@ -40,17 +41,20 @@ extern "C"
 //
 void regCacheRelease(RegCache* regCacheP)
 {
-  RegCacheItem* regP = regCacheP->regList;
+  RegCacheItem* rciP = regCacheP->regList;
   RegCacheItem* next;
 
-  while (regP != NULL)
+  while (rciP != NULL)
   {
-    next = regP->next;
+    next = rciP->next;
 
-    kjFree(regP->regTree);
-    free(regP);
+    kjFree(rciP->regTree);
+    if (rciP->idPatternRegexList != NULL)
+      regCacheItemRegexRelease(rciP);
 
-    regP = next;
+    free(rciP);
+
+    rciP = next;
   }
 
   free(regCacheP);

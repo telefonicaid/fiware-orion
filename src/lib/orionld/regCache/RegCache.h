@@ -25,12 +25,15 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>                                               // regex_t
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+#include "orionld/types/RegistrationMode.h"                      // RegistrationMode
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 
 
@@ -51,12 +54,31 @@ typedef struct RegDeltas
 
 // -----------------------------------------------------------------------------
 //
+// RegIdPattern -
+//
+typedef struct RegIdPattern
+{
+  regex_t               regex;
+  KjNode*               owner;  // Reference to the 'idPattern' in the rciP->regTree that the regex belongs to
+  struct RegIdPattern*  next;
+} RegIdPattern;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // RegCacheItem -
 //
 typedef struct RegCacheItem
 {
   KjNode*               regTree;
   RegDeltas             deltas;
+
+  // "Shortcuts" and transformed info, all copies from the regTree - for improved performance
+  RegistrationMode      mode;
+  uint64_t              opMask;
+  RegIdPattern*         idPatternRegexList;
+
   struct RegCacheItem*  next;
 } RegCacheItem;
 
@@ -72,6 +94,7 @@ typedef struct RegCache
   RegCacheItem*  regList;
   RegCacheItem*  last;
 } RegCache;
+
 
 
 // -----------------------------------------------------------------------------

@@ -186,6 +186,7 @@ SET (ORION_LIBS
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o
     orionld_rest
     orionld_serviceRoutines
+    orionld_forwarding
     orionld_troe
     orionld_kjTree
     orionld_mqtt
@@ -225,6 +226,7 @@ SET (ORION_LIBS
     orionld_payloadCheck
     orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
     orionld_payloadCheck
+    orionld_forwarding
     orionld_mqtt
     orionld_q
     orionld_mongoc       # subCache needs mongoc
@@ -363,6 +365,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/socketService)
   ADD_SUBDIRECTORY(src/lib/orionld/notifications)
+  ADD_SUBDIRECTORY(src/lib/orionld/forwarding)
   ADD_SUBDIRECTORY(src/lib/orionld/q)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)

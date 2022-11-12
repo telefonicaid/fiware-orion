@@ -522,7 +522,15 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
 {
   bzero(orionldRestServiceV, sizeof(orionldRestServiceV));
 
+  //
+  // FIXME: This "block should move to orionld.cpp ?
+  //
+  // * userAgentHeader(Len): Notifications with HTTP
+  // * userAgentHeaderNoLF:  Forwarding
+  //
   userAgentHeaderLen = snprintf(userAgentHeader, sizeof(userAgentHeader) -1, "User-Agent: orionld/%s\r\n", ORIONLD_VERSION);  // Used in notifications as value of HTTP Header User-Agent
+  snprintf(userAgentHeaderNoLF, sizeof(userAgentHeaderNoLF) -1, "User-Agent: orionld/%s", ORIONLD_VERSION);  // Used in forwarding as value of HTTP Header User-Agent
+
 
   int svIx;    // Service Vector Index
   for (svIx = 0; svIx < vecItems; svIx++)

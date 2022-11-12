@@ -47,6 +47,7 @@ function style_check
 
 
 style_check src/lib/orionld/regCache
+style_check src/lib/orionld/forwarding
 style_check src/lib/orionld/prometheus
 style_check src/lib/orionld/mongoc
 style_check src/lib/orionld/payloadCheck

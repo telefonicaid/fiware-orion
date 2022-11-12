@@ -26,7 +26,6 @@
 
 extern "C"
 {
-#include "kbase/kMacros.h"                                      // K_VEC_SIZE
 #include "kjson/KjNode.h"                                       // KjNode
 #include "kjson/kjLookup.h"                                     // kjLookup
 #include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
@@ -36,6 +35,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
+#include "orionld/forwarding/FwdOperation.h"                    // fwdOperationFromString, FwdNone
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
 #include "orionld/payloadCheck/pcheckInformation.h"             // pcheckInformation
 #include "orionld/payloadCheck/pcheckTimeInterval.h"            // pcheckTimeInterval
@@ -66,140 +66,6 @@ bool pCheckRegistrationMode(const char* mode)
 
 // -----------------------------------------------------------------------------
 //
-// FwdOperation - FIXME: Move to its own header file (under src/lib/orionld/forwarding?)
-//
-typedef enum FwdOperation
-{
-  FwdNone,                           // 0
-  FwdCreateEntity,
-  FwdUpdateEntity,
-  FwdAppendAttrs,
-  FwdUpdateAttrs,
-  FwdDeleteAttrs,                    // 5
-  FwdDeleteEntity,
-  FwdCreateBatch,
-  FwdUpsertBatch,
-  FwdUpdateBatch,
-  FwdDeleteBatch,                    // 10
-  FwdUpsertTemporal,
-  FwdAppendAttrsTemporal,
-  FwdDeleteAttrsTemporal,
-  FwdUpdateAttrsTemporal,
-  FwdDeleteAttrInstanceTemporal,     // 15
-  FwdDeleteTemporal,
-  FwdMergeEntity,
-  FwdReplaceEntity,
-  FwdReplaceAttrs,
-  FwdMergeBatch,                     // 20
-
-  FwdRetrieveEntity,
-  FwdQueryEntity,
-  FwdQueryBatch,
-  FwdRetrieveTemporal,
-  FwdQueryTemporal,                  // 25
-  FwdRetrieveEntityTypes,
-  FwdRetrieveEntityTypeDetails,
-  FwdRetrieveEntityTypeInfo,
-  FwdRetrieveAttrTypes,
-  FwdRetrieveAttrTypeDetails,        // 30
-  FwdRetrieveAttrTypeInfo,
-
-  FwdCreateSubscription,
-  FwdUpdateSubscription,
-  FwdRetrieveSubscription,
-  FwdQuerySubscription,              // 35
-  FwdDeleteSubscription
-} FwdOperation;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// fwdOperations -
-//
-const char* fwdOperations[] = {
-  "none",
-  "createEntity",
-  "updateEntity",
-  "appendAttrs",
-  "updateAttrs",
-  "deleteAttrs",
-  "deleteEntity",
-  "createBatch",
-  "upsertBatch",
-  "updateBatch",
-  "deleteBatch",
-  "upsertTemporal",
-  "appendAttrsTemporal",
-  "deleteAttrsTemporal",
-  "updateAttrsTemporal",
-  "deleteAttrInstanceTemporal",
-  "deleteTemporal",
-  "mergeEntity",
-  "replaceEntity",
-  "replaceAttrs",
-  "mergeBatch",
-
-  "retrieveEntity",
-  "queryEntity",
-  "queryBatch",
-  "retrieveTemporal",
-  "queryTemporal",
-  "retrieveEntityTypes",
-  "retrieveEntityTypeDetails",
-  "retrieveEntityTypeInfo",
-  "retrieveAttrTypes",
-  "retrieveAttrTypeDetails",
-  "retrieveAttrTypeInfo",
-
-  "createSubscription",
-  "updateSubscription",
-  "retrieveSubscription",
-  "querySubscription",
-  "deleteSubscription",
-
-  // Aliases for pre-defined groups of operations
-  "federationOps",
-  "updateOps",
-  "retrieveOps",
-  "redirectionOps"
-};
-
-
-
-// -----------------------------------------------------------------------------
-//
-// fwdOpFromString - FIXME: Own module (well, FwdOperation.cpp?)
-//
-FwdOperation fwdOpFromString(const char* fwdOp)
-{
-  for (long unsigned int ix = 1; ix < K_VEC_SIZE(fwdOperations); ix++)
-  {
-    if (strcmp(fwdOp, fwdOperations[ix]) == 0)
-      return (FwdOperation) ix;
-  }
-
-  return FwdNone;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// fwdOpToString - FIXME: Own module (well, FwdOperation.cpp?)
-//
-const char* fwdOpToString(FwdOperation op)
-{
-  if ((op < 1) || (op >= K_VEC_SIZE(fwdOperations)))
-    return "nop";
-
-  return fwdOperations[op];
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // pCheckRegistrationOperations - FIXME: Own module
 //
 bool pCheckRegistrationOperations(KjNode* operationsP)
@@ -218,10 +84,13 @@ bool pCheckRegistrationOperations(KjNode* operationsP)
       return false;
     }
 
-    if (fwdOpFromString(fwdOpP->value.s) == FwdNone)
+    if (fwdOperationFromString(fwdOpP->value.s) == FwdNone)
     {
-      orionldError(OrionldBadRequestData, "Invalid value for Registration::operations array item", fwdOpP->value.s, 400);
-      return false;
+      if (fwdOperationAliasFromString(fwdOpP->value.s) == FwdNone)
+      {
+        orionldError(OrionldBadRequestData, "Invalid value for Registration::operations array item", fwdOpP->value.s, 400);
+        return false;
+      }
     }
   }
 

@@ -80,6 +80,7 @@ extern "C"
 #include "kalloc/kaBufferReset.h"                           // kaBufferReset
 #include "kjson/kjBufferCreate.h"                           // kjBufferCreate
 #include "kjson/kjFree.h"                                   // kjFree
+#include "kjson/kjLookup.h"                                 // kjLookup
 }
 
 #include "parseArgs/parseArgs.h"
@@ -123,6 +124,7 @@ extern "C"
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
 #include "orionld/db/dbInit.h"                                // dbInit
 #include "orionld/mqtt/mqttRelease.h"                         // mqttRelease
+#include "orionld/regCache/regCacheInit.h"                    // regCacheInit
 #include "orionld/regCache/regCacheCreate.h"                  // regCacheCreate
 #include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
 #include "orionld/troe/troeInit.h"                            // troeInit
@@ -133,12 +135,12 @@ extern "C"
 
 #include "orionld/mongoc/mongocServerVersionGet.h"            // mongocServerVersionGet
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
-#include "orionld/regCache/regCacheInit.h"                    // regCacheInit
 #include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
 #include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
 #include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
+#include "orionld/forwarding/forwardingInit.h"                // forwardingInit
 
 using namespace orion;
 
@@ -807,8 +809,49 @@ static void libLogFunction
 }
 
 
+#ifdef DEBUG
+// -----------------------------------------------------------------------------
+//
+// regCachePresent -
+//
+void regCachePresent(void)
+{
+  for (OrionldTenant* tenantP = &tenant0; tenantP != NULL; tenantP = tenantP->next)
+  {
+    if (tenantP->regCache == NULL)
+      LM(("Tenant '%s': No regCache", tenantP->mongoDbName));
+    else
+    {
+      LM(("Tenant '%s':", tenantP->mongoDbName));
+      RegCacheItem* rciP = tenantP->regCache->regList;
 
-// char* SUB_CACHE_DISABLED = NULL;
+      while (rciP != NULL)
+      {
+        KjNode* regIdP = kjLookup(rciP->regTree, "id");
+
+        LM(("  o Registration %s:", (regIdP != NULL)? regIdP->value.s : "unknown"));
+        LM(("    o mode:  %s", registrationModeToString(rciP->mode)));
+        LM(("    o ops:   0x%x", rciP->opMask));
+
+        if (rciP->idPatternRegexList != NULL)
+        {
+          LM(("    o patterns:"));
+          for (RegIdPattern* ripP = rciP->idPatternRegexList; ripP != NULL; ripP = ripP->next)
+          {
+            LM(("      o %s (idPattern at %p)", ripP->owner->value.s, ripP->owner));
+          }
+        }
+        else
+          LM(("    o patterns: NONE"));
+        LM(("  -----------------------------------"));
+        rciP = rciP->next;
+      }
+    }
+  }
+}
+#endif
+
+
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
@@ -821,8 +864,10 @@ int main(int argC, char* argV[])
   //
   // Just an experiment.
   // It's an interesting way of "comparing strings"
-  // The problem is "const chasr*" vs "char*" - stupid C++ and its type checking!!!
+  // The problem is "const char*" vs "char*" - stupid C++ and its type checking!!!
   //
+  // char* SUB_CACHE_DISABLED = NULL;
+
   char* sc = SUB_CACHE_DISABLED;
   if (sc == SUB_CACHE_DISABLED)
   {
@@ -1136,6 +1181,9 @@ int main(int argC, char* argV[])
   // Otherwise, we have empirically checked that CB may randomly crash
   //
   contextBrokerInit(dbName, multitenancy);
+
+  if (forwarding)
+    forwardingInit();
 
   if (https)
   {
