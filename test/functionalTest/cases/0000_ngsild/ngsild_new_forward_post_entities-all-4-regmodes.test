@@ -299,7 +299,7 @@ echo
 
 echo "15. Just for fun, GET the individual urn:E1 in CB (remember, this request implements the old PoC of forwarding)"
 echo "==============================================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise"
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise" -H "Orionld-Legacy: yes"
 echo
 echo
 

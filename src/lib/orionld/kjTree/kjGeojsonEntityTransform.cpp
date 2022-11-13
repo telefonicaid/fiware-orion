@@ -40,6 +40,99 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// geoPropertyAsSimplified -
+//
+// If it really is a GeoProperty (normalized, keyValues or concise) a cloned Simplified representation, with name "geometry", is returned.
+// Is it NOT a valid GeoProperty, then a NULL clone is returned (with name "geometry")
+//
+static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
+{
+  kjTreeLog(attributeP, "attributeP");
+  if (attributeP->type != KjObject)
+  {
+    LM(("Not an object"));
+    return NULL;
+  }
+
+  KjNode* typeP = kjLookup(attributeP, "type");
+  if (typeP == NULL)
+  {
+    LM(("No type - might be OK if concise - BUT, in such case there MUST be a value and that value MUST have type + coordinates"));
+
+    if (orionldState.uriParamOptions.concise == true)
+    {
+      // In 'Concise' attribute format, there may be no type field
+      KjNode* valueP = kjLookup(attributeP, "value");
+
+      if (valueP != NULL)
+      {
+        attributeP = valueP;
+        typeP      = kjLookup(attributeP, "type");
+
+        if (typeP == NULL)
+        {
+          LM(("No type inside 'value' for Concise"));
+          return NULL;
+        }
+      }
+    }
+    else
+      return NULL;
+  }
+
+  if (strcmp(typeP->value.s, "GeoProperty") == 0)  // It's a Normalized GeoProperty, return its value
+  {
+    KjNode* valueP = kjLookup(attributeP, "value");
+
+    if (valueP == NULL)
+    {
+      LM(("No value"));
+      return NULL;
+    }
+
+    attributeP = valueP;  // to be cloned and named 'geometry
+    typeP      = kjLookup(attributeP, "type");
+
+    if (typeP == NULL)
+    {
+      LM(("No type inside 'value' for Normalized"));
+      return NULL;
+    }
+  }
+
+  //
+  // attributeP now points to the "value" field
+  // typeP points to the "type" field inside attributeP
+  //
+  if ((strcmp(typeP->value.s, "Point")           != 0)  &&
+      (strcmp(typeP->value.s, "LineString")      != 0)  &&
+      (strcmp(typeP->value.s, "Polygon")         != 0)  &&
+      (strcmp(typeP->value.s, "MultiPoint")      != 0)  &&
+      (strcmp(typeP->value.s, "MultiLineString") != 0)  &&
+      (strcmp(typeP->value.s, "MultiPolygon")    != 0))
+  {
+    LM(("Not a GeoJSON type (%s)", typeP->value.s));
+    return NULL;  // Not a GeoProperty
+  }
+
+  KjNode* coordsP = kjLookup(attributeP, "coordinates");
+
+  if ((coordsP == NULL) || (coordsP->type != KjArray))
+  {
+    LM(("No coords"));
+    return NULL;
+  }
+
+  LM(("Cloning and returning"));
+  KjNode* cloneP = kjClone(orionldState.kjsonP, attributeP);
+  cloneP->name = (char*) "geometry";
+  return cloneP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // kjGeojsonEntityTransform - transform a KjNode tree into geo+json format
 //
 // PARAMETERS
@@ -147,45 +240,8 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
     geoPropertyP = geoPropertyNode;
 
   if (geoPropertyP != NULL)
-  {
-    if (geoPropertyP->type == KjObject)
-    {
-      //
-      // Might be either only the value or the entire GeoProperty
-      //
-      KjNode* type = kjLookup(geoPropertyP, "type");
-
-      if ((type != NULL) && (strcmp(type->value.s, "GeoProperty") == 0))
-      {
-        KjNode* valueP = kjLookup(geoPropertyP, "value");
-
-        if (valueP != NULL)
-        {
-          geoPropertyP = kjClone(orionldState.kjsonP, valueP);
-          geoPropertyP->name = (char*) "geometry";
-        }
-        else
-          geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
-      }
-      else
-      {
-        if (orionldState.uriParamOptions.concise == true)
-        {
-          // In 'Concise' attribute format, there may be no type field
-          KjNode* valueP = kjLookup(geoPropertyP, "value");
-
-          if (valueP != NULL)
-            geoPropertyP = valueP;
-        }
-
-        geoPropertyP = kjClone(orionldState.kjsonP, geoPropertyP);
-        geoPropertyP->name = (char*) "geometry";
-      }
-    }
-    else
-      geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
-  }
-  else
+    geoPropertyP = geoPropertyAsSimplified(geoPropertyP);  // as KeyValues if GeoProperty (and cloned), else NULL
+  if (geoPropertyP == NULL)
     geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
 
   kjChildAdd(geojsonTreeP, geoPropertyP);

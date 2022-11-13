@@ -22,6 +22,13 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjBuilder.h"                                     // kjChildRemove, kjChildAdd, kjArray, ...
+}
+
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -29,6 +36,8 @@
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/legacyDriver/legacyGetEntity.h"                // legacyGetEntity
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
+#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
+#include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own interface
 
 
@@ -45,9 +54,9 @@
 //
 bool orionldGetEntity(void)
 {
-  // if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
+  if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntity();
-#if 0
+
   const char* entityId = orionldState.wildcard[0];
   if (pCheckUri(entityId, "Entity ID in URL PATH", true) == false)
     return false;
@@ -89,8 +98,51 @@ bool orionldGetEntity(void)
       return false;
     }
     // If distributed, then it's perfectly OK to have nothing locally
+    // BUT, distributes hasn't been implemented yet, so ...
+    const char* title = (orionldState.in.attrList.items != 0)? "Combination Entity/Attributes Not Found" : "Entity Not Found";
+    orionldError(OrionldResourceNotFound, title, entityId, 404);
+    return false;
   }
 
-  return false;
-#endif
+  KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, orionldState.uriParams.lang, true, &orionldState.pd);
+  orionldState.responseTree   = apiEntityP;
+  orionldState.httpStatusCode = 200;
+
+  if (orionldState.out.contentType == GEOJSON)
+  {
+    orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.geoPropertyNode);
+
+    //
+    // If URI params 'attrs' and 'geometryProperty' are given BUT 'geometryProperty' is not part of 'attrs', then we need to remove 'geometryProperty' from
+    // the "properties" object
+    //
+    if ((orionldState.in.attrList.items > 0) && (orionldState.uriParams.geometryProperty != NULL))
+    {
+      bool geometryPropertyInAttrList = false;
+
+      for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
+      {
+        if (strcmp(orionldState.in.geometryPropertyExpanded, orionldState.in.attrList.array[ix]) == 0)
+        {
+          geometryPropertyInAttrList = true;
+          break;
+        }
+      }
+
+      if (geometryPropertyInAttrList == false)
+      {
+        KjNode* propertiesP = kjLookup(orionldState.responseTree, "properties");
+
+        if (propertiesP != NULL)
+        {
+          KjNode* geometryPropertyP = kjLookup(propertiesP, orionldState.in.geometryPropertyExpanded);
+
+          if (geometryPropertyP != NULL)
+            kjChildRemove(propertiesP, geometryPropertyP);
+        }
+      }
+    }
+  }
+
+  return true;
 }

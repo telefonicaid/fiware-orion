@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"                                       // LM*
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -57,6 +59,13 @@ KjNode* dbModelToObservedAt(KjNode* dbObservedAtP)
   }
   else if (dbObservedAtP->type == KjString)
     bufP = dbObservedAtP->value.s;
+  else if (dbObservedAtP->type == KjFloat)
+  {
+    numberToDate(dbObservedAtP->value.f, buf, sizeof(buf) - 1);
+    bufP = buf;
+  }
+  else
+    LM_E(("dbObservedAt is of type '%s'", kjValueType(dbObservedAtP->type)));
 
   if (bufP == NULL)
   {
