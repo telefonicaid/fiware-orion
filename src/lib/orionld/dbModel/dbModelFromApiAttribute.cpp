@@ -70,7 +70,6 @@ extern "C"
 //
 bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV, KjNode* attrRemovedV, bool* ignoreP, bool stealCreDate)
 {
-  LM(("CA: Treating attribute '%s'", attrP->name));
   KjNode* mdP         = NULL;
   char*   attrEqName  = kaStrdup(&orionldState.kalloc, attrP->name);
   char*   attrDotName = kaStrdup(&orionldState.kalloc, attrP->name);
@@ -132,7 +131,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   }
 
   KjNode*  dbAttrP = (dbAttrsP != NULL)? kjLookup(dbAttrsP, attrEqName) : NULL;
-  LM(("PE: dbAttrsP:%p, dbAttrP:%p", dbAttrsP, dbAttrP));
 
   // Move everything into "md", leaving attrP EMPTY
   mdP = kjObject(orionldState.kjsonP, "md");
@@ -167,10 +165,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
       if (ix == 0)
       {
         if (dbAttrP == NULL)  // Attribute does not already exist - needs a creDate
-        {
-          LM(("PE: Adding creDate to attribute '%s'", attrP->name));
           kjTimestampAdd(attrP, "creDate");
-        }
         else if (stealCreDate == true)  // FIXME: opMode == REPLACE
         {
           KjNode* creDateP = kjLookup(dbAttrP, "creDate");
@@ -184,7 +179,6 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
         // Also, the attribute is being modified - need to update the "modifiedAt" (called modDate in Orion's DB-Model)
         kjTimestampAdd(attrP, "modDate");
-        LM(("PE: modDate in place"));
       }
     }
   }
@@ -282,13 +276,11 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
 
     if (strcmp(subP->name, "creDate") == 0)
     {
-      LM(("CA: Got a 'creDate' as 'sub-attr' of attribute '%s'", attrP->name));
       kjChildRemove(mdP, subP);
       kjChildAdd(attrP, subP);
       subP = next;
       continue;
     }
-    LM(("CA: Expanding sub-attr '%s'", subP->name));
     subP->name = orionldSubAttributeExpand(orionldState.contextP, subP->name, true, NULL);
 
     // Add the name of the sub-attribute to the "mdNames" array

@@ -29,6 +29,8 @@ extern "C"
 #include "kjson/kjLookup.h"                                    // kjLookup
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/types/OrionldResponseErrorType.h"            // OrionldResponseErrorType
 
@@ -62,28 +64,30 @@ KjNode* entityLookupById(KjNode* entityArray, char* entityId)
 //
 KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId, KjNode** entityTypeNodeP)
 {
+  int entities = 0;
   for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
+    ++entities;
     KjNode* _idNodeP = kjLookup(entityP, "_id");
 
-    if (_idNodeP != NULL)
+    if (_idNodeP == NULL)
     {
-      KjNode* idNodeP = kjLookup(_idNodeP, "id");
+      LM(("Database Error (Entity without _id )"));
+      continue;
+    }
 
-      if (idNodeP == NULL)
-        idNodeP = kjLookup(_idNodeP, "@id");
+    KjNode* idNodeP = kjLookup(_idNodeP, "id");
 
-      if ((idNodeP != NULL) && (idNodeP->type == KjString) && (strcmp(idNodeP->value.s, entityId) == 0))  // If NULL, something is really wrong!!!
-      {
-        if (entityTypeNodeP != NULL)
-        {
-          *entityTypeNodeP = kjLookup(_idNodeP, "type");
-          if (*entityTypeNodeP == NULL)
-            *entityTypeNodeP = kjLookup(_idNodeP, "@type");
-        }
+    if (idNodeP == NULL)
+      LM(("Database Error (Entity _id without id)"));
+    else if (idNodeP->type != KjString)
+      LM(("Database Error (Entity _id::id that is not a string)"));
+    else if (strcmp(idNodeP->value.s, entityId) == 0)  // Match
+    {
+      if (entityTypeNodeP != NULL)
+        *entityTypeNodeP = kjLookup(_idNodeP, "type");
 
-        return entityP;
-      }
+      return entityP;
     }
   }
 
