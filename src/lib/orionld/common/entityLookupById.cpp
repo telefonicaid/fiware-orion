@@ -64,10 +64,8 @@ KjNode* entityLookupById(KjNode* entityArray, char* entityId)
 //
 KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId, KjNode** entityTypeNodeP)
 {
-  int entities = 0;
   for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    ++entities;
     KjNode* _idNodeP = kjLookup(entityP, "_id");
 
     if (_idNodeP == NULL)
