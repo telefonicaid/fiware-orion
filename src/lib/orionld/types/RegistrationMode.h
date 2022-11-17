@@ -34,19 +34,27 @@
 //
 typedef enum RegistrationMode
 {
-  RegModeNone = 0,
-  RegModeExclusive,
-  RegModeInclusive,
-  RegModeRedirect,
-  RegModeAuxiliary
+  RegModeNone      = 0,
+  RegModeExclusive = 1,
+  RegModeRedirect  = 2,
+  RegModeInclusive = 4,
+  RegModeAuxiliary = 8
 } RegistrationMode;
 
 
 
 // -----------------------------------------------------------------------------
 //
-// registrationMode - FIXME: move to its own module
+// registrationMode -
 //
 extern RegistrationMode registrationMode(const char* stringMode);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// registrationModeToString -
+//
+extern const char* registrationModeToString(RegistrationMode registrationMode);
 
 #endif  // SRC_LIB_ORIONLD_TYPES_REGISTRATIONMODE_H_

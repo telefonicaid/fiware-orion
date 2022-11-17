@@ -39,17 +39,20 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
+#include "orionld/types/RegistrationMode.h"                    // registrationMode
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pcheckRegistration.h"           // pcheckRegistration
 #include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/legacyDriver/legacyPatchRegistration.h"      // legacyPatchRegistration
 #include "orionld/regCache/RegCache.h"                         // RegCacheItem
 #include "orionld/regCache/regCacheItemLookup.h"               // regCacheItemLookup
+#include "orionld/regCache/regCacheIdPatternRegexCompile.h"    // regCacheIdPatternRegexCompile
+#include "orionld/regCache/regCacheItemRegexRelease.h"         // regCacheItemRegexRelease
 #include "orionld/dbModel/dbModelFromApiRegistration.h"        // dbModelFromApiRegistration
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
 #include "orionld/mongoc/mongocRegistrationReplace.h"          // mongocRegistrationReplace
+#include "orionld/forwarding/FwdOperation.h"                   // fwdOperationMask
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"  // Own Interface
 
 
@@ -630,9 +633,6 @@ bool orionldPatchRegistration(void)
   if (pcheckRegistration(orionldState.requestTree, false, false, &propertyTree) == false)
     return false;
 
-  if (propertyTree != NULL)
-    kjTreeLog(propertyTree, "Registration Properties:");
-
   //
   // All good, we can start!
   //
@@ -689,15 +689,20 @@ bool orionldPatchRegistration(void)
     kjChildRemove(regPatch, nodeP);
 
 
-  //
-  // Update counters+timestamps of dbRegP from the cached registration (that may have newer values)
-  //
   if (rciP != NULL)
   {
+    //
+    // Update counters+timestamps of dbRegP from the cached registration (that may have newer values)
+    //
     if (rciP->deltas.timesSent   > 0)  regCounter(dbRegP,   "timesSent",   rciP->deltas.timesSent);
     if (rciP->deltas.timesFailed > 0)  regCounter(dbRegP,   "timesFailed", rciP->deltas.timesFailed);
     if (rciP->deltas.lastSuccess > 0)  regTimestamp(dbRegP, "lastSuccess", rciP->deltas.lastSuccess);
     if (rciP->deltas.lastFailure > 0)  regTimestamp(dbRegP, "lastFailure", rciP->deltas.lastFailure);
+
+    KjNode* informationP = kjLookup(regPatch, "information");
+
+    if (informationP != NULL)
+      regCacheItemRegexRelease(rciP);
   }
 
   //
@@ -717,11 +722,31 @@ bool orionldPatchRegistration(void)
   // Replace the old cached registration
   //
   dbModelToApiRegistration(dbRegP, true, true);
-  apiModelToCacheRegistration(dbRegP);
+
   kjFree(rciP->regTree);
   rciP->regTree = kjClone(NULL, dbRegP);
   bzero(&rciP->deltas, sizeof(rciP->deltas));
 
+  //
+  // Update the regTree fields that are mirrored in RegCacheItem
+  //
+  KjNode* operationsP  = kjLookup(rciP->regTree, "operations");
+  KjNode* modeP        = kjLookup(rciP->regTree, "mode");
+  KjNode* informationP = kjLookup(rciP->regTree, "information");
+
+  rciP->mode = (modeP != NULL)? registrationMode(modeP->value.s) : RegModeInclusive;
+
+  if (operationsP != NULL)
+    rciP->opMask = fwdOperationMask(operationsP);
+
+  if (informationP != NULL)
+  {
+    if (regCacheIdPatternRegexCompile(rciP, informationP) == false)
+      LM_X(1, ("Internal Error (if this happens it's a bug of Orion-LD - the idPattern was checked in pcheckEntityInfo and all OK"));
+  }
+
+  // extern void regCachePresent(void);
+  // regCachePresent();
 
   //
   // Return 204 if all OK

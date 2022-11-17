@@ -61,7 +61,6 @@ bool mongocRegistrationInsert(KjNode* dbRegistrationP, const char* registrationI
 
   mongocKjTreeToBson(dbRegistrationP, &document);
 
-  LM(("Inserting reg"));
   bool b = mongoc_collection_insert_one(orionldState.mongoc.registrationsP, &document, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
   {
@@ -78,6 +77,5 @@ bool mongocRegistrationInsert(KjNode* dbRegistrationP, const char* registrationI
   bson_destroy(&document);
   bson_destroy(&reply);
 
-  LM(("all good? %d", b));
   return b;
 }

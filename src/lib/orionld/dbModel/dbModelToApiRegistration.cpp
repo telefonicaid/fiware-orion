@@ -171,7 +171,7 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs, bool forCache)
           if (isTypePatternP != NULL)
             kjChildRemove(eInfoP, isTypePatternP);
 
-          if (typeP != NULL)
+          if ((typeP != NULL) && (forCache == false))
             typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
         }
       }
@@ -190,20 +190,13 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs, bool forCache)
 
           if ((nameP != NULL) && (typeP != NULL))
           {
+            char*   shortName     =  (forCache == true)? nameP->value.s : orionldContextItemAliasLookup(orionldState.contextP, nameP->value.s, NULL, NULL);
+            KjNode* attrNameNodeP = kjString(orionldState.kjsonP, NULL, shortName);
+
             if (strcmp(typeP->value.s, "Property") == 0)
-            {
-              char*   shortName     = orionldContextItemAliasLookup(orionldState.contextP, nameP->value.s, NULL, NULL);
-              KjNode* propertyNameP = kjString(orionldState.kjsonP, NULL, shortName);
-
-              kjChildAdd(propertyNamesV, propertyNameP);
-            }
-            if (strcmp(typeP->value.s, "Relationship") == 0)
-            {
-              char*   shortName         = orionldContextItemAliasLookup(orionldState.contextP, nameP->value.s, NULL, NULL);
-              KjNode* relationshipNameP = kjString(orionldState.kjsonP, NULL, shortName);
-
-              kjChildAdd(relationshipNamesV, relationshipNameP);
-            }
+              kjChildAdd(propertyNamesV, attrNameNodeP);
+            else if (strcmp(typeP->value.s, "Relationship") == 0)
+              kjChildAdd(relationshipNamesV, attrNameNodeP);
           }
 
           if (propertyNamesV->value.firstChildP != NULL)
@@ -227,34 +220,42 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs, bool forCache)
     }
   }
 
-  //
-  // managementInterval + observationInterval
-  //
-  KjNode* managementIntervalP  = kjLookup(dbRegP, "managementInterval");
-  KjNode* observationIntervalP = kjLookup(dbRegP, "observationInterval");
+  if (forCache == false)
+  {
+    //
+    // managementInterval + observationInterval to ISO8601 Strings
+    //
+    KjNode* managementIntervalP  = kjLookup(dbRegP, "managementInterval");
+    KjNode* observationIntervalP = kjLookup(dbRegP, "observationInterval");
 
-  if (managementIntervalP != NULL)
-    dbModelToApiInterval(managementIntervalP);
-  if (observationIntervalP)
-    dbModelToApiInterval(observationIntervalP);
+    if (managementIntervalP != NULL)
+      dbModelToApiInterval(managementIntervalP);
+    if (observationIntervalP)
+      dbModelToApiInterval(observationIntervalP);
+  }
 
   //
   // properties
   //
-  KjNode* propertiesP = kjLookup(dbRegP, "properties");
-  if (propertiesP != NULL)
+  if (forCache == false)
   {
-    // Lookup aliases for the properties
-    for (KjNode* propertyP = propertiesP->value.firstChildP; propertyP != NULL; propertyP = propertyP->next)
+    KjNode* propertiesP = kjLookup(dbRegP, "properties");
+    if (propertiesP != NULL)
     {
-      propertyP->name = orionldContextItemAliasLookup(orionldState.contextP, propertyP->name, NULL, NULL);
+      // Lookup aliases for the properties
+      {
+        for (KjNode* propertyP = propertiesP->value.firstChildP; propertyP != NULL; propertyP = propertyP->next)
+        {
+          propertyP->name = orionldContextItemAliasLookup(orionldState.contextP, propertyP->name, NULL, NULL);
+        }
+      }
+
+      // Remove "properties" from dbRegP and link the contexts of "properties" to "dbRegP"
+      kjChildRemove(dbRegP, propertiesP);
+
+      dbRegP->lastChild->next = propertiesP->value.firstChildP;
+      dbRegP->lastChild       = propertiesP->lastChild;
     }
-
-    // Remove "properties" from dbRegP and link the contexts of "properties" to "dbRegP"
-    kjChildRemove(dbRegP, propertiesP);
-
-    dbRegP->lastChild->next = propertiesP->value.firstChildP;
-    dbRegP->lastChild       = propertiesP->lastChild;
   }
 
   return true;

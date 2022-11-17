@@ -47,7 +47,6 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"          // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjChildPrepend.h"                       // kjChildPrepend
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocEntityRetrieve.h"                 // Own interface
 
 
@@ -144,7 +143,6 @@ static bool presentationAttributeFix(KjNode* attrP, const char* entityId, bool s
     if (modifiedAtP != NULL)
       kjChildRemove(attrP, modifiedAtP);
 
-    kjTreeLog(attrP, "attrP");
     for (KjNode* mdP = attrP->value.firstChildP; mdP != NULL; mdP = mdP->next)
     {
       if (mdP->type != KjObject)

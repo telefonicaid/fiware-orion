@@ -281,6 +281,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
       subP = next;
       continue;
     }
+
     subP->name = orionldSubAttributeExpand(orionldState.contextP, subP->name, true, NULL);
 
     // Add the name of the sub-attribute to the "mdNames" array

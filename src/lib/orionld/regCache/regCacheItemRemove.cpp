@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>                                               // regfree
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -30,8 +32,8 @@ extern "C"
 }
 
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/regCache/regCacheItemRegexRelease.h"           // regCacheItemRegexRelease
 #include "orionld/regCache/regCacheItemRemove.h"                 // Own interface
-
 
 
 // -----------------------------------------------------------------------------
@@ -83,6 +85,11 @@ bool regCacheItemRemove(RegCache* rcP, const char* regId)
 
       // Free the reg-cache item to be deleted (call regCacheItemRelease(rciP)?)
       kjFree(rciP->regTree);
+
+      // In case we have any regex's, free them
+      regCacheItemRegexRelease(rciP);
+
+      // And finally, free the entire struct
       free(rciP);
 
       return true;

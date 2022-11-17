@@ -65,6 +65,7 @@ SET (SOURCES
     batchUpdateEntity.cpp
     batchReplaceEntity.cpp
     metadataAdd.cpp
+    curlToBrokerStrerror.cpp
 )
 
 # Include directories

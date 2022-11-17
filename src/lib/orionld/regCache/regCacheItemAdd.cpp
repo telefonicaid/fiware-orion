@@ -33,7 +33,11 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
+#include "orionld/regCache/regCacheIdPatternRegexCompile.h"      // regCacheIdPatternRegexCompile
+#include "orionld/forwarding/FwdOperation.h"                     // fwdOperationMask
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/regCache/regCacheItemAdd.h"                    // Own interface
 
 
@@ -98,11 +102,11 @@ static void regStringAdd(KjNode* regP, const char* name, const char* value)
 //
 RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
 {
-  RegCacheItem* rciP = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
+  RegCacheItem* rciP   = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
 
   //
   // Insert the new RegCacheItem LAST in rcP's linked list of registrations
-  // MUST BE INSERTED LAST. If not, the pagination doesn'¡t work with the registration cache!!!
+  // MUST BE INSERTED LAST. If not, pagination doesn't work with the registration cache!!!
   //
   if (rcP->last == NULL)
     rcP->regList = rciP;
@@ -122,6 +126,21 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
     regTimestampAdd(rciP->regTree, "lastFailure");
     regStringAdd(rciP->regTree,    "status", "active");
   }
+
+  //
+  // Some fields are "mirrored" inside RegCacheItem, for faster access
+  // FIXME: Make a function of these 7 lines (it will grow)
+  //        The exact same thing is done in orionldPatchRegistration
+  //
+  KjNode* operationsP  = kjLookup(rciP->regTree, "operations");
+  KjNode* modeP        = kjLookup(rciP->regTree, "mode");
+  KjNode* informationP = kjLookup(rciP->regTree, "information");
+
+  rciP->opMask  = fwdOperationMask(operationsP);
+  rciP->mode    = (modeP != NULL)? registrationMode(modeP->value.s) : RegModeInclusive;
+
+  if (regCacheIdPatternRegexCompile(rciP, informationP) == false)
+    LM_X(1, ("Internal Error (if this happens it's a bug of Orion-LD - the idPattern was checked in pcheckEntityInfo and all OK"));
 
   return rciP;
 }

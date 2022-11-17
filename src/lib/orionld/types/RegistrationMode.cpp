@@ -41,3 +41,19 @@ RegistrationMode registrationMode(const char* stringMode)
 
   return RegModeNone;
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// registrationModeToString -
+//
+const char* registrationModeToString(RegistrationMode registrationMode)
+{
+  if      (registrationMode == RegModeExclusive)  return "exclusive";
+  else if (registrationMode == RegModeInclusive)  return "inclusive";
+  else if (registrationMode == RegModeRedirect)   return "redirect";
+  else if (registrationMode == RegModeAuxiliary)  return "auxiliary";
+
+  return "invalid registration mode";
+}

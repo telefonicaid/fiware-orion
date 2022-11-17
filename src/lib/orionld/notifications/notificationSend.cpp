@@ -77,7 +77,7 @@ static const char* simplifiedHeader         = (char*) "Ngsild-Attribute-Format: 
 static const char* normalizedHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: normalized\r\n";
 static const char* keyValuesHeaderNgsiV2    = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
 
-char    userAgentHeader[64];     // "User-Agent: orionld/" + ORIONLD_VERSION + \r\n" - initialized by orionldServiceInit()
+char    userAgentHeader[64];     // "User-Agent: orionld/" + ORIONLD_VERSION + \r\n" - initialized in orionldServiceInit()
 size_t  userAgentHeaderLen = 0;  // Also set in orionldServiceInit()
 
 
@@ -575,7 +575,7 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
 // notificationSend -
 //
 // writev is used for the notifications.
-// The advantasge with writev is that is takes as input an array of buffers, mwaning there's no
+// The advantage with writev is that is takes as input an array of buffers, meaning there's no
 // need to copy the entire payload into one single buffer:
 //
 // ssize_t writev(int fd, const struct iovec* iov, int iovcnt);
