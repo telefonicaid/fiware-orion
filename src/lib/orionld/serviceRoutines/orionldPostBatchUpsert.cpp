@@ -166,6 +166,12 @@ bool orionldPostBatchUpsert(void)
   //
   // The entity id array is ready - time to query mongo
   //
+  // Important to remember about pagination here!!!
+  // Default value for the "limit" is 20, so, if I don't do anything about that,
+  // I'll only get the first 20 entities, and ... I need them ALL.
+  //
+  orionldState.uriParams.limit  = noOfEntities;
+  orionldState.uriParams.offset = 0;
   KjNode* dbEntityArray = mongocEntitiesQuery(NULL, &eIdArray, NULL, NULL, NULL, NULL, NULL, NULL);
   if (dbEntityArray == NULL)
   {
