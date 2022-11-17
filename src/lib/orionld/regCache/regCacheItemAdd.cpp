@@ -100,7 +100,7 @@ static void regStringAdd(KjNode* regP, const char* name, const char* value)
 //
 RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
 {
-  RegCacheItem* rciP   = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
+  RegCacheItem* rciP = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
 
   //
   // Insert the new RegCacheItem LAST in rcP's linked list of registrations
@@ -114,6 +114,7 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
   rcP->last = rciP;
 
   rciP->regTree = kjClone(NULL, regP);
+  rciP->next    = NULL;
 
   //
   // Some fields are "mirrored" inside RegCacheItem, for faster access

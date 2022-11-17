@@ -128,7 +128,7 @@ KjNode* mongocEntityLookup(const char* entityId, StringArray* attrsV, const char
     goto done;
   }
 
-done:
+ done:
   bson_destroy(&options);
   mongoc_read_prefs_destroy(readPrefs);
   mongoc_cursor_destroy(mongoCursorP);

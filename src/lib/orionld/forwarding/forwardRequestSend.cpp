@@ -23,7 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <stdio.h>                                               // snprintf
-#include <string.h>                                              // strncmp
+#include <string.h>                                              // strncmp, strncpy
 #include <curl/curl.h>                                           // curl
 
 extern "C"
@@ -38,8 +38,274 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 #include "orionld/forwarding/forwardRequestSend.h"               // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// HttpResponse -
+//
+typedef struct HttpResponse
+{
+  ForwardPending*  fwdPendingP;
+  CURL*            curlHandle;
+  char*            buf;
+  uint32_t         bufPos;
+  uint32_t         bufLen;
+  bool             mustBeFreed;
+  // Linked List of Response headers
+  char             preBuf[4 * 1024];  // Could be much smaller for POST/PATCH/PUT/DELETE (only cover errors, 1k would be more than enough)
+} HttpResponse;
+
+
+//
+// Need a better way to create the URL.
+// Working with chunks:
+// 1. URL
+// 2. "id"  (entity id or subscription id)
+// 3. "attrName"   (for PATCH Attribute, for example
+// 4. Linked list of uri params
+//
+
+// -----------------------------------------------------------------------------
+//
+// SList
+//
+typedef struct SList
+{
+  char*          sP;
+  int            sLen;
+  struct SList*  next;
+} SList;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// ForwardUrlParts -
+//
+typedef struct ForwardUrlParts
+{
+  ForwardPending*  fwdPendingP;  // From here we need "op", "entityId", "attrName", ...
+  SList*           params;       // Linked list of strings (URI params)
+  SList*           last;         // Last item in the 'params' list - used for linking in new items
+} ForwardUrlParts;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// urlPath -
+//
+int urlPath(char* url, int urlLen, ForwardUrlParts* urlPartsP, KjNode* endpointP)
+{
+  int nb;
+
+  if (urlPartsP->fwdPendingP->operation == FwdCreateEntity)
+    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities", endpointP->value.s);
+  else if (urlPartsP->fwdPendingP->operation == FwdRetrieveEntity)
+    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->fwdPendingP->entityId);
+  else
+    LM_X(1, ("Forwarding is not implemented for '%s' requests", fwdOperations[urlPartsP->fwdPendingP->operation]));
+
+  return nb;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// urlCompose -
+//
+char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
+{
+  int totalLen = 0;
+
+  //
+  // Calculating the length of the resulting URL
+  //
+  totalLen += strlen(endpointP->value.s);
+  totalLen += fwdOperationUrlLen[urlPartsP->fwdPendingP->operation];
+
+  if (urlPartsP->fwdPendingP->entityId != NULL)
+    totalLen += strlen(urlPartsP->fwdPendingP->entityId) + 1;  // +1: the '/' after "/entities" and before the entityId
+  if (urlPartsP->fwdPendingP->attrName != NULL)
+    totalLen += strlen(urlPartsP->fwdPendingP->attrName) + 1;  // +1: the '/' after "/attrs" and before the attrName
+
+  for (SList* paramP = urlPartsP->params; paramP != NULL; paramP = paramP->next)
+  {
+    totalLen += paramP->sLen + 1;  // +1: Either '?' or '&'
+  }
+
+  totalLen += 1;  // For the string delimiter ('\0')
+
+  //
+  // Allocating a buffer for the URL (now that we know the length needed)
+  //
+  char* url = kaAlloc(&orionldState.kalloc, totalLen);
+
+  //
+  // Filling in the URL, piece by piece
+  //
+  int nb = urlPath(url, totalLen, urlPartsP, endpointP);
+
+  if (urlPartsP->params == NULL)
+    return url;
+
+  url[nb++] = '?';
+  for (SList* paramP = urlPartsP->params; paramP != NULL; paramP = paramP->next)
+  {
+    strcpy(&url[nb], paramP->sP);
+    nb += paramP->sLen;
+
+    if (paramP->next != NULL)
+      url[nb++] = '&';
+  }
+
+  return url;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamAdd -
+//
+void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value, int totalLen)
+{
+  SList* sListP = (SList*) kaAlloc(&orionldState.kalloc, sizeof(SList));
+
+  if (value == NULL)
+  {
+    // If 'value' == NULL, then 'key' is complete (e.g.
+    sListP->sP   = (char*) key;
+    sListP->sLen = (totalLen == -1)? strlen(key) : totalLen;
+  }
+  else
+  {
+    int sLen     = strlen(key) + 1 + strlen(value) + 1;
+    sListP->sP   = kaAlloc(&orionldState.kalloc, sLen);
+
+    sListP->sLen = snprintf(sListP->sP, sLen, "%s=%s", key, value);
+  }
+
+  sListP->next = NULL;
+
+  if (urlPartsP->params == NULL)
+    urlPartsP->params = sListP;
+  else
+    urlPartsP->last->next = sListP;
+
+  urlPartsP->last = sListP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// responseSave -
+//
+static int responseSave(void* chunk, size_t size, size_t members, void* userP)
+{
+  char*            chunkP        = (char*) chunk;
+  size_t           chunkLen      = size * members;
+  HttpResponse*    httpResponseP = (HttpResponse*) userP;
+
+  //
+  // Allocate room for the new piece
+  //
+  // 1. Preallocated buffer - If total size (httpResponseP->bufPos + chunkLen) < sizeof(httpResponseP->preBuf)
+  // 2. kalloc buffer       - If total size <= 20k
+  // 3. malloc              - AND set httpResponseP->mustBeFreed
+  //
+  uint32_t newSize = httpResponseP->bufPos + chunkLen;
+
+  if (newSize < httpResponseP->bufLen)
+    strncpy(&httpResponseP->buf[httpResponseP->bufPos], chunkP, chunkLen);
+  else if (newSize >= httpResponseP->bufLen)
+  {
+    char* oldBuf = httpResponseP->buf;
+
+    if (newSize < 20480)  // < 20k : use kalloc
+    {
+      httpResponseP->buf = kaAlloc(&orionldState.kalloc, newSize + 1024);
+      if (httpResponseP->buf == NULL)
+        LM_RE(1, ("Out of memory (kaAlloc failed allocating %d bytes for response buffer)", newSize + 1024));
+
+      snprintf(httpResponseP->buf, newSize + 1023, "%s%s", oldBuf, chunkP);
+    }
+    else  // > 20k: use malloc
+    {
+      httpResponseP->buf = (char*) malloc(newSize + 1024);
+      if (httpResponseP->buf == NULL)
+        LM_RE(1, ("Out of memory (allocating %d bytes for response buffer)", newSize + 1024));
+
+      snprintf(httpResponseP->buf, newSize + 1023, "%s%s", oldBuf, chunkP);
+
+      if (httpResponseP->mustBeFreed == true)
+        free(oldBuf);
+      httpResponseP->mustBeFreed = true;
+    }
+
+    httpResponseP->fwdPendingP->rawResponse = httpResponseP->buf;  // Cause ... it has changed
+    httpResponseP->bufLen = newSize + 1024;
+  }
+
+  httpResponseP->bufPos = newSize;
+
+  return chunkLen;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// attrsParam -
+//
+void attrsParam(ForwardUrlParts* urlPartsP, StringArray* attrList)
+{
+  //
+  // The attributes are in longnames but ... should probably compact them.
+  // A registration can have its own @context, in cSourceInfo - for now, we use the @context of the original request.
+  // The attrList is always cloned, so, no problem modifying it.
+  //
+  int attrsLen = 0;
+  for (int ix = 0; ix < attrList->items; ix++)
+  {
+    attrList->array[ix]  = orionldContextItemAliasLookup(orionldState.contextP, attrList->array[ix], NULL, NULL);
+    attrsLen            += strlen(attrList->array[ix]) + 1;
+  }
+
+  // Make room for "attrs=" and the string-end zero
+  attrsLen += 7;
+
+  char* attrs = kaAlloc(&orionldState.kalloc, attrsLen);
+
+  strcpy(attrs, "attrs=");
+
+  int   pos = 6;
+  for (int ix = 0; ix < attrList->items; ix++)
+  {
+    int len = strlen(attrList->array[ix]);
+    strcpy(&attrs[pos], attrList->array[ix]);
+
+    // Add comma unless it's the last attr (in which case we add a zero, just in case
+    pos += len;
+
+    if (ix != attrList->items - 1)  // Not the last attr
+    {
+      attrs[pos] = ',';
+      pos += 1;
+    }
+    else
+      attrs[pos] = 0;
+  }
+
+  uriParamAdd(urlPartsP, attrs, NULL, pos);
+}
 
 
 
@@ -81,16 +347,31 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
     return false;
   }
 
-
   //
   // URL
   //
-  KjNode* endpointP = kjLookup(fwdPendingP->regP->regTree, "endpoint");
-  char    url[128];
+  KjNode*         endpointP = kjLookup(fwdPendingP->regP->regTree, "endpoint");
+  ForwardUrlParts urlParts  = { fwdPendingP, NULL, NULL };
 
-  snprintf(url, sizeof(url), "%s/ngsi-ld/v1/entities", endpointP->value.s);
+  //
+  // Add URI Params
+  //
+  if (orionldState.verb == GET)
+  {
+    if ((fwdPendingP->attrList != NULL) && (fwdPendingP->attrList->items > 0))
+      attrsParam(&urlParts, fwdPendingP->attrList);
+
+    if (orionldState.uriParamOptions.concise == true)
+      uriParamAdd(&urlParts, "options=concise", NULL, 15);
+    else if (orionldState.uriParamOptions.keyValues == true)
+      uriParamAdd(&urlParts, "options=simplified", NULL, 18);
+  }
+
+  //
+  // Compose the entire URL and pass it to CURL
+  //
+  char* url = urlCompose(&urlParts, endpointP);
   curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_URL, url);
-  LM(("FWD: URL: '%s'", url));
 
   bool https = (strncmp(endpointP->value.s, "https", 5) == 0);
 
@@ -98,11 +379,17 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   //
   // BODY
   //
-  int   approxContentLen = kjFastRenderSize(fwdPendingP->body);
-  char* payloadBody      = kaAlloc(&orionldState.kalloc, approxContentLen);
+  int   approxContentLen = 0;
+  char* payloadBody      = NULL;
 
-  kjFastRender(fwdPendingP->body, payloadBody);
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_POSTFIELDS, payloadBody);
+  if (fwdPendingP->body != NULL)
+  {
+    approxContentLen = kjFastRenderSize(fwdPendingP->body);
+    payloadBody      = kaAlloc(&orionldState.kalloc, approxContentLen);
+
+    kjFastRender(fwdPendingP->body, payloadBody);
+    curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_POSTFIELDS, payloadBody);
+  }
 
 
   //
@@ -124,20 +411,23 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   //
   headers = curl_slist_append(headers, hostHeader);
 
-  //
-  // Content-Length
-  //
-  int  contentLen = strlen(payloadBody);
-  char contentLenHeader[64];
-  snprintf(contentLenHeader, sizeof(contentLenHeader), "Content-Length: %d", contentLen);
-  headers = curl_slist_append(headers, contentLenHeader);
+  if (fwdPendingP->body != NULL)
+  {
+    //
+    // Content-Length
+    //
+    int  contentLen = strlen(payloadBody);
+    char contentLenHeader[64];
+    snprintf(contentLenHeader, sizeof(contentLenHeader), "Content-Length: %d", contentLen);
+    headers = curl_slist_append(headers, contentLenHeader);
 
-  //
-  // Content-Type (for now we maintain the original Content-Type in the forwarded request
-  // First we remove it from the "headers" curl_slist, so that we can give it ourselves
-  //
-  const char* contentType = (orionldState.in.contentType == JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
-  headers = curl_slist_append(headers, contentType);
+    //
+    // Content-Type (for now we maintain the original Content-Type in the forwarded request
+    // First we remove it from the "headers" curl_slist, so that we can give it ourselves
+    //
+    const char* contentType = (orionldState.in.contentType == JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
+    headers = curl_slist_append(headers, contentType);
+  }
 
   //
   // Accept - application/json
@@ -207,6 +497,24 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
   curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
 
+
+  //
+  // Reading the response
+  //
+  HttpResponse* httpResponseP = (HttpResponse*) kaAlloc(&orionldState.kalloc, sizeof(HttpResponse));
+
+  httpResponseP->fwdPendingP  = fwdPendingP;
+  httpResponseP->curlHandle   = fwdPendingP->curlHandle;
+  httpResponseP->buf          = httpResponseP->preBuf;
+  httpResponseP->bufPos       = 0;
+  httpResponseP->bufLen       = sizeof(httpResponseP->preBuf);
+  httpResponseP->mustBeFreed  = false;
+
+  httpResponseP->fwdPendingP->rawResponse = httpResponseP->buf;
+
+  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_WRITEFUNCTION, responseSave);          // Callback for reading the response body (and headers?)
+  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_WRITEDATA, (void*) httpResponseP);     // User data for responseSave
+
   if (https)
   {
     // SSL options
@@ -220,5 +528,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   // SEND (sort of)
   //
   curl_multi_add_handle(orionldState.curlFwdMultiP, fwdPendingP->curlHandle);
+
+  LM(("FWD: Request '%s' has been enqueued for forwarding", url));
   return 0;
 }

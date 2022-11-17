@@ -32,6 +32,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
@@ -43,7 +45,13 @@ extern "C"
 typedef struct ForwardPending
 {
   RegCacheItem*           regP;
-  KjNode*                 body;
+  FwdOperation            operation;
+  KjNode*                 body;         // For Create/Update Requests (also used for GET - tree of response)
+  char*                   rawResponse;  // Response buffer as raw ASCII as it was received by libcurl (parsed and stored as ForwardPending::body)
+  char*                   entityId;     // Used by GET /entities/{entityId}
+  char*                   attrName;     // Used by PATCH /entities/{entityId}/attrs/{attrName}
+  StringArray*            attrList;     // URI Param "attrs" for GET Requests
+  char*                   geoProp;      // URI Param "geometryProperty" for GET Requests
   bool                    error;
   CURL*                   curlHandle;
   struct curl_slist*      curlHeaders;

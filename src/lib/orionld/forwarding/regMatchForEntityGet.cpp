@@ -25,21 +25,23 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
+#include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
-#include "orionld/forwarding/regMatchInformationArray.h"         // regMatchInformationArray
+#include "orionld/forwarding/regMatchInformationArrayForGet.h"   // regMatchInformationArrayForGet
 #include "orionld/forwarding/regMatchForEntityGet.h"             // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchForEntityCreation -
+// regMatchForEntityGet -
 //
 // To match for Entity Creation, a registration needs:
 // - "operations" must include "retrieveEntity"
@@ -47,38 +49,51 @@ extern "C"
 //   - entity id and
 //   - attributes if present in the registration (and 'attrs' URL param)
 //
-ForwardPending* regMatchForEntityRetrieval
+ForwardPending* regMatchForEntityGet
 (
   RegistrationMode regMode,
   FwdOperation     operation,
   const char*      entityId,
-  StringList*      attrs,
-  
+  StringArray*     attrV,
+  const char*      geoProp
 )
 {
   ForwardPending* fwdPendingHead = NULL;
   ForwardPending* fwdPendingTail = NULL;
 
+  int regIx = 0;
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
+    ++regIx;
+    // <DEBUG>
+    KjNode* regIdP = kjLookup(regP->regTree, "id");
+    char*   regId  = (char*) "unknown registration";
+    if (regIdP != NULL)
+      regId = regIdP->value.s;
+    LM(("Treating registration no %d: %s for registrations of mode '%s'", regIx, regId, registrationModeToString(regMode)));
+    // </DEBUG>
+
     if ((regP->mode & regMode) == 0)
     {
-      LM(("No Reg Match due to regMode"));
+      LM(("%s: No Reg Match due to regMode", regId));
       continue;
     }
 
     if (regMatchOperation(regP, operation) == false)
     {
-      LM(("No Reg Match due to Operation"));
+      LM(("%s: No Reg Match due to Operation", regId));
+      continue;
+    }
+    ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, attrV, geoProp);
+    if (fwdPendingP == NULL)
+    {
+      LM(("%s: No Reg Match due to Information Array", regId));
       continue;
     }
 
-    ForwardPending* fwdPendingP = regMatchInformationArray(regP, entityId, entityType, incomingP);
-    if (fwdPendingP == NULL)
-    {
-      LM(("No Reg Match due to Information Array"));
-      continue;
-    }
+    // Add extra info in ForwardPending, needed by forwardRequestSend
+    fwdPendingP->entityId  = (char*) entityId;
+    fwdPendingP->operation = operation;
 
     // Add fwdPendingP to the linked list
     if (fwdPendingHead == NULL)
@@ -88,6 +103,8 @@ ForwardPending* regMatchForEntityRetrieval
 
     fwdPendingTail       = fwdPendingP;
     fwdPendingTail->next = NULL;
+
+    LM(("%s: Reg Match !", regId));
   }
 
   return fwdPendingHead;

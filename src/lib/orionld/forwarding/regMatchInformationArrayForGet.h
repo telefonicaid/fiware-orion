@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCAUXATTRIBUTESFILTER_H_
-#define SRC_LIB_ORIONLD_MONGOC_MONGOCAUXATTRIBUTESFILTER_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAYFORGET_H_
+#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAYFORGET_H_
 
 /*
 *
@@ -25,21 +25,21 @@
 *
 * Author: Ken Zangelin
 */
-#include <bson/bson.h>                                           // bson_t, ...
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocAuxAttributesFilter -
+// regMatchInformationArrayForGet -
 //
-extern bool mongocAuxAttributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP, const char* geojsonGeometry);
+extern ForwardPending* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId, StringArray* attrV, const char* geoProp);
 
-#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCAUXATTRIBUTESFILTER_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAYFORGET_H_

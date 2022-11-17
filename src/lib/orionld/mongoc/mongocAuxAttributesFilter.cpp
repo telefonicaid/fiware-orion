@@ -38,7 +38,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// mongocAuxAttributesFilter - 
+// mongocAuxAttributesFilter -
 //
 bool mongocAuxAttributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP, const char* geojsonGeometry)
 {

@@ -81,6 +81,9 @@ ForwardPending* regMatchForEntityCreation
       continue;
     }
 
+    // Add extra info in ForwardPending, needed by forwardRequestSend
+    fwdPendingP->operation = operation;
+
     // Add fwdPendingP to the linked list
     if (fwdPendingHead == NULL)
       fwdPendingHead = fwdPendingP;

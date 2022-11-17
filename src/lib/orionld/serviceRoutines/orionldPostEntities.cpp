@@ -118,8 +118,9 @@ bool orionldPostEntities(void)
   int              forwards       = 0;
   KjNode*          responseBody   = NULL;
   ForwardPending*  fwdPendingList = NULL;
+  bool             distributed    = (forwarding == true) || (orionldState.uriParams.local == false);
 
-  if (forwarding)
+  if (distributed)
   {
     KjNode* entityIdNodeP = kjString(orionldState.kjsonP, "entityId", entityId);  // Only used if 207 response
 
@@ -357,7 +358,7 @@ bool orionldPostEntities(void)
   }
 
  awaitFwdResponses:
-  if ((forwarding) && (forwards > 0))
+  if (forwards > 0)
   {
     CURLMsg* msgP;
     int      msgsLeft;
