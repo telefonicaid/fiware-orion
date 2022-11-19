@@ -61,17 +61,15 @@ ForwardPending* regMatchForEntityGet
   ForwardPending* fwdPendingHead = NULL;
   ForwardPending* fwdPendingTail = NULL;
 
-  int regIx = 0;
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-    ++regIx;
-    // <DEBUG>
+#ifdef DEBUG
     KjNode* regIdP = kjLookup(regP->regTree, "id");
     char*   regId  = (char*) "unknown registration";
     if (regIdP != NULL)
       regId = regIdP->value.s;
-    LM(("Treating registration no %d: %s for registrations of mode '%s'", regIx, regId, registrationModeToString(regMode)));
-    // </DEBUG>
+    LM(("Treating registration '%s' for registrations of mode '%s'", regId, registrationModeToString(regMode)));
+#endif
 
     if ((regP->mode & regMode) == 0)
     {

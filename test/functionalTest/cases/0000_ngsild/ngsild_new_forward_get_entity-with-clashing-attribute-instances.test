@@ -1,0 +1,412 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieve a distributed entity with clashing attribute instances
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB  0 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+brokerStart CP2 0 IPv4 -experimental
+
+--SHELL--
+#
+# Test:
+# - Create E1 on CB with attribute P1+observedAt (newest), P2, P3 
+# - Create E1 on CP1 with attribute P1,P2+observedAt (newest), P3 
+# - Create E1 on CP2 with attribute P1+observedAt, P2+observedAt, P3 (newest)
+
+# - Register CP1 (E1/P1-P3) on CB as an Inclusive registration
+# - Register CP2 (E1/P1-P3) on CB as an Inclusive registration
+
+# - GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2
+# - Patch E1/P3 on CB - it now gets the newest modifedAt
+# - GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CB
+
+
+# 01. Create E1 on CB with attribute P1+observedAt (newest), P2, P3
+# 02. Create E1 on CP1 with attribute P1,P2+observedAt (newest), P3
+# 03. Create E1 on CP2 with attribute P1+observedAt, P2+observedAt, P3 (newest)
+# 04. Register CP1 (E1/P1-P3) on CB as an Inclusive registration
+# 05. Register CP2 (E1/P1-P3) on CB as an Inclusive registration
+# 06. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2
+# 07. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with sysAttrs
+# 08. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues
+# 09. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues+sysAttrs
+# 10. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise
+# 11. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs
+
+
+echo "01. Create E1 on CB with attribute P1+observedAt (newest), P2, P3"
+echo "================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "value": "local P1",
+    "observedAt": "2022-11-17T16:51:03"
+  },
+  "P2": "local P2",
+  "P3": "local P3"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 on CP1 with attribute P1,P2+observedAt (newest), P3"
+echo "================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP1",
+  "P2": {
+    "value": "P2 in CP1",
+    "observedAt": "2022-11-17T16:51:02"
+  },
+  "P3": "P3 in CP1"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Create E1 on CP2 with attribute P1+observedAt, P2+observedAt, P3 (newest)"
+echo "============================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "value": "P1 in CP2",
+    "observedAt": "2022-11-17T16:51:01"
+  },
+  "P2": {
+    "value": "P2 in CP2",
+    "observedAt": "2022-11-17T16:51:01"
+  },
+  "P3": "P3 in CP2"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Register CP1 (E1/P1-P3) on CB as an Inclusive registration"
+echo "=============================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2", "P3" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Register CP2 (E1/P1-P3) on CB as an Inclusive registration"
+echo "=============================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2", "P3" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "06. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "07. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with sysAttrs"
+echo "====================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=sysAttrs
+echo
+echo
+
+
+echo "08. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues"
+echo "======================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=keyValues
+echo
+echo
+
+
+echo "09. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues+sysAttrs"
+echo "==============================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=keyValues,sysAttrs
+echo
+echo
+
+
+echo "10. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise"
+echo "===================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=concise
+echo
+echo
+
+
+echo "11. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs"
+echo "============================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=concise,sysAttrs
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 on CB with attribute P1+observedAt (newest), P2, P3
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create E1 on CP1 with attribute P1,P2+observedAt (newest), P3
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Create E1 on CP2 with attribute P1+observedAt, P2+observedAt, P3 (newest)
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. Register CP1 (E1/P1-P3) on CB as an Inclusive registration
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+05. Register CP2 (E1/P1-P3) on CB as an Inclusive registration
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+06. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 240
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "type": "Property",
+        "value": "local P1"
+    },
+    "P2": {
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "type": "Property",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "P3 in CP2"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+07. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with sysAttrs
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 556
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "type": "Property",
+        "value": "local P1"
+    },
+    "P2": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "type": "Property",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "Property",
+        "value": "P3 in CP2"
+    },
+    "createdAt": "202REGEX(.*)",
+    "id": "urn:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+08. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "local P1",
+    "P2": "P2 in CP1",
+    "P3": "P3 in CP2",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+09. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues+sysAttrs
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 196
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Can't have system attributes when /simplified/ output format is selected",
+    "title": "Incoherent value for /options/ URI param",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 176
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "value": "local P1"
+    },
+    "P2": {
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "value": "P2 in CP1"
+    },
+    "P3": "P3 in CP2",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+11. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs
+=============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 502
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "value": "local P1"
+    },
+    "P2": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "P3 in CP2"
+    },
+    "createdAt": "202REGEX(.*)",
+    "id": "urn:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

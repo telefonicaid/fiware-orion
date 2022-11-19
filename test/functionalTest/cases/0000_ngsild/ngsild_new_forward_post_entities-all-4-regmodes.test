@@ -75,7 +75,8 @@ brokerStart CP6 0 IPv4 -experimental
 # 13. GET urn:E1 in CP6 (R6) - see 404 Not Found
 # 14. GET all entities in CB - see E1 with P7-P12
 # 15. Create urn:E1 in CP6 with property P13
-# 16. GET the individual urn:E1 in CB
+# 16. GET the individual urn:E1 in CB with options=simplified
+# 17. GET the individual urn:E1 in CB with options=concise
 #
 
 echo "01. Exclusive registration R1 of urn:E1/T+P1"
@@ -310,8 +311,15 @@ echo
 echo
 
 
-echo "16. GET the individual urn:E1 in CB"
-echo "==================================="
+echo "16. GET the individual urn:E1 in CB with options=simplified"
+echo "==========================================================="
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=simplified"
+echo
+echo
+
+
+echo "17. GET the individual urn:E1 in CB with options=concise"
+echo "========================================================"
 orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise"
 echo
 echo
@@ -508,8 +516,35 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 
 
-16. GET the individual urn:E1 in CB
-===================================
+16. GET the individual urn:E1 in CB with options=simplified
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 242
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "For CP1",
+    "P10": "For CP5+CB",
+    "P11": "For CB",
+    "P12": "For CB",
+    "P13": "On CP6",
+    "P2": "For CP2",
+    "P3": "For CP3",
+    "P4": "For CP3+CP4",
+    "P5": "For CP3+CP4",
+    "P6": "For CP4",
+    "P7": "For CP5+CB",
+    "P8": "For CP5+CB",
+    "P9": "For CP5+CB",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+17. GET the individual urn:E1 in CB with options=concise
+========================================================
 HTTP/1.1 200 OK
 Content-Length: 242
 Content-Type: application/json

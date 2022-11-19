@@ -98,7 +98,7 @@ static void langFixSimplified(KjNode* languageMapP, const char* lang)
 //
 // langFixNormalized -
 //
-static void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP, const char* lang)
+void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP, const char* lang)
 {
   KjNode* valueP = kjLookup(languageMapP, lang);
   if (valueP == NULL)

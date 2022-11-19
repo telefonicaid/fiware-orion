@@ -102,7 +102,7 @@ typedef struct ForwardUrlParts
 //
 int urlPath(char* url, int urlLen, ForwardUrlParts* urlPartsP, KjNode* endpointP)
 {
-  int nb;
+  int nb = 0;
 
   if (urlPartsP->fwdPendingP->operation == FwdCreateEntity)
     nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities", endpointP->value.s);
@@ -165,6 +165,7 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
       url[nb++] = '&';
   }
 
+  url[nb] = 0;
   return url;
 }
 
@@ -361,10 +362,11 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
     if ((fwdPendingP->attrList != NULL) && (fwdPendingP->attrList->items > 0))
       attrsParam(&urlParts, fwdPendingP->attrList);
 
-    if (orionldState.uriParamOptions.concise == true)
-      uriParamAdd(&urlParts, "options=concise", NULL, 15);
-    else if (orionldState.uriParamOptions.keyValues == true)
-      uriParamAdd(&urlParts, "options=simplified", NULL, 18);
+    //
+    // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add)
+    // They MUST be sent with NOEMALIZED and SYSATTRS, as with out that, there's no way to pick attributes in case we have clashes
+    //
+    uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
   }
 
   //

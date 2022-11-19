@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
+#include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 #include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
 #include "orionld/forwarding/forwardingListsMerge.h"             // forwardingListsMerge
@@ -53,35 +54,148 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
+// timestampMerge -
+//
+void timestampMerge(KjNode* apiEntityP, KjNode* additionP, KjNode* currentTsP, KjNode* newTsP, const char* tsName, bool newReplaces)
+{
+  if (currentTsP != NULL)  // This should always be the case
+  {
+    bool newIsNewer = strcmp(currentTsP->value.s, newTsP->value.s) < 0;
+
+    if (newReplaces == newIsNewer)
+    {
+      LM(("Changing %s", tsName));
+      currentTsP->value.s = newTsP->value.s;
+    }
+    else
+      LM(("Keeping %s", tsName));
+  }
+  else
+  {
+    LM(("Adding %s (as it wasn't present!!!  - should never happen)", tsName));
+    kjChildRemove(additionP, newTsP);
+    kjChildAdd(apiEntityP, newTsP);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// newerAttribute -
+//
+KjNode* newerAttribute(KjNode* currentP, KjNode* pretenderP)
+{
+  KjNode* currentObservedAt   = kjLookup(currentP,   "observedAt");
+  KjNode* pretenderObservedAt = kjLookup(pretenderP, "observedAt");
+
+  LM(("current   observedAt: '%s'", (currentObservedAt   != NULL)? currentObservedAt->value.s   : "none"));
+  LM(("pretender observedAt: '%s'", (pretenderObservedAt != NULL)? pretenderObservedAt->value.s : "none"));
+
+  if ((currentObservedAt == NULL) && (pretenderObservedAt == NULL))
+  {
+    KjNode* currentModifiedAt   = kjLookup(currentP,   "modifiedAt");
+    KjNode* pretenderModifiedAt = kjLookup(pretenderP, "modifiedAt");
+
+    LM(("current   modifiedAt: '%s'", (currentModifiedAt   != NULL)? currentModifiedAt->value.s   : "none"));
+    LM(("pretender modifiedAt: '%s'", (pretenderModifiedAt != NULL)? pretenderModifiedAt->value.s : "none"));
+
+    if ((currentModifiedAt != NULL) && (pretenderModifiedAt != NULL))
+    {
+      if (strcmp(currentModifiedAt->value.s, pretenderModifiedAt->value.s) >= 0)
+        return currentP;
+      else
+        return pretenderP;
+    }
+    else if (currentModifiedAt != NULL)
+      return currentP;
+    else if (pretenderModifiedAt != NULL)
+      return pretenderP;
+    else
+      return currentP;  // Just pick one ...
+  }
+  else if (currentObservedAt == NULL)
+    return pretenderP;
+  else if (pretenderObservedAt == NULL)
+    return currentP;
+  else  // both non-NULL
+  {
+    LM(("Comparing observedAt"));
+    LM(("  Current:   %s", currentObservedAt->value.s));
+    LM(("  Pretender: %s", pretenderObservedAt->value.s));
+    if (strcmp(currentObservedAt->value.s, pretenderObservedAt->value.s) >= 0)
+    {
+      LM(("Current wins"));
+      return currentP;
+    }
+    else
+    {
+      LM(("Pretender wins"));
+      return pretenderP;
+    }
+  }
+
+  LM_W(("Not sure how we got here ... keeping the current - no replace"));
+  return currentP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // entityMerge -
 //
-bool entityMerge(KjNode* apiEntityP, KjNode* body)
+bool entityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary)
 {
-  KjNode* idP     = kjLookup(body, "id");
-  KjNode* typeP   = kjLookup(body, "type");
+  KjNode* idP             = kjLookup(additionP,  "id");
+  KjNode* typeP           = kjLookup(additionP,  "type");
 
   if (idP)
-    kjChildRemove(body, idP);
+    kjChildRemove(additionP, idP);
   if (typeP)
-    kjChildRemove(body, typeP);
+    kjChildRemove(additionP, typeP);
 
-  KjNode* attrP   = body->value.firstChildP;
+  if (sysAttrs == true)  // sysAttrs for the final response
+  {
+    KjNode* addCreatedAtP   = kjLookup(additionP,  "createdAt");
+    KjNode* addModifiedAtP  = kjLookup(additionP,  "modifiedAt");
+    KjNode* createdAtP      = kjLookup(apiEntityP, "createdAt");
+    KjNode* modifiedAtP     = kjLookup(apiEntityP, "modifiedAt");
+
+    if (addCreatedAtP != NULL)
+      timestampMerge(apiEntityP, additionP, createdAtP,  addCreatedAtP,  "createdAt",  false);   // false: replace if older
+    if (addModifiedAtP != NULL)
+      timestampMerge(apiEntityP, additionP, modifiedAtP, addModifiedAtP, "modifiedAt", true);    // true: replace if newer
+  }
+
+  KjNode* attrP   = additionP->value.firstChildP;
   KjNode* next;
 
   while (attrP != NULL)
   {
     next = attrP->next;
 
-    KjNode* oldP = kjLookup(apiEntityP, attrP->name);
+    KjNode* currentP = kjLookup(apiEntityP, attrP->name);
+    LM(("Treating attribute '%s' (already present at %p)", attrP->name, currentP));
 
-    if (oldP == NULL)
+    if (currentP == NULL)
     {
-      kjChildRemove(body, attrP);
+      LM(("First instance of '%s' - moving it from 'additionP' to 'entity'", attrP->name));
+      kjChildRemove(additionP, attrP);
       kjChildAdd(apiEntityP, attrP);
     }
-    else  // two copies of the same attr ...
+    else if (auxiliary == false)  // two copies of the same attr ...  and NOT from an auxiliary registration
     {
-      LM_W(("The attribute '%s' is already present ... Need to implement ... something!", attrP->name));
+      LM(("Consecutive instance of '%s' (replace or ignore)", attrP->name));
+      if (newerAttribute(currentP, attrP) == attrP)
+      {
+        LM(("Replacing the attribute '%s' as the alternative instance is newer", attrP->name));
+        kjChildRemove(apiEntityP, currentP);
+        kjChildRemove(additionP, attrP);
+        kjChildAdd(apiEntityP, attrP);
+      }
+      else
+        LM(("Keeping the attribute '%s' as the alternative instance is older", attrP->name));
     }
 
     attrP = next;
@@ -134,6 +248,283 @@ static void attrsDebug2(ForwardPending*  fwdPendingList)
   LM(("SLIST: ******************************************************"));
 }
 #endif
+
+
+
+// -----------------------------------------------------------------------------
+//
+// sysAttrsRemove -
+//
+void sysAttrsRemove(KjNode* container)
+{
+  KjNode* createdAtP  = kjLookup(container, "createdAt");
+  KjNode* modifiedAtP = kjLookup(container, "modifiedAt");
+
+  if (createdAtP != NULL)
+    kjChildRemove(container, createdAtP);
+
+  if (modifiedAtP != NULL)
+    kjChildRemove(container, modifiedAtP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// langFixNormalized - from kjTreeFromContextAttribute.cpp
+//
+// FIXME: move to its own module
+//
+extern void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP, const char* lang);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// ntonSubAttribute -
+//
+void ntonSubAttribute(KjNode* saP, char* lang, bool sysAttrs)
+{
+  LM(("Treating sub-attribute '%s'", saP->name));
+
+  if (sysAttrs == false)
+    sysAttrsRemove(saP);
+
+  KjNode* typeP = kjLookup(saP, "type");
+  if ((lang != NULL) && (typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty")))
+  {
+    KjNode* languageMapP = kjLookup(saP, "languageMap");
+    langFixNormalized(saP, typeP, languageMapP, lang);
+  }
+
+  for (KjNode* fieldP = saP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
+  {
+    LM(("Treating attribute field '%s'", fieldP->name));
+    if (strcmp(fieldP->name, "type")        == 0)  continue;
+    if (strcmp(fieldP->name, "value")       == 0)  continue;
+    if (strcmp(fieldP->name, "object")      == 0)  continue;
+    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
+    if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
+    if (strcmp(fieldP->name, "observedAt")  == 0)  continue;
+    if (strcmp(fieldP->name, "unitCode")    == 0)  continue;
+
+    ntonSubAttribute(fieldP, lang, sysAttrs);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// ntonAttribute -
+//
+void ntonAttribute(KjNode* attrP, char* lang, bool sysAttrs)
+{
+  LM(("Treating attribute '%s'", attrP->name));
+
+  // if array, we're dealing with datasetId ...  - later!
+
+  if (sysAttrs == false)
+    sysAttrsRemove(attrP);
+
+  KjNode* typeP = kjLookup(attrP, "type");
+  if ((lang != NULL) && (typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty")))
+  {
+    KjNode* languageMapP = kjLookup(attrP, "languageMap");
+    langFixNormalized(attrP, typeP, languageMapP, lang);
+  }
+
+  for (KjNode* fieldP = attrP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
+  {
+    LM(("Treating attribute field '%s'", fieldP->name));
+    if (strcmp(fieldP->name, "type")        == 0)  continue;
+    if (strcmp(fieldP->name, "value")       == 0)  continue;
+    if (strcmp(fieldP->name, "object")      == 0)  continue;
+    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
+    if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
+    if (strcmp(fieldP->name, "observedAt")  == 0)  continue;
+    if (strcmp(fieldP->name, "unitCode")    == 0)  continue;
+
+    ntonSubAttribute(fieldP, lang, sysAttrs);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// ntonEntity - transform entity from normalized to fixed normalized
+//
+// Removing sysAttrs, fixing lang, ...
+//
+void ntonEntity(KjNode* apiEntityP, char* lang, bool sysAttrs)
+{
+  if (sysAttrs == false)
+    sysAttrsRemove(apiEntityP);
+
+  for (KjNode* fieldP = apiEntityP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
+  {
+    if (strcmp(fieldP->name, "id")          == 0)  continue;
+    if (strcmp(fieldP->name, "type")        == 0)  continue;
+    if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
+    if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
+
+    // It's an attribute
+    ntonAttribute(fieldP, lang, sysAttrs);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// ntosEntity - normalized to simplified for an entity
+//
+// The combination Simplified+KeyValues isn't allowed, we'd never get this far
+//
+void ntosEntity(KjNode* apiEntityP, char* lang)
+{
+  KjNode* attrP = apiEntityP->value.firstChildP;
+  KjNode* next;
+
+  while (attrP != NULL)
+  {
+    next = attrP->next;
+
+    if (strcmp(attrP->name, "id") == 0)
+    {
+      attrP = next;
+      continue;
+    }
+    if (strcmp(attrP->name, "type") == 0)
+    {
+      attrP = next;
+      continue;
+    }
+
+    if (strcmp(attrP->name, "createdAt") == 0)
+    {
+      kjChildRemove(apiEntityP, attrP);
+      attrP = next;
+      continue;
+    }
+
+    if (strcmp(attrP->name, "modifiedAt") == 0)
+    {
+      kjChildRemove(apiEntityP, attrP);
+      attrP = next;
+      continue;
+    }
+
+    //
+    // It's an attribute
+    //
+    KjNode* valueP = kjLookup(attrP, "value");
+
+    if (valueP == NULL)
+      valueP = kjLookup(attrP, "object");
+
+    if (valueP == NULL)
+      valueP = kjLookup(attrP, "languageMap");
+
+    if (valueP != NULL)
+    {
+      attrP->value     = valueP->value;
+      attrP->type      = valueP->type;
+      attrP->lastChild = valueP->lastChild;
+    }
+    else
+      LM_E(("No attribute value (object/languageMap) found - this should never happen!!!"));
+
+    attrP = next;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// ntocEntity -
+//
+void ntocEntity(KjNode* apiEntityP, char* lang, bool sysAttrs)
+{
+  KjNode* attrP = apiEntityP->value.firstChildP;
+  KjNode* next;
+
+  while (attrP != NULL)
+  {
+    next = attrP->next;
+
+    if (strcmp(attrP->name, "id") == 0)
+    {
+      attrP = next;
+      continue;
+    }
+    if (strcmp(attrP->name, "type") == 0)
+    {
+      attrP = next;
+      continue;
+    }
+
+    if (strcmp(attrP->name, "createdAt") == 0)
+    {
+      if (sysAttrs == false)
+        kjChildRemove(apiEntityP, attrP);
+      attrP = next;
+      continue;
+    }
+
+    if (strcmp(attrP->name, "modifiedAt") == 0)
+    {
+      if (sysAttrs == false)
+        kjChildRemove(apiEntityP, attrP);
+      attrP = next;
+      continue;
+    }
+
+    //
+    // It's a regular attribute
+    //
+    // 1. Remove the attribute type
+    // 2. If only "value" left - simplified
+    //
+    KjNode* typeP       = kjLookup(attrP, "type");
+    KjNode* createdAtP  = kjLookup(attrP, "createdAt");
+    KjNode* modifiedAtP = kjLookup(attrP, "modifiedAt");
+
+    if (typeP != NULL)
+      kjChildRemove(attrP, typeP);
+
+    if (sysAttrs == false)
+    {
+      if (createdAtP != NULL)
+        kjChildRemove(attrP, createdAtP);
+
+      if (modifiedAtP != NULL)
+        kjChildRemove(attrP, modifiedAtP);
+    }
+
+    KjNode* valueP     = kjLookup(attrP, "value");
+    LM(("'Ere (attr '%s' of type '%s')", attrP->name, kjValueType(attrP->type)));
+    int     attrFields = kjChildCount(attrP);
+    LM(("'Ere"));
+
+    if ((valueP != NULL) && (attrFields == 1))  // Simplified
+    {
+      attrP->value     = valueP->value;
+      attrP->type      = valueP->type;
+      attrP->lastChild = valueP->lastChild;
+    }
+    else  // Dig into sub-attrs - might want a recursive call here
+    {
+    }
+
+    attrP = next;
+  }
+}
+
 
 
 // ----------------------------------------------------------------------------
@@ -257,7 +648,25 @@ bool orionldGetEntity(void)
     return false;
   }
   else
-    apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, orionldState.uriParams.lang, true, &orionldState.pd);
+  {
+    // In the distributed case, one and the same attribute may come from different providers,
+    // and we'll have to pick ONE of them.
+    // The algorithm to pick one is;
+    // 1. Newest observedAt
+    // 2. If none of the attributes has an observedAt:  newest modifiedAt
+    // 3. If none of the attributes has an modifiedAt - pick the first one
+    //
+    // So, in order for this to work, in a distributed GET, we can't get rid of the sysAttrs in dbModelToApiEntity2.
+    // We also cannot get rid of the sub-attrs (observedAt may be needed) - that would be if orionldState.out.format == Simplified
+    // We might need those two for the attribute-instance-decision
+    //
+    // For the very same reason, all forwarded GET requests must carry the URI-params "?options=sysAttrs,normalized"
+    //
+    if (forwards > 0)  // Need Normalized and sysattrs if the operation has parts of the entity distributed (to help pick attr instances)
+      apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, orionldState.uriParams.lang, true, &orionldState.pd);
+    else
+      apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, orionldState.uriParams.lang, true, &orionldState.pd);
+  }
 
   //
   // Now read responses to the forwarded requests
@@ -284,7 +693,7 @@ bool orionldGetEntity(void)
           if (apiEntityP == NULL)
             apiEntityP = fwdPendingP->body;
           else
-            entityMerge(apiEntityP, fwdPendingP->body);
+            entityMerge(apiEntityP, fwdPendingP->body, orionldState.uriParamOptions.sysAttrs, fwdPendingP->regP->mode == RegModeAuxiliary);
         }
         else
           LM_E(("Internal Error (parse error for the received response of a forwarded request)"));
@@ -292,14 +701,13 @@ bool orionldGetEntity(void)
       else
         LM_E(("CURL Error %d awaiting response to forwarded request: %s", msgP->data.result, curl_easy_strerror(msgP->data.result)));
     }
-  }
 
-  orionldState.responseTree   = apiEntityP;
-  orionldState.httpStatusCode = 200;
+    kjTreeLog(apiEntityP, "API entity after forwarding");
+  }
 
   if (orionldState.out.contentType == GEOJSON)
   {
-    orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.geoPropertyNode);
+    apiEntityP = kjGeojsonEntityTransform(apiEntityP, orionldState.geoPropertyNode);
 
     //
     // If URI params 'attrs' and 'geometryProperty' are given BUT 'geometryProperty' is not part of 'attrs', then we need to remove 'geometryProperty' from
@@ -320,7 +728,7 @@ bool orionldGetEntity(void)
 
       if (geometryPropertyInAttrList == false)
       {
-        KjNode* propertiesP = kjLookup(orionldState.responseTree, "properties");
+        KjNode* propertiesP = kjLookup(apiEntityP, "properties");
 
         if (propertiesP != NULL)
         {
@@ -332,6 +740,23 @@ bool orionldGetEntity(void)
       }
     }
   }
+  else if (forwards > 0)
+  {
+    kjTreeLog(apiEntityP, "API Entity to transform");
+    // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
+    bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
+    char* lang     = orionldState.uriParams.lang;
+
+    if (orionldState.out.format == RF_KEYVALUES)
+      ntosEntity(apiEntityP, lang);
+    else if (orionldState.out.format == RF_CONCISE)
+      ntocEntity(apiEntityP, lang, sysAttrs);
+    else
+      ntonEntity(apiEntityP, lang, sysAttrs);
+  }
+
+  orionldState.responseTree   = apiEntityP;
+  orionldState.httpStatusCode = 200;
 
   return true;
 }
