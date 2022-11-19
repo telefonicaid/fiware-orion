@@ -58,7 +58,8 @@ brokerStart CP2 0 IPv4 -experimental
 # 09. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues+sysAttrs
 # 10. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise
 # 11. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs
-
+# 12. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs AND lang=es
+#
 
 echo "01. Create E1 on CB with attribute P1+observedAt (newest), P2, P3"
 echo "================================================================="
@@ -70,7 +71,23 @@ payload='{
     "observedAt": "2022-11-17T16:51:03"
   },
   "P2": "local P2",
-  "P3": "local P3"
+  "P3": "local P3",
+  "food": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "Local Food",
+      "es": "comida local",
+      "se": "Lokal mat"
+    }
+  },
+  "L2": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "Local Food",
+      "es": "comida local",
+      "se": "Lokal mat"
+    }
+  }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
 echo
@@ -87,7 +104,15 @@ payload='{
     "value": "P2 in CP1",
     "observedAt": "2022-11-17T16:51:02"
   },
-  "P3": "P3 in CP1"
+  "P3": "P3 in CP1",
+  "food": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "CP1 Food",
+      "es": "comida en CP1",
+      "se": "Mat i CP1"
+    }
+  }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
 echo
@@ -107,7 +132,15 @@ payload='{
     "value": "P2 in CP2",
     "observedAt": "2022-11-17T16:51:01"
   },
-  "P3": "P3 in CP2"
+  "P3": "P3 in CP2",
+  "food": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "CP2 Food",
+      "es": "comida en CP2",
+      "se": "Mat i CP2"
+    }
+  }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
 echo
@@ -127,7 +160,7 @@ payload='{
           "type": "T"
         }
       ],
-      "properties": [ "P1", "P2", "P3" ]
+      "properties": [ "P1", "P2", "P3", "food" ]
     }
   ],
   "endpoint": "http://localhost:'$CP1_PORT'",
@@ -152,7 +185,7 @@ payload='{
           "type": "T"
         }
       ],
-      "properties": [ "P1", "P2", "P3" ]
+      "properties": [ "P1", "P2", "P3", "food" ]
     }
   ],
   "endpoint": "http://localhost:'$CP2_PORT'",
@@ -206,6 +239,13 @@ echo
 echo
 
 
+echo "12. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs AND lang=es"
+echo "========================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?options=concise,sysAttrs&lang=es'
+echo
+echo
+
+
 --REGEXPECT--
 01. Create E1 on CB with attribute P1+observedAt (newest), P2, P3
 =================================================================
@@ -255,12 +295,20 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
 06. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 240
+Content-Length: 449
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
+    "L2": {
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        },
+        "type": "LanguageProperty"
+    },
     "P1": {
         "observedAt": "2022-11-17T16:51:03.000Z",
         "type": "Property",
@@ -275,6 +323,14 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Property",
         "value": "P3 in CP2"
     },
+    "food": {
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        },
+        "type": "LanguageProperty"
+    },
     "id": "urn:E1",
     "type": "T"
 }
@@ -283,12 +339,22 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 07. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with sysAttrs
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 556
+Content-Length: 923
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
+    "L2": {
+        "createdAt": "202REGEX(.*)",
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        },
+        "modifiedAt": "202REGEX(.*)",
+        "type": "LanguageProperty"
+    },
     "P1": {
         "createdAt": "202REGEX(.*)",
         "modifiedAt": "202REGEX(.*)",
@@ -310,6 +376,16 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "value": "P3 in CP2"
     },
     "createdAt": "202REGEX(.*)",
+    "food": {
+        "createdAt": "202REGEX(.*)",
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        },
+        "modifiedAt": "202REGEX(.*)",
+        "type": "LanguageProperty"
+    },
     "id": "urn:E1",
     "modifiedAt": "202REGEX(.*)",
     "type": "T"
@@ -319,15 +395,25 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 08. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 201
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
+    "L2": {
+        "en": "Local Food",
+        "es": "comida local",
+        "se": "Lokal mat"
+    },
     "P1": "local P1",
     "P2": "P2 in CP1",
     "P3": "P3 in CP2",
+    "food": {
+        "en": "CP2 Food",
+        "es": "comida en CP2",
+        "se": "Mat i CP2"
+    },
     "id": "urn:E1",
     "type": "T"
 }
@@ -350,12 +436,19 @@ Date: REGEX(.*)
 10. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 176
+Content-Length: 333
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
+    "L2": {
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        }
+    },
     "P1": {
         "observedAt": "2022-11-17T16:51:03.000Z",
         "value": "local P1"
@@ -365,6 +458,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "value": "P2 in CP1"
     },
     "P3": "P3 in CP2",
+    "food": {
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        }
+    },
     "id": "urn:E1",
     "type": "T"
 }
@@ -373,12 +473,21 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 11. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs
 =============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 502
+Content-Length: 817
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
+    "L2": {
+        "createdAt": "202REGEX(.*)",
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        },
+        "modifiedAt": "202REGEX(.*)"
+    },
     "P1": {
         "createdAt": "202REGEX(.*)",
         "modifiedAt": "202REGEX(.*)",
@@ -397,6 +506,60 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "value": "P3 in CP2"
     },
     "createdAt": "202REGEX(.*)",
+    "food": {
+        "createdAt": "202REGEX(.*)",
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        },
+        "modifiedAt": "202REGEX(.*)"
+    },
+    "id": "urn:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+12. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs AND lang=es
+=========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 747
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": {
+        "createdAt": "202REGEX(.*)",
+        "lang": "es",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "comida local"
+    },
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "value": "local P1"
+    },
+    "P2": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "P3 in CP2"
+    },
+    "createdAt": "202REGEX(.*)",
+    "food": {
+        "createdAt": "202REGEX(.*)",
+        "lang": "es",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "comida en CP2"
+    },
     "id": "urn:E1",
     "modifiedAt": "202REGEX(.*)",
     "type": "T"
