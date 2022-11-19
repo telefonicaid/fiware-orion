@@ -363,11 +363,14 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
       attrsParam(&urlParts, fwdPendingP->attrList);
 
     //
-    // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add)
+    // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add that)
     // They MUST be sent with NOEMALIZED and SYSATTRS, as with out that, there's no way to pick attributes in case we have clashes
     //
     uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
   }
+
+  if (orionldState.uriParams.lang != NULL)
+    uriParamAdd(&urlParts, "lang", orionldState.uriParams.lang, -1);
 
   //
   // Compose the entire URL and pass it to CURL
