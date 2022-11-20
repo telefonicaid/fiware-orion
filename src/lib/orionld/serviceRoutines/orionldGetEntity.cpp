@@ -302,12 +302,13 @@ void ntonSubAttribute(KjNode* saP, char* lang, bool sysAttrs)
     LM(("Treating attribute field '%s'", fieldP->name));
     if (strcmp(fieldP->name, "type")        == 0)  continue;
     if (strcmp(fieldP->name, "value")       == 0)  continue;
-    if (strcmp(fieldP->name, "object")      == 0)  continue;
-    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
     if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
     if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "observedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "unitCode")    == 0)  continue;
+    if (strcmp(fieldP->name, "object")      == 0)  continue;
+    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "lang")        == 0)  continue;
 
     ntonSubAttribute(fieldP, lang, sysAttrs);
   }
@@ -323,13 +324,20 @@ void ntonAttribute(KjNode* attrP, char* lang, bool sysAttrs)
 {
   LM(("Treating attribute '%s'", attrP->name));
 
-  // if array, we're dealing with datasetId ...  - later!
+  //
+  // If ARRAY, we're dealing with datasetId ...  - later!
+  //
+  if (attrP->type == KjArray)
+  {
+    LM(("Multi-Attribute (datasetId) not supported, sorry ..."));
+    return;
+  }
 
   if (sysAttrs == false)
     sysAttrsRemove(attrP);
 
   KjNode* typeP = kjLookup(attrP, "type");
-  if ((lang != NULL) && (typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty")))
+  if ((lang != NULL) && (typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty") == 0))
   {
     KjNode* languageMapP = kjLookup(attrP, "languageMap");
     langFixNormalized(attrP, typeP, languageMapP, lang);
@@ -340,12 +348,13 @@ void ntonAttribute(KjNode* attrP, char* lang, bool sysAttrs)
     LM(("Treating attribute field '%s'", fieldP->name));
     if (strcmp(fieldP->name, "type")        == 0)  continue;
     if (strcmp(fieldP->name, "value")       == 0)  continue;
-    if (strcmp(fieldP->name, "object")      == 0)  continue;
-    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
     if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
     if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "observedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "unitCode")    == 0)  continue;
+    if (strcmp(fieldP->name, "object")      == 0)  continue;
+    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "lang")        == 0)  continue;
 
     ntonSubAttribute(fieldP, lang, sysAttrs);
   }
@@ -705,6 +714,21 @@ bool orionldGetEntity(void)
     kjTreeLog(apiEntityP, "API entity after forwarding");
   }
 
+  if (forwards > 0)
+  {
+    kjTreeLog(apiEntityP, "API Entity to transform");
+    // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
+    bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
+    char* lang     = orionldState.uriParams.lang;
+
+    if (orionldState.out.format == RF_KEYVALUES)
+      ntosEntity(apiEntityP, lang);
+    else if (orionldState.out.format == RF_CONCISE)
+      ntocEntity(apiEntityP, lang, sysAttrs);
+    else
+      ntonEntity(apiEntityP, lang, sysAttrs);
+  }
+
   if (orionldState.out.contentType == GEOJSON)
   {
     apiEntityP = kjGeojsonEntityTransform(apiEntityP, orionldState.geoPropertyNode);
@@ -739,20 +763,6 @@ bool orionldGetEntity(void)
         }
       }
     }
-  }
-  else if (forwards > 0)
-  {
-    kjTreeLog(apiEntityP, "API Entity to transform");
-    // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
-    bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
-    char* lang     = orionldState.uriParams.lang;
-
-    if (orionldState.out.format == RF_KEYVALUES)
-      ntosEntity(apiEntityP, lang);
-    else if (orionldState.out.format == RF_CONCISE)
-      ntocEntity(apiEntityP, lang, sysAttrs);
-    else
-      ntonEntity(apiEntityP, lang, sysAttrs);
   }
 
   orionldState.responseTree   = apiEntityP;
