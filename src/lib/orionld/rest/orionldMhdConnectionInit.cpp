@@ -834,15 +834,18 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     if (strcmp(value, "true") == 0)
       orionldState.uriParams.reset = true;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_RESET;
   }
   else if (strcmp(key, "level") == 0)
   {
     orionldState.uriParams.level = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_LEVEL;
   }
   else if (strcmp(key, "local") == 0)
   {
     if (strcmp(value, "true") == 0)
       orionldState.uriParams.local = true;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_LOCAL;
   }
   else if (strcmp(key, "entity::type") == 0)  // Is NGSIv1 ?entity::type=X the same as NGSIv2 ?type=X ?
   {

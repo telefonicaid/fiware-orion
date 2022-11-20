@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/curlToBrokerStrerror.h"                 // curlToBrokerStrerror
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/legacyDriver/legacyGetEntity.h"                // legacyGetEntity
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
@@ -63,16 +64,10 @@ void timestampMerge(KjNode* apiEntityP, KjNode* additionP, KjNode* currentTsP, K
     bool newIsNewer = strcmp(currentTsP->value.s, newTsP->value.s) < 0;
 
     if (newReplaces == newIsNewer)
-    {
-      LM(("Changing %s", tsName));
       currentTsP->value.s = newTsP->value.s;
-    }
-    else
-      LM(("Keeping %s", tsName));
   }
   else
   {
-    LM(("Adding %s (as it wasn't present!!!  - should never happen)", tsName));
     kjChildRemove(additionP, newTsP);
     kjChildAdd(apiEntityP, newTsP);
   }
@@ -89,16 +84,10 @@ KjNode* newerAttribute(KjNode* currentP, KjNode* pretenderP)
   KjNode* currentObservedAt   = kjLookup(currentP,   "observedAt");
   KjNode* pretenderObservedAt = kjLookup(pretenderP, "observedAt");
 
-  LM(("current   observedAt: '%s'", (currentObservedAt   != NULL)? currentObservedAt->value.s   : "none"));
-  LM(("pretender observedAt: '%s'", (pretenderObservedAt != NULL)? pretenderObservedAt->value.s : "none"));
-
   if ((currentObservedAt == NULL) && (pretenderObservedAt == NULL))
   {
     KjNode* currentModifiedAt   = kjLookup(currentP,   "modifiedAt");
     KjNode* pretenderModifiedAt = kjLookup(pretenderP, "modifiedAt");
-
-    LM(("current   modifiedAt: '%s'", (currentModifiedAt   != NULL)? currentModifiedAt->value.s   : "none"));
-    LM(("pretender modifiedAt: '%s'", (pretenderModifiedAt != NULL)? pretenderModifiedAt->value.s : "none"));
 
     if ((currentModifiedAt != NULL) && (pretenderModifiedAt != NULL))
     {
@@ -120,19 +109,10 @@ KjNode* newerAttribute(KjNode* currentP, KjNode* pretenderP)
     return currentP;
   else  // both non-NULL
   {
-    LM(("Comparing observedAt"));
-    LM(("  Current:   %s", currentObservedAt->value.s));
-    LM(("  Pretender: %s", pretenderObservedAt->value.s));
     if (strcmp(currentObservedAt->value.s, pretenderObservedAt->value.s) >= 0)
-    {
-      LM(("Current wins"));
       return currentP;
-    }
     else
-    {
-      LM(("Pretender wins"));
       return pretenderP;
-    }
   }
 
   LM_W(("Not sure how we got here ... keeping the current - no replace"));
@@ -176,26 +156,20 @@ bool entityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxi
     next = attrP->next;
 
     KjNode* currentP = kjLookup(apiEntityP, attrP->name);
-    LM(("Treating attribute '%s' (already present at %p)", attrP->name, currentP));
 
     if (currentP == NULL)
     {
-      LM(("First instance of '%s' - moving it from 'additionP' to 'entity'", attrP->name));
       kjChildRemove(additionP, attrP);
       kjChildAdd(apiEntityP, attrP);
     }
     else if (auxiliary == false)  // two copies of the same attr ...  and NOT from an auxiliary registration
     {
-      LM(("Consecutive instance of '%s' (replace or ignore)", attrP->name));
       if (newerAttribute(currentP, attrP) == attrP)
       {
-        LM(("Replacing the attribute '%s' as the alternative instance is newer", attrP->name));
         kjChildRemove(apiEntityP, currentP);
         kjChildRemove(additionP, attrP);
         kjChildAdd(apiEntityP, attrP);
       }
-      else
-        LM(("Keeping the attribute '%s' as the alternative instance is older", attrP->name));
     }
 
     attrP = next;
@@ -285,8 +259,6 @@ extern void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP
 //
 void ntonSubAttribute(KjNode* saP, char* lang, bool sysAttrs)
 {
-  LM(("Treating sub-attribute '%s'", saP->name));
-
   if (sysAttrs == false)
     sysAttrsRemove(saP);
 
@@ -299,7 +271,6 @@ void ntonSubAttribute(KjNode* saP, char* lang, bool sysAttrs)
 
   for (KjNode* fieldP = saP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
   {
-    LM(("Treating attribute field '%s'", fieldP->name));
     if (strcmp(fieldP->name, "type")        == 0)  continue;
     if (strcmp(fieldP->name, "value")       == 0)  continue;
     if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
@@ -322,14 +293,12 @@ void ntonSubAttribute(KjNode* saP, char* lang, bool sysAttrs)
 //
 void ntonAttribute(KjNode* attrP, char* lang, bool sysAttrs)
 {
-  LM(("Treating attribute '%s'", attrP->name));
-
   //
   // If ARRAY, we're dealing with datasetId ...  - later!
   //
   if (attrP->type == KjArray)
   {
-    LM(("Multi-Attribute (datasetId) not supported, sorry ..."));
+    LM_E(("Multi-Attribute (datasetId) not supported, sorry ..."));
     return;
   }
 
@@ -345,7 +314,6 @@ void ntonAttribute(KjNode* attrP, char* lang, bool sysAttrs)
 
   for (KjNode* fieldP = attrP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
   {
-    LM(("Treating attribute field '%s'", fieldP->name));
     if (strcmp(fieldP->name, "type")        == 0)  continue;
     if (strcmp(fieldP->name, "value")       == 0)  continue;
     if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
@@ -516,9 +484,7 @@ void ntocEntity(KjNode* apiEntityP, char* lang, bool sysAttrs)
     }
 
     KjNode* valueP     = kjLookup(attrP, "value");
-    LM(("'Ere (attr '%s' of type '%s')", attrP->name, kjValueType(attrP->type)));
     int     attrFields = kjChildCount(attrP);
-    LM(("'Ere"));
 
     if ((valueP != NULL) && (attrFields == 1))  // Simplified
     {
@@ -555,7 +521,7 @@ bool orionldGetEntity(void)
   if (pCheckUri(entityId, "Entity ID in URL PATH", true) == false)
     return false;
 
-  bool             distributed    = (forwarding == true) || (orionldState.uriParams.local == false);
+  bool             distributed    = (forwarding == true) && (orionldState.uriParams.local == false);
   ForwardPending*  fwdPendingList = NULL;
   int              forwards       = 0;
 
@@ -644,17 +610,12 @@ bool orionldGetEntity(void)
   KjNode* apiEntityP = NULL;
   if (dbEntityP == NULL)
   {
-    if (distributed == false)
+    if (forwards == 0)
     {
       const char* title = (orionldState.in.attrList.items != 0)? "Combination Entity/Attributes Not Found" : "Entity Not Found";
       orionldError(OrionldResourceNotFound, title, entityId, 404);
       return false;
     }
-    // If distributed, then it's perfectly OK to have nothing locally
-    // BUT, distributes hasn't been implemented yet, so ...
-    const char* title = (orionldState.in.attrList.items != 0)? "Combination Entity/Attributes Not Found" : "Entity Not Found";
-    orionldError(OrionldResourceNotFound, title, entityId, 404);
-    return false;
   }
   else
   {
@@ -764,6 +725,12 @@ bool orionldGetEntity(void)
       }
     }
   }
+
+  //
+  // If a tenant is in use, it must be included in the response
+  //
+  if (orionldState.tenantP != &tenant0)
+    orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
 
   orionldState.responseTree   = apiEntityP;
   orionldState.httpStatusCode = 200;

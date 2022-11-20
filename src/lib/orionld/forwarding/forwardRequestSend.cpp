@@ -38,6 +38,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 #include "orionld/forwarding/forwardRequestSend.h"               // Own interface
@@ -404,9 +405,11 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   // - User-Agent
   // - Date
   // - Those in csourceInfo (if Content-Type is present, it is ignored (for now))
+  // - NGSILD-Tenant (part of registration, but can also be in csourceInfo?)
   //
   KjNode*             csourceInfoP = kjLookup(fwdPendingP->regP->regTree, "contextSourceInfo");
-  struct curl_slist*  headers     = NULL;
+  KjNode*             tenantP      = kjLookup(fwdPendingP->regP->regTree, "tenant");
+  struct curl_slist*  headers      = NULL;
 
   // Date
   headers = curl_slist_append(headers, dateHeader);
@@ -444,6 +447,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   //
   // Custom headers from Registration::contextSourceInfo
   //
+  char* infoTenant = NULL;
   if (csourceInfoP != NULL)
   {
     for (KjNode* regHeaderP = csourceInfoP->value.firstChildP; regHeaderP != NULL; regHeaderP = regHeaderP->next)
@@ -469,11 +473,34 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
         continue;
       }
 
+      if (strcasecmp(keyP->value.s, "NGSILD-Tenant") == 0)
+      {
+        infoTenant = valueP->value.s;
+        continue;
+      }
+
       char  header[256];  // Assuming 256 is enough
       snprintf(header, sizeof(header), "%s: %s", keyP->value.s, valueP->value.s);
       headers = curl_slist_append(headers, header);
     }
   }
+
+  // Tenant
+  char* tenant = NULL;
+  if (tenantP != NULL)
+    tenant = tenantP->value.s;
+  else if (infoTenant != NULL)
+    tenant = infoTenant;
+  else if (orionldState.tenantP != &tenant0)
+    tenant = orionldState.tenantP->tenant;
+
+  if (tenant != NULL)
+  {
+    char tenantHeader[64];
+    snprintf(tenantHeader, sizeof(tenantHeader), "NGSILD-Tenant: %s", tenant);
+    headers = curl_slist_append(headers, tenantHeader);
+  }
+
 
   // User-Agent
   headers = curl_slist_append(headers, userAgentHeaderNoLF);  // userAgentHeader is initialized in orionldServiceInit()
