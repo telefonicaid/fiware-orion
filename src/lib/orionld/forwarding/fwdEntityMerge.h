@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_FWDENTITYMERGE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_FWDENTITYMERGE_H_
 
 /*
 *
@@ -27,23 +27,15 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeLog -
+// fwdEntityMerge -
 //
-#define kjTreeLog(tree, msg)             kjTreeLogFunction(tree, msg, __FILE__, __LINE__)
+extern bool fwdEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// kjTreeLogFunction -
-//
-extern void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo);
-
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_FWDENTITYMERGE_H_

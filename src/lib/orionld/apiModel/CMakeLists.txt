@@ -21,25 +21,15 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    forwardingInit.cpp
-    FwdOperation.cpp
-    forwardRequestSend.cpp
-    forwardingRelease.cpp
-    forwardingSuccess.cpp
-    forwardingFailure.cpp
-    forwardingListsMerge.cpp
-    fwdPendingLookupByCurlHandle.cpp
-    fwdEntityMerge.cpp
-    regMatchEntityInfo.cpp
-    regMatchOperation.cpp
-    regMatchInformationItem.cpp
-    regMatchInformationItemForGet.cpp
-    regMatchInformationArray.cpp
-    regMatchInformationArrayForGet.cpp
-    regMatchAttributes.cpp
-    regMatchAttributesForGet.cpp
-    regMatchForEntityCreation.cpp
-    regMatchForEntityGet.cpp
+   langFixNormalized.cpp
+   langFixSimplified.cpp
+   ntonEntity.cpp
+   ntonAttribute.cpp
+   ntonSubAttribute.cpp
+   ntocEntity.cpp
+   ntocAttribute.cpp
+   ntocSubAttribute.cpp
+   ntosEntity.cpp
 )
 
 # Include directories
@@ -49,4 +39,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_forwarding STATIC ${SOURCES})
+ADD_LIBRARY(orionld_apiModel STATIC ${SOURCES})

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,25 +22,40 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                              // strcmp
+
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
-
-
-// -----------------------------------------------------------------------------
-//
-// kjTreeLog -
-//
-#define kjTreeLog(tree, msg)             kjTreeLogFunction(tree, msg, __FILE__, __LINE__)
+#include "orionld/kjTree/kjSysAttrsRemove.h"                     // kjSysAttrsRemove
+#include "orionld/apiModel/ntonAttribute.h"                      // ntonAttribute
+#include "orionld/apiModel/ntonEntity.h"                         // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeLogFunction -
+// ntonEntity -
 //
-extern void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo);
+void ntonEntity(KjNode* apiEntityP, const char* lang, bool sysAttrs)
+{
+  if (sysAttrs == false)
+    kjSysAttrsRemove(apiEntityP);
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
+  for (KjNode* fieldP = apiEntityP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
+  {
+    if (strcmp(fieldP->name, "id")          == 0)  continue;
+    if (strcmp(fieldP->name, "type")        == 0)  continue;
+
+    if (sysAttrs == true)
+    {
+      if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
+      if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
+    }
+
+    // It's an attribute
+    ntonAttribute(fieldP, lang, sysAttrs);
+  }
+}

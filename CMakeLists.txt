@@ -206,6 +206,7 @@ SET (ORION_LIBS
     orionld_socketService
     orionld_troe
     orionld_dbModel
+    orionld_apiModel
     serviceRoutines
     serviceRoutinesV2
     ngsiNotify
@@ -231,6 +232,7 @@ SET (ORION_LIBS
     orionld_q
     orionld_mongoc       # subCache needs mongoc
     orionld_dbModel
+    orionld_apiModel
     orionld_common
     orionld_types
     parse
@@ -378,6 +380,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/kjTree)
   ADD_SUBDIRECTORY(src/lib/orionld/db)
   ADD_SUBDIRECTORY(src/lib/orionld/dbModel)
+  ADD_SUBDIRECTORY(src/lib/orionld/apiModel)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoBackend)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoCppLegacy)
   ADD_SUBDIRECTORY(src/lib/orionld/mongoc)

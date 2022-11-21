@@ -62,6 +62,7 @@ SET (SOURCES
     kjTreeFromCachedSubscription.cpp
     kjAttributeNormalizedToSimplified.cpp
     kjAttributeNormalizedToConcise.cpp
+    kjSysAttrsRemove.cpp
 )
 
 # Include directories

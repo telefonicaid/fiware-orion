@@ -223,7 +223,7 @@ std::string payloadParse
 * tenantCheck -
 *
 * This function used to be 'static', but as it is now used by MetricsMgr::serviceValid
-* it has been mede 'extern'.
+* it has been made 'extern'.
 * This might change when github issue #2781 is looked into and if we stop using the
 * function, is should go back to being 'static'.
 */

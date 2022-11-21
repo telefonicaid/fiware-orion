@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJSYSATTRSREMOVE_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJSYSATTRSREMOVE_H_
 
 /*
 *
@@ -34,16 +34,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeLog -
+// kjSysAttrsRemove -
 //
-#define kjTreeLog(tree, msg)             kjTreeLogFunction(tree, msg, __FILE__, __LINE__)
+extern void kjSysAttrsRemove(KjNode* container);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// kjTreeLogFunction -
-//
-extern void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo);
-
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJSYSATTRSREMOVE_H_
