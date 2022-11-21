@@ -22,7 +22,7 @@
 # Project name and basic prerequisities
 #
 PROJECT(orionld)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 
 #
 # DEBUG or RELEASE build ?
