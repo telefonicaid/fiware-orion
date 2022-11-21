@@ -36,7 +36,7 @@ The **value** is *mandatory* inside a property and it can be of any JSON type ex
 This is how a very simple Property _P1_ is expressed in JSON (P1 inside the entity _urn:entities:E1_):
 ```json
 {
-  "id: "urn:entities:E1",
+  "id": "urn:entities:E1",
   "type": "T",
   "P1": {
     "type": "Property",
@@ -61,7 +61,7 @@ $ curl localhost:1026//ngsi-ld/v1/entities -d "$payloadData"
 Here a somewhat more complex example - an attribute *P1 with a _compound value_ and one sub-attribute *P11* (a Property):
 ```json
 {
-  "id: "urn:entities:E1",
+  "id": "urn:entities:E1",
   "type": "T",
   "P1": {
     "type": "Property",
@@ -90,7 +90,7 @@ The second type of attributes, _relationships_, contain information on how an en
 An example entity with a *Relationship*: 
 ```json
 {
-  "id: "urn:entities:anura:E1",
+  "id": "urn:entities:anura:E1",
   "type": "T",
   "Cousin": {
     "type": "Relationship",
