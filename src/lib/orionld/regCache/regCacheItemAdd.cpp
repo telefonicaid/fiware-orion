@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
 #include "orionld/forwarding/FwdOperation.h"                     // fwdOperationMask
 #include "orionld/regCache/regCacheItemAdd.h"                    // Own interface
@@ -98,7 +99,7 @@ static void regStringAdd(KjNode* regP, const char* name, const char* value)
 //
 // regCacheItemAdd -
 //
-RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
+RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode* regP, bool fromDb, OrionldContext* fwdContextP)
 {
   RegCacheItem* rciP = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
 
@@ -113,8 +114,10 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
 
   rcP->last = rciP;
 
-  rciP->regTree = kjClone(NULL, regP);
-  rciP->next    = NULL;
+  rciP->regId     = strdup(registrationId);
+  rciP->regTree   = kjClone(NULL, regP);
+  rciP->contextP  = fwdContextP;
+  rciP->next      = NULL;
 
   //
   // Some fields are "mirrored" inside RegCacheItem, for faster access

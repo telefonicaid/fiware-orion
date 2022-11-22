@@ -34,8 +34,10 @@ extern "C"
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
+#include "orionld/context/OrionldContext.h"                     // OrionldContext
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/forwarding/FwdOperation.h"                    // fwdOperationFromString, FwdNone
+#include "orionld/regCache/regCacheItemContextCheck.h"          // regCacheItemContextCheck
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
 #include "orionld/payloadCheck/pcheckInformation.h"             // pcheckInformation
 #include "orionld/payloadCheck/pcheckTimeInterval.h"            // pcheckTimeInterval
@@ -125,7 +127,12 @@ KjNode* kjLookupInKvList(KjNode* firstSiblingP, const char* name)
 //
 // pCheckKeyValueArray - FIXME: Own module
 //
-bool pCheckKeyValueArray(KjNode* csiP)
+// Keys with special treatment:
+// * jsonldContext - needs to be downloaded, parsed etc, to be accepted.
+// * Content-Type  - must be a valid mime type
+// * Accept        - must be a valid Accept value (parse it and make sure)
+//
+bool pCheckKeyValueArray(KjNode* csiP, OrionldContext** fwdContextPP)
 {
   for (KjNode* kvObjectP = csiP->value.firstChildP; kvObjectP != NULL; kvObjectP = kvObjectP->next)
   {
@@ -175,6 +182,17 @@ bool pCheckKeyValueArray(KjNode* csiP)
     {
       orionldError(OrionldBadRequestData, "Duplicated Key in Registration::contextSourceInfo", keyP->value.s, 400);
       return false;
+    }
+
+    // Special keys
+    if (strcmp(keyP->value.s, "jsonldContext") == 0)
+    {
+      // If an @context is given for the registration, make sure it's valid
+      if (regCacheItemContextCheck(NULL, valueP->value.s, fwdContextPP) == false)
+      {
+        LM_W(("Unable to add Registration @context '%s' for an item in the reg-cache", valueP->value.s));
+        return 0;
+      }
     }
   }
 
@@ -330,7 +348,7 @@ bool pCheckScope(const char* scope)
 // - output param for "mode"
 // - ...
 //
-bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creation, KjNode**  propertyTreeP)
+bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creation, KjNode**  propertyTreeP, OrionldContext** contextPP)
 {
   KjNode*  idP                   = NULL;  // Optional but already extracted by orionldMhdConnectionInit
   KjNode*  typeP                 = NULL;  // Mandatory but already extracted by orionldMhdConnectionInit
@@ -499,7 +517,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
       DUPLICATE_CHECK(contextSourceInfoP, "contextSourceInfo", nodeP);
       ARRAY_CHECK(contextSourceInfoP, "contextSourceInfo");
       EMPTY_ARRAY_CHECK(contextSourceInfoP, "contextSourceInfo");
-      if (pCheckKeyValueArray(contextSourceInfoP) == false)
+      if (pCheckKeyValueArray(contextSourceInfoP, contextPP) == false)
         return false;
     }
     else if (strcmp(nodeP->name, "scope") == 0)

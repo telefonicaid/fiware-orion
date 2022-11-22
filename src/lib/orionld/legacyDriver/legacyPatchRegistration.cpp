@@ -569,11 +569,15 @@ bool legacyPatchRegistration(void)
     }
   }
 
-  if (pcheckRegistration(orionldState.requestTree, false, false, &propertyTree) == false)
+  OrionldContext* contextP = NULL;  // Needed but not used in legacy implementation
+  if (pcheckRegistration(orionldState.requestTree, false, false, &propertyTree, &contextP) == false)
   {
     LM_E(("pcheckRegistration FAILED"));
     return false;
   }
+
+  if (contextP != NULL)
+    LM_W(("Registration @context in place but this is not supported by the legacy implementation of PATCH Registration"));
 
   KjNode* dbRegistrationP = mongoCppLegacyRegistrationGet(registrationId);
 

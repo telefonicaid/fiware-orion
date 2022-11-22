@@ -169,6 +169,15 @@ bool orionldGetEntity(void)
     {
       const char* title = (orionldState.in.attrList.items != 0)? "Combination Entity/Attributes Not Found" : "Entity Not Found";
       orionldError(OrionldResourceNotFound, title, entityId, 404);
+
+#if 0
+      LM(("@context is: '%s'", orionldState.contextP->url));
+
+      for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
+      {
+        LM(("Attr %d: '%s'", ix, orionldState.in.attrList.array[ix]));
+      }
+#endif
       return false;
     }
   }
@@ -214,6 +223,16 @@ bool orionldGetEntity(void)
         fwdPendingP->body = kjParse(orionldState.kjsonP, fwdPendingP->rawResponse);
         if (fwdPendingP->body != NULL)
         {
+          if (fwdPendingP->regP->acceptJsonld == true)
+          {
+            KjNode* atContextP = kjLookup(fwdPendingP->body, "@context");
+            if (atContextP != NULL)
+              kjChildRemove(fwdPendingP->body, atContextP);
+
+            // Now expand the whole thing using the context        *fwdPendingP->regP->contextP*
+            // And then compact the whole thing using the context  *orionldState.contextP*
+            // Set fwdPendingP->body to the resulting KjNode tree
+          }
           // Merge in the received body into the local (or nothing)
           if (apiEntityP == NULL)
             apiEntityP = fwdPendingP->body;

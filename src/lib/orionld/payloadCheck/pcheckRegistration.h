@@ -30,6 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+
 
 
 // -----------------------------------------------------------------------------
@@ -54,6 +56,6 @@ extern "C"
 // as a KjNode tree, until we are able to perform this check.
 // The output parameter 'propertyTreeP' is used for this purpose.
 //
-extern bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creation, KjNode**  propertyTreeP);
+extern bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creation, KjNode**  propertyTreeP, OrionldContext** contextP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKREGISTRATION_H_

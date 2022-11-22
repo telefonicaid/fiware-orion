@@ -628,8 +628,9 @@ bool orionldPatchRegistration(void)
   //        HOWEVER, what if for example "observationInterval" didn't previously exist, it is patched in.
   //        if that is so, then both startAt and endAt are necessary
   //
-  KjNode* propertyTree = NULL;
-  if (pcheckRegistration(orionldState.requestTree, false, false, &propertyTree) == false)
+  KjNode*         propertyTree = NULL;
+  OrionldContext* fwdContextP  = NULL;
+  if (pcheckRegistration(orionldState.requestTree, false, false, &propertyTree, &fwdContextP) == false)
     return false;
 
   if (propertyTree != NULL)
@@ -709,6 +710,9 @@ bool orionldPatchRegistration(void)
 
     rciP->opMask  = fwdOperationMask(operationsP);
     rciP->mode    = (modeP != NULL)? registrationMode(modeP->value.s) : RegModeInclusive;
+
+    if (fwdContextP != NULL)
+      rciP->contextP = fwdContextP;
   }
 
   //

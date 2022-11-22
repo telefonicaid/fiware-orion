@@ -33,12 +33,14 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjRenderSize.h"                                  // kjFastRenderSize
 #include "kjson/kjRender.h"                                      // kjFastRender
+#include "kjson/kjBuilder.h"                                     // kjString, kjChildAdd
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 #include "orionld/forwarding/forwardRequestSend.h"               // Own interface
@@ -267,8 +269,11 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
 //
 // attrsParam -
 //
-void attrsParam(ForwardUrlParts* urlPartsP, StringArray* attrList)
+void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArray* attrList)
 {
+  if (contextP == NULL)
+    contextP = orionldCoreContextP;
+
   //
   // The attributes are in longnames but ... should probably compact them.
   // A registration can have its own @context, in cSourceInfo - for now, we use the @context of the original request.
@@ -277,8 +282,10 @@ void attrsParam(ForwardUrlParts* urlPartsP, StringArray* attrList)
   int attrsLen = 0;
   for (int ix = 0; ix < attrList->items; ix++)
   {
-    attrList->array[ix]  = orionldContextItemAliasLookup(orionldState.contextP, attrList->array[ix], NULL, NULL);
+    LM(("Compacting attr '%s' for forwarding, using context '%s'", attrList->array[ix], contextP->url));
+    attrList->array[ix]  = orionldContextItemAliasLookup(contextP, attrList->array[ix], NULL, NULL);
     attrsLen            += strlen(attrList->array[ix]) + 1;
+    LM(("Compacted attr: '%s'", attrList->array[ix]));
   }
 
   // Make room for "attrs=" and the string-end zero
@@ -317,6 +324,19 @@ void attrsParam(ForwardUrlParts* urlPartsP, StringArray* attrList)
 //
 bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
 {
+  //
+  // Figure out the @context to use for the forwarded request
+  // 1. Default value is, of course, the Core Context
+  // 2. Next up is the @context used in the original request, the one provoking the forwarded request
+  // 3. The registration might have its own @context (from "jsonldContext" in the cSourceInfo array
+  //
+  // Actually, point 1 is not necessary as orionldState.contextP (@context used in the original request) will point to the Core Context
+  // if no @context was used in the original request
+  //
+  //
+  OrionldContext* fwdContextP = (fwdPendingP->regP->contextP != NULL)? fwdPendingP->regP->contextP : orionldState.contextP;
+
+  //
   // For now we only support http and https for forwarded requests. libcurl is used for both of them
   // So, a single function with an "if" or two will do - copy from orionld/notifications/httpsNotify.cpp
   //
@@ -361,7 +381,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   if (orionldState.verb == GET)
   {
     if ((fwdPendingP->attrList != NULL) && (fwdPendingP->attrList->items > 0))
-      attrsParam(&urlParts, fwdPendingP->attrList);
+      attrsParam(fwdContextP, &urlParts, fwdPendingP->attrList);
 
     //
     // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add that)
@@ -383,22 +403,6 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
 
 
   //
-  // BODY
-  //
-  int   approxContentLen = 0;
-  char* payloadBody      = NULL;
-
-  if (fwdPendingP->body != NULL)
-  {
-    approxContentLen = kjFastRenderSize(fwdPendingP->body);
-    payloadBody      = kaAlloc(&orionldState.kalloc, approxContentLen);
-
-    kjFastRender(fwdPendingP->body, payloadBody);
-    curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_POSTFIELDS, payloadBody);
-  }
-
-
-  //
   // HTTP Headers
   // - Content-Length
   // - Content-Type
@@ -406,6 +410,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   // - Date
   // - Those in csourceInfo (if Content-Type is present, it is ignored (for now))
   // - NGSILD-Tenant (part of registration, but can also be in csourceInfo?)
+  // - Link - can be in csourceInfo (named jsonldContext)
   //
   KjNode*             csourceInfoP = kjLookup(fwdPendingP->regP->regTree, "contextSourceInfo");
   KjNode*             tenantP      = kjLookup(fwdPendingP->regP->regTree, "tenant");
@@ -414,40 +419,14 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   // Date
   headers = curl_slist_append(headers, dateHeader);
 
-  //
   // Host
-  //
   headers = curl_slist_append(headers, hostHeader);
 
-  if (fwdPendingP->body != NULL)
-  {
-    //
-    // Content-Length
-    //
-    int  contentLen = strlen(payloadBody);
-    char contentLenHeader[64];
-    snprintf(contentLenHeader, sizeof(contentLenHeader), "Content-Length: %d", contentLen);
-    headers = curl_slist_append(headers, contentLenHeader);
-
-    //
-    // Content-Type (for now we maintain the original Content-Type in the forwarded request
-    // First we remove it from the "headers" curl_slist, so that we can give it ourselves
-    //
-    const char* contentType = (orionldState.in.contentType == JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
-    headers = curl_slist_append(headers, contentType);
-  }
-
-  //
-  // Accept - application/json
-  //
-  const char* accept = "Accept: application/json";
-  headers = curl_slist_append(headers, accept);
-
-
-  //
   // Custom headers from Registration::contextSourceInfo
-  //
-  char* infoTenant = NULL;
+  char* infoTenant    = NULL;
+  char* accept        = NULL;
+  char* jsonldContext = NULL;
+
   if (csourceInfoP != NULL)
   {
     for (KjNode* regHeaderP = csourceInfoP->value.firstChildP; regHeaderP != NULL; regHeaderP = regHeaderP->next)
@@ -455,23 +434,9 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
       KjNode* keyP   = kjLookup(regHeaderP, "key");
       KjNode* valueP = kjLookup(regHeaderP, "value");
 
-      if ((keyP == NULL) || (valueP == NULL))
-      {
-        LM_W(("Missing key or value in csourceInfo"));
-        continue;
-      }
-
-      if ((keyP->type != KjString) || (valueP->type != KjString))
-      {
-        LM_W(("key or value in csourceInfo is non-string"));
-        continue;
-      }
-
-      if (strcasecmp(keyP->value.s, "Content-Type") == 0)
-      {
-        LM_W(("Content-Type is part of the csourceInfo headers - that is not implemented yet, sorry"));
-        continue;
-      }
+      if ((keyP == NULL) || (valueP == NULL))                     { LM_W(("Missing key or value in Registration::contextSourceInfo")); continue; }
+      if ((keyP->type != KjString) || (valueP->type != KjString)) { LM_W(("key or value in Registration::contextSourceInfo is non-string")); continue; }
+      if (strcasecmp(keyP->value.s, "Content-Type") == 0)         { LM_W(("Content-Type is part of the Registration::contextSourceInfo headers, however, that is not implemented yet, sorry")); continue; }
 
       if (strcasecmp(keyP->value.s, "NGSILD-Tenant") == 0)
       {
@@ -479,11 +444,58 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
         continue;
       }
 
+      if (strcasecmp(keyP->value.s, "jsonldContext") == 0)
+      {
+        jsonldContext = valueP->value.s;
+        LM(("************* jsonldContext: %s", jsonldContext));
+        continue;
+      }
+
+      if (strcasecmp(keyP->value.s, "Accept") == 0)
+        accept = valueP->value.s;
+
       char  header[256];  // Assuming 256 is enough
       snprintf(header, sizeof(header), "%s: %s", keyP->value.s, valueP->value.s);
       headers = curl_slist_append(headers, header);
     }
   }
+
+  //
+  // Accept - application/json (unless present in Registration::contextSourceInfo
+  //
+  if (accept == NULL)
+  {
+    const char* accept = "Accept: application/json";
+    headers = curl_slist_append(headers, accept);
+  }
+
+  // FIXME: This field "acceptJsonld" should be done at creation/patching time and not here!
+  fwdPendingP->regP->acceptJsonld = (accept != NULL) && (strcmp(accept, "application/ld+json") == 0);
+
+  //
+  // Link header must be added if "Content-Type" is "application/json" in original request
+  //
+  if (orionldState.verb == GET)
+    orionldState.in.contentType = JSON;
+
+  if (orionldState.in.contentType == JSON)
+  {
+    // Link header to be added if present in Registration::contextSourceInfo OR if not Core Context
+    if ((jsonldContext == NULL) && (orionldState.contextP != orionldCoreContextP))
+      jsonldContext = orionldState.contextP->url;
+
+    if (jsonldContext != NULL)
+    {
+      char linkHeader[512];
+      snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", jsonldContext);
+      headers = curl_slist_append(headers, linkHeader);
+      LM(("Added Link Header '%s'", orionldState.contextP->url));
+    }
+    else
+      LM(("No Link Header added - Core Context (jsonldContext == NULL)"));
+  }
+  else
+    LM(("No Link Header added - Core Context (orionldState.in.contentType != JSON  (%d))", orionldState.in.contentType));
 
   // Tenant
   char* tenant = NULL;
@@ -517,6 +529,52 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
 #endif
 
   //
+  // BODY
+  //
+  int   approxContentLen = 0;
+  char* payloadBody      = NULL;
+
+  if (fwdPendingP->body != NULL)
+  {
+    //
+    // Content-Type (for now we maintain the original Content-Type in the forwarded request
+    // First we remove it from the "headers" curl_slist, so that we can formulate it ourselves
+    //
+    const char* contentType = (orionldState.in.contentType == JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
+    headers = curl_slist_append(headers, contentType);
+
+    if (orionldState.in.contentType == JSONLD)
+    {
+      // Add the context to the body if not there already
+      KjNode* contextP = kjLookup(fwdPendingP->body, "@context");
+
+      if (contextP == NULL)
+      {
+        LM(("Adding @context '%s' to body of msg to be forwarded", fwdPendingP->regP->contextP->url));
+        contextP = kjString(orionldState.kjsonP, "@context", fwdPendingP->regP->contextP->url);
+        kjChildAdd(fwdPendingP->body, contextP);
+      }
+    }
+
+    approxContentLen = kjFastRenderSize(fwdPendingP->body);
+    payloadBody      = kaAlloc(&orionldState.kalloc, approxContentLen);
+
+    kjFastRender(fwdPendingP->body, payloadBody);
+
+    //
+    // Content-Length
+    //
+    int  contentLen = strlen(payloadBody);
+    char contentLenHeader[64];
+    snprintf(contentLenHeader, sizeof(contentLenHeader), "Content-Length: %d", contentLen);
+    headers = curl_slist_append(headers, contentLenHeader);
+
+    // BODY
+    curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_POSTFIELDS, payloadBody);
+  }
+
+
+//
   // Need to save the pointer to the curl headers in order to free it afterwards
   //
   fwdPendingP->curlHeaders = headers;

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMADD_H_
-#define SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMADD_H_
+#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMCONTEXTCHECK_H_
+#define SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMCONTEXTCHECK_H_
 
 /*
 *
@@ -30,16 +30,19 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regCacheItemAdd -
+// regCacheItemContextCheck -
 //
-extern RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode* regP, bool fromDb, OrionldContext* fwdContextP);
+// PARAMETERS
+// * apiRegP            - KjNode tree of the entire API formatted Registration (to lookup the "jsonldContext" from "contextSourceInfo"
+// * jsonldContextValue - Direct value of "jsonldContext" - NULL if not known
+// * fwdContextPP       - To give back the context returned from orionldContextFromUrl (to be inserted ionto the reg-cache item)
+//
+extern bool regCacheItemContextCheck(KjNode* apiRegP, char* jsonldContextValue, OrionldContext** fwdContextPP);
 
-#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMADD_H_
+#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMCONTEXTCHECK_H_

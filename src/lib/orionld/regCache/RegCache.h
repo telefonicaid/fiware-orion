@@ -33,6 +33,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "orionld/types/RegistrationMode.h"                      // RegistrationMode
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
 
@@ -57,9 +58,12 @@ typedef struct RegDeltas
 typedef struct RegCacheItem
 {
   KjNode*               regTree;
+  char*                 regId;         // FIXME: Set when creating registration - points inside regTree, used for debugging only
   RegDeltas             deltas;
   RegistrationMode      mode;
   uint64_t              opMask;
+  OrionldContext*       contextP;      // FIXME: Set when creating/patching registration
+  bool                  acceptJsonld;  // Accept is set to application/ld+json
   struct RegCacheItem*  next;
 } RegCacheItem;
 

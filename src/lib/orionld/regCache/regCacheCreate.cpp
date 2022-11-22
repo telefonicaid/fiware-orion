@@ -22,6 +22,12 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
+}
+
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
@@ -30,6 +36,7 @@
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/regCache/RegCache.h"                           // RegCache
 #include "orionld/regCache/regCacheItemAdd.h"                    // regCacheItemAdd
+#include "orionld/regCache/regCacheItemContextCheck.h"           // regCacheItemContextCheck
 #include "orionld/regCache/regCacheCreate.h"                     // Own interface
 
 
@@ -47,14 +54,29 @@ int regIterFunc(RegCache* rcP, KjNode* dbRegP)
     LM_E(("dbModelToApiRegistration failed"));
     return 1;
   }
+  // The DB Registration 'dbRegP' is now in API Registration format (after calling dbModelToApiRegistration)
+  KjNode* apiRegP = dbRegP;
+
+  // If an @context is given for the registration, make sure it's valid
+  OrionldContext* fwdContextP = NULL;
+  if (regCacheItemContextCheck(apiRegP, NULL, &fwdContextP) == false)
+  {
+    LM_W(("Unable to resolve a Registration @context for a reg-cache item"));
+    return 0;
+  }
+
+  // Registration Id
+  KjNode* regIdNodeP = kjLookup(apiRegP, "id");
+  char*   regId      = (regIdNodeP != NULL)? regIdNodeP->value.s : (char*) "no:reg:id";
 
   // Convert API Reg to Cache Reg
-  apiModelToCacheRegistration(dbRegP);
+  apiModelToCacheRegistration(apiRegP);
 
-  kjTreeLog(dbRegP, "RC: Cache Reg");
+  kjTreeLog(apiRegP, "RC: Cache Reg");
 
   // Insert cacheRegP in tenantP->regCache (rcP)
-  regCacheItemAdd(rcP, dbRegP, true);
+  regCacheItemAdd(rcP, regId, apiRegP, true, fwdContextP);
+
   return 0;
 }
 
