@@ -60,7 +60,7 @@ RUN \
       libgcrypt-dev && \
     # Install libmicrohttpd from source
     cd /opt && \
-    curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz && \
+    curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz && \
     tar xvf libmicrohttpd-0.9.70.tar.gz && \
     cd libmicrohttpd-0.9.70 && \
     ./configure --disable-messages --disable-postprocessor --disable-dauth && \
@@ -69,7 +69,7 @@ RUN \
     ldconfig && \
     # Install mosquitto from source
     cd /opt && \
-    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz && \
+    curl -kOL https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz && \
     tar xvf mosquitto-2.0.12.tar.gz && \
     cd mosquitto-2.0.12 && \
     sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
