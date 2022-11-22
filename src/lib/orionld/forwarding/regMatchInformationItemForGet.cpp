@@ -51,7 +51,7 @@ StringArray* regMatchInformationItemForGet(RegCacheItem* regP, KjNode* infoP, co
     bool match = false;
     for (KjNode* entityInfoP = entities->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
     {
-      if (regMatchEntityInfo(entityInfoP, entityId, NULL) == true)
+      if (regMatchEntityInfo(regP, entityInfoP, entityId, NULL) == true)
       {
         match = true;
         break;

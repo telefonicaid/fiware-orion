@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
+#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHEIDPATTERNREGEXCOMPILE_H_
+#define SRC_LIB_ORIONLD_REGCACHE_REGCACHEIDPATTERNREGEXCOMPILE_H_
 
 /*
 *
@@ -30,14 +30,15 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchEntityInfo -
+// regCacheIdPatternRegexCompile -
 //
-extern bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* entityId, const char* entityType);
+extern bool regCacheIdPatternRegexCompile(RegCacheItem* rciP, KjNode* informationArrayP);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
+#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEIDPATTERNREGEXCOMPILE_H_

@@ -1,0 +1,699 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarding of POST Entities requests - with idPattern
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB  0 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+brokerStart CP2 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Create a registration R1 for Entity Ids E1.*
+# 02. Create a registration R2 for Entity Ids E2.*
+# 03. Create an Entity with ID E11 - should be forwarded to R1::endpoint
+# 04. Create an Entity with ID E21 - should be forwarded to R2::endpoint
+# 05. GET E11 from CP1 - see it
+# 06. GET E21 from CP2 - see it
+# 07. Get all Entities from CB - see none (local=true)
+# 08. DELETE E11  (no forwarding as it is not yet implemented)
+# 09. DELETE E12  (no forwarding as it is not yet implemented)
+# 10. Kill and restart the broker (so it reads the registrations from DB and populates the regCache)
+#
+# 11. Create an Entity with ID E11 - should be forwarded to R1::endpoint
+# 12. Create an Entity with ID E21 - should be forwarded to R2::endpoint
+# 13. GET E11 from CP1 - see it
+# 14. GET E21 from CP2 - see it
+# 15. Get all Entities from CB - see none (local=true)
+#
+# 16. See R1 in DB - pay attention to the 'contextRegistration' stuff ('information' in API)
+# 17. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB)
+# 18. PATCH R1 for Entity Ids E3.*
+# 19. See R1 in DB - pay attention to the 'contextRegistration' stuff ('information' in API) - should have been overwritten
+# 20. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB) - should have been overwritten
+#
+#
+# 21. Create an Entity with ID E31 - should be forwarded to R1::endpoint
+# 22. GET E31 from CP1 - see it
+# 23. Get all Entities from CB - see none (local=true)
+#
+
+echo "01. Create a registration R1 for Entity Ids E1.*"
+echo "================================================"
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "idPattern": "urn:E1.*",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "exclusive",
+  "operations": [ "createEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a registration R2 for Entity Ids E2.*"
+echo "================================================"
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "idPattern": "urn:E2.*",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "mode": "exclusive",
+  "operations": [ "createEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an Entity with ID E11 - should be forwarded to R1::endpoint"
+echo "======================================================================"
+payload='{
+  "id": "urn:E11",
+  "type": "T",
+  "P1": "FOR CP1",
+  "P2": "For CP1"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create an Entity with ID E21 - should be forwarded to R2::endpoint"
+echo "======================================================================"
+payload='{
+  "id": "urn:E21",
+  "type": "T",
+  "P1": "FOR CP2",
+  "P2": "For CP2"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GET E11 from CP1 - see it"
+echo "============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E11 --port $CP1_PORT
+echo
+echo
+
+
+echo "06. GET E21 from CP2 - see it"
+echo "============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E21 --port $CP2_PORT
+echo
+echo
+
+
+echo "07. Get all Entities from CB - see none (local=true)"
+echo "===================================================="
+orionCurl --url /ngsi-ld/v1/entities?local=true
+echo
+echo
+
+
+echo "08. DELETE E11  (no forwarding as it is not yet implemented)"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E11 --port $CP1_PORT -X DELETE
+echo
+echo
+
+
+echo "09. DELETE E12  (no forwarding as it is not yet implemented)"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E21 --port $CP2_PORT -X DELETE
+echo
+echo
+
+
+echo "10. Kill and restart the broker (so it reads the registrations from DB and populates the regCache)"
+echo "=================================================================================================="
+brokerStop CB
+brokerStart CB 0 IPv4 -experimental -forwarding
+echo
+echo
+
+
+echo "11. Create an Entity with ID E11 - should be forwarded to R1::endpoint"
+echo "======================================================================"
+payload='{
+  "id": "urn:E11",
+  "type": "T",
+  "P1": "FOR CP1, 2nd time",
+  "P2": "For CP1, 2nd time"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "12. Create an Entity with ID E21 - should be forwarded to R2::endpoint"
+echo "======================================================================"
+payload='{
+  "id": "urn:E21",
+  "type": "T",
+  "P1": "FOR CP2, 2nd time",
+  "P2": "For CP2, 2nd time"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "13. GET E11 from CP1 - see it"
+echo "============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E11 --port $CP1_PORT
+echo
+echo
+
+
+echo "14. GET E21 from CP2 - see it"
+echo "============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E21 --port $CP2_PORT
+echo
+echo
+
+
+echo "15. Get all Entities from CB - see none (local=true)"
+echo "===================================================="
+orionCurl --url /ngsi-ld/v1/entities?local=true
+echo
+echo
+
+
+echo "16. See R1 in DB - pay attention to the 'contextRegistration' stuff ('information' in API)"
+echo "=========================================================================================="
+mongoCmd2 ftest 'db.registrations.findOne({"_id": "urn:R1"})'
+echo
+echo
+
+
+echo "17. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB)"
+echo "==============================================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1
+echo
+echo
+
+
+
+echo "18. PATCH R1 for Entity Ids E3.*"
+echo "================================"
+payload='{
+  "information": [
+    {
+      "entities": [
+        {
+          "idPattern": "urn:E3.*",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2" ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "19. See R1 in DB - pay attention to the 'contextRegistration' stuff ('information' in API) - should have been overwritten"
+echo "========================================================================================================================="
+mongoCmd2 ftest 'db.registrations.findOne({"_id": "urn:R1"})'
+echo
+echo
+
+
+echo "20. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB) - should have been overwritten"
+echo "=============================================================================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1
+echo
+echo
+
+
+echo "21. Create an Entity with ID E31 - should be forwarded to R1::endpoint"
+echo "======================================================================"
+payload='{
+  "id": "urn:E31",
+  "type": "T",
+  "P1": "FOR CP1, 1st time",
+  "P2": "For CP1, 1st time"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "22. GET E31 from CP1 - see it"
+echo "============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E31 --port $CP1_PORT
+echo
+echo
+
+
+echo "23. Get all Entities from CB - see none (local=true)"
+echo "===================================================="
+orionCurl --url /ngsi-ld/v1/entities?local=true
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration R1 for Entity Ids E1.*
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create a registration R2 for Entity Ids E2.*
+================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+03. Create an Entity with ID E11 - should be forwarded to R1::endpoint
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E11
+
+
+
+04. Create an Entity with ID E21 - should be forwarded to R2::endpoint
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E21
+
+
+
+05. GET E11 from CP1 - see it
+=============================
+HTTP/1.1 200 OK
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "FOR CP1"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP1"
+    },
+    "id": "urn:E11",
+    "type": "T"
+}
+
+
+06. GET E21 from CP2 - see it
+=============================
+HTTP/1.1 200 OK
+Content-Length: 113
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "FOR CP2"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP2"
+    },
+    "id": "urn:E21",
+    "type": "T"
+}
+
+
+07. Get all Entities from CB - see none (local=true)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+08. DELETE E11  (no forwarding as it is not yet implemented)
+============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. DELETE E12  (no forwarding as it is not yet implemented)
+============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+10. Kill and restart the broker (so it reads the registrations from DB and populates the regCache)
+==================================================================================================
+
+
+11. Create an Entity with ID E11 - should be forwarded to R1::endpoint
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E11
+
+
+
+12. Create an Entity with ID E21 - should be forwarded to R2::endpoint
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E21
+
+
+
+13. GET E11 from CP1 - see it
+=============================
+HTTP/1.1 200 OK
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "FOR CP1, 2nd time"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP1, 2nd time"
+    },
+    "id": "urn:E11",
+    "type": "T"
+}
+
+
+14. GET E21 from CP2 - see it
+=============================
+HTTP/1.1 200 OK
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "FOR CP2, 2nd time"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP2, 2nd time"
+    },
+    "id": "urn:E21",
+    "type": "T"
+}
+
+
+15. Get all Entities from CB - see none (local=true)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+16. See R1 in DB - pay attention to the 'contextRegistration' stuff ('information' in API)
+==========================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:E1.*",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+					"isPattern" : "true"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P1",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P2",
+					"type" : "Property"
+				}
+			],
+			"providingApplication" : "http://localhost:9801"
+		}
+	],
+	"mode" : "exclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"properties" : {
+		
+	},
+	"status" : "active"
+}
+bye
+
+
+17. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB)
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 264
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "endpoint": "http://localhost:9801",
+    "id": "urn:R1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "idPattern": "urn:E1.*",
+                    "type": "T"
+                }
+            ],
+            "propertyNames": [
+                "P1",
+                "P2"
+            ]
+        }
+    ],
+    "mode": "exclusive",
+    "operations": [
+        "createEntity"
+    ],
+    "origin": "cache",
+    "status": "active",
+    "type": "ContextSourceRegistration"
+}
+
+
+18. PATCH R1 for Entity Ids E3.*
+================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+19. See R1 in DB - pay attention to the 'contextRegistration' stuff ('information' in API) - should have been overwritten
+=========================================================================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:E3.*",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+					"isPattern" : "true"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P1",
+					"type" : "Property"
+				},
+				{
+					"name" : "https://uri.etsi.org/ngsi-ld/default-context/P2",
+					"type" : "Property"
+				}
+			],
+			"providingApplication" : "http://localhost:9801"
+		}
+	],
+	"mode" : "exclusive",
+	"operations" : [
+		"createEntity"
+	],
+	"properties" : {
+		
+	},
+	"status" : "active"
+}
+bye
+
+
+20. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB) - should have been overwritten
+==============================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 264
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "endpoint": "http://localhost:9801",
+    "id": "urn:R1",
+    "information": [
+        {
+            "entities": [
+                {
+                    "idPattern": "urn:E3.*",
+                    "type": "T"
+                }
+            ],
+            "propertyNames": [
+                "P1",
+                "P2"
+            ]
+        }
+    ],
+    "mode": "exclusive",
+    "operations": [
+        "createEntity"
+    ],
+    "origin": "cache",
+    "status": "active",
+    "type": "ContextSourceRegistration"
+}
+
+
+21. Create an Entity with ID E31 - should be forwarded to R1::endpoint
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E31
+
+
+
+22. GET E31 from CP1 - see it
+=============================
+HTTP/1.1 200 OK
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "FOR CP1, 1st time"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP1, 1st time"
+    },
+    "id": "urn:E31",
+    "type": "T"
+}
+
+
+23. Get all Entities from CB - see none (local=true)
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>                                               // regex_t
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -53,6 +55,19 @@ typedef struct RegDeltas
 
 // -----------------------------------------------------------------------------
 //
+// RegIdPattern -
+//
+typedef struct RegIdPattern
+{
+  regex_t               regex;
+  KjNode*               owner;  // Reference to the 'idPattern' in the rciP->regTree that the regex belongs to
+  struct RegIdPattern*  next;
+} RegIdPattern;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // RegCacheItem -
 //
 typedef struct RegCacheItem
@@ -60,10 +75,13 @@ typedef struct RegCacheItem
   KjNode*               regTree;
   char*                 regId;         // FIXME: Set when creating registration - points inside regTree, used for debugging only
   RegDeltas             deltas;
+
+  // "Shortcuts" and transformed info, all copies from the regTree - for improved performance
   RegistrationMode      mode;
   uint64_t              opMask;
   OrionldContext*       contextP;      // FIXME: Set when creating/patching registration
   bool                  acceptJsonld;  // Accept is set to application/ld+json
+  RegIdPattern*         idPatternRegexList;
   struct RegCacheItem*  next;
 } RegCacheItem;
 
@@ -79,6 +97,7 @@ typedef struct RegCache
   RegCacheItem*  regList;
   RegCacheItem*  last;
 } RegCache;
+
 
 
 // -----------------------------------------------------------------------------

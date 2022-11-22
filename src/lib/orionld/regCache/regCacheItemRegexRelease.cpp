@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,19 +22,29 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/regCache/RegCache.h"                         // RegCacheItem
+#include "orionld/regCache/regCacheItemRegexRelease.h"         // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchEntityInfo -
+// regCacheItemRegexRelease - free any old REGEX in the rciP->idPatternRegexList
 //
-extern bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* entityId, const char* entityType);
+void regCacheItemRegexRelease(RegCacheItem* rciP)
+{
+  RegIdPattern* ripP = rciP->idPatternRegexList;
+  RegIdPattern* next;
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
+  while (ripP != NULL)
+  {
+    next = ripP->next;
+
+    regfree(&ripP->regex);
+    free(ripP);
+    ripP = next;
+  }
+
+  rciP->idPatternRegexList = NULL;
+}
+

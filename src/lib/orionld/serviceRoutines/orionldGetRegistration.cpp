@@ -41,7 +41,6 @@ extern "C"
 #include "orionld/legacyDriver/legacyGetRegistration.h"        // legacyGetRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/serviceRoutines/orionldGetRegistration.h"    // Own Interface
 
 
@@ -236,10 +235,20 @@ void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, b
   }
 
   //
+  // expires (expiresAt)
+  //
+  KjNode* expiresP = kjLookup(regTree, "expires");  // Just to change the name to "expiresAt"
+
+  if (expiresP != NULL)
+    expiresP->name = (char*) "expiresAt";
+
+
+  //
   // Remove the "properties" from "regTree" AND
   // link in all children from "properties" to the end of "regTree"
   //
   KjNode* propertiesP = kjLookup(regTree, "properties");
+
   if (propertiesP != NULL)
   {
     // Lookup aliases for the properties
@@ -262,15 +271,6 @@ void apiModelFromCachedRegistration(KjNode* regTree, RegCacheItem* cachedRegP, b
       regTree->lastChild       = propertiesP->lastChild;
     }
   }
-
-  //
-  // expires (expiresAt)
-  //
-  KjNode* expiresP = kjLookup(regTree, "expires");  // Just to change the name to "expiresAt"
-
-  if (expiresP != NULL)
-    expiresP->name = (char*) "expiresAt";
-
 
   //
   // managementInterval + observationInterval
@@ -327,6 +327,7 @@ bool orionldGetRegistration(void)
 
       apiModelFromCachedRegistration(orionldState.responseTree, cachedRegP, orionldState.uriParamOptions.sysAttrs);
       regTypeAndOrigin(orionldState.responseTree, true);
+
       return true;
     }
   }

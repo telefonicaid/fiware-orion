@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strcmp
+#include <regex.h>                                               // regexec
 
 extern "C"
 {
@@ -31,6 +32,30 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem, RegIdPattern
+#include "orionld/forwarding/regMatchEntityInfo.h"               // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// regIdPatternLookup -
+//
+static RegIdPattern* regIdPatternLookup(RegCacheItem* regP, KjNode* idPatternP)
+{
+  RegIdPattern* ripP = regP->idPatternRegexList;
+
+  while (ripP != NULL)
+  {
+    if (ripP->owner == idPatternP)
+      return ripP;
+
+    ripP = ripP->next;
+  }
+
+  return NULL;
+}
 
 
 
@@ -54,9 +79,7 @@ extern "C"
 //   }
 // ]
 //
-// FIXME: Implement matching over idPattern as well
-//
-bool regMatchEntityInfo(KjNode* entityInfoP, const char* entityId, const char* entityType)
+bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* entityId, const char* entityType)
 {
   KjNode* idP         = kjLookup(entityInfoP, "id");
   KjNode* idPatternP  = kjLookup(entityInfoP, "idPattern");
@@ -93,9 +116,21 @@ bool regMatchEntityInfo(KjNode* entityInfoP, const char* entityId, const char* e
   }
   else if (idPatternP != NULL)
   {
-    // FIXME: Implement idPattern matching
-    LM_W(("Sorry, idPattern matching is not yet implemented ..."));
-    return false;
+    RegIdPattern* ripP = regIdPatternLookup(regP, idPatternP);  // I need the RegCacheItem here ...
+
+    if (ripP == NULL)
+    {
+      LM_E(("Internal Error (the regex corresponding to this idPattern could not be found)"));
+      return false;
+    }
+    else
+    {
+      if (regexec(&ripP->regex, entityId, 0, NULL, 0) != 0)
+      {
+        LM(("RM: No match due to entity idPattern"));
+        return false;
+      }
+    }
   }
 
   return true;

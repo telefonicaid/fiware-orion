@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
+#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
+#define SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
 
 /*
 *
@@ -25,19 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchEntityInfo -
+// regCacheItemRegexRelease - free any old REGEX in the rciP->idPatternRegexList
 //
-extern bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* entityId, const char* entityType);
+extern void regCacheItemRegexRelease(RegCacheItem* rciP);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
+#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
