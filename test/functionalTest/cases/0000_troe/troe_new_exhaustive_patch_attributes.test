@@ -701,6 +701,7 @@ Content-Length: 503
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Tenant: t1
 
 {
     "id": "urn:ngsi-ld:entity:E2",
@@ -905,6 +906,7 @@ Content-Length: 509
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Tenant: t1
 
 {
     "id": "urn:ngsi-ld:entity:E2",
@@ -1109,6 +1111,7 @@ Content-Length: 515
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Tenant: t1
 
 {
     "id": "urn:ngsi-ld:entity:E2",
