@@ -457,7 +457,7 @@ Another important aspect of this library is that the notifications are sent by s
 
 Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads await new items in the notification queue and when an item becomes present, it is taken from the queue and processed, sending the notification in question. If the thread pool is not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient", which gives this behaviour). More information on notification modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
 
-This module is always invoked from `processOnChangeConditionForUpdateContext()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
+This module is always invoked from `processNotification()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
 
 The following four images demonstrate the program flow for context entity notifications without and with thread pool, both in the case
 of HTTP and MQTT notifications.

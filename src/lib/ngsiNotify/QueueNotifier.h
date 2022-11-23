@@ -57,7 +57,9 @@ public:
                 const std::vector<int>&          serviceNumThreadV);
   ~QueueNotifier(void);
 
-  void sendNotifyContextRequest(NotifyContextRequest&            ncr,
+  void sendNotifyContextRequest(ContextElementResponse*          notifyCerP,
+                                const std::string&               subId,
+                                const StringList&                attrL,
                                 const ngsiv2::Notification&      notification,
                                 const std::string&               tenant,
                                 long long                        maxFailsLimit,

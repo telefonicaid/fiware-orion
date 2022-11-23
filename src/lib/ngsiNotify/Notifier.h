@@ -45,7 +45,9 @@ class Notifier
 public:
   virtual ~Notifier(void);
 
-  virtual void sendNotifyContextRequest(NotifyContextRequest&            ncr,
+  virtual void sendNotifyContextRequest(ContextElementResponse*          notifyCerP,
+                                        const std::string&               subId,
+                                        const StringList&                attrL,
                                         const ngsiv2::Notification&      notification,
                                         const std::string&               tenant,
                                         long long                        maxFailsLimit,
@@ -60,7 +62,9 @@ public:
                                         const std::vector<std::string>&  metadataFilter);
 
 protected:
-  static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest&            ncr,
+  static std::vector<SenderThreadParams*>* buildSenderParams(ContextElementResponse*          notifyCerP,
+                                                             const std::string&               subId,
+                                                             const StringList&                attrL,
                                                              const ngsiv2::Notification&      notification,
                                                              const std::string&               tenant,
                                                              long long                        maxFailsLimit,

@@ -1707,13 +1707,13 @@ static bool addTriggeredSubscriptions
 
 /* ****************************************************************************
 *
-* processOnChangeConditionForUpdateContext -
+* processNotification -
 *
 * This method returns true if the notification was actually sent. Otherwise, false
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-static bool processOnChangeConditionForUpdateContext
+static bool processNotification
 (
   ContextElementResponse*          notifyCerP,
   const StringList&                attrL,
@@ -1731,77 +1731,9 @@ static bool processOnChangeConditionForUpdateContext
   bool                             covered = false
 )
 {
-  NotifyContextRequest   ncr;
-  ContextElementResponse cer;
-
-  cer.entity.fill(notifyCerP->entity.id,
-                  notifyCerP->entity.type,
-                  notifyCerP->entity.isPattern,
-                  notifyCerP->entity.servicePath);
-
-  for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
-  {
-    ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
-
-    /* 'skip' field is used to mark deleted attributes that must not be included in the
-     * notification (see deleteAttrInNotifyCer function for details) */
-    if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
-    {
-      /* Empty attribute list in the subscription mean that all attributes are added
-       * Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
-       * cer.entity destructor does release() on the attrs vector */
-      if (!caP->skip)
-      {
-        cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
-      }
-    }
-    else
-    {
-      for (unsigned int jx = 0; jx < attrL.size(); jx++)
-      {
-        if (caP->name == attrL[jx] && !caP->skip)
-        {
-          /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
-           * cer.entity destructor does release() on the attrs vector */
-          cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
-        }
-      }
-    }
-  }
-  if (covered)
-  {
-    for (unsigned int ix = 0; ix < attrL.size(); ix++)
-    {
-      // Aviod over-adding attribute, checking first that the attribute is not already added
-      std::string attrName = attrL[ix];
-      if (cer.entity.attributeVector.get(attrName) < 0)
-      {
-        ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
-        caP->valueType = orion::ValueTypeNull;
-        cer.entity.attributeVector.push_back(caP);
-      }
-    }
-  }
-
-  /* Early exit without sending notification if attribute list is empty */
-  if (cer.entity.attributeVector.size() == 0)
-  {
-    ncr.contextElementResponseVector.release();
-    return false;
-  }
-
-  /* Setting status code in CER */
-  cer.statusCode.fill(SccOk);
-
-  ncr.contextElementResponseVector.push_back(&cer);
-
-  /* Complete the fields in NotifyContextRequest */
-  ncr.subscriptionId.set(subId);
-  // FIXME: we use a proper origin name
-  ncr.originator.set("localhost");
-
-  ncr.subscriptionId.set(subId);
-  getNotifier()->sendNotifyContextRequest(ncr,
+  getNotifier()->sendNotifyContextRequest(notifyCerP,
+                                          subId,
+                                          attrL, // FIXME PR: duplicated
                                           notification,
                                           tenant,
                                           maxFailsLimit,
@@ -1814,6 +1746,7 @@ static bool processOnChangeConditionForUpdateContext
                                           blacklist,
                                           covered,
                                           metadataV);
+
   return true;
 }
 
@@ -1946,20 +1879,20 @@ static unsigned int processSubscriptions
     notification.mqttInfo.fill(tSubP->mqttInfo);
     notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
 
-    notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
-                                                                tSubP->attrL,
-                                                                tSubP->metadata,
-                                                                mapSubId,
-                                                                tSubP->renderFormat,
-                                                                tenant,
-                                                                tSubP->maxFailsLimit,
-                                                                tSubP->failsCounter,
-                                                                xauthToken,
-                                                                fiwareCorrelator,
-                                                                notifStartCounter + notifSent + 1,
-                                                                notification,
-                                                                tSubP->blacklist,
-                                                                tSubP->covered);
+    notificationSent = processNotification(notifyCerP,
+                                           tSubP->attrL,
+                                           tSubP->metadata,
+                                           mapSubId,
+                                           tSubP->renderFormat,
+                                           tenant,
+                                           tSubP->maxFailsLimit,
+                                           tSubP->failsCounter,
+                                           xauthToken,
+                                           fiwareCorrelator,
+                                           notifStartCounter + notifSent + 1,
+                                           notification,
+                                           tSubP->blacklist,
+                                           tSubP->covered);
 
     // notification already consumed, it can be freed
     // Only one of the release operations will do something, but it is simpler (and safer)

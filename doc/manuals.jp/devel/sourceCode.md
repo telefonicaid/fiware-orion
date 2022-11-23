@@ -443,7 +443,7 @@ typedef struct MongoConnection
 
 Orionは、[CLI パラメータ](../admin/cli.md) `-notificationMode` を使用して、Orion は、通知を送信するためのスレッド・プール (`-notificationMode threadpool`) で開始することができます。その場合、Orion の起動中にスレッド・プールが作成され、これらのスレッドは通知キュー内の新しいアイテムを待機し、アイテムが存在するとキューから取り出して処理し、問題の通知を送信します。スレッド・プールが使用されない場合、通知が送信されるたびにスレッドが作成されます。`-notificationMode` のデフォルト値は "transient" です。 通知モードの詳細については、[Orion 管理マニュアルのこのセクション](../admin/perf_tuning.md#notification-modes-and-performance) を参照してください。
 
-このモジュールは、属性の更新/作成により、常に `processOnChangeConditionForUpdateContext()` から呼び出されます (図 [MD-01](mongoBackend.md#flow-md-01) を参照)。
+このモジュールは、属性の更新/作成により、常に `processNotification()` から呼び出されます (図 [MD-01](mongoBackend.md#flow-md-01) を参照)。
 
 次の4つの図は、HTTP 通知とMQTT 通知の両方の場合に、スレッド・プールがある場合とない場合の
 コンテキスト・エンティティ通知のプログラム・フローを示しています。

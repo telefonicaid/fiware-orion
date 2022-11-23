@@ -65,7 +65,9 @@ Notifier::~Notifier (void)
 */
 void Notifier::sendNotifyContextRequest
 (
-    NotifyContextRequest&            ncr,
+    ContextElementResponse*          notifyCerP,
+    const std::string&               subId,
+    const StringList&                attrL,
     const ngsiv2::Notification&      notification,
     const std::string&               tenant,
     long long                        maxFailsLimit,
@@ -81,8 +83,9 @@ void Notifier::sendNotifyContextRequest
 )
 {
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
-                                                                          notification,
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(notifyCerP,
+                                                                          subId,
+                                                                          attrL,                                                                          notification,
                                                                           tenant,
                                                                           maxFailsLimit,
                                                                           failsCounter,
@@ -95,7 +98,9 @@ void Notifier::sendNotifyContextRequest
                                                                           covered,
                                                                           metadataFilter);
 
-  if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
+  // FIXME PR: is this ok?
+  //if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
+  if ((paramsV != NULL) && (!paramsV->empty()))
   {
     int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
 
@@ -372,7 +377,7 @@ static bool setNgsiPayload
 static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 (
     const SubscriptionId&                subscriptionId,
-    const ContextElementResponseVector&  cv,
+    ContextElementResponse*              notifyCerP,
     const ngsiv2::Notification&          notification,
     const std::string&                   tenant,
     long long                            maxFailsLimit,
@@ -386,12 +391,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const std::vector<std::string>&      metadataFilter
 )
 {
-  std::vector<SenderThreadParams*>*  paramsV;
+  std::vector<SenderThreadParams*>*  paramsV = NULL;
 
   paramsV = new std::vector<SenderThreadParams*>;
 
-  for (unsigned ix = 0; ix < cv.size(); ix++)
-  {
+  //for (unsigned ix = 0; ix < cv.size(); ix++)
+  //{
     std::string                         method;
     std::string                         url;
     std::string                         payload;
@@ -399,7 +404,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     std::string                         mimeType;
     std::map<std::string, std::string>  qs;
     std::map<std::string, std::string>  headers;
-    Entity&                             en      = cv[ix]->entity;
+    Entity&                             en      = notifyCerP->entity;
 
     //
     // 1. Verb/Method
@@ -428,6 +433,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     if (macroSubstitute(&url, notifUrl, en, tenant, xauthToken) == false)
     {
       // Warning already logged in macroSubstitute()
+      // FIXME PR: should return NULL?
+      // FIXME PR: we are inside a for loop, maybe should use 'continue' instead of return?
       return paramsV;  // empty vector
     }
 
@@ -444,6 +451,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
      if (!setPayload(includePayload, notifPayload, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
      {
        // Warning already logged in macroSubstitute()
+       // FIXME PR: should return NULL?
+       // FIXME PR: we are inside a for loop, maybe should use 'continue' instead of return?
        return paramsV;  // empty vector
      }
     }
@@ -460,6 +469,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       if (!setNgsiPayload(ngsi, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload))
       {
         // Warning already logged in macroSubstitute()
+        // FIXME PR: should return NULL?
+        // FIXME PR: we are inside a for loop, maybe should use 'continue' instead of return?
         return paramsV;  // empty vector
       }
       renderFormat = NGSI_V2_CUSTOM;
@@ -480,6 +491,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         if ((macroSubstitute(&key, it->first, en, tenant, xauthToken) == false) || (macroSubstitute(&value, it->second, en, tenant, xauthToken) == false))
         {
           // Warning already logged in macroSubstitute()
+          // FIXME PR: should return NULL?
+          // FIXME PR: we are inside a for loop, maybe should use 'continue' instead of return?
           return paramsV;  // empty vector
         }
 
@@ -506,6 +519,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         if ((macroSubstitute(&key, it->first, en, tenant, xauthToken) == false) || (macroSubstitute(&value, it->second, en, tenant, xauthToken) == false))
         {
           // Warning already logged in macroSubstitute()
+          // FIXME PR: should return NULL?
+          // FIXME PR: we are inside a for loop, maybe should use 'continue' instead of return?
           return paramsV;  // empty vector
         }
 
@@ -537,6 +552,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+      // FIXME PR: should return NULL?
+      // FIXME PR: we are inside a for loop, maybe should use 'continue' instead of return?
       return paramsV;  // empty vector
     }
 
@@ -571,6 +588,8 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       if (macroSubstitute(&topic, notification.mqttInfo.topic, en, tenant, xauthToken) == false)
       {
         // Warning already logged in macroSubstitute()
+        // FIXME PR: should return NULL?
+        // FIXME PR: we are inside a for loop, maybe should use 'continue' instead of return?
         return paramsV;  // empty vector
       }
     }
@@ -606,8 +625,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
     paramsV->push_back(params);
-  }
+  //}
 
+  // FIXME PR: paramsV is always mono-item...
   return paramsV;
 }
 
@@ -619,7 +639,9 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 */
 std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 (
-  NotifyContextRequest&            ncr,
+  ContextElementResponse*          notifyCerP,
+  const std::string&               subId,
+  const StringList&                attrL,  // FIXME PR: duplicated
   const ngsiv2::Notification&      notification,
   const std::string&               tenant,
   long long                        maxFailsLimit,
@@ -653,6 +675,21 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       verb = NOVERB;
     }
 
+    if (covered)
+    {
+      for (unsigned int ix = 0; ix < attrL.size(); ix++)
+      {
+        // Aviod over-adding attribute, checking first that the attribute is not already added
+        std::string attrName = attrL[ix];
+        if (notifyCerP->entity.attributeVector.get(attrName) < 0)
+        {
+          ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
+          caP->valueType = orion::ValueTypeNull;
+          notifyCerP->entity.attributeVector.push_back(caP);
+        }
+      }
+    }
+
     //
     // If any of the 'template parameters' is used by the subscripion, then it is not a question of an ordinary notification but one using templates.
     // Ordinary notifications are simply sent, all of it as one message.
@@ -671,8 +708,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     bool custom = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.custom : notification.mqttInfo.custom;
     if (custom && !disableCusNotif)
     {
-      return buildSenderParamsCustom(ncr.subscriptionId,
-                                     ncr.contextElementResponseVector,
+      return buildSenderParamsCustom(subId,
+                                     notifyCerP,
                                      notification,
                                      tenant,
                                      maxFailsLimit,
@@ -687,6 +724,64 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     }
 
     paramsV = new std::vector<SenderThreadParams*>();
+
+    NotifyContextRequest   ncr;
+    ContextElementResponse cer;
+
+    cer.entity.fill(notifyCerP->entity.id,
+                    notifyCerP->entity.type,
+                    notifyCerP->entity.isPattern,
+                    notifyCerP->entity.servicePath);
+
+    for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
+    {
+      ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
+
+      /* 'skip' field is used to mark deleted attributes that must not be included in the
+     * notification (see deleteAttrInNotifyCer function for details) */
+      if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
+      {
+        /* Empty attribute list in the subscription mean that all attributes are added
+       * Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
+       * cer.entity destructor does release() on the attrs vector */
+        if (!caP->skip)
+        {
+          cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+        }
+      }
+      else
+      {
+        for (unsigned int jx = 0; jx < attrL.size(); jx++)
+        {
+          if (caP->name == attrL[jx] && !caP->skip)
+          {
+            /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
+           * cer.entity destructor does release() on the attrs vector */
+            cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
+          }
+        }
+      }
+    }
+
+    /* Early exit without sending notification if attribute list is empty */
+    if (cer.entity.attributeVector.size() == 0)
+    {
+      ncr.contextElementResponseVector.release();
+      // FIXME PR: check if we can process correctly NULL as params
+      return NULL;
+    }
+
+    /* Setting status code in CER */
+    cer.statusCode.fill(SccOk);
+
+    ncr.contextElementResponseVector.push_back(&cer);
+
+    /* Complete the fields in NotifyContextRequest */
+    ncr.subscriptionId.set(subId);
+    // FIXME: we use a proper origin name
+    ncr.originator.set("localhost");
+
+    ncr.subscriptionId.set(subId);
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
@@ -726,6 +821,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+      // FIXME PR: should be NULL?
       return paramsV;  //empty vector
     }
 

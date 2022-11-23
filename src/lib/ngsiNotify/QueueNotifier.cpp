@@ -124,7 +124,9 @@ size_t QueueNotifier::queueSize(const std::string& service)
 */
 void QueueNotifier::sendNotifyContextRequest
 (
-  NotifyContextRequest&            ncr,
+  ContextElementResponse*          notifyCerP,
+  const std::string&               subId,
+  const StringList&                attrL,
   const ngsiv2::Notification&      notification,
   const std::string&               tenant,
   long long                        maxFailsLimit,
@@ -139,7 +141,9 @@ void QueueNotifier::sendNotifyContextRequest
   const std::vector<std::string>&  metadataFilter
 )
 {
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
+  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(notifyCerP,
+                                                                          subId,
+                                                                          attrL,
                                                                           notification,
                                                                           tenant,
                                                                           maxFailsLimit,
