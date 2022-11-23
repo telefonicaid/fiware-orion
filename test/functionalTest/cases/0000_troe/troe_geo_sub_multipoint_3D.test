@@ -133,7 +133,7 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Number,urn:ngsi-ld:entiti
 04. See the sub-attributes in the temporal database
 ===================================================
 id,valuetype,entityid,unitcode,st_astext,observedat
-https://uri.etsi.org/ngsi-ld/default-context/mPoint,GeoMultiPoint,urn:ngsi-ld:entities:E1,,"MULTIPOINT Z (1 2 3,4 5 6)",2021-01-08 13:15:17.456
+https://uri.etsi.org/ngsi-ld/default-context/mPoint,GeoMultiPoint,urn:ngsi-ld:entities:E1,,"MULTIPOINT Z REGEX((\(1 2 3,4 5 6\)|\(\(1 2 3\),\(4 5 6\)\)))",2021-01-08 13:15:17.456
 
 
 05. GET the entity
@@ -177,7 +177,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 06. GET the sub-attributes from TRoE using postgis
 ==================================================
 id,valuetype,entityid,unitcode,st_astext,observedat
-https://uri.etsi.org/ngsi-ld/default-context/mPoint,GeoMultiPoint,urn:ngsi-ld:entities:E1,,"MULTIPOINT Z (1 2 3,4 5 6)",2021-01-08 13:15:17.456
+https://uri.etsi.org/ngsi-ld/default-context/mPoint,GeoMultiPoint,urn:ngsi-ld:entities:E1,,"MULTIPOINT Z REGEX((\(1 2 3,4 5 6\)|\(\(1 2 3\),\(4 5 6\)\)))",2021-01-08 13:15:17.456
 
 
 07. GET nothing from TRoE using postgis

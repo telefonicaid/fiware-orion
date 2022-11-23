@@ -128,7 +128,7 @@ Create,urn:ngsi-ld:entities:E1,https://uri.etsi.org/ngsi-ld/default-context/T
 03. See the attributes in the temporal database
 ===============================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,st_astext,observedat
-Create,location,GeoMultiPoint,urn:ngsi-ld:entities:E1,f,,None,"MULTIPOINT Z (1 2 3,4 5 6)",
+Create,location,GeoMultiPoint,urn:ngsi-ld:entities:E1,f,,None,"MULTIPOINT Z REGEX((\(1 2 3,4 5 6\)|\(\(1 2 3\),\(4 5 6\)\)))",
 
 
 04. See the sub-attributes in the temporal database
@@ -171,13 +171,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 06. GET the attribute from TRoE
 ===============================
 id,valuetype,entityid,id,unitcode,st_astext,observedat
-location,GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,"MULTIPOINT Z (1 2 3,4 5 6)",
+location,GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,"MULTIPOINT Z REGEX((\(1 2 3,4 5 6\)|\(\(1 2 3\),\(4 5 6\)\)))",
 
 
 07. GET the attribute from TRoE using postgis
 =============================================
 valuetype,entityid,id,unitcode,st_astext,observedat
-GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,"MULTIPOINT Z (1 2 3,4 5 6)",
+GeoMultiPoint,urn:ngsi-ld:entities:E1,location,,"MULTIPOINT Z REGEX((\(1 2 3,4 5 6\)|\(\(1 2 3\),\(4 5 6\)\)))",
 
 
 08. GET nothing from TRoE using postgis
