@@ -58,15 +58,10 @@ public:
   ~QueueNotifier(void);
 
   void sendNotifyContextRequest(ContextElementResponse*          notifyCerP,
-                                const std::string&               subId,
-                                const StringList&                attrL,
                                 const ngsiv2::Notification&      notification,
-                                const std::string&               tenant,
+                                const notifStaticFields&         nsf,
                                 long long                        maxFailsLimit,
                                 long long                        failsCounter,
-                                const std::string&               xauthToken,
-                                const std::string&               fiwareCorrelator,
-                                unsigned int                     correlatorCounter,
                                 RenderFormat                     renderFormat,
                                 const std::vector<std::string>&  attrsFilter,
                                 bool                             blacklist,

@@ -125,15 +125,10 @@ size_t QueueNotifier::queueSize(const std::string& service)
 void QueueNotifier::sendNotifyContextRequest
 (
   ContextElementResponse*          notifyCerP,
-  const std::string&               subId,
-  const StringList&                attrL,
   const ngsiv2::Notification&      notification,
-  const std::string&               tenant,
+  const notifStaticFields&         nsf,
   long long                        maxFailsLimit,
   long long                        failsCounter,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  unsigned int                     correlatorCounter,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
@@ -142,15 +137,14 @@ void QueueNotifier::sendNotifyContextRequest
 )
 {
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(notifyCerP,
-                                                                          subId,
-                                                                          attrL,
+                                                                          nsf.subId,
                                                                           notification,
-                                                                          tenant,
+                                                                          nsf.tenant,
                                                                           maxFailsLimit,
                                                                           failsCounter,
-                                                                          xauthToken,
-                                                                          fiwareCorrelator,
-                                                                          correlatorCounter,
+                                                                          nsf.xauthToken,
+                                                                          nsf.fiwareCorrelator,
+                                                                          nsf.correlatorCounter,
                                                                           renderFormat,
                                                                           attrsFilter,
                                                                           blacklist,
@@ -166,11 +160,11 @@ void QueueNotifier::sendNotifyContextRequest
   // Try to use per-service queue. If not found, use the default queue
   ServiceQueue* sq;
 
-  std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(tenant);
+  std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(nsf.tenant);
   std::string queueName;
   if (iter != serviceSq.end())
   {
-    queueName = tenant;
+    queueName = nsf.tenant;
     sq = iter->second;
   }
   else

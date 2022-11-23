@@ -1731,16 +1731,19 @@ static bool processNotification
   bool                             covered = false
 )
 {
+  notifStaticFields nsf;
+
+  nsf.subId             = subId;
+  nsf.tenant            = tenant;
+  nsf.xauthToken        = xauthToken;
+  nsf.fiwareCorrelator  = fiwareCorrelator;
+  nsf.correlatorCounter = correlatorCounter;
+
   getNotifier()->sendNotifyContextRequest(notifyCerP,
-                                          subId,
-                                          attrL, // FIXME PR: duplicated
                                           notification,
-                                          tenant,
+                                          nsf,
                                           maxFailsLimit,
                                           failsCounter,
-                                          xauthToken,
-                                          fiwareCorrelator,
-                                          correlatorCounter,
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
