@@ -120,6 +120,8 @@ extern "C"
 #include "orionld/common/branchName.h"                        // ORIONLD_BRANCH
 #include "orionld/prometheus/promInit.h"                      // promInit
 #include "orionld/mongoc/mongocInit.h"                        // mongocInit
+#include "orionld/mongoc/mongocServerVersionGet.h"            // mongocServerVersionGet
+#include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
 #include "orionld/db/dbInit.h"                                // dbInit
@@ -127,7 +129,6 @@ extern "C"
 #include "orionld/regCache/regCacheInit.h"                    // regCacheInit
 #include "orionld/regCache/regCacheCreate.h"                  // regCacheCreate
 #include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
-#include "orionld/troe/troeInit.h"                            // troeInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -137,10 +138,19 @@ extern "C"
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
 #include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
+
+#include "orionld/troe/troeInit.h"                            // troeInit
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
 #include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
 #include "orionld/forwarding/forwardingInit.h"                // forwardingInit
+#include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
+#include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
+
+
+#include "orionld/version.h"
+#include "orionld/orionRestServices.h"
+#include "orionld/orionldRestServices.h"
 
 using namespace orion;
 

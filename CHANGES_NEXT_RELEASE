@@ -28,6 +28,7 @@
 * Issue #280   Implemented DELETE /csourceRegistrations/{registrationId} using mongoc AND the Registration cache
 * Issue #280   Implemented PATCH /csourceRegistrations/{registrationId} using mongoc AND the Registration cache
 * Issue #280   Implemented GET /csourceRegistrations using the Registration cache (URL params still need implementation
-* Issue #280   Implemented GET /csourceRegistrations URL params attrs, id, idPattern (well, partially), and type
-* Issue #280   Implemented the new forwarding for POST /entities
+* Issue #280   Implemented GET /csourceRegistrations URL params attrs, id, idPattern, and type
 * Issue #1269  Fixed a bug in BATCH Upsert
+* Issue #280   Implemented the new forwarding for POST /entities
+* Issue #280   Implemented the new forwarding for GET /entities/{entityId}

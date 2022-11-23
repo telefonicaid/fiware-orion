@@ -268,6 +268,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 Location: /ngsi-ld/v1/entities/urn:E1
 
 {
+#SORT_START
     "entityId": "urn:E1",
     "failure": [
         {
@@ -302,6 +303,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
         "A1",
         "P1"
     ]
+#SORT_END
 }
 
 

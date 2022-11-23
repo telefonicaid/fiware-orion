@@ -44,6 +44,7 @@ extern "C"
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
+#include "orionld/mongoc/mongocAuxAttributesFilter.h"            // mongocAuxAttributesFilter
 #include "orionld/mongoc/mongocEntitiesQuery.h"                  // Own interface
 
 
@@ -155,110 +156,6 @@ static bool entityIdFilter(bson_t* mongoFilterP, StringArray* entityIds)
 static bool entityIdPatternFilter(bson_t* mongoFilterP, const char* idPattern)
 {
   bson_append_regex(mongoFilterP, "_id.id", 6, idPattern, "m");
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attributesFilter -
-//
-static bool attributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP, const char* geojsonGeometry)
-{
-  char    path[512];  // Assuming 512 is always enough ...
-  bson_t  exists;
-  bool    geojsonGeometryToProjection = (geojsonGeometry == NULL)? false : true;  // if GEOJSON, the "geometry" must be present
-
-  bson_init(&exists);
-  bson_append_int32(&exists, "$exists", 7, 1);
-
-  //
-  // Remember, an attribute may be either in "attrs", or "@datasets", or both ...
-  // Example filter for attr A1 and A2:
-  //
-  // { $or: [ { attrs.A1: {$exists: 1} }, { attrs.A2: {$exists: 1} }, { @datasets.A1: {$exists: 1}}, { @datasets.A2: {$exists: 1}} ] }
-  //
-  bson_t array;
-  bson_init(&array);
-
-  char num[3] = { '0', '0', 0 };
-  int  numLen = 1;
-
-  //
-  // First "attrs.X"
-  //
-  for (int ix = 0; ix < attrList->items; ix++)
-  {
-    int    len = snprintf(path, sizeof(path) - 1, "attrs.%s", attrList->array[ix]);
-    bson_t attrExists;
-
-    bson_init(&attrExists);
-    dotForEq(&path[6]);
-
-    bson_append_document(&attrExists, path, len, &exists);
-    bson_append_bool(projectionP, path, len, true);
-
-    bson_append_document(&array, &num[2-numLen], numLen, &attrExists);
-
-    num[1] += 1;
-    if (((ix + 1) % 10) == 0)
-    {
-      num[1] = '0';
-      num[0] += 1;
-      numLen = 2;
-    }
-
-    bson_destroy(&attrExists);
-
-    if ((geojsonGeometry != NULL) && (strcmp(attrList->array[ix], geojsonGeometry) == 0))
-    {
-      geojsonGeometryToProjection = false;  // Already present - no need to add to projection
-    }
-  }
-
-  //
-  // Then "@datasets.X" - geojsonGeometryToProjection is already taken care of by "attrs" loop
-  //
-  int offset = attrList->items;
-  for (int ix = 0; ix < attrList->items; ix++)
-  {
-    int    len = snprintf(path, sizeof(path) - 1, "@datasets.%s", attrList->array[ix]);
-    bson_t attrExists;
-
-    bson_init(&attrExists);
-    dotForEq(&path[10]);
-
-    bson_append_document(&attrExists, path, len, &exists);
-    bson_append_bool(projectionP, path, len, true);
-
-    bson_append_document(&array, &num[2-numLen], numLen, &attrExists);
-
-    num[1] += 1;
-    if (((offset + ix + 1) % 10) == 0)
-    {
-      num[1] = '0';
-      num[0] += 1;
-      numLen = 2;
-    }
-
-    bson_destroy(&attrExists);
-  }
-
-  bson_append_array(mongoFilterP, "$or", 3, &array);
-  bson_destroy(&array);
-
-  if (geojsonGeometryToProjection == true)
-  {
-    int len = snprintf(path, sizeof(path) - 1, "attrs.%s", geojsonGeometry);
-    dotForEq(&path[6]);
-    bson_append_bool(projectionP, path, len, true);
-    orionldState.geoPropertyFromProjection = true;
-
-    // What about the dataset ... ?
-  }
-
-  bson_destroy(&exists);
   return true;
 }
 
@@ -839,7 +736,7 @@ KjNode* mongocEntitiesQuery
   // Attribute List
   if ((attrList != NULL) && (attrList->items > 0))
   {
-    if (attributesFilter(&mongoFilter, attrList, &projection, geojsonGeometry) == false)
+    if (mongocAuxAttributesFilter(&mongoFilter, attrList, &projection, geojsonGeometry) == false)
       return NULL;
   }
   else

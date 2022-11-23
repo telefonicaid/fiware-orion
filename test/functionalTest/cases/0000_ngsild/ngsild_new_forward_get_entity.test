@@ -1,0 +1,430 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieve a distributed entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+dbInit CP4
+brokerStart CB  0 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+brokerStart CP2 0 IPv4 -experimental
+brokerStart CP3 0 IPv4 -experimental
+brokerStart CP4 0 IPv4 -experimental
+
+--SHELL--
+#
+# Test:
+# - Create E1 on CB with attribute P1
+# - Create E1 on CP1 with attribute P2
+# - Create E1 on CP2 with attribute P3
+# - Create E1 on CP3 with attribute P4
+# - Create E1 on CP4 with attribute P1-P5
+# - Register CP1 (E1/P2) on CB as an Exclusive registration
+# - Register CP2 (E1/P3) on CB as an Redirect registration
+# - Register CP3 (E1/P4) on CB as an Inclusive registration
+# - Register CP4 (E1/P1-5) on CB as an Auxiliary registration
+# - GET E1 on CB - see E1 with P1-P5 (only P5 from CP4)
+#
+# 01. Create E1 on CB with attribute P1
+# 02. Create E1 on CP1 with attribute P2
+# 03. Create E1 on CP2 with attribute P3
+# 04. Create E1 on CP3 with attribute P4
+# 05. Create E1 on CP4 with attribute P1-P5
+# 06. Register CP1 (E1/P2) on CB as an Exclusive registration
+# 07. Register CP2 (E1/P3) on CB as an Redirect registration
+# 08. Register CP3 (E1/P4) on CB as an Inclusive registration
+# 09. Register CP4 (E1/P1-5) on CB as an Auxiliary registration
+# 10. GET E1 on CB - see E1 with P1-P5 (only P5 from CP4)
+# 11. GET E1 on CB with attrs=P1,P3,P5,P7
+# 12. GET E1 on CB with attrs=P1,P2,P5,P7
+#
+
+echo "01. Create E1 on CB with attribute P1"
+echo "====================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "For local"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 on CP1 with attribute P2"
+echo "======================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P2": "For CP1"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Create E1 on CP2 with attribute P3"
+echo "======================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P3": "For CP2"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Create E1 on CP3 with attribute P4"
+echo "======================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P4": "For CP3"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "05. Create E1 on CP4 with attribute P1-P5"
+echo "========================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "For CP4",
+  "P2": "For CP4",
+  "P3": "For CP4",
+  "P4": "For CP4",
+  "P5": "For CP4"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP4_PORT
+echo
+echo
+
+
+echo "06. Register CP1 (E1/P2) on CB as an Exclusive registration"
+echo "==========================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P2" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Register CP2 (E1/P3) on CB as an Redirect registration"
+echo "=========================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P3" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "redirect"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Register CP3 (E1/P4) on CB as an Inclusive registration"
+echo "==========================================================="
+payload='{
+  "id": "urn:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P4" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP3_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Register CP4 (E1/P1-5) on CB as an Auxiliary registration"
+echo "============================================================="
+payload='{
+  "id": "urn:R4",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2", "P3", "P4", "P5" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP4_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "auxiliary"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "10. GET E1 on CB - see E1 with P1-P5 (only P5 from CP4)"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "11. GET E1 on CB with attrs=P1,P3,P5,P7"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?attrs=P1,P3,P5,P7
+echo
+echo
+
+
+echo "12. GET E1 on CB with attrs=P1,P2,P5,P7"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?attrs=P1,P2,P5,P7
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 on CB with attribute P1
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create E1 on CP1 with attribute P2
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Create E1 on CP2 with attribute P3
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. Create E1 on CP3 with attribute P4
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+05. Create E1 on CP4 with attribute P1-P5
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. Register CP1 (E1/P2) on CB as an Exclusive registration
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+07. Register CP2 (E1/P3) on CB as an Redirect registration
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+08. Register CP3 (E1/P4) on CB as an Inclusive registration
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R3
+
+
+
+09. Register CP4 (E1/P1-5) on CB as an Auxiliary registration
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R4
+
+
+
+10. GET E1 on CB - see E1 with P1-P5 (only P5 from CP4)
+=======================================================
+HTTP/1.1 200 OK
+Content-Length: 243
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "For local"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP1"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "For CP2"
+    },
+    "P4": {
+        "type": "Property",
+        "value": "For CP3"
+    },
+    "P5": {
+        "type": "Property",
+        "value": "For CP4"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+11. GET E1 on CB with attrs=P1,P3,P5,P7
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 157
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "For local"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "For CP2"
+    },
+    "P5": {
+        "type": "Property",
+        "value": "For CP4"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+12. GET E1 on CB with attrs=P1,P2,P5,P7
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 157
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "For local"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP1"
+    },
+    "P5": {
+        "type": "Property",
+        "value": "For CP4"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+brokerStop CP4
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+dbDrop CP4

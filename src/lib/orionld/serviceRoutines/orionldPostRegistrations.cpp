@@ -174,7 +174,8 @@ bool orionldPostRegistrations(void)
     registrationId = regIdP->value.s;
   }
 
-  bool b = pcheckRegistration(regP, false, true, &propertyTree);
+  OrionldContext* fwdContextP = NULL;
+  bool b = pcheckRegistration(regP, false, true, &propertyTree, &fwdContextP);
   if (b == false)
     LM_RE(false, ("pCheckRegistration FAILED"));
 
@@ -214,8 +215,8 @@ bool orionldPostRegistrations(void)
   // Add the property tree at the end
   kjChildAdd(orionldState.requestTree, propertyTree);
 
-  apiModelToCacheRegistration(orionldState.requestTree);  // FIXME: Try to do it without this function
-  regCacheItemAdd(orionldState.tenantP->regCache, orionldState.requestTree, false);  // Clones the registration
+  apiModelToCacheRegistration(orionldState.requestTree);
+  regCacheItemAdd(orionldState.tenantP->regCache, registrationId, orionldState.requestTree, false, fwdContextP);  // Clones the registration
 
   // This is where "id" is changed to "_id"
   dbModelFromApiRegistration(orionldState.requestTree, NULL);

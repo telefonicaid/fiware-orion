@@ -1,0 +1,1253 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieve a distributed entity with clashing attribute instances
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB  0 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+brokerStart CP2 0 IPv4 -experimental
+
+--SHELL--
+#
+# Test:
+# - Create E1 on CB with attribute P1+observedAt (newest), P2, P3 
+# - Create E1 on CP1 with attribute P1,P2+observedAt (newest), P3 
+# - Create E1 on CP2 with attribute P1+observedAt, P2+observedAt, P3 (newest)
+
+# - Register CP1 (E1/P1-P3) on CB as an Inclusive registration
+# - Register CP2 (E1/P1-P3) on CB as an Inclusive registration
+
+# - GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2
+# - Patch E1/P3 on CB - it now gets the newest modifedAt
+# - GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CB
+
+
+# 01. Create E1 on CB with attribute P1+observedAt (newest), P2, P3 (plus G2, R1, and R2)
+# 02. Create E1 on CP1 with attribute P1,P2+observedAt (newest), P3
+# 03. Create E1 on CP2 with attribute P1+observedAt, P2+observedAt, P3 (newest)
+# 04. Register CP1 (E1/P1-P3) on CB as an Inclusive registration
+# 05. Register CP2 (E1/P1-P3) on CB as an Inclusive registration
+# 06. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2
+# 07. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with sysAttrs
+# 08. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues
+# 09. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues+sysAttrs
+# 10. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise
+# 11. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs
+# 12. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs AND lang=es
+# 13. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with lang=es
+# 14. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues AND lang=es
+# 15. Add G2, R1, and R2 to E1 on CB
+# 16. GET E1 on CB - as 06 plus G2, R1, and R2
+# 17. GET E1 on CB - as 06 plus G2, R1, and R2, with keyValues
+# 18. GET E1 on CB - as 10 plus G2, R1, and R2, with concise
+# 19. GET E1 on CB with Accept: application/geo+json and geoproperty==G2
+# 20. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with concise
+# 21. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues
+# 22. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with lang=es
+# 23. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with concise AND with lang=es
+# 24. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues AND with lang=es
+#
+
+echo "01. Create E1 on CB with attribute P1+observedAt (newest), P2, P3"
+echo "================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "value": "local P1",
+    "observedAt": "2022-11-17T16:51:03"
+  },
+  "P2": "local P2",
+  "P3": "local P3",
+  "food": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "Local Food",
+      "es": "comida local",
+      "se": "Lokal mat"
+    }
+  },
+  "L2": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "Local Food",
+      "es": "comida local",
+      "se": "Lokal mat"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 on CP1 with attribute P1,P2+observedAt (newest), P3"
+echo "================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP1",
+  "P2": {
+    "value": "P2 in CP1",
+    "observedAt": "2022-11-17T16:51:02"
+  },
+  "P3": "P3 in CP1",
+  "food": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "CP1 Food",
+      "es": "comida en CP1",
+      "se": "Mat i CP1"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Create E1 on CP2 with attribute P1+observedAt, P2+observedAt, P3 (newest)"
+echo "============================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "value": "P1 in CP2",
+    "observedAt": "2022-11-17T16:51:01"
+  },
+  "P2": {
+    "value": "P2 in CP2",
+    "observedAt": "2022-11-17T16:51:01"
+  },
+  "P3": "P3 in CP2",
+  "food": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "en": "CP2 Food",
+      "es": "comida en CP2",
+      "se": "Mat i CP2"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Register CP1 (E1/P1-P3) on CB as an Inclusive registration"
+echo "=============================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2", "P3", "food" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Register CP2 (E1/P1-P3) on CB as an Inclusive registration"
+echo "=============================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2", "P3", "food" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "06. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "07. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with sysAttrs"
+echo "====================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=sysAttrs
+echo
+echo
+
+
+echo "08. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues"
+echo "======================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=keyValues
+echo
+echo
+
+
+echo "09. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues+sysAttrs"
+echo "==============================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=keyValues,sysAttrs
+echo
+echo
+
+
+echo "10. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise"
+echo "===================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=concise
+echo
+echo
+
+
+echo "11. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs"
+echo "============================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=concise,sysAttrs
+echo
+echo
+
+
+echo "12. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs AND lang=es"
+echo "========================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?options=concise,sysAttrs&lang=es'
+echo
+echo
+
+
+echo "13. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with lang=es"
+echo "===================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?lang=es'
+echo
+echo
+
+
+echo "14. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues AND lang=es"
+echo "=================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?options=simplified&lang=es'
+echo
+echo
+
+
+echo "15. Add G2, R1, and R2 to E1 on CB"
+echo "=================================="
+payload='{
+  "R1": {
+    "object": "urn:local:E1:R1",
+    "observedAt": "2022-11-17T16:51:01"
+  },
+  "R2": {
+    "object": "urn:local:E1:R2"
+  },
+  "G2": {
+    "type": "Point",
+    "coordinates": [ 1, 2, 3 ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "16. GET E1 on CB - as 06 plus G2, R1, and R2"
+echo "============================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "17. GET E1 on CB - as 06 plus G2, R1, and R2, with keyValues"
+echo "============================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=simplified
+echo
+echo
+
+
+echo "18. GET E1 on CB - as 10 plus G2, R1, and R2, with concise"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=concise
+echo
+echo
+
+
+echo "19. GET E1 on CB with Accept: application/geo+json and geoproperty==G2"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?geometryProperty=G2 --out application/geo+json
+echo
+echo
+
+
+echo "20. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with concise"
+echo "======================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?geometryProperty=G2&options=concise' --out application/geo+json
+echo
+echo
+
+
+echo "21. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues"
+echo "========================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?geometryProperty=G2&options=simplified' --out application/geo+json
+echo
+echo
+
+
+echo "22. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with lang=es"
+echo "======================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?geometryProperty=G2&lang=es' --out application/geo+json
+echo
+echo
+
+
+echo "23. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with concise AND with lang=es"
+echo "========================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?geometryProperty=G2&options=concise&lang=es' --out application/geo+json
+echo
+echo
+
+
+echo "24. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues AND with lang=es"
+echo "=========================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?geometryProperty=G2&options=simplified&lang=es' --out application/geo+json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 on CB with attribute P1+observedAt (newest), P2, P3
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create E1 on CP1 with attribute P1,P2+observedAt (newest), P3
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Create E1 on CP2 with attribute P1+observedAt, P2+observedAt, P3 (newest)
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. Register CP1 (E1/P1-P3) on CB as an Inclusive registration
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+05. Register CP2 (E1/P1-P3) on CB as an Inclusive registration
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+06. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 449
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": {
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        },
+        "type": "LanguageProperty"
+    },
+    "P1": {
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "type": "Property",
+        "value": "local P1"
+    },
+    "P2": {
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "type": "Property",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "P3 in CP2"
+    },
+    "food": {
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        },
+        "type": "LanguageProperty"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+07. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with sysAttrs
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 923
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": {
+        "createdAt": "202REGEX(.*)",
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        },
+        "modifiedAt": "202REGEX(.*)",
+        "type": "LanguageProperty"
+    },
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "type": "Property",
+        "value": "local P1"
+    },
+    "P2": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "type": "Property",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "Property",
+        "value": "P3 in CP2"
+    },
+    "createdAt": "202REGEX(.*)",
+    "food": {
+        "createdAt": "202REGEX(.*)",
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        },
+        "modifiedAt": "202REGEX(.*)",
+        "type": "LanguageProperty"
+    },
+    "id": "urn:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+08. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 201
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": {
+        "en": "Local Food",
+        "es": "comida local",
+        "se": "Lokal mat"
+    },
+    "P1": "local P1",
+    "P2": "P2 in CP1",
+    "P3": "P3 in CP2",
+    "food": {
+        "en": "CP2 Food",
+        "es": "comida en CP2",
+        "se": "Mat i CP2"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+09. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues+sysAttrs
+===============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 196
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Can't have system attributes when /simplified/ output format is selected",
+    "title": "Incoherent value for /options/ URI param",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 333
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": {
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        }
+    },
+    "P1": {
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "value": "local P1"
+    },
+    "P2": {
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "value": "P2 in CP1"
+    },
+    "P3": "P3 in CP2",
+    "food": {
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+11. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs
+=============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 817
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": {
+        "createdAt": "202REGEX(.*)",
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        },
+        "modifiedAt": "202REGEX(.*)"
+    },
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "value": "local P1"
+    },
+    "P2": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "P3 in CP2"
+    },
+    "createdAt": "202REGEX(.*)",
+    "food": {
+        "createdAt": "202REGEX(.*)",
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        },
+        "modifiedAt": "202REGEX(.*)"
+    },
+    "id": "urn:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+12. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with concise+sysAttrs AND lang=es
+=========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 747
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": {
+        "createdAt": "202REGEX(.*)",
+        "lang": "es",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "comida local"
+    },
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "value": "local P1"
+    },
+    "P2": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "P3 in CP2"
+    },
+    "createdAt": "202REGEX(.*)",
+    "food": {
+        "createdAt": "202REGEX(.*)",
+        "lang": "es",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "comida en CP2"
+    },
+    "id": "urn:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
+
+
+13. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with lang=es
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 363
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": {
+        "lang": "es",
+        "type": "Property",
+        "value": "comida local"
+    },
+    "P1": {
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "type": "Property",
+        "value": "local P1"
+    },
+    "P2": {
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "type": "Property",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "P3 in CP2"
+    },
+    "food": {
+        "lang": "es",
+        "type": "Property",
+        "value": "comida en CP2"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+14. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues AND lang=es
+==================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L2": "comida local",
+    "P1": "local P1",
+    "P2": "P2 in CP1",
+    "P3": "P3 in CP2",
+    "food": "comida en CP2",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+15. Add G2, R1, and R2 to E1 on CB
+==================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+16. GET E1 on CB - as 06 plus G2, R1, and R2
+============================================
+HTTP/1.1 200 OK
+Content-Length: 676
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G2": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                1,
+                2,
+                3
+            ],
+            "type": "Point"
+        }
+    },
+    "L2": {
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        },
+        "type": "LanguageProperty"
+    },
+    "P1": {
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "type": "Property",
+        "value": "local P1"
+    },
+    "P2": {
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "type": "Property",
+        "value": "P2 in CP1"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "P3 in CP2"
+    },
+    "R1": {
+        "object": "urn:local:E1:R1",
+        "observedAt": "2022-11-17T16:51:01.000Z",
+        "type": "Relationship"
+    },
+    "R2": {
+        "object": "urn:local:E1:R2",
+        "type": "Relationship"
+    },
+    "food": {
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        },
+        "type": "LanguageProperty"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+17. GET E1 on CB - as 06 plus G2, R1, and R2, with keyValues
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 291
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G2": {
+        "coordinates": [
+            1,
+            2,
+            3
+        ],
+        "type": "Point"
+    },
+    "L2": {
+        "en": "Local Food",
+        "es": "comida local",
+        "se": "Lokal mat"
+    },
+    "P1": "local P1",
+    "P2": "P2 in CP1",
+    "P3": "P3 in CP2",
+    "R1": "urn:local:E1:R1",
+    "R2": "urn:local:E1:R2",
+    "food": {
+        "en": "CP2 Food",
+        "es": "comida en CP2",
+        "se": "Mat i CP2"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+18. GET E1 on CB - as 10 plus G2, R1, and R2, with concise
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 485
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G2": {
+        "coordinates": [
+            1,
+            2,
+            3
+        ],
+        "type": "Point"
+    },
+    "L2": {
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        }
+    },
+    "P1": {
+        "observedAt": "2022-11-17T16:51:03.000Z",
+        "value": "local P1"
+    },
+    "P2": {
+        "observedAt": "2022-11-17T16:51:02.000Z",
+        "value": "P2 in CP1"
+    },
+    "P3": "P3 in CP2",
+    "R1": {
+        "object": "urn:local:E1:R1",
+        "observedAt": "2022-11-17T16:51:01.000Z"
+    },
+    "R2": {
+        "object": "urn:local:E1:R2"
+    },
+    "food": {
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        }
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+19. GET E1 on CB with Accept: application/geo+json and geoproperty==G2
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 831
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            1,
+            2,
+            3
+        ],
+        "type": "Point"
+    },
+    "id": "urn:E1",
+    "properties": {
+        "G2": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    1,
+                    2,
+                    3
+                ],
+                "type": "Point"
+            }
+        },
+        "L2": {
+            "languageMap": {
+                "en": "Local Food",
+                "es": "comida local",
+                "se": "Lokal mat"
+            },
+            "type": "LanguageProperty"
+        },
+        "P1": {
+            "observedAt": "2022-11-17T16:51:03.000Z",
+            "type": "Property",
+            "value": "local P1"
+        },
+        "P2": {
+            "observedAt": "2022-11-17T16:51:02.000Z",
+            "type": "Property",
+            "value": "P2 in CP1"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "P3 in CP2"
+        },
+        "R1": {
+            "object": "urn:local:E1:R1",
+            "observedAt": "2022-11-17T16:51:01.000Z",
+            "type": "Relationship"
+        },
+        "R2": {
+            "object": "urn:local:E1:R2",
+            "type": "Relationship"
+        },
+        "food": {
+            "languageMap": {
+                "en": "CP2 Food",
+                "es": "comida en CP2",
+                "se": "Mat i CP2"
+            },
+            "type": "LanguageProperty"
+        },
+        "type": "T"
+    },
+    "type": "Feature"
+}
+
+
+20. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with concise
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            1,
+            2,
+            3
+        ],
+        "type": "Point"
+    },
+    "id": "urn:E1",
+    "properties": {
+        "G2": {
+            "coordinates": [
+                1,
+                2,
+                3
+            ],
+            "type": "Point"
+        },
+        "L2": {
+            "languageMap": {
+                "en": "Local Food",
+                "es": "comida local",
+                "se": "Lokal mat"
+            }
+        },
+        "P1": {
+            "observedAt": "2022-11-17T16:51:03.000Z",
+            "value": "local P1"
+        },
+        "P2": {
+            "observedAt": "2022-11-17T16:51:02.000Z",
+            "value": "P2 in CP1"
+        },
+        "P3": "P3 in CP2",
+        "R1": {
+            "object": "urn:local:E1:R1",
+            "observedAt": "2022-11-17T16:51:01.000Z"
+        },
+        "R2": {
+            "object": "urn:local:E1:R2"
+        },
+        "food": {
+            "languageMap": {
+                "en": "CP2 Food",
+                "es": "comida en CP2",
+                "se": "Mat i CP2"
+            }
+        },
+        "type": "T"
+    },
+    "type": "Feature"
+}
+
+
+21. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 446
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            1,
+            2,
+            3
+        ],
+        "type": "Point"
+    },
+    "id": "urn:E1",
+    "properties": {
+        "G2": {
+            "coordinates": [
+                1,
+                2,
+                3
+            ],
+            "type": "Point"
+        },
+        "L2": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        },
+        "P1": "local P1",
+        "P2": "P2 in CP1",
+        "P3": "P3 in CP2",
+        "R1": "urn:local:E1:R1",
+        "R2": "urn:local:E1:R2",
+        "food": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        },
+        "type": "T"
+    },
+    "type": "Feature"
+}
+
+
+22. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with lang=es
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 745
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            1,
+            2,
+            3
+        ],
+        "type": "Point"
+    },
+    "id": "urn:E1",
+    "properties": {
+        "G2": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    1,
+                    2,
+                    3
+                ],
+                "type": "Point"
+            }
+        },
+        "L2": {
+            "lang": "es",
+            "type": "Property",
+            "value": "comida local"
+        },
+        "P1": {
+            "observedAt": "2022-11-17T16:51:03.000Z",
+            "type": "Property",
+            "value": "local P1"
+        },
+        "P2": {
+            "observedAt": "2022-11-17T16:51:02.000Z",
+            "type": "Property",
+            "value": "P2 in CP1"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "P3 in CP2"
+        },
+        "R1": {
+            "object": "urn:local:E1:R1",
+            "observedAt": "2022-11-17T16:51:01.000Z",
+            "type": "Relationship"
+        },
+        "R2": {
+            "object": "urn:local:E1:R2",
+            "type": "Relationship"
+        },
+        "food": {
+            "lang": "es",
+            "type": "Property",
+            "value": "comida en CP2"
+        },
+        "type": "T"
+    },
+    "type": "Feature"
+}
+
+
+23. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with concise AND with lang=es
+========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 570
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            1,
+            2,
+            3
+        ],
+        "type": "Point"
+    },
+    "id": "urn:E1",
+    "properties": {
+        "G2": {
+            "coordinates": [
+                1,
+                2,
+                3
+            ],
+            "type": "Point"
+        },
+        "L2": {
+            "lang": "es",
+            "value": "comida local"
+        },
+        "P1": {
+            "observedAt": "2022-11-17T16:51:03.000Z",
+            "value": "local P1"
+        },
+        "P2": {
+            "observedAt": "2022-11-17T16:51:02.000Z",
+            "value": "P2 in CP1"
+        },
+        "P3": "P3 in CP2",
+        "R1": {
+            "object": "urn:local:E1:R1",
+            "observedAt": "2022-11-17T16:51:01.000Z"
+        },
+        "R2": {
+            "object": "urn:local:E1:R2"
+        },
+        "food": {
+            "lang": "es",
+            "value": "comida en CP2"
+        },
+        "type": "T"
+    },
+    "type": "Feature"
+}
+
+
+24. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues AND with lang=es
+==========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 364
+Content-Type: application/geo+json
+Date: REGEX(.*)
+
+{
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "geometry": {
+        "coordinates": [
+            1,
+            2,
+            3
+        ],
+        "type": "Point"
+    },
+    "id": "urn:E1",
+    "properties": {
+        "G2": {
+            "coordinates": [
+                1,
+                2,
+                3
+            ],
+            "type": "Point"
+        },
+        "L2": "comida local",
+        "P1": "local P1",
+        "P2": "P2 in CP1",
+        "P3": "P3 in CP2",
+        "R1": "urn:local:E1:R1",
+        "R2": "urn:local:E1:R2",
+        "food": "comida en CP2",
+        "type": "T"
+    },
+    "type": "Feature"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

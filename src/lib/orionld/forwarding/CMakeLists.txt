@@ -29,12 +29,17 @@ SET (SOURCES
     forwardingFailure.cpp
     forwardingListsMerge.cpp
     fwdPendingLookupByCurlHandle.cpp
+    fwdEntityMerge.cpp
     regMatchEntityInfo.cpp
-    regMatchInformationItem.cpp
-    regMatchInformationArray.cpp
-    regMatchAttributes.cpp
     regMatchOperation.cpp
+    regMatchInformationItem.cpp
+    regMatchInformationItemForGet.cpp
+    regMatchInformationArray.cpp
+    regMatchInformationArrayForGet.cpp
+    regMatchAttributes.cpp
+    regMatchAttributesForGet.cpp
     regMatchForEntityCreation.cpp
+    regMatchForEntityGet.cpp
 )
 
 # Include directories

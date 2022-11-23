@@ -118,8 +118,9 @@ bool orionldPostEntities(void)
   int              forwards       = 0;
   KjNode*          responseBody   = NULL;
   ForwardPending*  fwdPendingList = NULL;
+  bool             distributed    = (forwarding == true) || (orionldState.uriParams.local == false);
 
-  if (forwarding)
+  if (distributed)
   {
     KjNode* entityIdNodeP = kjString(orionldState.kjsonP, "entityId", entityId);  // Only used if 207 response
 
@@ -136,12 +137,12 @@ bool orionldPostEntities(void)
     //        Auxiliary registrations aren't allowed to receive create/update forwardes messages
     //
     // The fix is as follows:
-    //   ForwardPending* exclusiveList = regMatchForEntityCreation(RegModeExclusive, entityId, entityType, orionldState.requestTree); (chopping attrs off)
-    //   ForwardPending* redirectList  = regMatchForEntityCreation(RegModeRedirect, entityId, entityType, orionldState.requestTree);
+    //   ForwardPending* exclusiveList = regMatchForEntityCreation(RegModeExclusive, FwdCreateEntity, entityId, entityType, orionldState.requestTree); (chopping attrs off)
+    //   ForwardPending* redirectList  = regMatchForEntityCreation(RegModeRedirect,  FwdCreateEntity, entityId, entityType, orionldState.requestTree);
     //
     //   purgeRedirectedAttributes(redirectList, orionldState.requestTree);
     //
-    //   ForwardPending* inclusiveList = regMatchForEntityCreation(RegModeInclusive, entityId, entityType, orionldState.requestTree);
+    //   ForwardPending* inclusiveList = regMatchForEntityCreation(RegModeInclusive, FwdCreateEntity, entityId, entityType, orionldState.requestTree);
     //
     //   fwdPendingList = forwardingListsMerge(exclusiveList, redirectList);
     //   fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
@@ -164,13 +165,13 @@ bool orionldPostEntities(void)
     // - P7-P10 on R5::endpoint
     // - P7-P10 on local broker
     //
-    ForwardPending* exclusiveList = regMatchForEntityCreation(RegModeExclusive, entityId, entityType, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
-    ForwardPending* redirectList  = regMatchForEntityCreation(RegModeRedirect, entityId, entityType, orionldState.requestTree);
+    ForwardPending* exclusiveList = regMatchForEntityCreation(RegModeExclusive, FwdCreateEntity, entityId, entityType, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
+    ForwardPending* redirectList  = regMatchForEntityCreation(RegModeRedirect,  FwdCreateEntity, entityId, entityType, orionldState.requestTree);
 
     if (redirectList != NULL)
       purgeRedirectedAttributes(redirectList, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
 
-    ForwardPending* inclusiveList = regMatchForEntityCreation(RegModeInclusive, entityId, entityType, orionldState.requestTree);
+    ForwardPending* inclusiveList = regMatchForEntityCreation(RegModeInclusive, FwdCreateEntity, entityId, entityType, orionldState.requestTree);
     fwdPendingList = forwardingListsMerge(exclusiveList, redirectList);
     fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
 
@@ -244,7 +245,7 @@ bool orionldPostEntities(void)
   //
   if (orionldState.requestTree != NULL)
   {
-    if (mongocEntityLookup(entityId) != NULL)
+    if (mongocEntityLookup(entityId, NULL, NULL) != NULL)
     {
       if (fwdPendingList == NULL)  // Purely local request
       {
@@ -356,7 +357,7 @@ bool orionldPostEntities(void)
   }
 
  awaitFwdResponses:
-  if ((forwarding) && (forwards > 0))
+  if (forwards > 0)
   {
     CURLMsg* msgP;
     int      msgsLeft;

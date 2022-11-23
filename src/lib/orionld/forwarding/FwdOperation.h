@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdint.h>                                              // types: uint64_t, ...
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -84,7 +86,15 @@ typedef enum FwdOperation
 //
 // fwdOperations -
 //
-extern const char* fwdOperations[];
+extern const char* fwdOperations[37];
+
+
+
+// -----------------------------------------------------------------------------
+//
+// fwdOperationUrlLen -
+//
+extern const int fwdOperationUrlLen[37];
 
 
 

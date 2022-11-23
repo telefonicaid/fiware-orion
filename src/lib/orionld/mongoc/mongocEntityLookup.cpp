@@ -32,8 +32,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
+#include "orionld/mongoc/mongocAuxAttributesFilter.h"            // mongocAuxAttributesFilter
 #include "orionld/mongoc/mongocEntityLookup.h"                   // Own interface
 
 
@@ -47,19 +49,23 @@ extern "C"
 //   * orionldPatchEntity  - Like PUT but also using entity type, entire attributes, etc.
 //   * orionldPostEntities - Only to make sure the entity does not already exists (mongocEntityExists should be implemented and used instead)
 //   * orionldPostEntity   - The entire DB Entity is needed as it is later used as base for the "merge" with the payload body
+//   * orionldGetEntity    - filtering over attributes (?attrs=A1,A2,...An&?geometryProperty=GP)
 //
-// So, this function is quite needed, just as it is.
-// FIXME: I should merge the two though, moving all the dbModel stuff away from mongocEntityRetrieve
+// So, this function is QUITE NEEDED, just as it is.
 //
-KjNode* mongocEntityLookup(const char* entityId)
+// The other one, mongocEntityRetrieve, does much more than just DB. It needs to be be REMOVED.
+// mongocEntityRetrieve is only used by legacyGetEntity() which is being deprecated anyway.
+//
+KjNode* mongocEntityLookup(const char* entityId, StringArray* attrsV, const char* geojsonGeometry)
 {
-  bson_t            mongoFilter;
-  const bson_t*     mongoDocP;
-  mongoc_cursor_t*  mongoCursorP;
-  bson_error_t      mcError;
-  char*             title;
-  char*             details;
-  KjNode*           entityNodeP = NULL;
+  bson_t                mongoFilter;
+  const bson_t*         mongoDocP;
+  mongoc_cursor_t*      mongoCursorP;
+  bson_error_t          mcError;
+  char*                 title;
+  char*                 details;
+  KjNode*               entityNodeP = NULL;
+  mongoc_read_prefs_t*  readPrefs   = mongoc_read_prefs_new(MONGOC_READ_NEAREST);
 
   //
   // Create the filter for the query
@@ -73,12 +79,40 @@ KjNode* mongocEntityLookup(const char* entityId)
     orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
 
   //
+  // Projection (will be added to if attrList != NULL)
+  //
+  bson_t projection;
+  bson_init(&projection);
+  bson_append_bool(&projection, "attrNames",       9, true);
+  bson_append_bool(&projection, "creDate",         7, true);
+  bson_append_bool(&projection, "modDate",         7, true);
+  bson_append_bool(&projection, "lastCorrelator", 14, true);
+
+  // Attribute List AND GeoJSON Geometry
+  if ((attrsV != NULL) && (attrsV->items > 0))
+  {
+    if (mongocAuxAttributesFilter(&mongoFilter, attrsV, &projection, geojsonGeometry) == false)
+      return NULL;
+  }
+  else
+  {
+    bson_append_bool(&projection, "attrs",     5, true);
+    bson_append_bool(&projection, "@datasets", 9, true);
+  }
+
+  bson_t options;
+  bson_init(&options);
+  bson_append_document(&options, "projection", 10, &projection);
+  bson_destroy(&projection);
+
+  //
   // Run the query
   //
-  if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, NULL, NULL)) == NULL)
+  if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
-    return NULL;
+    entityNodeP = NULL;
+    goto done;
   }
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
@@ -90,11 +124,14 @@ KjNode* mongocEntityLookup(const char* entityId)
   if (mongoc_cursor_error(mongoCursorP, &mcError))
   {
     LM_E(("Internal Error (DB Error '%s')", mcError.message));
-    return NULL;
+    entityNodeP = NULL;
+    goto done;
   }
 
+ done:
+  bson_destroy(&options);
+  mongoc_read_prefs_destroy(readPrefs);
   mongoc_cursor_destroy(mongoCursorP);
-  // semGive(&mongoEntitiesSem);
   bson_destroy(&mongoFilter);
 
   return entityNodeP;

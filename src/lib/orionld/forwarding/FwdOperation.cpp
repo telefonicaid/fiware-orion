@@ -83,6 +83,51 @@ const char* fwdOperations[37] = {
 };
 
 
+
+// -----------------------------------------------------------------------------
+//
+// fwdOperationUrlLen -
+//
+const int fwdOperationUrlLen[37] = {
+  0,
+  20,   // strlen("/ngsi-ld/v1/entities")
+  21,   // strlen("/ngsi-ld/v1/entities/")       + strlen(entityId)
+  27,   // strlen("/ngsi-ld/v1/entities//attrs") + strlen(entityId)
+  27,   // strlen("/ngsi-ld/v1/entities//attrs") + strlen(entityId)
+  28,   // strlen("/ngsi-ld/v1/entities//attrs") + strlen(entityId) + strlen(attrName)
+  21,   // strlen("/ngsi-ld/v1/entities/")       + strlen(entityId)
+  35,   // strlen("/ngsi-ld/v1/entityOperations/create")
+  35,   // strlen("/ngsi-ld/v1/entityOperations/upsert")
+  35,   // strlen("/ngsi-ld/v1/entityOperations/update")
+  35,   // strlen("/ngsi-ld/v1/entityOperations/delete")
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  21,   // strlen("/ngsi-ld/v1/entities/")       + strlen(entityId)
+  20,   // strlen("/ngsi-ld/v1/entities")
+  34,   // strlen("/ngsi-ld/v1/entityOperations/query")
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  0,    // Not Implemented ...
+  25,   // strlen("/ngsi-ld/v1/subscriptions")
+  26,   // strlen("/ngsi-ld/v1/subscriptions/")  + strlen(subscriptionId)
+  26,   // strlen("/ngsi-ld/v1/subscriptions/")  + strlen(subscriptionId)
+  26    // strlen("/ngsi-ld/v1/subscriptions/")  + strlen(subscriptionId)
+};
+
+
+
 // -----------------------------------------------------------------------------
 //
 // fwdOperationAlias -
@@ -182,7 +227,7 @@ uint64_t fwdOperationMask(KjNode* operationsP)
       {
         if (strcmp(op, fwdOperations[ix]) == 0)
         {
-          mask |= (1 << ix);
+          mask |= (1L << ix);
           break;
         }
       }

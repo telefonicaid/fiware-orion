@@ -32,6 +32,7 @@ extern "C"
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArray.h"         // regMatchInformationArray
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // Own interface
@@ -47,25 +48,27 @@ extern "C"
 // - "operations" must include "createEntity
 // - "information" must match by entity id+type and attributes if present in the registration
 //
-ForwardPending* regMatchForEntityCreation(RegistrationMode regMode, const char* entityId, const char* entityType, KjNode* incomingP)
+ForwardPending* regMatchForEntityCreation
+(
+  RegistrationMode regMode,
+  FwdOperation     operation,
+  const char*      entityId,
+  const char*      entityType,
+  KjNode*          incomingP
+)
 {
   ForwardPending* fwdPendingHead = NULL;
   ForwardPending* fwdPendingTail = NULL;
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-    if (regP->mode == RegModeAuxiliary)
-    {
-      LM(("No Reg Match due to Auxiliary Registration"));
-      continue;
-    }
     if ((regP->mode & regMode) == 0)
     {
       LM(("No Reg Match due to regMode"));
       continue;
     }
 
-    if (regMatchOperation(regP, FwdCreateEntity) == false)  // FIXME: "createEntity" should be an enum value
+    if (regMatchOperation(regP, operation) == false)
     {
       LM(("No Reg Match due to Operation"));
       continue;
@@ -77,6 +80,9 @@ ForwardPending* regMatchForEntityCreation(RegistrationMode regMode, const char* 
       LM(("No Reg Match due to Information Array"));
       continue;
     }
+
+    // Add extra info in ForwardPending, needed by forwardRequestSend
+    fwdPendingP->operation = operation;
 
     // Add fwdPendingP to the linked list
     if (fwdPendingHead == NULL)

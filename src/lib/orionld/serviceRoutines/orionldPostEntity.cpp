@@ -136,7 +136,7 @@ bool orionldPostEntity(void)
   //
   // Get the entity from the database
   //
-  KjNode* dbEntityP = mongocEntityLookup(entityId);
+  KjNode* dbEntityP = mongocEntityLookup(entityId, NULL, NULL);
   if (dbEntityP == NULL)
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);

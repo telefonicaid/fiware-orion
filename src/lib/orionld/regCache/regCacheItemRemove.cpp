@@ -68,9 +68,7 @@ bool regCacheItemRemove(RegCache* rcP, const char* regId)
     {
       // Remove rciP from rcP
       if (rciP == rcP->regList)  // First item is the item to remove - step over it
-      {
         rcP->regList = rciP->next;
-      }
       else if (rciP->next == NULL)  // Last item is the item to remove
       {
         if (prev != NULL)
@@ -79,12 +77,11 @@ bool regCacheItemRemove(RegCache* rcP, const char* regId)
           rcP->regList = NULL;  // First and last item is the same - list is emptied
       }
       else  // In the middle
-      {
         prev->next = rciP->next;  // Just step over it
-      }
 
       // Free the reg-cache item to be deleted (call regCacheItemRelease(rciP)?)
       kjFree(rciP->regTree);
+      free(rciP->regId);
 
       // In case we have any regex's, free them
       regCacheItemRegexRelease(rciP);

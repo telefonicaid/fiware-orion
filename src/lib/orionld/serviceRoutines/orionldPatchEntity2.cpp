@@ -389,7 +389,7 @@ bool orionldPatchEntity2(void)
   //        Not really worth it.
   //        At least, postponed (not forgotten) for now.
   //
-  dbEntityP = mongocEntityLookup(entityId);
+  dbEntityP = mongocEntityLookup(entityId, NULL, NULL);
 
   if (dbEntityP == NULL)
   {

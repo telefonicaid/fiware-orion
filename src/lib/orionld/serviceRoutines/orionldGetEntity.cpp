@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,339 +22,38 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>                                                // std::string
-#include <vector>                                                // std::vector
+#include <curl/curl.h>                                           // curl
 
 extern "C"
 {
-#include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
-#include "kbase/kStringSplit.h"                                  // kStringSplit
-#include "kbase/kStringArrayJoin.h"                              // kStringArrayJoin
-#include "kbase/kStringArrayLookup.h"                            // kStringArrayLookup
-#include "kbase/kTime.h"                                         // kTimeGet
-#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjObject, ...
 #include "kjson/kjParse.h"                                       // kjParse
+#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjBuilder.h"                                     // kjChildRemove, kjChildAdd, kjArray, ...
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
-#include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/common/performance.h"                          // PERFORMANCE
+#include "orionld/common/curlToBrokerStrerror.h"                 // curlToBrokerStrerror
 #include "orionld/common/tenantList.h"                           // tenant0
-#include "orionld/mongoc/mongocRegistrationLookup.h"             // mongocRegistrationLookup
-#include "orionld/mongoc/mongocEntityRetrieve.h"                 // mongocEntityRetrieve
-#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
-#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
-#include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/legacyDriver/legacyGetEntity.h"                // legacyGetEntity
+#include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
+#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
 #include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
-#include "orionld/serviceRoutines/orionldGetEntity.h"            // Own Interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attrsToAlias -
-//
-static void attrsToAlias(OrionldContext* contextP, char* attrV[], int attrs)
-{
-  for (int ix = 0; ix < attrs; ix++)
-  {
-    attrV[ix] = orionldContextItemAliasLookup(contextP, attrV[ix], NULL, NULL);
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldForwardGetEntity2 -
-//
-// An NGSI-LD Registration looks like this:
-//
-// {
-//   "type": "ContextSourceRegistration",
-//   "id": "urn:ngsi-ld:ContextSourceRegistration:csr01",
-//   "information": [
-//     {
-//       "entities": [
-//         {
-//           "id": "urn:ngsi-ld:entities:E1",
-//           "type": "Entity"
-//         }
-//       ],
-//       "properties": [ "P1", "P2", ... ],
-//       "relationships": [ "R1", ... ]
-//     }
-//   ],
-//   "endpoint": "http://localhost:9801"
-// }
-//
-// I.e., each registration have:
-// - ONE Endpoint
-// - An array of entity/attribute combinations
-//
-// -----------------------------------------------------------------------
-//
-// In the NGSIv1 database model, the registration is stored like this:
-//
-//  {
-//    ...
-//    "contextRegistration" : [
-//      {
-//        "entities" : [
-//          {
-//            "id" : "urn:ngsi-ld:entities:E1",
-//            "type" : "https://uri.etsi.org/ngsi-ld/default-context/Entity"
-//          }
-//        ],
-//        "attrs" : [
-//          {
-//            "name" : "https://uri.etsi.org/ngsi-ld/default-context/P1",
-//            "type" : "Property",
-//          },
-//          {
-//            "name" : "https://uri.etsi.org/ngsi-ld/default-context/P2",
-//            "type" : "Property",
-//          },
-//          {
-//            "name" : "https://uri.etsi.org/ngsi-ld/default-context/R1",
-//            "type" : "Relationship",
-//          }
-//        ],
-//        "providingApplication" : "http://my.csource.org:1026"
-//      }
-//    ], ...
-//
-// In the database, every contextRegistration item can have its own "providingApplication", however, the incoming payload of NGSi-LD Registrations
-// doesn't allow this, so ALL the contextRegistration items will forcibly have the same "providingApplication" ("endpoint" in NGSI-LD).
-//
-// We assume that one entity is registered for one endpoint only once.
-// => There will be ONE forwarded request per matching registration.
-//
-// As all forwarded requests will return "a piece" of the entity, the Entity::ID and Entity::Type will be stripped off the response, so that only the attributes
-// remain and then those attributes will be merged into the "Response Entity".
-//
-// Let's skip the Entity Type completely. If the Entity ID matches, we're good.
-//
-// So, we'll need to merge the attribute names into a comma-separated list, for the URI parameter "attrs"
-// And especially, if the original GET operation contained the attrs URI param, we need to not include those.
-// Four cases:
-//
-//   URI param 'attrs' present in Original Request     Attribute List in the Registration     Action
-//   --------------------------------------------      ----------------------------------     --------------------------------------
-//   NO                                                NO                                     No "attrs" URI param in the forwarded request
-//   NO                                                YES                                    "attrs" URI param exact copy of "Attribute List in the Registration"
-//   YES                                               NO                                     "attrs" URI param exact copy of "URI param 'attrs' in Original Request"
-//   YES                                               YES                                    "attrs" URI param is a merge between the two
-//
-//
-static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId, char** uriParamAttrV, int uriParamAttrs)
-{
-  char            host[128]                  = { 0 };
-  char            protocol[32]               = { 0 };
-  unsigned short  port                       = 0;
-  char*           uriDir                     = (char*) "";
-  char*           detail;
-  KjNode*         entityP                    = NULL;
-  char*           registrationAttrV[100];
-  int             registrationAttrs          = 0;
-
-  if (kjTreeRegistrationInfoExtract(registrationP, protocol, sizeof(protocol), host, sizeof(host), &port, &uriDir, registrationAttrV, 100, &registrationAttrs, &detail) == false)
-    return NULL;
-
-  char* newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, 200 * 30);  // Assuming max 30 attrs, max 200 chars per attr ...
-
-  if ((uriParamAttrs == 0) && (registrationAttrs == 0))
-    newUriParamAttrsString = (char*) "";
-  else if ((uriParamAttrs == 0) && (registrationAttrs != 0))
-  {
-    newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, registrationAttrs * 200);
-    attrsToAlias(orionldState.contextP, registrationAttrV, registrationAttrs);
-    kStringArrayJoin(newUriParamAttrsString, registrationAttrV, registrationAttrs, ",");
-  }
-  else if ((uriParamAttrs != 0) && (registrationAttrs == 0))
-  {
-    newUriParamAttrsString = (char*) kaAlloc(&orionldState.kalloc, uriParamAttrs * 200);
-    attrsToAlias(orionldState.contextP, uriParamAttrV, uriParamAttrs);
-    kStringArrayJoin(newUriParamAttrsString, uriParamAttrV, uriParamAttrs, ",");
-  }
-  else
-  {
-    char* attrsV[100];
-    int   attrs = 0;
-
-    for (int ix = 0; ix < uriParamAttrs; ix++)
-    {
-      if (kStringArrayLookup(registrationAttrV, registrationAttrs, uriParamAttrV[ix]) != -1)
-        attrsV[attrs++] = uriParamAttrV[ix];
-    }
-
-    if (attrs == 0)
-      return NULL;
-
-    attrsToAlias(orionldState.contextP, attrsV, attrs);
-    kStringArrayJoin(newUriParamAttrsString, attrsV, attrs, ",");
-  }
-
-
-  int   size    = 256 + strlen(newUriParamAttrsString);
-  char* urlPath = (char*) kaAlloc(&orionldState.kalloc, size);
-  char* uriDirP = (char*) ((uriDir == NULL)? "" : uriDir);
-
-
-  //
-  // If the uri directory (from the registration) ends in a slash, then have it removed.
-  // It is added in the snpintf further down
-  //
-  if (uriDirP != NULL)
-  {
-    int slen = strlen(uriDirP);
-    if (uriDirP[slen - 1] == '/')
-      uriDirP[slen - 1] = 0;
-  }
-
-  if (*newUriParamAttrsString != 0)
-  {
-    if (orionldState.uriParamOptions.keyValues)
-      snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?options=keyValues&attrs=%s", uriDirP, entityId, newUriParamAttrsString);
-    else
-      snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?attrs=%s", uriDirP, entityId, newUriParamAttrsString);
-  }
-  else
-  {
-    if (orionldState.uriParamOptions.keyValues)
-      snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?options=keyValues", uriDirP, entityId);
-    else
-      snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s", uriDirP, entityId);
-  }
-
-
-  //
-  // Sending the Forwarded request
-  //
-  orionldState.httpResponse.buf       = NULL;  // orionldRequestSend allocates
-  orionldState.httpResponse.size      = 0;
-  orionldState.httpResponse.used      = 0;
-  orionldState.httpResponse.allocated = false;
-
-  bool tryAgain = false;
-  bool reqOk;
-  bool downloadFailed;
-
-  //
-  // Prepare HTTP headers
-  //
-  OrionldHttpHeader headerV[5];
-  int               header = 0;
-
-  if (orionldState.tenantP != &tenant0)
-  {
-    headerV[header].type  = HttpHeaderTenant;
-    headerV[header].value = orionldState.tenantP->tenant;
-    ++header;
-  }
-
-  if ((orionldState.in.servicePath != NULL) && (orionldState.in.servicePath[0] != 0))
-  {
-    headerV[header].type  = HttpHeaderPath;
-    headerV[header].value = orionldState.in.servicePath;
-    ++header;
-  }
-
-  if (orionldState.in.xAuthToken != NULL)
-  {
-    headerV[header].type  = HttpHeaderXauth;
-    headerV[header].value = orionldState.in.xAuthToken;
-    ++header;
-  }
-
-  headerV[header].type = HttpHeaderNone;
-
-  if (orionldState.linkHttpHeaderPresent)
-  {
-    char link[512];
-
-    snprintf(link, sizeof(link), "<%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", orionldState.link);
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "GET", urlPath, 5000, link, &detail, &tryAgain, &downloadFailed, "Accept: application/json", NULL, NULL, 0, headerV);
-  }
-  else
-    reqOk = orionldRequestSend(&orionldState.httpResponse, protocol, host, port, "GET", urlPath, 5000, NULL, &detail, &tryAgain, &downloadFailed, "Accept: application/json", NULL, NULL, 0, headerV);
-
-  if (reqOk)
-    entityP = kjParse(orionldState.kjsonP, orionldState.httpResponse.buf);
-
-  return entityP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// orionldForwardGetEntity -
-//
-static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode* responseP, bool needEntityType, char** attrsV, int attrs)
-{
-  //
-  // Treat all hits from the registrations
-  //
-  for (KjNode* regP = regArrayP->value.firstChildP; regP != NULL; regP = regP->next)
-  {
-    KjNode*  partTree = orionldForwardGetEntityPart(regP, entityId, attrsV, attrs);
-    if (partTree == NULL)
-    {
-      continue;
-    }
-
-    if (partTree->type != KjObject)
-    {
-      LM_W(("Garbage from Context Provider (the response to a forwarded GET /entities/{EID} must be a JSON object - not %s)",
-            kjValueType(partTree->type)));
-      continue;
-    }
-
-    //
-    // Move all attributes from 'partTree' into responseP
-    //
-    KjNode* nodeP = partTree->value.firstChildP;
-    KjNode* next;
-
-    while (nodeP != NULL)
-    {
-      next = nodeP->next;
-
-      if (SCOMPARE3(nodeP->name, 'i', 'd', 0) || SCOMPARE4(nodeP->name, '@', 'i', 'd', 0))
-      {
-        // Do Nothing
-      }
-      else if (SCOMPARE5(nodeP->name, 't', 'y', 'p', 'e', 0) || SCOMPARE6(nodeP->name, '@', 't', 'y', 'p', 'e', 0))
-      {
-        if (needEntityType)
-        {
-          //
-          // We're taking the entity::type from the Response to the forwarded request
-          // because no local entity was found.
-          // It could also be taken from the registration.
-          //
-          kjChildAdd(responseP, nodeP);
-          needEntityType = false;
-        }
-      }
-      else
-        kjChildAdd(responseP, nodeP);
-
-      nodeP = next;
-    }
-  }
-
-  return responseP;
-}
+#include "orionld/kjTree/kjSysAttrsRemove.h"                     // kjSysAttrsRemove
+#include "orionld/apiModel/ntonEntity.h"                         // ntonEntity
+#include "orionld/apiModel/ntosEntity.h"                         // ntosEntity
+#include "orionld/apiModel/ntocEntity.h"                         // ntocEntity
+#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
+#include "orionld/forwarding/forwardingListsMerge.h"             // forwardingListsMerge
+#include "orionld/forwarding/forwardRequestSend.h"               // forwardRequestSend
+#include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"     // fwdPendingLookupByCurlHandle
+#include "orionld/forwarding/fwdEntityMerge.h"                   // fwdEntityMerge
+#include "orionld/serviceRoutines/orionldGetEntity.h"            // Own interface
 
 
 
@@ -362,120 +61,253 @@ static KjNode* orionldForwardGetEntity(char* entityId, KjNode* regArrayP, KjNode
 //
 // orionldGetEntity -
 //
-// URI params:
+// URL PARAMETERS
 // - attrs
-// - options=keyValues
-//
-// For the NGSI-LD Forwarding scheme to work, we need to check for registrations and not only in the
-// local database. For this to work correctly:
-// 1. Lookup matching registrations
-// 2. Lookup the entity in the local database
-// 3. If not found locally and no matching registrations, return a404 Not Found
-// 4. If not found locally, we need to extract the entity type from a Context Provider and if that doesn't work, then we can get
-//    the entity type from the matching registration.
-// 5. Forward the GET /entities/{entityId} to all matching CPs and add the attributes to the entity
-// 6. Return the full entity
+// - geometryProperty
+// - lang
+// - options=simplified/concise  (normalized is default)
 //
 bool orionldGetEntity(void)
 {
-  KjNode*  regArray = NULL;
-  char*    eId      = orionldState.wildcard[0];
+  if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
+    return legacyGetEntity();
 
-  //
-  // Make sure the ID (eId) is a valid URI
-  //
-  PCHECK_URI(eId, true, 0, "Invalid Entity ID", "Not a URL nor a URN", 400);
-
-  if (forwarding)
-    regArray = mongocRegistrationLookup(eId, NULL, NULL);
-
-  bool attrsMandatory = false;
-
-  //
-  // Need a copy of orionldState.in.attrList, replacing dots for eqs, for mongocEntityRetrieve
-  // Slightly modified as mongocEntityRetrieve expects no size of the array but NULL terminated (one more item, set to NULL)
-  //
-  char** eqAttrV = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * (orionldState.in.attrList.items + 1));
-
-  eqAttrV[orionldState.in.attrList.items] = NULL;  // NULL-terminate the array
-
-  for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
-  {
-    eqAttrV[ix] = kaStrdup(&orionldState.kalloc, orionldState.in.attrList.array[ix]);
-    dotForEq(eqAttrV[ix]);
-  }
-
-  if ((orionldState.in.attrList.items > 0) && (regArray == NULL))  // attrs given, no matching registrations => no hit unless some attr present
-    attrsMandatory = true;
-
-  char* geometryProperty = NULL;
-  if (orionldState.out.contentType == GEOJSON)
-  {
-    if (orionldState.uriParams.geometryProperty != NULL)
-    {
-      geometryProperty = kaStrdup(&orionldState.kalloc, orionldState.in.geometryPropertyExpanded);
-      dotForEq(geometryProperty);
-    }
-    else
-      geometryProperty = (char*) "location";
-  }
-
-  //
-  // FIXME: mongocEntityRetrieve DOES TOO MUCH+
-  //        Split into DB-retrieval + dbModel-stuff
-  //
-  orionldState.responseTree = mongocEntityRetrieve(eId,
-                                                   eqAttrV,
-                                                   attrsMandatory,
-                                                   orionldState.uriParamOptions.sysAttrs,
-                                                   orionldState.uriParamOptions.keyValues,
-                                                   orionldState.uriParamOptions.concise,
-                                                   orionldState.uriParams.datasetId,
-                                                   geometryProperty,
-                                                   &orionldState.geoPropertyNode,
-                                                   orionldState.uriParams.lang);
-
-  if ((orionldState.responseTree == NULL) && (regArray == NULL))
-  {
-    const char* title = (attrsMandatory == true)? "Combination Entity/Attributes Not Found" : "Entity Not Found";
-    orionldError(OrionldResourceNotFound, title, eId, 404);
+  const char* entityId = orionldState.wildcard[0];
+  if (pCheckUri(entityId, "Entity ID in URL PATH", true) == false)
     return false;
+
+  bool             distributed    = (forwarding == true) && (orionldState.uriParams.local == false);
+  ForwardPending*  fwdPendingList = NULL;
+  int              forwards       = 0;
+
+  if (distributed)
+  {
+    StringArray*  attrV   = (orionldState.uriParams.attrs != NULL)? &orionldState.in.attrList : NULL;
+    const char*   geoProp = orionldState.uriParams.geometryProperty;
+
+    char dateHeader[70];
+    snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
+
+    //
+    // If attrV AND geoProp are set, then geoProp needs to be merged in into attrV
+    // UNLESS it's not present already.
+    //
+    // If attrV is not used BUT geoProp is, then attrV needs to be an array on ONE ITEM: geoProp
+    //
+    // This must be done as local copies, as otherwiose we fuck it up for the query lin the local database
+    //
+    //
+    // If 'attrs' is used, any matches in Exclusive/Redirect registrations must chop off attributes from 'attrs'
+    //
+    // We want EVERYTHING from Auxiliary regs (and we may throw it all away in the end),
+    // so we create the ForwardPending list FIRST, before any attrs are removed
+    //
+    ForwardPending* auxiliarList  = regMatchForEntityGet(RegModeAuxiliary, FwdRetrieveEntity, entityId, attrV, geoProp);
+    ForwardPending* exclusiveList = regMatchForEntityGet(RegModeExclusive, FwdRetrieveEntity, entityId, attrV, geoProp);
+    ForwardPending* redirectList  = regMatchForEntityGet(RegModeRedirect,  FwdRetrieveEntity, entityId, attrV, geoProp);
+    ForwardPending* inclusiveList = regMatchForEntityGet(RegModeInclusive, FwdRetrieveEntity, entityId, attrV, geoProp);
+
+    fwdPendingList = forwardingListsMerge(exclusiveList,  redirectList);
+    fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
+    fwdPendingList = forwardingListsMerge(fwdPendingList, auxiliarList);
+
+    // Send - copy from orionldPostEntities
+    if (fwdPendingList != NULL)
+    {
+      for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
+      {
+        // Send the forwarded request and await all responses
+        if (fwdPendingP->regP != NULL)
+        {
+          if (forwardRequestSend(fwdPendingP, dateHeader) == 0)
+          {
+            ++forwards;
+            fwdPendingP->error = false;
+          }
+          else
+          {
+            LM_W(("Forwarded request failed"));
+            fwdPendingP->error = true;
+          }
+        }
+      }
+
+      int stillRunning = 1;
+      int loops        = 0;
+
+      while (stillRunning != 0)
+      {
+        CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
+        if (cm != 0)
+        {
+          LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
+          forwards = 0;
+          break;
+        }
+
+        if (stillRunning != 0)
+        {
+          cm = curl_multi_wait(orionldState.curlFwdMultiP, NULL, 0, 1000, NULL);
+          if (cm != CURLM_OK)
+          {
+            LM_E(("Internal Error (curl_multi_wait: error %d", cm));
+            break;
+          }
+        }
+
+        if ((++loops >= 10) && ((loops % 5) == 0))
+          LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
+      }
+    }
   }
 
-  // Need to null out a possible "Not Found"
-  orionldState.pd.status = 200;
-
-  //
-  // GET /ngsi-ld/v1/entities/{entityId} returns a single Entity, not an Array.
-  // It is supposed that there is only ONE entity with a certain Entity ID in the entire system ...
-  //
-  // However, a Context Provider (or more) may have a copy of an entity and that same entity may exist in local in the broker ...
-  // In the future we need to rethink this, and perhaps return an Array of entities, not just one single entity.
-  // We might also want to include the origin (the Context Provider) of the entity as part of the response ...
-  //
-  // For now, if the entity is found in a Context Provider, the first one that is found will be returned.
-  // If nothing found in the Context Providers, then the local database is searched.
-  // This way, only one Entity is returned and we don't break the API. For now ...
-  //
-  if (regArray != NULL)
+  KjNode* dbEntityP  = mongocEntityLookup(entityId, &orionldState.in.attrList, orionldState.uriParams.geometryProperty);
+  KjNode* apiEntityP = NULL;
+  if (dbEntityP == NULL)
   {
-    bool needEntityType = false;
-
-    if (orionldState.responseTree == NULL)
+    if (forwards == 0)
     {
-      KjNode* idNodeP = kjString(orionldState.kjsonP, "id", eId);
+      const char* title = (orionldState.in.attrList.items != 0)? "Combination Entity/Attributes Not Found" : "Entity Not Found";
+      orionldError(OrionldResourceNotFound, title, entityId, 404);
 
-      orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
-      kjChildAdd(orionldState.responseTree, idNodeP);
+#if 0
+      LM(("@context is: '%s'", orionldState.contextP->url));
 
-      needEntityType = true;  // Get it from Forward-response
+      for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
+      {
+        LM(("Attr %d: '%s'", ix, orionldState.in.attrList.array[ix]));
+      }
+#endif
+      return false;
+    }
+  }
+  else
+  {
+    // In the distributed case, one and the same attribute may come from different providers,
+    // and we'll have to pick ONE of them.
+    // The algorithm to pick one is;
+    // 1. Newest observedAt
+    // 2. If none of the attributes has an observedAt:  newest modifiedAt
+    // 3. If none of the attributes has an modifiedAt - pick the first one
+    //
+    // So, in order for this to work, in a distributed GET, we can't get rid of the sysAttrs in dbModelToApiEntity2.
+    // We also cannot get rid of the sub-attrs (observedAt may be needed) - that would be if orionldState.out.format == Simplified
+    // We might need those two for the attribute-instance-decision
+    //
+    // For the very same reason, all forwarded GET requests must carry the URI-params "?options=sysAttrs,normalized"
+    //
+    if (forwards > 0)  // Need Normalized and sysattrs if the operation has parts of the entity distributed (to help pick attr instances)
+      apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, orionldState.uriParams.lang, true, &orionldState.pd);
+    else
+      apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, orionldState.uriParams.lang, true, &orionldState.pd);
+  }
+
+  //
+  // Now read responses to the forwarded requests
+  //
+  if (forwards > 0)
+  {
+    CURLMsg* msgP;
+    int      msgsLeft;
+
+    while ((msgP = curl_multi_info_read(orionldState.curlFwdMultiP, &msgsLeft)) != NULL)
+    {
+      if (msgP->msg != CURLMSG_DONE)
+        continue;
+
+      if (msgP->data.result == CURLE_OK)
+      {
+        ForwardPending* fwdPendingP = fwdPendingLookupByCurlHandle(fwdPendingList, msgP->easy_handle);
+
+        LM(("Got a response: %s", fwdPendingP->rawResponse));
+        fwdPendingP->body = kjParse(orionldState.kjsonP, fwdPendingP->rawResponse);
+        if (fwdPendingP->body != NULL)
+        {
+          if (fwdPendingP->regP->acceptJsonld == true)
+          {
+            KjNode* atContextP = kjLookup(fwdPendingP->body, "@context");
+            if (atContextP != NULL)
+              kjChildRemove(fwdPendingP->body, atContextP);
+
+            // Now expand the whole thing using the context        *fwdPendingP->regP->contextP*
+            // And then compact the whole thing using the context  *orionldState.contextP*
+            // Set fwdPendingP->body to the resulting KjNode tree
+          }
+          // Merge in the received body into the local (or nothing)
+          if (apiEntityP == NULL)
+            apiEntityP = fwdPendingP->body;
+          else
+            fwdEntityMerge(apiEntityP, fwdPendingP->body, orionldState.uriParamOptions.sysAttrs, fwdPendingP->regP->mode == RegModeAuxiliary);
+        }
+        else
+          LM_E(("Internal Error (parse error for the received response of a forwarded request)"));
+      }
+      else
+        LM_E(("CURL Error %d awaiting response to forwarded request: %s", msgP->data.result, curl_easy_strerror(msgP->data.result)));
     }
 
-    orionldForwardGetEntity(eId, regArray, orionldState.responseTree, needEntityType, orionldState.in.attrList.array, orionldState.in.attrList.items);
+    kjTreeLog(apiEntityP, "API entity after forwarding");
+  }
+
+  if (forwards > 0)
+  {
+    kjTreeLog(apiEntityP, "API Entity to transform");
+    // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
+    bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
+    char* lang     = orionldState.uriParams.lang;
+
+    if (orionldState.out.format == RF_KEYVALUES)
+      ntosEntity(apiEntityP, lang);
+    else if (orionldState.out.format == RF_CONCISE)
+      ntocEntity(apiEntityP, lang, sysAttrs);
+    else
+      ntonEntity(apiEntityP, lang, sysAttrs);
   }
 
   if (orionldState.out.contentType == GEOJSON)
-    orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.geoPropertyNode);
+  {
+    apiEntityP = kjGeojsonEntityTransform(apiEntityP, orionldState.geoPropertyNode);
+
+    //
+    // If URI params 'attrs' and 'geometryProperty' are given BUT 'geometryProperty' is not part of 'attrs', then we need to remove 'geometryProperty' from
+    // the "properties" object
+    //
+    if ((orionldState.in.attrList.items > 0) && (orionldState.uriParams.geometryProperty != NULL))
+    {
+      bool geometryPropertyInAttrList = false;
+
+      for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
+      {
+        if (strcmp(orionldState.in.geometryPropertyExpanded, orionldState.in.attrList.array[ix]) == 0)
+        {
+          geometryPropertyInAttrList = true;
+          break;
+        }
+      }
+
+      if (geometryPropertyInAttrList == false)
+      {
+        KjNode* propertiesP = kjLookup(apiEntityP, "properties");
+
+        if (propertiesP != NULL)
+        {
+          KjNode* geometryPropertyP = kjLookup(propertiesP, orionldState.in.geometryPropertyExpanded);
+
+          if (geometryPropertyP != NULL)
+            kjChildRemove(propertiesP, geometryPropertyP);
+        }
+      }
+    }
+  }
+
+  //
+  // If a tenant is in use, it must be included in the response
+  //
+  if (orionldState.tenantP != &tenant0)
+    orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
+
+  orionldState.responseTree   = apiEntityP;
+  orionldState.httpStatusCode = 200;
 
   return true;
 }

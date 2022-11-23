@@ -237,7 +237,7 @@ MongoDB server version: REGEX(.*)
 					"modifiedAt" : REGEX(.*)
 				},
 				"https://uri=etsi=org/ngsi-ld/default-context/rr1" : {
-					"object" : "urn:ngsi-ld:Building:R2",
+					"value" : "urn:ngsi-ld:Building:R2",
 					"type" : "Relationship",
 					"createdAt" : REGEX(.*),
 					"modifiedAt" : REGEX(.*)

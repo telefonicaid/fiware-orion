@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
@@ -39,6 +40,6 @@ extern "C"
 //
 // regCacheItemAdd -
 //
-extern RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb);
+extern RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode* regP, bool fromDb, OrionldContext* fwdContextP);
 
 #endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMADD_H_

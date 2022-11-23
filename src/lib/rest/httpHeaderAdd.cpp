@@ -97,7 +97,7 @@ void httpHeaderLinkAdd(const char* _url)
     linkP = (char*) malloc(urlLen + LINK_REL_AND_TYPE_SIZE + 5);
     if (linkP == NULL)
     {
-      LM_E(("Out-of-memory allocating roome for HTTP Link Header"));
+      LM_E(("Out-of-memory allocating room for HTTP Link Header"));
       return;
     }
     freeLinkP = true;

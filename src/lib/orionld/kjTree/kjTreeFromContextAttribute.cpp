@@ -28,7 +28,6 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjBuilder.h"                                   // kjObject, kjString, kjBoolean, ...
-#include "kjson/kjLookup.h"                                    // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
@@ -36,10 +35,13 @@ extern "C"
 
 #include "common/RenderFormat.h"                               // RenderFormat
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
+
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
+#include "orionld/apiModel/langFixNormalized.h"                // langFixNormalized
+#include "orionld/apiModel/langFixSimplified.h"                // langFixSimplified
 #include "orionld/kjTree/kjTreeFromCompoundValue.h"            // kjTreeFromCompoundValue
 #include "orionld/kjTree/kjTreeFromContextAttribute.h"         // Own interface
 
@@ -55,87 +57,6 @@ extern "C"
     *detailsP = (char*) "unable to allocate";  \
     return NULL;                               \
   }
-
-
-
-// -----------------------------------------------------------------------------
-//
-// langFixSimplified -
-//
-static void langFixSimplified(KjNode* languageMapP, const char* lang)
-{
-  KjNode* valueP = kjLookup(languageMapP, lang);
-  if (valueP == NULL)
-    valueP = kjLookup(languageMapP, "@none");
-  if (valueP == NULL)
-    valueP = kjLookup(languageMapP, "en");
-  if (valueP == NULL)
-    valueP = languageMapP->value.firstChildP;
-
-  if (valueP == NULL)
-  {
-    languageMapP->type     = KjString;
-    languageMapP->value.s  = (char*) "empty languageMap";
-  }
-  else if (valueP->type == KjString)
-  {
-    languageMapP->type     = KjString;
-    languageMapP->value.s  = valueP->value.s;
-  }
-  else  // Array
-  {
-    languageMapP->type               = KjArray;
-    languageMapP->value.firstChildP  = valueP->value.firstChildP;
-    languageMapP->lastChild          = valueP->lastChild;
-    valueP->value.firstChildP        = NULL;
-    valueP->lastChild                = NULL;
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// langFixNormalized -
-//
-static void langFixNormalized(KjNode* attrP, KjNode* typeP, KjNode* languageMapP, const char* lang)
-{
-  KjNode* valueP = kjLookup(languageMapP, lang);
-  if (valueP == NULL)
-    valueP = kjLookup(languageMapP, "@none");
-  if (valueP == NULL)
-    valueP = kjLookup(languageMapP, "en");
-  if (valueP == NULL)
-    valueP = languageMapP->value.firstChildP;
-
-  if (valueP == NULL)
-  {
-    languageMapP->type     = KjString;
-    languageMapP->value.s  = (char*) "empty languageMap";
-  }
-  else if (valueP->type == KjString)
-  {
-    languageMapP->type     = KjString;
-    languageMapP->value.s  = valueP->value.s;
-  }
-  else  // Array
-  {
-    languageMapP->type              = KjArray;
-    languageMapP->value.firstChildP = valueP->value.firstChildP;
-    languageMapP->lastChild         = valueP->lastChild;
-    valueP->value.firstChildP       = NULL;
-    valueP->lastChild               = NULL;
-  }
-
-  languageMapP->name = (char*) "value";
-  typeP->value.s     = (char*) "Property";
-
-  if (valueP != NULL)
-  {
-    KjNode* langP = kjString(orionldState.kjsonP, "lang", valueP->name);  // The name of the chosen language
-    kjChildAdd(attrP, langP);
-  }
-}
 
 
 

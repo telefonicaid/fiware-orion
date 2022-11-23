@@ -49,7 +49,7 @@ brokerStart CP6 0 IPv4 -experimental
 # - Redirect  registration R3 of urn:E1/T+P3+P4+P5 (or just T+P3+P4+P5)
 # - Redirect  registration R4 of urn:E1/T+P4+P5+P6
 # - Inclusive registration R5 of urn:E1/T+P7+P8+P9+P10 (not possible to include P1-P6 as they're in exclusive/redirect regs already)
-# - Auxiliary registration R6 of urn:E1/T+P11+P12  (no forward is made for auxiliary registrations)
+# - Auxiliary registration R6 of urn:E1/T+P11+P12+P13  (no forward is made for auxiliary registrations)
 #
 # The entity is distributed like this:
 # - P1 on R1::endpoint
@@ -58,14 +58,14 @@ brokerStart CP6 0 IPv4 -experimental
 # - P4-P6 on R4::endpoint
 # - P7-P10 on R5::endpoint
 # - P7-P12 on local broker
-# - Nothing on R6::endpoint
+# - P13 on R6::endpoint (for the last GET to 'GET something'
 #
 # 01. Exclusive registration R1 of urn:E1/T+P1
 # 02. Exclusive registration R2 of urn:E1/T+P2
 # 03. Redirect registration R3 of urn:E1/T+P3+P4+P5 (or just T+P3+P4+P5)
 # 04. Redirect registration R4 of urn:E1/T+P4+P5+P6
 # 05. Inclusive registration R5 of urn:E1/T+P7+P8+P9+P10
-# 06. Auxiliary registration R6 of urn:E1/T+P11+P12
+# 06. Auxiliary registration R6 of urn:E1/T+P11+P12+P13
 # 07. Create urn:E1/T+P1-P12 on CB - provoke 5 forwarded requests
 # 08. GET urn:E1 in CP1 (R1) - see P1 only
 # 09. GET urn:E1 in CP2 (R2) - see P2 only
@@ -74,7 +74,9 @@ brokerStart CP6 0 IPv4 -experimental
 # 12. GET urn:E1 in CP5 (R5) - see P7-P10
 # 13. GET urn:E1 in CP6 (R6) - see 404 Not Found
 # 14. GET all entities in CB - see E1 with P7-P12
-# 15. Just for fun, GET the individual urn:E1 in CB (remember, this request implements the old PoC of forwarding)
+# 15. Create urn:E1 in CP6 with property P13
+# 16. GET the individual urn:E1 in CB with options=simplified
+# 17. GET the individual urn:E1 in CB with options=concise
 #
 
 echo "01. Exclusive registration R1 of urn:E1/T+P1"
@@ -94,7 +96,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP1_PORT'",
-  "operations": [ "createEntity" ],
+  "operations": [ "createEntity", "retrieveEntity" ],
   "mode": "exclusive"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -119,7 +121,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP2_PORT'",
-  "operations": [ "createEntity" ],
+  "operations": [ "createEntity", "retrieveEntity" ],
   "mode": "exclusive"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -144,7 +146,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP3_PORT'",
-  "operations": [ "createEntity" ],
+  "operations": [ "createEntity", "retrieveEntity" ],
   "mode": "redirect"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -169,7 +171,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP4_PORT'",
-  "operations": [ "createEntity" ],
+  "operations": [ "createEntity", "retrieveEntity" ],
   "mode": "redirect"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -194,15 +196,15 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP5_PORT'",
-  "operations": [ "createEntity" ]
+  "operations": [ "createEntity", "retrieveEntity" ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
 echo
 
 
-echo "06. Auxiliary registration R6 of urn:E1/T+P11+P12"
-echo "================================================="
+echo "06. Auxiliary registration R6 of urn:E1/T+P11+P12+P13"
+echo "====================================================="
 payload='{
   "id": "urn:R6",
   "type": "ContextSourceRegistration",
@@ -214,10 +216,10 @@ payload='{
           "type": "T"
         }
       ],
-      "properties": [ "P11", "P12" ]
+      "properties": [ "P11", "P12", "P13" ]
     }
   ],
-  "endpoint": "http://localhost:'$CP4_PORT'",
+  "endpoint": "http://localhost:'$CP6_PORT'",
   "mode": "auxiliary"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -297,8 +299,27 @@ echo
 echo
 
 
-echo "15. Just for fun, GET the individual urn:E1 in CB (remember, this request implements the old PoC of forwarding)"
-echo "==============================================================================================================="
+echo "15. Create urn:E1 in CP6 with property P13"
+echo "=========================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P13": "On CP6"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP6_PORT
+echo
+echo
+
+
+echo "16. GET the individual urn:E1 in CB with options=simplified"
+echo "==========================================================="
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=simplified"
+echo
+echo
+
+
+echo "17. GET the individual urn:E1 in CB with options=concise"
+echo "========================================================"
 orionCurl --url "/ngsi-ld/v1/entities/urn:E1?options=concise"
 echo
 echo
@@ -350,8 +371,8 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R5
 
 
 
-06. Auxiliary registration R6 of urn:E1/T+P11+P12
-=================================================
+06. Auxiliary registration R6 of urn:E1/T+P11+P12+P13
+=====================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -486,57 +507,64 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 ]
 
 
-15. Just for fun, GET the individual urn:E1 in CB (remember, this request implements the old PoC of forwarding)
-===============================================================================================================
+15. Create urn:E1 in CP6 with property P13
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+16. GET the individual urn:E1 in CB with options=simplified
+===========================================================
 HTTP/1.1 200 OK
-Content-Length: 674
+Content-Length: 242
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "P1": {
-        "type": "Property",
-        "value": "For CP1"
-    },
-    "P10": {
-        "type": "Property",
-        "value": "For CP5+CB"
-    },
+    "P1": "For CP1",
+    "P10": "For CP5+CB",
     "P11": "For CB",
     "P12": "For CB",
-    "P2": {
-        "type": "Property",
-        "value": "For CP2"
-    },
-    "P3": {
-        "type": "Property",
-        "value": "For CP3"
-    },
-    "P4": {
-        "type": "Property",
-        "value": "For CP3+CP4"
-    },
-    "P5": {
-        "type": "Property",
-        "value": "For CP3+CP4"
-    },
-    "P6": {
-        "type": "Property",
-        "value": "For CP4"
-    },
-    "P7": {
-        "type": "Property",
-        "value": "For CP5+CB"
-    },
-    "P8": {
-        "type": "Property",
-        "value": "For CP5+CB"
-    },
-    "P9": {
-        "type": "Property",
-        "value": "For CP5+CB"
-    },
+    "P13": "On CP6",
+    "P2": "For CP2",
+    "P3": "For CP3",
+    "P4": "For CP3+CP4",
+    "P5": "For CP3+CP4",
+    "P6": "For CP4",
+    "P7": "For CP5+CB",
+    "P8": "For CP5+CB",
+    "P9": "For CP5+CB",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+17. GET the individual urn:E1 in CB with options=concise
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 242
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "For CP1",
+    "P10": "For CP5+CB",
+    "P11": "For CB",
+    "P12": "For CB",
+    "P13": "On CP6",
+    "P2": "For CP2",
+    "P3": "For CP3",
+    "P4": "For CP3+CP4",
+    "P5": "For CP3+CP4",
+    "P6": "For CP4",
+    "P7": "For CP5+CB",
+    "P8": "For CP5+CB",
+    "P9": "For CP5+CB",
     "id": "urn:E1",
     "type": "T"
 }
@@ -550,7 +578,7 @@ brokerStop CP3
 brokerStop CP4
 brokerStop CP5
 brokerStop CP6
-#dbDrop CB
+dbDrop CB
 dbDrop CP1
 dbDrop CP2
 dbDrop CP3

@@ -31,12 +31,24 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/StringArray.h"                           // StringArray
+
 
 
 // -----------------------------------------------------------------------------
 //
 // mongocEntityLookup -
 //
-extern KjNode* mongocEntityLookup(const char* entityId);
+// This function, that seems quite similar to mongocEntityRetrieve, is used by:
+//   * orionldPutEntity    - Uses creDate + attrs to make sure no attr types are modified
+//   * orionldPatchEntity  - Like PUT but also using entity type, entire attributes, etc.
+//   * orionldPostEntities - Only to make sure the entity does not already exists (mongocEntityExists should be implemented and used instead)
+//   * orionldPostEntity   - The entire DB Entity is needed as it is later used as base for the "merge" with the payload body
+//
+// So, this function is QUITE NEEDED, just as it is.
+// The other one, mongocEntityRetrieve, does much more than just DB. It should be REMOVED.
+// mongocEntityRetrieve is only used by legacyGetEntity() which is being deprecated anyway.
+//
+extern KjNode* mongocEntityLookup(const char* entityId, StringArray* attrsV, const char* geojsonGeometry);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYLOOKUP_H_

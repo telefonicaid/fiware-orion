@@ -43,15 +43,6 @@ extern "C"
 //
 bool regMatchOperation(RegCacheItem* regP, FwdOperation op)
 {
-  KjNode* operations = kjLookup(regP->regTree, "operations");
-
-  if (operations == NULL)
-  {
-    LM_W(("Registration without operations - that can't be"));
-    kjTreeLog(regP->regTree, "Registration in reg-cache");
-    return false;
-  }
-
   uint64_t opShifted = (1L << op);
   return ((regP->opMask & opShifted) == opShifted);
 }

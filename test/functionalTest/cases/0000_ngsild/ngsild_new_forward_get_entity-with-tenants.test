@@ -1,0 +1,249 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieve a distributed entity on tenant t1
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t1
+dbInit CP1
+dbInit CP1 t1
+dbInit CP2
+dbInit CP2 t1
+brokerStart CB  0 IPv4 -experimental -multiservice -forwarding
+brokerStart CP1 0 IPv4 -experimental -multiservice
+brokerStart CP2 0 IPv4 -experimental -multiservice
+
+--SHELL--
+#
+# 01. Create E1:P1 on CP1, tenant t1
+# 02. Create E1:R1 on CP2, tenant t1
+# 03. Register E1:P1 for CP1 on CB, tenant t1
+# 04. Register E1:R1 for CP2 on CB, tenant t1
+# 05. GET E1 on CB, tenant t1 - see E1:P1+R1
+# 06. GET E1 on CB, tenant t1, with local=true set - 404
+# 07. GET E1 on CB, default tenant - 404
+# 08. Register E1:P1 for CP1 on CB, default tenant, but with tenant==t1 in the registration
+# 09. Register E1:R1 for CP2 on CB, default tenant, but with tenant==t1 in the registration
+# 10. GET E1 on CB, default tenant - see E1:P1+R1
+#
+
+echo "01. Create E1:P1 on CP1, tenant t1"
+echo "=================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP1"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT --tenant t1
+echo
+echo
+
+
+echo "02. Create E1:R1 on CP2, tenant t1"
+echo "=================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "R1": { "object": "urn:CP2:R1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT --tenant t1
+echo
+echo
+
+
+echo "03. Register E1:P1 for CP1 on CB, tenant t1"
+echo "==========================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "04. Register E1:R1 for CP2 on CB, tenant t1"
+echo "==========================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "relationshipNames": [ "R1" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --tenant t1
+echo
+echo
+
+
+echo "05. GET E1 on CB, tenant t1 - see E1:P1+R1"
+echo "=========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --tenant T1
+echo
+echo
+
+
+echo "06. GET E1 on CB, tenant t1, with local=true set - 404"
+echo "======================================================"
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?local=true' --tenant T1
+echo
+echo
+
+
+echo "07. GET E1 on CB, default tenant - 404"
+echo "======================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1:P1 on CP1, tenant t1
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+NGSILD-Tenant: t1
+
+
+
+02. Create E1:R1 on CP2, tenant t1
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+NGSILD-Tenant: t1
+
+
+
+03. Register E1:P1 for CP1 on CB, tenant t1
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+NGSILD-Tenant: t1
+
+
+
+04. Register E1:R1 for CP2 on CB, tenant t1
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+NGSILD-Tenant: t1
+
+
+
+05. GET E1 on CB, tenant t1 - see E1:P1+R1
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Tenant: t1
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "P1 in CP1"
+    },
+    "R1": {
+        "object": "urn:CP2:R1",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+06. GET E1 on CB, tenant t1, with local=true set - 404
+======================================================
+HTTP/1.1 404 Not Found
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+07. GET E1 on CB, default tenant - 404
+======================================
+HTTP/1.1 404 Not Found
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CB t1
+dbDrop CP1
+dbDrop CP1 t1
+dbDrop CP2
+dbDrop CP2 t1
+

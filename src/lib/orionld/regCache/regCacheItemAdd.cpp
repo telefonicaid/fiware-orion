@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
 #include "orionld/regCache/regCacheIdPatternRegexCompile.h"      // regCacheIdPatternRegexCompile
 #include "orionld/forwarding/FwdOperation.h"                     // fwdOperationMask
@@ -100,9 +101,9 @@ static void regStringAdd(KjNode* regP, const char* name, const char* value)
 //
 // regCacheItemAdd -
 //
-RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
+RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode* regP, bool fromDb, OrionldContext* fwdContextP)
 {
-  RegCacheItem* rciP   = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
+  RegCacheItem* rciP = (RegCacheItem*) calloc(1, sizeof(RegCacheItem));
 
   //
   // Insert the new RegCacheItem LAST in rcP's linked list of registrations
@@ -115,7 +116,10 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, KjNode* regP, bool fromDb)
 
   rcP->last = rciP;
 
-  rciP->regTree = kjClone(NULL, regP);
+  rciP->regId     = strdup(registrationId);
+  rciP->regTree   = kjClone(NULL, regP);
+  rciP->contextP  = fwdContextP;
+  rciP->next      = NULL;
 
   // Counters and timestamps - create if they don't exist
   if (fromDb == false)

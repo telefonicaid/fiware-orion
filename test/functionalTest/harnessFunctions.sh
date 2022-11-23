@@ -1194,6 +1194,7 @@ function dbInsertEntity()
 #   --linkHeaderFix                (replace hostname and port in Link HTTP header with "IP:PORT")
 #   --header      <HTTP header>    (more headers)
 #   -H            <HTTP header>    (more headers)
+#   -Link         <@context url>   (The URL to the @context)
 #   --verbose                      (verbose output)
 #   -v                             (verbose output)
 #   --debug                        (debug mode - output to /tmp/orionFuncTestDebug.log)
@@ -1229,6 +1230,7 @@ function orionCurl()
   _xauthToken=''
   _payloadCheck=''
   _linkHeaderFix=''
+  _Link=''
 
   #
   # Parsing parameters
@@ -1249,6 +1251,7 @@ function orionCurl()
     elif [ "$1" == "--correlator" ]; then      _correlator='--header "Fiware-Correlator: '${2}'"'; shift;
     elif [ "$1" == "-H" ]; then                _headers=${_headers}" --header \"$2\""; shift;
     elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header \"$2\""; shift;
+    elif [ "$1" == "-Link" ]; then             _Link="$2"; shift;
     elif [ "$1" == "--in" ]; then              _in="$2"; shift;
     elif [ "$1" == "--out" ]; then             _out="$2"; shift;
     elif [ "$1" == "--xauthToken" ]; then      _xauthToken='--header "X-Auth-Token: '${2}'"'; shift;
@@ -1338,12 +1341,19 @@ function orionCurl()
     _noPayloadCheck='on'
   fi
 
+  if [ "$_Link" != "" ]
+  then
+    _Link="--header 'Link: <"$_Link'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'"'"
+    _inFormat='--header "Content-Type: application/json"'
+  fi
+
   logMsg $_in: $_in
   logMsg _out: $_out
   logMsg _outFormat: $_outFormat
   logMsg _inFormat: $_inFormat
   logMsg payloadCheckFormat: $payloadCheckFormat
   logMsg _noPayloadCheck: $_noPayloadCheck
+  logMsg _Link: $_Link
 
 
   #
@@ -1356,6 +1366,7 @@ function orionCurl()
   if [ "$_method"      != "" ]; then  command=${command}' '${_method};      fi
   if [ "$_tenant"      != "" ]; then  command=${command}' '${_tenant};      fi
   if [ "$_servicePath" != "" ]; then  command=${command}' '${_servicePath}; fi
+  if [ "$_Link"        != "" ]; then  command=${command}' '${_Link};        fi
   if [ "$_inFormat"    != "" ]; then  command=${command}' '${_inFormat};    fi
   if [ "$_outFormat"   != "" ]; then  command=${command}' '${_outFormat};   fi
   if [ "$_origin"      != "" ]; then  command=${command}' '${_origin};      fi

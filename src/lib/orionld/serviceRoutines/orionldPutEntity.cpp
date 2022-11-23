@@ -37,6 +37,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityReplace.h"                  // mongocEntityReplace
+#include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
@@ -81,7 +82,7 @@ static bool entityIdCheck(KjNode* idP, const char* entityIdFromUrl)
 // NOTE
 //   This function destroys the old DB Entity tree
 //
-static KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, const char* entityId)
+KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, const char* entityId)
 {
   KjNode* dbEntityP   = kjObject(orionldState.kjsonP, NULL);
   KjNode* attrNamesP  = kjArray(orionldState.kjsonP,  "attrNames");
@@ -149,7 +150,7 @@ static KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, con
       // items from the list inside the loop
       //
       saP      = subAttrP;   // saP is used inside this loop
-      subAttrP = saP->next;  // this is just the "loop incrementor
+      subAttrP = saP->next;  // this is just the "loop incrementor"
 
       if (strcmp(saP->name, "type")        == 0) continue;
       if (strcmp(saP->name, "value")       == 0) continue;
@@ -194,6 +195,15 @@ static KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, con
       else
       {
         dotForEq(saP->name);
+
+        for (KjNode* subAttrFieldP = saP->value.firstChildP; subAttrFieldP != NULL; subAttrFieldP = subAttrFieldP->next)
+        {
+          if (strcmp(subAttrFieldP->name, "type")        == 0) continue;
+          if (strcmp(subAttrFieldP->name, "value")       == 0) continue;
+          if (strcmp(subAttrFieldP->name, "object")      == 0) { subAttrFieldP->name = (char*) "value"; continue; }
+          if (strcmp(subAttrFieldP->name, "languageMap") == 0) { subAttrFieldP->name = (char*) "value"; continue; }
+        }
+
         creDateP = kjFloat(orionldState.kjsonP,  "createdAt",  orionldState.requestTime);
         modDateP = kjFloat(orionldState.kjsonP,  "modifiedAt", orionldState.requestTime);
         kjChildAdd(saP, creDateP);
@@ -258,14 +268,16 @@ bool orionldPutEntity(void)
   //
   // Check Entity Type
   //
-  KjNode* typeNodeP = kjLookup(orionldState.requestTree, "type");
-  if (pCheckEntityType(typeNodeP, true, NULL) == false)
+  char*   entityType = NULL;  // Set by pCheckEntityType
+  KjNode* typeNodeP  = kjLookup(orionldState.requestTree, "type");
+
+  if (pCheckEntityType(typeNodeP, true, &entityType) == false)
     return false;
 
   //
   // Get the entity from the database
   //
-  KjNode* oldDbEntityP = mongocEntityLookup(entityId);
+  KjNode* oldDbEntityP = mongocEntityLookup(entityId, NULL, NULL);
   if (oldDbEntityP == NULL)
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
@@ -282,6 +294,8 @@ bool orionldPutEntity(void)
   //
   // Create the new DB Entity, based mainly on orionldState.requestTree
   // From oldDbEntityP (old db content) we just keep the creDate of the entity
+  //
+  // FIXME: Use dbModelFromApiEntity instead of apiEntityToDbEntity
   //
   KjNode* dbEntityP = apiEntityToDbEntity(orionldState.requestTree, oldDbEntityP, entityId);
 

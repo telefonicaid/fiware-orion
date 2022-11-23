@@ -83,21 +83,27 @@ bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* ent
 {
   KjNode* idP         = kjLookup(entityInfoP, "id");
   KjNode* idPatternP  = kjLookup(entityInfoP, "idPattern");
-  KjNode* typeP       = kjLookup(entityInfoP, "type");
 
   //
-  // "type" is mandatory for all 'entityInfo'
+  // "id" is mandatory for 'exclusive' registrations
+  // "type" is mandatory for all 'entityInfo' BUT, when matching
+  // for GET /entities or /entities/{entityId} then there may be no entityType to compare with
   //
-  if (typeP == NULL)
+  if (entityType != NULL)
   {
-    LM(("RM: No match due to invalid registration (no type in EntityInfo)"));
-    return false;
-  }
+    KjNode* typeP = kjLookup(entityInfoP, "type");
 
-  if (strcmp(typeP->value.s, entityType) != 0)
-  {
-    LM(("RM: No match due to entity type ('%s' in reg, '%s' in entity creation)", typeP->value.s, entityType));
-    return false;
+    if (typeP == NULL)
+    {
+      LM(("RM: No match due to invalid registration (no type in EntityInfo)"));
+      return false;
+    }
+
+    if (strcmp(typeP->value.s, entityType) != 0)
+    {
+      LM(("RM: No match due to entity type ('%s' in reg, '%s' in entity creation)", typeP->value.s, entityType));
+      return false;
+    }
   }
 
   if (idP != NULL)
