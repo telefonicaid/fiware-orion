@@ -390,6 +390,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
   paramsV = new std::vector<SenderThreadParams*>;
 
+  // FIXME PR: reindent
   //for (unsigned ix = 0; ix < cv.size(); ix++)
   //{
     std::string                         method;
