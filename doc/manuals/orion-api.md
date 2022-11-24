@@ -68,11 +68,13 @@
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
       - [Macro substitution](#macro-substitution)
-      - [JSON payloads](#json-payloads)
-      - [Omitting payload](#omitting-payload)
+      - [Headers special treatment](#headers-special-treatment)
       - [Remove headers](#remove-headers)
+      - [Text based payload](#text-based-payload)
+      - [JSON payloads](#json-payloads)
+      - [NGSI payload patching](#ngsi-payload-patching)
+      - [Omitting payload](#omitting-payload)
       - [Additional considerations](#additional-considerations)
-      - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
     - [Covered Subscriptions](#covered-subscriptions)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
@@ -2056,14 +2058,14 @@ In case of `httpCustom`:
   `Ngsiv2-AttrsFormat` headers cannot be overwritten in custom notifications. Any attempt of
   doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.
 * `qs` (both parameter name and value can be templatized)
-* `payload`
+* `payload`, `json` and `ngsi` (all them payload related fields)
 * `method`, lets the clients select the HTTP method to be used for delivering
 the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
 HEAD, OPTIONS, TRACE, and CONNECT.
 
 In case of `mqttCustom`:
 
-* `payload`
+* `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
 
 Macro substitution for templates is based on the syntax `${..}`. In particular:
@@ -2082,7 +2084,7 @@ Macro substitution for templates is based on the syntax `${..}`. In particular:
   then its JSON representation as string is used.
 
 In the rare case an attribute was named in the same way of the `${service}`, `${servicePath}` or
-`${authToken}`  (e.g. an attribute which name is `service`) then the attribute value takes precedence.
+`${authToken}` (e.g. an attribute which name is `service`) then the attribute value takes precedence.
 
 Example:
 
@@ -2098,7 +2100,10 @@ Let's consider the following `notification.httpCustom` object in a given subscri
   "qs": {
     "type": "${type}"
   },
-  "payload": "The temperature is ${temperature} degrees"
+  "json": {
+    "t": "${temperature}",
+    "unit": "degress"
+  }
 }
 ```
 
@@ -2109,55 +2114,53 @@ The resulting notification after applying the template would be:
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
-Content-Type: text/plain
-Content-Length: 31
+Content-Type: application/json
+Content-Length: ...
 
-The temperature is 23.4 degrees
-```
-
-### JSON payloads
-
-As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
-used to generate JSON-based payloads. For instance:
-
-```
-"httpCustom": {
-   ...
-   "json": {
-     "t": "${temperature}",
-     "h": [ "${humidityMin}", "${humidityMax}" ],
-     "v": 4
-   }
+{
+  "t": 23.4,
+  "unit": "degress"
 }
 ```
 
-Some notes to take into account when using `json` instead of `payload`:
+### Headers special treatment
 
-* The value of the `json` field must be an array or object. Although a simple string or number is
-  also a valid JSON, these cases are not supported.
-* The macro replacement logic works the same way than in `payload` case, with the following
-  considerations:
-  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
-  * The value of the JSON object or JSON array item in which the macro is used has to match
-    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
-    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
-    will not work
-  * It takes into account the nature of the attribute value to be replaced. For instance,
-    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
-    `"t": "10"` if `temperature` attribute is a string.
-  * If the attribute doesn't exist in the entity, then `null` value is used
-* URL automatic decoding applied to `payload` and `headers` fields (described
-  [custom payload and headers special treatment](#custom-payload-and-headers-special-treatment))
-  is not applied to `json` field.
-* `payload` and `json` cannot be used at the same time
-* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.headers`
+field in the API operations, such as `POST /v2/subscription` or `GET /v2/subscriptions`.
 
-### Omitting payload
+However, at notification time, any URL encoded characters in `httpCustom.headers` is decoded.
 
-If `payload` is set to `null`, then the notifications associated to that subscription will not
-include any payload (i.e. content-length 0 notifications). Note this is not the same than using
-`payload` set to `""` or omitting the field. In that case, the notification will be sent using
-the NGSIv2 normalized format.
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}",
+    "t": "${temperature}"
+  },
+  "payload": null
+}
+```
+
+Note that `"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
+
+Now, let's consider that Orion triggers a notification associated to this subscription.
+Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
+`temperature` with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room&t=23.4
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json
+Content-Length: 0
+```
 
 ### Remove headers
 
@@ -2180,34 +2183,15 @@ For instance:
 * To cut the propagation of headers (from updates to notifications), such the
   aforementioned `x-auth-token`
 
-### Additional considerations
+### Text based payload
 
-Some considerations to take into account when using custom notifications:
+If `payload` is used in `httpCustom` or `mqttCustom` the following considerations apply.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
 
-* It is the client's responsibility to ensure that after substitution, the notification is a
-  correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
-  correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
-  template is malformed, then no notification is sent.
-* Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-  custom notifications. This is described in detail in
-  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
-* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
-  [CLI parameter](admin/cli.md). In this case:
-  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
-  * No `${...}` macro substitution is performed.
-
-Note that if a custom payload is used for the notification (the field `payload` is given in the
-corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
-in the notification.
-
-### Custom payload and headers special treatment
-
-[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in the API operations, such as
-`POST /v2/subscription` or `GET /v2/subscriptions`. The same restrictions apply to the header values
-in `httpCustom.headers`.
-
-However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
-of `httpCustom.headers` are decoded.
+* [General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload`
+  field in the API operations, such as `POST /v2/subscription` or `GET /v2/subscriptions`. An example
+  is shown below.
+* `Content-Type` header is set to `text/plain`, except if overwritten by `headers` field
 
 Example:
 
@@ -2216,10 +2200,6 @@ Let's consider the following `notification.httpCustom` object in a given subscri
 ```
 "httpCustom": {
   "url": "http://foo.com/entity/${id}",
-  "headers": {
-    "Content-Type": "text/plain",
-    "Authorization": "Basic ABC...ABC%3D%3D"
-  },
   "method": "PUT",
   "qs": {
     "type": "${type}"
@@ -2229,8 +2209,7 @@ Let's consider the following `notification.httpCustom` object in a given subscri
 ```
 
 Note that the above payload value is the URL encoded version of this string:
-`the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
-`"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
+`the value of the "temperature" attribute (of type Number) is ${temperature}`.
 
 Now, let's consider that Orion triggers a notification associated to this subscription.
 Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
@@ -2238,12 +2217,123 @@ Notification data is for entity with id `DC_S1-D41` and type `Room`, including a
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
-Authorization: "Basic ABC...ABC=="
-Content-Type: application/json
+Content-Type: text/plain
 Content-Length: 65
 
 the value of the "temperature" attribute (of type Number) is 23.4
 ```
+
+### JSON payloads
+
+If `json` is used in `httpCustom` or `mqttCustom` the following considerations apply.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
+
+The `json` field can be used to generate arbitrary JSON-based payloads. For instance:
+
+```
+"httpCustom": {
+   ...
+   "json": {
+     "t": "${temperature}",
+     "h": [ "${humidityMin}", "${humidityMax}" ],
+     "v": 4
+   }
+}
+```
+
+Some notes to take into account when using `json`:
+
+* The value of the `json` field must be an array or object. Although a simple string or number is
+  also a valid JSON, these cases are not supported.
+* The [macro replacement logic](#macro-substitution) works as expected, with the following
+  considerations:
+  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
+  * The value of the JSON object or JSON array item in which the macro is used has to match
+    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
+    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
+    will not work
+  * It takes into account the nature of the attribute value to be replaced. For instance,
+    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
+    `"t": "10"` if `temperature` attribute is a string.
+  * If the attribute doesn't exist in the entity, then `null` value is used
+* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+
+### NGSI payload patching
+
+If `ngsi` is used in `httpCustom` or `mqttCustom` the following considerations apply.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
+
+The `ngsi` field can be used to specify a entity fragment that will *patch* the one corresponding
+to the notification. This allows to add new attributes and/or change the value of existing
+attributes, id and type. For instance:
+
+```
+"httpCustom": {
+   ...
+   "ngsi": {
+     "id": "prefix:${id}",
+     "type": "newType",
+     "originalService": {
+       "value": "${service}",
+       "type": "Text"
+     },
+     "originalServicePath": {
+       "value": "${servicePath}",
+       "type": "Text"
+     }
+   }
+}
+```
+
+Some notes to take into account when using `ngsi`:
+
+* The value of the `ngsi` field must be a valid [JSON Entity Representation](#json-entity-representation),
+  with some extra considerations:
+  * `id` or `type` are not mandatory
+  * If attribute `type` is not specified, the defaults described in [Partial Representations](#partial-representations)
+    are used.
+  * Attribute `metadata` is not allowed
+  * `{}` is a valid value for `ngsi` in which case no patching is done and the origina NGSIv2 notification
+    is sent as is
+* If `notification.attrs` is used, the attribute filtering is done *after* applyig the NGSI patching
+* The patching semantics applied is the same than used in append (i.e. add what doesn't
+  exists change what exists) but other semantics could be added in the future.
+* The [macro replacement logic](#macro-substitution) works as expected, with the following
+  considerations:
+  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
+  * If the macro *covers completely the string where is used*, then the JSON nature of the attribute value
+    is taken into account. For instance, `"value": "${temperature}"` resolves to `"value": 10`
+    if temperature attribute is a number or to `"value": "10"` if `temperature` attribute is a string.
+  * If the macro *is only part of string where is used*, then the attributue value is always casted
+    to string. For instance, `"value": "Temperature is: ${temperature}"` resolves to 
+    `"value": "Temperature is 10"` even if temperature attribute is a number. Note that if the
+    attribute value is a JSON array or objet, it is stringfied in this case.
+  * If the attribute doesn't exist in the entity, then `null` value is used
+* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+
+### Omitting payload
+
+If `payload` is set to `null`, then the notifications associated to that subscription will not
+include any payload (i.e. content-length 0 notifications). Note this is not the same than using
+`payload` set to `""` or omitting the field. In that case, the notification will be sent using
+the NGSIv2 normalized format.
+
+### Additional considerations
+
+Some considerations to take into account when using custom notifications:
+
+* It is the client's responsibility to ensure that after substitution, the notification is a
+  correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
+  correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
+  template is malformed, then no notification is sent.
+* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
+  [CLI parameter](admin/cli.md). In this case:
+  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
+  * No `${...}` macro substitution is performed.
+
+Note that if a custom payload is used for the notification (the field `payload`, `json` or `ngsi`
+is given in the corresponding subscription), then a value of `custom`
+is used for the `Ngsiv2-AttrsFormat` header in the notification.
 
 ## Oneshot Subscriptions
 

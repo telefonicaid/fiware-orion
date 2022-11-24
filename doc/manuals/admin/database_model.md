@@ -324,6 +324,10 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
     the field is omitted, then the NGSIv2 normalized format is used.
 -   **json**: optional field to store a JSON object or array to generated JSON-based payload for
     notification customization functionality in the Orion API. More detail of this functionality [here](../orion-api.md#json-payloads)
+-   **ngsi**: optional field to store a NGSI patching object for notification customization functionality
+    in the Orion API. More detail of this functionality [here](../orion-api.md#ngsi-payload-patching).
+    The value of this field is an object with a `attrs` key which value is a simplified version of
+    `attrs` in [the entities collection](#entities-collection).
 -   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.
