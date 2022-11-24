@@ -226,6 +226,7 @@ typedef struct OrionldStateOut
 typedef struct OrionldStateIn
 {
   // Incoming HTTP headers
+  KjNode*   httpHeaders;         // Object holding all incoming headers - used for forwarding and "urn:ngsi-ld:request"
   MimeType  contentType;
   char*     contentTypeString;
   int       contentLength;
