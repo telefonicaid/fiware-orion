@@ -40,7 +40,7 @@
 *
 * TriggeredSubscription -
 *
-* This class is thought to store the information about an ONCHANGE subscription
+* This class is thought to store the information about a subscription
 * triggered by an updateContext in order to notify, avoding a double-query on
 * the csbubs collection. Note that adding all the BSON object retrieved from the
 * csubs collection is not efficient, so we use only the needed fields-

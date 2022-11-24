@@ -566,7 +566,7 @@ static bool mergeAttrInfo
 * Returns true if an attribute was found, false otherwise. If true,
 * the "actualUpdate" argument (passed by reference) is set to true in the case that the
 * original value of the attribute was different than the one used in the update (this is
-* important for ONCHANGE notifications)
+* important for notifications)
 *
 * The isReplace boolean specifies how toSet has to be filled, either:
 *
@@ -672,7 +672,7 @@ static bool updateAttribute
 * The "actualUpdate" argument (passed by reference) is set to true 1) in the case
 * of actual append that, or 2) in the case of append as update if the
 * original value of the attribute was different than the one used in the update (this is
-* important for ONCHANGE notifications). Otherwise it is false
+* important for notifications). Otherwise it is false
 *
 * In addition, return value is as follows:
 * - true: there was an actual append change
@@ -2609,7 +2609,7 @@ static bool processContextAttributeVector
     }
 
     /* Add the attribute to the list of modifiedAttrs, in order to check at the end if it triggers some
-     * ONCHANGE subscription. Note that actualUpdate is always true in the case of  "delete" or "append",
+     * subscription. Note that actualUpdate is always true in the case of  "delete" or "append",
      * so the if statement is "bypassed" */
     if (actualUpdate)
     {
