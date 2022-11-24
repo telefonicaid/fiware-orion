@@ -458,7 +458,7 @@ static std::string parseCustomPayload
 
   if (n > 1)
   {
-    return badInput(ciP, "no more than one payload, json or ngsi field at the same time in httpCustom or mqttCustom");
+    return badInput(ciP, "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom");
   }
 
   if (holder.HasMember("payload"))

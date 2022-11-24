@@ -2304,6 +2304,7 @@ Some notes to take into account when using `ngsi`:
 * The [macro replacement logic](#macro-substitution) works as expected, with the following
   considerations:
   * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
+  * It cannot be used in the attribute `type`. Only in the `value` macro replacements can be done.
   * If the macro *covers completely the string where is used*, then the JSON nature of the attribute value
     is taken into account. For instance, `"value": "${temperature}"` resolves to `"value": 10`
     if temperature attribute is a number or to `"value": "10"` if `temperature` attribute is a string.
