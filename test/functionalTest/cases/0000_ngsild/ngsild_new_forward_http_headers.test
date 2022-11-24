@@ -1,0 +1,224 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+HTTP header test for forwarded requests - the accumulator is used as it can easily be dumped
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -forwarding
+accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_PORT} 
+
+--SHELL--
+#
+# 01. Create a registration (exclusive) for the accumulator, with all types of hjeaders inside Regostration::contextSourceInfo
+# 02. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
+# 03. Dump the accumulator to see all the HTTP headers of the forwarded request
+# 04. PATCH the registration setting the contextSourceInfo with invalid values, see what happens in the forwarded request later
+# 05. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
+# 06. Dump the accumulator to see all the HTTP headers of the forwarded request
+#
+
+echo "01. Create a registration (exclusive) for the accumulator, with all types of hjeaders inside Regostration::contextSourceInfo"
+echo "============================================================================================================================"
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "contextSourceInfo": [
+    {
+      "key": "H1",
+      "value": "h1"
+    },
+    {
+      "key": "FwdHeader",
+      "value": "urn:ngsi-ld:request"
+    },
+    {
+      "key": "NotIncluded",
+      "value": "urn:ngsi-ld:request"
+    }
+  ],
+  "endpoint": "http://localhost:'$LISTENER_PORT'",
+  "operations": [ "createEntity" ],
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Send a request to create an Entity in the CB - will be forwarded to the accumulator"
+echo "======================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "FwdHeader: xyz"
+echo
+echo
+
+
+echo "03. Dump the accumulator to see all the HTTP headers of the forwarded request"
+echo "============================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. PATCH the registration setting the contextSourceInfo with invalid values, see what happens in the forwarded request later"
+echo "============================================================================================================================="
+payload='{
+  "contextSourceInfo": [
+    {
+      "key": "Content-Length",
+      "value": "12"
+    },
+    {
+      "key": "Accept",
+      "value": "application/ld+json"
+    },
+    {
+      "key": "User-Agent",
+      "value": "user-agent"
+    },
+    {
+      "key": "Content-Type",
+      "value": "plain/text"
+    },
+    {
+      "key": "H1",
+      "value": "Step 04"
+    }
+    
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)"
+echo "================================================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "FwdHeader: xyz"
+echo
+echo
+
+
+echo "06. Dump the accumulator to see all the HTTP headers of the forwarded request"
+echo "============================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration (exclusive) for the accumulator, with all types of hjeaders inside Regostration::contextSourceInfo
+============================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Send a request to create an Entity in the CB - will be forwarded to the accumulator
+=======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Dump the accumulator to see all the HTTP headers of the forwarded request
+=============================================================================
+POST http://REGEX(.*)/ngsi-ld/v1/entities
+Content-Length: 141
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Date: REGEX(.*)
+H1: h1
+Fwdheader: xyz
+
+{
+    "id": "urn:E1",
+    "type": "https://uri.etsi.org/ngsi-ld/default-context/T"
+}
+=======================================
+
+
+04. PATCH the registration setting the contextSourceInfo with invalid values, see what happens in the forwarded request later
+=============================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
+=================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. Dump the accumulator to see all the HTTP headers of the forwarded request
+=============================================================================
+POST http://REGEX(.*)/ngsi-ld/v1/entities
+Content-Length: 141
+User-Agent: user-agent,orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/ld+json
+Content-Type: application/json
+Date: REGEX(.*)
+H1: Step 04
+
+{
+    "id": "urn:E1",
+    "type": "https://uri.etsi.org/ngsi-ld/default-context/T"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
