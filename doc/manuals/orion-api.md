@@ -2263,9 +2263,12 @@ Some notes to take into account when using `json`:
 If `ngsi` is used in `httpCustom` or `mqttCustom` the following considerations apply.
 Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
 
-The `ngsi` field can be used to specify a entity fragment that will *patch* the one corresponding
-to the notification. This allows to add new attributes and/or change the value of existing
-attributes, id and type. For instance:
+The `ngsi` field can be used to specify an entity fragment that will *patch* the entity in
+the notification. This allows to add new attributes and/or change the value of
+existing attributes, id and type. The resulting notification uses NGSIv2 normalized format described
+in [Notification Messages](#notification-messages).
+
+For instance:
 
 ```
 "httpCustom": {
@@ -2293,11 +2296,11 @@ Some notes to take into account when using `ngsi`:
   * If attribute `type` is not specified, the defaults described in [Partial Representations](#partial-representations)
     are used.
   * Attribute `metadata` is not allowed
-  * `{}` is a valid value for `ngsi` in which case no patching is done and the origina NGSIv2 notification
-    is sent as is
+  * `{}` is a valid value for the `ngsi` field, in which case no patching is done and the original
+    notification is sent
 * If `notification.attrs` is used, the attribute filtering is done *after* applyig the NGSI patching
-* The patching semantics applied is the same than used in append (i.e. add what doesn't
-  exists change what exists) but other semantics could be added in the future.
+* The patching semantic applied is *update or append* (similar to `append` `actionType` in updates) but other
+  semantics could be added in the future.
 * The [macro replacement logic](#macro-substitution) works as expected, with the following
   considerations:
   * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
@@ -2307,7 +2310,7 @@ Some notes to take into account when using `ngsi`:
   * If the macro *is only part of string where is used*, then the attributue value is always casted
     to string. For instance, `"value": "Temperature is: ${temperature}"` resolves to 
     `"value": "Temperature is 10"` even if temperature attribute is a number. Note that if the
-    attribute value is a JSON array or objet, it is stringfied in this case.
+    attribute value is a JSON array or object, it is stringfied in this case.
   * If the attribute doesn't exist in the entity, then `null` value is used
 * `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
 
@@ -2316,7 +2319,7 @@ Some notes to take into account when using `ngsi`:
 If `payload` is set to `null`, then the notifications associated to that subscription will not
 include any payload (i.e. content-length 0 notifications). Note this is not the same than using
 `payload` set to `""` or omitting the field. In that case, the notification will be sent using
-the NGSIv2 normalized format.
+the NGSIv2 normalized format described in [Notification Messages](#notification-messages).
 
 ### Additional considerations
 
@@ -3730,11 +3733,12 @@ A `httpCustom` object contains the following subfields.
 | `headers` | ✓        | object | A key-map of HTTP headers that are included in notification messages. Must not be empty.         |
 | `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages. Must not be empty. |
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
-| `payload` | ✓        | string | The payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
-| `json`    | ✓        | object | Alternative to `payload` to use JSON-based payloads. See [JSON Payloads](#json-payloads) section for more details. |
+| `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
+| `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
 
-`payload` and `json` cannot be used at the same time, they are mutually exclusive.
+`payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
 If `httpCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
 
@@ -3749,10 +3753,11 @@ A `mqttCustom` object contains the following subfields.
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
 | `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
-| `payload` | ✓        | string | The payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
-| `json`    | ✓        | object | Alternative to `payload` to use JSON-based payloads. See [JSON Payloads](#json-payloads) section for more details. |
+| `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
+| `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
 
-`payload` and `json` cannot be used at the same time, they are mutually exclusive.
+`payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
 If `mqttCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, 
 see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
