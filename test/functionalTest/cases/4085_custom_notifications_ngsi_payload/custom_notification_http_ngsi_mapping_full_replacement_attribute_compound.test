@@ -30,9 +30,6 @@ accumulatorStart --pretty-print
 
 --SHELL--
 
-# FIXME PR: variant of this test with "notifications.attrs": [ "A1" ] to
-# check effective filtering of other Ax in ngsi field
-
 #
 # 01. Create custom sub with ngsi compound attributes covering all JSON types
 # 02. Create entity E1

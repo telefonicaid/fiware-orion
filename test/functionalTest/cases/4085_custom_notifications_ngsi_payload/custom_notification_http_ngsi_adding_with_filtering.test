@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification HTTP with NGSI payload adding attribute macro full replacement simple value
+Custom notification HTTP with NGSI payload adding attribute with filtering
 
 --SHELL-INIT--
 dbInit CB
@@ -31,15 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub1 with ngsi attributes covering all JSON types
+# 01. Create custom sub1 with ngsi attributes covering all JSON types with filtering
 # 02. Create entity E1
 # 03. Update entity E1
 # 04. Dump accumulator and see two notifications with replaced values
 #
 
 
-echo "01. Create custom sub1 with ngsi attributes covering all JSON types"
-echo "==================================================================="
+echo "01. Create custom sub1 with ngsi attributes covering all JSON types with filtering"
+echo "=================================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -78,7 +78,8 @@ payload='{
           "type": "None"
         }
       }
-    }
+    },
+    "attrs": [ "A1", "A2", "A3" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -162,8 +163,8 @@ echo
 
 
 --REGEXPECT--
-01. Create custom sub1 with ngsi attributes covering all JSON types
-===================================================================
+01. Create custom sub1 with ngsi attributes covering all JSON types with filtering
+==================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -194,7 +195,7 @@ Date: REGEX(.*)
 ===================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 731
+Content-Length: 224
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -219,65 +220,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Boolean",
                 "value": true
-            },
-            "A4": {
-                "metadata": {},
-                "type": "Object",
-                "value": {
-                    "x": 1,
-                    "y": 2
-                }
-            },
-            "A5": {
-                "metadata": {},
-                "type": "Array",
-                "value": [
-                    1,
-                    true,
-                    "zzz"
-                ]
-            },
-            "A6": {
-                "metadata": {},
-                "type": "None",
-                "value": null
-            },
-            "B1": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": "foo"
-            },
-            "B2": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": 1
-            },
-            "B3": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": true
-            },
-            "B4": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": {
-                    "x": 1,
-                    "y": 2
-                }
-            },
-            "B5": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": [
-                    1,
-                    true,
-                    "zzz"
-                ]
-            },
-            "B6": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": null
             },
             "id": "E1",
             "type": "T"
@@ -288,7 +230,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 749
+Content-Length: 226
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -313,69 +255,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Boolean",
                 "value": false
-            },
-            "A4": {
-                "metadata": {},
-                "type": "Object",
-                "value": {
-                    "w": "ttt",
-                    "z": 10
-                }
-            },
-            "A5": {
-                "metadata": {},
-                "type": "Array",
-                "value": [
-                    4,
-                    null,
-                    {
-                        "r": 2
-                    }
-                ]
-            },
-            "A6": {
-                "metadata": {},
-                "type": "None",
-                "value": null
-            },
-            "B1": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": "bar"
-            },
-            "B2": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": 10
-            },
-            "B3": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": false
-            },
-            "B4": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": {
-                    "w": "ttt",
-                    "z": 10
-                }
-            },
-            "B5": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": [
-                    4,
-                    null,
-                    {
-                        "r": 2
-                    }
-                ]
-            },
-            "B6": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": null
             },
             "id": "E1",
             "type": "T"

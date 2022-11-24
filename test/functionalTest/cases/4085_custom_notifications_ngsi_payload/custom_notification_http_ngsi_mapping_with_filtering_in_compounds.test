@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification HTTP with NGSI payload adding attribute without some source attribute
+Custom notification HTTP with NGSI payload mapping attribute with filtering in compounds
 
 --SHELL-INIT--
 dbInit CB
@@ -31,15 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub1 with ngsi attributes covering all JSON types
+# 01. Create custom sub with ngsi compound attributes covering all JSON types with filtering
 # 02. Create entity E1
 # 03. Update entity E1
 # 04. Dump accumulator and see two notifications with replaced values
 #
 
 
-echo "01. Create custom sub1 with ngsi attributes covering all JSON types"
-echo "==================================================================="
+echo "01. Create custom sub with ngsi compound attributes covering all JSON types with filtering"
+echo "=========================================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -54,32 +54,28 @@ payload='{
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
         "A1": {
-          "value": "${B1}",
-          "type": "Text"
+          "value": {
+            "other": {
+              "text": "${A1}",
+              "number": "${A2}"
+            },
+            "bools": [ "${A1}", "${A2}" ]
+          },
+          "type": "StructuredValue"
         },
         "A2": {
-          "value": "${B2}",
-          "type": "Number"
-        },
-        "A3": {
-          "value": "${B3}",
-          "type": "Boolean"
-        },
-        "A4": {
-          "value": "${B4}",
-          "type": "Object"
-        },
-        "A5": {
-          "value": "${B5}",
-          "type": "Array"
-        },
-        "A6": {
-          "value": "${B6}",
-          "type": "None"
+          "value": [
+            "${A1}",
+            {
+              "one" : [ "${A2}", "${A1}" ],
+              "two" : "${A2}"
+            }
+          ],
+          "type": "StructuredValue"
         }
       }
     },
-    "attrs": [ "A1", "A2", "A3", "A4", "A5", "A6", "B1" ]
+    "attrs": [ "A1" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -92,28 +88,12 @@ echo "===================="
 payload='{
   "id": "E1",
   "type": "T",
-  "B1": {
+  "A1": {
     "value": "foo",
     "type": "irrelevant"
   },
-  "B2": {
+  "A2": {
     "value": 1,
-    "type": "irrelevant"
-  },
-  "B3": {
-    "value": true,
-    "type": "irrelevant"
-  },
-  "B4": {
-    "value": { "x": 1, "y": 2},
-    "type": "irrelevant"
-  },
-  "B5": {
-    "value": [ 1, true, "zzz" ],
-    "type": "irrelevant"
-  },
-  "B6": {
-    "value": null,
     "type": "irrelevant"
   }
 }'
@@ -125,28 +105,12 @@ echo
 echo "03. Update entity E1"
 echo "===================="
 payload='{
-  "B1": {
+  "A1": {
     "value": "bar",
     "type": "irrelevant"
   },
-  "B2": {
+  "A2": {
     "value": 10,
-    "type": "irrelevant"
-  },
-  "B3": {
-    "value": false,
-    "type": "irrelevant"
-  },
-  "B4": {
-    "value": { "z": 10, "w": "ttt"},
-    "type": "irrelevant"
-  },
-  "B5": {
-    "value": [ 4, null, {"r": 2} ],
-    "type": "irrelevant"
-  },
-  "B6": {
-    "value": null,
     "type": "irrelevant"
   }
 }'
@@ -163,8 +127,8 @@ echo
 
 
 --REGEXPECT--
-01. Create custom sub1 with ngsi attributes covering all JSON types
-===================================================================
+01. Create custom sub with ngsi compound attributes covering all JSON types with filtering
+==========================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -195,7 +159,7 @@ Date: REGEX(.*)
 ===================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 445
+Content-Length: 185
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -208,45 +172,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "A1": {
                 "metadata": {},
-                "type": "Text",
-                "value": "foo"
-            },
-            "A2": {
-                "metadata": {},
-                "type": "Number",
-                "value": 1
-            },
-            "A3": {
-                "metadata": {},
-                "type": "Boolean",
-                "value": true
-            },
-            "A4": {
-                "metadata": {},
-                "type": "Object",
+                "type": "StructuredValue",
                 "value": {
-                    "x": 1,
-                    "y": 2
+                    "bools": [
+                        "foo",
+                        1
+                    ],
+                    "other": {
+                        "number": 1,
+                        "text": "foo"
+                    }
                 }
-            },
-            "A5": {
-                "metadata": {},
-                "type": "Array",
-                "value": [
-                    1,
-                    true,
-                    "zzz"
-                ]
-            },
-            "A6": {
-                "metadata": {},
-                "type": "None",
-                "value": null
-            },
-            "B1": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": "foo"
             },
             "id": "E1",
             "type": "T"
@@ -257,7 +193,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 454
+Content-Length: 187
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -270,47 +206,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "A1": {
                 "metadata": {},
-                "type": "Text",
-                "value": "bar"
-            },
-            "A2": {
-                "metadata": {},
-                "type": "Number",
-                "value": 10
-            },
-            "A3": {
-                "metadata": {},
-                "type": "Boolean",
-                "value": false
-            },
-            "A4": {
-                "metadata": {},
-                "type": "Object",
+                "type": "StructuredValue",
                 "value": {
-                    "w": "ttt",
-                    "z": 10
-                }
-            },
-            "A5": {
-                "metadata": {},
-                "type": "Array",
-                "value": [
-                    4,
-                    null,
-                    {
-                        "r": 2
+                    "bools": [
+                        "bar",
+                        10
+                    ],
+                    "other": {
+                        "number": 10,
+                        "text": "bar"
                     }
-                ]
-            },
-            "A6": {
-                "metadata": {},
-                "type": "None",
-                "value": null
-            },
-            "B1": {
-                "metadata": {},
-                "type": "irrelevant",
-                "value": "bar"
+                }
             },
             "id": "E1",
             "type": "T"
