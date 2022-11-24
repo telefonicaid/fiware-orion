@@ -3731,7 +3731,10 @@ A `httpCustom` object contains the following subfields.
 | `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages. Must not be empty. |
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
 | `payload` | ✓        | string | The payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `json`    | ✓        | object | Alternative to `payload` to use JSON-based payloads. See [JSON Payloads](#json-payloads) section for more details. |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
+
+`payload` and `json` cannot be used at the same time, they are mutually exclusive.
 
 If `httpCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
 
@@ -3746,7 +3749,10 @@ A `mqttCustom` object contains the following subfields.
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
 | `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
-| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
+| `payload` | ✓        | string | The payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `json`    | ✓        | object | Alternative to `payload` to use JSON-based payloads. See [JSON Payloads](#json-payloads) section for more details. |
+
+`payload` and `json` cannot be used at the same time, they are mutually exclusive.
 
 If `mqttCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, 
 see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.

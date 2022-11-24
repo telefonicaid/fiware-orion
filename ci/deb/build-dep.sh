@@ -81,7 +81,7 @@ echo "INSTALL: rapidjson" \
 && mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include
 
 echo "INSTALL: libmicrohttpd" \
-&& curl -L http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar xzC /opt/ \
+&& curl -L https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar xzC /opt/ \
 && cd /opt/libmicrohttpd-0.9.70  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
@@ -97,7 +97,7 @@ echo "INSTALL: gmock" \
 && make install
 
 echo "INSTALL: mosquitto" \
-&& curl -kL http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz | tar xzC /opt/ \
+&& curl -kL https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz | tar xzC /opt/ \
 && cd /opt/mosquitto-2.0.12 \
 && sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk \
 && sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk \

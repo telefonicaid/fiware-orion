@@ -524,9 +524,6 @@ the [**ngsiNotify** library](#srclibngsinotify).
 ## src/lib/cache/
 To gain efficiency, Orion keeps its subscriptions in RAM, and a Subscription Cache Manager has been implemented for this purpose (more detail on the subscription cache in [this section of the Orion administration manual](../admin/perf_tuning.md#subscription-cache)).
 
-One of the main reasons for this cache is that when performing subscription matching at DB level, the operator `$where` must be used in MongoDB, and this
-is not at all recommended (it involves JavaScript execution at DB level, which has both performance and security problems).
-
 When the broker starts, the contents of the [csubs collection](../admin/database_model.md#csubs-collection) is extracted from the database and the subscription cache is populated.
 When a subscription is updated/created, the subscription cache is modified, but also the database. In this sense, the subscription cache is "write-through".
 
