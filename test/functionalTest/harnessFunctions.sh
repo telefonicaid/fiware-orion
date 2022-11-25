@@ -48,6 +48,21 @@ fi
 
 # ------------------------------------------------------------------------------
 #
+# The test suite needs the docker container 'wistefan/context-server' to run.
+# - that's the context server that is used in 3 of the functests, so far ...
+#
+cServer=$(docker ps | grep 'wistefan/context-server')
+if [ "$cServer" == "" ]
+then
+  echo "The context Server isn't running. Starting it ..."
+  docker run --rm -d --name context-server -p 7080:8080 -e MEMORY_ENABLED=true wistefan/context-server
+  echo "... Started"
+fi
+
+
+
+# ------------------------------------------------------------------------------
+#
 # harnessExit - 
 #
 function harnessExit()

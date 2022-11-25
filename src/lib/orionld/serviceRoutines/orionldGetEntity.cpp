@@ -155,9 +155,12 @@ bool orionldGetEntity(void)
           }
         }
 
-        if ((++loops >= 10) && ((loops % 5) == 0))
+        if ((++loops >= 50) && ((loops % 10) == 0))
           LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
       }
+
+      if (loops >= 50)
+        LM_W(("curl_multi_perform finally finished!"));
     }
   }
 
