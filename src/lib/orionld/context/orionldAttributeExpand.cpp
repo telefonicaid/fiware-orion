@@ -55,13 +55,27 @@ char* orionldAttributeExpand
   else if (strcmp(shortName, "@type")            == 0) return shortName;
   else if (strcmp(shortName, "scope")            == 0) return shortName;
   else if (strcmp(shortName, "location")         == 0) return shortName;
+  else if (strcmp(shortName, "createdAt")        == 0) return shortName;
+  else if (strcmp(shortName, "modifiedAt")       == 0) return shortName;
   else if (strcmp(shortName, "observationSpace") == 0) return shortName;
   else if (strcmp(shortName, "operationSpace")   == 0) return shortName;
-  else if (strcmp(shortName, "observedAt")       == 0)
+
+#if 1
+  // FIXME: 'observedAt' as an attribute is not a thing - special treatment only if sub-attribute
+  //  The implementation needs modifications.
+  //
+  //  Wait ... what if the @context says it must be a String, a DateTime?
+  //  The @context doesn't distinguish between attributesd and sub-attributes ...
+  //  It will need to be a String wherever it is.
+  //
+  //  We should probably forbid an attribute to have the name 'observedAt'
+  //
+  else if (strcmp(shortName, "observedAt") == 0)
   {
     orionldContextItemExpand(contextP, shortName, false, contextItemPP);
     return shortName;
   }
+#endif
 
   if (orionldContextItemAlreadyExpanded(shortName) == true)
     return shortName;

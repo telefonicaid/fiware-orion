@@ -54,6 +54,9 @@ char* orionldSubAttributeExpand
   if      (strcmp(shortName, "type")        == 0) return shortName;
   else if (strcmp(shortName, "value")       == 0) return shortName;
   else if (strcmp(shortName, "object")      == 0) return shortName;
+  else if (strcmp(shortName, "languageMap") == 0) return shortName;
+  else if (strcmp(shortName, "createdAt")   == 0) return shortName;
+  else if (strcmp(shortName, "modifiedAt")  == 0) return shortName;
   else if (strcmp(shortName, "location")    == 0) return shortName;
   else if (strcmp(shortName, "observedAt")  == 0) return shortName;
   else if (strcmp(shortName, "unitCode")    == 0) return shortName;

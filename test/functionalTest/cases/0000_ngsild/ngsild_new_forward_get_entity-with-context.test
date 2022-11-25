@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Retrieve a distributed entity with @context combinations
+Retrieve a distributed entity with @context combinations - IT FAILS !!!
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -243,16 +243,12 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 07. GET E1 on CB, with Accept == application/json, and no Link header - see longnames (except R1)
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 222
+Content-Length: 241
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "R1": {
-        "object": "R1:in:CP2",
-        "type": "Relationship"
-    },
     "http://example.org/P1": {
         "type": "Property",
         "value": "P1 in CP1"
@@ -260,6 +256,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "http://example.org/P2": {
         "type": "Property",
         "value": "P2 in CB"
+    },
+    "http://example.org/R1": {
+        "object": "R1:in:CP2",
+        "type": "Relationship"
     },
     "id": "urn:E1",
     "type": "http://example.org/T"
@@ -269,16 +269,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 08. GET E1 on CB, with Accept == application/ld+json
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 295
+Content-Length: 314
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-    "R1": {
-        "object": "R1:in:CP2",
-        "type": "Relationship"
-    },
     "http://example.org/P1": {
         "type": "Property",
         "value": "P1 in CP1"
@@ -286,6 +282,10 @@ Date: REGEX(.*)
     "http://example.org/P2": {
         "type": "Property",
         "value": "P2 in CB"
+    },
+    "http://example.org/R1": {
+        "object": "R1:in:CP2",
+        "type": "Relationship"
     },
     "id": "urn:E1",
     "type": "http://example.org/T"

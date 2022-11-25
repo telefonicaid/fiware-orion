@@ -30,6 +30,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/regCache/regCacheItemContextCheck.h"           // Own interface
@@ -73,7 +74,6 @@ bool regCacheItemContextCheck(KjNode* apiRegP, char* jsonldContextValue, Orionld
   *fwdContextPP = NULL;
 
   char* jsonldContext = jsonldContextValue;
-
   if (jsonldContext == NULL)
   {
     KjNode* cSourceInfoP = kjLookup(apiRegP, "contextSourceInfo");
@@ -81,7 +81,7 @@ bool regCacheItemContextCheck(KjNode* apiRegP, char* jsonldContextValue, Orionld
     if (cSourceInfoP == NULL)
       return true;
 
-    char* jsonldContext = kjValueFromKvList(cSourceInfoP, "jsonldContext");
+    jsonldContext = kjValueFromKvList(cSourceInfoP, "jsonldContext");
     if (jsonldContext == NULL)
       return true;
   }
