@@ -31,6 +31,16 @@ brokerStart CB
 --SHELL--
 
 #
+# FIXME: 'observedAt' as an attribute is not a thing - special treatment only if sub-attribute
+#        The implementation needs modifications.
+#
+#        Wait ... what if the @context says it must be a String, a DateTime?
+#        The @context doesn't distinguish between attributesd and sub-attributes ...
+#        It will need to be a String wherever it is.
+#
+#        We should probably forbid an attribute to have the name 'observedAt'
+#
+#
 # 01. Attempt to create an entity with an attribute observedAt that is an Integer - see error
 # 02. Attempt to create an entity with an attribute observedAt that is a Boolean - see error
 # 03. Attempt to create an entity with an attribute observedAt that is a Float - see error
