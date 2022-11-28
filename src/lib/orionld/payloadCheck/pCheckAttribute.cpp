@@ -1011,6 +1011,9 @@ static bool pCheckAttributeObject
     }
     else if (strcmp(fieldP->name, "observedAt") == 0)
     {
+      //
+      // FIXME: Forbid?   (400 Bad Request)
+      //
       if (timestampCheck(fieldP) == false)
         return false;
     }

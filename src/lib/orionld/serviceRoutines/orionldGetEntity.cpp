@@ -38,6 +38,8 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/curlToBrokerStrerror.h"                 // curlToBrokerStrerror
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/context/orionldEntityExpand.h"                 // orionldEntityExpand
+#include "orionld/context/orionldEntityCompact.h"                // orionldEntityCompact
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/legacyDriver/legacyGetEntity.h"                // legacyGetEntity
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
@@ -159,9 +161,12 @@ bool orionldGetEntity(void)
           }
         }
 
-        if ((++loops >= 10) && ((loops % 5) == 0))
+        if ((++loops >= 50) && ((loops % 10) == 0))
           LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
       }
+
+      if (loops >= 50)
+        LM_W(("curl_multi_perform finally finished!"));
     }
   }
 
@@ -232,11 +237,19 @@ bool orionldGetEntity(void)
             KjNode* atContextP = kjLookup(fwdPendingP->body, "@context");
             if (atContextP != NULL)
               kjChildRemove(fwdPendingP->body, atContextP);
-
-            // Now expand the whole thing using the context        *fwdPendingP->regP->contextP*
-            // And then compact the whole thing using the context  *orionldState.contextP*
-            // Set fwdPendingP->body to the resulting KjNode tree
           }
+
+          //
+          // If the original @context was not used when forwarding (a jsonldContext is present in the registration)
+          // then we now must expand the entity using the context 'fwdPendingP->regP->contextP'
+          // and then compact it again, using the @context of the original request
+          //
+          if ((fwdPendingP->regP->contextP != NULL) && (fwdPendingP->regP->contextP != orionldState.contextP))
+          {
+            orionldEntityExpand(fwdPendingP->body, fwdPendingP->regP->contextP);
+            orionldEntityCompact(fwdPendingP->body, orionldState.contextP);
+          }
+
           // Merge in the received body into the local (or nothing)
           if (apiEntityP == NULL)
             apiEntityP = fwdPendingP->body;

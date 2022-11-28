@@ -29,6 +29,7 @@ extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_FT, K_VEC_SIZE
 #include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
+#include "kjson/kjBuilder.h"                                     // kjString, kjChildAdd
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -400,6 +401,21 @@ bool pCheckTenantName(const char* dbName)
 //
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
+  //
+  // Need to keep track of ALL incoming headers, in case they're asked for in forwarded requests
+  // This is copying information, but as it is not a default behaviour, that's OK.
+  // Forwarding slows down eberything SO MUCH, so, ... I'm perfectly fine with this copy
+  //
+  if (forwarding == true)
+  {
+    KjNode* kvP = kjString(orionldState.kjsonP, key, value);
+
+    if (orionldState.in.httpHeaders == NULL)
+      orionldState.in.httpHeaders = kjObject(orionldState.kjsonP, NULL);
+
+    kjChildAdd(orionldState.in.httpHeaders, kvP);
+  }
+
   if (strcasecmp(key, "Orionld-Legacy") == 0)
   {
     if (mongocOnly == false)
