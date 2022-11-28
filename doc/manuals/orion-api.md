@@ -2308,7 +2308,7 @@ Some notes to take into account when using `ngsi`:
   * If the macro *covers completely the string where is used*, then the JSON nature of the attribute value
     is taken into account. For instance, `"value": "${temperature}"` resolves to `"value": 10`
     if temperature attribute is a number or to `"value": "10"` if `temperature` attribute is a string.
-  * If the macro *is only part of string where is used*, then the attributue value is always casted
+  * If the macro *is only part of string where is used*, then the attribute value is always casted
     to string. For instance, `"value": "Temperature is: ${temperature}"` resolves to 
     `"value": "Temperature is 10"` even if temperature attribute is a number. Note that if the
     attribute value is a JSON array or object, it is stringfied in this case.
