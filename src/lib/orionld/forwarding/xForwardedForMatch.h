@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDREQUESTSEND_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FORWARDREQUESTSEND_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_XFORWARDEDFORMATCH_H_
+#define SRC_LIB_ORIONLD_FORWARDING_XFORWARDEDFORMATCH_H_
 
 /*
 *
@@ -25,14 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardRequestSend -
+// xForwardedForMatch -
 //
-extern bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, const char* xForwardedForHeader);
+extern bool xForwardedForMatch(char* hostsHeader, char* host);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDREQUESTSEND_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_XFORWARDEDFORMATCH_H_

@@ -168,7 +168,8 @@ using namespace orion;
 *
 * Global vars
 */
-static bool isFatherProcess = false;
+static bool      isFatherProcess = false;
+char             localIpAndPort[135];
 
 
 
@@ -1127,6 +1128,10 @@ int main(int argC, char* argV[])
   //
   gethostname(orionldHostName, sizeof(orionldHostName));
   orionldHostNameLen = strlen(orionldHostName);
+
+  // localIpAndPort - IP:port for X-Forwarded-For
+  snprintf(localIpAndPort, sizeof(localIpAndPort), "%s:%d", orionldHostName, port);
+  LM(("localIpAndPort: %s", localIpAndPort));
 
   orionldStateInit(NULL);
 

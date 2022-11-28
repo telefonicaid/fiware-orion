@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDREQUESTSEND_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FORWARDREQUESTSEND_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,14 +22,41 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include <string.h>                                              // strstr
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardRequestSend -
+// xForwardedForMatch -
 //
-extern bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, const char* xForwardedForHeader);
+bool xForwardedForMatch(char* hostsHeader, char* host)
+{
+  //
+  // For example:
+  //   hostsHeader == "X-Forwarded-For: host1:1026, host2:1028"
+  //   host        == "host2:1028"
+  //
+  // It's a match if (all three match):
+  //   1. "host" is found as a subsctring of hostsHeader
+  //   2. the char before is either ':', ',', or ' '   AND
+  //   3. The char after is either '\0', ' ', or ','
+  //
+  if (hostsHeader == NULL)
+    return false;
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDREQUESTSEND_H_
+  char* subString = strstr(hostsHeader, host);
+  if (subString == NULL)
+    return false;
+
+  char charBefore = subString[-1];
+  char charAFter  = subString[strlen(host)];
+
+  if ((charBefore != ' ') && (charBefore != ':') && (charBefore != ','))
+    return false;
+
+  if ((charAFter != 0) && (charAFter != ',') && (charAFter != ' '))
+    return false;
+
+  return true;
+}

@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArray.h"         // regMatchInformationArray
+#include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // Own interface
 
 
@@ -62,6 +63,13 @@ ForwardPending* regMatchForEntityCreation
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
+    // Loop detection
+    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
+    {
+      LM(("No Reg Match due to loop detection"));
+      continue;
+    }
+
     if ((regP->mode & regMode) == 0)
     {
       LM(("No Reg Match due to regMode"));

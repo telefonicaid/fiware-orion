@@ -32,6 +32,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/common/orionldState.h"                         // orionldState, localIpAndPort
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
@@ -99,6 +100,50 @@ static void regStringAdd(KjNode* regP, const char* name, const char* value)
 
 // -----------------------------------------------------------------------------
 //
+// regIpAndPortExtract -
+//
+static char* regIpAndPortExtract(KjNode* regP)
+{
+  KjNode* endpointP = kjLookup(regP, "endpoint");
+
+  if (endpointP == NULL)  // This can't happen!
+    return NULL;
+
+  char* endpoint  = endpointP->value.s;
+
+  // E.g. https://HOST:POST/
+  // We need to extract and copy HOST:POST
+  //
+  char* start = strstr(endpoint, "://");
+
+  if (start == NULL)
+    start = endpoint;   // no '<protocol>://' - assuming "HOST:PORT/..."
+  else
+    start = &start[3];  // jusmpin over the ://
+
+  int   len = 0;
+  char* end = strchr(start, '/');
+
+  if (end == NULL)  // no PATH in the URK, that's OK: "endpoint": "http://localhost:1026"
+    len = strlen(start);
+  else
+    len = (unsigned long long) end - (unsigned long long) start;
+
+  char* buf = (char*) malloc(len + 1);  // This goes to the cache - must be allocated using malloc
+
+  if (buf == NULL)
+    LM_RE(NULL, ("Out of memory allocating ipAndPort for a registration (%d bytes)", len + 1));
+
+  strncpy(buf, start, len);
+  buf[len] = 0;
+
+  return buf;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // regCacheItemAdd -
 //
 RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode* regP, bool fromDb, OrionldContext* fwdContextP)
@@ -119,6 +164,7 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode*
   rciP->regId     = strdup(registrationId);
   rciP->regTree   = kjClone(NULL, regP);
   rciP->contextP  = fwdContextP;
+  rciP->ipAndPort = regIpAndPortExtract(regP);
   rciP->next      = NULL;
 
   // Counters and timestamps - create if they don't exist

@@ -81,6 +81,7 @@ typedef struct RegCacheItem
   uint64_t              opMask;
   OrionldContext*       contextP;      // FIXME: Set when creating/patching registration
   bool                  acceptJsonld;  // Accept is set to application/ld+json
+  char*                 ipAndPort;     // IP:port - for X-Forwarded-For
   RegIdPattern*         idPatternRegexList;
   struct RegCacheItem*  next;
 } RegCacheItem;

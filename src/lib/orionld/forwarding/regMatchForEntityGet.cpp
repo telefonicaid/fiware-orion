@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForGet.h"   // regMatchInformationArrayForGet
+#include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
 #include "orionld/forwarding/regMatchForEntityGet.h"             // Own interface
 
 
@@ -49,7 +50,7 @@ extern "C"
 //   - entity id and
 //   - attributes if present in the registration (and 'attrs' URL param)
 //
-ForwardPending* regMatchForEntityGet
+ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
 (
   RegistrationMode regMode,
   FwdOperation     operation,
@@ -71,6 +72,13 @@ ForwardPending* regMatchForEntityGet
     LM(("Treating registration '%s' for registrations of mode '%s'", regId, registrationModeToString(regMode)));
 #endif
 
+    // Loop detection
+    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
+    {
+      LM(("No Reg Match due to loop detection"));
+      continue;
+    }
+
     if ((regP->mode & regMode) == 0)
     {
       LM(("%s: No Reg Match due to regMode", regId));
@@ -82,7 +90,8 @@ ForwardPending* regMatchForEntityGet
       LM(("%s: No Reg Match due to Operation", regId));
       continue;
     }
-    ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, attrV, geoProp);
+
+    ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, attrV, geoProp);  // FIXME: +entity-type
     if (fwdPendingP == NULL)
     {
       LM(("%s: No Reg Match due to Information Array", regId));
