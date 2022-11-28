@@ -32,3 +32,4 @@
 * Issue #1269  Fixed a bug in BATCH Upsert
 * Issue #280   Implemented the new forwarding for POST /entities
 * Issue #280   Implemented the new forwarding for GET /entities/{entityId}
+* Issue #280   Loop detection for forwarded requests - using the X-Forwarded-For header

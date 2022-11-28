@@ -53,6 +53,7 @@ extern "C"
 #include "orionld/forwarding/forwardRequestSend.h"               // forwardRequestSend
 #include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"     // fwdPendingLookupByCurlHandle
 #include "orionld/forwarding/fwdEntityMerge.h"                   // fwdEntityMerge
+#include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own interface
 
 
@@ -111,15 +112,18 @@ bool orionldGetEntity(void)
     fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
     fwdPendingList = forwardingListsMerge(fwdPendingList, auxiliarList);
 
-    // Send - copy from orionldPostEntities
+    // Enqueue all forwarded requests
     if (fwdPendingList != NULL)
     {
+      // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
+      char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+
       for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
       {
         // Send the forwarded request and await all responses
         if (fwdPendingP->regP != NULL)
         {
-          if (forwardRequestSend(fwdPendingP, dateHeader) == 0)
+          if (forwardRequestSend(fwdPendingP, dateHeader, xff) == 0)
           {
             ++forwards;
             fwdPendingP->error = false;

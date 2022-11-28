@@ -322,7 +322,7 @@ void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArra
 //
 // forwardRequestSend -
 //
-bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
+bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, const char* xForwardedForHeader)
 {
   //
   // Figure out the @context to use for the forwarded request
@@ -408,6 +408,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
   // - Content-Type
   // - User-Agent
   // - Date
+  // - X-Forwarded-For
   // - Those in csourceInfo (if Content-Type is present, it is ignored (for now))
   // - NGSILD-Tenant (part of registration, but can also be in csourceInfo?)
   // - Link - can be in csourceInfo (named jsonldContext)
@@ -421,6 +422,9 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader)
 
   // Host
   headers = curl_slist_append(headers, hostHeader);
+
+  // X-Forwarded-For
+  headers = curl_slist_append(headers, xForwardedForHeader);
 
   // Custom headers from Registration::contextSourceInfo
   char* infoTenant    = NULL;

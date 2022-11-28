@@ -52,6 +52,9 @@ void regCacheRelease(RegCache* regCacheP)
     if (rciP->idPatternRegexList != NULL)
       regCacheItemRegexRelease(rciP);
 
+    if (rciP->ipAndPort != NULL)
+      free(rciP->ipAndPort);
+
     free(rciP);
 
     rciP = next;

@@ -40,6 +40,8 @@ SET (SOURCES
     regMatchAttributesForGet.cpp
     regMatchForEntityCreation.cpp
     regMatchForEntityGet.cpp
+    xForwardedForCompose.cpp
+    xForwardedForMatch.cpp
 )
 
 # Include directories

@@ -1,0 +1,92 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Upsert Issue #1269
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create entities according to issue #1269 (using upsert) - all OK
+# 02. Repeat the upsert command - provokes a mongo database error about duplicated _id keys - make sure it DOES NOT!
+#
+
+echo "01. Create entities according to issue #1269 (using upsert) - all OK"
+echo "===================================================================="
+payload='[
+  {
+    "id": "urn:E1",
+    "type": "T",
+    "P1": 1
+  },
+  {
+    "id": "urn:E1",
+    "type": "T",
+    "P1": 2
+  },
+  {
+    "id": "urn:E2",
+    "type": "T",
+    "P1": 1
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. Repeat the upsert command - provokes a mongo database error about duplicated _id keys - make sure it DOES NOT!"
+echo "=================================================================================================================="
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert -X POST --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities according to issue #1269 (using upsert) - all OK
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 19
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:E1",
+    "urn:E2"
+]
+
+
+02. Repeat the upsert command - provokes a mongo database error about duplicated _id keys - make sure it DOES NOT!
+==================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
