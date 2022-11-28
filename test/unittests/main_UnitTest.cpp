@@ -106,7 +106,7 @@ bool            experimental            = false;
 bool            mongocOnly              = false;
 bool            debugCurl               = false;
 int             cSubCounters            = 0;
-
+char            localIpAndPort[135];
 
 
 /* ****************************************************************************
