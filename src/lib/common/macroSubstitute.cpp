@@ -35,6 +35,34 @@
 
 /* ****************************************************************************
 *
+* buildReplacementMap -
+*
+*/
+void buildReplacementsMap
+(
+  const Entity&                        en,
+  const std::string&                   service,
+  const std::string&                   token,
+  std::map<std::string, std::string>*  replacementsP
+)
+{
+  replacementsP->insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    // Note that if some attribute is named service, servicePath or authToken (although it would be
+    // an anti-pattern), the attribute takes precedence
+    (*replacementsP)[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * stringValueOrNull -
 */
 static std::string stringValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key)

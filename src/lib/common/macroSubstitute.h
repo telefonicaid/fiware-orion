@@ -30,6 +30,19 @@
 #include "apiTypesV2/Entity.h"
 
 
+/* ****************************************************************************
+*
+* buildReplacementMap -
+*
+*/
+extern void buildReplacementsMap
+(
+  const Entity&                        en,
+  const std::string&                   service,
+  const std::string&                   token,
+  std::map<std::string, std::string>*  replacementsP
+);
+
 
 /* ****************************************************************************
 *
