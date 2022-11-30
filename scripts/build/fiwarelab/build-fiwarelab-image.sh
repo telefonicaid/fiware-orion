@@ -160,14 +160,14 @@ sudo /etc/init.d/iptables save
 # --------------- Context Broker ---------------
 
 # Install Node
-wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+wget https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 sudo rpm -i epel-release-6-8.noarch.rpm
 rm epel-release-6-8.noarch.rpm
 sudo yum -y install nodejs npm
 
 # Install Redis (partially based on http://alexanderkohout.de/blog/how-to-install-redis/)
 sudo yum -y install gcc
-wget http://download.redis.io/releases/redis-2.6.17.tar.gz
+wget https://download.redis.io/releases/redis-2.6.17.tar.gz
 tar xfvz redis-2.6.17.tar.gz
 rm redis-2.6.17.tar.gz
 cd redis-2.6.17/deps

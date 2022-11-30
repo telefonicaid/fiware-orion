@@ -25,7 +25,7 @@ set -e
 
 echo
 echo -e "\e[1;32m Debian Builder: installing Paho MQTT C library \e[0m"
-wget http://mirror.centos.org/centos/7/os/x86_64/Packages/doxygen-1.8.5-4.el7.x86_64.rpm
+wget https://mirror.centos.org/centos/7/os/x86_64/Packages/doxygen-1.8.5-4.el7.x86_64.rpm
 yum install -y doxygen-1.8.5-4.el7.x86_64.rpm
 
 

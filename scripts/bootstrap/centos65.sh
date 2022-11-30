@@ -23,14 +23,14 @@
 #
 
 # Setting up EPEL Repo
-wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+wget https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 sudo rpm -ivh epel-release-6-8.noarch.rpm
 
 # Install required packages
 sudo yum -y install make cmake gcc-c++ scons git libmicrohttpd-devel boost-devel libcurl-devel clang CUnit-devel mongodb-server python python-flask python-jinja2 curl libxml2 nc mongodb-org valgrind libxslt
 
 # Install MongoDB C++ Driver
-wget http://downloads.mongodb.org/cxx-driver/mongodb-linux-x86_64-2.2.3.tgz
+wget https://downloads.mongodb.org/cxx-driver/mongodb-linux-x86_64-2.2.3.tgz
 tar xfvz mongodb-linux-x86_64-2.2.3.tgz
 cd mongo-cxx-driver-v2.2
 scons                                         # The build/libmongoclient.a library is generated as outcome
@@ -61,7 +61,7 @@ sudo cp libcantcoap.a /usr/local/lib
 cd ..
 
 # Install CoAP Client
-wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
+wget https://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
 mv download libcoap-4.1.1.tar.gz
 tar xvzf libcoap-4.1.1.tar.gz
 cd libcoap-4.1.1

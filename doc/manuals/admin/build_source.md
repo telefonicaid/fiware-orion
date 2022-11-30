@@ -43,7 +43,7 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.48.tar.gz
         tar xvf libmicrohttpd-0.9.48.tar.gz
         cd libmicrohttpd-0.9.48
         ./configure --disable-messages --disable-postprocessor --disable-dauth
