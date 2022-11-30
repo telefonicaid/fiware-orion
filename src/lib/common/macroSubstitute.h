@@ -29,19 +29,12 @@
 
 #include "apiTypesV2/Entity.h"
 
-/* ****************************************************************************
-*
-* macroSubstitute - 
-*/
-extern bool macroSubstitute(std::string* sP, const std::string& in, const Entity& en, const std::string& service, const std::string& authToken);
-
 
 
 /* ****************************************************************************
 *
 * macroSubstitute -
 *
-* FIXME PR: unify to macroSubstitude functions
 */
 extern bool macroSubstitute(std::string* sP, const std::string& in, std::map<std::string, std::string>* replacementsP);
 

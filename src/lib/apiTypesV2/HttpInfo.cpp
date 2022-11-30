@@ -157,6 +157,35 @@ void HttpInfo::fill(const orion::BSONObj& bo)
       this->includePayload = true;
     }
 
+    if (bo.hasField(CSUB_JSON))
+    {
+      payloadType = ngsiv2::CustomPayloadType::Json;
+
+      orion::BSONElement be = getFieldF(bo, CSUB_JSON);
+      if (be.type() == orion::Object)
+      {
+        // this new memory is freed in HttpInfo::release()
+        this->json = new orion::CompoundValueNode(orion::ValueTypeObject);
+        this->json->valueType = orion::ValueTypeObject;
+        compoundObjectResponse(this->json, be);
+      }
+      else if (be.type() == orion::Array)
+      {
+        // this new memory is freed in HttpInfo::release()
+        this->json = new orion::CompoundValueNode(orion::ValueTypeVector);
+        this->json->valueType = orion::ValueTypeVector;
+        compoundVectorResponse(this->json, be);
+      }
+      else
+      {
+        LM_E(("Runtime Error (csub json field must be Object or Array but is %s)", orion::bsonType2String(be.type())));
+      }
+    }
+    else
+    {
+      this->json = NULL;
+    }
+
     if (bo.hasField(CSUB_NGSI))
     {
       payloadType = ngsiv2::CustomPayloadType::Ngsi;
@@ -202,36 +231,6 @@ void HttpInfo::fill(const orion::BSONObj& bo)
     {
       orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
       headers.toStringMap(&this->headers);
-    }
-
-    if (bo.hasField(CSUB_JSON))
-    {
-      // FIXME PR: move block code after the others related with payload
-      payloadType = ngsiv2::CustomPayloadType::Json;
-
-      orion::BSONElement be = getFieldF(bo, CSUB_JSON);
-      if (be.type() == orion::Object)
-      {
-        // this new memory is freed in HttpInfo::release()
-        this->json = new orion::CompoundValueNode(orion::ValueTypeObject);
-        this->json->valueType = orion::ValueTypeObject;
-        compoundObjectResponse(this->json, be);
-      }
-      else if (be.type() == orion::Array)
-      {
-        // this new memory is freed in HttpInfo::release()
-        this->json = new orion::CompoundValueNode(orion::ValueTypeVector);
-        this->json->valueType = orion::ValueTypeVector;
-        compoundVectorResponse(this->json, be);
-      }
-      else
-      {
-        LM_E(("Runtime Error (csub json field must be Object or Array but is %s)", orion::bsonType2String(be.type())));
-      }
-    }
-    else
-    {
-      this->json = NULL;
     }
   }
 }

@@ -117,6 +117,34 @@ void Notifier::sendNotifyContextRequest
 
 /* ****************************************************************************
 *
+* buildReplacementMap -
+*
+*/
+static void buildReplacementsMap
+(
+  const Entity&                        en,
+  const std::string&                   service,
+  const std::string&                   token,
+  std::map<std::string, std::string>*  replacementsP
+)
+{
+  replacementsP->insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    // Note that if some attribute is named service, servicePath or authToken (although it would be
+    // an anti-pattern), the attribute takes precedence
+    (*replacementsP)[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * setPayload -
 *
 * Return false if some problem occur
@@ -168,7 +196,9 @@ static bool setPayload
   }
   else
   {
-    if (!macroSubstitute(payloadP, notifPayload, en, service, token))
+    std::map<std::string, std::string> replacements;
+    buildReplacementsMap(en, service, token, &replacements);
+    if (!macroSubstitute(payloadP, notifPayload, &replacements))
     {
       return false;
     }
@@ -203,18 +233,7 @@ static bool setJsonPayload
   // orion::CompoundValueNode()::toJson(), but the include Entity.h in CompoundValueNode.h
   // makes compiler to cry (maybe some kind of circular dependency problem?)
   std::map<std::string, std::string> replacements;
-  replacements.insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
-  replacements.insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
-  replacements.insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
-  replacements.insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
-  replacements.insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
-  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
-  {
-    // Note that if some attribute is named service, servicePath or authToken (although it would be
-    // an anti-pattern), the attribute takes precedence
-    replacements[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
-  }
-
+  buildReplacementsMap(en, service, token, &replacements);
   *payloadP = json->toJson(&replacements);
   *mimeTypeP = "application/json";  // this can be overriden by headers field
   return true;
@@ -244,19 +263,8 @@ static bool setNgsiPayload
   // Prepare a map for macro replacements. We firstly tried to pass Entity object to
   // orion::CompoundValueNode()::toJson(), but the include Entity.h in CompoundValueNode.h
   // makes compiler to cry (maybe some kind of circular dependency problem?)
-  // FIXME PR: duplicated code in setJsonPayload()
   std::map<std::string, std::string> replacements;
-  replacements.insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
-  replacements.insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
-  replacements.insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
-  replacements.insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
-  replacements.insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
-  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
-  {
-    // Note that if some attribute is named service, servicePath or authToken (although it would be
-    // an anti-pattern), the attribute takes precedence
-    replacements[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
-  }
+  buildReplacementsMap(en, service, token, &replacements);
 
   NotifyContextRequest   ncr;
   ContextElementResponse cer;
@@ -402,6 +410,10 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     std::map<std::string, std::string>  headers;
     Entity&                             en      = notifyCerP->entity;
 
+    // Used by several macroSubstitute() calls along this function
+    std::map<std::string, std::string> replacements;
+    buildReplacementsMap(en, service, xauthToken, &replacements);
+
     //
     // 1. Verb/Method
     //
@@ -426,7 +438,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     // 2. URL
     //
     std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-    if (macroSubstitute(&url, notifUrl, en, tenant, xauthToken) == false)
+    if (macroSubstitute(&url, notifUrl, &replacements) == false)
     {
       // Warning already logged in macroSubstitute()
       // FIXME PR: should return NULL?
@@ -484,7 +496,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         std::string key   = it->first;
         std::string value = it->second;
 
-        if ((macroSubstitute(&key, it->first, en, tenant, xauthToken) == false) || (macroSubstitute(&value, it->second, en, tenant, xauthToken) == false))
+        if ((macroSubstitute(&key, it->first, &replacements) == false) || (macroSubstitute(&value, it->second, &replacements) == false))
         {
           // Warning already logged in macroSubstitute()
           // FIXME PR: should return NULL?
@@ -512,7 +524,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         std::string key   = it->first;
         std::string value = it->second;
 
-        if ((macroSubstitute(&key, it->first, en, tenant, xauthToken) == false) || (macroSubstitute(&value, it->second, en, tenant, xauthToken) == false))
+        if ((macroSubstitute(&key, it->first, &replacements) == false) || (macroSubstitute(&value, it->second, &replacements) == false))
         {
           // Warning already logged in macroSubstitute()
           // FIXME PR: should return NULL?
@@ -581,7 +593,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     // 8. Topic (only in the case of MQTT notifications)
     if (notification.type == ngsiv2::MqttNotification)
     {
-      if (macroSubstitute(&topic, notification.mqttInfo.topic, en, tenant, xauthToken) == false)
+      if (macroSubstitute(&topic, notification.mqttInfo.topic, &replacements) == false)
       {
         // Warning already logged in macroSubstitute()
         // FIXME PR: should return NULL?
