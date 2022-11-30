@@ -556,7 +556,7 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
     {
       // "Partial replacement" case. In this case, the result is always a string
       std::string effectiveValue;
-      if (!macroSubstitute(&effectiveValue, stringValue, replacementsP))
+      if (!macroSubstitute(&effectiveValue, stringValue, replacementsP, "null"))
       {
         // error already logged in macroSubstitute, using stringValue itself as failsafe
         effectiveValue = stringValue;

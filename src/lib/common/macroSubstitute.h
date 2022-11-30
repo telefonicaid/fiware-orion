@@ -49,6 +49,6 @@ extern void buildReplacementsMap
 * macroSubstitute -
 *
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, std::map<std::string, std::string>* replacementsP);
+extern bool macroSubstitute(std::string* sP, const std::string& in, std::map<std::string, std::string>* replacementsP, const std::string& nullString);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

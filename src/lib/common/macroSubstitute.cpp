@@ -65,12 +65,12 @@ void buildReplacementsMap
 *
 * stringValueOrNull -
 */
-static std::string stringValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key)
+static std::string stringValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key, const std::string& nullString)
 {
   std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
   if (iter == replacementsP->end())
   {
-    return "null";
+    return nullString;
   }
   else
   {
@@ -116,7 +116,7 @@ static std::string stringValueOrNull(std::map<std::string, std::string>* replace
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, std::map<std::string, std::string>* replacementsP)
+bool macroSubstitute(std::string* to, const std::string& from, std::map<std::string, std::string>* replacementsP, const std::string& nullString)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -179,7 +179,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNull(replacementsP, macroName).length() * times;
+    toAdd += stringValueOrNull(replacementsP, macroName, nullString).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -197,7 +197,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNull(replacementsP, macroName);
+    std::string value = stringValueOrNull(replacementsP, macroName, nullString);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)

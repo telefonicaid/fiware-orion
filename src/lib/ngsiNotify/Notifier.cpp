@@ -170,7 +170,7 @@ static bool setPayload
   {
     std::map<std::string, std::string> replacements;
     buildReplacementsMap(en, service, token, &replacements);
-    if (!macroSubstitute(payloadP, notifPayload, &replacements))
+    if (!macroSubstitute(payloadP, notifPayload, &replacements, ""))
     {
       return false;
     }
@@ -270,7 +270,7 @@ static bool setNgsiPayload
     {
       // "Partial replacement" case. In this case, the result is always a string
       std::string effectiveValue;
-      if (!macroSubstitute(&effectiveValue, ngsi.id, &replacements))
+      if (!macroSubstitute(&effectiveValue, ngsi.id, &replacements, "null"))
       {
         // error already logged in macroSubstitute, using en.id itself as failsafe
         effectiveValue = en.id;
@@ -308,7 +308,7 @@ static bool setNgsiPayload
     {
       // "Partial replacement" case. In this case, the result is always a string
       std::string effectiveValue;
-      if (!macroSubstitute(&effectiveValue, ngsi.type, &replacements))
+      if (!macroSubstitute(&effectiveValue, ngsi.type, &replacements, "null"))
       {
         // error already logged in macroSubstitute, using en.id itself as failsafe
         effectiveValue = en.type;
@@ -410,7 +410,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     // 2. URL
     //
     std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-    if (macroSubstitute(&url, notifUrl, &replacements) == false)
+    if (macroSubstitute(&url, notifUrl, &replacements, "") == false)
     {
       // Warning already logged in macroSubstitute()
       // FIXME PR: should return NULL?
@@ -468,7 +468,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         std::string key   = it->first;
         std::string value = it->second;
 
-        if ((macroSubstitute(&key, it->first, &replacements) == false) || (macroSubstitute(&value, it->second, &replacements) == false))
+        if ((macroSubstitute(&key, it->first, &replacements, "") == false) || (macroSubstitute(&value, it->second, &replacements, "") == false))
         {
           // Warning already logged in macroSubstitute()
           // FIXME PR: should return NULL?
@@ -496,7 +496,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         std::string key   = it->first;
         std::string value = it->second;
 
-        if ((macroSubstitute(&key, it->first, &replacements) == false) || (macroSubstitute(&value, it->second, &replacements) == false))
+        if ((macroSubstitute(&key, it->first, &replacements,  "") == false) || (macroSubstitute(&value, it->second, &replacements, "") == false))
         {
           // Warning already logged in macroSubstitute()
           // FIXME PR: should return NULL?
@@ -565,7 +565,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     // 8. Topic (only in the case of MQTT notifications)
     if (notification.type == ngsiv2::MqttNotification)
     {
-      if (macroSubstitute(&topic, notification.mqttInfo.topic, &replacements) == false)
+      if (macroSubstitute(&topic, notification.mqttInfo.topic, &replacements, "") == false)
       {
         // Warning already logged in macroSubstitute()
         // FIXME PR: should return NULL?

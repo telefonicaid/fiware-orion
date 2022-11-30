@@ -1001,7 +1001,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     {
       // "Partial replacement" case. In this case, the result is always a string
       std::string effectiveValue;
-      if (!macroSubstitute(&effectiveValue, stringValue, replacementsP))
+      if (!macroSubstitute(&effectiveValue, stringValue, replacementsP, "null"))
       {
         // error already logged in macroSubstitute, using stringValue itself as failsafe
         effectiveValue = stringValue;
