@@ -248,35 +248,11 @@ static bool setNgsiPayload
   }
   else
   {
-    // FIXME PR: duplicated code in CompoundValueNode.cpp
-    if ((ngsi.id.rfind("${") == 0) && (ngsi.id.rfind("}", ngsi.id.size()) == ngsi.id.size() - 1))
-    {
-      // "Full replacement" case. In this case, the result is not always a string
-      // len("${") + len("}") = 3
-      std::string macroName = ngsi.id.substr(2, ngsi.id.size() - 3);
-      std::map<std::string, std::string>::iterator iter = replacements.find(macroName);
-      if (iter == replacements.end())
-      {
-        // macro doesn't exist in the replacement map, so we use en.id as failsave
-        effectiveId = en.id;
-      }
-      else
-      {
-        // Note we have to remove double quotes here
-        effectiveId = iter->second.substr(1, iter->second.size()-2);
-      }
-    }
-    else
-    {
-      // "Partial replacement" case. In this case, the result is always a string
-      std::string effectiveValue;
-      if (!macroSubstitute(&effectiveValue, ngsi.id, &replacements, "null"))
-      {
-        // error already logged in macroSubstitute, using en.id itself as failsafe
-        effectiveValue = en.id;
-      }
-      effectiveId = effectiveValue;
-    }
+    // If id is not found in the replacements macro, we use en.id.
+    // In addition, Note we have to remove double quotes here
+    // FIXME PR: is the case in which en.id failsafe to be used covered by tests?
+    std::string s = smartStringValue(ngsi.id, &replacements, '"' + en.id + '"');
+    effectiveId = s.substr(1, s.size()-2);
   }
 
   std::string effectiveType;
@@ -286,35 +262,11 @@ static bool setNgsiPayload
   }
   else
   {
-    // FIXME PR: duplicated code in CompoundValueNode.cpp
-    if ((ngsi.type.rfind("${") == 0) && (ngsi.type.rfind("}", ngsi.type.size()) == ngsi.type.size() - 1))
-    {
-      // "Full replacement" case. In this case, the result is not always a string
-      // len("${") + len("}") = 3
-      std::string macroName = ngsi.type.substr(2, ngsi.type.size() - 3);
-      std::map<std::string, std::string>::iterator iter = replacements.find(macroName);
-      if (iter == replacements.end())
-      {
-        // macro doesn't exist in the replacement map, so we use en.id as failsave
-        effectiveType = en.type;
-      }
-      else
-      {
-        // Note we have to remove double quotes here
-        effectiveType = iter->second.substr(1, iter->second.size()-2);
-      }
-    }
-    else
-    {
-      // "Partial replacement" case. In this case, the result is always a string
-      std::string effectiveValue;
-      if (!macroSubstitute(&effectiveValue, ngsi.type, &replacements, "null"))
-      {
-        // error already logged in macroSubstitute, using en.id itself as failsafe
-        effectiveValue = en.type;
-      }
-      effectiveType = effectiveValue;
-    }
+    // If type is not found in the replacements macro, we use en.type.
+    // In addition, Note we have to remove double quotes here
+    // FIXME PR: is the case in which en.type failsafe to be used covered by tests?
+    std::string s = smartStringValue(ngsi.type, &replacements, '"' + en.type + '"');
+    effectiveType = s.substr(1, s.size()-2);
   }
 
   cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);

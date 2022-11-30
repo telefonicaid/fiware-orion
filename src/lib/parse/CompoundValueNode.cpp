@@ -536,41 +536,7 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
   switch (valueType)
   {
   case orion::ValueTypeString:
-    if ((replacementsP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
-    {
-      // "Full replacement" case. In this case, the result is not always a string
-      // len("${") + len("}") = 3
-      std::string macroName = stringValue.substr(2, stringValue.size() - 3);
-      std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
-      if (iter == replacementsP->end())
-      {
-        // macro doesn't exist in the replacement map, so we use null as failsafe
-        out += "null";
-      }
-      else
-      {
-        out += iter->second;
-      }
-    }
-    else if (replacementsP != NULL)
-    {
-      // "Partial replacement" case. In this case, the result is always a string
-      std::string effectiveValue;
-      if (!macroSubstitute(&effectiveValue, stringValue, replacementsP, "null"))
-      {
-        // error already logged in macroSubstitute, using stringValue itself as failsafe
-        effectiveValue = stringValue;
-      }
-      out += '"' + toJsonString(effectiveValue) + '"';
-    }
-    else
-    {
-      out = '"';
-      out += toJsonString(stringValue);
-      out += '"';
-    }
-
-    return out;
+    return smartStringValue(stringValue, replacementsP, "null");
 
   case orion::ValueTypeNumber:
     return double2string(numberValue);

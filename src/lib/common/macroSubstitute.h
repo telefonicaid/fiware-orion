@@ -29,6 +29,14 @@
 
 #include "apiTypesV2/Entity.h"
 
+/* ****************************************************************************
+*
+* smartStringValue -
+*
+*/
+extern std::string smartStringValue(const std::string stringValue, std::map<std::string, std::string>* replacementsP, const std::string notFoundDefault);
+
+
 
 /* ****************************************************************************
 *
@@ -44,11 +52,12 @@ extern void buildReplacementsMap
 );
 
 
+
 /* ****************************************************************************
 *
 * macroSubstitute -
 *
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, std::map<std::string, std::string>* replacementsP, const std::string& nullString);
+extern bool macroSubstitute(std::string* sP, const std::string& in, std::map<std::string, std::string>* replacementsP, const std::string& notFoundDefault);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

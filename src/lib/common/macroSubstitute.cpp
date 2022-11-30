@@ -29,7 +29,56 @@
 #include "common/string.h"
 #include "common/limits.h"
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
+
+
+
+/* ****************************************************************************
+*
+* smartStringValue -
+*
+* Returns the effective string value, taking into account replacements
+*/
+std::string smartStringValue(const std::string stringValue, std::map<std::string, std::string>* replacementsP, const std::string notFoundDefault)
+{
+  // This code is pretty similar to the one in CompoundValueNode::toJson()
+  // The program logic branching is the same, but the result at the end of each if-else
+  // is different, which makes difficult to unify both them
+  if ((replacementsP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
+  {
+    // "Full replacement" case. In this case, the result is not always a string
+    // len("${") + len("}") = 3
+    std::string macroName = stringValue.substr(2, stringValue.size() - 3);
+    std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
+    if (iter == replacementsP->end())
+    {
+      // macro doesn't exist in the replacement map, so we use null as failsafe
+      return notFoundDefault;
+    }
+    else
+    {
+      return iter->second;
+    }
+  }
+  else if (replacementsP != NULL)
+  {
+    // "Partial replacement" case. In this case, the result is always a string
+    std::string effectiveValue;
+    if (!macroSubstitute(&effectiveValue, stringValue, replacementsP, "null"))
+    {
+      // error already logged in macroSubstitute, using stringValue itself as failsafe
+      effectiveValue = stringValue;
+    }
+    // toJsonString will stringfly JSON values in macros
+    return '"' + toJsonString(effectiveValue) + '"';
+  }
+  else
+  {
+    // No replacement applied, just return the original string
+    return '"' + stringValue + '"';
+  }
+}
 
 
 
@@ -65,12 +114,12 @@ void buildReplacementsMap
 *
 * stringValueOrNull -
 */
-static std::string stringValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key, const std::string& nullString)
+static std::string stringValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key, const std::string& notFoundDefault)
 {
   std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
   if (iter == replacementsP->end())
   {
-    return nullString;
+    return notFoundDefault;
   }
   else
   {
@@ -116,7 +165,7 @@ static std::string stringValueOrNull(std::map<std::string, std::string>* replace
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, std::map<std::string, std::string>* replacementsP, const std::string& nullString)
+bool macroSubstitute(std::string* to, const std::string& from, std::map<std::string, std::string>* replacementsP, const std::string& notFoundDefault)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -179,7 +228,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNull(replacementsP, macroName, nullString).length() * times;
+    toAdd += stringValueOrNull(replacementsP, macroName, notFoundDefault).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -197,7 +246,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNull(replacementsP, macroName, nullString);
+    std::string value = stringValueOrNull(replacementsP, macroName, notFoundDefault);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)
