@@ -625,61 +625,8 @@ SenderThreadParams* Notifier::buildSenderParams
     NotifyContextRequest   ncr;
     ContextElementResponse cer;
 
-#if 1
-    cer.entity.fill(notifyCerP->entity.id,
-                    notifyCerP->entity.type,
-                    notifyCerP->entity.isPattern,
-                    notifyCerP->entity.servicePath);
-
-    // FIXME PR: maybe filtering is already done by filtering logic and most
-    // of this block is unneded?
-    for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
-    {
-      ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
-
-      /* 'skip' field is used to mark deleted attributes that must not be included in the
-     * notification (see deleteAttrInNotifyCer function for details) */
-      if ((attrsFilter.size() == 0) ||
-          (std::find(attrsFilter.begin(), attrsFilter.end(), std::string(ALL_ATTRS)) != attrsFilter.end()) ||
-          (blacklist == true))
-      {
-        /* Empty attribute list in the subscription mean that all attributes are added
-       * Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
-       * cer.entity destructor does release() on the attrs vector */
-        if (!caP->skip)
-        {
-          cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
-        }
-      }
-      else
-      {
-        for (unsigned int jx = 0; jx < attrsFilter.size(); jx++)
-        {
-          if (caP->name == attrsFilter[jx] && !caP->skip)
-          {
-            /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
-           * cer.entity destructor does release() on the attrs vector */
-            cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
-          }
-        }
-      }
-    }
-
-    /* Early exit without sending notification if attribute list is empty */
-    if (cer.entity.attributeVector.size() == 0)
-    {
-      ncr.contextElementResponseVector.release();
-      // FIXME PR: check if we can process correctly NULL as params
-      return NULL;
-    }
-    // FIXME PR: ...useless until this point?
-
-
-    /* Setting status code in CER */
-    cer.statusCode.fill(SccOk);
-#else
     cer.fill(notifyCerP);
-#endif
+    cer.statusCode.fill(SccOk);
 
     ncr.contextElementResponseVector.push_back(&cer);
 
