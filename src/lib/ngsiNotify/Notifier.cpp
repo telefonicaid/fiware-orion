@@ -630,7 +630,7 @@ SenderThreadParams* Notifier::buildSenderParams
                     notifyCerP->entity.isPattern,
                     notifyCerP->entity.servicePath);
 
-#if 0
+#if 1
     // FIXME PR: maybe filtering is already done by filtering logic and most
     // of this block is unneded?
     for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
