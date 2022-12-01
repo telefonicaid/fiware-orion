@@ -76,7 +76,7 @@ std::string smartStringValue(const std::string stringValue, std::map<std::string
   else
   {
     // No replacement applied, just return the original string
-    return '"' + stringValue + '"';
+    return '"' + toJsonString(stringValue) + '"';
   }
 }
 
@@ -112,9 +112,9 @@ void buildReplacementsMap
 
 /* ****************************************************************************
 *
-* stringValueOrNull -
+* stringValueOrNothing -
 */
-static std::string stringValueOrNull(std::map<std::string, std::string>* replacementsP, const std::string key, const std::string& notFoundDefault)
+static std::string stringValueOrNothing(std::map<std::string, std::string>* replacementsP, const std::string key, const std::string& notFoundDefault)
 {
   std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
   if (iter == replacementsP->end())
@@ -228,7 +228,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNull(replacementsP, macroName, notFoundDefault).length() * times;
+    toAdd += stringValueOrNothing(replacementsP, macroName, notFoundDefault).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -246,7 +246,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNull(replacementsP, macroName, notFoundDefault);
+    std::string value = stringValueOrNothing(replacementsP, macroName, notFoundDefault);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)
