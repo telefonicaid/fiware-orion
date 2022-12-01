@@ -651,6 +651,85 @@ fi
 
 # ------------------------------------------------------------------------------
 #
+# The test suite needs the docker container 'wistefan/context-server' to run.
+# If we're inside github actions, then "docker" is not installed, and as the Context Server is
+# already guaranteed to run, we don't need to bother about starting the Context Server from here.
+#
+# The Context Server is used in 3 of the functests:
+#   * ngsild_context-delete-and-reload.test
+#   * ngsild_missing_notification.test
+#   * ngsild_new_missing_notification.test
+#
+pushContexts=1
+dockerExec=$(which docker)
+if [ "$dockerExec" != "" ]
+then
+    cServer=$(docker ps | grep 'wistefan/context-server')
+    if [ "$cServer" == "" ]
+    then
+        echo "The Context Server isn't running. Starting it ..."
+        docker run --rm -d --name context-server -p 7080:8080 -e MEMORY_ENABLED=true wistefan/context-server
+        echo "... Context Server Started"
+        sleep 3  # Very slow - it doesn't work without this delay
+    else
+        echo "The Context Server is already running."
+        pushContexts=0                                 # Assuming the @contexts have been pushed already
+    fi
+else
+    echo "* docker is not installed - if we're in GitHub Actions, that's how it should be."
+    echo "* If not in GitHub Actions, this might be a problem."
+    echo "  - this test suite starts the Context Server if need be, but without docker that's not possible"
+    echo "  - so, if you get here (and it's not GA) you'll have to start the Context Server manually:"
+    echo "    % docker run --rm -d --name context-server -p 7080:8080 -e MEMORY_ENABLED=true wistefan/context-server"
+fi
+
+
+
+# ------------------------------------------------------------------------------
+#
+# Loading the context server with the @contexts found under test/functionalTest/contexts
+#
+# There's only one @context right now:
+# - schema_lab_fiware_org_ld_context.jsonld (mirroring "https://schema.lab.fiware.org/ld/context")
+#
+if [ -d test/functionalTest/contexts ] && [ "$pushContexts" == "1" ]
+then
+    cd test/functionalTest/contexts
+    echo "----- Pushing contexts to the Context Server -----"
+    for file in *.jsonld
+    do
+        if [ -f "$file" ]
+        then
+            body=$(cat $file)
+            cServerCurl --url /jsonldContexts/$file --file $file --verb POST > /tmp/cServerCurl.stdout 2> /tmp/cServerCurl.stderr
+            if [ $? == 0 ]
+            then
+                echo "  Context '$file' pushed to the Context Server"
+            else
+                echo "Context '$file' was not pushed - it failed!"
+                echo "stderr:"
+                echo "----------------------------------------------------------"
+                cat /tmp/cServerCurl.stderr
+                echo "----------------------------------------------------------"
+                echo
+                echo "stdout:"
+                echo "----------------------------------------------------------"
+                cat /tmp/cServerCurl.stdout
+                echo "----------------------------------------------------------"
+                echo
+                exit 1
+            fi
+        fi
+    done
+    echo "--------------------------------------------------"
+    echo
+    cd -
+fi
+
+
+
+# ------------------------------------------------------------------------------
+#
 # Preparations - cd to the test directory
 #
 logMsg Functional Tests Starting ...
@@ -663,6 +742,7 @@ then
 else
   cd $dir
 fi
+
 
 
 logMsg "Orion Functional tests starting"

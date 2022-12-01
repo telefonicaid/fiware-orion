@@ -36,7 +36,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/curlToBrokerStrerror.h"                 // curlToBrokerStrerror
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldEntityExpand.h"                 // orionldEntityExpand
 #include "orionld/context/orionldEntityCompact.h"                // orionldEntityCompact
@@ -172,6 +171,7 @@ bool orionldGetEntity(void)
 
   KjNode* dbEntityP  = mongocEntityLookup(entityId, &orionldState.in.attrList, orionldState.uriParams.geometryProperty);
   KjNode* apiEntityP = NULL;
+
   if (dbEntityP == NULL)
   {
     if (forwards == 0)
