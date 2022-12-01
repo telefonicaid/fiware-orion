@@ -158,7 +158,7 @@ def ignore(root, file):
     if 'heavyTest' in root and (file.endswith('.json') or file.endswith('.xml')):
         return True
 
-    # JSONLD files in test/functionalTest/contexts are not processed
+    # JSONLD files in test/functionalTest/contexts are not processed - they can't have the Copyright header
     if 'contexts' in root and file.endswith('.jsonld'):
         return True
 
