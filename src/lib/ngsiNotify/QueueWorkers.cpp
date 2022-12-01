@@ -74,13 +74,10 @@ int QueueWorkers::stop()
   // Put in the queue as many kill messages as threads we have
   for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
   {
-    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>();
+    SenderThreadParams*  paramsP = new SenderThreadParams();
+    paramsP->type = QUEUE_MSG_KILL;
 
-    SenderThreadParams*  params = new SenderThreadParams();
-    params->type = QUEUE_MSG_KILL;
-    paramsV->push_back(params);
-
-    if (!pQueue->try_push(paramsV, true))
+    if (!pQueue->try_push(paramsP, true))
     {
       LM_E(("Runtime Error (thread kill message cannot be sent due to push in queue failed)"));
     }
@@ -104,7 +101,7 @@ int QueueWorkers::stop()
 */
 static void* workerFunc(void* pSyncQ)
 {
-  SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue = (SyncQOverflow<std::vector<SenderThreadParams*>*> *) pSyncQ;
+  SyncQOverflow<SenderThreadParams*>*  queue = (SyncQOverflow<SenderThreadParams*> *) pSyncQ;
   CURL*                                              curl;
 
   // Initialize curl context
@@ -118,24 +115,21 @@ static void* workerFunc(void* pSyncQ)
 
   for (;;)
   {
-    std::vector<SenderThreadParams*>* paramsV = queue->pop();
+    SenderThreadParams* paramsP = queue->pop();
 
-    // The "protocol" to signal thread termination is to find a kill msg in the first
-    // element of the paramsV vector (note that by construction in QueueWorkers::stop()
-    // this vector will have only one item in this case)
-    if ((paramsV->size() == 1) && ((*paramsV)[0]->type == QUEUE_MSG_KILL))
+    // The "protocol" to signal thread termination is to find a kill msg
+    if (paramsP->type == QUEUE_MSG_KILL)
     {
       LM_T(LmtThreadpool, ("Thread %x receiving termination signal...", pthread_self()));
 
-      delete (*paramsV)[0];
-      delete paramsV;
+      delete paramsP;
       curl_easy_cleanup((CURL*) curl);
 
       pthread_exit(NULL);
     }
 
     // process paramV to send notification (freeing memory after use)
-    doNotify(paramsV, curl, queue, "worker");
+    doNotify(paramsP, curl, queue, "worker");
 
     // Reset curl for next iteration
     curl_easy_reset(curl);

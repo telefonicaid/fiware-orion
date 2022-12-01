@@ -467,10 +467,10 @@ of HTTP and MQTT notifications.
 
 _NF-01: HTTP Notification on entity-attribute Update/Creation without thread pool_
 
-* A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
+* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1).
 * `pthread_create()` is called to create a new thread for sending of the notifications and without awaiting any result, the control is returned to mongoBackend (step 2).
 * `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 3).
-* `startSenderThread()` calls to `doNotify()` function, which loops over the `SenderThreadParams` vector and sends a notification per item (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
+* `startSenderThread()` calls to `doNotify()` function, which sends the notification corresponding to the `SenderThreadParams` object (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout).
 
 <a name="flow-nf-01b"></a>
 ![MQTT Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
@@ -486,13 +486,13 @@ _NF-01b: MQTT Notification on entity-attribute Update/Creation without thread po
 
 _NF-03: HTTP Notification on entity-attribute Update/Creation with thread pool_
 
-* A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
+* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1).
 * A `ServiceQueue` is selected depending the service associated to the notification. If no queue exists for the service
   associated to the notification, then the default `ServiceQueue` is used. The `try_push()` method in the selected
   `ServiceQueue` is used to put the notification in the right queue (step 2).
-* The vector is pushed onto the Notification Message Queue (step 3). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
+* The object is pushed onto the Notification Message Queue (step 3). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
 * One of the worker threads in the thread pool pops an item from the message queue (step 4). This is done using `SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
-* The worker thread calls to `doNotify()` function, which loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
+* The worker thread calls to `doNotify()` function, which takes the `SenderThreadParam` object of the popped queue item and sends the corresponding notification (steps 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout).
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
 
 <a name="flow-nf-03b"></a>

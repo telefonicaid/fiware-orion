@@ -136,7 +136,7 @@ void QueueNotifier::sendNotifyContextRequest
   const std::vector<std::string>&  metadataFilter
 )
 {
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(notifyCerP,
+  SenderThreadParams* paramsP = Notifier::buildSenderParams(notifyCerP,
                                                                           nsf.subId,
                                                                           notification,
                                                                           nsf.tenant,
@@ -151,11 +151,9 @@ void QueueNotifier::sendNotifyContextRequest
                                                                           covered,
                                                                           metadataFilter);
 
-  size_t notificationsNum = paramsV->size();
-  for (unsigned ix = 0; ix < notificationsNum; ix++)
-  {
-    clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
-  }
+
+  clock_gettime(CLOCK_REALTIME, &(paramsP->timeStamp));
+
 
   // Try to use per-service queue. If not found, use the default queue
   ServiceQueue* sq;
@@ -173,19 +171,15 @@ void QueueNotifier::sendNotifyContextRequest
     sq = &defaultSq;
   }
 
-  bool enqueued = sq->try_push(paramsV);
+  bool enqueued = sq->try_push(paramsP);
   if (!enqueued)
   {
-    QueueStatistics::incReject(notificationsNum);
+    QueueStatistics::incReject(1);
     LM_E(("Runtime Error (%s notification queue is full)", queueName.c_str()));
-    for (unsigned ix = 0; ix < paramsV->size(); ix++)
-    {
-      delete (*paramsV)[ix];
-    }
-    delete paramsV;
+    delete paramsP;
 
     return;
   }
 
-  QueueStatistics::incIn(notificationsNum);
+  QueueStatistics::incIn(1);
 }

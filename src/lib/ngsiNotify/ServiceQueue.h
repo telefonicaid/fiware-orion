@@ -41,11 +41,11 @@ public:
   ServiceQueue(size_t queueSize, int numThreads);
   int start(void);
   int stop(void);
-  bool try_push(std::vector<SenderThreadParams*>* item);
+  bool try_push(SenderThreadParams* item);
   size_t size() const;
 
 private:
-  SyncQOverflow<std::vector<SenderThreadParams*>*>  queue;
+  SyncQOverflow<SenderThreadParams*>  queue;
   QueueWorkers                                      workers;
 
 };

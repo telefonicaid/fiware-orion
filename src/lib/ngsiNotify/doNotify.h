@@ -38,9 +38,9 @@
 */
 extern void doNotify
 (
-  std::vector<SenderThreadParams*>*                  paramsV,
+  SenderThreadParams*                  paramsV,
   CURL*                                              curl,
-  SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue,
+  SyncQOverflow<SenderThreadParams*>*  queue,
   const char*                                        logPrefix
 );
 

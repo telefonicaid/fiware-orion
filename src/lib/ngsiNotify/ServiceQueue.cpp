@@ -65,7 +65,7 @@ int ServiceQueue::stop(void)
 *
 * ServiceQueue::try_push -
 */
-bool ServiceQueue::try_push(std::vector<SenderThreadParams*>* item)
+bool ServiceQueue::try_push(SenderThreadParams* item)
 {
   return queue.try_push(item);
 }

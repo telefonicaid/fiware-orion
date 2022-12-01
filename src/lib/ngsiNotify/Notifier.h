@@ -74,7 +74,7 @@ public:
                                         const std::vector<std::string>&  metadataFilter);
 
 protected:
-  static std::vector<SenderThreadParams*>* buildSenderParams(ContextElementResponse*          notifyCerP,
+  static SenderThreadParams* buildSenderParams(ContextElementResponse*          notifyCerP,
                                                              const std::string&               subId,
                                                              const ngsiv2::Notification&      notification,
                                                              const std::string&               tenant,
