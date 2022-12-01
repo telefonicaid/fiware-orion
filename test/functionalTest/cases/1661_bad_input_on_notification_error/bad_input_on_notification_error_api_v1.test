@@ -301,7 +301,7 @@ Date: REGEX(.*)
 
 10. Check log-file to make sure a Runtime Error was provoked due to the invalid subscription
 ============================================================================================
-Runtime Error (not sending NotifyContextRequest: malformed URL: 'badReferenceForSubscription')
+Runtime Error (not sending notification: malformed URL: 'badReferenceForSubscription')
 
 
 --TEARDOWN--

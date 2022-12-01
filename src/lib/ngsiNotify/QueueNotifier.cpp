@@ -151,6 +151,13 @@ void QueueNotifier::sendNotifyContextRequest
                                                             covered,
                                                             metadataFilter);
 
+  // Early return if some problem occurred with params building
+  // Nothing is added to the queue in this case
+  if (paramsP == NULL)
+  {
+    return;
+  }
+
   clock_gettime(CLOCK_REALTIME, &(paramsP->timeStamp));
 
   // Try to use per-service queue. If not found, use the default queue
