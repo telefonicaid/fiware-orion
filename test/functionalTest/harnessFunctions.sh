@@ -48,21 +48,6 @@ fi
 
 # ------------------------------------------------------------------------------
 #
-# The test suite needs the docker container 'wistefan/context-server' to run.
-# - that's the context server that is used in 3 of the functests, so far ...
-#
-cServer=$(docker ps | grep 'wistefan/context-server')
-if [ "$cServer" == "" ]
-then
-  echo "The context Server isn't running. Starting it ..."
-  docker run --rm -d --name context-server -p 7080:8080 -e MEMORY_ENABLED=true wistefan/context-server
-  echo "... Started"
-fi
-
-
-
-# ------------------------------------------------------------------------------
-#
 # harnessExit - 
 #
 function harnessExit()
@@ -1672,7 +1657,7 @@ function cServerStop
 
 # -----------------------------------------------------------------------------
 #
-# cServerCurl [--verb <verb>] --url <url> [--payload <payload>]
+# cServerCurl [--verb <verb>] --url <url> [--payload <payload>] [ --file <@filename>]
 #
 function cServerCurl
 {
@@ -1686,9 +1671,10 @@ function cServerCurl
 
   while [ "$#" != 0 ]
   do
-    if   [ "$1" == "--verb" ];    then  verb=$2;    shift;
-    elif [ "$1" == "--url" ];     then  url=$2;     shift;
-    elif [ "$1" == "--payload" ]; then  _payload=$2; hasPayload=yes; shift;
+    if   [ "$1" == "--verb" ];    then  verb=$2;                            shift;
+    elif [ "$1" == "--url" ];     then  url=$2;                             shift;
+    elif [ "$1" == "--file" ];    then  _payload=$(cat $2); hasPayload=yes; shift;
+    elif [ "$1" == "--payload" ]; then  _payload=$2;        hasPayload=yes; shift;
     else
       echo "Invalid option/parameter for cServerCurl: $1"
       exit 1
@@ -1707,24 +1693,35 @@ function cServerCurl
     verb=POST
   fi
 
+  r=0
   if [ "$hasPayload" == "yes" ]
   then
-    curl -s http://localhost:7080$url -X $verb -d "$_payload" -H "Content-Type: application/ld+json" --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+    curlCommand='curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders -d "$_payload" -H "Content-Type: application/ld+json"'
+    curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders -d "$_payload" -H "Content-Type: application/ld+json"  > /tmp/cServerOut
     r=$?
   else
-    curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders > /tmp/cServerOut
-#    curl -s http://localhost:7080$url -X $verb -H "Content-Type: application/ld+json" --dump-header /tmp/cServerHeaders > /tmp/cServerOut
+    curlCommand='curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders'
+    curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders                                                        > /tmp/cServerOut
     r=$?
   fi
 
   if [ $r != 0 ]
   then
     echo curl error $r
-    echo curl command: curl http:localhost:7080$url -d "$_payload"
+    echo CURL Command: $curlCommand
+    echo Verb: $verb
+    echo URL:  $url
+    if [ "$_payload" != "" ]
+    then
+      echo Payload: $_payload
+    fi
     echo curl response:
   fi
+
   cat /tmp/cServerHeaders
   cat /tmp/cServerOut
+
+  return $r;
 }
 
 

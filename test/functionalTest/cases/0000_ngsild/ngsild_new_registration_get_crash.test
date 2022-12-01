@@ -55,7 +55,7 @@ payload='{
     }
   ],
   "endpoint": "http://context-provider:3000/static/tweets",
-  "@context": "https://schema.lab.fiware.org/ld/context"
+  "@context": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations -X POST --payload "$payload" -H "Content-Type: application/ld+json"
 echo

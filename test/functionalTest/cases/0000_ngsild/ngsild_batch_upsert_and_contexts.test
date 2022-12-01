@@ -70,7 +70,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
@@ -110,7 +110,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
@@ -150,7 +150,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
@@ -190,7 +190,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
@@ -230,7 +230,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:16956",
@@ -269,7 +269,7 @@ echo
 
 echo "03. Get the entities"
 echo "===================="
-orionCurl --url '/ngsi-ld/v1/entities?type=WeatherObserved&prettyPrint=yes' -H 'Link: <https://schema.lab.fiware.org/ld/context>; ""' -H 'Fiware-Service: smartmaas001' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?type=WeatherObserved&prettyPrint=yes' -H 'Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld>; ""' -H 'Fiware-Service: smartmaas001' --noPayloadCheck
 echo
 echo
 
@@ -309,7 +309,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:22828",
@@ -349,7 +349,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:15333",
@@ -389,7 +389,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:25514",
@@ -429,7 +429,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
@@ -469,7 +469,7 @@ payload='[
       }
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:16956",
@@ -495,7 +495,7 @@ echo
 
 echo "06. Get the entities"
 echo "===================="
-orionCurl --url '/ngsi-ld/v1/entities?type=WeatherObserved&prettyPrint=yes' -H 'Link: <https://schema.lab.fiware.org/ld/context>; ""' -H 'Fiware-Service: smartmaas001' --noPayloadCheck
+orionCurl --url '/ngsi-ld/v1/entities?type=WeatherObserved&prettyPrint=yes' -H 'Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld>; ""' -H 'Fiware-Service: smartmaas001' --noPayloadCheck
 echo
 echo
 
@@ -537,7 +537,7 @@ HTTP/1.1 200 OK
 Content-Length: 4161
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
   {
@@ -727,7 +727,7 @@ Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json
 04. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1596
+Content-Length: 1632
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -763,7 +763,7 @@ Date: REGEX(.*)
     }
   },
   {
-    "url": "https://schema.lab.fiware.org/ld/context",
+    "url": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
     "id": "REGEX(.*)",
     "type": "array",
     "origin": "Downloaded",
@@ -792,7 +792,7 @@ HTTP/1.1 200 OK
 Content-Length: 4161
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
   {
@@ -982,7 +982,7 @@ Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json
 07. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1596
+Content-Length: 1632
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -1018,7 +1018,7 @@ Date: REGEX(.*)
     }
   },
   {
-    "url": "https://schema.lab.fiware.org/ld/context",
+    "url": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
     "id": "REGEX(.*)",
     "type": "array",
     "origin": "Downloaded",

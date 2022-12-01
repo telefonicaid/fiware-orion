@@ -69,7 +69,7 @@ payload='[
       "observedAt": "2020-04-06T20:40:02.260Z"
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ]
   },
@@ -101,7 +101,7 @@ payload='[
       "observedAt": "2020-04-06T20:40:02.260Z"
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ]
   }
@@ -113,7 +113,7 @@ echo
 
 echo "02. GET the entities"
 echo "===================="
-orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&options=keyValues' -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&options=keyValues' -H 'Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -150,7 +150,7 @@ payload='[
       "observedAt": "2020-04-06T20:40:02.260Z"
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ]
   },
@@ -182,7 +182,7 @@ payload='[
       "observedAt": "2020-04-06T20:40:02.260Z"
     },
     "@context": [
-      "https://schema.lab.fiware.org/ld/context",
+      "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
       "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
     ]
   }
@@ -194,7 +194,7 @@ echo
 
 echo "04. GET the entities"
 echo "===================="
-orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&options=keyValues' -H 'Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+orionCurl --url '/ngsi-ld/v1/entities?type=GtfsStation&options=keyValues' -H 'Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
 echo
 
@@ -219,7 +219,7 @@ HTTP/1.1 200 OK
 Content-Length: 547
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
 #SORT_START
@@ -278,7 +278,7 @@ HTTP/1.1 200 OK
 Content-Length: 805
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://schema.lab.fiware.org/ld/context>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
 #SORT_START

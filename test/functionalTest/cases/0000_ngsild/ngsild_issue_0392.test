@@ -59,7 +59,7 @@ payload='{
     "observedAt": "2020-03-02T16:31:13.124Z"
   },
   "@context": [
-    "https://schema.lab.fiware.org/ld/context",
+    "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
