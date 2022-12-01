@@ -184,9 +184,9 @@ static void doNotifyMqtt(SenderThreadParams* params)
 void doNotify
 (
   SenderThreadParams*                  paramsP,
-  CURL*                                              curl,
+  CURL*                                curl,
   SyncQOverflow<SenderThreadParams*>*  queue,
-  const char*                                        logPrefix
+  const char*                          logPrefix
 )
 {
   if (queue != NULL)

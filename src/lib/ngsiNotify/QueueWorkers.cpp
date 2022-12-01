@@ -102,7 +102,7 @@ int QueueWorkers::stop()
 static void* workerFunc(void* pSyncQ)
 {
   SyncQOverflow<SenderThreadParams*>*  queue = (SyncQOverflow<SenderThreadParams*> *) pSyncQ;
-  CURL*                                              curl;
+  CURL*                                curl;
 
   // Initialize curl context
   curl = curl_easy_init();

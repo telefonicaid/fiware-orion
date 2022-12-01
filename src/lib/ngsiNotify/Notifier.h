@@ -75,19 +75,19 @@ public:
 
 protected:
   static SenderThreadParams* buildSenderParams(ContextElementResponse*          notifyCerP,
-                                                             const std::string&               subId,
-                                                             const ngsiv2::Notification&      notification,
-                                                             const std::string&               tenant,
-                                                             long long                        maxFailsLimit,
-                                                             long long                        failsCounter,
-                                                             const std::string&               xauthToken,
-                                                             const std::string&               fiwareCorrelator,
-                                                             unsigned int                     correlatorCounter,
-                                                             RenderFormat                     renderFormat,
-                                                             const std::vector<std::string>&  attrsFilter,
-                                                             bool                             blacklist,
-                                                             bool                             covered,
-                                                             const std::vector<std::string>&  metadataFilter);
+                                               const std::string&               subId,
+                                               const ngsiv2::Notification&      notification,
+                                               const std::string&               tenant,
+                                               long long                        maxFailsLimit,
+                                               long long                        failsCounter,
+                                               const std::string&               xauthToken,
+                                               const std::string&               fiwareCorrelator,
+                                               unsigned int                     correlatorCounter,
+                                               RenderFormat                     renderFormat,
+                                               const std::vector<std::string>&  attrsFilter,
+                                               bool                             blacklist,
+                                               bool                             covered,
+                                               const std::vector<std::string>&  metadataFilter);
 };
 
 #endif  // SRC_LIB_NGSINOTIFY_NOTIFIER_H_

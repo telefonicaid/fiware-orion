@@ -137,23 +137,21 @@ void QueueNotifier::sendNotifyContextRequest
 )
 {
   SenderThreadParams* paramsP = Notifier::buildSenderParams(notifyCerP,
-                                                                          nsf.subId,
-                                                                          notification,
-                                                                          nsf.tenant,
-                                                                          maxFailsLimit,
-                                                                          failsCounter,
-                                                                          nsf.xauthToken,
-                                                                          nsf.fiwareCorrelator,
-                                                                          nsf.correlatorCounter,
-                                                                          renderFormat,
-                                                                          attrsFilter,
-                                                                          blacklist,
-                                                                          covered,
-                                                                          metadataFilter);
-
+                                                            nsf.subId,
+                                                            notification,
+                                                            nsf.tenant,
+                                                            maxFailsLimit,
+                                                            failsCounter,
+                                                            nsf.xauthToken,
+                                                            nsf.fiwareCorrelator,
+                                                            nsf.correlatorCounter,
+                                                            renderFormat,
+                                                            attrsFilter,
+                                                            blacklist,
+                                                            covered,
+                                                            metadataFilter);
 
   clock_gettime(CLOCK_REALTIME, &(paramsP->timeStamp));
-
 
   // Try to use per-service queue. If not found, use the default queue
   ServiceQueue* sq;

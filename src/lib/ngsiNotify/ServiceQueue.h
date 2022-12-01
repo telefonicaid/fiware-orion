@@ -46,7 +46,7 @@ public:
 
 private:
   SyncQOverflow<SenderThreadParams*>  queue;
-  QueueWorkers                                      workers;
+  QueueWorkers                        workers;
 
 };
 

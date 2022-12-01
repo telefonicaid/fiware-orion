@@ -79,19 +79,19 @@ void Notifier::sendNotifyContextRequest
 {
   pthread_t                         tid;
   SenderThreadParams* paramsP = Notifier::buildSenderParams(notifyCerP,
-                                                                          nsf.subId,
-                                                                          notification,
-                                                                          nsf.tenant,
-                                                                          maxFailsLimit,
-                                                                          failsCounter,
-                                                                          nsf.xauthToken,
-                                                                          nsf.fiwareCorrelator,
-                                                                          nsf.correlatorCounter,
-                                                                          renderFormat,
-                                                                          attrsFilter,
-                                                                          blacklist,
-                                                                          covered,
-                                                                          metadataFilter);
+                                                            nsf.subId,
+                                                            notification,
+                                                            nsf.tenant,
+                                                            maxFailsLimit,
+                                                            failsCounter,
+                                                            nsf.xauthToken,
+                                                            nsf.fiwareCorrelator,
+                                                            nsf.correlatorCounter,
+                                                            renderFormat,
+                                                            attrsFilter,
+                                                            blacklist,
+                                                            covered,
+                                                            metadataFilter);
 
   if (paramsP != NULL)
   {
@@ -297,19 +297,19 @@ static bool setNgsiPayload
 */
 static SenderThreadParams* buildSenderParamsCustom
 (
-    const SubscriptionId&                subscriptionId,
-    ContextElementResponse*              notifyCerP,
-    const ngsiv2::Notification&          notification,
-    const std::string&                   tenant,
-    long long                            maxFailsLimit,
-    long long                            failsCounter,
-    const std::string&                   xauthToken,
-    const std::string&                   fiwareCorrelator,
-    unsigned int                         correlatorCounter,
-    RenderFormat                         renderFormat,
-    const std::vector<std::string>&      attrsFilter,
-    bool                                 blacklist,
-    const std::vector<std::string>&      metadataFilter
+    const SubscriptionId&            subscriptionId,
+    ContextElementResponse*          notifyCerP,
+    const ngsiv2::Notification&      notification,
+    const std::string&               tenant,
+    long long                        maxFailsLimit,
+    long long                        failsCounter,
+    const std::string&               xauthToken,
+    const std::string&               fiwareCorrelator,
+    unsigned int                     correlatorCounter,
+    RenderFormat                     renderFormat,
+    const std::vector<std::string>&  attrsFilter,
+    bool                             blacklist,
+    const std::vector<std::string>&  metadataFilter
 )
 {
   std::string                         method;
@@ -625,12 +625,12 @@ SenderThreadParams* Notifier::buildSenderParams
     NotifyContextRequest   ncr;
     ContextElementResponse cer;
 
+#if 1
     cer.entity.fill(notifyCerP->entity.id,
                     notifyCerP->entity.type,
                     notifyCerP->entity.isPattern,
                     notifyCerP->entity.servicePath);
 
-#if 1
     // FIXME PR: maybe filtering is already done by filtering logic and most
     // of this block is unneded?
     for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
@@ -673,10 +673,13 @@ SenderThreadParams* Notifier::buildSenderParams
       return NULL;
     }
     // FIXME PR: ...useless until this point?
-#endif
+
 
     /* Setting status code in CER */
     cer.statusCode.fill(SccOk);
+#else
+    cer.fill(notifyCerP);
+#endif
 
     ncr.contextElementResponseVector.push_back(&cer);
 
