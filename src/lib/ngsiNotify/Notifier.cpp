@@ -243,8 +243,8 @@ static bool setNgsiPayload
   else
   {
     // If id is not found in the replacements macro, we use en.id.
-    // In addition, Note we have to remove double quotes here
-    // FIXME PR: is the case in which en.id failsafe to be used covered by tests?
+    // In addition, note we have to remove double quotes here given the
+    // values stored in replacements map are "raw strings"
     std::string s = smartStringValue(ngsi.id, &replacements, '"' + en.id + '"');
     effectiveId = s.substr(1, s.size()-2);
   }
@@ -257,8 +257,8 @@ static bool setNgsiPayload
   else
   {
     // If type is not found in the replacements macro, we use en.type.
-    // In addition, Note we have to remove double quotes here
-    // FIXME PR: is the case in which en.type failsafe to be used covered by tests?
+    // In addition, note we have to remove double quotes here given the
+    // values stored in replacements map are "raw strings"
     std::string s = smartStringValue(ngsi.type, &replacements, '"' + en.type + '"');
     effectiveType = s.substr(1, s.size()-2);
   }
