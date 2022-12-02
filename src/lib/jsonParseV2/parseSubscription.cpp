@@ -50,6 +50,7 @@
 #include "jsonParseV2/parseSubscription.h"
 #include "jsonParseV2/parseExpression.h"
 #include "jsonParseV2/parseCompoundCommon.h"
+#include "jsonParseV2/parseContextAttribute.h"
 
 
 
@@ -439,15 +440,25 @@ std::string parseCustomJson
 static std::string parseCustomPayload
 (
   ConnectionInfo*             ciP,
+  ngsiv2::CustomPayloadType*  payloadType,
   std::string*                payload,
-  orion::CompoundValueNode**  json,
   bool*                       includePayload,
+  orion::CompoundValueNode**  json,
+  Entity*                     ngsi,
   const Value&                holder
 )
 {
-  if ((holder.HasMember("payload")) && (holder.HasMember("json")))
+  // Text is the one by default
+  *payloadType = ngsiv2::CustomPayloadType::Text;
+
+  unsigned int n = 0;
+  if (holder.HasMember("payload")) n++;
+  if (holder.HasMember("json"))    n++;
+  if (holder.HasMember("ngsi"))    n++;
+
+  if (n > 1)
   {
-    return badInput(ciP, "payload and json fields cannot be used at the same time in httpCustom or mqttCustom");
+    return badInput(ciP, "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom");
   }
 
   if (holder.HasMember("payload"))
@@ -479,10 +490,74 @@ static std::string parseCustomPayload
   }
   else  if (holder.HasMember("json"))
   {
+    *payloadType = ngsiv2::CustomPayloadType::Json;
+
     std::string r = parseCustomJson(holder["json"], json);
     if (!r.empty())
     {
       return badInput(ciP, r);
+    }
+  }
+  else if (holder.HasMember("ngsi"))
+  {
+    *payloadType = ngsiv2::CustomPayloadType::Ngsi;
+
+    for (rapidjson::Value::ConstMemberIterator iter = holder["ngsi"].MemberBegin(); iter != holder["ngsi"].MemberEnd(); ++iter)
+    {
+      std::string name   = iter->name.GetString();
+      std::string type   = jsonParseTypeNames[iter->value.GetType()];
+
+      if (name == "id")
+      {
+        if (type != "String")
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
+        }
+
+        ngsi->id = iter->value.GetString();
+
+        if (forbiddenIdChars(V2, ngsi->id.c_str(), ""))
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
+        }
+      }
+      else if (name == "type")
+      {
+        if (type != "String")
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
+        }
+
+        ngsi->type = iter->value.GetString();
+
+        if (forbiddenIdChars(V2, ngsi->type.c_str(), ""))
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
+        }
+      }
+      else  // attribute
+      {
+        ContextAttribute* caP = new ContextAttribute();
+
+        ngsi->attributeVector.push_back(caP);
+
+        std::string r = parseContextAttribute(ciP, iter, caP);
+
+        if (r == "max deep reached")
+        {
+          return badInput(ciP, ERROR_DESC_PARSE_MAX_JSON_NESTING);
+        }
+        else if (r != "OK")  // other error cases get a general treatment
+        {
+          return badInput(ciP, r);
+        }
+
+        // metadadata are now allowed in this case
+        if (caP->metadataVector.size() > 0)
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF);
+        }
+      }
     }
   }
 
@@ -854,9 +929,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // payload
     r = parseCustomPayload(ciP,
+                           &subsP->notification.httpInfo.payloadType,
                            &subsP->notification.httpInfo.payload,
-                           &subsP->notification.httpInfo.json,
                            &subsP->notification.httpInfo.includePayload,
+                           &subsP->notification.httpInfo.json,
+                           &subsP->notification.httpInfo.ngsi,
                            httpCustom);
     if (!r.empty())
     {
@@ -1003,9 +1080,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // payload
     r = parseCustomPayload(ciP,
+                           &subsP->notification.mqttInfo.payloadType,
                            &subsP->notification.mqttInfo.payload,
-                           &subsP->notification.mqttInfo.json,
                            &subsP->notification.mqttInfo.includePayload,
+                           &subsP->notification.mqttInfo.json,
+                           &subsP->notification.mqttInfo.ngsi,
                            mqttCustom);
 
     if (!r.empty())

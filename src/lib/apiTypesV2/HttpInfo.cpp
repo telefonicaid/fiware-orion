@@ -44,7 +44,7 @@ namespace ngsiv2
 *
 * HttpInfo::HttpInfo - 
 */
-HttpInfo::HttpInfo() : verb(NOVERB), json(NULL), custom(false), includePayload(true), timeout(0)
+HttpInfo::HttpInfo() : verb(NOVERB), json(NULL), payloadType(Text), custom(false), includePayload(true), timeout(0)
 {
 }
 
@@ -67,13 +67,29 @@ std::string HttpInfo::toJson()
 
   if (custom)
   {
-    if (!this->includePayload)
+    switch (payloadType)
     {
-      jh.addNull("payload");
-    }
-    else if (!this->payload.empty())
-    {
-      jh.addString("payload", this->payload);
+    case Text:
+      if (!this->includePayload)
+      {
+        jh.addNull("payload");
+      }
+      else if (!this->payload.empty())
+      {
+        jh.addString("payload", this->payload);
+      }
+      break;
+
+    case Json:
+      if (this->json != NULL)
+      {
+        jh.addRaw("json", this->json->toJson());
+      }
+      break;
+
+    case Ngsi:
+      jh.addRaw("ngsi", this->ngsi.toJson(NGSI_V2_NORMALIZED, true));
+      break;
     }
 
     if (this->verb != NOVERB)
@@ -89,11 +105,6 @@ std::string HttpInfo::toJson()
     if (headers.size() != 0)
     {
       jh.addRaw("headers", objectToJson(headers));
-    }
-
-    if (this->json != NULL)
-    {
-      jh.addRaw("json", this->json->toJson());
     }
   }
 
@@ -114,8 +125,20 @@ void HttpInfo::fill(const orion::BSONObj& bo)
 
   if (this->custom)
   {
+    unsigned int n = 0;
+    if (bo.hasField(CSUB_PAYLOAD)) n++;
+    if (bo.hasField(CSUB_JSON))    n++;
+    if (bo.hasField(CSUB_NGSI))    n++;
+    if (n > 1)
+    {
+      LM_E(("custom notification must not have more than one payload related field"));
+      return;
+    }
+
     if (bo.hasField(CSUB_PAYLOAD))
     {
+      payloadType = ngsiv2::CustomPayloadType::Text;
+
       if (getFieldF(bo, CSUB_PAYLOAD).isNull())
       {
         // We initialize also this->payload in this case, although its value is irrelevant
@@ -132,6 +155,54 @@ void HttpInfo::fill(const orion::BSONObj& bo)
     {
       this->payload = "";
       this->includePayload = true;
+    }
+
+    if (bo.hasField(CSUB_JSON))
+    {
+      payloadType = ngsiv2::CustomPayloadType::Json;
+
+      orion::BSONElement be = getFieldF(bo, CSUB_JSON);
+      if (be.type() == orion::Object)
+      {
+        // this new memory is freed in HttpInfo::release()
+        this->json = new orion::CompoundValueNode(orion::ValueTypeObject);
+        this->json->valueType = orion::ValueTypeObject;
+        compoundObjectResponse(this->json, be);
+      }
+      else if (be.type() == orion::Array)
+      {
+        // this new memory is freed in HttpInfo::release()
+        this->json = new orion::CompoundValueNode(orion::ValueTypeVector);
+        this->json->valueType = orion::ValueTypeVector;
+        compoundVectorResponse(this->json, be);
+      }
+      else
+      {
+        LM_E(("Runtime Error (csub json field must be Object or Array but is %s)", orion::bsonType2String(be.type())));
+      }
+    }
+    else
+    {
+      this->json = NULL;
+    }
+
+    if (bo.hasField(CSUB_NGSI))
+    {
+      payloadType = ngsiv2::CustomPayloadType::Ngsi;
+
+      orion::BSONObj ngsiObj = getObjectFieldF(bo, CSUB_NGSI);
+      if (ngsiObj.hasField(ENT_ENTITY_ID))
+      {
+        this->ngsi.id = getStringFieldF(ngsiObj, ENT_ENTITY_ID);
+      }
+      if (ngsiObj.hasField(ENT_ENTITY_TYPE))
+      {
+        this->ngsi.type = getStringFieldF(ngsiObj, ENT_ENTITY_TYPE);
+      }
+      if (ngsiObj.hasField(ENT_ATTRS))
+      {
+        this->ngsi.attributeVector.fill(getObjectFieldF(ngsiObj, ENT_ATTRS));
+      }
     }
 
     if (bo.hasField(CSUB_TIMEOUT))
@@ -161,34 +232,30 @@ void HttpInfo::fill(const orion::BSONObj& bo)
       orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
       headers.toStringMap(&this->headers);
     }
-
-    if (bo.hasField(CSUB_JSON))
-    {
-      orion::BSONElement be = getFieldF(bo, CSUB_JSON);
-      if (be.type() == orion::Object)
-      {
-        // this new memory is freed in HttpInfo::release()
-        this->json = new orion::CompoundValueNode(orion::ValueTypeObject);
-        this->json->valueType = orion::ValueTypeObject;
-        compoundObjectResponse(this->json, be);
-      }
-      else if (be.type() == orion::Array)
-      {
-        // this new memory is freed in HttpInfo::release()
-        this->json = new orion::CompoundValueNode(orion::ValueTypeVector);
-        this->json->valueType = orion::ValueTypeVector;
-        compoundVectorResponse(this->json, be);
-      }
-      else
-      {
-        LM_E(("Runtime Error (csub json field must be Object or Array but is %s)", orion::bsonType2String(be.type())));
-      }
-    }
-    else
-    {
-      this->json = NULL;
-    }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* HttpInfo::fill -
+*/
+void HttpInfo::fill(const HttpInfo& _httpInfo)
+{
+  this->url            = _httpInfo.url;
+  this->verb           = _httpInfo.verb;
+  this->qs             = _httpInfo.qs;
+  this->headers        = _httpInfo.headers;
+  this->payload        = _httpInfo.payload;
+  this->payloadType    = _httpInfo.payloadType;
+  this->custom         = _httpInfo.custom;
+  this->includePayload = _httpInfo.includePayload;
+  this->timeout        = _httpInfo.timeout;
+
+  this->json = _httpInfo.json == NULL? NULL : _httpInfo.json->clone();
+
+  this->ngsi.fill(_httpInfo.ngsi, false, true);  // clone compounds enabled
 }
 
 
@@ -206,5 +273,6 @@ void HttpInfo::release()
     delete json;
     json = NULL;
   }
+  ngsi.release();
 }
 }

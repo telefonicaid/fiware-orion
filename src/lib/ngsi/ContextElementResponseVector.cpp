@@ -79,17 +79,18 @@ std::string ContextElementResponseVector::toJsonV1
 */
 std::string ContextElementResponseVector::toJson
 (
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter
+  RenderFormat                         renderFormat,
+  const std::vector<std::string>&      attrsFilter,
+  bool                                 blacklist,
+  const std::vector<std::string>&      metadataFilter,
+  std::map<std::string, std::string>*  replacementsP
 )
 {
   JsonVectorHelper jvh;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    jvh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
+    jvh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP));
   }
 
   return jvh.str();

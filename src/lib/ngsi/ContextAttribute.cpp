@@ -34,6 +34,7 @@
 #include "common/limits.h"
 #include "common/RenderFormat.h"
 #include "common/JsonHelper.h"
+#include "common/macroSubstitute.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
@@ -278,7 +279,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
   compoundValueP        = caP->compoundValueP;
   caP->compoundValueP   = NULL;
   found                 = caP->found;
-  skip                  = false;
+  skip                  = caP->skip;
   typeGiven             = caP->typeGiven;
   onlyValue             = caP->onlyValue;
   previousValue         = NULL;
@@ -925,8 +926,12 @@ void ContextAttribute::filterAndOrderMetadata
 *
 * toJson -
 *
+* renderMedatata false is used by ngsi rendering logic in custom notifications
+*
+* renderNgsiField true is used in custom notification payloads, which have some small differences
+* with regards to conventional rendering
 */
-std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter)
+std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, std::map<std::string, std::string>* replacementsP)
 {
   JsonObjectHelper jh;
 
@@ -959,7 +964,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     // of DB entities) may lead to NULL, so the check is needed
     if (childToRenderP != NULL)
     {
-      jh.addRaw("value", childToRenderP->toJson());
+      jh.addRaw("value", childToRenderP->toJson(replacementsP));
     }
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -975,7 +980,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else if (valueType == orion::ValueTypeString)
   {
-    jh.addString("value", stringValue);
+    jh.addRaw("value", smartStringValue(stringValue, replacementsP, "null"));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -998,9 +1003,12 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
 
   //
-  // metadata
+  // metadata (note that ngsi field in custom notifications doesn't include metadata)
   //
-  jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
+  if (!renderNgsiField)
+  {
+    jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
+  }
 
   return jh.str();
 }

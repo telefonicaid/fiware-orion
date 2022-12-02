@@ -31,13 +31,13 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create subscription with json payload and conte-type text/plain
+# 01. Create subscription with json payload and content-type text/plain
 # 02. Create entity to trigger notification
 # 03. Dump accumulator, see notification with content-type
 #
 
-echo "01. Create subscription with json payload and conte-type text/plain"
-echo "==================================================================="
+echo "01. Create subscription with json payload and content-type text/plain"
+echo "====================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -105,8 +105,8 @@ echo
 
 
 --REGEXPECT--
-01. Create subscription with json payload and conte-type text/plain
-===================================================================
+01. Create subscription with json payload and content-type text/plain
+=====================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})

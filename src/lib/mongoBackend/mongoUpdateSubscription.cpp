@@ -61,7 +61,7 @@ using ngsiv2::EntID;
 * setNotificationInfo -
 *
 * This function does the cleanup ($unset) corresponding to a potential change
-* of notificaiton type. Then, it calls the setNotificationInfo() in MongoCommonSubscription.h/cpp
+* of notification type. Then, it calls the setNotificationInfo() in MongoCommonSubscription.h/cpp
 */
 void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, orion::BSONObjBuilder* unsetB)
 {
@@ -72,13 +72,24 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     unsetB->append(CSUB_USER,      1);
     unsetB->append(CSUB_PASSWD,    1);
 
-    if ((sub.notification.httpInfo.includePayload) && (sub.notification.httpInfo.payload.empty()))
+    if  (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Text)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.httpInfo.includePayload) && (sub.notification.httpInfo.payload.empty()))
+      {
+        unsetB->append(CSUB_PAYLOAD, 1);
+      }
+    }
+    else if (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Json)
     {
       unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
     }
-
-    if (sub.notification.httpInfo.json == NULL)
+    else  // (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
     {
+      unsetB->append(CSUB_PAYLOAD, 1);
       unsetB->append(CSUB_JSON, 1);
     }
   }
@@ -95,14 +106,25 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_PASSWD, 1);
     }
 
-    if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
-    {
-      unsetB->append(CSUB_PAYLOAD, 1);
-    }
-
-    if (sub.notification.mqttInfo.json == NULL)
+    if  (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
     {
       unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
+      {
+        unsetB->append(CSUB_PAYLOAD, 1);
+      }
+    }
+    else if (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Json)
+    {
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
+    }
+    else  // (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_PAYLOAD, 1);
     }
   }
 

@@ -1354,9 +1354,8 @@ static bool isCustomAttr(std::string attrName)
 *
 * entitiesQuery -
 *
-* This method is used by queryContext and subscribeContext (ONCHANGE conditions). It takes
-* a vector with entities and a vector with attributes as input and returns the corresponding
-* ContextElementResponseVector or error.
+* This method is used by queryContext. It takes a vector with entities and a vector
+* with attributes as input and returns the corresponding ContextElementResponseVector or error.
 *
 * Note the includeEmpty argument. This is used if we don't want the result to include empty
 * attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at

@@ -31,6 +31,7 @@
 #include "common/string.h"
 #include "common/tag.h"
 #include "common/JsonHelper.h"
+#include "common/macroSubstitute.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 
@@ -535,29 +536,7 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
   switch (valueType)
   {
   case orion::ValueTypeString:
-    if ((replacementsP != NULL) && (stringValue.rfind("${", 0) == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
-    {
-      // len("${") + len("}") = 3
-      std::string macroName = stringValue.substr(2, stringValue.size() - 3);
-      std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
-      if (iter == replacementsP->end())
-      {
-        // macro doesn't exist in the replacement map, so we use null al failsafe
-        out += "null";
-      }
-      else
-      {
-        out += iter->second;
-      }
-    }
-    else
-    {
-      out = '"';
-      out += toJsonString(stringValue);
-      out += '"';
-    }
-
-    return out;
+    return smartStringValue(stringValue, replacementsP, "null");
 
   case orion::ValueTypeNumber:
     return double2string(numberValue);

@@ -65,13 +65,13 @@ echo
 01. Create custom subscription with payload and json field, see error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 122
+Content-Length: 133
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "description": "payload and json fields cannot be used at the same time in httpCustom or mqttCustom",
+    "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
     "error": "BadRequest"
 }
 

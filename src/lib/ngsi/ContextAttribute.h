@@ -107,7 +107,7 @@ public:
 
   std::string  toJsonV1AsNameString(bool comma);
 
-  std::string  toJson(const std::vector<std::string>&  metadataFilter);
+  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, std::map<std::string, std::string>* replacementsP = NULL);
 
   std::string  toJsonValue(void);
 

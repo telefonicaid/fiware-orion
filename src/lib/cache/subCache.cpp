@@ -56,7 +56,7 @@ volatile SubCacheState subCacheState = ScsIdle;
 
 
 //
-// The subscription cache maintains in memory all subscriptions of type ONCHANGE.
+// The subscription cache maintains in memory all subscriptions.
 // The reason for this cache is to avoid a very slow mongo operation ... (Fermin)
 //
 // The 'mongo part' of the cache is implemented in mongoBackend/mongoSubCache.cpp/h and used in:
@@ -485,7 +485,7 @@ static bool subMatch
 
 
   //
-  // If ONCHANGE and one of the attribute names in the scope vector
+  // If one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
   // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
   // case of ONANYCHANGE subscriptions).
@@ -872,17 +872,8 @@ void subCacheItemInsert
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 
-  cSubP->httpInfo = httpInfo;
-  if (httpInfo.json != NULL)
-  {
-    cSubP->httpInfo.json = httpInfo.json->clone();
-  }
-
-  cSubP->mqttInfo = mqttInfo;
-  if (mqttInfo.json != NULL)
-  {
-    cSubP->mqttInfo.json = mqttInfo.json->clone();
-  }
+  cSubP->httpInfo.fill(httpInfo);
+  cSubP->mqttInfo.fill(mqttInfo);
 
   //
   // String filters

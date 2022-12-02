@@ -38,10 +38,10 @@
 */
 extern void doNotify
 (
-  std::vector<SenderThreadParams*>*                  paramsV,
-  CURL*                                              curl,
-  SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue,
-  const char*                                        logPrefix
+  SenderThreadParams*                  paramsV,
+  CURL*                                curl,
+  SyncQOverflow<SenderThreadParams*>*  queue,
+  const char*                          logPrefix
 );
 
 #endif  // SRC_LIB_NGSINOTIFY_DONOTIFY_H_

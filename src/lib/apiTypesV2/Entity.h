@@ -80,12 +80,15 @@ class Entity
                         bool                             comma,
                         bool                             omitAttributeValues = false);
 
-  std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      bool                             blacklist,
-                      const std::vector<std::string>&  metadataFilter);
+  std::string  toJson(RenderFormat                         renderFormat,
+                      const std::vector<std::string>&      attrsFilter,
+                      bool                                 blacklist,
+                      const std::vector<std::string>&      metadataFilter,
+                      bool                                 renderNgsiField = false,
+                      std::map<std::string, std::string>*  replacementsP    = NULL);
 
-  std::string  toJson(RenderFormat                     renderFormat);
+  std::string  toJson(RenderFormat                     renderFormat,
+                      bool                             renderNgsiField = false);
 
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
 
@@ -126,12 +129,15 @@ class Entity
                            bool                             blacklist,
                            std::vector<ContextAttribute*>*  orderedAttrs);
 
-  void addAllAttrsExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs);
+  void addAllAttrsExceptFiltered(std::vector<ContextAttribute*>*  orderedAttrs);
 
   std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
-  std::string toJsonNormalized(const std::vector<ContextAttribute*>& orderedAttrs, const std::vector<std::string>&  metadataFilter);
+  std::string toJsonNormalized(const std::vector<ContextAttribute*>&  orderedAttrs,
+                               const std::vector<std::string>&        metadataFilter,
+                               bool                                   renderNgsiField = false,
+                               std::map<std::string, std::string>*    replacementsP    = NULL);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

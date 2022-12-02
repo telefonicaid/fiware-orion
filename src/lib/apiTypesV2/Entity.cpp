@@ -118,14 +118,14 @@ Entity::~Entity()
 
 /* ****************************************************************************
 *
-* Entity::addAllAttrsExceptShadowed -
+* Entity::addAllAttrsExceptFiltered -
 *
 */
-void Entity::addAllAttrsExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs)
+void Entity::addAllAttrsExceptFiltered(std::vector<ContextAttribute*>*  orderedAttrs)
 {
   for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
   {
-    if (!attributeVector[ix]->shadowed)
+    if ((!attributeVector[ix]->shadowed) && (!attributeVector[ix]->skip))
     {
       orderedAttrs->push_back(attributeVector[ix]);
     }
@@ -150,17 +150,17 @@ void Entity::filterAndOrderAttrs
     if (attrsFilter.size() == 0)
     {
       // No filter, no blacklist. Attributes are "as is" in the entity except shadowed ones,
-      // which require explicit inclusion (dateCreated, etc.)
-      addAllAttrsExceptShadowed(orderedAttrs);
+      // which require explicit inclusion (dateCreated, etc.) and skipped
+      addAllAttrsExceptFiltered(orderedAttrs);
     }
     else
     {
       // Filter, blacklist. The order is the one in the entity, after removing attributes.
-      // In blacklist case shadowed attributes (dateCreated, etc) are never included
+      // In blacklist case shadowed attributes (dateCreated, etc) and skipped are never included
       for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
       {
         std::string name = attributeVector[ix]->name;
-        if ((!attributeVector[ix]->shadowed) && (std::find(attrsFilter.begin(), attrsFilter.end(), name) == attrsFilter.end()))
+        if ((!attributeVector[ix]->shadowed) && (!attributeVector[ix]->skip) && (std::find(attrsFilter.begin(), attrsFilter.end(), name) == attrsFilter.end()))
         {
           orderedAttrs->push_back(attributeVector[ix]);
         }
@@ -172,8 +172,8 @@ void Entity::filterAndOrderAttrs
     if (attrsFilter.size() == 0)
     {
       // No filter, no blacklist. Attributes are "as is" in the entity
-      // except shadowed ones (dateCreated, etc.)
-      addAllAttrsExceptShadowed(orderedAttrs);
+      // except shadowed ones (dateCreated, etc.) and skipped
+      addAllAttrsExceptFiltered(orderedAttrs);
     }
     else
     {
@@ -183,7 +183,12 @@ void Entity::filterAndOrderAttrs
         // - If '*' is in: all attributes are included in the same order used by the entity
         for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
         {
-          if (attributeVector[ix]->shadowed)
+          if (attributeVector[ix]->skip)
+          {
+            // Skipped attributes are never included
+            continue;
+          }
+          else if (attributeVector[ix]->shadowed)
           {
             // Shadowed attributes needs explicit inclusion
             if ((std::find(attrsFilter.begin(), attrsFilter.end(), attributeVector[ix]->name) != attrsFilter.end()))
@@ -200,11 +205,17 @@ void Entity::filterAndOrderAttrs
       else
       {
         // - If '*' is not in: attributes are include in the attrsFilter order
+        // (except skiped)
         for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
         {
           int found;
           if ((found = attributeVector.get(attrsFilter[ix])) != -1)
           {
+            if (attributeVector[found]->skip)
+            {
+              // Skipped attributes are never included
+              continue;
+            }
             orderedAttrs->push_back(attributeVector[found]);
           }
         }
@@ -263,13 +274,18 @@ std::string Entity::toJsonV1
 *   o 'normalized' (default)
 *   o 'keyValues'  (less verbose, only name and values shown for attributes - no type, no metadatas)
 *   o 'values'     (only the values of the attributes are printed, in a vector)
+*
+* renderNgsiField true is used in custom notification payloads, which have some small differences
+* with regards to conventional rendering
 */
 std::string Entity::toJson
 (
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter
+  RenderFormat                         renderFormat,
+  const std::vector<std::string>&      attrsFilter,
+  bool                                 blacklist,
+  const std::vector<std::string>&      metadataFilter,
+  bool                                 renderNgsiField,
+  std::map<std::string, std::string>*  replacementsP
 )
 {
   std::vector<ContextAttribute* > orderedAttrs;
@@ -288,7 +304,7 @@ std::string Entity::toJson
     out = toJsonKeyvalues(orderedAttrs);
     break;
   default:  // NGSI_V2_NORMALIZED
-    out = toJsonNormalized(orderedAttrs, metadataFilter);
+    out = toJsonNormalized(orderedAttrs, metadataFilter, renderNgsiField, replacementsP);
     break;
   }
 
@@ -302,11 +318,14 @@ std::string Entity::toJson
 * Entity::toJson -
 *
 * Simplified version of toJson without filters
+*
+* renderNgsiField true is used in custom notification payloads, which have some small differences
+* with regards to conventional rendering
 */
-std::string Entity::toJson(RenderFormat renderFormat)
+std::string Entity::toJson(RenderFormat renderFormat, bool renderNgsiField)
 {
   std::vector<std::string>  nullFilter;
-  return toJson(renderFormat, nullFilter, false, nullFilter);
+  return toJson(renderFormat, nullFilter, false, nullFilter, renderNgsiField);
 }
 
 
@@ -393,23 +412,48 @@ std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& ordere
 /* ****************************************************************************
 *
 * Entity::toJsonNormalized -
+*
+* renderNgsiField true is used in custom notification payloads, which have some small differences
+* with regards to conventional rendering
 */
-std::string Entity::toJsonNormalized(const std::vector<ContextAttribute*>& orderedAttrs, const std::vector<std::string>&  metadataFilter)
+std::string Entity::toJsonNormalized
+(
+  const std::vector<ContextAttribute*>&  orderedAttrs,
+  const std::vector<std::string>&        metadataFilter,
+  bool                                   renderNgsiField,
+  std::map<std::string, std::string>*    replacementsP
+)
 {
   JsonObjectHelper jh;
 
   if (renderId)
   {
-    jh.addString("id", id);
+    if (renderNgsiField)
+    {
+      /* In ngsi field in notifications "" is allowed for id and type, in which case we don't
+       * print the field */
+      if (!id.empty())
+      {
+        jh.addString("id", id);
+      }
+      if (!type.empty())
+      {
+        jh.addString("type", type);
+      }
+    }
+    else
+    {
+      jh.addString("id", id);
 
-    /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-    jh.addString("type", (!type.empty())? type : DEFAULT_ENTITY_TYPE);
+      /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
+      jh.addString("type", (!type.empty())? type : DEFAULT_ENTITY_TYPE);
+    }
   }
 
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
     ContextAttribute* caP = orderedAttrs[ix];
-    jh.addRaw(caP->name, caP->toJson(metadataFilter));
+    jh.addRaw(caP->name, caP->toJson(metadataFilter, renderNgsiField, replacementsP));
   }
 
   return jh.str();

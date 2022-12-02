@@ -73,10 +73,11 @@ std::string NotifyContextRequest::toJsonV1
 */
 std::string NotifyContextRequest::toJson
 (
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter    
+  RenderFormat                        renderFormat,
+  const std::vector<std::string>&     attrsFilter,
+  bool                                blacklist,
+  const std::vector<std::string>&     metadataFilter,
+  std::map<std::string, std::string>* replacementsP
 )
 {
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
@@ -90,7 +91,7 @@ std::string NotifyContextRequest::toJson
   JsonObjectHelper jh;
 
   jh.addString("subscriptionId", subscriptionId.get());
-  jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
+  jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP));
 
   return jh.str();
 }

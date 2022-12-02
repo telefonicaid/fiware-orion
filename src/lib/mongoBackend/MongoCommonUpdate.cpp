@@ -109,29 +109,6 @@ inline std::string correlatorRoot(const std::string& fullCorrelator)
 
 /* ****************************************************************************
 *
-* isNotCustomMetadata -
-*
-* Check that the parameter is a not custom metadata, i.e. one metadata without
-* an special semantic to be interpreted by the context broker itself
-*
-* NGSIv2 builtin metadata (dateCreated, dateModified, etc.) are considered custom
-*
-* FIXME P6: this function probably could be removed. By the moment we leave it
-* and we decide what to do in some time (if we add a new custom metadata it could be
-* a convenient placeholder). If kept, it should be moved to another place
-* "closer" to metadata
-*/
-static bool isNotCustomMetadata(std::string md)
-{
-  // After removing ID and deprecating location, all metadata are custom so
-  // we always return false
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * hasMetadata -
 *
 * Check if a metadata is included in a (request) ContextAttribute.
@@ -348,130 +325,6 @@ static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, 
 
 /* ****************************************************************************
 *
-* appendMetadata -
-*/
-static void appendMetadata
-(
-  orion::BSONObjBuilder*    mdBuilder,
-  orion::BSONArrayBuilder*  mdNamesBuilder,
-  const Metadata*    mdP,
-  bool               useDefaultType
-)
-{
-  std::string type = mdP->type;
-
-  if (!mdP->typeGiven && useDefaultType)
-  {
-    if ((mdP->compoundValueP == NULL) || (mdP->compoundValueP->valueType != orion::ValueTypeVector))
-    {
-      type = defaultType(mdP->valueType);
-    }
-    else
-    {
-      type = defaultType(orion::ValueTypeVector);
-    }
-  }
-
-  mdNamesBuilder->append(mdP->name);
-  std::string effectiveName = dbEncode(mdP->name);
-
-  // FIXME P8: this code probably should be refactored to be clearer and cleaner
-  if (!type.empty())
-  {
-    orion::BSONObjBuilder bob;
-    bob.append(ENT_ATTRS_MD_TYPE, type);
-    switch (mdP->valueType)
-    {
-    case orion::ValueTypeString:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->stringValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeNumber:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->numberValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeBoolean:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->boolValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeNull:
-      bob.appendNull(ENT_ATTRS_MD_VALUE);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeObject:
-      if (mdP->compoundValueP->valueType == orion::ValueTypeVector)
-      {
-        orion::BSONArrayBuilder ba;
-        compoundValueBson(mdP->compoundValueP->childV, ba);
-        bob.append(ENT_ATTRS_MD_VALUE, ba.arr());
-        mdBuilder->append(effectiveName, bob.obj());
-      }
-      else
-      {
-        orion::BSONObjBuilder bo;
-        compoundValueBson(mdP->compoundValueP->childV, bo);
-        bob.append(ENT_ATTRS_MD_VALUE, bo.obj());
-        mdBuilder->append(effectiveName, bob.obj());
-      }
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown metadata type: %d)", mdP->valueType));
-    }
-  }
-  else
-  {
-    orion::BSONObjBuilder bob;
-    switch (mdP->valueType)
-    {
-    case orion::ValueTypeString:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->stringValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeNumber:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->numberValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeBoolean:
-      bob.append(ENT_ATTRS_MD_VALUE, mdP->boolValue);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeNull:
-      bob.appendNull(ENT_ATTRS_MD_VALUE);
-      mdBuilder->append(effectiveName, bob.obj());
-      return;
-
-    case orion::ValueTypeObject:
-      if (mdP->compoundValueP->isVector())
-      {
-        orion::BSONArrayBuilder ba;
-        compoundValueBson(mdP->compoundValueP->childV, ba);
-        bob.append(ENT_ATTRS_MD_VALUE, ba.arr());
-        mdBuilder->append(effectiveName, bob.obj());
-      }
-      else
-      {
-        orion::BSONObjBuilder bo;
-        bob.append(ENT_ATTRS_MD_VALUE, bo.obj());
-        mdBuilder->append(effectiveName, bob.obj());
-      }
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown metadata type)"));
-    }
-  }
-}
-
-/* ****************************************************************************
-*
 * isSomeCalculatedOperatorUsed -
 *
 * Returns true if some calculated operator ($inc, etc.) is in use, so the
@@ -601,13 +454,7 @@ static bool mergeAttrInfo
   {
     Metadata* mdP = caP->metadataVector[ix];
 
-    /* Skip not custom metadata */
-    if (isNotCustomMetadata(mdP->name))
-    {
-      continue;
-    }
-
-    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == V2);
+    mdP->appendToBsoN(&mdBuilder, &mdNamesBuilder, apiVersion == V2);
   }
 
 
@@ -637,7 +484,7 @@ static bool mergeAttrInfo
       {
         if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
-          appendMetadata(&mdBuilder, &mdNamesBuilder, &md, false);
+          md.appendToBsoN(&mdBuilder, &mdNamesBuilder, false);
         }
       }
 
@@ -714,55 +561,12 @@ static bool mergeAttrInfo
 
 /* ****************************************************************************
 *
-* contextAttributeCustomMetadataToBson -
-*
-* Generates the BSON for metadata vector to be inserted in database for a given atribute.
-* If there is no custom metadata, then it returns false (true otherwise).
-*/
-static bool contextAttributeCustomMetadataToBson
-(
-  orion::BSONObj*                 md,
-  orion::BSONArray*               mdNames,
-  const ContextAttribute*  ca,
-  bool                     useDefaultType
-)
-{
-  orion::BSONObjBuilder    mdToAdd;
-  orion::BSONArrayBuilder  mdNamesToAdd;
-
-  for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix)
-  {
-    const Metadata* md = ca->metadataVector[ix];
-
-    if (!isNotCustomMetadata(md->name))
-    {
-      appendMetadata(&mdToAdd, &mdNamesToAdd, md, useDefaultType);
-      LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                      md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
-    }
-  }
-
-  *md      = mdToAdd.obj();
-  *mdNames = mdNamesToAdd.arr();
-
-  if (md->nFields() > 0)
-  {
-    return true;
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * updateAttribute -
 *
 * Returns true if an attribute was found, false otherwise. If true,
 * the "actualUpdate" argument (passed by reference) is set to true in the case that the
 * original value of the attribute was different than the one used in the update (this is
-* important for ONCHANGE notifications)
+* important for notifications)
 *
 * The isReplace boolean specifies how toSet has to be filled, either:
 *
@@ -830,14 +634,15 @@ static bool updateAttribute
     caP->valueBson(std::string(ENT_ATTRS_VALUE), &newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
-    orion::BSONObj    md;
-    orion::BSONArray  mdNames;
+    orion::BSONObjBuilder    md;
+    orion::BSONArrayBuilder  mdNames;
 
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
+    caP->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+    if (mdNames.arrSize() > 0)
     {
-      newAttr.append(ENT_ATTRS_MD, md);
+      newAttr.append(ENT_ATTRS_MD, md.obj());
     }
-    newAttr.append(ENT_ATTRS_MDNAMES, mdNames);
+    newAttr.append(ENT_ATTRS_MDNAMES, mdNames.arr());
 
     toSet->append(effectiveName, newAttr.obj());
     attrNamesAdd->append(caP->name);
@@ -867,7 +672,7 @@ static bool updateAttribute
 * The "actualUpdate" argument (passed by reference) is set to true 1) in the case
 * of actual append that, or 2) in the case of append as update if the
 * original value of the attribute was different than the one used in the update (this is
-* important for ONCHANGE notifications). Otherwise it is false
+* important for notifications). Otherwise it is false
 *
 * In addition, return value is as follows:
 * - true: there was an actual append change
@@ -930,14 +735,15 @@ static bool appendAttribute
   }
 
   /* 3. Metadata */
-  orion::BSONObj   md;
-  orion::BSONArray mdNames;
+  orion::BSONObjBuilder   md;
+  orion::BSONArrayBuilder mdNames;
 
-  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
+  caP->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+  if (mdNames.arrSize() > 0)
   {
-    toSet->append(composedName + "." + ENT_ATTRS_MD, md);
+    toSet->append(composedName + "." + ENT_ATTRS_MD, md.obj());
   }
-  toSet->append(composedName + "." + ENT_ATTRS_MDNAMES, mdNames);
+  toSet->append(composedName + "." + ENT_ATTRS_MDNAMES, mdNames.arr());
 
   /* 4. Dates */
   double now = getCurrentTime();
@@ -2035,13 +1841,13 @@ static bool addTriggeredSubscriptions
 
 /* ****************************************************************************
 *
-* processOnChangeConditionForUpdateContext -
+* processNotification -
 *
 * This method returns true if the notification was actually sent. Otherwise, false
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-static bool processOnChangeConditionForUpdateContext
+static bool processNotification
 (
   ContextElementResponse*          notifyCerP,
   const StringList&                attrL,
@@ -2059,89 +1865,25 @@ static bool processOnChangeConditionForUpdateContext
   bool                             covered = false
 )
 {
-  NotifyContextRequest   ncr;
-  ContextElementResponse cer;
+  notifStaticFields nsf;
 
-  cer.entity.fill(notifyCerP->entity.id,
-                  notifyCerP->entity.type,
-                  notifyCerP->entity.isPattern,
-                  notifyCerP->entity.servicePath);
+  nsf.subId             = subId;
+  nsf.tenant            = tenant;
+  nsf.xauthToken        = xauthToken;
+  nsf.fiwareCorrelator  = fiwareCorrelator;
+  nsf.correlatorCounter = correlatorCounter;
 
-  for (unsigned int ix = 0; ix < notifyCerP->entity.attributeVector.size(); ix++)
-  {
-    ContextAttribute* caP = notifyCerP->entity.attributeVector[ix];
-
-    /* 'skip' field is used to mark deleted attributes that must not be included in the
-     * notification (see deleteAttrInNotifyCer function for details) */
-    if ((attrL.size() == 0) || attrL.lookup(ALL_ATTRS) || (blacklist == true))
-    {
-      /* Empty attribute list in the subscription mean that all attributes are added
-       * Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
-       * cer.entity destructor does release() on the attrs vector */
-      if (!caP->skip)
-      {
-        cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
-      }
-    }
-    else
-    {
-      for (unsigned int jx = 0; jx < attrL.size(); jx++)
-      {
-        if (caP->name == attrL[jx] && !caP->skip)
-        {
-          /* Note we use cloneCompound=true in the ContextAttribute constructor. This is due to
-           * cer.entity destructor does release() on the attrs vector */
-          cer.entity.attributeVector.push_back(new ContextAttribute(caP, false, true));
-        }
-      }
-    }
-  }
-  if (covered)
-  {
-    for (unsigned int ix = 0; ix < attrL.size(); ix++)
-    {
-      // Aviod over-adding attribute, checking first that the attribute is not already added
-      std::string attrName = attrL[ix];
-      if (cer.entity.attributeVector.get(attrName) < 0)
-      {
-        ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
-        caP->valueType = orion::ValueTypeNull;
-        cer.entity.attributeVector.push_back(caP);
-      }
-    }
-  }
-
-  /* Early exit without sending notification if attribute list is empty */
-  if (cer.entity.attributeVector.size() == 0)
-  {
-    ncr.contextElementResponseVector.release();
-    return false;
-  }
-
-  /* Setting status code in CER */
-  cer.statusCode.fill(SccOk);
-
-  ncr.contextElementResponseVector.push_back(&cer);
-
-  /* Complete the fields in NotifyContextRequest */
-  ncr.subscriptionId.set(subId);
-  // FIXME: we use a proper origin name
-  ncr.originator.set("localhost");
-
-  ncr.subscriptionId.set(subId);
-  getNotifier()->sendNotifyContextRequest(ncr,
+  getNotifier()->sendNotifyContextRequest(notifyCerP,
                                           notification,
-                                          tenant,
+                                          nsf,
                                           maxFailsLimit,
                                           failsCounter,
-                                          xauthToken,
-                                          fiwareCorrelator,
-                                          correlatorCounter,
                                           renderFormat,
                                           attrL.stringV,
                                           blacklist,
                                           covered,
                                           metadataV);
+
   return true;
 }
 
@@ -2270,38 +2012,24 @@ static unsigned int processSubscriptions
 
     // Build notification object. We use topic empty-ness to know the type
     ngsiv2::Notification notification;
-    notification.httpInfo = tSubP->httpInfo;
-    notification.mqttInfo = tSubP->mqttInfo;
+    notification.httpInfo.fill(tSubP->httpInfo);
+    notification.mqttInfo.fill(tSubP->mqttInfo);
     notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
-    if (notification.type == ngsiv2::HttpNotification)
-    {
-      if (tSubP->httpInfo.json != NULL)
-      {
-        notification.httpInfo.json = tSubP->httpInfo.json->clone();
-      }
-    }
-    else  // notification.type == ngsiv2::MqttNotification
-    {
-      if (tSubP->mqttInfo.json != NULL)
-      {
-        notification.mqttInfo.json = tSubP->mqttInfo.json->clone();
-      }
-    }
 
-    notificationSent = processOnChangeConditionForUpdateContext(notifyCerP,
-                                                                tSubP->attrL,
-                                                                tSubP->metadata,
-                                                                mapSubId,
-                                                                tSubP->renderFormat,
-                                                                tenant,
-                                                                tSubP->maxFailsLimit,
-                                                                tSubP->failsCounter,
-                                                                xauthToken,
-                                                                fiwareCorrelator,
-                                                                notifStartCounter + notifSent + 1,
-                                                                notification,
-                                                                tSubP->blacklist,
-                                                                tSubP->covered);
+    notificationSent = processNotification(notifyCerP,
+                                           tSubP->attrL,
+                                           tSubP->metadata,
+                                           mapSubId,
+                                           tSubP->renderFormat,
+                                           tenant,
+                                           tSubP->maxFailsLimit,
+                                           tSubP->failsCounter,
+                                           xauthToken,
+                                           fiwareCorrelator,
+                                           notifStartCounter + notifSent + 1,
+                                           notification,
+                                           tSubP->blacklist,
+                                           tSubP->covered);
 
     // notification already consumed, it can be freed
     // Only one of the release operations will do something, but it is simpler (and safer)
@@ -2456,12 +2184,9 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
   for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix)
   {
     Metadata* mdReq = caReq->metadataVector[ix];
+    Metadata* md    = new Metadata(mdReq);
 
-    if (!isNotCustomMetadata(mdReq->name))
-    {
-      Metadata* md = new Metadata(mdReq);
-      caRes->metadataVector.push_back(md);
-    }
+    caRes->metadataVector.push_back(md);
   }
 }
 
@@ -3018,7 +2743,7 @@ static bool processContextAttributeVector
     }
 
     /* Add the attribute to the list of modifiedAttrs, in order to check at the end if it triggers some
-     * ONCHANGE subscription. Note that actualUpdate is always true in the case of  "delete" or "append",
+     * subscription. Note that actualUpdate is always true in the case of  "delete" or "append",
      * so the if statement is "bypassed" */
     if (actualUpdate)
     {
@@ -3156,13 +2881,14 @@ static bool createEntity
                     attrsV[ix]->getValue().c_str()));
 
     /* Custom metadata */
-    orion::BSONObj   md;
-    orion::BSONArray mdNames;
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == V2))
+    orion::BSONObjBuilder   md;
+    orion::BSONArrayBuilder mdNames;
+    attrsV[ix]->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+    if (mdNames.arrSize() > 0)
     {
-      bsonAttr.append(ENT_ATTRS_MD, md);
+      bsonAttr.append(ENT_ATTRS_MD, md.obj());
     }
-    bsonAttr.append(ENT_ATTRS_MDNAMES, mdNames);
+    bsonAttr.append(ENT_ATTRS_MDNAMES, mdNames.arr());
 
     attrsToAdd.append(effectiveName, bsonAttr.obj());
     attrNamesToAdd.append(attrsV[ix]->name);

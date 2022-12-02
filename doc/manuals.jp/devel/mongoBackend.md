@@ -207,8 +207,8 @@ _MB-06: エンティティを削除する mongoUpdate DELETE_
 
 _MD-01: `processSubscriptions()` 機能の詳細_
 
-* `processSubscriptions()` がいくつかの場所から呼び出されます(ステップ1)。図 [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) および [MB-05](#flow-mb-05) を参照してください。トリガされた個々のサブスクリプションは、`processOnChangeConditionForUpdateContext()`を呼び出すことでループで処理されます
-* `processOnChangeConditionForUpdateContext()` が呼び出され (ステップ2)、Notifierオブジェクト ([ngsiNotify](sourceCode.md#srclibngsinotify) ライブラリ) を使用して通知を送信します (ステップ3)。詳細は図 [NF-01](sourceCode.md#flow-nf-01) と [NF-03](sourceCode.md#flow-nf-03) に記載されています
+* `processSubscriptions()` がいくつかの場所から呼び出されます(ステップ1)。図 [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) および [MB-05](#flow-mb-05) を参照してください。トリガされた個々のサブスクリプションは、`processNotification()`を呼び出すことでループで処理されます
+* `processNotification()` が呼び出され (ステップ2)、Notifierオブジェクト ([ngsiNotify](sourceCode.md#srclibngsinotify) ライブラリ) を使用して通知を送信します (ステップ3)。詳細は図 [NF-01](sourceCode.md#flow-nf-01) と [NF-03](sourceCode.md#flow-nf-03) に記載されています
 * 次のステップは、通知が実際に送信された場合にのみ実行されます。キャッシュの使用状況に応じて：
     * サブスクリプション・キャッシュが使用されていない場合、データベースの最後の通知時間とカウントは `connectionOperations` モジュールの `collectionUpdate()` を使ってデータベース内で更新されます (ステップ4と5)
     * サブスクリプション・キャッシュが使用されている場合、サブスクリプションはサブスクリプション・キャッシュから  `subCacheItemLookup()` を呼び出して取得されます (ステップ7)。次に、最後の通知時間とカウントがサブスクリプション・キャッシュで変更されます。次のサブスクリプション・キャッシュの最新表示時にデータベースに統合されます。詳細は[このドキュメント](subscriptionCache.md#subscription-cache-refresh)を参照してください。サブスクリプション・キャッシュへのアクセスは、サブスクリプション・キャッシュ・セマフォによって保護されます。サブスクリプション・キャッシュ・セマフォは、それぞれステップ6と8で取得され、解放されます。[詳細はこのドキュメント](semaphores.md#subscription-cache-semaphore)を参照してください。

@@ -57,8 +57,6 @@ TriggeredSubscription::TriggeredSubscription
   failsCounter(_failsCounter),
   lastNotification(_lastNotification),
   renderFormat(_renderFormat),
-  httpInfo(_httpInfo),
-  mqttInfo(_mqttInfo),
   attrL(_attrL),
   cacheSubId(_cacheSubId),
   tenant((_tenant == NULL)? "" : _tenant),
@@ -67,15 +65,8 @@ TriggeredSubscription::TriggeredSubscription
   blacklist(false),
   covered(_covered)
 {
-  // Dynamic memory must be cloned
-  if (_httpInfo.json != NULL)
-  {
-    httpInfo.json = _httpInfo.json->clone();
-  }
-  if (_mqttInfo.json != NULL)
-  {
-    mqttInfo.json = _mqttInfo.json->clone();
-  }
+  httpInfo.fill(_httpInfo);
+  mqttInfo.fill(_mqttInfo);
 }
 
 

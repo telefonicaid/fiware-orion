@@ -116,6 +116,7 @@
 #define CSUB_QS                      "qs"
 #define CSUB_PAYLOAD                 "payload"
 #define CSUB_JSON                    "json"
+#define CSUB_NGSI                    "ngsi"
 #define CSUB_BLACKLIST               "blacklist"
 #define CSUB_ONLYCHANGED             "onlyChanged"
 #define CSUB_COVERED                 "covered"

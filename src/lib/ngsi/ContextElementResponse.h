@@ -74,10 +74,11 @@ typedef struct ContextElementResponse
                         bool                             comma               = false,
                         bool                             omitAttributeValues = false);
 
-  std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      bool                             blacklist,
-                      const std::vector<std::string>&  metadataFilter);
+  std::string  toJson(RenderFormat                         renderFormat,
+                      const std::vector<std::string>&      attrsFilter,
+                      bool                                 blacklist,
+                      const std::vector<std::string>&      metadataFilter,
+                      std::map<std::string, std::string>*  replacementsP);
 
   void         release(void);
 
