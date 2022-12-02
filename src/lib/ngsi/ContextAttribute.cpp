@@ -279,7 +279,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
   compoundValueP        = caP->compoundValueP;
   caP->compoundValueP   = NULL;
   found                 = caP->found;
-  skip                  = false;
+  skip                  = caP->skip;
   typeGiven             = caP->typeGiven;
   onlyValue             = caP->onlyValue;
   previousValue         = NULL;

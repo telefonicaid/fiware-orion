@@ -118,14 +118,14 @@ Entity::~Entity()
 
 /* ****************************************************************************
 *
-* Entity::addAllAttrsExceptShadowed -
+* Entity::addAllAttrsExceptFiltered -
 *
 */
-void Entity::addAllAttrsExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs)
+void Entity::addAllAttrsExceptFiltered(std::vector<ContextAttribute*>*  orderedAttrs)
 {
   for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
   {
-    if (!attributeVector[ix]->shadowed)
+    if ((!attributeVector[ix]->shadowed) && (!attributeVector[ix]->skip))
     {
       orderedAttrs->push_back(attributeVector[ix]);
     }
@@ -150,17 +150,17 @@ void Entity::filterAndOrderAttrs
     if (attrsFilter.size() == 0)
     {
       // No filter, no blacklist. Attributes are "as is" in the entity except shadowed ones,
-      // which require explicit inclusion (dateCreated, etc.)
-      addAllAttrsExceptShadowed(orderedAttrs);
+      // which require explicit inclusion (dateCreated, etc.) and skipped
+      addAllAttrsExceptFiltered(orderedAttrs);
     }
     else
     {
       // Filter, blacklist. The order is the one in the entity, after removing attributes.
-      // In blacklist case shadowed attributes (dateCreated, etc) are never included
+      // In blacklist case shadowed attributes (dateCreated, etc) and skipped are never included
       for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
       {
         std::string name = attributeVector[ix]->name;
-        if ((!attributeVector[ix]->shadowed) && (std::find(attrsFilter.begin(), attrsFilter.end(), name) == attrsFilter.end()))
+        if ((!attributeVector[ix]->shadowed) && (!attributeVector[ix]->skip) && (std::find(attrsFilter.begin(), attrsFilter.end(), name) == attrsFilter.end()))
         {
           orderedAttrs->push_back(attributeVector[ix]);
         }
@@ -172,8 +172,8 @@ void Entity::filterAndOrderAttrs
     if (attrsFilter.size() == 0)
     {
       // No filter, no blacklist. Attributes are "as is" in the entity
-      // except shadowed ones (dateCreated, etc.)
-      addAllAttrsExceptShadowed(orderedAttrs);
+      // except shadowed ones (dateCreated, etc.) and skipped
+      addAllAttrsExceptFiltered(orderedAttrs);
     }
     else
     {
@@ -183,7 +183,12 @@ void Entity::filterAndOrderAttrs
         // - If '*' is in: all attributes are included in the same order used by the entity
         for (unsigned int ix = 0; ix < attributeVector.size(); ix++)
         {
-          if (attributeVector[ix]->shadowed)
+          if (attributeVector[ix]->skip)
+          {
+            // Skipped attributes are never included
+            continue;
+          }
+          else if (attributeVector[ix]->shadowed)
           {
             // Shadowed attributes needs explicit inclusion
             if ((std::find(attrsFilter.begin(), attrsFilter.end(), attributeVector[ix]->name) != attrsFilter.end()))
@@ -200,11 +205,17 @@ void Entity::filterAndOrderAttrs
       else
       {
         // - If '*' is not in: attributes are include in the attrsFilter order
+        // (except skiped)
         for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
         {
           int found;
           if ((found = attributeVector.get(attrsFilter[ix])) != -1)
           {
+            if (attributeVector[found]->skip)
+            {
+              // Skipped attributes are never included
+              continue;
+            }
             orderedAttrs->push_back(attributeVector[found]);
           }
         }

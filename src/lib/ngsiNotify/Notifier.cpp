@@ -625,7 +625,9 @@ SenderThreadParams* Notifier::buildSenderParams
     NotifyContextRequest   ncr;
     ContextElementResponse cer;
 
-    cer.fill(notifyCerP);
+    /* Note we use cloneCompound=true in cer.entity.fill(). This is due to
+     * cer.entity destructor does release() on the attrs vector */
+    cer.entity.fill(notifyCerP->entity, false, true);
     cer.statusCode.fill(SccOk);
 
     ncr.contextElementResponseVector.push_back(&cer);
