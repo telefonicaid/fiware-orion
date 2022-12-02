@@ -551,7 +551,7 @@ Date: REGEX(.*)
 21. Relationship whose object is not a string - normalized
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -565,7 +565,7 @@ Date: REGEX(.*)
 22. Relationship whose object is not a string - concise
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -635,7 +635,7 @@ Date: REGEX(.*)
 32. Property with unitCode that is not a string - normalized
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -649,7 +649,7 @@ Date: REGEX(.*)
 33. Property with unitCode that is not a string - concise
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -663,7 +663,7 @@ Date: REGEX(.*)
 34. Property with observedAt that is not a string - normalized
 ==============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 155
+Content-Length: 154
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -677,7 +677,7 @@ Date: REGEX(.*)
 35. Property with observedAt that is not a string - concise
 ===========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 155
+Content-Length: 154
 Content-Type: application/json
 Date: REGEX(.*)
 
