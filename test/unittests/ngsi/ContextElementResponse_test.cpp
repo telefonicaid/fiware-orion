@@ -79,9 +79,7 @@ TEST(ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "details");
 
-   std::vector<std::string> emptyV;
-
-   out = cer.toJsonV1(false, UpdateContextElement, emptyV, false, emptyV, false);
+   out = cer.toJsonV1(false, UpdateContextElement, false, false);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

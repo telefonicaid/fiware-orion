@@ -118,12 +118,9 @@ std::string EntityVector::toJsonV1
 
   out += startTag("contextElements", true);
 
-  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
-  std::vector<std::string> emptyV;
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->toJsonV1(asJsonObject, requestType, emptyV, false, emptyV, ix != vec.size() - 1);
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, false, ix != vec.size() - 1);
   }
 
   out += endTag(comma, true);
