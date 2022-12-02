@@ -31,6 +31,7 @@ brokerStart CB
 
 #
 # 01. Create custom subscription with payload and json field, see error
+# 02. Create custom subscription with json field as string, see error
 #
 
 echo "01. Create custom subscription with payload and json field, see error"
@@ -60,6 +61,28 @@ echo
 echo
 
 
+echo "02. Create custom subscription with json field as string, see error"
+echo "==================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "json": "only objects and arrays are accepted"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
 
 --REGEXPECT--
 01. Create custom subscription with payload and json field, see error
@@ -72,6 +95,20 @@ Date: REGEX(.*)
 
 {
     "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
+    "error": "BadRequest"
+}
+
+
+02. Create custom subscription with json field as string, see error
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 102
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "json fields in httpCustom or mqttCustom must be object or array",
     "error": "BadRequest"
 }
 
