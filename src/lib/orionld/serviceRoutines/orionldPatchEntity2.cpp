@@ -373,7 +373,7 @@ void orionldAlterationsPresent(OrionldAlteration* altP)
 // Into this:
 //   "R1": { "object": "urn:E1" }
 //
-static void attributeTransform(KjNode* attrP, OrionldAttributeType attrTypeFromDb, const char* typeAsString)
+static void attributeTransform(KjNode* attrP, OrionldAttributeType attrTypeFromDb, const char* typeAsString, const char* lang)
 {
   KjNode* valueP = kjClone(orionldState.kjsonP, attrP);
   KjNode* typeP  = kjString(orionldState.kjsonP, "type", typeAsString);
@@ -388,6 +388,15 @@ static void attributeTransform(KjNode* attrP, OrionldAttributeType attrTypeFromD
   attrP->value.firstChildP = typeP;
   typeP->next              = valueP;
   attrP->lastChild         = valueP;
+
+  if ((attrTypeFromDb == LanguageProperty) && (lang != NULL))
+  {
+    KjNode* langP = kjString(orionldState.kjsonP, lang, valueP->value.s);
+
+    valueP->type              = KjObject;
+    valueP->value.firstChildP = langP;
+    valueP->lastChild         = NULL;
+  }
 }
 
 
@@ -475,14 +484,26 @@ bool apiEntitySimplifiedToNormalized(KjNode* apiEntityFragmentP, KjNode* dbAttrs
           }
           else if (attrTypeFromDb == LanguageProperty)
           {
-            if (attrP->type != KjObject)
+            //
+            // If the URI param 'lang' is used, RHS must be a String
+            // If not, RHS must be an Object
+            //
+            if (orionldState.uriParams.lang != NULL)
             {
-              orionldError(OrionldBadRequestData, "attribute error 3", attrP->name, 400);
+              if (attrP->type != KjString)
+              {
+                orionldError(OrionldBadRequestData, "Invalid JSON type (not a JSON String)", attrP->name, 400);
+                return false;
+              }
+            }
+            else if (attrP->type != KjObject)
+            {
+              orionldError(OrionldBadRequestData, "Invalid JSON type (not a JSON Object)", attrP->name, 400);
               return false;
             }
           }
 
-          attributeTransform(attrP, attrTypeFromDb, dbAttrTypeP->value.s);
+          attributeTransform(attrP, attrTypeFromDb, dbAttrTypeP->value.s, orionldState.uriParams.lang);
         }
       }
     }
