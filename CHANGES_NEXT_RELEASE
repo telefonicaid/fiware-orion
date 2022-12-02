@@ -7,3 +7,4 @@
 - Deprecated: GET /v2 operation
 - Remove: RPM package stuff
 - Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
+- Remove: /ngsi9 URL paths (deprecated since Orion 1.2.0)
