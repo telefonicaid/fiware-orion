@@ -57,14 +57,11 @@ public:
                 const std::vector<int>&          serviceNumThreadV);
   ~QueueNotifier(void);
 
-  void sendNotifyContextRequest(NotifyContextRequest&            ncr,
+  void sendNotifyContextRequest(ContextElementResponse*          notifyCerP,
                                 const ngsiv2::Notification&      notification,
-                                const std::string&               tenant,
+                                const notifStaticFields&         nsf,
                                 long long                        maxFailsLimit,
                                 long long                        failsCounter,
-                                const std::string&               xauthToken,
-                                const std::string&               fiwareCorrelator,
-                                unsigned int                     correlatorCounter,
                                 RenderFormat                     renderFormat,
                                 const std::vector<std::string>&  attrsFilter,
                                 bool                             blacklist,

@@ -2037,14 +2037,13 @@ NGSIv1 は非推奨であることに注意してください。したがって�
     カスタム通知で上書きできないことに注意してください。そうしようとする試み
     (例: `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` は無視されます
 -   `qs` (パラメータ名と値の両方をテンプレート化できます)
--   `payload`
+-   `payload` または `json`
 -   `method` は、クライアントが通知の配信に使用する HTTP メソッドを選択できるようにしますが、有効な HTTP
     動詞のみを使用できることに注意してください: GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS, TRACE および CONNECT
 
 `mqttCustom` の場合:
 
-
--   `payload`
+-   `payload` または `json`
 -   `topic`
 
 テンプレートのマクロ置換は、構文 `${..}` に基づいています。特に:
@@ -3678,7 +3677,10 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 | `qs`       | ✓          | object | 通知メッセージに含まれる URL クエリ・パラメータのキー・マップ。空であってはなりません                                                                                                                                                                                                                                                               |
 | `method`   | ✓          | string | 通知を送信するときに使用するメソッド (デフォルトは POST)。有効な HTTP メソッドのみが許可されます。無効な HTTP メソッドを指定すると、400 Bad Request エラーが返されます                                                                                                                                                                              |
 | `payload`  | ✓          | string | 通知で使用されるペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。`null` の場合、通知にはペイロードは含まれません                                                                                                                                     |
+| `json`     | ✓          | object | JSON ベースのペイロードを使用するための `payload` の代替です。詳細については、[JSON ペイロード](#json-payloads)のセクションを参照してください。                                 |
 | `timeout`  | ✓          | number | サブスクリプションがレスポンスを待機する最大時間 (ミリ秒単位)。このパラメータに許可される最大値は1800000 (30分) です。`timeout` が0に定義されているか省略されている場合、`-httpTimeout` CLI パラメータとして渡された値が使用されます。詳細については、[コマンドライン・オプション](admin/cli.md#command-line-options)のセクションを参照してください |
+
+`payload` と `json` は同時に使用できません。相互に排他的です。
 
 `httpCustom` を使用する場合は、[カスタム通知](#custom-notifications) のセクションで説明されている考慮事項が適用されます。
 
@@ -3695,7 +3697,10 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 | `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                      |
 | `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                   |
 | `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                   |
-| `payload`  | ✓          | string | 通知で使用されるペイロード。省略した場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます          |
+| `payload`  | ✓          | string | 通知で使用されるペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。 `null` の場合、通知にはペイロードは含まれません |
+| `json`     | ✓          | object | JSON ベースのペイロードを使用するための `payload` の代替です。詳細については、[JSON ペイロード](#json-payloads)のセクションを参照してください。       |
+
+`payload` と `json` は同時に使用できません。相互に排他的です。
 
 `mqttCustom` を使用する場合は、[カスタム通知](#custom-notifications)のセクションで説明されている考慮事項が適用されます。
 MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)のドキュメントを参照してください。

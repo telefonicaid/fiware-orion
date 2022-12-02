@@ -31,8 +31,33 @@
 
 /* ****************************************************************************
 *
-* macroSubstitute - 
+* smartStringValue -
+*
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, const Entity& en, const std::string& service, const std::string& authToken);
+extern std::string smartStringValue(const std::string stringValue, std::map<std::string, std::string>* replacementsP, const std::string notFoundDefault);
+
+
+
+/* ****************************************************************************
+*
+* buildReplacementMap -
+*
+*/
+extern void buildReplacementsMap
+(
+  const Entity&                        en,
+  const std::string&                   service,
+  const std::string&                   token,
+  std::map<std::string, std::string>*  replacementsP
+);
+
+
+
+/* ****************************************************************************
+*
+* macroSubstitute -
+*
+*/
+extern bool macroSubstitute(std::string* sP, const std::string& in, std::map<std::string, std::string>* replacementsP, const std::string& notFoundDefault);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

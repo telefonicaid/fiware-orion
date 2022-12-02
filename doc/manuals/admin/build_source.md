@@ -47,7 +47,7 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
         tar xvf libmicrohttpd-0.9.70.tar.gz
         cd libmicrohttpd-0.9.70
         ./configure --disable-messages --disable-postprocessor --disable-dauth
@@ -57,7 +57,7 @@ commands that require root privilege):
 
 * Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.12/ can be modified to fine tune the build)
 
-        wget http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
+        wget https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
         tar xvf mosquitto-2.0.12.tar.gz
         cd mosquitto-2.0.12
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
@@ -194,7 +194,7 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
         tar xvf libmicrohttpd-0.9.70.tar.gz
         cd libmicrohttpd-0.9.70
         ./configure --disable-messages --disable-postprocessor --disable-dauth
@@ -204,7 +204,7 @@ commands that require root privilege):
 
 * Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.12/ can be modified to fine tune the build)
 
-        wget http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
+        wget https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
         tar xvf mosquitto-2.0.12.tar.gz
         cd mosquitto-2.0.12
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk

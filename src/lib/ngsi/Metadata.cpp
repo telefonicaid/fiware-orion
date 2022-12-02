@@ -41,6 +41,7 @@
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/compoundResponses.h"
+#include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/dbFieldEncoding.h"
 
 #include "mongoDriver/safeMongo.h"
@@ -544,4 +545,124 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
   }
 
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* Metadata::appendToBsoN -
+*/
+void Metadata::appendToBsoN(orion::BSONObjBuilder* mdBuilder, orion::BSONArrayBuilder* mdNamesBuilder, bool useDefaultType)
+{
+  std::string type = this->type;
+
+  if (!this->typeGiven && useDefaultType)
+  {
+    if ((this->compoundValueP == NULL) || (this->compoundValueP->valueType != orion::ValueTypeVector))
+    {
+      type = defaultType(this->valueType);
+    }
+    else
+    {
+      type = defaultType(orion::ValueTypeVector);
+    }
+  }
+
+  mdNamesBuilder->append(this->name);
+  std::string effectiveName = dbEncode(this->name);
+
+  // FIXME P8: this code probably should be refactored to be clearer and cleaner
+  if (!type.empty())
+  {
+    orion::BSONObjBuilder bob;
+    bob.append(ENT_ATTRS_MD_TYPE, type);
+    switch (this->valueType)
+    {
+    case orion::ValueTypeString:
+      bob.append(ENT_ATTRS_MD_VALUE, this->stringValue);
+      mdBuilder->append(effectiveName, bob.obj());
+      return;
+
+    case orion::ValueTypeNumber:
+      bob.append(ENT_ATTRS_MD_VALUE, this->numberValue);
+      mdBuilder->append(effectiveName, bob.obj());
+      return;
+
+    case orion::ValueTypeBoolean:
+      bob.append(ENT_ATTRS_MD_VALUE, this->boolValue);
+      mdBuilder->append(effectiveName, bob.obj());
+      return;
+
+    case orion::ValueTypeNull:
+      bob.appendNull(ENT_ATTRS_MD_VALUE);
+      mdBuilder->append(effectiveName, bob.obj());
+      return;
+
+    case orion::ValueTypeObject:
+      if (this->compoundValueP->valueType == orion::ValueTypeVector)
+      {
+        orion::BSONArrayBuilder ba;
+        compoundValueBson(this->compoundValueP->childV, ba);
+        bob.append(ENT_ATTRS_MD_VALUE, ba.arr());
+        mdBuilder->append(effectiveName, bob.obj());
+      }
+      else
+      {
+        orion::BSONObjBuilder bo;
+        compoundValueBson(this->compoundValueP->childV, bo);
+        bob.append(ENT_ATTRS_MD_VALUE, bo.obj());
+        mdBuilder->append(effectiveName, bob.obj());
+      }
+      break;
+
+    default:
+      LM_E(("Runtime Error (unknown metadata type: %d)", this->valueType));
+    }
+  }
+  else
+  {
+    orion::BSONObjBuilder bob;
+    switch (this->valueType)
+    {
+    case orion::ValueTypeString:
+      bob.append(ENT_ATTRS_MD_VALUE, this->stringValue);
+      mdBuilder->append(effectiveName, bob.obj());
+      return;
+
+    case orion::ValueTypeNumber:
+      bob.append(ENT_ATTRS_MD_VALUE, this->numberValue);
+      mdBuilder->append(effectiveName, bob.obj());
+      return;
+
+    case orion::ValueTypeBoolean:
+      bob.append(ENT_ATTRS_MD_VALUE, this->boolValue);
+      mdBuilder->append(effectiveName, bob.obj());
+      return;
+
+    case orion::ValueTypeNull:
+      bob.appendNull(ENT_ATTRS_MD_VALUE);
+      mdBuilder->append(effectiveName, bob.obj());
+      return;
+
+    case orion::ValueTypeObject:
+      if (this->compoundValueP->isVector())
+      {
+        orion::BSONArrayBuilder ba;
+        compoundValueBson(this->compoundValueP->childV, ba);
+        bob.append(ENT_ATTRS_MD_VALUE, ba.arr());
+        mdBuilder->append(effectiveName, bob.obj());
+      }
+      else
+      {
+        orion::BSONObjBuilder bo;
+        bob.append(ENT_ATTRS_MD_VALUE, bo.obj());
+        mdBuilder->append(effectiveName, bob.obj());
+      }
+      break;
+
+    default:
+      LM_E(("Runtime Error (unknown metadata type)"));
+    }
+  }
 }

@@ -124,149 +124,8 @@ ContextElementResponse::ContextElementResponse
 
   //
   // Attribute vector
-  // FIXME P5: constructor for orion::BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
-  orion::BSONObj         attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
-  std::set<std::string>  attrNames;
-
-  attrs.getFieldNames(&attrNames);
-  for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
-  {
-    std::string        attrName                = *i;
-    orion::BSONObj     attr                    = getObjectFieldF(attrs, attrName);
-    ContextAttribute*  caP                     = NULL;
-    ContextAttribute   ca;
-    bool               noLocationMetadata      = true;
-
-    // Name and type
-    ca.name           = dbDecode(attrName);
-    ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
-
-    // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
-    if (!includedAttribute(ca.name, attrL))
-    {
-      continue;
-    }
-
-    /* It could happen (although very rarely) that the value field is missing in the
-     * DB for the attribute. The following is a safety check measure to protect against that */
-    if (!attr.hasField(ENT_ATTRS_VALUE))
-    {
-      caP = new ContextAttribute(ca.name, ca.type, "");
-    }
-    else
-    {
-      switch(getFieldF(attr, ENT_ATTRS_VALUE).type())
-      {
-      case orion::String:
-        ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
-        if (!includeEmpty && ca.stringValue.empty())
-        {
-          continue;
-        }
-        caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
-        break;
-
-      case orion::NumberDouble:
-        ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
-        caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
-        break;
-
-      case orion::NumberInt:
-        ca.numberValue = (double) getIntFieldF(attr, ENT_ATTRS_VALUE);
-        caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
-        break;
-
-      case orion::Bool:
-        ca.boolValue = getBoolFieldF(attr, ENT_ATTRS_VALUE);
-        caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
-        break;
-
-      case orion::jstNULL:
-        caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->valueType = orion::ValueTypeNull;
-        break;
-
-      case orion::Object:
-        caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
-        caP->valueType = orion::ValueTypeObject;
-        compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
-        break;
-
-      case orion::Array:
-        caP = new ContextAttribute(ca.name, ca.type, "");
-        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
-        caP->valueType = orion::ValueTypeVector;
-        compoundVectorResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
-        break;
-
-      default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
-      }
-    }
-
-    /* dateExpires is managed like a regular attribute in DB, but it is a builtin and it is shadowed */
-    if (caP->name == DATE_EXPIRES)
-    {
-      caP->shadowed = true;
-    }
-
-    /* Setting custom metadata (if any) */
-    if (attr.hasField(ENT_ATTRS_MD))
-    {
-      orion::BSONObj                mds = getObjectFieldF(attr, ENT_ATTRS_MD);
-      std::set<std::string>  mdsSet;
-
-      mds.getFieldNames(&mdsSet);
-      for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
-      {
-        std::string currentMd = *i;
-        Metadata*   md = new Metadata(dbDecode(currentMd), getObjectFieldF(mds, currentMd));
-
-        /* The flag below indicates that a location metadata with WGS84 was found during iteration.
-        *  It needs to the NGSIV1 check below, in order to add it if the flag is false
-        *  In addition, adjust old wrong WSG84 metadata value with WGS84 */
-        if (md->name == NGSI_MD_LOCATION)
-        {
-          noLocationMetadata = false;
-
-          if (md->valueType == orion::ValueTypeString && md->stringValue == LOCATION_WGS84_LEGACY)
-          {
-            md->stringValue = LOCATION_WGS84;
-          }
-        }
-
-        caP->metadataVector.push_back(md);
-      }
-    }
-
-    if (apiVersion == V1)
-    {
-      /* Setting location metadata (if location attr found
-       *  and the location metadata was not present or was present but with old wrong WSG84 value) */
-      if ((locAttr == ca.name) && (ca.type != GEO_POINT) && noLocationMetadata)
-      {
-        /* Note that if attribute type is geo:point then the user is using the "new way"
-         * of locating entities in NGSIv1, thus location metadata is not rendered */
-        Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
-        caP->metadataVector.push_back(md);
-      }
-    }
-
-    /* Set creDate and modDate at attribute level */
-    if (attr.hasField(ENT_ATTRS_CREATION_DATE))
-    {
-      caP->creDate = getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE);
-    }
-
-    if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
-    {
-      caP->modDate = getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE);
-    }
-
-    entity.attributeVector.push_back(caP);
-  }
+  entity.attributeVector.fill(getObjectFieldF(entityDoc, ENT_ATTRS), attrL, includeEmpty, locAttr, apiVersion);
 
   /* Set creDate and modDate at entity level */
   if (entityDoc.hasField(ENT_CREATION_DATE))
@@ -323,19 +182,47 @@ std::string ContextElementResponse::toJsonV1
 
 /* ****************************************************************************
 *
+* ContextElementResponse::toJsonV1 -
+*
+* Wrapper of toJsonV1 with empty attrsFilter and metadataFilter
+*/
+std::string ContextElementResponse::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         blacklist,
+  bool         comma,
+  bool         omitAttributeValues
+)
+{
+  std::string out = "";
+
+  out += startTag();
+  out += entity.toJsonV1(asJsonObject, requestType, blacklist, true, omitAttributeValues);
+  out += statusCode.toJsonV1(false);
+  out += endTag(comma, false);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElementResponse::toJson - 
 */
 std::string ContextElementResponse::toJson
 (
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter
+  RenderFormat                         renderFormat,
+  const std::vector<std::string>&      attrsFilter,
+  bool                                 blacklist,
+  const std::vector<std::string>&      metadataFilter,
+  std::map<std::string, std::string>*  replacementsP
 )
 {
   std::string out;
 
-  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
+  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false, replacementsP);
 
   return out;
 }

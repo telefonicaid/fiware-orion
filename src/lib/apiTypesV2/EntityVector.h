@@ -46,6 +46,8 @@ typedef struct EntityVector
                       bool                             blacklist,
                       const std::vector<std::string>&  metadataFilter);
 
+  std::string  toJson(RenderFormat                     renderFormat);
+
   std::string   toJsonV1(bool asJsonObject, RequestType requestType, bool comma);
 
   std::string   check(ApiVersion apiVersion, RequestType requestType);

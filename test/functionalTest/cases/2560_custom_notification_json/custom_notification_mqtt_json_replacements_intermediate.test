@@ -125,6 +125,10 @@ echo
 echo
 
 
+# Sometimes the accumulator needs some time to get the MQTT notification
+sleep 0.5s
+
+
 echo "05. Dump accumulator, see 2 notifications"
 echo "========================================="
 accumulatorDump

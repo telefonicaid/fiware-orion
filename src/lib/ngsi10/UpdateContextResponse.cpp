@@ -99,10 +99,7 @@ std::string UpdateContextResponse::toJsonV1(bool asJsonObject)
     }
     else
     {      
-      // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
-      std::vector<std::string> emptyV;
-
-      out += contextElementResponseVector.toJsonV1(asJsonObject, RtUpdateContextResponse, emptyV, false, emptyV, false);
+      out += contextElementResponseVector.toJsonV1(asJsonObject, RtUpdateContextResponse, false, false);
     }
   }
   

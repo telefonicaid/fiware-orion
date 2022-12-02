@@ -46,7 +46,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
         tar xvf libmicrohttpd-0.9.70.tar.gz
         cd libmicrohttpd-0.9.70
         ./configure --disable-messages --disable-postprocessor --disable-dauth
@@ -56,7 +56,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.12/ の下の config.mk ファイルを変更してビルドを微調整できます)
 
-        wget http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
+        wget https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
         tar xvf mosquitto-2.0.12.tar.gz
         cd mosquitto-2.0.12
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
@@ -195,7 +195,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを
 得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
         tar xvf libmicrohttpd-0.9.70.tar.gz
         cd libmicrohttpd-0.9.70
         ./configure --disable-messages --disable-postprocessor --disable-dauth
@@ -205,7 +205,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
 * ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.12/ の下の config.mk ファイルを変更してビルドを微調整できます)
 
-        wget http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
+        wget https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
         tar xvf mosquitto-2.0.12.tar.gz
         cd mosquitto-2.0.12
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk

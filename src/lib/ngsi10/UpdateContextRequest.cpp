@@ -74,11 +74,7 @@ std::string UpdateContextRequest::toJson(void)
 {
   JsonObjectHelper jh;
 
-  // FIXME P2: maybe we should have a toJson() wrapper for toJson(NGSI_V2_NORMALIZED, nullFilter, false, nullFilter),
-  // if this pattern is common in the code (not sure right now)
-  std::vector<std::string>  nullFilter;
-
-  jh.addRaw("entities", entityVector.toJson(NGSI_V2_NORMALIZED, nullFilter, false, nullFilter));
+  jh.addRaw("entities", entityVector.toJson(NGSI_V2_NORMALIZED));
 
   jh.addString("actionType", actionTypeString(V2, updateActionType));
 

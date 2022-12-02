@@ -44,8 +44,9 @@ SET (HEADERS
     EntID.h
     BatchQuery.h
     BatchUpdate.h
+    CustomPayloadType.h
     HttpInfo.h
-    MqttInfo.cpp
+    MqttInfo.h
 )
 
 

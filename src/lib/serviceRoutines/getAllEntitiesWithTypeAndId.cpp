@@ -135,11 +135,8 @@ std::string getAllEntitiesWithTypeAndId
 
   // 06. Translate QueryContextResponse to ContextElementResponse
 
-  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
-  std::vector<std::string> emptyV;
-
   response.fill(&parseDataP->qcrs.res, entityId, entityType);
-  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, RtContextElementResponse, emptyV, false, emptyV));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, RtContextElementResponse, false));
 
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();

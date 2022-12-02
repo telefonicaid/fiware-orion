@@ -50,10 +50,17 @@ typedef struct ContextElementResponseVector
                                     bool                             comma               = false,
                                     bool                             omitAttributeValues = false);
 
-  std::string              toJson(RenderFormat                     renderFormat,
-                                  const std::vector<std::string>&  attrsFilter,
-                                  bool                             blacklist,
-                                  const std::vector<std::string>&  metadataFilter);
+  std::string              toJsonV1(bool                             asJsonObject,
+                                    RequestType                      requestType,
+                                    bool                             blacklist,
+                                    bool                             comma               = false,
+                                    bool                             omitAttributeValues = false);
+
+  std::string              toJson(RenderFormat                         renderFormat,
+                                  const std::vector<std::string>&      attrsFilter,
+                                  bool                                 blacklist,
+                                  const std::vector<std::string>&      metadataFilter,
+                                  std::map<std::string, std::string>*  replacementsP);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
   ContextElementResponse*  lookup(Entity* eP, HttpStatusCode code = SccNone);
