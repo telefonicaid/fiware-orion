@@ -26,8 +26,6 @@
 * Author: Fermin Galan
 */
 
-// FIXME PR: should be moved to Subscription.h ?
-
 namespace ngsiv2
 {
 /* ****************************************************************************
