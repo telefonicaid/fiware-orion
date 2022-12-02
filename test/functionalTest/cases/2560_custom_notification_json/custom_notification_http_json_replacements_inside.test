@@ -21,12 +21,12 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification MQTT with JSON with replacements
+Custom notification HTTP with JSON with replacements inside value
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
+accumulatorStart --pretty-print
 
 --SHELL--
 
@@ -50,16 +50,15 @@ payload='{
     ]
   },
   "notification": {
-    "mqttCustom": {
-      "topic": "topic1",
-      "url": "mqtt://localhost:1883",
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "json": {
-        "text": "${text}",
-        "number": "${number}",
-        "bool": "${bool}",
-        "null": "${null}",
-        "array": "${array}",
-        "object": "${object}"
+        "A": "ns:${text}",
+        "B": "ns:${number}",
+        "C": "ns:${bool}",
+        "D": "ns:${null}",
+        "E": "ns:${array}",
+        "F": "ns:${object}"
       }
     }
   }
@@ -81,16 +80,15 @@ payload='{
     ]
   },
   "notification": {
-    "mqttCustom": {
-      "topic": "topic1",
-      "url": "mqtt://localhost:1883",
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "json": [
-        "${text}",
-        "${number}",
-        "${bool}",
-        "${null}",
-        "${array}",
-        "${object}"
+        "ns:${text}",
+        "ns:${number}",
+        "ns:${bool}",
+        "ns:${null}",
+        "ns:${array}",
+        "ns:${object}"
       ]
     }
   }
@@ -155,10 +153,6 @@ echo
 echo
 
 
-# Sometimes the accumulator needs some time to get the MQTT notification
-sleep 0.5s
-
-
 echo "05. Dump accumulator, see 2 notifications"
 echo "========================================="
 accumulatorDump
@@ -190,7 +184,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see both subscriptions
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 778
+Content-Length: 755
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -202,18 +196,16 @@ Date: REGEX(.*)
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "mqttCustom": {
+            "httpCustom": {
                 "json": {
-                    "array": "${array}",
-                    "bool": "${bool}",
-                    "null": "${null}",
-                    "number": "${number}",
-                    "object": "${object}",
-                    "text": "${text}"
+                    "A": "ns:${text}",
+                    "B": "ns:${number}",
+                    "C": "ns:${bool}",
+                    "D": "ns:${null}",
+                    "E": "ns:${array}",
+                    "F": "ns:${object}"
                 },
-                "qos": 0,
-                "topic": "topic1",
-                "url": "mqtt://localhost:1883"
+                "url": "http://127.0.0.1:9997/notify"
             },
             "onlyChangedAttrs": false
         },
@@ -236,18 +228,16 @@ Date: REGEX(.*)
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "mqttCustom": {
+            "httpCustom": {
                 "json": [
-                    "${text}",
-                    "${number}",
-                    "${bool}",
-                    "${null}",
-                    "${array}",
-                    "${object}"
+                    "ns:${text}",
+                    "ns:${number}",
+                    "ns:${bool}",
+                    "ns:${null}",
+                    "ns:${array}",
+                    "ns:${object}"
                 ],
-                "qos": 0,
-                "topic": "topic1",
-                "url": "mqtt://localhost:1883"
+                "url": "http://127.0.0.1:9997/notify"
             },
             "onlyChangedAttrs": false
         },
@@ -280,68 +270,42 @@ Date: REGEX(.*)
 #SORT_START
 05. Dump accumulator, see 2 notifications
 =========================================
-MQTT message at topic topic1:
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 187
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
 {
-    "array": [
-        "22",
-        {
-            "x": [
-                "x1",
-                "x2"
-            ],
-            "y": 3
-        },
-        [
-            "z1",
-            "z2"
-        ]
-    ],
-    "bool": true,
-    "null": null,
-    "number": 10,
-    "object": {
-        "x": {
-            "x1": "a",
-            "x2": "b"
-        },
-        "y": [
-            "y1",
-            "y2"
-        ]
-    },
-    "text": "foo"
+    "A": "ns:foo",
+    "B": "ns:10",
+    "C": "ns:true",
+    "D": "ns:null",
+    "E": "ns:[\"22\",{\"x\":[\"x1\",\"x2\"],\"y\":3},[\"z1\",\"z2\"]]",
+    "F": "ns:{\"x\":{\"x1\":\"a\",\"x2\":\"b\"},\"y\":[\"y1\",\"y2\"]}"
 }
 =======================================
-MQTT message at topic topic1:
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 163
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
 [
-    "foo",
-    10,
-    true,
-    null,
-    [
-        "22",
-        {
-            "x": [
-                "x1",
-                "x2"
-            ],
-            "y": 3
-        },
-        [
-            "z1",
-            "z2"
-        ]
-    ],
-    {
-        "x": {
-            "x1": "a",
-            "x2": "b"
-        },
-        "y": [
-            "y1",
-            "y2"
-        ]
-    }
+    "ns:foo",
+    "ns:10",
+    "ns:true",
+    "ns:null",
+    "ns:[\"22\",{\"x\":[\"x1\",\"x2\"],\"y\":3},[\"z1\",\"z2\"]]",
+    "ns:{\"x\":{\"x1\":\"a\",\"x2\":\"b\"},\"y\":[\"y1\",\"y2\"]}"
 ]
 =======================================
 #SORT_END
