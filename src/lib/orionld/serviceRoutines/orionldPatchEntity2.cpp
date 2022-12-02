@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
@@ -46,7 +47,11 @@ extern "C"
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
+#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
+#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
@@ -359,6 +364,158 @@ void orionldAlterationsPresent(OrionldAlteration* altP)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// attributeTransform -
+//
+// E.g. transform this;
+//   "R1": { "urn:E1" }
+// Into this:
+//   "R1": { "object": "urn:E1" }
+//
+static void attributeTransform(KjNode* attrP, OrionldAttributeType attrTypeFromDb, const char* typeAsString, const char* lang)
+{
+  KjNode* valueP = kjClone(orionldState.kjsonP, attrP);
+  KjNode* typeP  = kjString(orionldState.kjsonP, "type", typeAsString);
+
+  attrP->type = KjObject;
+
+  if (attrTypeFromDb == Relationship)
+    valueP->name = (char*) "object";
+  else if (attrTypeFromDb == LanguageProperty)
+    valueP->name = (char*) "languageMap";
+
+  attrP->value.firstChildP = typeP;
+  typeP->next              = valueP;
+  attrP->lastChild         = valueP;
+
+  if ((attrTypeFromDb == LanguageProperty) && (lang != NULL))
+  {
+    KjNode* langP = kjString(orionldState.kjsonP, lang, valueP->value.s);
+
+    valueP->type              = KjObject;
+    valueP->value.firstChildP = langP;
+    valueP->lastChild         = NULL;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// attributeValueAdd -
+//
+static void attributeValueAdd(KjNode* attrP)
+{
+  KjNode* valueP = kjClone(orionldState.kjsonP, attrP);
+
+  attrP->type = KjObject;
+
+  valueP->name = (char*) "value";
+
+  attrP->value.firstChildP = valueP;
+  attrP->lastChild         = valueP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// apiEntitySimplifiedToNormalized -
+//
+bool apiEntitySimplifiedToNormalized(KjNode* apiEntityFragmentP, KjNode* dbAttrsP)
+{
+  for (KjNode* attrP = apiEntityFragmentP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if (strcmp(attrP->name, "id")         == 0)      continue;
+    if (strcmp(attrP->name, "type")       == 0)      continue;
+    if (strcmp(attrP->name, "createdAt")  == 0)      continue;
+    if (strcmp(attrP->name, "modifiedAt") == 0)      continue;
+
+    //
+    // It's an attribute.
+    // If "Property" or "GeoProperty", add a "value" and move the RHS inside "value"
+    // If LanguageProperty, "languageMap"
+    // If Relationship, "object"
+    //
+    // That info we take from the DB.
+    // If not found in the DB, we ignore it - will provoke an error in pCheckEntity() later
+    // For this to work, the attribute names must be expanded ...
+    // Hmmm, perhaps better to do it after pCheckEntity() ?  (pCheckEntity() expands the attribute names)
+    // OR, as minimal check is needed, now that it's just the value, perhaps skip pCheckEntity()?
+    //
+    char*                   longName       = orionldAttributeExpand(orionldState.contextP, attrP->name, true, NULL);
+    char*                   eqName         = kaStrdup(&orionldState.kalloc, longName);
+    OrionldAttributeType    attrTypeFromDb = NoAttributeType;
+
+    dotForEq(eqName);
+    KjNode*                 dbAttrP        = kjLookup(dbAttrsP, eqName);
+
+    if (dbAttrP != NULL)
+    {
+      KjNode* dbAttrTypeP = kjLookup(dbAttrP, "type");
+
+      if (dbAttrTypeP != NULL)  // Can't be NULL
+      {
+        attrTypeFromDb = orionldAttributeType(dbAttrTypeP->value.s);
+
+        //
+        // If the attribute already existed, then we take the DB info and we modify the payload body, adding value/object/languageMap
+        // If it does not already exist, we simply let pCheckAttribute() decide what to do (when calling pCheckEntity()
+        //
+        if ((attrTypeFromDb != Property) && (attrTypeFromDb != GeoProperty) && (attrTypeFromDb != NoAttributeType))
+        {
+          //
+          // Before transforming, we need to check that the type is OK, cause, we here "modify the input" and this may lead to
+          // confusing error messages ("Invalid JSON type - not a string, it is an 'object'"), when in reality the original input was a Number, not an Object
+          //
+          if (attrTypeFromDb == Relationship)
+          {
+            if (attrP->type != KjString)
+            {
+              orionldError(OrionldBadRequestData, "Attempt to transform a Relationship into a Property", longName, 400);
+              return false;
+            }
+            else if (pCheckUri(attrP->value.s, longName, true) == false)
+            {
+              // pCheckUri calls orionldError
+              return false;
+            }
+          }
+          else if (attrTypeFromDb == LanguageProperty)
+          {
+            //
+            // If the URI param 'lang' is used, RHS must be a String
+            // If not, RHS must be an Object
+            //
+            if (orionldState.uriParams.lang != NULL)
+            {
+              if (attrP->type != KjString)
+              {
+                orionldError(OrionldBadRequestData, "Invalid JSON type (not a JSON String)", attrP->name, 400);
+                return false;
+              }
+            }
+            else if (attrP->type != KjObject)
+            {
+              orionldError(OrionldBadRequestData, "Invalid JSON type (not a JSON Object)", attrP->name, 400);
+              return false;
+            }
+          }
+
+          attributeTransform(attrP, attrTypeFromDb, dbAttrTypeP->value.s, orionldState.uriParams.lang);
+        }
+      }
+    }
+    else  // The attribute is NEW. Then it's ALWAYS a Property or GeoProperty - adding "value" and let the decision come later
+      attributeValueAdd(attrP);
+  }
+
+  return true;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPatchEntity2 -
@@ -397,11 +554,22 @@ bool orionldPatchEntity2(void)
     return false;
   }
 
+
   char*   entityType  = NULL;
   KjNode* dbAttrsP    = NULL;
 
   if (dbEntityFields(dbEntityP, entityId, &entityType, &dbAttrsP) == false)
     return false;
+
+  //
+  // If options=simplified/keyValues is present, the behaviour is very different
+  // BUT, if I add the "value" to each attribute in the payload body, I have "Normalized" it
+  //
+  if (orionldState.uriParamOptions.keyValues == true)
+  {
+    if (apiEntitySimplifiedToNormalized(orionldState.requestTree, dbAttrsP) == false)
+      return false;
+  }
 
   //
   // FIXME: change pCheckEntity param no 3 to be not only the attributes, but the entire entity (dbEntityP)

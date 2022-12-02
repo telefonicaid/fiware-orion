@@ -1,0 +1,429 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity attribute using PATCH
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Create an entity E1 with 4 attributes, P1, R1, G1, L1
+# 02. PATCH E1 using keyValues, modifying all 4, plus adding P2, G2
+# 03. GET E1
+# 04. Now, attempt to add a LanguageProperty and a Relationship, using keyValues, note they are created as Property - that's just how it works
+# 05. GET E1, see L2 and R2, note that L2 and R2 have been created as Property
+#
+# URI param 'lang
+# 06. PATCH E1:L1, modify "en": "two" to "one+one" using URI param "lang"
+# 07. GET E1, see the new languageMap of L1
+# 08. PATCH E1:L1, add a new language: "sv"
+# 09. GET E1, see the new languageMap of L1
+#
+
+echo "01. Create an entity E1 with 4 attributes, P1, R1, G1, L1"
+echo "========================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:E1" },
+  "G1": { "type": "Point", "coordinates": [ 1, 2 ] },
+  "L1": { "languageMap": { "en": "one", "es": "uno" } }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH E1 using keyValues, modifying all 4, plus adding P2, G2"
+echo "================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 2,
+  "R1": "urn:E2",
+  "G1": { "type": "Point", "coordinates": [ 3, 4 ] },
+  "L1": { "en": "two", "es": "dos" },
+  "P2": 3,
+  "G2": { "type": "Point", "coordinates": [ 5, 6 ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=simplified -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. GET E1"
+echo "=========="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "04. Now, attempt to add a LanguageProperty and a Relationship, using keyValues, note they are created as Property - that's just how it works"
+echo "============================================================================================================================================"
+payload='{
+  "L2": { "languageMap": { "en": "three", "es": "tres" } },
+  "R2": "urn:E2"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=simplified -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. GET E1, see L2 and R2, note that L2 and R2 have been created as Property"
+echo "============================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo '06. PATCH E1:L1, modify "en": "two" to "one+one" using URI param "lang"'
+echo '======================================================================='
+payload='{
+  "L1": "one+one"
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?options=simplified&lang=en' -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. GET E1, see the new languageMap of L1"
+echo "========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo '08. PATCH E1:L1, add a new language: "sv"'
+echo '========================================='
+payload='{
+  "L1": "ett+ett"
+}'
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?options=simplified&lang=sv' -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "09. GET E1, see the new languageMap of L1"
+echo "========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with 4 attributes, P1, R1, G1, L1
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. PATCH E1 using keyValues, modifying all 4, plus adding P2, G2
+=================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET E1
+==========
+HTTP/1.1 200 OK
+Content-Length: 360
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G1": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                3,
+                4
+            ],
+            "type": "Point"
+        }
+    },
+    "G2": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                5,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "L1": {
+        "languageMap": {
+            "en": "two",
+            "es": "dos"
+        },
+        "type": "LanguageProperty"
+    },
+    "P1": {
+        "type": "Property",
+        "value": 2
+    },
+    "P2": {
+        "type": "Property",
+        "value": 3
+    },
+    "R1": {
+        "object": "urn:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. Now, attempt to add a LanguageProperty and a Relationship, using keyValues, note they are created as Property - that's just how it works
+============================================================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET E1, see L2 and R2, note that L2 and R2 have been created as Property
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 478
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G1": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                3,
+                4
+            ],
+            "type": "Point"
+        }
+    },
+    "G2": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                5,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "L1": {
+        "languageMap": {
+            "en": "two",
+            "es": "dos"
+        },
+        "type": "LanguageProperty"
+    },
+    "L2": {
+        "type": "Property",
+        "value": {
+            "languageMap": {
+                "en": "three",
+                "es": "tres"
+            }
+        }
+    },
+    "P1": {
+        "type": "Property",
+        "value": 2
+    },
+    "P2": {
+        "type": "Property",
+        "value": 3
+    },
+    "R1": {
+        "object": "urn:E2",
+        "type": "Relationship"
+    },
+    "R2": {
+        "type": "Property",
+        "value": "urn:E2"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+06. PATCH E1:L1, modify "en": "two" to "one+one" using URI param "lang"
+=======================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. GET E1, see the new languageMap of L1
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 482
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G1": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                3,
+                4
+            ],
+            "type": "Point"
+        }
+    },
+    "G2": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                5,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "L1": {
+        "languageMap": {
+            "en": "one+one",
+            "es": "dos"
+        },
+        "type": "LanguageProperty"
+    },
+    "L2": {
+        "type": "Property",
+        "value": {
+            "languageMap": {
+                "en": "three",
+                "es": "tres"
+            }
+        }
+    },
+    "P1": {
+        "type": "Property",
+        "value": 2
+    },
+    "P2": {
+        "type": "Property",
+        "value": 3
+    },
+    "R1": {
+        "object": "urn:E2",
+        "type": "Relationship"
+    },
+    "R2": {
+        "type": "Property",
+        "value": "urn:E2"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+08. PATCH E1:L1, add a new language: "sv"
+=========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. GET E1, see the new languageMap of L1
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 497
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "G1": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                3,
+                4
+            ],
+            "type": "Point"
+        }
+    },
+    "G2": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                5,
+                6
+            ],
+            "type": "Point"
+        }
+    },
+    "L1": {
+        "languageMap": {
+            "en": "one+one",
+            "es": "dos",
+            "sv": "ett+ett"
+        },
+        "type": "LanguageProperty"
+    },
+    "L2": {
+        "type": "Property",
+        "value": {
+            "languageMap": {
+                "en": "three",
+                "es": "tres"
+            }
+        }
+    },
+    "P1": {
+        "type": "Property",
+        "value": 2
+    },
+    "P2": {
+        "type": "Property",
+        "value": 3
+    },
+    "R1": {
+        "object": "urn:E2",
+        "type": "Relationship"
+    },
+    "R2": {
+        "type": "Property",
+        "value": "urn:E2"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

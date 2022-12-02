@@ -33,3 +33,5 @@
 * Issue #280   Implemented the new forwarding for POST /entities
 * Issue #280   Implemented the new forwarding for GET /entities/{entityId}
 * Issue #280   Loop detection for forwarded requests - using the X-Forwarded-For header
+* Issue #1262  keyValues/simplified input format for PATCH /entities/{entityId}
+* Issue #1261  'lang' URI param support for PATCH /entities/{entityId}

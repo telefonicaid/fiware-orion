@@ -482,7 +482,7 @@ bool datasetIdCheck(KjNode* datasetIdP)
 {
   if (datasetIdP->type != KjString)
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", datasetIdP->name, 400);
+    orionldError(OrionldBadRequestData, "Invalid JSON type - not a string", datasetIdP->name, 400);
     return false;
   }
 
@@ -501,7 +501,7 @@ bool objectCheck(KjNode* objectP)
 {
   if (objectP->type != KjString)
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", objectP->name, 400);
+    orionldError(OrionldBadRequestData, "Invalid JSON type - not a string", objectP->name, 400);
     return false;
   }
 
@@ -546,7 +546,7 @@ bool unitCodeCheck(KjNode* unitCodeP)
 {
   if (unitCodeP->type != KjString)
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string", unitCodeP->name, 400);
+    orionldError(OrionldBadRequestData, "Invalid JSON type - not a string", unitCodeP->name, 400);
     return false;
   }
 
@@ -563,7 +563,7 @@ bool timestampCheck(KjNode* fieldP)
 {
   if (fieldP->type != KjString)
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON  type - not a string (so, not a valid timestamp)", fieldP->name, 400);
+    orionldError(OrionldBadRequestData, "Invalid JSON type - not a string (so, not a valid timestamp)", fieldP->name, 400);
     return false;
   }
 
@@ -871,9 +871,13 @@ static bool pCheckAttributeObject
 
     if ((attrTypeFromDb != NoAttributeType) && (attributeType != attrTypeFromDb))
     {
-      const char* title = attrTypeChangeTitle(attrTypeFromDb, attributeType);
-      orionldError(OrionldBadRequestData, title, attrP->name, 400);
-      return false;
+      // This might be OK, if keyValues is ON => attributeType is a guess
+      if (orionldState.uriParamOptions.keyValues == false)
+      {
+        const char* title = attrTypeChangeTitle(attrTypeFromDb, attributeType);
+        orionldError(OrionldBadRequestData, title, attrP->name, 400);
+        return false;
+      }
     }
 
     if (geoJsonValue == true)
@@ -925,9 +929,13 @@ static bool pCheckAttributeObject
 
     if ((attrTypeFromDb != NoAttributeType) && (attributeType != NoAttributeType) && (attributeType != attrTypeFromDb))
     {
-      const char* title = attrTypeChangeTitle(attrTypeFromDb, attributeType);
-      orionldError(OrionldBadRequestData, title, attrP->name, 400);
-      return false;
+      // This might be OK, if keyValues is ON => attributeType is a guess
+      if (orionldState.uriParamOptions.keyValues == false)
+      {
+        const char* title = attrTypeChangeTitle(attrTypeFromDb, attributeType);
+        orionldError(OrionldBadRequestData, title, attrP->name, 400);
+        return false;
+      }
     }
 
     //
