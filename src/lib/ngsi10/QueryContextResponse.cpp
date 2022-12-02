@@ -126,12 +126,9 @@ std::string QueryContextResponse::toJsonV1(bool asJsonObject)
   //
   out += startTag();
 
-  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
-  std::vector<std::string> emptyV;
-
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.toJsonV1(asJsonObject, QueryContext, emptyV, false, emptyV, errorCodeRendered);
+    out += contextElementResponseVector.toJsonV1(asJsonObject, QueryContext, false, errorCodeRendered);
   }
 
   if (errorCodeRendered == true)

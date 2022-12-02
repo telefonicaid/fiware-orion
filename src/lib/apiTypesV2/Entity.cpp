@@ -267,6 +267,28 @@ std::string Entity::toJsonV1
 
 /* ****************************************************************************
 *
+* Entity::toJsonV1 -
+*
+* Wrapper of toJsonV1 with empty attrsFilter and metadataFilter
+*
+*/
+std::string Entity::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         blacklist,
+  bool         comma,
+  bool         omitAttributeValues
+)
+{
+  std::vector<std::string> emptyV;
+  return toJsonV1(asJsonObject, requestType, emptyV, blacklist, emptyV, comma, omitAttributeValues);
+}
+
+
+
+/* ****************************************************************************
+*
 * Entity::toJson -
 *
 * The rendering of JSON in APIv2 depends on the URI param 'options'
