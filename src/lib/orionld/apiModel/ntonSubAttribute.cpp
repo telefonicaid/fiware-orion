@@ -45,7 +45,7 @@ extern "C"
 void ntonSubAttribute(KjNode* saP, const char* lang, bool sysAttrs)
 {
   if (sysAttrs == false)
-    kjSysAttrsRemove(saP);
+    kjSysAttrsRemove(saP, 0);
 
   KjNode* typeP = kjLookup(saP, "type");
   if ((lang != NULL) && (typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty")))

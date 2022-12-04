@@ -42,7 +42,7 @@ extern "C"
 void ntonEntity(KjNode* apiEntityP, const char* lang, bool sysAttrs)
 {
   if (sysAttrs == false)
-    kjSysAttrsRemove(apiEntityP);
+    kjSysAttrsRemove(apiEntityP, 0);
 
   for (KjNode* fieldP = apiEntityP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
   {

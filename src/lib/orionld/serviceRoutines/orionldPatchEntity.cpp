@@ -107,7 +107,8 @@ bool orionldPatchEntity(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyPatchEntity();
 
-  const char* entityId = orionldState.wildcard[0];
+  const char* entityId   = orionldState.wildcard[0];
+  const char* entityType = orionldState.uriParams.type;
 
   //
   // Initial Validity Checks;
@@ -121,7 +122,7 @@ bool orionldPatchEntity(void)
   //
   // Get the entity from mongo (only really need creDate and type of the attributes ...)
   //
-  KjNode* dbEntityP = mongocEntityLookup(entityId, NULL, NULL);
+  KjNode* dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
   if (dbEntityP == NULL)
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
@@ -133,7 +134,8 @@ bool orionldPatchEntity(void)
   // [ It is already extracted (by orionldMhdConnectionTreat) and checked for String ]
   //
   KjNode*     dbTypeNodeP = dbEntityTypeExtract(dbEntityP);
-  const char* entityType  = dbTypeNodeP->value.s;
+
+  entityType  = dbTypeNodeP->value.s;  // FIXME: What if entityType was given as URI param?
 
   if (orionldState.payloadTypeNode != NULL)
   {

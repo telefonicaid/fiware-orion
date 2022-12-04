@@ -49,6 +49,6 @@ extern "C"
 // The other one, mongocEntityRetrieve, does much more than just DB. It should be REMOVED.
 // mongocEntityRetrieve is only used by legacyGetEntity() which is being deprecated anyway.
 //
-extern KjNode* mongocEntityLookup(const char* entityId, StringArray* attrsV, const char* geojsonGeometry);
+extern KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringArray* attrsV, const char* geojsonGeometry);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYLOOKUP_H_

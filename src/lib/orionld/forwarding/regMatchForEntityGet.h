@@ -46,6 +46,7 @@ extern ForwardPending* regMatchForEntityGet
   RegistrationMode regMode,
   FwdOperation     operation,
   const char*      entityId,
+  const char*      entityType,
   StringArray*     attrV,
   const char*      geoProp
 );

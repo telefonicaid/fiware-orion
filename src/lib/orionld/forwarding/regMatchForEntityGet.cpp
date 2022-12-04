@@ -55,6 +55,7 @@ ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
   RegistrationMode regMode,
   FwdOperation     operation,
   const char*      entityId,
+  const char*      entityType,
   StringArray*     attrV,
   const char*      geoProp
 )
@@ -91,7 +92,7 @@ ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
       continue;
     }
 
-    ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, attrV, geoProp);  // FIXME: +entity-type
+    ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, entityType, attrV, geoProp);  // FIXME: +entity-type
     if (fwdPendingP == NULL)
     {
       LM(("%s: No Reg Match due to Information Array", regId));
@@ -99,8 +100,9 @@ ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
     }
 
     // Add extra info in ForwardPending, needed by forwardRequestSend
-    fwdPendingP->entityId  = (char*) entityId;
-    fwdPendingP->operation = operation;
+    fwdPendingP->entityId   = (char*) entityId;
+    fwdPendingP->entityType = (char*) entityType;
+    fwdPendingP->operation  = operation;
 
     // Add fwdPendingP to the linked list
     if (fwdPendingHead == NULL)

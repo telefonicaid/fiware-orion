@@ -126,7 +126,7 @@ bool orionldPostEntity(void)
     return legacyPostEntity();
 
   char* entityId                  = orionldState.wildcard[0];
-  char* entityType                = NULL;
+  char* entityType                = orionldState.uriParams.type;
   bool  ignoreExistingAttributes  = (orionldState.uriParamOptions.noOverwrite == true)? true : false;
 
   PCHECK_OBJECT(orionldState.requestTree, 0, NULL, "Entity Fragment", 400);
@@ -136,7 +136,7 @@ bool orionldPostEntity(void)
   //
   // Get the entity from the database
   //
-  KjNode* dbEntityP = mongocEntityLookup(entityId, NULL, NULL);
+  KjNode* dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
   if (dbEntityP == NULL)
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);

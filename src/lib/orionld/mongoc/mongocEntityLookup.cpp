@@ -56,7 +56,7 @@ extern "C"
 // The other one, mongocEntityRetrieve, does much more than just DB. It needs to be be REMOVED.
 // mongocEntityRetrieve is only used by legacyGetEntity() which is being deprecated anyway.
 //
-KjNode* mongocEntityLookup(const char* entityId, StringArray* attrsV, const char* geojsonGeometry)
+KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringArray* attrsV, const char* geojsonGeometry)
 {
   bson_t                mongoFilter;
   const bson_t*         mongoDocP;
@@ -71,7 +71,14 @@ KjNode* mongocEntityLookup(const char* entityId, StringArray* attrsV, const char
   // Create the filter for the query
   //
   bson_init(&mongoFilter);
+
   bson_append_utf8(&mongoFilter, "_id.id", 6, entityId, -1);
+
+  if (entityType != NULL)
+  {
+    LM(("Adding the entity type to the query: '%s'", entityType));
+    bson_append_utf8(&mongoFilter, "_id.type", 8, entityType, -1);
+  }
 
   mongocConnectionGet();
 

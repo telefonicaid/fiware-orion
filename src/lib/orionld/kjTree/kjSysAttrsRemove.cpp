@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <unistd.h>                                            // NULL
+#include <string.h>                                            // strcmp
 
 extern "C"
 {
@@ -39,7 +40,11 @@ extern "C"
 //
 // kjSysAttrsRemove -
 //
-void kjSysAttrsRemove(KjNode* container)
+// PARAMETERS
+//   container      - the toplevel KjNode from where to remove the sysAttrs (createdAt+modifiedAt)
+//   recursionLevel - while it is > 0, we go down one level (0 => single level, no recursion)
+//
+void kjSysAttrsRemove(KjNode* container, int recursionLevel)
 {
   KjNode* createdAtP  = kjLookup(container, "createdAt");
   KjNode* modifiedAtP = kjLookup(container, "modifiedAt");
@@ -49,4 +54,13 @@ void kjSysAttrsRemove(KjNode* container)
 
   if (modifiedAtP != NULL)
     kjChildRemove(container, modifiedAtP);
+
+  if (recursionLevel > 0)
+  {
+    for (KjNode* childP = container->value.firstChildP; childP != NULL; childP = childP->next)
+    {
+      if ((childP->type == KjObject) && (strcmp(childP->name, "value") != 0) && (strcmp(childP->name, "languageMap") != 0))
+        kjSysAttrsRemove(childP, recursionLevel - 1);
+    }
+  }
 }
