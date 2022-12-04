@@ -529,6 +529,7 @@ bool orionldPatchEntity2(void)
   }
 
   char*    entityId    = orionldState.wildcard[0];
+  char*    entityType  = orionldState.uriParams.type;
   KjNode*  dbEntityP;
 
   //
@@ -546,7 +547,7 @@ bool orionldPatchEntity2(void)
   //        Not really worth it.
   //        At least, postponed (not forgotten) for now.
   //
-  dbEntityP = mongocEntityLookup(entityId, NULL, NULL);
+  dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
 
   if (dbEntityP == NULL)
   {
@@ -555,7 +556,6 @@ bool orionldPatchEntity2(void)
   }
 
 
-  char*   entityType  = NULL;
   KjNode* dbAttrsP    = NULL;
 
   if (dbEntityFields(dbEntityP, entityId, &entityType, &dbAttrsP) == false)

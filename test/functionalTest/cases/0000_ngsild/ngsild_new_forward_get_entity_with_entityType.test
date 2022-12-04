@@ -1,0 +1,216 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieve a distributed entity, giving the type of the entity
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+brokerStart CB  0 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# We found a "funny" problem, really it's a user error, but the broker needs to protect itself against it.
+# Scenario:
+#   1. CP1 registers (in CB) entities of type "Vehicle" - no more hints in the registration - Registration R1
+#   2. An entity urn:E1 is created in CP1, with type "Building"
+#   3. CB receives an Entity Retieve request for the entity urn:E1, from an "end-user"
+#      - There's no entity type info, just the Entity ID, so, the registration R1 matches, as it has no Entity ID info, just the Entity Type
+#   4. CB sends the forwarded request to GET /entities/urn:E1
+#   5. CP1 responds with urn:E1, exactly what was asked for
+#   6. CB responds to the "end-user" with the entity urn:E1 - all good?
+#
+#   No, it's NOT "all good", as CP1 only retgistered entities of type "Vehicle", but urn:E1 is of the type "Building" ...
+#
+#   In order to fix this problem, we've added the URI param "type" to GET /entities/{entityId}
+#   If the entity exists in CB, the entity type will be added to the forwarded request and the "misunderstanding" is fixed.
+#   If the entity DOES NOT exists in CB, the problem will still occur, BUT, the initial request can be sent with the URI param type=Building.
+#   That fixes the probem, because R1 is no longer a match, as CB now knows the entity type "Building" and "R1" only exposes entities of type "Vehicle"
+#
+# TEST 1 - the "failure"
+# 01. Registration R1 in CB, for CP1, entity type "Vehicle"
+# 02. Create entity urn:E1 in CP1, with entity type "Building"
+# 03. GET /entities/urn:E1 in CB, get urn:E1 (with type Building) from CP1
+#
+# TEST 2 - fixing it by doing the GET with the entity type 'Building'
+# 04. GET /entities/urn:E1?type=Building in CB - see nothing
+#
+# TEST 3 - fixing it by having the entity locally
+# 05. Create entity urn:E1 in CB, with entity type "Building"
+# 06. GET /entities/urn:E1 - see only local data
+#
+
+echo "01. Registration R1 in CB, for CP1, entity type 'Vehicle'"
+echo "========================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Vehicle"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity urn:E1 in CP1, with entity type 'Building'"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "Building",
+  "P1": "In CP1"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. GET /entities/urn:E1 in CB, get urn:E1 (with type Building) from CP1"
+echo "========================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "04. GET /entities/urn:E1?type=Building in CB - see nothing"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?type=Building
+echo
+echo
+
+
+echo '05. Create entity urn:E1 in CB, with entity type "Building"'
+echo '==========================================================='
+payload='{
+  "id": "urn:E1",
+  "type": "Building",
+  "P2": "In CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GET /entities/urn:E1 - see only local data"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Registration R1 in CB, for CP1, entity type 'Vehicle'
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create entity urn:E1 in CP1, with entity type 'Building'
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. GET /entities/urn:E1 in CB, get urn:E1 (with type Building) from CP1
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "In CP1"
+    },
+    "id": "urn:E1",
+    "type": "Building"
+}
+
+
+04. GET /entities/urn:E1?type=Building in CB - see nothing
+==========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+05. Create entity urn:E1 in CB, with entity type "Building"
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. GET /entities/urn:E1 - see only local data
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P2": {
+        "type": "Property",
+        "value": "In CB"
+    },
+    "id": "urn:E1",
+    "type": "Building"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+#dbDrop CB
+dbDrop CP1

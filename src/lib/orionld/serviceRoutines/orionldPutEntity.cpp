@@ -268,7 +268,7 @@ bool orionldPutEntity(void)
   //
   // Check Entity Type
   //
-  char*   entityType = NULL;  // Set by pCheckEntityType
+  char*   entityType = orionldState.uriParams.type;  // Set by pCheckEntityType - need to look at that ...
   KjNode* typeNodeP  = kjLookup(orionldState.requestTree, "type");
 
   if (pCheckEntityType(typeNodeP, true, &entityType) == false)
@@ -277,7 +277,7 @@ bool orionldPutEntity(void)
   //
   // Get the entity from the database
   //
-  KjNode* oldDbEntityP = mongocEntityLookup(entityId, NULL, NULL);
+  KjNode* oldDbEntityP = mongocEntityLookup(entityId, NULL, NULL, NULL);
   if (oldDbEntityP == NULL)
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);

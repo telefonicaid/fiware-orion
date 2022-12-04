@@ -55,7 +55,7 @@ void ntonAttribute(KjNode* attrP, const char* lang, bool sysAttrs)
   }
 
   if (sysAttrs == false)
-    kjSysAttrsRemove(attrP);
+    kjSysAttrsRemove(attrP, 0);
 
   KjNode* typeP = kjLookup(attrP, "type");
   if ((lang != NULL) && (typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty") == 0))

@@ -40,6 +40,6 @@ extern "C"
 //
 // regMatchInformationArrayForGet -
 //
-extern ForwardPending* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId, StringArray* attrV, const char* geoProp);
+extern ForwardPending* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId, const char* entityType, StringArray* attrV, const char* geoProp);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAYFORGET_H_

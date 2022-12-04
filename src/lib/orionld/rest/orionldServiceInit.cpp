@@ -233,6 +233,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
     serviceP->uriParams |= ORIONLD_URIPARAM_LANG;
     serviceP->uriParams |= ORIONLD_URIPARAM_LOCAL;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }

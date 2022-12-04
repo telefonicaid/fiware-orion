@@ -36,6 +36,6 @@ extern "C"
 //
 // kjSysAttrsRemove -
 //
-extern void kjSysAttrsRemove(KjNode* container);
+extern void kjSysAttrsRemove(KjNode* container, int recursionLevel);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJSYSATTRSREMOVE_H_
