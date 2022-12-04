@@ -39,6 +39,6 @@ extern "C"
 //
 // regMatchInformationItemForGet -
 //
-extern StringArray* regMatchInformationItemForGet(RegCacheItem* regP, KjNode* infoP, const char* entityId, StringArray* attrV, const char* geoProp);
+extern StringArray* regMatchInformationItemForGet(RegCacheItem* regP, KjNode* infoP, const char* entityId, const char* entityType, StringArray* attrV, const char* geoProp);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONITEMFORGET_H_

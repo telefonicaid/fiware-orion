@@ -46,7 +46,7 @@ void ntocSubAttribute(KjNode* saP, const char* lang, bool sysAttrs)
 {
   // 1. Remove the sysAttrs, if so requested
   if (sysAttrs == false)
-    kjSysAttrsRemove(saP);
+    kjSysAttrsRemove(saP, 0);
 
 
   // 2. LanguageProperty?

@@ -49,7 +49,7 @@ payload='{
     }
   },
   "@context": [
-    "https://schema.lab.fiware.org/ld/context",
+    "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ]
 }'
@@ -62,7 +62,7 @@ echo "02. Patch the location property"
 echo "==============================="
 payload='{
   "@context": [
-    "https://schema.lab.fiware.org/ld/context",
+    "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
     "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
   ],
   "location": {

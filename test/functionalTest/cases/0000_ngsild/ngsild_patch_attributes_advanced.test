@@ -426,7 +426,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 12. Add a datasetId, that is not a string - see error
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 126
+Content-Length: 125
 Content-Type: application/json
 Date:REGEX(.*)
 

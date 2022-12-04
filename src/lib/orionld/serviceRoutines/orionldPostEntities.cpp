@@ -247,7 +247,7 @@ bool orionldPostEntities(void)
   //
   if (orionldState.requestTree != NULL)
   {
-    if (mongocEntityLookup(entityId, NULL, NULL) != NULL)
+    if (mongocEntityLookup(entityId, NULL, NULL, NULL) != NULL)
     {
       if (fwdPendingList == NULL)  // Purely local request
       {

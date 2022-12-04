@@ -52,7 +52,7 @@ echo
 echo
 
 
-echo "02. PATCH E1,	modifying R1 using key-values"
+echo "02. PATCH E1, modifying R1 using key-values"
 echo "==========================================="
 payload='{
   "R1": "urn:R2"
@@ -106,7 +106,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 
 
-02. PATCH E1,	modifying R1 using key-values
+02. PATCH E1, modifying R1 using key-values
 ===========================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -148,13 +148,13 @@ Date: REGEX(.*)
 05. PATCH E1, modifying R1 using key-values, attempt with a string RHS that is not a valid URI - see error
 ==========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 170
+Content-Length: 159
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
-    "title": "PATCH of Relationship - not a valid URI",
+    "title": "Invalid URI - no colon found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

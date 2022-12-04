@@ -158,6 +158,10 @@ def ignore(root, file):
     if 'heavyTest' in root and (file.endswith('.json') or file.endswith('.xml')):
         return True
 
+    # JSONLD files in test/functionalTest/contexts are not processed - they can't have the Copyright header
+    if 'contexts' in root and file.endswith('.jsonld'):
+        return True
+
     # Some files in docker/ directory are not processed
     if 'docker' in root and file in ['Dockerfile', 'Dockerfile-base', 'Dockerfile-ubi-base', 'Dockerfile-ubi', 'Dockerfile-test', 'Dockerfile-debug', 'Dockerfile-gdb', 'gdbinit', 'docker-compose.yml', 'subscription-manager.conf', 'ubi.repo']:
         return True

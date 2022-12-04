@@ -36,7 +36,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/curlToBrokerStrerror.h"                 // curlToBrokerStrerror
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldEntityExpand.h"                 // orionldEntityExpand
 #include "orionld/context/orionldEntityCompact.h"                // orionldEntityCompact
@@ -75,11 +74,80 @@ bool orionldGetEntity(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntity();
 
-  const char* entityId = orionldState.wildcard[0];
+  bool         distributed = (forwarding == true) && (orionldState.uriParams.local == false);
+  bool         sysAttrs    = orionldState.uriParamOptions.sysAttrs;
+  char*        lang        = orionldState.uriParams.lang;
+  char*        entityType  = NULL;  // If the entity is found locally, its type will be included as help in the forwarded requests
+  const char*  entityId    = orionldState.wildcard[0];
+
   if (pCheckUri(entityId, "Entity ID in URL PATH", true) == false)
     return false;
 
-  bool             distributed    = (forwarding == true) && (orionldState.uriParams.local == false);
+  //
+  // If the entity type is set as URI param (only ONE), then it will be used, but first it needs to be expanded.
+  // In the case the entity "entityId" exists, but with another type, it is not considered a hit - 404
+  //
+  if (orionldState.in.typeList.items > 0)
+  {
+    if (orionldState.in.typeList.items == 1)
+      entityType = orionldState.in.typeList.array[0];
+    else
+    {
+      orionldError(OrionldBadRequestData, "Invalid URI param (type)", "more than one entity type", 400);
+      return false;
+    }
+  }
+
+  LM(("TYPE: entityType: '%s' (from URI param)", entityType));
+
+  KjNode* dbEntityP      = mongocEntityLookup(entityId, entityType, &orionldState.in.attrList, orionldState.uriParams.geometryProperty);
+  KjNode* apiEntityP     = NULL;
+  bool    forcedSysAttrs = false;
+
+  if (dbEntityP != NULL)  // Convert from DB to API Entity + GET the entity type
+  {
+    // In the distributed case, one and the same attribute may come from different providers,
+    // and we'll have to pick ONE of them.
+    // The algorithm to pick one is;
+    // 1. Newest observedAt
+    // 2. If none of the attributes has an observedAt:  newest modifiedAt
+    // 3. If none of the attributes has an modifiedAt - pick the first one
+    //
+    // So, in order for this to work, in a distributed GET, we can't get rid of the sysAttrs in dbModelToApiEntity2.
+    // We also cannot get rid of the sub-attrs (observedAt may be needed) - that would be if orionldState.out.format == Simplified
+    // We might need those two for the attribute-instance-decision
+    //
+    // For the very same reason, all forwarded GET requests must carry the URI-params "?options=sysAttrs,normalized" + type=X is available
+    //
+
+    if (entityType == NULL)
+    {
+      //
+      // As we need the expanded entity type, we look it up in the DB Model version of the entity, not the API model version
+      // AND, we must do this before calling dbModelToApiEntity2 as "id"/"type" are removed from "_id".
+      //
+      kjTreeLog(dbEntityP, "TYPE: dbEntityP");
+      KjNode* _idP        = kjLookup(dbEntityP, "_id");
+      LM(("TYPE: _idP at %p", _idP));
+      KjNode* entityTypeP = (_idP != NULL)? kjLookup(_idP, "type") : NULL;
+      LM(("TYPE: entityTypeP at %p", entityTypeP));
+
+      if (entityTypeP != NULL)
+        entityType = entityTypeP->value.s;
+      LM(("TYPE: entityType: '%s' (from DB)", entityType));
+    }
+    else
+      LM(("TYPE: The entity type is already set in URL param: '%s'", entityType));
+
+    if (distributed == true)
+    {
+      forcedSysAttrs = true;
+      apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, lang, true, &orionldState.pd);
+    }
+    else
+      apiEntityP = dbModelToApiEntity2(dbEntityP, sysAttrs, orionldState.out.format, lang, true, &orionldState.pd);
+  }
+
   ForwardPending*  fwdPendingList = NULL;
   int              forwards       = 0;
 
@@ -105,10 +173,10 @@ bool orionldGetEntity(void)
     // We want EVERYTHING from Auxiliary regs (and we may throw it all away in the end),
     // so we create the ForwardPending list FIRST, before any attrs are removed
     //
-    ForwardPending* auxiliarList  = regMatchForEntityGet(RegModeAuxiliary, FwdRetrieveEntity, entityId, attrV, geoProp);
-    ForwardPending* exclusiveList = regMatchForEntityGet(RegModeExclusive, FwdRetrieveEntity, entityId, attrV, geoProp);
-    ForwardPending* redirectList  = regMatchForEntityGet(RegModeRedirect,  FwdRetrieveEntity, entityId, attrV, geoProp);
-    ForwardPending* inclusiveList = regMatchForEntityGet(RegModeInclusive, FwdRetrieveEntity, entityId, attrV, geoProp);
+    ForwardPending* auxiliarList  = regMatchForEntityGet(RegModeAuxiliary, FwdRetrieveEntity, entityId, entityType, attrV, geoProp);
+    ForwardPending* exclusiveList = regMatchForEntityGet(RegModeExclusive, FwdRetrieveEntity, entityId, entityType, attrV, geoProp);
+    ForwardPending* redirectList  = regMatchForEntityGet(RegModeRedirect,  FwdRetrieveEntity, entityId, entityType, attrV, geoProp);
+    ForwardPending* inclusiveList = regMatchForEntityGet(RegModeInclusive, FwdRetrieveEntity, entityId, entityType, attrV, geoProp);
 
     fwdPendingList = forwardingListsMerge(exclusiveList,  redirectList);
     fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
@@ -170,8 +238,6 @@ bool orionldGetEntity(void)
     }
   }
 
-  KjNode* dbEntityP  = mongocEntityLookup(entityId, &orionldState.in.attrList, orionldState.uriParams.geometryProperty);
-  KjNode* apiEntityP = NULL;
   if (dbEntityP == NULL)
   {
     if (forwards == 0)
@@ -179,41 +245,16 @@ bool orionldGetEntity(void)
       const char* title = (orionldState.in.attrList.items != 0)? "Combination Entity/Attributes Not Found" : "Entity Not Found";
       orionldError(OrionldResourceNotFound, title, entityId, 404);
 
-#if 0
-      LM(("@context is: '%s'", orionldState.contextP->url));
-
-      for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
-      {
-        LM(("Attr %d: '%s'", ix, orionldState.in.attrList.array[ix]));
-      }
-#endif
       return false;
     }
   }
-  else
-  {
-    // In the distributed case, one and the same attribute may come from different providers,
-    // and we'll have to pick ONE of them.
-    // The algorithm to pick one is;
-    // 1. Newest observedAt
-    // 2. If none of the attributes has an observedAt:  newest modifiedAt
-    // 3. If none of the attributes has an modifiedAt - pick the first one
-    //
-    // So, in order for this to work, in a distributed GET, we can't get rid of the sysAttrs in dbModelToApiEntity2.
-    // We also cannot get rid of the sub-attrs (observedAt may be needed) - that would be if orionldState.out.format == Simplified
-    // We might need those two for the attribute-instance-decision
-    //
-    // For the very same reason, all forwarded GET requests must carry the URI-params "?options=sysAttrs,normalized"
-    //
-    if (forwards > 0)  // Need Normalized and sysattrs if the operation has parts of the entity distributed (to help pick attr instances)
-      apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, orionldState.uriParams.lang, true, &orionldState.pd);
-    else
-      apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, orionldState.out.format, orionldState.uriParams.lang, true, &orionldState.pd);
-  }
+
 
   //
-  // Now read responses to the forwarded requests
+  // Read the responses to the forwarded requests
   //
+  int fwdMerges = 0;
+
   if (forwards > 0)
   {
     CURLMsg* msgP;
@@ -228,7 +269,6 @@ bool orionldGetEntity(void)
       {
         ForwardPending* fwdPendingP = fwdPendingLookupByCurlHandle(fwdPendingList, msgP->easy_handle);
 
-        LM(("Got a response: %s", fwdPendingP->rawResponse));
         fwdPendingP->body = kjParse(orionldState.kjsonP, fwdPendingP->rawResponse);
         if (fwdPendingP->body != NULL)
         {
@@ -254,7 +294,10 @@ bool orionldGetEntity(void)
           if (apiEntityP == NULL)
             apiEntityP = fwdPendingP->body;
           else
-            fwdEntityMerge(apiEntityP, fwdPendingP->body, orionldState.uriParamOptions.sysAttrs, fwdPendingP->regP->mode == RegModeAuxiliary);
+          {
+            fwdEntityMerge(apiEntityP, fwdPendingP->body, sysAttrs, fwdPendingP->regP->mode == RegModeAuxiliary);
+            fwdMerges += 1;
+          }
         }
         else
           LM_E(("Internal Error (parse error for the received response of a forwarded request)"));
@@ -270,8 +313,6 @@ bool orionldGetEntity(void)
   {
     kjTreeLog(apiEntityP, "API Entity to transform");
     // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
-    bool  sysAttrs = orionldState.uriParamOptions.sysAttrs;
-    char* lang     = orionldState.uriParams.lang;
 
     if (orionldState.out.format == RF_KEYVALUES)
       ntosEntity(apiEntityP, lang);
@@ -279,6 +320,11 @@ bool orionldGetEntity(void)
       ntocEntity(apiEntityP, lang, sysAttrs);
     else
       ntonEntity(apiEntityP, lang, sysAttrs);
+  }
+
+  if ((dbEntityP != NULL) && (fwdMerges == 0) && (forcedSysAttrs == true) && (sysAttrs == false))
+  {
+    kjSysAttrsRemove(apiEntityP, 2);
   }
 
   if (orionldState.out.contentType == GEOJSON)

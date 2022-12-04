@@ -42,18 +42,18 @@ extern "C"
 //
 // regMatchInformationArrayForGet -
 //
-ForwardPending* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId, StringArray* attrV, const char* geoProp)
+ForwardPending* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId, const char* entityType, StringArray* attrV, const char* geoProp)
 {
   KjNode* informationV = kjLookup(regP->regTree, "information");
 
   for (KjNode* infoP = informationV->value.firstChildP; infoP != NULL; infoP = infoP->next)
   {
-    StringArray* attrList = regMatchInformationItemForGet(regP, infoP, entityId, attrV, geoProp);
+    StringArray* attrList = regMatchInformationItemForGet(regP, infoP, entityId, entityType, attrV, geoProp);
 
-    if ((attrV != NULL) && (attrList == NULL))  // No match
+    if (attrList == NULL)  // No match
       continue;
 
-    // If we get this far, then it's a match and we can return
+    // If we get this far, then it's a match and we can create the ForwardPending item and return
     ForwardPending* fwdPendingP = (ForwardPending*) kaAlloc(&orionldState.kalloc, sizeof(ForwardPending));
 
     fwdPendingP->regP     = regP;

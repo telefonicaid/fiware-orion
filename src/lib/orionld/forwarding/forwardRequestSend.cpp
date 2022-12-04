@@ -128,7 +128,7 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
   int totalLen = 0;
 
   //
-  // Calculating the length of the resulting URL
+  // Calculating the length of the resulting URL (PATH+PARAMS)
   //
   totalLen += strlen(endpointP->value.s);
   totalLen += fwdOperationUrlLen[urlPartsP->fwdPendingP->operation];
@@ -138,6 +138,7 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
   if (urlPartsP->fwdPendingP->attrName != NULL)
     totalLen += strlen(urlPartsP->fwdPendingP->attrName) + 1;  // +1: the '/' after "/attrs" and before the attrName
 
+  // Adding the lengths of the uri params
   for (SList* paramP = urlPartsP->params; paramP != NULL; paramP = paramP->next)
   {
     totalLen += paramP->sLen + 1;  // +1: Either '?' or '&'
@@ -385,9 +386,15 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
 
     //
     // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add that)
-    // They MUST be sent with NOEMALIZED and SYSATTRS, as with out that, there's no way to pick attributes in case we have clashes
+    // They MUST be sent with NORMALIZED and SYSATTRS, as without that, there's no way to pick attributes in case we have clashes
     //
     uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
+
+    //
+    // If we know the Entity Type, we pass that piece of information as well
+    //
+    if (fwdPendingP->entityType != NULL)
+      uriParamAdd(&urlParts, "type", fwdPendingP->entityType, -1);
   }
 
   if (orionldState.uriParams.lang != NULL)

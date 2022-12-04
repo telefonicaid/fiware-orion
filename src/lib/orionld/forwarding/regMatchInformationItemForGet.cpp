@@ -42,7 +42,15 @@ extern "C"
 //
 // regMatchInformationItemForGet -
 //
-StringArray* regMatchInformationItemForGet(RegCacheItem* regP, KjNode* infoP, const char* entityId, StringArray* attrV, const char* geoProp)
+StringArray* regMatchInformationItemForGet
+(
+  RegCacheItem* regP,
+  KjNode*       infoP,
+  const char*   entityId,
+  const char*   entityType,
+  StringArray*  attrV,
+  const char*   geoProp
+)
 {
   KjNode* entities = kjLookup(infoP, "entities");
 
@@ -51,7 +59,7 @@ StringArray* regMatchInformationItemForGet(RegCacheItem* regP, KjNode* infoP, co
     bool match = false;
     for (KjNode* entityInfoP = entities->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
     {
-      if (regMatchEntityInfo(regP, entityInfoP, entityId, NULL) == true)
+      if (regMatchEntityInfo(regP, entityInfoP, entityId, entityType) == true)
       {
         match = true;
         break;
