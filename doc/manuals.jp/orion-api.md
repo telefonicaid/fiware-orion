@@ -68,7 +68,7 @@
     - [通知メッセージ (Notification Messages)](#notification-messages)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
       - [マクロ置換 (Macro substitution)](#macro-substitution)
-      - [ヘッダの特別な扱い ([Headers special treatment)](#headers-special-treatment)
+      - [ヘッダの特別な扱い (Headers special treatment)](#headers-special-treatment)
       - [ヘッダーの削除 (Remove headers)](#remove-headers)
       - [テキストベースのペイロード (Text based payload)](#text-based-payload)
       - [JSON ペイロード (JSON payloads)](#json-payloads)
@@ -2103,7 +2103,7 @@ Content-Length: ...
 
 <a name="headers-special-treatment"></a>
 
-### ヘッダの特別な扱い ([Headers special treatment)
+### ヘッダの特別な扱い (Headers special treatment)
 
 [一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions` などの
 API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers` のヘッダ値にも同じ制限が適用されます。
