@@ -68,11 +68,13 @@
     - [通知メッセージ (Notification Messages)](#notification-messages)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
       - [マクロ置換 (Macro substitution)](#macro-substitution)
+      - [ヘッダの特別な扱い ([Headers special treatment)](#headers-special-treatment)
+      - [ヘッダーの削除 (Remove headers)](#remove-headers)
+      - [テキストベースのペイロード (Text based payload)](#text-based-payload)
       - [JSON ペイロード (JSON payloads)](#json-payloads)
+      - [NGSI ペイロードのパッチ適用 (NGSI payload patching)](#ngsi-payload-patching)
       - [ペイロードの省略 (Omitting payload)](#omitting-payload)
-      - [ヘッダの削除 (Remove headers)](#remove-headers)
       - [その他の考慮事項](#additional-considerations)
-      - [カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)](#custom-payload-and-headers-special-treatment)
     - [Oneshot サブスクリプション (Oneshot Subscriptions)](#oneshot-subscriptions)
     - [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
     - [変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)](#subscriptions-based-in-alteration-type)
@@ -2037,13 +2039,13 @@ NGSIv1 は非推奨であることに注意してください。したがって�
     カスタム通知で上書きできないことに注意してください。そうしようとする試み
     (例: `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` は無視されます
 -   `qs` (パラメータ名と値の両方をテンプレート化できます)
--   `payload` または `json`
+-   `payload`, `json`, `ngsi` (すべてペイロード関連のフィールド)
 -   `method` は、クライアントが通知の配信に使用する HTTP メソッドを選択できるようにしますが、有効な HTTP
     動詞のみを使用できることに注意してください: GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS, TRACE および CONNECT
 
 `mqttCustom` の場合:
 
--   `payload` または `json`
+-   `payload`, `json`, `ngsi` (すべてペイロード関連のフィールド)
 -   `topic`
 
 テンプレートのマクロ置換は、構文 `${..}` に基づいています。特に:
@@ -2077,7 +2079,10 @@ NGSIv1 は非推奨であることに注意してください。したがって�
   "qs": {
     "type": "${type}"
   },
-  "payload": "The temperature is ${temperature} degrees"
+  "json": {
+    "t": "${temperature}",
+    "unit": "degress"
+  }
 }
 ```
 
@@ -2087,9 +2092,119 @@ NGSIv1 は非推奨であることに注意してください。したがって�
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
+Content-Type: application/json
+Content-Length: ...
+
+{
+  "t": 23.4,
+  "unit": "degress"
+}
+```
+
+<a name="headers-special-treatment"></a>
+
+### ヘッダの特別な扱い ([Headers special treatment)
+
+[一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions` などの
+API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers` のヘッダ値にも同じ制限が適用されます。
+
+ただし、通知時に、`httpCustom.payload` または `httpCustom.headers` の値に含まれる URL エンコード文字はすべてデコード
+されます。
+
+例：
+
+特定のサブスクリプションで次の `notification.httpCustom` オブジェクトを考えてみましょう。
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}",
+    "t": "${temperature}"
+  },
+  "payload": null
+}
+```
+
+`"Basic ABC...ABC%3D%3D"` は、この文字列の URL エンコード・バージョンであることに注意してください:
+`"Basic ABC...ABC=="`
+
+ここで、Orion がこのサブスクリプションに関連付けられた通知をトリガーすると考えてみましょう。
+通知データは、ID が `DC_S1-D41` でタイプが `Room` のエンティティ用で、値が 23.4 の `temperature`
+という名前の属性が含まれます。テンプレートを適用した後の結果の通知は次のようになります:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room&t=23.4
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json
+Content-Length: 0
+```
+
+<a name="remove-headers"></a>
+
+### ヘッダの削除 (Remove headers)
+
+`headers` オブジェクトのヘッダ・キーに空の文字列値を指定すると、そのヘッダが通知から削除されます。
+たとえば、次の構成です:
+
+```
+"httpCustom": {
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+サブスクリプションに関連付けられた通知の `x-auth-token` ヘッダを削除します。
+
+これは、Orion が通知に自動的に含めるヘッダーを削除するのに役立ちます。
+例えば：
+
+-   通知にデフォルトで含まれるヘッダを避けるため (例: `Accept`)
+-   前述の `x-auth-token` などのヘッダの伝播 (更新から通知まで) をカットするため
+
+<a name="text-based-payload"></a>
+
+### テキストベースのペイロード (Text based payload)
+
+`payload` が `httpCustom` または `mqttCustom` で使用される場合、次の考慮事項が適用されます。
+同時に使用できるのは、`payload`, `json` また `ngsi` のうちの1つだけであることに注意してください。
+
+-   [一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions`
+    などの API オペレーションの `httpCustom.payload` フィールドにも適用されます。以下に例を示します
+-   `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `text/plain` に設定されます
+
+例：
+
+特定のサブスクリプションで次の `notification.httpCustom` オブジェクトを考えてみましょう
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
+}
+```
+
+上記のペイロード値は、この文字列の URL エンコード・バージョンであることに注意してください:
+`the value of the "temperature" attribute (of type Number) is ${temperature}`
+
+ここで、Orion がこのサブスクリプションに関連付けられた通知をトリガーすると考えてみましょう。
+通知データは、ID が `DC_S1-D41` でタイプが `部屋` のエンティティ用で、値が23.4の `temperature`
+という名前の属性が含まれます。テンプレートを適用した後の結果の通知は次のようになります:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
 Content-Type: text/plain
-Content-Length: 31
-The temperature is 23.4 degrees
+Content-Length: 65
+
+the value of the "temperature" attribute (of type Number) is 23.4
 ```
 
 <a name="json-payloads"></a>
@@ -2128,6 +2243,61 @@ The temperature is 23.4 degrees
 -   `payload` と `json` は同時に使用できません
 -    `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `application/json` に設定されます
 
+
+<a name="ngsi-payload-patching"></a>
+
+### NGSI ペイロードのパッチ適用 (NGSI payload patching)
+
+`ngsi` が `httpCustom` または `mqttCustom` で使用されている場合、次の考慮事項が適用されます。
+同時に使用できるのは、`payload`, `json` or `ngsi` のうちの1つだけであることに注意してください。
+
+`ngsi` フィールドを使用して、通知内のエンティティに*パッチ*を適用するエンティティ・フラグメントを指定できます。
+これにより、新しい属性を追加したり、既存の属性の値、ID および型 (type) を変更したりできます。結果の通知は、
+[通知メッセージ](#notification-messages)で説明されている NGSIv2 正規化形式を使用します。
+
+例えば：
+
+```
+"httpCustom": {
+   ...
+   "ngsi": {
+     "id": "prefix:${id}",
+     "type": "newType",
+     "originalService": {
+       "value": "${service}",
+       "type": "Text"
+     },
+     "originalServicePath": {
+       "value": "${servicePath}",
+       "type": "Text"
+     }
+   }
+}
+```
+
+`ngsi` を使用する際に考慮すべきいくつかの注意事項:
+
+-   `ngsi` フィールドの値は、有効な [JSON エンティティ表現](#json-entity-representation) である必要がありますが、
+    いくつかの追加の考慮事項があります:
+    -   `id` または `type` は必須ではありません
+    -   属性 `type` が指定されていない場合は、[部分表現](#partial-representations) で説明されているデフォルトが使用されます
+    -   属性 `metadata` は使用できません
+    -   `{}` は `ngsi` フィールドの有効な値です。この場合、パッチは適用されず、元の通知が送信されます
+-   `notification.attrs` が使用されている場合、属性フィルタリングは NGSI パッチを適用した*後に*行われます
+-   適用されるパッチのセマンティクスは *update または append* (更新の `append` `actionType` に似ています) ですが、
+    他のセマンティクスが将来追加される可能性があります
+-   [マクロ置換ロジック](#macro-substitution) は期待どおりに機能しますが、次の考慮事項があります:
+    -   JSON オブジェクトのキー部分では使用できません。つまり、`"${key}": 10` は機能しません
+    -   属性 `type` では使用できません。`value` マクロでのみ置換を行うことができます
+    -   マクロが *使用されている文字列を完全にカバーしている場合*、属性値の JSON の性質が考慮されます。たとえば、
+        `"value": "${temperature}"` は、温度属性が数値の場合は `"value": 10` に解決され、`temperature`
+        属性が文字列の場合は `"value": "10"` に解決されます
+    -   マクロが使用されている文字列の一部のみである場合、属性値は常に文字列にキャストされます。たとえば、
+        `"value": "Temperature is: ${temperature}"` は、温度属性が数値であっても、`"value": "Temperature is 10"`
+        に解決されます。属性値が JSON 配列またはオブジェクトの場合、この場合は文字列化されることに注意してください
+    -   属性がエンティティに存在しない場合、`null` 値が使用されます
+-   `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `application/json` に設定されます
+
 <a name="omitting-payload"></a>
 
 ### ペイロードの省略 (Omitting payload)
@@ -2135,28 +2305,6 @@ The temperature is 23.4 degrees
 `payload` が `null` に設定されている場合、そのサブスクリプションに関連付けられている通知にはペイロードが含まれません
 (つまり、コンテンツ長 0 の通知)。これは、`""` に設定された `payload` を使用したり、フィールドを省略したりすることと
 同じではないことに注意してください。その場合、通知は NGSIv2 正規化形式を使用して送信されます。
-
-<a name="remove-headers"></a>
-
-### ヘッダの削除 (Remove headers)
-
-`headers` オブジェクトのヘッダ・キーに空の文字列値を指定すると、そのヘッダが通知から削除されます。
-たとえば、次の構成です:
-
-```
-"httpCustom": { 
-   ...
-   "headers": {"x-auth-token": ""}
-}
-```
-
-サブスクリプションに関連付けられた通知の `x-auth-token` ヘッダを削除します。
-
-これは、Orion が通知に自動的に含めるヘッダーを削除するのに役立ちます。
-
-例えば：
--   通知にデフォルトで含まれるヘッダを避けるため (例: `Accept`)
--   前述の `x-auth-token` などのヘッダの伝播 (更新から通知まで) をカットするため
 
 <a name="additional-considerations"></a>
 
@@ -2179,52 +2327,6 @@ The temperature is 23.4 degrees
 
 通知にカスタム・ペイロードが使用されている場合 (フィールド `payload` は対応するサブスクリプションにあります)、通知の
 `Ngsiv2-AttrsFormat` ヘッダに `custom` の値が使用されます。
-
-<a name="custom-payload-and-headers-special-treatment"></a>
-
-### カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)
-
-[一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions` などの
-API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers` のヘッダ値にも同じ制限が適用されます。
-
-ただし、通知時に、`httpCustom.payload` または `httpCustom.headers` の値に含まれる URL エンコード文字はすべてデコード
-されます。
-
-例：
-
-特定のサブスクリプションで次の `notification.httpCustom` オブジェクトを考えてみましょう。
-
-```
-"httpCustom": {
-  "url": "http://foo.com/entity/${id}",
-  "headers": {
-    "Content-Type": "text/plain",
-    "Authorization": "Basic ABC...ABC%3D%3D"
-  },
-  "method": "PUT",
-  "qs": {
-    "type": "${type}"
-  },
-  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
-}
-```
-
-上記のペイロード値は、この文字列の URL エンコードされたバージョンであることに注意してください:
-`the value of the "temperature" attribute (of type Number) is ${temperature}`。
-`"Basic ABC...ABC%3D%3D"` は、この文字列の URL エンコードされたバージョンであることに注意してください:
-`"Basic ABC...ABC=="`.
-
-ここで、Orion がこのサブスクリプションに関連付けられた通知をトリガーすることを考えてみましょう。 通知データは、
-ID が `DC_S1-D41` でタイプが `Room` のエンティティ用で、値が 23.4 の `temperature` という名前の属性が含まれます。
-テンプレートを適用した後の結果の通知は次のようになります:
-
-```
-PUT http://foo.com/entity/DC_S1-D41?type=Room
-Authorization: "Basic ABC...ABC=="
-Content-Type: application/json 
-Content-Length: 65
-the value of the "temperature" attribute (of type Number) is 23.4
-```
 
 <a name="oneshot-subscriptions"></a>
 
@@ -3676,11 +3778,12 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 | `headers`  | ✓          | object | 通知メッセージに含まれる HTTP ヘッダのキー・マップ。空であってはなりません                                                                                                                                                                                                                                                                          |
 | `qs`       | ✓          | object | 通知メッセージに含まれる URL クエリ・パラメータのキー・マップ。空であってはなりません                                                                                                                                                                                                                                                               |
 | `method`   | ✓          | string | 通知を送信するときに使用するメソッド (デフォルトは POST)。有効な HTTP メソッドのみが許可されます。無効な HTTP メソッドを指定すると、400 Bad Request エラーが返されます                                                                                                                                                                              |
-| `payload`  | ✓          | string | 通知で使用されるペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。`null` の場合、通知にはペイロードは含まれません                                                                                                                                     |
-| `json`     | ✓          | object | JSON ベースのペイロードを使用するための `payload` の代替です。詳細については、[JSON ペイロード](#json-payloads)のセクションを参照してください。                                 |
+| `payload`  | ✓          | string | 通知で使用されるテキスト・ベースのペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。`null` の場合、通知にはペイロードは含まれません                                                                                                                   |
+| `json`     | ✓          | object | 通知で使用される JSON ベースのペイロード。詳細については、[JSON ペイロード](#json-payloads) セクションを参照してください                                                                                                                                                                                                                            |
+| `ngsi`     | ✓          | object | 通知で使用されるペイロードの NGSI パッチ。詳細については、[NGSI ペイロードのパッチ適用](#ngsi-payload-patching) セクションを参照してください                                                                                                                                                                                                        |
 | `timeout`  | ✓          | number | サブスクリプションがレスポンスを待機する最大時間 (ミリ秒単位)。このパラメータに許可される最大値は1800000 (30分) です。`timeout` が0に定義されているか省略されている場合、`-httpTimeout` CLI パラメータとして渡された値が使用されます。詳細については、[コマンドライン・オプション](admin/cli.md#command-line-options)のセクションを参照してください |
 
-`payload` と `json` は同時に使用できません。相互に排他的です。
+`payload`, `json` または `ngsi` は同時に使用できません。相互に排他的です。
 
 `httpCustom` を使用する場合は、[カスタム通知](#custom-notifications) のセクションで説明されている考慮事項が適用されます。
 
@@ -3690,17 +3793,18 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 
 `mqttCustom` オブジェクトには、次のサブフィールドが含まれています:
 
-| パラメータ | オプション | タイプ | 説明                                                                                                                                                   |
-|------------|------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `url`      |            | string | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます) |
-| `topic`    |            | string | 使用する MQTT トピックを表します。このフィールドに対してもマクロ置換が実行されます (つまり、属性に基づくトピック)                                      |
-| `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                      |
-| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                   |
-| `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                   |
-| `payload`  | ✓          | string | 通知で使用されるペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。 `null` の場合、通知にはペイロードは含まれません |
-| `json`     | ✓          | object | JSON ベースのペイロードを使用するための `payload` の代替です。詳細については、[JSON ペイロード](#json-payloads)のセクションを参照してください。       |
+| パラメータ | オプション | タイプ | 説明                                                                                                                                                                                                                              |
+|------------|------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`      |            | string | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます)                                                                             |
+| `topic`    |            | string | 使用する MQTT トピックを表します。このフィールドに対してもマクロ置換が実行されます (つまり、属性に基づくトピック)                                                                                                                 |
+| `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                                                                                                 |
+| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                                                                                              |
+| `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                                                                                              |
+| `payload`  | ✓          | string | 通知で使用されるテキスト・ベースのペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。`null` の場合、通知にはペイロードは含まれません |
+| `json`     | ✓          | object | 通知で使用される JSON ベースのペイロード。詳細については、[JSON ペイロード](#json-payloads) セクションを参照してください                                                                                                          |
+| `ngsi`     | ✓          | object | 通知で使用されるペイロードの NGSI パッチ。詳細については、[NGSI ペイロードのパッチ適用](#ngsi-payload-patching) セクションを参照してください                                                                                      |
 
-`payload` と `json` は同時に使用できません。相互に排他的です。
+`payload`, `json` または `ngsi` は同時に使用できません。相互に排他的です。
 
 `mqttCustom` を使用する場合は、[カスタム通知](#custom-notifications)のセクションで説明されている考慮事項が適用されます。
 MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)のドキュメントを参照してください。
