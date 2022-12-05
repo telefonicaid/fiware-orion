@@ -45,7 +45,7 @@ proxyCoap functionality. You need to install COAP client (an example application
 libcoap sources) before to use them:
 
 ```
-wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
+wget https://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
 mv download libcoap-4.1.1.tar.gz
 tar xvzf libcoap-4.1.1.tar.gz
 cd libcoap-4.1.1

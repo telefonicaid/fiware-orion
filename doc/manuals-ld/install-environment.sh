@@ -70,7 +70,7 @@ function Ubuntu20.04() {
     sudo mkdir /opt/libmicrohttpd >/dev/null 2>>$filename
     sudo chown $USER:$GROUP /opt/libmicrohttpd >/dev/null 2>>$filename
     cd /opt/libmicrohttpd >/dev/null 2>>$filename
-    wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz >/dev/null 2>>$filename
+    wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz >/dev/null 2>>$filename
     tar xvf libmicrohttpd-0.9.75.tar.gz >/dev/null 2>>$filename
     cd libmicrohttpd-0.9.75 >/dev/null 2>>$filename
     ./configure --disable-messages --disable-postprocessor --disable-dauth >/dev/null 2>>$filename

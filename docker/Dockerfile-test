@@ -8,7 +8,7 @@ ARG PATH_TO_SRC='/opt/orion/'
 ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build:/usr/local/lib
 RUN echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
 
-RUN  wget http://downloads.sourceforge.net/ltp/lcov-1.14.tar.gz
+RUN  wget https://downloads.sourceforge.net/ltp/lcov-1.14.tar.gz
 RUN tar -xf lcov-1.14.tar.gz
 WORKDIR lcov-1.14
 RUN make install

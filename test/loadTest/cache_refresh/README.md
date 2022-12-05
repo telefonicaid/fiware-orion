@@ -79,7 +79,7 @@ These tests are used to verify the cache refresh in a balanced system.
   jq is a lightweight and flexible command-line JSON processor. It is used for the json with statistics returned from ContextBroker.
        steps to install jq:
       ---------------------
-           wget http://stedolan.github.io/jq/download/linux64/jq
+           wget https://stedolan.github.io/jq/download/linux64/jq
            chmod +x ./jq
            sudo cp jq /usr/local/bin
   ```

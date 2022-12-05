@@ -143,7 +143,7 @@ This is how you install libmicrohttpd from source code:
 sudo mkdir /opt/libmicrohttpd
 sudo chown $USER:$GROUP /opt/libmicrohttpd
 cd /opt/libmicrohttpd
-wget http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
+wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.72.tar.gz
 tar xvf libmicrohttpd-0.9.72.tar.gz
 cd libmicrohttpd-0.9.72
 ./configure --disable-messages --disable-postprocessor --disable-dauth
