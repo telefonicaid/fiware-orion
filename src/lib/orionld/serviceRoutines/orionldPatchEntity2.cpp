@@ -505,6 +505,11 @@ bool apiEntitySimplifiedToNormalized(KjNode* apiEntityFragmentP, KjNode* dbAttrs
 
           attributeTransform(attrP, attrTypeFromDb, dbAttrTypeP->value.s, orionldState.uriParams.lang);
         }
+        else if ((attrTypeFromDb == Property) && (attrP->type == KjObject))
+        {
+          // All other combinations are taken care of by pCheckAttribute (called by pCheckEntity)
+          attributeValueAdd(attrP);
+        }
       }
     }
     else  // The attribute is NEW. Then it's ALWAYS a Property or GeoProperty - adding "value" and let the decision come later

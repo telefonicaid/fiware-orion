@@ -1,0 +1,199 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update an entity attribute using PATCH
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+#
+# Following the steps from the "Still failing on Build 1196" comment in the issue @1262
+#
+# 01. Create an entity urn:ngsi-ld:City:001
+# 02. PATCH the entity using keyValues, modifying temperature, location, address, and runBy
+# 03. GET the entity and see that all three modifications are performed correctly
+#
+
+echo "01. Create an entity urn:ngsi-ld:City:001"
+echo "========================================="
+payload='{
+  "id": "urn:ngsi-ld:City:001",
+  "type": "City",
+  "temperature": {
+    "type": "Property",
+    "value": 25,
+    "unitCode": "CEL",
+    "observedAt": "2022-06-30T00:00:00.000Z"
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        28.955,
+        41.0136
+      ]
+    }
+  },
+  "population": {
+    "type": "Property",
+    "value": 15840900,
+    "observedAt": "2022-12-31T00:00:00.000Z"
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Kanlica Iskele Meydani",
+      "addressRegion": "Istanbul",
+      "addressLocality": "Besiktas",
+      "postalCode": "12345"
+    }
+  },
+  "name": {
+    "type": "LanguageProperty",
+    "languageMap": {
+      "el": "Konstantinopel",
+      "en": "Constantinople",
+      "tr": "Istanbul"
+    }
+  },
+  "runBy": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Adminstration:001"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH the entity using keyValues, modifying temperature, location, address, and runBy"
+echo "========================================================================================="
+payload='{
+  "temperature": 19,
+  "location": {
+    "type": "Point",
+    "coordinates": [
+      13.3505,
+      52.5146
+    ]
+  },
+  "address": {
+    "addressLocality": "Beyoglu",
+    "postalCode": "98765",
+    "xtraInfo": "to check the patch behaviour"
+  },
+  "runBy": "urn:ngsi-ld:Adminstration:Adalet_ve_Kalkinma_Partisi"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:City:001?options=keyValues -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. GET the entity and see that all three modifications are performed correctly"
+echo "==============================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:City:001
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:ngsi-ld:City:001
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:001
+
+
+
+02. PATCH the entity using keyValues, modifying temperature, location, address, and runBy
+=========================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET the entity and see that all three modifications are performed correctly
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 732
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "address": {
+        "type": "Property",
+        "value": {
+            "addressLocality": "Beyoglu",
+            "addressRegion": "Istanbul",
+            "postalCode": "98765",
+            "streetAddress": "Kanlica Iskele Meydani",
+            "xtraInfo": "to check the patch behaviour"
+        }
+    },
+    "id": "urn:ngsi-ld:City:001",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.3505,
+                52.5146
+            ],
+            "type": "Point"
+        }
+    },
+    "name": {
+        "languageMap": {
+            "el": "Konstantinopel",
+            "en": "Constantinople",
+            "tr": "Istanbul"
+        },
+        "type": "LanguageProperty"
+    },
+    "population": {
+        "observedAt": "2022-12-31T00:00:00.000Z",
+        "type": "Property",
+        "value": 15840900
+    },
+    "runBy": {
+        "object": "urn:ngsi-ld:Adminstration:Adalet_ve_Kalkinma_Partisi",
+        "type": "Relationship"
+    },
+    "temperature": {
+        "observedAt": "2022-06-30T00:00:00.000Z",
+        "type": "Property",
+        "unitCode": "CEL",
+        "value": 19
+    },
+    "type": "City"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
