@@ -66,18 +66,18 @@ payload='{
   "address": {
     "type": "Property",
     "value": {
-      "streetAddress": "Kanlıca İskele Meydanı",
-      "addressRegion": "İstanbul",
-      "addressLocality": "Beşiktaş",
+      "streetAddress": "Kanlica Iskele Meydani",
+      "addressRegion": "Istanbul",
+      "addressLocality": "Besiktas",
       "postalCode": "12345"
     }
   },
   "name": {
     "type": "LanguageProperty",
     "languageMap": {
-      "el": "Κωνσταντινούπολις",
+      "el": "Konstantinopel",
       "en": "Constantinople",
-      "tr": "İstanbul"
+      "tr": "Istanbul"
     }
   },
   "runBy": {
@@ -102,11 +102,11 @@ payload='{
     ]
   },
   "address": {
-    "addressLocality": "Beyoğlu",
+    "addressLocality": "Beyoglu",
     "postalCode": "98765",
     "xtraInfo": "to check the patch behaviour"
   },
-  "runBy": "urn:ngsi-ld:Adminstration:Adalet_ve_Kalkınma_Partisi"
+  "runBy": "urn:ngsi-ld:Adminstration:Adalet_ve_Kalkinma_Partisi"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:City:001?options=keyValues -X PATCH --payload "$payload"
 echo
@@ -140,7 +140,7 @@ Date: REGEX(.*)
 03. GET the entity and see that all three modifications are performed correctly
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 759
+Content-Length: 732
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -149,10 +149,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "address": {
         "type": "Property",
         "value": {
-            "addressLocality": "Beyo\u011flu",
-            "addressRegion": "\u0130stanbul",
+            "addressLocality": "Beyoglu",
+            "addressRegion": "Istanbul",
             "postalCode": "98765",
-            "streetAddress": "Kanl\u0131ca \u0130skele Meydan\u0131",
+            "streetAddress": "Kanlica Iskele Meydani",
             "xtraInfo": "to check the patch behaviour"
         }
     },
@@ -169,9 +169,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     },
     "name": {
         "languageMap": {
-            "el": "\u039a\u03c9\u03bd\u03c3\u03c4\u03b1\u03bd\u03c4\u03b9\u03bd\u03bf\u03cd\u03c0\u03bf\u03bb\u03b9\u03c2",
+            "el": "Konstantinopel",
             "en": "Constantinople",
-            "tr": "\u0130stanbul"
+            "tr": "Istanbul"
         },
         "type": "LanguageProperty"
     },
@@ -181,7 +181,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "value": 15840900
     },
     "runBy": {
-        "object": "urn:ngsi-ld:Adminstration:Adalet_ve_Kalk\u0131nma_Partisi",
+        "object": "urn:ngsi-ld:Adminstration:Adalet_ve_Kalkinma_Partisi",
         "type": "Relationship"
     },
     "temperature": {
