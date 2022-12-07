@@ -778,8 +778,11 @@ static bool pCheckUriParamGeometryProperty()
 {
   if (orionldState.uriParams.geometryProperty == NULL)
   {
-    orionldState.uriParams.geometryProperty  = (char*) "location";
-    orionldState.in.geometryPropertyExpanded = (char*) "location";
+    if (orionldState.out.contentType == GEOJSON)
+    {
+      orionldState.uriParams.geometryProperty  = (char*) "location";
+      orionldState.in.geometryPropertyExpanded = (char*) "location";
+    }
   }
   else
   {

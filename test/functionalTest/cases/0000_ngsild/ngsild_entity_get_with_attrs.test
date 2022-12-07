@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET entity with attrs filter to asee just a few of the attributes
+GET entity with attrs filter to see just a few of the attributes
 
 --SHELL-INIT--
 export BROKER=orionld
@@ -31,17 +31,27 @@ brokerStart CB 0-255 --prettyPrint
 --SHELL--
 
 #
-# 01. Create entity E1 with 5 attributes
+# 01. Create entity E1 with 6 attributes
 # 02. GET entity with the first three attributes only, using URI param 'attrs'
 # 03. GET entity with attrs URI param == 'P11' - see 404 Not Found
 #
 
-echo "01. Create entity E1 with 5 attributes"
+echo "01. Create entity E1 with 6 attributes"
 echo "======================================"
 payload='{
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "T",
-  "P1": {
+  "location": {
+    "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [
+          28.955,
+          41.0136
+        ]
+      }
+    },
+    "P1": {
     "type": "Property",
     "value": 1
   },
@@ -82,7 +92,7 @@ echo
 
 
 --REGEXPECT--
-01. Create entity E1 with 5 attributes
+01. Create entity E1 with 6 attributes
 ======================================
 HTTP/1.1 201 Created
 Content-Length: 0
