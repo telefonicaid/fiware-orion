@@ -98,8 +98,6 @@ bool orionldGetEntity(void)
     }
   }
 
-  LM(("TYPE: entityType: '%s' (from URI param)", entityType));
-
   KjNode* dbEntityP      = mongocEntityLookup(entityId, entityType, &orionldState.in.attrList, orionldState.uriParams.geometryProperty);
   KjNode* apiEntityP     = NULL;
   bool    forcedSysAttrs = false;
@@ -126,18 +124,12 @@ bool orionldGetEntity(void)
       // As we need the expanded entity type, we look it up in the DB Model version of the entity, not the API model version
       // AND, we must do this before calling dbModelToApiEntity2 as "id"/"type" are removed from "_id".
       //
-      kjTreeLog(dbEntityP, "TYPE: dbEntityP");
       KjNode* _idP        = kjLookup(dbEntityP, "_id");
-      LM(("TYPE: _idP at %p", _idP));
       KjNode* entityTypeP = (_idP != NULL)? kjLookup(_idP, "type") : NULL;
-      LM(("TYPE: entityTypeP at %p", entityTypeP));
 
       if (entityTypeP != NULL)
         entityType = entityTypeP->value.s;
-      LM(("TYPE: entityType: '%s' (from DB)", entityType));
     }
-    else
-      LM(("TYPE: The entity type is already set in URL param: '%s'", entityType));
 
     if (distributed == true)
     {
@@ -305,13 +297,10 @@ bool orionldGetEntity(void)
       else
         LM_E(("CURL Error %d awaiting response to forwarded request: %s", msgP->data.result, curl_easy_strerror(msgP->data.result)));
     }
-
-    kjTreeLog(apiEntityP, "API entity after forwarding");
   }
 
   if (forwards > 0)
   {
-    kjTreeLog(apiEntityP, "API Entity to transform");
     // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
 
     if (orionldState.out.format == RF_KEYVALUES)
