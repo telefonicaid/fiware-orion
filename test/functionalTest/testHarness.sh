@@ -672,7 +672,6 @@ then
         echo "... Context Server Started"
         sleep 3  # Very slow - it doesn't work without this delay
     else
-        echo "The Context Server is already running."
         pushContexts=0                                 # Assuming the @contexts have been pushed already
     fi
 else
