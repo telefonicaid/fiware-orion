@@ -1248,7 +1248,10 @@ MHD_Result orionldMhdConnectionTreat(void)
   // Enqueue response
   //
   if (orionldState.responsePayload != NULL)
+  {
+    LM(("OPT: FINAL Response body: %s", orionldState.responsePayload));
     restReply(NULL, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
+  }
   else
     restReply(NULL, NULL);
 
