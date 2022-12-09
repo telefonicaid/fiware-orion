@@ -1,0 +1,194 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+URI params - issue #1289
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create an Entity urn:ngsi-ld:Vehicle:AIS:211440340
+# 02. Create an Entity urn:ngsi-ld:Vehicle:AIS:211783270
+# 03. Create an Entity urn:ngsi-ld:Vehicle:AIS:211445200
+# 04. Query with geoproperty, see all 3
+#
+
+echo "01. Create an Entity urn:ngsi-ld:Vehicle:AIS:211440340"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:AIS:211440340",
+  "type": "Vehicle",
+  "location": {
+    "type": "GeoProperty",
+      "value": {
+        "coordinates": [
+          9.712908,
+          54.308173
+        ],
+      "type": "Point"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an Entity urn:ngsi-ld:Vehicle:AIS:211783270"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:AIS:211783270",
+  "type": "Vehicle",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "coordinates": [
+        10.026042,
+        54.582267
+      ],
+      "type": "Point"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an Entity urn:ngsi-ld:Vehicle:AIS:211445200"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:AIS:211445200",
+  "type": "Vehicle",
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "coordinates": [
+        9.448432,
+        54.17357
+      ],
+      "type": "Point"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Query with geoproperty, see all 3"
+echo "====================================="
+orionCurl --url '/ngsi-ld/v1/entities?limit=3&attrs=id,location&idPattern=AIS&type=Vehicle&geometry=Point&coordinates=\[9.712908,54.308173\]&georel=near;maxDistance==36800'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an Entity urn:ngsi-ld:Vehicle:AIS:211440340
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:AIS:211440340
+
+
+
+02. Create an Entity urn:ngsi-ld:Vehicle:AIS:211783270
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:AIS:211783270
+
+
+
+03. Create an Entity urn:ngsi-ld:Vehicle:AIS:211445200
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:AIS:211445200
+
+
+
+04. Query with geoproperty, see all 3
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 463
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "id": "urn:ngsi-ld:Vehicle:AIS:211440340",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    9.712908,
+                    54.308173
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "Vehicle"
+    },
+    {
+        "id": "urn:ngsi-ld:Vehicle:AIS:211783270",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    10.026042,
+                    54.582267
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "Vehicle"
+    },
+    {
+        "id": "urn:ngsi-ld:Vehicle:AIS:211445200",
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "coordinates": [
+                    9.448432,
+                    54.17357
+                ],
+                "type": "Point"
+            }
+        },
+        "type": "Vehicle"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

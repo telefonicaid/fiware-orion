@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/langStringExtract.h"                    // langValueFix
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
@@ -200,6 +201,30 @@ static void sysAttrsToTimestamps(KjNode* attrP)
 
 // -----------------------------------------------------------------------------
 //
+// dbModelToApiLangPropertySimplified -
+//
+void dbModelToApiLangPropertySimplified(KjNode* dbAttrP, const char* lang)
+{
+  KjNode* dbValueP = kjLookup(dbAttrP, "value");
+  KjNode* dbTypeP  = kjLookup(dbAttrP, "type");
+
+  if (lang != NULL)
+    langValueFix(dbAttrP, dbValueP, dbTypeP, lang);
+  else
+  {
+    dbValueP->name = (char*) "languageMap";
+
+    // Remove everything except dbValueP (languageMap)
+    dbAttrP->value.firstChildP = dbValueP;
+    dbAttrP->lastChild         = dbValueP;
+    dbValueP->next = NULL;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // dbModelToApiAttribute2 -
 //
 KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, char* lang, bool compacted, OrionldProblemDetails* pdP)
@@ -325,41 +350,18 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
 
   if ((renderFormat == RF_KEYVALUES) || (conciseAsKeyValues == true))
   {
-    // "Steal" the value node and rename it to have the attribute's name instead - that's all that's needed for SIMPLIFIED FORMAT
-    attrP = kjLookup(dbAttrP, "value");
-
     if (attrTypeNodeP == NULL)
       attrTypeNodeP = kjLookup(dbAttrP, "type");
 
-    if ((lang != NULL) && (strcmp(attrTypeNodeP->value.s, "LanguageProperty") == 0))
+    if (strcmp(attrTypeNodeP->value.s, "LanguageProperty") == 0)
     {
-      // FIXME: try to use langValueFix
-      KjNode* langValueNodeP = kjLookup(attrP, lang);
-      if (langValueNodeP == NULL)
-        langValueNodeP = kjLookup(attrP, "@none");
-      if (langValueNodeP == NULL)
-        langValueNodeP = kjLookup(attrP, "en");
-      if (langValueNodeP == NULL)
-        langValueNodeP = attrP->value.firstChildP;
-
-      if (langValueNodeP == NULL)
-      {
-        attrP->type      = KjString;
-        attrP->value.s   = (char*) "empty languageMap ...";
-      }
-      else if (langValueNodeP->type == KjString)
-      {
-        attrP->type      = KjString;
-        attrP->value.s   = langValueNodeP->value.s;
-      }
-      else  // It's an array
-      {
-        attrP->type                       = KjArray;
-        attrP->value.firstChildP          = langValueNodeP->value.firstChildP;
-        attrP->lastChild                  = langValueNodeP->lastChild;
-        langValueNodeP->value.firstChildP = NULL;
-        langValueNodeP->lastChild         = NULL;
-      }
+      dbModelToApiLangPropertySimplified(dbAttrP, lang);
+      attrP = dbAttrP;
+    }
+    else
+    {
+      // "Steal" the value node and rename it to have the attribute's name instead - that's all that's needed for SIMPLIFIED FORMAT
+      attrP = kjLookup(dbAttrP, "value");  // In the DB, all attributes have the "value" name.
     }
 
     attrP->name = shortName;

@@ -317,7 +317,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 05. GET entities in Simplified form
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 123
+Content-Length: 139
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -325,21 +325,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 [
     {
         "L": {
-            "en": [
-                "one",
-                "two",
-                "three"
-            ],
-            "es": [
-                "uno",
-                "dos",
-                "tres"
-            ],
-            "sv": [
-                "ett",
-                "tvaa",
-                "tre"
-            ]
+            "languageMap": {
+                "en": [
+                    "one",
+                    "two",
+                    "three"
+                ],
+                "es": [
+                    "uno",
+                    "dos",
+                    "tres"
+                ],
+                "sv": [
+                    "ett",
+                    "tvaa",
+                    "tre"
+                ]
+            }
         },
         "id": "urn:ngsi-ld:T:E1",
         "type": "T"
