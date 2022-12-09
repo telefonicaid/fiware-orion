@@ -39,9 +39,9 @@ brokerStart CP4 0 IPv4 -experimental
 --SHELL--
 #
 # Test:
-# - Create E1 on CB with attribute P1
-# - Create E1 on CP1 with attribute P2
-# - Create E1 on CP2 with attribute P3
+# - Create E1 on CB with attribute P1, L1
+# - Create E1 on CP1 with attribute P2, L2
+# - Create E1 on CP2 with attribute P3, L3
 # - Create E1 on CP3 with attribute P4
 # - Create E1 on CP4 with attribute P1-P5
 # - Register CP1 (E1/P2) on CB as an Exclusive registration
@@ -50,50 +50,56 @@ brokerStart CP4 0 IPv4 -experimental
 # - Register CP4 (E1/P1-5) on CB as an Auxiliary registration
 # - GET E1 on CB - see E1 with P1-P5 (only P5 from CP4)
 #
-# 01. Create E1 on CB with attribute P1
-# 02. Create E1 on CP1 with attribute P2
-# 03. Create E1 on CP2 with attribute P3
+# 01. Create E1 on CB with attributes P1, L1
+# 02. Create E1 on CP1 with attributes P2, L2
+# 03. Create E1 on CP2 with attributes P3, L3
 # 04. Create E1 on CP3 with attribute P4
 # 05. Create E1 on CP4 with attribute P1-P5
 # 06. Register CP1 (E1/P2) on CB as an Exclusive registration
 # 07. Register CP2 (E1/P3) on CB as an Redirect registration
 # 08. Register CP3 (E1/P4) on CB as an Inclusive registration
 # 09. Register CP4 (E1/P1-5) on CB as an Auxiliary registration
-# 10. GET E1 on CB - see E1 with P1-P5 (only P5 from CP4)
+# 10. GET E1 on CB - see E1 with P1-P5, L1-L3 (only P5 from CP4)
 # 11. GET E1 on CB with attrs=P1,P3,P5,P7
 # 12. GET E1 on CB with attrs=P1,P2,P5,P7
+# 13. GET E1 on CB with options=keyValues
+# 14. GET E1 on CB with lang=es
+# 15. GET E1 on CB with options=keyValues AND lang=es
 #
 
-echo "01. Create E1 on CB with attribute P1"
-echo "====================================="
+echo "01. Create E1 on CB with attributes P1, L1"
+echo "=========================================="
 payload='{
   "id": "urn:E1",
   "type": "T",
-  "P1": "For local"
+  "P1": "For local",
+  "L1": { "languageMap": { "en": "yes", "es": "si" } }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
 echo
 echo
 
 
-echo "02. Create E1 on CP1 with attribute P2"
-echo "======================================"
+echo "02. Create E1 on CP1 with attributes P2, L2"
+echo "==========================================="
 payload='{
   "id": "urn:E1",
   "type": "T",
-  "P2": "For CP1"
+  "P2": "For CP1",
+  "L2": { "languageMap": { "en": "yes", "es": "si" } }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
 echo
 echo
 
 
-echo "03. Create E1 on CP2 with attribute P3"
-echo "======================================"
+echo "03. Create E1 on CP2 with attributes P3, L3"
+echo "==========================================="
 payload='{
   "id": "urn:E1",
   "type": "T",
-  "P3": "For CP2"
+  "P3": "For CP2",
+  "L3": { "languageMap": { "en": "yes", "es": "si" } }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
 echo
@@ -141,7 +147,7 @@ payload='{
           "type": "T"
         }
       ],
-      "properties": [ "P2" ]
+      "properties": [ "P2", "L2" ]
     }
   ],
   "endpoint": "http://localhost:'$CP1_PORT'",
@@ -166,7 +172,7 @@ payload='{
           "type": "T"
         }
       ],
-      "properties": [ "P3" ]
+      "properties": [ "P3", "L3" ]
     }
   ],
   "endpoint": "http://localhost:'$CP2_PORT'",
@@ -228,8 +234,8 @@ echo
 echo
 
 
-echo "10. GET E1 on CB - see E1 with P1-P5 (only P5 from CP4)"
-echo "======================================================="
+echo "10. GET E1 on CB - see E1 with P1-P5, L1-L3 (only P5 from CP4)"
+echo "=============================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:E1
 echo
 echo
@@ -249,9 +255,30 @@ echo
 echo
 
 
+echo "13. GET E1 on CB with options=keyValues"
+echo "======================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=keyValues
+echo
+echo
+
+
+echo "14. GET E1 on CB with lang=es"
+echo "============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?lang=es
+echo
+echo
+
+
+echo "15. GET E1 on CB with options=keyValues AND lang=es"
+echo "==================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:E1?options=keyValues&lang=es'
+echo
+echo
+
+
 --REGEXPECT--
-01. Create E1 on CB with attribute P1
-=====================================
+01. Create E1 on CB with attributes P1, L1
+==========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -259,8 +286,8 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 
 
-02. Create E1 on CP1 with attribute P2
-======================================
+02. Create E1 on CP1 with attributes P2, L2
+===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -268,8 +295,8 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 
 
-03. Create E1 on CP2 with attribute P3
-======================================
+03. Create E1 on CP2 with attributes P3, L3
+===========================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -331,15 +358,36 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R4
 
 
 
-10. GET E1 on CB - see E1 with P1-P5 (only P5 from CP4)
-=======================================================
+10. GET E1 on CB - see E1 with P1-P5, L1-L3 (only P5 from CP4)
+==============================================================
 HTTP/1.1 200 OK
-Content-Length: 243
+Content-Length: 453
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
+    "L1": {
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        },
+        "type": "LanguageProperty"
+    },
+    "L2": {
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        },
+        "type": "LanguageProperty"
+    },
+    "L3": {
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        },
+        "type": "LanguageProperty"
+    },
     "P1": {
         "type": "Property",
         "value": "For local"
@@ -412,6 +460,114 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Property",
         "value": "For CP4"
     },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+13. GET E1 on CB with options=keyValues
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 235
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L1": {
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        }
+    },
+    "L2": {
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        }
+    },
+    "L3": {
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        }
+    },
+    "P1": "For local",
+    "P2": "For CP1",
+    "P3": "For CP2",
+    "P4": "For CP3",
+    "P5": "For CP4",
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+14. GET E1 on CB with lang=es
+=============================
+HTTP/1.1 200 OK
+Content-Length: 393
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L1": {
+        "lang": "es",
+        "type": "Property",
+        "value": "si"
+    },
+    "L2": {
+        "lang": "es",
+        "type": "Property",
+        "value": "si"
+    },
+    "L3": {
+        "lang": "es",
+        "type": "Property",
+        "value": "si"
+    },
+    "P1": {
+        "type": "Property",
+        "value": "For local"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP1"
+    },
+    "P3": {
+        "type": "Property",
+        "value": "For CP2"
+    },
+    "P4": {
+        "type": "Property",
+        "value": "For CP3"
+    },
+    "P5": {
+        "type": "Property",
+        "value": "For CP4"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+15. GET E1 on CB with options=keyValues AND lang=es
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "L1": "si",
+    "L2": "si",
+    "L3": "si",
+    "P1": "For local",
+    "P2": "For CP1",
+    "P3": "For CP2",
+    "P4": "For CP3",
+    "P5": "For CP4",
     "id": "urn:E1",
     "type": "T"
 }

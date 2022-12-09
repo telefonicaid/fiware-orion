@@ -1,0 +1,190 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity in simplified output format
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create two entities
+# 02. GET one of the entities with ?options=keyValues
+#
+
+echo "01. Create two entities"
+echo "======================="
+payload='[
+    {
+        "id": "urn:ngsi-ld:City:001",
+        "type": "City",
+        "temperature": {
+            "type": "Property",
+            "value": 25,
+            "unitCode": "CEL",
+            "observedAt": "2022-06-30T00:00:00.000Z"
+        },
+        "location": {
+            "type": "GeoProperty",
+            "value": {
+                "type": "Point",
+                "coordinates": [
+                    28.955,
+                    41.0136
+                ]
+            }
+        },
+        "population": {
+            "type": "Property",
+            "value": 15840900,
+            "observedAt": "2022-12-31T00:00:00.000Z"
+        },
+        "address": {
+            "type": "Property",
+            "value": {
+                "streetAddress": "Kanlica Iskele Meydani",
+                "addressRegion": "Istanbul",
+                "addressLocality": "Besiktas",
+                "postalCode": "12345"
+            }
+        },
+        "name": {
+            "type": "LanguageProperty",
+            "languageMap": {
+                "en": "Constantinople",
+                "tr": "Istanbul"
+            }
+        },
+        "runBy": {
+            "type": "Relationship",
+            "object": "urn:ngsi-ld:Adminstration:Cumhuriyet_Halk_Partisi"
+        }
+    },
+    {
+        "id": "urn:ngsi-ld:City:002",
+        "type": "City",
+        "temperature": {
+            "value": 25,
+            "unitCode": "CEL",
+            "observedAt": "2022-06-30T00:00:00.000Z"
+        },
+        "address": {
+            "value": {
+                "streetAddress": "Viale di Valle Aurelia",
+                "addressRegion": "Lazio",
+                "addressLocality": "Roma",
+                "postalCode": "00138"
+            }
+        },
+        "location": {
+            "type": "Point",
+            "coordinates": [
+                12.482,
+                41.893
+            ]
+        },
+        "population": {
+            "value": 4342212,
+            "observedAt": "2021-01-01T00:00:00.000Z"
+        },
+        "name": {
+            "languageMap": {
+                "en": "Rome",
+                "it": "Roma"
+            }
+        },
+        "runBy": {
+            "object": "urn:ngsi-ld:Adminstration:Partito_Democratico"
+        }
+    }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert --payload "$payload"
+echo
+echo
+
+
+
+echo "02. GET one of the entities with ?options=keyValues"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:City:001?options=keyValues
+echo
+echo
+
+
+--REGEXPECT--
+01. Create two entities
+=======================
+HTTP/1.1 201 Created
+Content-Length: 47
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:City:001",
+    "urn:ngsi-ld:City:002"
+]
+
+
+02. GET one of the entities with ?options=keyValues
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 394
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "address": {
+        "addressLocality": "Besiktas",
+        "addressRegion": "Istanbul",
+        "postalCode": "12345",
+        "streetAddress": "Kanlica Iskele Meydani"
+    },
+    "id": "urn:ngsi-ld:City:001",
+    "location": {
+        "coordinates": [
+            28.955,
+            41.0136
+        ],
+        "type": "Point"
+    },
+    "name": {
+        "languageMap": {
+            "en": "Constantinople",
+            "tr": "Istanbul"
+        }
+    },
+    "population": 15840900,
+    "runBy": "urn:ngsi-ld:Adminstration:Cumhuriyet_Halk_Partisi",
+    "temperature": 25,
+    "type": "City"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

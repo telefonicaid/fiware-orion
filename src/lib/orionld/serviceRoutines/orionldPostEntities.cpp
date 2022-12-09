@@ -217,9 +217,12 @@ bool orionldPostEntities(void)
           }
         }
 
-        if ((++loops >= 10) && ((loops % 5) == 0))
+        if ((++loops >= 50) && ((loops % 25) == 0))
           LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
       }
+
+      if (loops >= 100)
+        LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
 
       // Anything left for a local entity?
       if (orionldState.requestTree->value.firstChildP != NULL)
@@ -233,12 +236,6 @@ bool orionldPostEntities(void)
       else
         orionldState.requestTree = NULL;  // Meaning: nothing left for local DB
     }
-
-    //
-    // After sending all forwarded requests, we let the local DB access run
-    // After that is done (if anything left for local DB),
-    //   we select on the reponses and build the answer
-    //
   }
 
 

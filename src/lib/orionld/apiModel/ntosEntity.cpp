@@ -48,51 +48,55 @@ void ntosEntity(KjNode* apiEntityP, const char* lang)
   KjNode* attrP = apiEntityP->value.firstChildP;
   KjNode* next;
 
+  // Remove sysAttrs
+  const char* attrNames[2] = { "createdAt", "modifiedAt" };
+  for (int ix = 0; ix < 2; ix++)
+  {
+    KjNode* nodeP = kjLookup(apiEntityP, attrNames[ix]);
+    if (nodeP != NULL)
+      kjChildRemove(apiEntityP, nodeP);
+  }
+
+
+  // Loop over the remaining fields
   while (attrP != NULL)
   {
     next = attrP->next;
 
-    if (strcmp(attrP->name, "id") == 0)
-    {
-      attrP = next;
-      continue;
-    }
-    if (strcmp(attrP->name, "type") == 0)
+    // Skip "id" and "type" ... and "scope" once that gets implemented
+    if ((strcmp(attrP->name, "id") == 0) || (strcmp(attrP->name, "type") == 0))
     {
       attrP = next;
       continue;
     }
 
-    if (strcmp(attrP->name, "createdAt") == 0)
-    {
-      kjChildRemove(apiEntityP, attrP);
-      attrP = next;
-      continue;
-    }
-
-    if (strcmp(attrP->name, "modifiedAt") == 0)
-    {
-      kjChildRemove(apiEntityP, attrP);
-      attrP = next;
-      continue;
-    }
-
-    //
-    // It's an attribute
-    //
-    KjNode* valueP = kjLookup(attrP, "value");
+    bool    isLangMap = false;
+    KjNode* valueP    = kjLookup(attrP, "value");
 
     if (valueP == NULL)
       valueP = kjLookup(attrP, "object");
 
     if (valueP == NULL)
-      valueP = kjLookup(attrP, "languageMap");
+    {
+      valueP    = kjLookup(attrP, "languageMap");
+      isLangMap = true;  // Only valid if valueP != NULL
+    }
 
     if (valueP != NULL)
     {
-      attrP->value     = valueP->value;
-      attrP->type      = valueP->type;
-      attrP->lastChild = valueP->lastChild;
+      if (isLangMap == true)
+      {
+        // Remove everything except valueP (languageMap)
+        attrP->value.firstChildP = valueP;
+        attrP->lastChild         = valueP;
+        valueP->next = NULL;
+      }
+      else
+      {
+        attrP->value     = valueP->value;
+        attrP->type      = valueP->type;
+        attrP->lastChild = valueP->lastChild;
+      }
     }
     else
       LM_E(("No attribute value (object/languageMap) found - this should never happen!!!"));
