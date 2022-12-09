@@ -26,6 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjBuilder.h"                                     // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -46,12 +47,25 @@ void kjAttributeNormalizedToSimplified(KjNode* attrP, const char* lang)
   KjNode* objectP      = kjLookup(attrP, "object");
   KjNode* languageMapP = kjLookup(attrP, "languageMap");
 
-  if (valueP == NULL) valueP = objectP;
-  if (valueP == NULL) valueP = languageMapP;
-
-  if (valueP != NULL)
+  if (languageMapP == NULL)
   {
-    attrP->type  = valueP->type;
-    attrP->value = valueP->value;
+    if (valueP == NULL)
+      valueP = objectP;
+
+    if (valueP != NULL)
+    {
+      attrP->type  = valueP->type;
+      attrP->value = valueP->value;
+    }
+  }
+  else
+  {
+    //
+    // LanguageMap in keyValues is less compact - due to JSON-LD that would expand the language tags otherwise
+    // Removing all fields except 'languageMap'
+    //
+    attrP->value.firstChildP = languageMapP;
+    attrP->lastChild         = languageMapP;
+    languageMapP->next = NULL;
   }
 }

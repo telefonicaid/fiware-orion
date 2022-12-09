@@ -30,8 +30,13 @@ brokerStart CB 0 IPv4 -experimental
 
 --SHELL--
 
-echo "01. Create an Entity"
-echo "===================="
+#
+# 01. Create two entities
+# 02. GET one of the entities with ?options=keyValues
+#
+
+echo "01. Create two entities"
+echo "======================="
 payload='[
     {
         "id": "urn:ngsi-ld:City:001",
@@ -122,16 +127,16 @@ echo
 
 
 
-echo "02. GET the entity with ?options=keyValues"
-echo "=========================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:City:001/?options=keyValues
+echo "02. GET one of the entities with ?options=keyValues"
+echo "==================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:City:001?options=keyValues
 echo
 echo
 
 
 --REGEXPECT--
-01. Create an Entity
-====================
+01. Create two entities
+=======================
 HTTP/1.1 201 Created
 Content-Length: 47
 Content-Type: application/json
@@ -143,10 +148,10 @@ Date: REGEX(.*)
 ]
 
 
-02. GET the entity with ?options=keyValues
-==========================================
+02. GET one of the entities with ?options=keyValues
+===================================================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 394
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -167,8 +172,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Point"
     },
     "name": {
-        "en": "Constantinople",
-        "tr": "Istanbul"
+        "languageMap": {
+            "en": "Constantinople",
+            "tr": "Istanbul"
+        }
     },
     "population": 15840900,
     "runBy": "urn:ngsi-ld:Adminstration:Cumhuriyet_Halk_Partisi",
