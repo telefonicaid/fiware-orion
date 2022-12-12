@@ -156,7 +156,7 @@
 に基づいて構築され、膨大な数の改善と機能強化を追加しています。
 
 Orion API は、オリジナルの NGSIv2 仕様と完全に互換性がありますが、いくつかの小さな違いについては、
-このドキュメントの最後にある[別紙]((#differences-regarding-the-original-ngsiv2-spec))で説明しています。
+このドキュメントの最後にある[別紙](#differences-regarding-the-original-ngsiv2-spec)で説明しています。
 
 <a name="specification"></a>
 
@@ -2229,13 +2229,14 @@ the value of the "temperature" attribute (of type Number) is 23.4
 
 -   `json` フィールドの値は、配列またはオブジェクトでなければなりません。単純な文字列または数値も有効な JSON
     ですが、これらのケースはサポートされていません
--   マクロ置換ロジックは、次の点を考慮して、`payload` の場合と同じように機能します
+-   [マクロ置換ロジック](#macro-substitution)は、次の点を考慮して、`payload` の場合と同じように機能します:
     -   JSON オブジェクトのキー部分では使用できません。つまり、`"${key}": 10` は機能しません
-    -   マクロが使用される JSON オブジェクトまたは JSON 配列アイテムの値は、マクロ式と正確に一致する必要があります。
-        したがって、`"t": "${temperature}"` は機能しますが、`"t": "the temperature is ${temperature}"` または
-        `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"` は機能しません
-    -   置換される属性値の性質を考慮します。たとえば、`"t": "${temperature}"` は、温度属性が数値の場合は `"t": 10`
-        に解決され、`temperature` 属性が文字列の場合は `"t": "10"` に解決されます
+    -   マクロが*使用されている文字列を完全にカバーしている場合*、属性値の JSON の性質が考慮されます。たとえば、
+        `"t": "${temperature}"` は、温度属性が数値の場合は `"t": 10` に解決され、`temperature` 属性が文字列の場合は
+        `"t": "10"` に解決されます
+    -   マクロが使用されている文字列の一部のみである場合、属性値は常に文字列にキャストされます。たとえば、
+        `"t": "Temperature is: ${temperature}"` は、温度属性が数値であっても、`"t": "Temperature is 10"`
+        に解決されます。属性値が JSON 配列またはオブジェクトの場合、この場合は文字列化されることに注意してください
     -   属性がエンティティに存在しない場合は、`null` 値が使用されます
 -   `payload` フィールドと `headers` フィールドに適用される URL 自動デコード
     ([カスタム・ペイロードとヘッダの特別な処理](#custom-payload-and-headers-special-treats) で説明) は、`json`
