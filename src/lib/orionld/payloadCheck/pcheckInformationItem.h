@@ -30,12 +30,14 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/RegistrationMode.h"                      // RegistrationMode
+
 
 
 // ----------------------------------------------------------------------------
 //
 // pcheckInformationItem -
 //
-extern bool pcheckInformationItem(KjNode* informationP);
+extern bool pcheckInformationItem(RegistrationMode regMode, KjNode* informationP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATIONITEM_H_

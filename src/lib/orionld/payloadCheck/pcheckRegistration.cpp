@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                             // strcmp, strcspn
+#include <string.h>                                             // strcmp
 
 extern "C"
 {
@@ -34,290 +34,21 @@ extern "C"
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
+#include "orionld/types/RegistrationMode.h"                     // RegistrationMode
 #include "orionld/context/OrionldContext.h"                     // OrionldContext
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/forwarding/FwdOperation.h"                    // fwdOperationFromString, FwdNone
-#include "orionld/regCache/regCacheItemContextCheck.h"          // regCacheItemContextCheck
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
+#include "orionld/payloadCheck/pCheckRegistrationMode.h"        // pCheckRegistrationMode
+#include "orionld/payloadCheck/pCheckRegistrationOperations.h"  // pCheckRegistrationOperations
+#include "orionld/payloadCheck/pCheckRegistrationManagement.h"  // pCheckRegistrationManagement
+#include "orionld/payloadCheck/pCheckKeyValueArray.h"           // pCheckKeyValueArray
+#include "orionld/payloadCheck/pCheckTenant.h"                  // pCheckTenant
+#include "orionld/payloadCheck/pCheckScope.h"                   // pCheckScope
 #include "orionld/payloadCheck/pcheckInformation.h"             // pcheckInformation
 #include "orionld/payloadCheck/pcheckTimeInterval.h"            // pcheckTimeInterval
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"        // pcheckGeoPropertyValue
 #include "orionld/payloadCheck/pcheckRegistration.h"            // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckRegistrationMode - FIXME: Own module
-//
-bool pCheckRegistrationMode(const char* mode)
-{
-  if ((strcmp(mode, "inclusive") != 0) &&
-      (strcmp(mode, "exclusive") != 0) &&
-      (strcmp(mode, "redirect")  != 0) &&
-      (strcmp(mode, "auxiliary") != 0))
-  {
-    orionldError(OrionldBadRequestData, "Invalid Registration Mode", mode, 400);
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckRegistrationOperations - FIXME: Own module
-//
-bool pCheckRegistrationOperations(KjNode* operationsP)
-{
-  for (KjNode* fwdOpP = operationsP->value.firstChildP; fwdOpP != NULL; fwdOpP = fwdOpP->next)
-  {
-    if (fwdOpP->type != KjString)
-    {
-      orionldError(OrionldBadRequestData, "Invalid JSON type for Registration::operations array item (not a JSON String)", kjValueType(fwdOpP->type), 400);
-      return false;
-    }
-
-    if (fwdOpP->value.s[0] == 0)
-    {
-      orionldError(OrionldBadRequestData, "Empty String in Registration::operations array", "", 400);
-      return false;
-    }
-
-    if (fwdOperationFromString(fwdOpP->value.s) == FwdNone)
-    {
-      if (fwdOperationAliasFromString(fwdOpP->value.s) == FwdNone)
-      {
-        orionldError(OrionldBadRequestData, "Invalid value for Registration::operations array item", fwdOpP->value.s, 400);
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// kjLookupInKvList - FIXME: Own module in kjTree library
-//
-KjNode* kjLookupInKvList(KjNode* firstSiblingP, const char* name)
-{
-  for (KjNode* siblingP = firstSiblingP->next; siblingP != NULL; siblingP = siblingP->next)
-  {
-    KjNode* keyP = kjLookup(siblingP, "key");
-
-    if ((keyP != NULL) && (keyP->type == KjString))
-    {
-      if (strcmp(keyP->value.s, name) == 0)
-        return siblingP;
-    }
-  }
-
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckKeyValueArray - FIXME: Own module
-//
-// Keys with special treatment:
-// * jsonldContext - needs to be downloaded, parsed etc, to be accepted.
-// * Content-Type  - must be a valid mime type
-// * Accept        - must be a valid Accept value (parse it and make sure)
-//
-bool pCheckKeyValueArray(KjNode* csiP, OrionldContext** fwdContextPP)
-{
-  for (KjNode* kvObjectP = csiP->value.firstChildP; kvObjectP != NULL; kvObjectP = kvObjectP->next)
-  {
-    KjNode* keyP   = NULL;
-    KjNode* valueP = NULL;
-
-    PCHECK_OBJECT(kvObjectP, 0, NULL, "Registration::contextSourceInfo[X]", 400);
-    PCHECK_OBJECT_EMPTY(kvObjectP, 0, NULL, "Registration::contextSourceInfo[X]", 400);
-
-    for (KjNode* kvItemP = kvObjectP->value.firstChildP; kvItemP != NULL; kvItemP = kvItemP->next)
-    {
-      if (strcmp(kvItemP->name, "key") == 0)
-      {
-        PCHECK_DUPLICATE(keyP, kvItemP, 0, "Duplicated field in Registration::contextSourceInfo[X]", kvItemP->name, 400);
-        PCHECK_STRING(keyP, 0, "Non-String item in Registration::contextSourceInfo[X]", kvItemP->name, 400);
-        PCHECK_STRING_EMPTY(keyP, 0, "Empty String item in Registration::contextSourceInfo[X]", kvItemP->name, 400);
-      }
-      else if (strcmp(kvItemP->name, "value") == 0)
-      {
-        PCHECK_DUPLICATE(valueP, kvItemP, 0, "Duplicated field in Registration::contextSourceInfo[X]", kvItemP->name, 400);
-        PCHECK_STRING(valueP, 0, "Non-String item in Registration::contextSourceInfo[X]", kvItemP->name, 400);
-        PCHECK_STRING_EMPTY(valueP, 0, "Empty String item in Registration::contextSourceInfo[X]", kvItemP->name, 400);
-      }
-      else
-      {
-        orionldError(OrionldBadRequestData, "Unrecognized field in Registration::contextSourceInfo[X]", kvItemP->name, 400);
-        return false;
-      }
-    }
-
-    if (keyP == NULL)
-    {
-      orionldError(OrionldBadRequestData, "Missing Mandatory Field in Registration::contextSourceInfo[X]", "key", 400);
-      return false;
-    }
-
-    if (valueP == NULL)
-    {
-      orionldError(OrionldBadRequestData, "Missing Mandatory Field in Registration::contextSourceInfo[X]", "value", 400);
-      return false;
-    }
-
-    //
-    // Check for duplicates
-    //
-    if ((kvObjectP->next != NULL) && (kjLookupInKvList(kvObjectP, keyP->value.s) != NULL))
-    {
-      orionldError(OrionldBadRequestData, "Duplicated Key in Registration::contextSourceInfo", keyP->value.s, 400);
-      return false;
-    }
-
-    // Special keys
-    if (strcmp(keyP->value.s, "jsonldContext") == 0)
-    {
-      // If an @context is given for the registration, make sure it's valid
-      if (regCacheItemContextCheck(NULL, valueP->value.s, fwdContextPP) == false)
-      {
-        LM_W(("Unable to add Registration @context '%s' for an item in the reg-cache", valueP->value.s));
-        return 0;
-      }
-    }
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckRegistrationManagement - FIXME: Own module
-//
-bool pCheckRegistrationManagement(KjNode* rmP)
-{
-  KjNode* localOnlyP     = NULL;
-  KjNode* timeoutP       = NULL;
-  KjNode* cooldownP      = NULL;
-
-  for (KjNode* rmItemP = rmP->value.firstChildP; rmItemP != NULL; rmItemP = rmItemP->next)
-  {
-    if (strcmp(rmItemP->name, "localOnly") == 0)
-    {
-      PCHECK_DUPLICATE(localOnlyP, rmItemP, 0, NULL, "Registration::management::localOnly", 400);
-      PCHECK_BOOL(localOnlyP, 0, NULL, "Registration::management::localOnly", 400);
-    }
-    else if (strcmp(rmItemP->name, "timeout") == 0)
-    {
-      PCHECK_DUPLICATE(timeoutP, rmItemP, 0, NULL, "Registration::management::timeout", 400);
-      PCHECK_NUMBER(timeoutP, 0, NULL, "Registration::management::timeout", 400);
-
-      if (timeoutP->type == KjFloat)
-      {
-        if (timeoutP->value.f <= 0.001)
-        {
-          orionldError(OrionldBadRequestData, "Non-supported value for Registration::management::timeout", "Must be Greater Than 0", 400);
-          return false;
-        }
-      }
-      else if (timeoutP->type == KjInt)
-      {
-        if (timeoutP->value.i <= 0)
-        {
-          orionldError(OrionldBadRequestData, "Non-supported value for Registration::management::timeout", "Must be Greater Than 0", 400);
-          return false;
-        }
-      }
-    }
-    else if (strcmp(rmItemP->name, "cooldown") == 0)
-    {
-      PCHECK_DUPLICATE(cooldownP, rmItemP, 0, NULL, "Registration::management::cooldown", 400);
-      PCHECK_NUMBER(cooldownP, 0, NULL, "Registration::management::cooldown", 400);
-
-      if (cooldownP->type == KjFloat)
-      {
-        if (cooldownP->value.f <= 0.001)
-        {
-          orionldError(OrionldBadRequestData, "Non-supported value for Registration::management::cooldown", "Must be Greater Than 0", 400);
-          return false;
-        }
-      }
-      else if (cooldownP->type == KjInt)
-      {
-        if (cooldownP->value.i <= 0)
-        {
-          orionldError(OrionldBadRequestData, "Non-supported value for Registration::management::cooldown", "Must be Greater Than 0", 400);
-          return false;
-        }
-      }
-    }
-    else if (strcmp(rmItemP->name, "cacheDuration") == 0)
-    {
-      orionldError(OrionldOperationNotSupported, "Not Implemented", "Registration::management::cacheDuration", 501);
-      return false;
-    }
-    else
-    {
-      orionldError(OrionldBadRequestData, "Unrecognized field in Registration::management", rmItemP->name, 400);
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckTenant - FIXME: Own module
-//
-bool pCheckTenant(const char* tenantName)
-{
-  if (strlen(tenantName) > 16)
-  {
-    orionldError(OrionldBadRequestData, "Invalid tenant name (too long)", tenantName, 400);
-    return false;
-  }
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckScope - FIXME: Own module
-//
-bool pCheckScope(const char* scope)
-{
-  size_t len = strlen(scope);
-
-  if (len > 80)
-  {
-    orionldError(OrionldBadRequestData, "Invalid scope (too long)", scope, 400);
-    return false;
-  }
-
-  if (strcspn(scope, " :.\\\"'<>|") != len)
-  {
-    orionldError(OrionldBadRequestData, "Invalid scope (contains forbidden characters)", scope, 400);
-    return false;
-  }
-
-  return true;
-}
 
 
 
@@ -387,8 +118,20 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
   // It's quicker to implement this like that, as there's no need to go over the entire path tree and also not necessary to look for >1 matches.
   // When Property P1 is about to be added to 'propertyTree' for a second time, the duplication will be noticed and the error triggered.
   //
-  KjNode* nodeP = registrationP->value.firstChildP;
-  KjNode* next;
+  // But, before the loop is started, we need the registrationMode, to check for invalid registrations
+  //
+  KjNode* regModeNodeP = kjLookup(registrationP, "mode");
+  if (regModeNodeP != NULL)
+  {
+    PCHECK_STRING(regModeNodeP, 0, NULL, "mode", 400);
+    PCHECK_STRING_EMPTY(regModeNodeP, 0, NULL, "mode", 400);
+    if (pCheckRegistrationMode(regModeNodeP->value.s) == false)
+      return false;
+  }
+
+  RegistrationMode regMode = (regModeNodeP == NULL)? RegModeInclusive : registrationMode(regModeNodeP->value.s);
+  KjNode*          nodeP   = registrationP->value.firstChildP;
+  KjNode*          next;
 
   while (nodeP != NULL)
   {
@@ -436,7 +179,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
       ARRAY_CHECK(nodeP, "information");
       EMPTY_ARRAY_CHECK(nodeP, "information");
 
-      if (pcheckInformation(nodeP) == false)
+      if (pcheckInformation(regMode, nodeP) == false)
         return false;
     }
     else if (strcmp(nodeP->name, "tenant") == 0)

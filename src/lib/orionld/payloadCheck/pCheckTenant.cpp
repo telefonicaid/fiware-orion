@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
-
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,17 +22,24 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
+#include <string.h>                                             // strlen
+
+#include "orionld/common/orionldError.h"                        // orionldError
+#include "orionld/payloadCheck/pCheckTenant.h"                  // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckTenant -
+//
+bool pCheckTenant(const char* tenantName)
 {
-#include "kjson/KjNode.h"                                        // KjNode
+  if (strlen(tenantName) > 16)
+  {
+    orionldError(OrionldBadRequestData, "Invalid tenant name (too long)", tenantName, 400);
+    return false;
+  }
+
+  return true;
 }
-
-
-
-// ----------------------------------------------------------------------------
-//
-// pcheckInformation -
-//
-extern bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP);
-
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_

@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
-
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,17 +22,35 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                             // NULL
+#include <string.h>                                             // strcmp
+
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                       // KjNode
+#include "kjson/kjLookup.h"                                     // kjLookup
 }
 
+#include "orionld/kjTree/kjLookupInKvList.h"                    // Own interface
 
 
-// ----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 //
-// pcheckInformation -
+// kjLookupInKvList -
 //
-extern bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP);
+KjNode* kjLookupInKvList(KjNode* firstSiblingP, const char* name)
+{
+  for (KjNode* siblingP = firstSiblingP->next; siblingP != NULL; siblingP = siblingP->next)
+  {
+    KjNode* keyP = kjLookup(siblingP, "key");
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
+    if ((keyP != NULL) && (keyP->type == KjString))
+    {
+      if (strcmp(keyP->value.s, name) == 0)
+        return siblingP;
+    }
+  }
+
+  return NULL;
+}

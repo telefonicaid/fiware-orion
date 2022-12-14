@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKKEYVALUEARRAY_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKKEYVALUEARRAY_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -27,15 +27,22 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                       // KjNode
 }
 
+#include "orionld/context/OrionldContext.h"                     // OrionldContext
 
 
-// ----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 //
-// pcheckInformation -
+// pCheckKeyValueArray -
 //
-extern bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP);
+// Keys with special treatment:
+// * jsonldContext - needs to be downloaded, parsed etc, to be accepted.
+// * Content-Type  - must be a valid mime type
+// * Accept        - must be a valid Accept value (parse it and make sure)
+//
+extern bool pCheckKeyValueArray(KjNode* csiP, OrionldContext** fwdContextPP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKKEYVALUEARRAY_H_

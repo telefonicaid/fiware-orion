@@ -33,6 +33,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
+#include "orionld/types/RegistrationMode.h"                     // RegistrationMode
 #include "orionld/payloadCheck/pcheckInformationItem.h"         // pcheckInformationItem
 #include "orionld/payloadCheck/pcheckInformation.h"             // Own interface
 
@@ -42,7 +43,7 @@ extern "C"
 //
 // pcheckInformation -
 //
-bool pcheckInformation(KjNode* informationArrayP)
+bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP)
 {
   if (informationArrayP->value.firstChildP == NULL)  // Empty Array
   {
@@ -55,7 +56,7 @@ bool pcheckInformation(KjNode* informationArrayP)
     OBJECT_CHECK(informationP, "information[X]");
     EMPTY_OBJECT_CHECK(informationP, "information[X]");
 
-    if (pcheckInformationItem(informationP) == false)
+    if (pcheckInformationItem(regMode, informationP) == false)
       return false;
   }
 

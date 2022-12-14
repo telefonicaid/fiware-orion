@@ -63,6 +63,7 @@ SET (SOURCES
     kjAttributeNormalizedToSimplified.cpp
     kjAttributeNormalizedToConcise.cpp
     kjSysAttrsRemove.cpp
+    kjLookupInKvList.cpp
 )
 
 # Include directories

@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
-
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,17 +22,32 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
+#include <string.h>                                             // strlen, strcspn
+
+#include "orionld/common/orionldError.h"                        // orionldError
+#include "orionld/payloadCheck/pCheckScope.h"                   // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckScope -
+//
+bool pCheckScope(const char* scope)
 {
-#include "kjson/KjNode.h"                                        // KjNode
+  size_t len = strlen(scope);
+
+  if (len > 80)
+  {
+    orionldError(OrionldBadRequestData, "Invalid scope (too long)", scope, 400);
+    return false;
+  }
+
+  if (strcspn(scope, " :.\\\"'<>|") != len)
+  {
+    orionldError(OrionldBadRequestData, "Invalid scope (contains forbidden characters)", scope, 400);
+    return false;
+  }
+
+  return true;
 }
-
-
-
-// ----------------------------------------------------------------------------
-//
-// pcheckInformation -
-//
-extern bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP);
-
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_

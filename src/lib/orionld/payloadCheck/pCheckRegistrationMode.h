@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKREGISTRATIONMODE_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKREGISTRATIONMODE_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,17 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// pcheckInformation -
+// pCheckRegistrationMode -
 //
-extern bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP);
+extern bool pCheckRegistrationMode(const char* mode);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKREGISTRATIONMODE_H_
