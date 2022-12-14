@@ -36,6 +36,6 @@ extern "C"
 //
 // pcheckInformation -
 //
-extern bool pcheckInformation(KjNode* informationArrayP);
+extern bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATION_H_

@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
+#include "orionld/types/RegistrationMode.h"                     // RegistrationMode
 #include "orionld/context/OrionldContext.h"                     // OrionldContext
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/forwarding/FwdOperation.h"                    // fwdOperationFromString, FwdNone
@@ -117,8 +118,20 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
   // It's quicker to implement this like that, as there's no need to go over the entire path tree and also not necessary to look for >1 matches.
   // When Property P1 is about to be added to 'propertyTree' for a second time, the duplication will be noticed and the error triggered.
   //
-  KjNode* nodeP = registrationP->value.firstChildP;
-  KjNode* next;
+  // But, before the loop is started, we need the registrationMode, to check for invalid registrations
+  //
+  KjNode* regModeNodeP = kjLookup(registrationP, "mode");
+  if (regModeNodeP != NULL)
+  {
+    PCHECK_STRING(regModeNodeP, 0, NULL, "mode", 400);
+    PCHECK_STRING_EMPTY(regModeNodeP, 0, NULL, "mode", 400);
+    if (pCheckRegistrationMode(regModeNodeP->value.s) == false)
+      return false;
+  }
+
+  RegistrationMode regMode = (regModeNodeP == NULL)? RegModeInclusive : registrationMode(regModeNodeP->value.s);
+  KjNode*          nodeP   = registrationP->value.firstChildP;
+  KjNode*          next;
 
   while (nodeP != NULL)
   {
@@ -166,7 +179,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
       ARRAY_CHECK(nodeP, "information");
       EMPTY_ARRAY_CHECK(nodeP, "information");
 
-      if (pcheckInformation(nodeP) == false)
+      if (pcheckInformation(regMode, nodeP) == false)
         return false;
     }
     else if (strcmp(nodeP->name, "tenant") == 0)
