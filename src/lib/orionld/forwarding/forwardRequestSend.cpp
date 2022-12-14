@@ -609,7 +609,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   }
 
 
-//
+  //
   // Need to save the pointer to the curl headers in order to free it afterwards
   //
   fwdPendingP->curlHeaders = headers;
