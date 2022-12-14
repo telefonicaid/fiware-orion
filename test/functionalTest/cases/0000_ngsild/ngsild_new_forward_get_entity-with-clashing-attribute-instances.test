@@ -504,24 +504,28 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 08. GET E1 on CB - see E1 with P1 from CB, P2 from CP1 and P3 from CP2, with keyValues
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 201
+Content-Length: 233
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "L2": {
-        "en": "Local Food",
-        "es": "comida local",
-        "se": "Lokal mat"
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        }
     },
     "P1": "local P1",
     "P2": "P2 in CP1",
     "P3": "P3 in CP2",
     "food": {
-        "en": "CP2 Food",
-        "es": "comida en CP2",
-        "se": "Mat i CP2"
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        }
     },
     "id": "urn:E1",
     "type": "T"
@@ -806,7 +810,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 17. GET E1 on CB - as 06 plus G2, R1, and R2, with keyValues
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 291
+Content-Length: 323
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -821,9 +825,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "type": "Point"
     },
     "L2": {
-        "en": "Local Food",
-        "es": "comida local",
-        "se": "Lokal mat"
+        "languageMap": {
+            "en": "Local Food",
+            "es": "comida local",
+            "se": "Lokal mat"
+        }
     },
     "P1": "local P1",
     "P2": "P2 in CP1",
@@ -831,9 +837,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "R1": "urn:local:E1:R1",
     "R2": "urn:local:E1:R2",
     "food": {
-        "en": "CP2 Food",
-        "es": "comida en CP2",
-        "se": "Mat i CP2"
+        "languageMap": {
+            "en": "CP2 Food",
+            "es": "comida en CP2",
+            "se": "Mat i CP2"
+        }
     },
     "id": "urn:E1",
     "type": "T"
@@ -1033,7 +1041,7 @@ Date: REGEX(.*)
 21. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 446
+Content-Length: 478
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
@@ -1058,9 +1066,11 @@ Date: REGEX(.*)
             "type": "Point"
         },
         "L2": {
-            "en": "Local Food",
-            "es": "comida local",
-            "se": "Lokal mat"
+            "languageMap": {
+                "en": "Local Food",
+                "es": "comida local",
+                "se": "Lokal mat"
+            }
         },
         "P1": "local P1",
         "P2": "P2 in CP1",
@@ -1068,9 +1078,11 @@ Date: REGEX(.*)
         "R1": "urn:local:E1:R1",
         "R2": "urn:local:E1:R2",
         "food": {
-            "en": "CP2 Food",
-            "es": "comida en CP2",
-            "se": "Mat i CP2"
+            "languageMap": {
+                "en": "CP2 Food",
+                "es": "comida en CP2",
+                "se": "Mat i CP2"
+            }
         },
         "type": "T"
     },

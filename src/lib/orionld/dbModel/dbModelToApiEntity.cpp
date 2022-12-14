@@ -173,6 +173,8 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   KjNode* datasetsP = kjLookup(dbEntityP, "@datasets");
   bool    longNames = (compacted == false) || ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES));
 
+  LM(("OPT: RenderFormat: %d (%s)", renderFormat, renderFormatToString(renderFormat)));
+
   if (datasetsP != NULL)
     kjChildRemove(dbEntityP, datasetsP);
 
@@ -289,10 +291,17 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   //
   // Now the attributes
   //
-  for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  KjNode* attrP = attrsP->value.firstChildP;
+  KjNode* next;
+
+  while (attrP != NULL)
   {
-    if (strcmp(attrP->name, ".added")   == 0) continue;
-    if (strcmp(attrP->name, ".removed") == 0) continue;
+    next = attrP->next;
+    if ((strcmp(attrP->name, ".added")   == 0) || (strcmp(attrP->name, ".removed") == 0))
+    {
+      attrP = next;
+      continue;
+    }
 
     KjNode* attributeP;
     KjNode* datasetP = datasetExtract(datasetsP, attrP->name);  // datasetExtract removes the dataset from @datasets
@@ -304,6 +313,7 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
     }
 
     kjChildAdd(entityP, attributeP);
+    attrP = next;
   }
 
   //

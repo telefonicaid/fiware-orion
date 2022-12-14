@@ -152,15 +152,17 @@ Date: REGEX(.*)
 03. GET E1 - make sure P1 is still there
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 92
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "LP1": {
-        "en": "yes",
-        "es": "si"
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        }
     },
     "P1": 1,
     "R1": "urn:E1",
@@ -186,15 +188,17 @@ Date: REGEX(.*)
 05. GET E1 - make sure R1 is still there
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 92
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "LP1": {
-        "en": "yes",
-        "es": "si"
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        }
     },
     "P1": 1,
     "R1": "urn:E1",
@@ -220,15 +224,17 @@ Date: REGEX(.*)
 07. GET E1 - make sure LP1 is still there
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 92
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
     "LP1": {
-        "en": "yes",
-        "es": "si"
+        "languageMap": {
+            "en": "yes",
+            "es": "si"
+        }
     },
     "P1": 1,
     "R1": "urn:E1",

@@ -778,8 +778,11 @@ static bool pCheckUriParamGeometryProperty()
 {
   if (orionldState.uriParams.geometryProperty == NULL)
   {
-    orionldState.uriParams.geometryProperty  = (char*) "location";
-    orionldState.in.geometryPropertyExpanded = (char*) "location";
+    if (orionldState.out.contentType == GEOJSON)
+    {
+      orionldState.uriParams.geometryProperty  = (char*) "location";
+      orionldState.in.geometryPropertyExpanded = (char*) "location";
+    }
   }
   else
   {
@@ -1245,7 +1248,10 @@ MHD_Result orionldMhdConnectionTreat(void)
   // Enqueue response
   //
   if (orionldState.responsePayload != NULL)
+  {
+    LM(("OPT: FINAL Response body: %s", orionldState.responsePayload));
     restReply(NULL, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
+  }
   else
     restReply(NULL, NULL);
 
