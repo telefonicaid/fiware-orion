@@ -80,7 +80,15 @@ static bool kjValuesDiffer(KjNode* leftAttr, KjNode* rightAttr)
   if (type == KjFloat)    return (left->value.f == right->value.f)?            false : true;
   if (type == KjBoolean)  return (left->value.b == right->value.b)?            false : true;
 
+  //
   // Compound values ... let's just render the values and do a strcmp on the rendered buffers
+  // However, might be an empty array/object  (kjFastRenderSize crashes if the parameter is NULL)
+  //
+  if ((left->value.firstChildP == NULL) && (right->value.firstChildP == NULL))
+    return false;
+  else if ((left->value.firstChildP == NULL) || (right->value.firstChildP == NULL))
+    return true;
+
   int   leftBufSize     = kjFastRenderSize(left->value.firstChildP);
   int   rightBufSize    = kjFastRenderSize(right->value.firstChildP);
   char* leftBuf         = kaAlloc(&orionldState.kalloc, leftBufSize);
