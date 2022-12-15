@@ -55,7 +55,7 @@ std::string getAllSubscriptions
   ParseData*                 parseDataP
 )
 {
-  std::vector<ngsiv2::Subscription> subs;
+  std::vector<ngsiv2::Subscription*> subs;
   OrionError                        oe;
   long long                         count  = 0;
   int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -90,7 +90,8 @@ std::string getAllSubscriptions
   // free sub memory associated to subscriptions
   for (unsigned int ix = 0; ix < subs.size(); ix++)
   {
-    subs[ix].release();
+    subs[ix]->release();
+    delete subs[ix];
   }
 
   return out;
