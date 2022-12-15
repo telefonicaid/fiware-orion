@@ -347,7 +347,7 @@ void mongoListSubscriptions
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     // Dynamic memory to be freed by the caller of mongoListSubscriptions()
-    // Former versions of this code were using Subscriptono instead of Subscription*
+    // Former versions of this code were using Subscription instead of Subscription*
     // but some obscure problem occurs when httpInfo/mqttInfo classes were expanded
     // with the ngsi field of type Entity
     Subscription*  sP = new Subscription();
