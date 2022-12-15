@@ -33,11 +33,11 @@ The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
 - Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
-- New subscripition modes (create only, update only, delete only and combinations) ([#1494](https://github.com/telefonicaid/fiware-orion/issues/1494))
+- ~New subscripition modes (create only, update only, delete only and combinations)~ ([#1494](https://github.com/telefonicaid/fiware-orion/issues/1494)
 - Pattern/filter batch updates ([#2389](https://github.com/telefonicaid/fiware-orion/issues/2389))
 - Notification endpoint alias ([#3655](https://github.com/telefonicaid/fiware-orion/issues/3655))
 - Aggregation operations API ([#3816](https://github.com/telefonicaid/fiware-orion/issues/3816))
-- Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
+- ~Custom notifications: simplifying sending JSON requests~ ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
 
 
 ## Medium term

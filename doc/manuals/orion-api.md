@@ -2226,7 +2226,7 @@ the value of the "temperature" attribute (of type Number) is 23.4
 ### JSON payloads
 
 If `json` is used in `httpCustom` or `mqttCustom` the following considerations apply.
-Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
 
 The `json` field can be used to generate arbitrary JSON-based payloads. For instance:
 
@@ -2261,7 +2261,7 @@ Some notes to take into account when using `json`:
 ### NGSI payload patching
 
 If `ngsi` is used in `httpCustom` or `mqttCustom` the following considerations apply.
-Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
 
 The `ngsi` field can be used to specify an entity fragment that will *patch* the entity in
 the notification. This allows to add new attributes and/or change the value of
