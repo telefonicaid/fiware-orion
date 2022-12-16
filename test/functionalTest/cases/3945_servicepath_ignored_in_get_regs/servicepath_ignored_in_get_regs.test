@@ -199,7 +199,7 @@ Date: REGEX(.*)
 
 05. GET /v2/registrations/reg2 in service path /foo, get nothing
 ================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 404 Not Found
 Content-Length: 92
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
