@@ -62,6 +62,8 @@ std::string getRegistration
 
   TIMED_MONGO(mongoRegistrationGet(&registration, regId, ciP->tenant, ciP->servicePathV[0], &oe));
 
+  ciP->httpStatusCode = oe.code;
+
   if (oe.code != SccOk)
   {
     return oe.toJson();
