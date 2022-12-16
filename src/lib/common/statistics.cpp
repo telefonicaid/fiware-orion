@@ -76,6 +76,7 @@ UrlCounter noOfRequestCounters[] =
   {StatisticsRequest,             -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
   {LogLevelRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, false},
   {SemStateRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  {VersionRequest,                -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
   {MetricsRequest,                -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
   {ExitRequest,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
   {LeakRequest,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false}
@@ -360,6 +361,12 @@ void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
     {
       break;
     }
+  }
+
+  // Version counter
+  if (request == VersionRequest)
+  {
+    ++noOfVersionRequests;
   }
 
   // If it is not a NGSIv2 request it has to be NGSIv1 or invalid
