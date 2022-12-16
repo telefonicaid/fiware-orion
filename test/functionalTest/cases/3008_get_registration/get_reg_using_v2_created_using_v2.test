@@ -130,7 +130,7 @@ Date: REGEX(.*)
 
 03. Attempt to GET a non existing registration (using a syntactical correct Reg ID)
 ===================================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 404 Not Found
 Content-Length: 92
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
