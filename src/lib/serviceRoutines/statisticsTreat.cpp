@@ -93,6 +93,8 @@ static void resetStatistics(void)
   noOfNotificationsSent        = -1;
   noOfSimulatedNotifications   = -1;
 
+  statisticsTime = getCurrentTime();
+
   QueueStatistics::reset();
 
   semTimeReqReset();
