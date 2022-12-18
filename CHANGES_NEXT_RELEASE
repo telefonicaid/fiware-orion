@@ -9,3 +9,4 @@
 - Deprecated: GET /v2 operation
 - Remove: RPM package stuff
 - Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
+- Add "Authorization" in CORS allowed headers (#4249)
