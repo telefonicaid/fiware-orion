@@ -45,7 +45,7 @@ echo
 HTTP/1.1 200 OK
 Content-Length: 0
 Access-Control-Max-Age: REGEX([0-9]+)
-Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token
+Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token, Authorization
 Access-Control-Expose-Headers: REGEX(.*)
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: REGEX(.*)
