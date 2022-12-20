@@ -43,7 +43,7 @@ CORS モードが有効な場合、Origin ヘッダはリクエストに存在�
 
 有効な `OPTIONS` リクエストに対する Orion のレスポンスには、以下のヘッダと値が含まれます : 
 
-    Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token 
+    Access-Control-Allow-Headers: Authorization, Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token
 
 ## アクセス制御の最大寿命
 
