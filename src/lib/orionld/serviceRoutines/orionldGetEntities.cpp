@@ -316,16 +316,6 @@ bool orionldGetEntities(void)
   if      (orionldState.in.typeList.items == 0) type = (char*) ".*";
   else if (orionldState.in.typeList.items == 1) type = orionldState.in.typeList.array[0];
 
-  //
-  // ID-list and Type-list at the same time is not supported
-  //
-  if ((orionldState.in.idList.items > 1) && (orionldState.in.typeList.items > 1))
-  {
-    LM_W(("Bad Input (URI params /id/ and /type/ are both lists - Not Permitted)"));
-    orionldError(OrionldBadRequestData, "URI params /id/ and /type/ are both lists", "Not Permitted", 400);
-    return false;
-  }
-
   OrionldGeoInfo geoInfo;
   if (geoCheck(&geoInfo) == false)
     return false;
