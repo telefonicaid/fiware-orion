@@ -61,16 +61,12 @@ echo
 --REGEXPECT--
 01. GET Entity with four URI Params: id, type, idPattern, and attrs, all four with valid values, but, two arrays
 ================================================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 138
+HTTP/1.1 200 OK
+Content-Length: 2
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "detail": "Not Permitted",
-    "title": "URI params /id/ and /type/ are both lists",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
+[]
 
 
 02. GET Entity with 'id=' - no value for id
