@@ -132,7 +132,7 @@ std::string jsonRequestTreat
     }
     break;
 
-  case IndividualSubscriptionRequest:
+  case SubscriptionRequest:
     answer = parseSubscription(ciP, &parseDataP->subsV2, true);  // NOTE: partial == true
     if (answer != "OK")
     {

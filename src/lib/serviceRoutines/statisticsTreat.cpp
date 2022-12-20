@@ -85,7 +85,6 @@ static void resetStatistics(void)
   }
 
   noOfVersionRequests          = -1;
-  noOfLegacyNgsiv1Requests     = -1;
   noOfInvalidRequests          = -1;
   noOfMissedVerb               = -1;
   noOfRegistrationUpdateErrors = -1;
@@ -136,6 +135,9 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "noPayloadRequests", noOfRequestsWithoutPayload);
 
   JsonObjectHelper jsRequests;
+  JsonObjectHelper jsRequestsLegacy;
+  bool             touchedRequests      = false;
+  bool             touchedRquestsLegacy = false;
   for (unsigned int ix = 0; ; ++ix)
   {
     // Note there is no need of checking allowed flags, as not allowed counter will be in -1
@@ -152,7 +154,17 @@ std::string renderCounterStats(void)
         (noOfRequestCounters[ix].patch != -1) || (noOfRequestCounters[ix].put != -1) ||
         (noOfRequestCounters[ix]._delete != -1) || (noOfRequestCounters[ix].options != -1))
     {
-      jsRequests.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request), jsRequest.str());
+      // We add in the accumulator corresponing do the request kind
+      if (((strncmp(noOfRequestCounters[ix].prefix, "v1", strlen("v1"))) == 0) || (strncmp(noOfRequestCounters[ix].prefix, "ngsi10", strlen("ngsi10")) == 0))
+      {
+        touchedRquestsLegacy = true;
+        jsRequestsLegacy.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request, std::string(noOfRequestCounters[ix].prefix)), jsRequest.str());
+      }
+      else
+      {
+        touchedRequests = true;
+        jsRequests.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request, std::string(noOfRequestCounters[ix].prefix)), jsRequest.str());
+      }
     }
 
     // We know that LeakRequest is the last request type in the array, by construction
@@ -162,9 +174,15 @@ std::string renderCounterStats(void)
       break;
     }
   }
-  js.addRaw("requests", jsRequests.str());
+  if (touchedRequests)
+  {
+    js.addRaw("requests", jsRequests.str());
+  }
+  if (touchedRquestsLegacy)
+  {
+    js.addRaw("requestsLegacy", jsRequestsLegacy.str());
+  }
 
-  renderUsedCounter(&js, "legacyNgsiv1",    noOfLegacyNgsiv1Requests);
   renderUsedCounter(&js, "missedVerb",      noOfMissedVerb);
   renderUsedCounter(&js, "invalidRequests", noOfInvalidRequests);
 
@@ -179,6 +197,7 @@ std::string renderCounterStats(void)
   // Instead of removing version-requests from the statistics,
   // we report the number of version-requests even if zero (-1).
   //
+  // FIXME PR: do we really needs this?
   js.addNumber("versionRequests", (long long)(noOfVersionRequests + 1));
 
   return js.str();

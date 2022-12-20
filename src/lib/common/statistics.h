@@ -237,6 +237,8 @@ typedef struct UrlCounter
 {
   RequestType request;
 
+  const char* prefix;
+
   int get;
   int post;
   int patch;
@@ -268,7 +270,6 @@ extern UrlCounter noOfRequestCounters[];
 
 // Special
 extern int noOfVersionRequests;
-extern int noOfLegacyNgsiv1Requests;
 extern int noOfInvalidRequests;
 extern int noOfMissedVerb;
 extern int noOfRegistrationUpdateErrors;
@@ -297,6 +298,6 @@ extern void timingStatisticsReset(void);
 *
 * statisticsUpdate - 
 */
-extern void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb);
+extern void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb, const char* prefix);
 
 #endif  // SRC_LIB_COMMON_STATISTICS_H_

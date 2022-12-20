@@ -6,8 +6,11 @@
 - Fix: reset measuring_interval_in_secs correctly reset upon DELETE /statistics (#4233)
 - Fix: version request correctly recorded in statistics API (#4233)
 - Fix: GET /v2/registrations/{regId} was wrongly returning 200 OK instaed of 404 Not Found in case of non existing registration (#4235)
+- Fix: GET /statistics counters requests now use URLs intead of symbolic names
+- Add: requestLegacy counters in GET /statistics response
 - Upgrade Debian version from 11.2 to 11.3 in Dockerfile
 - Deprecated: GET /v2 operation
 - Remove: RPM package stuff
+- Remove: rendundant routes in administrative REST API not aligned with documentation
 - Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
 - Add "Authorization" in CORS allowed headers (#4249)
