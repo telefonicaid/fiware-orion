@@ -647,7 +647,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       ciP->inMimeType = NOMIMETYPE;
     }
-    statisticsUpdate(serviceV[ix].request, ciP->inMimeType, ciP->verb);
+    statisticsUpdate(serviceV[ix].request, ciP->inMimeType, ciP->verb, compV.size() > 0 ? compV[0].c_str() : "");
 
     // Tenant to connectionInfo
     ciP->tenant = ciP->tenantFromHttpHeader;

@@ -117,7 +117,7 @@ echo
 
 echo "5. Statistics"
 echo "============="
-orionCurl --url /v1/admin/statistics
+orionCurl --url /statistics
 echo
 echo
 

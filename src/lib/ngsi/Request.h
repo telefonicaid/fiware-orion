@@ -113,7 +113,7 @@ typedef enum RequestType
   EntityTypeRequest,
   EntityAllTypesRequest,
   SubscriptionsRequest,
-  IndividualSubscriptionRequest,
+  SubscriptionRequest,
   BatchQueryRequest,
   BatchUpdateRequest,
 
@@ -146,7 +146,7 @@ extern const char* requestType(RequestType rt);
 *
 * requestTypeForCounter -
 */
-extern const char* requestTypeForCounter(RequestType rt);
+extern std::string requestTypeForCounter(RequestType rt, const std::string& prefix);
 
 
 
