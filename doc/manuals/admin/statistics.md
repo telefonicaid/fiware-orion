@@ -50,6 +50,8 @@ Unconditional fields are:
 The counter block provides information about counters for the times a particular request type has been received
 (also for notifications being sent), e.g:
 
+FIXME PR: update example
+
 ```
 {
   ...

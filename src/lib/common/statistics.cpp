@@ -139,7 +139,6 @@ UrlCounter noOfRequestCounters[] =
 };
 
 // Special
-int noOfVersionRequests          = -1;
 int noOfInvalidRequests          = -1;
 int noOfMissedVerb               = -1;
 int noOfRegistrationUpdateErrors = -1;
@@ -380,12 +379,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb, const
     {
       break;
     }
-  }
-
-  // Version counter
-  if (request == VersionRequest)
-  {
-    ++noOfVersionRequests;
   }
 
   // If it is not a NGSIv2 request it has to be NGSIv1 or invalid

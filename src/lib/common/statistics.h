@@ -269,7 +269,6 @@ extern int noOfRequestsWithoutPayload;
 extern UrlCounter noOfRequestCounters[];
 
 // Special
-extern int noOfVersionRequests;
 extern int noOfInvalidRequests;
 extern int noOfMissedVerb;
 extern int noOfRegistrationUpdateErrors;

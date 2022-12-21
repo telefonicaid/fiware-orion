@@ -84,7 +84,6 @@ static void resetStatistics(void)
     }
   }
 
-  noOfVersionRequests          = -1;
   noOfInvalidRequests          = -1;
   noOfMissedVerb               = -1;
   noOfRegistrationUpdateErrors = -1;
@@ -189,16 +188,6 @@ std::string renderCounterStats(void)
   renderUsedCounter(&js, "registrationUpdateErrors", noOfRegistrationUpdateErrors);
   renderUsedCounter(&js, "discoveryErrors", noOfDiscoveryErrors);
   renderUsedCounter(&js, "notificationsSent", noOfNotificationsSent);
-
-  //
-  // The valgrind test suite uses REST GET /version to check that the broker is alive
-  // This fact makes the statistics change and some working functests fail under valgrindTestSuite
-  // due to the 'extra' version-request in the statistics.
-  // Instead of removing version-requests from the statistics,
-  // we report the number of version-requests even if zero (-1).
-  //
-  // FIXME PR: do we really needs this?
-  js.addNumber("versionRequests", (long long)(noOfVersionRequests + 1));
 
   return js.str();
 }

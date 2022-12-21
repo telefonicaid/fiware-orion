@@ -145,7 +145,7 @@ Date: REGEX(.*)
 04. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 206
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -164,8 +164,7 @@ Date: REGEX(.*)
             "/v2/registrations/{id}": {
                 "GET": 2
             }
-        },
-        "versionRequests": 0
+        }
     },
     "measuring_interval_in_secs": REGEX(\d+),
     "uptime_in_secs": REGEX(\d+)
