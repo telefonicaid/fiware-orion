@@ -7,12 +7,12 @@ Orion Context Broker reference distribution is Debian 11. This doesn't mean that
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.74
-* libmicrohttpd: 0.9.70 (from source)
+* libmicrohttpd: 0.9.75 (from source)
 * libcurl: 7.74.0
 * openssl: 1.1.1k
 * libuuid: 2.36.1
-* libmosquitto: 2.0.12 (from source)
-* Mongo C driver: 1.17.4 (from source)
+* libmosquitto: 2.0.15 (from source)
+* Mongo C driver: 1.23.1 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
@@ -30,9 +30,9 @@ commands that require root privilege):
 
 * Install the Mongo Driver from source.
 
-        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz
-        tar xfvz mongo-c-driver-1.17.4.tar.gz
-        cd mongo-c-driver-1.17.4
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz
+        tar xfvz mongo-c-driver-1.23.1.tar.gz
+        cd mongo-c-driver-1.23.1
         mkdir cmake-build
         cd cmake-build
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
@@ -47,19 +47,19 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
-        tar xvf libmicrohttpd-0.9.70.tar.gz
-        cd libmicrohttpd-0.9.70
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz
+        tar xvf libmicrohttpd-0.9.75.tar.gz
+        cd libmicrohttpd-0.9.75
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.12/ can be modified to fine tune the build)
+* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.15/ can be modified to fine tune the build)
 
-        wget https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
-        tar xvf mosquitto-2.0.12.tar.gz
-        cd mosquitto-2.0.12
+        wget https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz
+        tar xvf mosquitto-2.0.15.tar.gz
+        cd mosquitto-2.0.15
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
@@ -153,12 +153,12 @@ And it includes the instruction to build MongoDB 4.4 that the Orion depends on.
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.71.0
-* libmicrohttpd: 0.9.70 (from source)
+* libmicrohttpd: 0.9.75 (from source)
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
-* libmosquitto: 2.0.12 (from source)
-* Mongo C driver: 1.17.4 (from source)
+* libmosquitto: 2.0.15 (from source)
+* Mongo C driver: 1.23.1 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
@@ -177,9 +177,9 @@ commands that require root privilege):
 
 * Install the Mongo Driver from source.
 
-        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz 
-        tar xfvz mongo-c-driver-1.17.4.tar.gz 
-        cd mongo-c-driver-1.17.4 
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz
+        tar xfvz mongo-c-driver-1.23.1.tar.gz
+        cd mongo-c-driver-1.23.1
         mkdir cmake-build 
         cd cmake-build 
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. 
@@ -194,19 +194,19 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz
-        tar xvf libmicrohttpd-0.9.70.tar.gz
-        cd libmicrohttpd-0.9.70
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz
+        tar xvf libmicrohttpd-0.9.75.tar.gz
+        cd libmicrohttpd-0.9.75
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.12/ can be modified to fine tune the build)
+* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.15/ can be modified to fine tune the build)
 
-        wget https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz
-        tar xvf mosquitto-2.0.12.tar.gz
-        cd mosquitto-2.0.12
+        wget https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz
+        tar xvf mosquitto-2.0.15.tar.gz
+        cd mosquitto-2.0.15
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk

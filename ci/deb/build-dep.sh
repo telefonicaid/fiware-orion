@@ -68,8 +68,8 @@ echo "INSTALL: python special dependencies" \
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
 # see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
 echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
-&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz | tar xzC /opt/ \
-&& cd /opt/mongo-c-driver-1.17.4 \
+&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz | tar xzC /opt/ \
+&& cd /opt/mongo-c-driver-1.23.1 \
 && mkdir cmake-build \
 && cd cmake-build \
 && cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
@@ -81,8 +81,8 @@ echo "INSTALL: rapidjson" \
 && mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include
 
 echo "INSTALL: libmicrohttpd" \
-&& curl -L https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz | tar xzC /opt/ \
-&& cd /opt/libmicrohttpd-0.9.70  \
+&& curl -L https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz | tar xzC /opt/ \
+&& cd /opt/libmicrohttpd-0.9.75  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
 && make install
@@ -97,8 +97,8 @@ echo "INSTALL: gmock" \
 && make install
 
 echo "INSTALL: mosquitto" \
-&& curl -kL https://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz | tar xzC /opt/ \
-&& cd /opt/mosquitto-2.0.12 \
+&& curl -kL https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz | tar xzC /opt/ \
+&& cd /opt/mosquitto-2.0.15 \
 && sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk \
 && sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk \
 && sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk \
@@ -108,8 +108,8 @@ echo "INSTALL: mosquitto" \
 ldconfig
 
 apt-get -y clean \
-&& rm -Rf /opt/mongo-c-driver-1.17.4 \
+&& rm -Rf /opt/mongo-c-driver-1.23.1 \
 && rm -Rf /opt/rapidjson-1.1.0 \
-&& rm -Rf /opt/libmicrohttpd-0.9.70 \
-&& rm -Rf /opt/mosquitto-2.0.12 \
+&& rm -Rf /opt/libmicrohttpd-0.9.75 \
+&& rm -Rf /opt/mosquitto-2.0.15 \
 && rm -Rf /opt/gmock-1.5.0
