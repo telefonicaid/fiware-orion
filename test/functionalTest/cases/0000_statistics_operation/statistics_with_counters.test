@@ -1,0 +1,737 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+statistics with counters
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -statCounters
+
+--SHELL--
+
+#
+# This test is special and doesn't follow the typical steps pattern
+# Instead of that, we just stimulate all possible API rute (without output)
+# and do GET /statistics after that
+#
+# Comparing with statistics_with_full_counter.test (diff wise) you can check
+# that every possible counter is included in "request" and "requestsLegacy"
+# except the following ones:
+#
+# - /exit[/*]": used only in DEBUG code
+# - /leak[/*]": used only in DEBUG code
+# - /statistics DELETE: as using it will ruin all statistics :)
+#
+# All counters has 1 hit except the following cases, which has 2, due to
+# the URL covers two possible requests:
+#
+# "/v1/subscribeContext|contextSubscriptions"
+# "/ngsi10/subscribeContext|contextSubscriptions"
+#
+# As a king of checksum note there are 131 orion curl ocurrences in this file
+# (it can be checked with grep) and that:
+#
+# - jsonRequests:      55
+# - noPayloadRequests: 75
+# - textRequest:        1
+#
+# which sum 131
+
+# Not legacy
+
+orionCurl --url /admin/log                     > /dev/null
+
+orionCurl --url /admin/log?level=DEBUG -X PUT  > /dev/null
+
+orionCurl --url /admin/metrics            > /dev/null
+orionCurl --url /admin/metrics -X DELETE  > /dev/null
+
+orionCurl --url /admin/sem  > /dev/null
+
+orionCurl --url /cache/statistics            > /dev/null
+orionCurl --url /cache/statistics -X DELETE  > /dev/null
+
+orionCurl --url /log/trace                > /dev/null
+orionCurl --url /log/trace/100 -X PUT     > /dev/null
+orionCurl --url /log/trace/100 -X DELETE  > /dev/null
+
+orionCurl --url /v2             > /dev/null
+orionCurl --url /v2 -X OPTIONS  > /dev/null
+
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {"value": 1, "type": "Number"}
+}'
+orionCurl --url /v2/entities                               > /dev/null
+orionCurl --url /v2/entities -X OPTIONS                    > /dev/null
+orionCurl --url /v2/entities -X POST --payload "$payload"  > /dev/null
+
+payload='{"value": 1, "type": "Number"}'
+orionCurl --url /v2/entities/E/attrs/A                                 > /dev/null
+orionCurl --url /v2/entities/E/attrs/A -X OPTIONS                      > /dev/null
+orionCurl --url /v2/entities/E/attrs/A -X DELETE                       > /dev/null
+orionCurl --url /v2/entities/E/attrs/A -X PUT    --payload "$payload"  > /dev/null
+
+payload='0'
+orionCurl --url /v2/entities/E/attrs/A/value                                                            > /dev/null
+orionCurl --url /v2/entities/E/attrs/A/value -X OPTIONS                                                 > /dev/null
+orionCurl --url /v2/entities/E/attrs/A/value -X PUT    --payload "$payload" --in text/plain --out json  > /dev/null
+
+payload='{
+  "A": {"value": 1, "type": "Number"}
+}'
+orionCurl --url /v2/entities/E/attrs                                 > /dev/null
+orionCurl --url /v2/entities/E/attrs -X OPTIONS                      > /dev/null
+orionCurl --url /v2/entities/E/attrs -X DELETE                       > /dev/null
+orionCurl --url /v2/entities/E/attrs -X POST   --payload "$payload"  > /dev/null
+orionCurl --url /v2/entities/E/attrs -X PATCH  --payload "$payload"  > /dev/null
+orionCurl --url /v2/entities/E/attrs -X PUT    --payload "$payload"  > /dev/null
+
+payload='{
+  "entities": [
+    {
+      "id": "E",
+      "type": "T"
+    }
+  ],
+  "attrs": [
+    "A"
+  ]
+}'
+orionCurl --url /v2/op/query -X OPTIONS                      > /dev/null
+orionCurl --url /v2/op/query -X POST   --payload "$payload"  > /dev/null
+
+payload='{
+  "entities": [
+    {
+      "id": "E",
+      "type": "T",
+      "A": {"value": 1, "type": "Number"}
+    }
+  ],
+  "actionType": "append"
+}'
+orionCurl --url /v2/op/update -X OPTIONS                      > /dev/null
+orionCurl --url /v2/op/update -X POST   --payload "$payload"  > /dev/null
+
+
+payload='{
+  "subscriptionId": "1231",
+  "data": [
+    {
+      "id": "E",
+      "type": "T",
+      "A": {"value": 1, "type": "Number"}
+    }
+  ]
+}'
+orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
+
+
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "room2",
+        "type": "Room"
+      }
+    ],
+    "attrs": [
+      "relativeHumidity"
+    ]
+  },
+  "provider": {
+    "http":{
+      "url": "http://localhost:1234"
+    }
+  }
+}'
+orionCurl --url /v2/registrations                                  > /dev/null
+orionCurl --url /v2/registrations -X OPTIONS                       > /dev/null
+orionCurl --url /v2/registrations -X POST    --payload "$payload"  > /dev/null
+
+orionCurl --url /v2/registrations/123                          > /dev/null
+orionCurl --url /v2/registrations/123 -X OPTIONS               > /dev/null
+orionCurl --url /v2/registrations/123 -X DELETE                > /dev/null
+orionCurl --url /v2/registrations/123 -X PATCH  --payload "$payload" > /dev/null
+
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions                                  > /dev/null
+orionCurl --url /v2/subscriptions -X OPTIONS                       > /dev/null
+orionCurl --url /v2/subscriptions -X POST    --payload "$payload"  > /dev/null
+
+orionCurl --url /v2/subscriptions/123                          > /dev/null
+orionCurl --url /v2/subscriptions/123 -X OPTIONS               > /dev/null
+orionCurl --url /v2/subscriptions/123 -X DELETE                > /dev/null
+orionCurl --url /v2/subscriptions/123 -X PATCH  --payload "$payload" > /dev/null
+
+orionCurl --url /v2/types             > /dev/null
+orionCurl --url /v2/types -X OPTIONS  > /dev/null
+
+orionCurl --url /v2/types/T             > /dev/null
+orionCurl --url /v2/types/T -X OPTIONS  > /dev/null
+
+orionCurl --url /version                > /dev/null
+
+# Legacy
+
+payload='{}'
+orionCurl --url /ngsi10/contextEntities/E                           > /dev/null
+orionCurl --url /ngsi10/contextEntities/E -X DELETE                 > /dev/null
+orionCurl --url /ngsi10/contextEntities/E -X POST   --payload "$payload"  > /dev/null
+orionCurl --url /ngsi10/contextEntities/E -X PUT    --payload "$payload"  > /dev/null
+orionCurl --url /v1/contextEntities/E                               > /dev/null
+orionCurl --url /v1/contextEntities/E -X DELETE                     > /dev/null
+orionCurl --url /v1/contextEntities/E -X POST       --payload "$payload"  > /dev/null
+orionCurl --url /v1/contextEntities/E -X PUT        --payload "$payload"  > /dev/null
+
+payload='{}'
+orionCurl --url /ngsi10/contextEntities/E/attributes                           > /dev/null
+orionCurl --url /ngsi10/contextEntities/E/attributes -X DELETE                 > /dev/null
+orionCurl --url /ngsi10/contextEntities/E/attributes -X POST   --payload "$payload"  > /dev/null
+orionCurl --url /ngsi10/contextEntities/E/attributes -X PUT    --payload "$payload"  > /dev/null
+orionCurl --url /v1/contextEntities/E/attributes                               > /dev/null
+orionCurl --url /v1/contextEntities/E/attributes -X DELETE                     > /dev/null
+orionCurl --url /v1/contextEntities/E/attributes -X POST       --payload "$payload"  > /dev/null
+orionCurl --url /v1/contextEntities/E/attributes -X PUT        --payload "$payload"  > /dev/null
+
+payload='{}'
+orionCurl --url /ngsi10/contextEntities/E/attributes/A                           > /dev/null
+orionCurl --url /ngsi10/contextEntities/E/attributes/A -X DELETE                 > /dev/null
+orionCurl --url /ngsi10/contextEntities/E/attributes/A -X POST   --payload "$payload"  > /dev/null
+orionCurl --url /ngsi10/contextEntities/E/attributes/A -X PUT    --payload "$payload"  > /dev/null
+orionCurl --url /v1/contextEntities/E/attributes/A                               > /dev/null
+orionCurl --url /v1/contextEntities/E/attributes/A -X DELETE                     > /dev/null
+orionCurl --url /v1/contextEntities/E/attributes/A -X POST       --payload "$payload"  > /dev/null
+orionCurl --url /v1/contextEntities/E/attributes/A -X PUT        --payload "$payload"  > /dev/null
+
+orionCurl --url /ngsi10/contextEntityTypes/T  > /dev/null
+orionCurl --url /v1/contextEntityTypes/T      > /dev/null
+
+orionCurl --url /ngsi10/contextEntityTypes/T/attributes  > /dev/null
+orionCurl --url /v1/contextEntityTypes/T/attributes      > /dev/null
+
+orionCurl --url /ngsi10/contextEntityTypes/T/attributes/A  > /dev/null
+orionCurl --url /v1/contextEntityTypes/T/attributes/A      > /dev/null
+
+payload='{}'
+orionCurl --url /ngsi10/contextSubscriptions/123 -X DELETE              > /dev/null
+orionCurl --url /ngsi10/contextSubscriptions/123 -X PUT --payload "$payload"  > /dev/null
+orionCurl --url /v1/contextSubscriptions/123 -X DELETE                  > /dev/null
+orionCurl --url /v1/contextSubscriptions/123 -X PUT --payload "$payload"      > /dev/null
+
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url /ngsi10/queryContext -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/queryContext -X POST --payload "$payload"  > /dev/null
+
+payload='{
+    "entities": [
+        {
+            "type": "T",
+            "isPattern": "false",
+            "id": "E"
+        }
+    ],
+    "attributes": [
+        "A"
+    ],
+    "reference": "http://localhost:1234",
+    "duration": "PT1H",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "A"
+            ]
+        }
+    ]
+}'
+orionCurl --url /ngsi10/subscribeContext     -X POST --payload "$payload"  > /dev/null
+orionCurl --url /ngsi10/contextSubscriptions -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/subscribeContext         -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/contextSubscriptions     -X POST --payload "$payload"  > /dev/null
+
+payload='{}'
+orionCurl --url /ngsi10/unsubscribeContext   -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/unsubscribeContext       -X POST --payload "$payload"  > /dev/null
+
+payload='{
+  "subscriptionId": "012345678901234567890123",
+  "throttling": "P5Y",
+  "duration": "P50Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [ "A" ]
+    }
+  ]
+}'
+orionCurl --url /ngsi10/updateContextSubscription -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/updateContextSubscription     -X POST --payload "$payload"  > /dev/null
+
+payload='{
+  "contextElements": [
+  {
+    "type": "T",
+    "isPattern": "false",
+    "id": "E",
+    "attributes": [
+    {
+      "name": "A",
+      "type": "Text",
+      "value": "foo"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /ngsi10/updateContext            -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/updateContext                -X POST --payload "$payload"  > /dev/null
+
+payload='{
+  "subscriptionId": "012345678901234567890123",
+  "originator": "http://localhost/test",
+  "contextResponses": [
+    {
+      "contextElement": {
+        "type": "T",
+        "isPattern": "false",
+        "id": "E",
+        "attributes": [
+          {
+            "name": "A",
+            "type": "Text",
+            "value": "foo"
+          }
+        ]
+      },
+      "statusCode": {
+        "code": "200",
+        "reasonPhrase": "Ok",
+        "details": "a"
+      }
+    }
+  ]
+}'
+orionCurl --url /ngsi10/notifyContext -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/notifyContext -X POST --payload "$payload"      > /dev/null
+
+payload='{}'
+orionCurl --url /v1/contextEntities/type/T/id/E                          > /dev/null
+orionCurl --url /v1/contextEntities/type/T/id/E -X DELETE                > /dev/null
+orionCurl --url /v1/contextEntities/type/T/id/E -X POST   --payload "$payload" > /dev/null
+orionCurl --url /v1/contextEntities/type/T/id/E -X PUT    --payload "$payload" > /dev/null
+
+payload='{}'
+orionCurl --url /v1/contextEntities/type/T/id/E/attributes/A                          > /dev/null
+orionCurl --url /v1/contextEntities/type/T/id/E/attributes/A -X DELETE                > /dev/null
+orionCurl --url /v1/contextEntities/type/T/id/E/attributes/A -X POST   --payload "$payload" > /dev/null
+orionCurl --url /v1/contextEntities/type/T/id/E/attributes/A -X PUT    --payload "$payload" > /dev/null
+
+payload='{}'
+orionCurl --url /v1/contextEntities                          > /dev/null
+orionCurl --url /v1/contextEntities -X POST   --payload "$payload" > /dev/null
+
+orionCurl --url /v1/contextTypes/T  > /dev/null
+
+orionCurl --url /v1/contextTypes  > /dev/null
+
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "T",
+          "isPattern": "false",
+          "id": "E"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "A",
+          "type": "Number"
+        }
+      ],
+      "providingApplication": "http://localhost:1234"
+    }
+  ],
+  "duration": "PT1M"
+}'
+orionCurl --url /v1/registry/registerContext -X POST --payload "$payload"  > /dev/null
+
+payload='{
+  "duration": "PT1M",
+  "providingApplication": "none"
+}'
+orionCurl --url /v1/registry/contextEntities/E                               > /dev/null
+orionCurl --url /v1/registry/contextEntities/E -X POST --payload "$payload"  > /dev/null
+
+orionCurl --url /v1/registry/contextEntities/type/T/id/E                               > /dev/null
+orionCurl --url /v1/registry/contextEntities/type/T/id/E -X POST --payload "$payload"  > /dev/null
+
+orionCurl --url /v1/registry/contextEntities/type/T/id/E/attributes/A                               > /dev/null
+orionCurl --url /v1/registry/contextEntities/type/T/id/E/attributes/A -X POST --payload "$payload"  > /dev/null
+
+orionCurl --url /v1/registry/contextEntities/E/attributes                               > /dev/null
+orionCurl --url /v1/registry/contextEntities/E/attributes -X POST --payload "$payload"  > /dev/null
+
+orionCurl --url /v1/registry/contextEntities/E/attributes/A                               > /dev/null
+orionCurl --url /v1/registry/contextEntities/E/attributes/A -X POST --payload "$payload"  > /dev/null
+
+payload='{
+  "duration": "PT2M",
+  "providingApplication": "some",
+  "registrationId": "'$REG_ID'"
+}'
+orionCurl --url /v1/registry/contextEntityTypes/T                               > /dev/null
+orionCurl --url /v1/registry/contextEntityTypes/T -X POST --payload "$payload"  > /dev/null
+
+orionCurl --url /v1/registry/contextEntityTypes/T/attributes                               > /dev/null
+orionCurl --url /v1/registry/contextEntityTypes/T/attributes -X POST --payload "$payload"  > /dev/null
+
+payload='{
+  "duration": "PT2M",
+  "providingApplication": "some",
+  "registrationId": "'$REG_ID'"
+}'
+orionCurl --url /v1/registry/contextEntityTypes/T/attributes/A                               > /dev/null
+orionCurl --url /v1/registry/contextEntityTypes/T/attributes/A -X POST --payload "$payload"  > /dev/null
+
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ],
+  "attributes": [
+    "A"
+  ]
+}'
+orionCurl --url /v1/registry/discoverContextAvailability -X POST --payload "$payload"  > /dev/null
+
+# Get statistics
+
+orionCurl --url /statistics?options
+
+--REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "counters": {
+        "jsonRequests": 55,
+        "noPayloadRequests": 75,
+        "requests": {
+            "/admin/log": {
+                "GET": 1,
+                "PUT": 1
+            },
+            "/admin/metrics": {
+                "DELETE": 1,
+                "GET": 1
+            },
+            "/admin/sem": {
+                "GET": 1
+            },
+            "/cache/statistics": {
+                "DELETE": 1,
+                "GET": 1
+            },
+            "/log/trace[/{level}]": {
+                "DELETE": 1,
+                "GET": 1,
+                "PUT": 1
+            },
+            "/statistics": {
+                "GET": 1
+            },
+            "/v2": {
+                "GET": 1,
+                "OPTIONS": 1
+            },
+            "/v2/entities": {
+                "GET": 1,
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/entities/{id}/attrs/{name}": {
+                "DELETE": 1,
+                "GET": 1,
+                "OPTIONS": 1,
+                "PUT": 1
+            },
+            "/v2/entities/{id}/attrs/{name}/value": {
+                "GET": 1,
+                "OPTIONS": 1,
+                "PUT": 1
+            },
+            "/v2/entities/{id}[/attrs]": {
+                "DELETE": 1,
+                "GET": 1,
+                "OPTIONS": 1,
+                "PATCH": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/v2/op/notify": {
+                "POST": 1
+            },
+            "/v2/op/query": {
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/op/update": {
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/registrations": {
+                "GET": 1,
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/registrations/{id}": {
+                "DELETE": 1,
+                "GET": 1,
+                "OPTIONS": 1,
+                "PATCH": 1
+            },
+            "/v2/subscriptions": {
+                "GET": 1,
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/subscriptions/{id}": {
+                "DELETE": 1,
+                "GET": 1,
+                "OPTIONS": 1,
+                "PATCH": 1
+            },
+            "/v2/types": {
+                "GET": 1,
+                "OPTIONS": 1
+            },
+            "/v2/types/{type}": {
+                "GET": 1,
+                "OPTIONS": 1
+            },
+            "/version": {
+                "GET": 1
+            }
+        },
+        "requestsLegacy": {
+            "/ngsi10/contextEntities/{id}": {
+                "DELETE": 1,
+                "GET": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/ngsi10/contextEntities/{id}/attributes/": {
+                "DELETE": 1,
+                "GET": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/ngsi10/contextEntities/{id}/attributes/{name}": {
+                "DELETE": 1,
+                "GET": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/ngsi10/contextEntityTypes/{type}": {
+                "GET": 1
+            },
+            "/ngsi10/contextEntityTypes/{type}/attributes/": {
+                "GET": 1
+            },
+            "/ngsi10/contextEntityTypes/{type}/attributes/{name}": {
+                "GET": 1
+            },
+            "/ngsi10/contextSubscriptions/{id}": {
+                "DELETE": 1,
+                "PUT": 1
+            },
+            "/ngsi10/notifyContext": {
+                "POST": 1
+            },
+            "/ngsi10/queryContext": {
+                "POST": 1
+            },
+            "/ngsi10/subscribeContext|contextSubscriptions": {
+                "POST": 2
+            },
+            "/ngsi10/unsubscribeContext": {
+                "POST": 1
+            },
+            "/ngsi10/updateContext": {
+                "POST": 1
+            },
+            "/ngsi10/updateContextSubscription": {
+                "POST": 1
+            },
+            "/v1/contextEntities/type/{type}/id/{id}": {
+                "DELETE": 1,
+                "GET": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/v1/contextEntities/type/{type}/id/{id}/attributes/{name}": {
+                "DELETE": 1,
+                "GET": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/v1/contextEntities/{id}": {
+                "DELETE": 1,
+                "GET": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/v1/contextEntities/{id}/attributes/": {
+                "DELETE": 1,
+                "GET": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/v1/contextEntities/{id}/attributes/{name}": {
+                "DELETE": 1,
+                "GET": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/v1/contextEntitites": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/contextEntityTypes/{type}": {
+                "GET": 1
+            },
+            "/v1/contextEntityTypes/{type}/attributes/": {
+                "GET": 1
+            },
+            "/v1/contextEntityTypes/{type}/attributes/{name}": {
+                "GET": 1
+            },
+            "/v1/contextSubscriptions/{id}": {
+                "DELETE": 1,
+                "PUT": 1
+            },
+            "/v1/contextType/{type}": {
+                "GET": 1
+            },
+            "/v1/contextTypes": {
+                "GET": 1
+            },
+            "/v1/notifyContext": {
+                "POST": 1
+            },
+            "/v1/queryContext": {
+                "POST": 1
+            },
+            "/v1/registry/contextEntities/type/{type}/id/{id}": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/registry/contextEntities/type/{type}/id/{id}/attributes/{name}": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/registry/contextEntities/{id}": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/registry/contextEntities/{id}/attributes": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/registry/contextEntities/{id}/attributes/{name}": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/registry/contextEntityTypes/{type}": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/registry/contextEntityTypes/{type}/attributes": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/registry/contextEntityTypes/{type}/attributes/{name}": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v1/registry/discoverContextAvailability": {
+                "POST": 1
+            },
+            "/v1/registry/registerContext": {
+                "POST": 1
+            },
+            "/v1/subscribeContext|contextSubscriptions": {
+                "POST": 2
+            },
+            "/v1/unsubscribeContext": {
+                "POST": 1
+            },
+            "/v1/updateContext": {
+                "POST": 1
+            },
+            "/v1/updateContextSubscription": {
+                "POST": 1
+            }
+        },
+        "textRequests": 1
+    },
+    "measuring_interval_in_secs": REGEX(\d+),
+    "uptime_in_secs": REGEX(\d+)
+}
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

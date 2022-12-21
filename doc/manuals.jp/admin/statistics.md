@@ -47,37 +47,37 @@ Orion Context broker は、`GET /statistics` と `GET /cache/statistics` を介�
     "noPayloadRequests": 250,
     "notificationsSent": 4,
     "requests": {
-      "entities": {
+      "/v2/entities": {
         "GET": 231
       },
-      "entity": {
+      "/v2/entities/{id}": {
         "GET": 2,
         "PATCH": 1,
         "POST": 3
       },
-      "entityTypes": {
+      "/v2/types": {
         "GET": 1
       },
-      "metrics": {
+      "/admin/metrics": {
         "GET": 2
       },
-      "statistics": {
+      "/statistics": {
         "GET": 9
       },
-      "subscription": {
+      "/v2/subscriptions/{id}": {
         "GET": 1
       },
-      "subscriptions": {
+      "/v2/subscriptions/{id}": {
         "GET": 2
       }
-    },
-    "versionRequests": 0
+    }
   },
   ...
 }
 ```
 
-特定のリクエスト型または verb (動詞) が受信されなかった場合、対応するカウンタは表示されません。
+`fullCounters` オプションが使用されている場合を除き (つまり、`GET /statistics?options=fullCounters`)、
+特定のリクエスト URL または verb (動詞) が受信されなかった場合、対応するカウンタは表示されません。
 
 ### SemWait ブロック
 

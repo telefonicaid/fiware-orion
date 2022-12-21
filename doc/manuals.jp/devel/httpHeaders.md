@@ -24,6 +24,7 @@
 20) [Fiware-Correlator](#20-fiware-correlator)                                     
 
 21) [X-Auth-Token](#21-x-auth-token)
+22) [Authorization](#22-authorization)
 
 
 
@@ -134,7 +135,7 @@ Orion によって送信される発信 HTTP レスポンスで使用されま�
 この動作は CORS に関連しています。[ユーザ・マニュアルの CORS について](../user/cors.md#access-control-allow-headers)
 を参照してください。
 
-    Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token	
+    Access-Control-Allow-Headers: Authorization, Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token
 									               								   
 [トップ](#top)		
 		
@@ -269,5 +270,15 @@ X-Auth-Token はオプションの HTTP ヘッダで、Orion はリクエスト�
 プロキシによって使用されます。
 	
     "X-Auth-Token": "fff0f4af447f4b589c835f805fe4be29"
+
+[トップ](#top)
+
+## 22. Authorization
+
+Authorization は、Orion がリクエストで受信したオプションの HTTP ヘッダであり、元のリクエストに関連付けられた他のリクエスト
+(通知およびフォワードされたクエリ/更新) に透過的に伝播します。[PEP Steelskin など](https://github.com/telefonicaid/fiware-pep-steelskin)
+の Orion と統合されたセキュリティ実施プロキシ (Security Enforcement Proxies) によって使用されます。
+
+    "Authorization": "Bearer fff0f4af447f4b589c835f805fe4be29"
 
 [トップ](#top)

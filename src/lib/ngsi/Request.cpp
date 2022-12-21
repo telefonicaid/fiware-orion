@@ -22,7 +22,11 @@
 *
 * Author: Ken Zangelin
 */
+#include <algorithm>
+
 #include "ngsi/Request.h"
+
+#include "logMsg/logMsg.h"
 
 
 
@@ -109,7 +113,7 @@ const char* requestType(RequestType rt)
   case EntityTypeRequest:                                return "EntityTypeRequest";
   case EntityAllTypesRequest:                            return "EntityAllTypesRequest";
   case SubscriptionsRequest:                             return "SubscriptionsRequest";
-  case IndividualSubscriptionRequest:                    return "IndividualSubscriptionRequest";
+  case SubscriptionRequest:                              return "SubscriptionRequest";
   case BatchQueryRequest:                                return "BatchQueryRequest";
   case BatchUpdateRequest:                               return "BatchUpdateRequest";
 
@@ -126,35 +130,91 @@ const char* requestType(RequestType rt)
 *
 * requestTypeForCounter -
 */
-const char* requestTypeForCounter(RequestType rt)
+std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
 {
-  // It supports only NGSIv2 and administrative requests (as are the ones that may appear in statistics counters)
+  // To lowercase
+  std::string prefix = "/" + _prefix;
+  std::transform(prefix.begin(), prefix.end(), prefix.begin(), ::tolower);
+
   switch (rt)
   {
-  case EntryPointsRequest:             return "entryPoint";
-  case EntitiesRequest:                return "entities";
-  case EntityRequest:                  return "entity";
-  case EntityAttributeRequest:         return "attribute";
-  case EntityAttributeValueRequest:    return "attributeValue";
-  case EntityAllTypesRequest:          return "entityTypes";
-  case EntityTypes:                    return "entityType";
-  case SubscriptionsRequest:           return "subscriptions";
-  case IndividualSubscriptionRequest:  return "subscription";
-  case RegistrationsRequest:           return "registrations";
-  case RegistrationRequest:            return "registration";
-  case BatchQueryRequest:              return "batchQuery";
-  case BatchUpdateRequest:             return "batchUpdate";
-  case NotifyContext:                  return "notify";
+  // pure v2
+  case EntryPointsRequest:             return "/v2";
+  case EntitiesRequest:                return "/v2/entities";
+  case EntityRequest:                  return "/v2/entities/{id}[/attrs]";
+  case EntityAttributeRequest:         return "/v2/entities/{id}/attrs/{name}";
+  case EntityAttributeValueRequest:    return "/v2/entities/{id}/attrs/{name}/value";
+  case EntityAllTypesRequest:          return "/v2/types";
+  case EntityTypeRequest:              return "/v2/types/{type}";
+  case SubscriptionsRequest:           return "/v2/subscriptions";
+  case SubscriptionRequest:            return "/v2/subscriptions/{id}";
+  case RegistrationsRequest:           return "/v2/registrations";
+  case RegistrationRequest:            return "/v2/registrations/{id}";
+  case BatchQueryRequest:              return "/v2/op/query";
+  case BatchUpdateRequest:             return "/v2/op/update";
 
-  case LogTraceRequest:                return "logTrace";
-  case StatisticsRequest:              return "statistics";
-  case LogLevelRequest:                return "logLevel";
-  case SemStateRequest:                return "semState";
-  case MetricsRequest:                 return "metrics";
-  case ExitRequest:                    return "exit";
-  case LeakRequest:                    return "leak";
+  // administrative requests
+  case LogTraceRequest:                return "/log/trace[/{level}]";
+  case LogLevelRequest:                return "/admin/log";
+  case SemStateRequest:                return "/admin/sem";
+  case MetricsRequest:                 return "/admin/metrics";
+  case ExitRequest:                    return "/exit[/*]";
+  case LeakRequest:                    return "/leak[/*]";
+  case VersionRequest:                 return "/version";
+  case StatisticsRequest:
+    if (prefix == "/cache")
+    {
+      return "/cache/statistics";
+    }
+    else
+    {
+      return "/statistics";
+    }
+
+  // pure v1
+  case RegisterContext:                      return "/v1/registry/registerContext";
+  case ContextEntitiesByEntityId:            return "/v1/registry/contextEntities/{id}";
+  case ContextEntitiesByEntityIdAndType:     return "/v1/registry/contextEntities/type/{type}/id/{id}";
+  case ContextEntityAttributes:              return "/v1/registry/contextEntities/{id}/attributes";
+  case ContextEntityTypeAttribute:           return "/v1/registry/contextEntityTypes/{type}/attributes/{name}";
+  case ContextEntityTypeAttributeContainer:  return "/v1/registry/contextEntityTypes/{type}/attributes";
+  case ContextEntityTypes:                   return "/v1/registry/contextEntityTypes/{type}";
+  case DiscoverContextAvailability:          return "/v1/registry/discoverContextAvailability";
+  case EntityByIdAttributeByName:            return "/v1/registry/contextEntities/{id}/attributes/{name}";
+  case EntityByIdAttributeByNameIdAndType:   return "/v1/registry/contextEntities/type/{type}/id/{id}/attributes/{name}";
+  case EntityTypes:                          return "/v1/contextTypes";
+
+  // v1 or NGSI10;
+  case AllContextEntities:                             return prefix + "/contextEntitites";
+  case AllEntitiesWithTypeAndId:                       return prefix + "/contextEntities/type/{type}/id/{id}";
+  case AttributesForEntityType:                        return prefix + "/contextType/{type}";
+  case IndividualContextEntity:                        return prefix + "/contextEntities/{id}";
+  case IndividualContextEntityAttribute:               return prefix + "/contextEntities/{id}/attributes/{name}";
+  case IndividualContextEntityAttributes:              return prefix + "/contextEntities/{id}/attributes/";
+  case IndividualContextEntityAttributeWithTypeAndId:  return prefix + "/contextEntities/type/{type}/id/{id}/attributes/{name}";
+  case Ngsi10ContextEntityTypes:                       return prefix + "/contextEntityTypes/{type}";
+  case Ngsi10ContextEntityTypesAttribute:              return prefix + "/contextEntityTypes/{type}/attributes/{name}";
+  case Ngsi10ContextEntityTypesAttributeContainer:     return prefix + "/contextEntityTypes/{type}/attributes/";
+  case Ngsi10SubscriptionsConvOp:                      return prefix + "/contextSubscriptions/{id}";
+  case QueryContext:                                   return prefix + "/queryContext";
+  case SubscribeContext:                               return prefix + "/subscribeContext|contextSubscriptions";
+  case UnsubscribeContext:                             return prefix + "/unsubscribeContext";
+  case UpdateContext:                                  return prefix + "/updateContext";
+  case UpdateContextSubscription:                      return prefix + "/updateContextSubscription";
+
+  // v2, v1 or NGSIv2
+  case NotifyContext:
+    if (prefix == "/v2")
+    {
+      return "/v2/op/notify";
+    }
+    else  // v1 or NGSI10 case
+    {
+      return prefix + "/notifyContext";
+    }
 
   default:
-    return "notNgsiv2Request";
+    LM_E(("Runtime Error (unclasified request %d, %s, prefix %s", rt, requestType(rt), prefix.c_str()));
+    return "/unclasified";
   }
 }

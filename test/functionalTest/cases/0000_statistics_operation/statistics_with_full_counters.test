@@ -1,0 +1,332 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+statistics with full countesrs
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -statCounters
+
+--SHELL--
+
+#
+# This test is special and doesn't follow the typical steps pattern
+# Instead of that, we just stimulate some possible API rute (without output)
+# and do GET /statistics after that
+#
+
+orionCurl --url /v2/registrations > /dev/null
+orionCurl --url /v2/subscriptions > /dev/null
+orionCurl --url /v2/entities      > /dev/null
+
+orionCurl --url /statistics?options=fullCounters
+
+--REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 3605
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "counters": {
+        "discoveryErrors": 0,
+        "invalidRequests": 0,
+        "jsonRequests": 0,
+        "missedVerb": 0,
+        "noPayloadRequests": 4,
+        "notificationsSent": 0,
+        "registrationUpdateErrors": 0,
+        "requests": {
+            "/admin/log": {
+                "GET": 0,
+                "PUT": 0
+            },
+            "/admin/metrics": {
+                "DELETE": 0,
+                "GET": 0
+            },
+            "/admin/sem": {
+                "GET": 0
+            },
+            "/cache/statistics": {
+                "DELETE": 0,
+                "GET": 0
+            },
+            "/exit[/*]": {
+                "GET": 0
+            },
+            "/leak[/*]": {
+                "GET": 0
+            },
+            "/log/trace[/{level}]": {
+                "DELETE": 0,
+                "GET": 0,
+                "PUT": 0
+            },
+            "/statistics": {
+                "DELETE": 0,
+                "GET": 1
+            },
+            "/v2": {
+                "GET": 0,
+                "OPTIONS": 0
+            },
+            "/v2/entities": {
+                "GET": 1,
+                "OPTIONS": 0,
+                "POST": 0
+            },
+            "/v2/entities/{id}/attrs/{name}": {
+                "DELETE": 0,
+                "GET": 0,
+                "OPTIONS": 0,
+                "PUT": 0
+            },
+            "/v2/entities/{id}/attrs/{name}/value": {
+                "GET": 0,
+                "OPTIONS": 0,
+                "PUT": 0
+            },
+            "/v2/entities/{id}[/attrs]": {
+                "DELETE": 0,
+                "GET": 0,
+                "OPTIONS": 0,
+                "PATCH": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/v2/op/notify": {
+                "POST": 0
+            },
+            "/v2/op/query": {
+                "OPTIONS": 0,
+                "POST": 0
+            },
+            "/v2/op/update": {
+                "OPTIONS": 0,
+                "POST": 0
+            },
+            "/v2/registrations": {
+                "GET": 1,
+                "OPTIONS": 0,
+                "POST": 0
+            },
+            "/v2/registrations/{id}": {
+                "DELETE": 0,
+                "GET": 0,
+                "OPTIONS": 0,
+                "PATCH": 0
+            },
+            "/v2/subscriptions": {
+                "GET": 1,
+                "OPTIONS": 0,
+                "POST": 0
+            },
+            "/v2/subscriptions/{id}": {
+                "DELETE": 0,
+                "GET": 0,
+                "OPTIONS": 0,
+                "PATCH": 0
+            },
+            "/v2/types": {
+                "GET": 0,
+                "OPTIONS": 0
+            },
+            "/v2/types/{type}": {
+                "GET": 0,
+                "OPTIONS": 0
+            },
+            "/version": {
+                "GET": 0
+            }
+        },
+        "requestsLegacy": {
+            "/ngsi10/contextEntities/{id}": {
+                "DELETE": 0,
+                "GET": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/ngsi10/contextEntities/{id}/attributes/": {
+                "DELETE": 0,
+                "GET": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/ngsi10/contextEntities/{id}/attributes/{name}": {
+                "DELETE": 0,
+                "GET": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/ngsi10/contextEntityTypes/{type}": {
+                "GET": 0
+            },
+            "/ngsi10/contextEntityTypes/{type}/attributes/": {
+                "GET": 0
+            },
+            "/ngsi10/contextEntityTypes/{type}/attributes/{name}": {
+                "GET": 0
+            },
+            "/ngsi10/contextSubscriptions/{id}": {
+                "DELETE": 0,
+                "PUT": 0
+            },
+            "/ngsi10/notifyContext": {
+                "POST": 0
+            },
+            "/ngsi10/queryContext": {
+                "POST": 0
+            },
+            "/ngsi10/subscribeContext|contextSubscriptions": {
+                "POST": 0
+            },
+            "/ngsi10/unsubscribeContext": {
+                "POST": 0
+            },
+            "/ngsi10/updateContext": {
+                "POST": 0
+            },
+            "/ngsi10/updateContextSubscription": {
+                "POST": 0
+            },
+            "/v1/contextEntities/type/{type}/id/{id}": {
+                "DELETE": 0,
+                "GET": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/v1/contextEntities/type/{type}/id/{id}/attributes/{name}": {
+                "DELETE": 0,
+                "GET": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/v1/contextEntities/{id}": {
+                "DELETE": 0,
+                "GET": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/v1/contextEntities/{id}/attributes/": {
+                "DELETE": 0,
+                "GET": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/v1/contextEntities/{id}/attributes/{name}": {
+                "DELETE": 0,
+                "GET": 0,
+                "POST": 0,
+                "PUT": 0
+            },
+            "/v1/contextEntitites": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/contextEntityTypes/{type}": {
+                "GET": 0
+            },
+            "/v1/contextEntityTypes/{type}/attributes/": {
+                "GET": 0
+            },
+            "/v1/contextEntityTypes/{type}/attributes/{name}": {
+                "GET": 0
+            },
+            "/v1/contextSubscriptions/{id}": {
+                "DELETE": 0,
+                "PUT": 0
+            },
+            "/v1/contextType/{type}": {
+                "GET": 0
+            },
+            "/v1/contextTypes": {
+                "GET": 0
+            },
+            "/v1/notifyContext": {
+                "POST": 0
+            },
+            "/v1/queryContext": {
+                "POST": 0
+            },
+            "/v1/registry/contextEntities/type/{type}/id/{id}": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/registry/contextEntities/type/{type}/id/{id}/attributes/{name}": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/registry/contextEntities/{id}": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/registry/contextEntities/{id}/attributes": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/registry/contextEntities/{id}/attributes/{name}": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/registry/contextEntityTypes/{type}": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/registry/contextEntityTypes/{type}/attributes": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/registry/contextEntityTypes/{type}/attributes/{name}": {
+                "GET": 0,
+                "POST": 0
+            },
+            "/v1/registry/discoverContextAvailability": {
+                "POST": 0
+            },
+            "/v1/registry/registerContext": {
+                "POST": 0
+            },
+            "/v1/subscribeContext|contextSubscriptions": {
+                "POST": 0
+            },
+            "/v1/unsubscribeContext": {
+                "POST": 0
+            },
+            "/v1/updateContext": {
+                "POST": 0
+            },
+            "/v1/updateContextSubscription": {
+                "POST": 0
+            }
+        },
+        "textRequests": 0
+    },
+    "measuring_interval_in_secs": REGEX(\d+),
+    "simulatedNotifications": 0,
+    "uptime_in_secs": REGEX(\d+)
+}
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
