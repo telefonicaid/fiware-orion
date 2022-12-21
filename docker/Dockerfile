@@ -19,7 +19,7 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=11.3-slim
+ARG  IMAGE_TAG=11.6-slim
 FROM debian:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
