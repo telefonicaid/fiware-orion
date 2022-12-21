@@ -48,6 +48,7 @@ A list of deprecated features and the version in which they were deprecated foll
   attributes in NGSIv2 is deprecated in Orion 1.5.0. Please use `attrs` URI parameter instead.
 * `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,
   use `/v1` and `/v1/registry` instead.
+        * `/ngsi9` URL paths removed in Orion 3.8.0
 * `location` metadata to specify entity location is deprecated in Orion 1.1.0. The new way
   of specifying entity location is to use `geo:point` type for the attribute (see details in
   [the corresponding section of the Orion API specification](orion-api.md#geospatial-properties-of-entities).
@@ -93,7 +94,7 @@ The following table provides information about the last Orion version supporting
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
-| `/ngsi10` and `/ngsi9` URL prefixes                                        | Not yet defined                           | Not yet defined                 |
+| `/ngsi10` and `/ngsi9` URL prefixes                                        | 3.7.0 (*)                                 | May 26th, 2022                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
 | `GET /v2` operation                                                        | Not yet defined                           | Not yet defined                 |
 | Initial notification upon subscription creation or update                  | 3.1.0                                     | June 9th, 2021                  |
@@ -105,3 +106,5 @@ The following table provides information about the last Orion version supporting
 | CLI `--silent`                                                             | 0.28.0                                    | February 29th, 2016             |
 | Configuration Manager role (including `-ngsi9`, `-fwdHost` and `-fwdPort`) | 0.24.0                                    | September 14th, 2015            |
 | Associations                                                               | 0.24.0                                    | September 14th, 2015            |
+
+(*) The removal was not fully done in a single version, but this is last one in which the functionality was still complete

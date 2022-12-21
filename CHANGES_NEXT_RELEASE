@@ -13,4 +13,5 @@
 - Remove: RPM package stuff
 - Remove: rendundant routes in administrative REST API not aligned with documentation
 - Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
+- Remove: /ngsi9 URL paths (deprecated since Orion 1.2.0)
 - Add "Authorization" in CORS allowed headers (#4249)

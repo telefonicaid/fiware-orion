@@ -30,6 +30,7 @@
     * `DELETE /v1/contextEntities/type/{entityType}/id/{entityId}/attributes/{attrName}/{attrId}`
 * Orion 1.5.0 では、NGSIv2 で `dateCreated` および/または `dateModified` 属性を含めるために `optionsURL` パラメータ使用することは推奨されていません。代わりに `attrs`URI パラメータを使用してください
 * パス・プレフィックスとして /ngsi10 そして /ngsi9URL は、orion 1.2.0 で廃止されました。代わりに `/v1` と `/v1/registry` を使用してください
+    * `/ngsi9` URL パスは Orion 3.8.0 で削除されました
 * エンティティの場所を指定する `location` メタデータは、Orion 1.1.0 では非推奨です。エンティティの場所を指定する新しい方法は、属性の `geo:point` 型を使用することです。[Orion API の対応するセクション](orion-api.md#geospatial-properties-of-entities)を参照してください)
 * Orion 0.26.1 のコマンドライン引数は廃止されました。Orion 1.0.0 で削除されました
     * **--silent** : エラー以外のすべてのログ出力を抑止します。代わりに `-logLevel ERROR` を使用してください
@@ -62,7 +63,7 @@
 | `POST /v2/entities` オペレーションの `attributes` フィールド                         | まだ定義されていません                          | まだ定義されていません     |
 | `APPEND`, `UPDATE`, など。`POST /v2/op/update` でのアクション・タイプ                | まだ定義されていません                          | まだ定義されていません     |
 | URI パラメータでの `dateCreated` および `dateModified`                               | まだ定義されていません                          | まだ定義されていません     |
-| `/ngsi10` および `/ngsi9` URL プレフィックス                                         | まだ定義されていません                          | まだ定義されていません     |
+| `/ngsi10` および `/ngsi9` URL プレフィックス                                         | 3.7.0 (*)                                       | 2022年5月26日              |
 | エンティティのロケーションを指定する `location` メタデータ                           | まだ定義されていません                          | まだ定義されていません     |
 | `GET /v2` 操作                                                                       | まだ定義されていません                          | まだ定義されていません     |
 |サブスクリプションの作成または更新時の初期通知                                        | 3.1.0                                           | 2021年6月9日               |
@@ -74,3 +75,5 @@
 | CLI `--silent`                                                                       | 0.28.0                                          | 2016年2月29日              |
 | Configuration Manager のロール (`-ngsi`, `-fwdHost` および `-fwdPort` を含む)        | 0.24.0                                          | 2015年9月14日              |
 | Associations (アソシエーション)                                                      | 0.24.0                                          | 2015年9月14日              |
+
+(*) 削除は1つのバージョンで完全には行われませんでしたが、これは機能がまだ完全であった最後のバージョンです。

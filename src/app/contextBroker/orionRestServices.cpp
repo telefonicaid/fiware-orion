@@ -87,7 +87,9 @@
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutinesV2/badVerbGetPutOnly.h"
 #include "serviceRoutinesV2/badVerbGetDeletePatchOnly.h"
-#include "serviceRoutines/badNgsi9Request.h"
+// FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+// (along with badNgsi9Request.h|cpp files themselves)
+//#include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
 #include "serviceRoutinesV2/badVerbAllNotDelete.h"
@@ -156,12 +158,13 @@ static RestService getServiceV[] =
   { SubscriptionRequest,                           3, { "v2", "subscriptions", "*"                                                     },  getSubscription                                  },
   { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     },  getRegistration                                  },
   { RegistrationsRequest,                          2, { "v2", "registrations"                                                          },  getRegistrations                                 },
-  { ContextEntitiesByEntityId,                     3, { "ngsi9", "contextEntities", "*"                                                },  getContextEntitiesByEntityId                     },
-  { ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         },  getContextEntityAttributes                       },
-  { EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    },  getEntityByIdAttributeByName                     },
-  { ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    },  getContextEntityTypes                            },
-  { ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      },  getContextEntityTypes                            },
-  { ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 },  getContextEntityTypeAttribute                    },
+  // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+  //{ ContextEntitiesByEntityId,                     3, { "ngsi9", "contextEntities", "*"                                                },  getContextEntitiesByEntityId                     },
+  //{ ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         },  getContextEntityAttributes                       },
+  //{ EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    },  getEntityByIdAttributeByName                     },
+  //{ ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    },  getContextEntityTypes                            },
+  //{ ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      },  getContextEntityTypes                            },
+  //{ ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 },  getContextEntityTypeAttribute                    },
   { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       },  getContextEntitiesByEntityId                     },
   { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         },  getContextEntityAttributes                       },
   { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    },  getEntityByIdAttributeByName                     },
@@ -227,24 +230,27 @@ static RestService postServiceV[] =
   { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, postBatchUpdate                                   },
   { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, postSubscriptions                                 },
   { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, postRegistration                                  },
-  { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, postRegisterContext                               },
-  { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
+  // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+  //{ RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, postRegisterContext                               },
+  //{ DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
   { RegisterContext,                               3, { "v1", "registry", "registerContext"                                            }, postRegisterContext                               },
   { DiscoverContextAvailability,                   3, { "v1", "registry", "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
-  { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, postRegisterContext                               },
-  { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
+  // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+  //{ RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, postRegisterContext                               },
+  //{ DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
   { UpdateContext,                                 2, { "v1",      "updateContext"                                                     }, (RestTreat) postUpdateContext                     },
   { QueryContext,                                  2, { "v1",      "queryContext"                                                      }, postQueryContext                                  },
   { SubscribeContext,                              2, { "v1",      "subscribeContext"                                                  }, postSubscribeContext                              },
   { UpdateContextSubscription,                     2, { "v1",      "updateContextSubscription"                                         }, postUpdateContextSubscription                     },
   { UnsubscribeContext,                            2, { "v1",      "unsubscribeContext"                                                }, postUnsubscribeContext                            },
   { NotifyContext,                                 2, { "v1",      "notifyContext"                                                     }, postNotifyContext                                 },
-  { ContextEntitiesByEntityId,                     3, { "ngsi9",          "contextEntities", "*"                                       }, postContextEntitiesByEntityId                     },
-  { ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, postContextEntityAttributes                       },
-  { EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    }, postEntityByIdAttributeByName                     },
-  { ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, postContextEntityTypes                            },
-  { ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, postContextEntityTypes                            },
-  { ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, postContextEntityTypeAttribute                    },
+  // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+  //{ ContextEntitiesByEntityId,                     3, { "ngsi9",          "contextEntities", "*"                                       }, postContextEntitiesByEntityId                     },
+  //{ ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, postContextEntityAttributes                       },
+  //{ EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    }, postEntityByIdAttributeByName                     },
+  //{ ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, postContextEntityTypes                            },
+  //{ ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, postContextEntityTypes                            },
+  //{ ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, postContextEntityTypeAttribute                    },
   { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, postContextEntitiesByEntityId                     },
   { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, postContextEntityAttributes                       },
   { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, postEntityByIdAttributeByName                     },
@@ -383,24 +389,27 @@ static RestService badVerbV[] =
   { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, badVerbPostOnly           },
   { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     }, badVerbGetDeleteOnly      },
   { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, badVerbGetPostOnly        },
-  { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
-  { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
+  // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+  //{ RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
+  //{ DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
   { RegisterContext,                               3, { "v1", "registry", "registerContext"                                            }, badVerbPostOnly           },
   { DiscoverContextAvailability,                   3, { "v1", "registry", "discoverContextAvailability"                                }, badVerbPostOnly           },
-  { RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
-  { DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
+  // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+  //{ RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
+  //{ DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
   { UpdateContext,                                 2, { "v1",             "updateContext"                                              }, badVerbPostOnly           },
   { QueryContext,                                  2, { "v1",             "queryContext"                                               }, badVerbPostOnly           },
   { SubscribeContext,                              2, { "v1",             "subscribeContext"                                           }, badVerbPostOnly           },
   { UpdateContextSubscription,                     2, { "v1",             "updateContextSubscription"                                  }, badVerbPostOnly           },
   { UnsubscribeContext,                            2, { "v1",             "unsubscribeContext"                                         }, badVerbPostOnly           },
   { NotifyContext,                                 2, { "v1",             "notifyContext"                                              }, badVerbPostOnly           },
-  { ContextEntitiesByEntityId,                     3, { "ngsi9",          "contextEntities", "*"                                       }, badVerbGetPostOnly        },
-  { ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, badVerbGetPostOnly        },
-  { EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    }, badVerbGetPostOnly        },
-  { ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, badVerbGetPostOnly        },
-  { ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, badVerbGetPostOnly        },
-  { ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },
+  // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+  //{ ContextEntitiesByEntityId,                     3, { "ngsi9",          "contextEntities", "*"                                       }, badVerbGetPostOnly        },
+  //{ ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, badVerbGetPostOnly        },
+  //{ EntityByIdAttributeByName,                     5, { "ngsi9",          "contextEntities", "*", "attributes", "*"                    }, badVerbGetPostOnly        },
+  //{ ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, badVerbGetPostOnly        },
+  //{ ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, badVerbGetPostOnly        },
+  //{ ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },
   { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, badVerbGetPostOnly        },
   { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, badVerbGetPostOnly        },
   { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, badVerbGetPostOnly        },
@@ -454,7 +463,8 @@ static RestService badVerbV[] =
   { UpdateContextSubscription,                     2, { "ngsi10",  "updateContextSubscription"                                         }, badVerbPostOnly           },
   { UnsubscribeContext,                            2, { "ngsi10",  "unsubscribeContext"                                                }, badVerbPostOnly           },
   { NotifyContext,                                 2, { "ngsi10",  "notifyContext"                                                     }, badVerbPostOnly           },
-  { InvalidRequest,                                2, { "ngsi9",   "*"                                                                 }, badNgsi9Request           },
+  // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+  //{ InvalidRequest,                                2, { "ngsi9",   "*"                                                                 }, badNgsi9Request           },
   { InvalidRequest,                                2, { "ngsi10",  "*"                                                                 }, badNgsi10Request          },
   { InvalidRequest,                                0, { "*", "*", "*", "*", "*", "*"                                                   }, badRequest                },
   { InvalidRequest,                                0, {                                                                                }, NULL                      },
