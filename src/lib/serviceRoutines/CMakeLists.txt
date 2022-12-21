@@ -128,7 +128,9 @@ badVerbGetDeleteOnly.h
 badVerbPutDeleteOnly.h
 badVerbGetPutDeleteOnly.h
 badVerbPutOnly.h
-badNgsi9Request.h
+# FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+# (along with badNgsi9Request.h|cpp files themselves)
+#badNgsi9Request.h
 badNgsi10Request.h
 badRequest.h
 postNotifyContext.h

@@ -87,7 +87,9 @@
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutinesV2/badVerbGetPutOnly.h"
 #include "serviceRoutinesV2/badVerbGetDeletePatchOnly.h"
-#include "serviceRoutines/badNgsi9Request.h"
+// FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+// (along with badNgsi9Request.h|cpp files themselves)
+//#include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
 #include "serviceRoutinesV2/badVerbAllNotDelete.h"
