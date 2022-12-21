@@ -272,7 +272,7 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
     // If observedAt, createdAt, modifiedAt, unitCode, ...   No ".value" must be appended
     if (caseNo == 3)
     {
-      if ((strcmp(mdNameP, "observedAt") == 0) || (strcmp(mdNameP, "modifiededAt") == 0) || (strcmp(mdNameP, "createdAt") == 0))
+      if ((strcmp(mdNameP, "observedAt") == 0) || (strcmp(mdNameP, "modifiedAt") == 0) || (strcmp(mdNameP, "createdAt") == 0))
         caseNo = 5;
     }
 
