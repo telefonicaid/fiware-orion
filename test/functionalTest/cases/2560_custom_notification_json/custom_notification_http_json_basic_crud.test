@@ -44,6 +44,7 @@ brokerStart CB
 # 12. Get sub2 to see it
 # 13. Update custom sub2 to add json field
 # 14. Get sub2 to see changes
+# 15. Get all subs and see sub1 an sub2 in its final state
 #
 
 
@@ -225,6 +226,13 @@ echo
 echo "14. Get sub1 to see changes"
 echo "==========================="
 orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "15. Get all subs and see sub1 an sub2 in its final state"
+echo "========================================================"
+orionCurl --url /v2/subscriptions
 echo
 echo
 
@@ -549,6 +557,74 @@ Date: REGEX(.*)
         ]
     }
 }
+
+
+15. Get all subs and see sub1 an sub2 in its final state
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 595
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "httpCustom": {
+                "payload": "bar",
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "httpCustom": {
+                "json": {
+                    "z4": true,
+                    "z5": [
+                        10,
+                        20
+                    ]
+                },
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": []
+            },
+            "entities": [
+                {
+                    "id": "E2",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
 
 
 --TEARDOWN--

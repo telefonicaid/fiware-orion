@@ -281,7 +281,7 @@ static void setStatus(Subscription* s, const orion::BSONObj& r, const std::strin
 */
 void mongoListSubscriptions
 (
-  std::vector<Subscription>*           subs,
+  std::vector<Subscription*>*          subs,
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
@@ -346,15 +346,19 @@ void mongoListSubscriptions
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    Subscription  s;
+    // Dynamic memory to be freed by the caller of mongoListSubscriptions()
+    // Former versions of this code were using Subscription instead of Subscription*
+    // but some obscure problem occurs when httpInfo/mqttInfo classes were expanded
+    // with the ngsi field of type Entity
+    Subscription*  sP = new Subscription();
 
-    setNewSubscriptionId(&s, r);
-    setDescription(&s, r);
-    setSubject(&s, r);
-    setStatus(&s, r, tenant);
-    setNotification(&s, r, tenant);
+    setNewSubscriptionId(sP, r);
+    setDescription(sP, r);
+    setSubject(sP, r);
+    setStatus(sP, r, tenant);
+    setNotification(sP, r, tenant);
 
-    subs->push_back(s);
+    subs->push_back(sP);
   }
 
   orion::releaseMongoConnection(connection);

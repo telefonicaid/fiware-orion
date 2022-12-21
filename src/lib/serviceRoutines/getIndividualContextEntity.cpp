@@ -115,11 +115,7 @@ std::string getIndividualContextEntity
 
 
   // 5. Render the ContextElementResponse
-
-  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
-  std::vector<std::string> emptyV;
-
-  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity, emptyV, false, emptyV));
+  TIMED_RENDER(answer = response.toJsonV1(asJsonObject, IndividualContextEntity, false));
 
 
   // 6. Cleanup and return result

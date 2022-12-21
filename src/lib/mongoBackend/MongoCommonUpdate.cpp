@@ -1704,6 +1704,10 @@ static bool addTriggeredSubscriptions_noCache
           mqttInfo,
           aList, "", "", covered);
 
+      // Release after using them to fill the TriggeredSubscription
+      httpInfo.release();
+      mqttInfo.release();
+
       if (!onlyChanged)
       {
         trigs->blacklist = blacklist;

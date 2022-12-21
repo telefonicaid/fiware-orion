@@ -49,7 +49,6 @@ TEST(commonStatistics, statisticsUpdate)
   noOfUpdateContextAttribute                 = 0;
   noOfNgsi10ContextEntityTypesAttributeContainer = 0;
   noOfNgsi10SubscriptionsConvOp              = 0;
-  noOfVersionRequests                        = 0;
   noOfLeakRequests                           = 0;
   noOfInvalidRequests                        = 0;
   noOfJsonRequests                           = 0;
@@ -87,7 +86,6 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfUpdateContextAttribute);
   EXPECT_EQ(1, noOfNgsi10ContextEntityTypesAttributeContainer);
   EXPECT_EQ(1, noOfNgsi10SubscriptionsConvOp);
-  EXPECT_EQ(1, noOfVersionRequests);
   EXPECT_EQ(1, noOfLeakRequests);
   EXPECT_EQ(1, noOfInvalidRequests);
   EXPECT_EQ(1, noOfRtSubscribeResponse);

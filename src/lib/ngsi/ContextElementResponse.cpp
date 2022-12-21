@@ -182,6 +182,33 @@ std::string ContextElementResponse::toJsonV1
 
 /* ****************************************************************************
 *
+* ContextElementResponse::toJsonV1 -
+*
+* Wrapper of toJsonV1 with empty attrsFilter and metadataFilter
+*/
+std::string ContextElementResponse::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         blacklist,
+  bool         comma,
+  bool         omitAttributeValues
+)
+{
+  std::string out = "";
+
+  out += startTag();
+  out += entity.toJsonV1(asJsonObject, requestType, blacklist, true, omitAttributeValues);
+  out += statusCode.toJsonV1(false);
+  out += endTag(comma, false);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElementResponse::toJson - 
 */
 std::string ContextElementResponse::toJson

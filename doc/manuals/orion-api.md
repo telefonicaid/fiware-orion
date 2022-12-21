@@ -2226,7 +2226,7 @@ the value of the "temperature" attribute (of type Number) is 23.4
 ### JSON payloads
 
 If `json` is used in `httpCustom` or `mqttCustom` the following considerations apply.
-Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
 
 The `json` field can be used to generate arbitrary JSON-based payloads. For instance:
 
@@ -2248,20 +2248,20 @@ Some notes to take into account when using `json`:
 * The [macro replacement logic](#macro-substitution) works as expected, with the following
   considerations:
   * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
-  * The value of the JSON object or JSON array item in which the macro is used has to match
-    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
-    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
-    will not work
-  * It takes into account the nature of the attribute value to be replaced. For instance,
-    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
-    `"t": "10"` if `temperature` attribute is a string.
+  * If the macro *covers completely the string where is used*, then the JSON nature of the attribute value
+    is taken into account. For instance, `"t": "${temperature}"` resolves to `"t": 10`
+    if temperature attribute is a number or to `"t": "10"` if `temperature` attribute is a string.
+  * If the macro *is only part of string where is used*, then the attribute value is always casted
+    to string. For instance, `"t": "Temperature is: ${temperature}"` resolves to 
+    `"t": "Temperature is 10"` even if temperature attribute is a number. Note that if the
+    attribute value is a JSON array or object, it is stringfied in this case.  
   * If the attribute doesn't exist in the entity, then `null` value is used
 * `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
 
 ### NGSI payload patching
 
 If `ngsi` is used in `httpCustom` or `mqttCustom` the following considerations apply.
-Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
 
 The `ngsi` field can be used to specify an entity fragment that will *patch* the entity in
 the notification. This allows to add new attributes and/or change the value of

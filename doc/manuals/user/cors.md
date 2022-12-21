@@ -62,7 +62,7 @@ and these are defined in [lib/rest/HttpHeaders.h](https://github.com/telefonicai
 Orion's response to a valid `OPTIONS` request would include the header and value
 below:
 
-    Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token
+    Access-Control-Allow-Headers: Authorization, Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token
 
 ## Access-Control-Max-Age
 

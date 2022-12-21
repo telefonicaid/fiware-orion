@@ -317,6 +317,7 @@ std::string parseCustomJson
 )
 {
   // this new memory is freed in in HttpInfo::release()/MqttInfo::release()()
+  // or before returning in this function in the case of error
   *json = new orion::CompoundValueNode();
 
   if (holder.IsArray())
@@ -364,6 +365,8 @@ std::string parseCustomJson
         std::string r = parseCompoundValue(iter, cvnP, 0);
         if (r != "OK")
         {
+          // Early return
+          delete *json;
           return r;
         }
       }
@@ -416,6 +419,7 @@ std::string parseCustomJson
         if (r != "OK")
         {
           // Early return
+          delete *json;
           return r;
         }
       }
@@ -423,6 +427,7 @@ std::string parseCustomJson
   }
   else
   {
+    delete *json;
     return "json fields in httpCustom or mqttCustom must be object or array";
   }
 

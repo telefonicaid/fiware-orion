@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom notification MQTT with JSON with replacements
+Custom notification MQTT with JSON with replacements inside value
 
 --SHELL-INIT--
 dbInit CB
@@ -54,12 +54,12 @@ payload='{
       "topic": "topic1",
       "url": "mqtt://localhost:1883",
       "json": {
-        "text": "${text}",
-        "number": "${number}",
-        "bool": "${bool}",
-        "null": "${null}",
-        "array": "${array}",
-        "object": "${object}"
+        "A": "ns:${text}",
+        "B": "ns:${number}",
+        "C": "ns:${bool}",
+        "D": "ns:${null}",
+        "E": "ns:${array}",
+        "F": "ns:${object}"
       }
     }
   }
@@ -85,12 +85,12 @@ payload='{
       "topic": "topic1",
       "url": "mqtt://localhost:1883",
       "json": [
-        "${text}",
-        "${number}",
-        "${bool}",
-        "${null}",
-        "${array}",
-        "${object}"
+        "ns:${text}",
+        "ns:${number}",
+        "ns:${bool}",
+        "ns:${null}",
+        "ns:${array}",
+        "ns:${object}"
       ]
     }
   }
@@ -154,7 +154,6 @@ orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
-
 # Sometimes the accumulator needs some time to get the MQTT notification
 sleep 0.5s
 
@@ -190,7 +189,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see both subscriptions
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 778
+Content-Length: 791
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -204,12 +203,12 @@ Date: REGEX(.*)
             "covered": false,
             "mqttCustom": {
                 "json": {
-                    "array": "${array}",
-                    "bool": "${bool}",
-                    "null": "${null}",
-                    "number": "${number}",
-                    "object": "${object}",
-                    "text": "${text}"
+                    "A": "ns:${text}",
+                    "B": "ns:${number}",
+                    "C": "ns:${bool}",
+                    "D": "ns:${null}",
+                    "E": "ns:${array}",
+                    "F": "ns:${object}"
                 },
                 "qos": 0,
                 "topic": "topic1",
@@ -238,12 +237,12 @@ Date: REGEX(.*)
             "covered": false,
             "mqttCustom": {
                 "json": [
-                    "${text}",
-                    "${number}",
-                    "${bool}",
-                    "${null}",
-                    "${array}",
-                    "${object}"
+                    "ns:${text}",
+                    "ns:${number}",
+                    "ns:${bool}",
+                    "ns:${null}",
+                    "ns:${array}",
+                    "ns:${object}"
                 ],
                 "qos": 0,
                 "topic": "topic1",
@@ -282,66 +281,22 @@ Date: REGEX(.*)
 =========================================
 MQTT message at topic topic1:
 {
-    "array": [
-        "22",
-        {
-            "x": [
-                "x1",
-                "x2"
-            ],
-            "y": 3
-        },
-        [
-            "z1",
-            "z2"
-        ]
-    ],
-    "bool": true,
-    "null": null,
-    "number": 10,
-    "object": {
-        "x": {
-            "x1": "a",
-            "x2": "b"
-        },
-        "y": [
-            "y1",
-            "y2"
-        ]
-    },
-    "text": "foo"
+    "A": "ns:foo",
+    "B": "ns:10",
+    "C": "ns:true",
+    "D": "ns:null",
+    "E": "ns:[\"22\",{\"x\":[\"x1\",\"x2\"],\"y\":3},[\"z1\",\"z2\"]]",
+    "F": "ns:{\"x\":{\"x1\":\"a\",\"x2\":\"b\"},\"y\":[\"y1\",\"y2\"]}"
 }
 =======================================
 MQTT message at topic topic1:
 [
-    "foo",
-    10,
-    true,
-    null,
-    [
-        "22",
-        {
-            "x": [
-                "x1",
-                "x2"
-            ],
-            "y": 3
-        },
-        [
-            "z1",
-            "z2"
-        ]
-    ],
-    {
-        "x": {
-            "x1": "a",
-            "x2": "b"
-        },
-        "y": [
-            "y1",
-            "y2"
-        ]
-    }
+    "ns:foo",
+    "ns:10",
+    "ns:true",
+    "ns:null",
+    "ns:[\"22\",{\"x\":[\"x1\",\"x2\"],\"y\":3},[\"z1\",\"z2\"]]",
+    "ns:{\"x\":{\"x1\":\"a\",\"x2\":\"b\"},\"y\":[\"y1\",\"y2\"]}"
 ]
 =======================================
 #SORT_END
