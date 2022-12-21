@@ -129,7 +129,7 @@
 #define OPT_FORCEDUPDATE                "forcedUpdate"
 #define OPT_OVERRIDEMETADATA            "overrideMetadata"
 #define OPT_SKIPFORWARDING              "skipForwarding"
-
+#define OPT_FULL_COUNTERS               "fullCounters"
 
 
 /* ****************************************************************************

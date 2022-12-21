@@ -111,9 +111,9 @@ static void resetStatistics(void)
 *
 * renderUsedCounter -
 */
-inline void renderUsedCounter(JsonObjectHelper* js, const std::string& field, int counter)
+inline void renderUsedCounter(JsonObjectHelper* js, const std::string& field, int counter, bool fullCounters)
 {
-  if (counter != -1)
+  if ((fullCounters) || (counter != -1))
   {
     js->addNumber(field, (long long)(counter + 1));
   }
@@ -125,13 +125,13 @@ inline void renderUsedCounter(JsonObjectHelper* js, const std::string& field, in
 *
 * renderCounterStats -
 */
-std::string renderCounterStats(void)
+std::string renderCounterStats(bool fullCounters)
 {
   JsonObjectHelper js;
 
-  renderUsedCounter(&js, "jsonRequests",      noOfJsonRequests);
-  renderUsedCounter(&js, "textRequests",      noOfTextRequests);
-  renderUsedCounter(&js, "noPayloadRequests", noOfRequestsWithoutPayload);
+  renderUsedCounter(&js, "jsonRequests",      noOfJsonRequests, fullCounters);
+  renderUsedCounter(&js, "textRequests",      noOfTextRequests, fullCounters);
+  renderUsedCounter(&js, "noPayloadRequests", noOfRequestsWithoutPayload, fullCounters);
 
   JsonObjectHelper jsRequests;
   JsonObjectHelper jsRequestsLegacy;
@@ -139,17 +139,34 @@ std::string renderCounterStats(void)
   bool             touchedRquestsLegacy = false;
   for (unsigned int ix = 0; ; ++ix)
   {
-    // Note there is no need of checking allowed flags, as not allowed counter will be in -1
     JsonObjectHelper jsRequest;
-    renderUsedCounter(&jsRequest, "GET",     noOfRequestCounters[ix].get);
-    renderUsedCounter(&jsRequest, "POST",    noOfRequestCounters[ix].post);
-    renderUsedCounter(&jsRequest, "PATCH",   noOfRequestCounters[ix].patch);
-    renderUsedCounter(&jsRequest, "PUT",     noOfRequestCounters[ix].put);
-    renderUsedCounter(&jsRequest, "DELETE",  noOfRequestCounters[ix]._delete);
-    renderUsedCounter(&jsRequest, "OPTIONS", noOfRequestCounters[ix].options);
+    if (noOfRequestCounters[ix].getAllowed)
+    {
+      renderUsedCounter(&jsRequest, "GET", noOfRequestCounters[ix].get, fullCounters);
+    }
+    if (noOfRequestCounters[ix].postAllowed)
+    {
+      renderUsedCounter(&jsRequest, "POST", noOfRequestCounters[ix].post, fullCounters);
+    }
+    if (noOfRequestCounters[ix].patchAllowed)
+    {
+      renderUsedCounter(&jsRequest, "PATCH", noOfRequestCounters[ix].patch, fullCounters);
+    }
+    if (noOfRequestCounters[ix].putAllowed)
+    {
+      renderUsedCounter(&jsRequest, "PUT", noOfRequestCounters[ix].put, fullCounters);
+    }
+    if (noOfRequestCounters[ix].deleteAllowed)
+    {
+      renderUsedCounter(&jsRequest, "DELETE", noOfRequestCounters[ix]._delete, fullCounters);
+    }
+    if (noOfRequestCounters[ix].optionsAllowed)
+    {
+      renderUsedCounter(&jsRequest, "OPTIONS", noOfRequestCounters[ix].options, fullCounters);
+    }
 
-    // We add the object only in the case at least some verb has been included
-    if ((noOfRequestCounters[ix].get != -1) || (noOfRequestCounters[ix].post != -1) ||
+    // We add the object only in the case at least some verb has been included or if full counters has been asked
+    if ((fullCounters) || (noOfRequestCounters[ix].get != -1) || (noOfRequestCounters[ix].post != -1) ||
         (noOfRequestCounters[ix].patch != -1) || (noOfRequestCounters[ix].put != -1) ||
         (noOfRequestCounters[ix]._delete != -1) || (noOfRequestCounters[ix].options != -1))
     {
@@ -182,12 +199,12 @@ std::string renderCounterStats(void)
     js.addRaw("requestsLegacy", jsRequestsLegacy.str());
   }
 
-  renderUsedCounter(&js, "missedVerb",      noOfMissedVerb);
-  renderUsedCounter(&js, "invalidRequests", noOfInvalidRequests);
+  renderUsedCounter(&js, "missedVerb",      noOfMissedVerb, fullCounters);
+  renderUsedCounter(&js, "invalidRequests", noOfInvalidRequests, fullCounters);
 
-  renderUsedCounter(&js, "registrationUpdateErrors", noOfRegistrationUpdateErrors);
-  renderUsedCounter(&js, "discoveryErrors", noOfDiscoveryErrors);
-  renderUsedCounter(&js, "notificationsSent", noOfNotificationsSent);
+  renderUsedCounter(&js, "registrationUpdateErrors", noOfRegistrationUpdateErrors, fullCounters);
+  renderUsedCounter(&js, "discoveryErrors", noOfDiscoveryErrors, fullCounters);
+  renderUsedCounter(&js, "notificationsSent", noOfNotificationsSent, fullCounters);
 
   return js.str();
 }
@@ -251,6 +268,7 @@ std::string statisticsTreat
   ParseData*                 parseDataP
 )
 {
+  bool fullCounters = ciP->uriParamOptions[OPT_FULL_COUNTERS];
 
   JsonObjectHelper js;
 
@@ -265,7 +283,7 @@ std::string statisticsTreat
    * beautifier tools may change this order */
   if (countersStatistics)
   {
-    js.addRaw("counters", renderCounterStats());
+    js.addRaw("counters", renderCounterStats(fullCounters));
   }
   if (semWaitStatistics)
   {
@@ -287,7 +305,7 @@ std::string statisticsTreat
 
   // Special case: simulated notifications
   int nSimNotif = __sync_fetch_and_add(&noOfSimulatedNotifications, 0);
-  renderUsedCounter(&js, "simulatedNotifications", nSimNotif);
+  renderUsedCounter(&js, "simulatedNotifications", nSimNotif, fullCounters);
 
   ciP->httpStatusCode = SccOk;
   return js.str();

@@ -155,16 +155,25 @@ std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
 
   // administrative requests
   case LogTraceRequest:                return "/log/trace[/{level}]";
-  case StatisticsRequest:              return "/statistics";
   case LogLevelRequest:                return "/admin/log";
   case SemStateRequest:                return "/admin/sem";
   case MetricsRequest:                 return "/admin/metrics";
   case ExitRequest:                    return "/exit[/*]";
   case LeakRequest:                    return "/leak[/*]";
   case VersionRequest:                 return "/version";
+  case StatisticsRequest:
+    if (prefix == "/cache")
+    {
+      return "/cache/statistics";
+    }
+    else
+    {
+      return "/statistics";
+    }
 
   // pure v1
-  case ContextEntitiesByEntityId:            return "/v1/registry/contextEntities";
+  case RegisterContext:                      return "/v1/registry/registerContext";
+  case ContextEntitiesByEntityId:            return "/v1/registry/contextEntities/{id}";
   case ContextEntitiesByEntityIdAndType:     return "/v1/registry/contextEntities/type/{type}/id/{id}";
   case ContextEntityAttributes:              return "/v1/registry/contextEntities/{id}/attributes";
   case ContextEntityTypeAttribute:           return "/v1/registry/contextEntityTypes/{type}/attributes/{name}";
@@ -188,11 +197,10 @@ std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
   case Ngsi10ContextEntityTypesAttributeContainer:     return prefix + "/contextEntityTypes/{type}/attributes/";
   case Ngsi10SubscriptionsConvOp:                      return prefix + "/contextSubscriptions/{id}";
   case QueryContext:                                   return prefix + "/queryContext";
-  case RegisterContext:                                return prefix + "/registerContext";
   case SubscribeContext:                               return prefix + "/subscribeContext|contextSubscriptions";
   case UnsubscribeContext:                             return prefix + "/unsubscribeContext";
   case UpdateContext:                                  return prefix + "/updateContext";
-  case UpdateContextSubscription:                      return prefix + "/upateContextSubscription";
+  case UpdateContextSubscription:                      return prefix + "/updateContextSubscription";
 
   // v2, v1 or NGSIv2
   case NotifyContext:

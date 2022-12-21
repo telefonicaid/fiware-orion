@@ -62,7 +62,7 @@ UrlCounter noOfRequestCounters[] =
   {EntityAttributeRequest,        "v2", -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  true},
   {EntityAttributeValueRequest,   "v2", -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, true},
   {EntityAllTypesRequest,         "v2", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
-  {EntityTypes,                   "v2", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
+  {EntityTypeRequest,             "v2", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
   {SubscriptionsRequest,          "v2", -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
   {SubscriptionRequest,           "v2", -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
   {RegistrationsRequest,          "v2", -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
