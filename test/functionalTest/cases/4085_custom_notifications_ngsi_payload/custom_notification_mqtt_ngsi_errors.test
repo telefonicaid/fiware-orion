@@ -33,6 +33,9 @@ brokerStart CB
 # 01. Create custom subscription with payload and ngsi field, see error
 # 02. Create custom subscription with json and ngsi field, see error
 # 03. Create custom subscription with ngsi field with metadata, see error
+# 04. Create custom subscription with ngsi field with invalidad id, see error
+# 05. Create custom subscription with ngsi field with invalidad type, see error
+# 06. Create custom subscription with ngsi field with invalidad attribute, see error
 #
 
 echo "01. Create custom subscription with payload and ngsi field, see error"
@@ -130,6 +133,87 @@ echo
 echo
 
 
+echo "04. Create custom subscription with ngsi field with invalidad id, see error"
+echo "==========================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "ngsi": {
+        "id": 42
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create custom subscription with ngsi field with invalidad type, see error"
+echo "============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "ngsi": {
+        "type": 42
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create custom subscription with ngsi field with invalidad attribute, see error"
+echo "=================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "ngsi": {
+        "A": {
+          "value": 10,
+          "type": 42
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. Create custom subscription with payload and ngsi field, see error
 =====================================================================
@@ -169,6 +253,48 @@ Date: REGEX(.*)
 
 {
     "description": "metadata are not allowed in ngsi field in custom notifications",
+    "error": "BadRequest"
+}
+
+
+04. Create custom subscription with ngsi field with invalidad id, see error
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 70
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid JSON type for entity id",
+    "error": "BadRequest"
+}
+
+
+05. Create custom subscription with ngsi field with invalidad type, see error
+=============================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "Invalid JSON type for entity type",
+    "error": "BadRequest"
+}
+
+
+06. Create custom subscription with ngsi field with invalidad attribute, see error
+==================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 75
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "invalid JSON type for attribute type",
     "error": "BadRequest"
 }
 
