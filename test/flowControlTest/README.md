@@ -3,7 +3,7 @@ This test was conducted during the development of flow control feature (version:
 Assuming the DB is empty (i.e. there aren't any entity or subscription previous to the start of the test), start ContextBroker the following way:
 
 ```
-contextBroker -logForHumans -fg -notifFlowControl 1:1000:10000000 -notificationMode threadpool:1000:1 -t 160 -logLevel DEBUG | grep -v INFO | grep -v 'DEBUG.*Repeated'
+contextBroker -logForHumans -fg -notifFlowControl 1:1000:10000000 -notificationMode threadpool:1000:1 -t 160 -logLevel DEBUG | grep -v INFO
 ```
 
 This is the startup log:
@@ -482,6 +482,7 @@ although the notifications queue at this point was 15 (higher than the target by
 ~20 seconds for the response (instead of 48 seconds).
 
 (*) Note that although each notification fails for the same reason (timeout) you will see only one WARN message in the
-logs. This is due to this WARN messge raises a notification alarm for `localhost:1028/givemeDelay` and Orion by default doesn't
-re-log alarm conditions for alarms already risen (except if `-relogAlarms` is used). Alarms are re-loged in the `-t 160` DEBUG level,
-but the `| grep -v 'DEBUG.*Repeated'` filter at contextBroker startup command avoids that.
+logs. This is due to this WARN message raises a notification alarm for `localhost:1028/givemeDelay` and Orion by default doesn't
+re-log alarm conditions for alarms already risen (except if `-relogAlarms` is used). However, note alarms are re-loged in the `-t 160` tracelevel,
+so you will see repetition messasges in de DEBUG level, which are not shown in the traces above for the sake of clarity (if this is too
+noisy for you, you can avoid them adjusting the `grep` filter at the contextBroker command line invokation).
