@@ -455,9 +455,9 @@ Thus, the client sending update10request gets its response not inmediatelly (as 
 option in the update request) but 48 seconds after. You will see something like this as response to the execution command:
 
 ```
-real	0m48,102s
-user	0m0,031s
-sys	  0m0,014s
+real  0m48,102s
+user  0m0,031s
+sys   0m0,014s
 ```
 
 After responding the client update, the worker continues sending pending notifications. Thus, we can see nine new messages in the
