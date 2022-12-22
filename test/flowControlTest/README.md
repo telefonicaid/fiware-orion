@@ -3,7 +3,7 @@ This test was conducted during the development of flow control feature (version:
 Assuming the DB is empty (i.e. there aren't any entity or subscription previous to the start of the test), start ContextBroker the following way:
 
 ```
-contextBroker -logForHumans -fg -notifFlowControl 1:1000:10000000 -notificationMode threadpool:1000:1 -t 160 -logLevel DEBUG | grep -v INFO
+contextBroker -logForHumans -fg -notifFlowControl 1:1000:10000000 -notificationMode threadpool:1000:1 -t 160 -logLevel DEBUG | grep -v INFO | grep -v 'DEBUG.*Repeated'
 ```
 
 This is the startup log:
@@ -310,10 +310,10 @@ this is the test script we are executing:
 ```
 for i in $(seq 1 10)
 do
-  update1request
+  bash update1request
 done
 sleep 2
-time update10request
+time bash update10request
 ```
 
 Let's examine the ContextBroker log. The first block corresponds to the ten update1request executions: 
@@ -452,7 +452,13 @@ in the next pass at 12:31:34 (pass 48) we have reached the target. The notificat
 returns control and ContextBroker finally responses to the client of the update.
 
 Thus, the client sending update10request gets its response not inmediatelly (as it would be the case without `flowControl`
-option in the update request) but 48 seconds after.
+option in the update request) but 48 seconds after. You will see something like this as response to the execution command:
+
+```
+real	0m48,102s
+user	0m0,031s
+sys	  0m0,014s
+```
 
 After responding the client update, the worker continues sending pending notifications. Thus, we can see nine new messages in the
 log (with an interval of 5 seconds) corresponding to the last 9 notifications in the queue.
@@ -477,4 +483,5 @@ although the notifications queue at this point was 15 (higher than the target by
 
 (*) Note that although each notification fails for the same reason (timeout) you will see only one WARN message in the
 logs. This is due to this WARN messge raises a notification alarm for `localhost:1028/givemeDelay` and Orion by default doesn't
-re-log alarm conditions for alarms already risen (except if `-relogAlarms` is used).
+re-log alarm conditions for alarms already risen (except if `-relogAlarms` is used). Alarms are re-loged in the `-t 160` DEBUG level,
+but the `| grep -v 'DEBUG.*Repeated'` filter at contextBroker startup command avoids that.
