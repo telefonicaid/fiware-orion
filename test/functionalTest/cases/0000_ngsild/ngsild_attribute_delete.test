@@ -61,7 +61,7 @@ echo
 
 echo "02. Try to delete the attribute A1 of entity E2 - entity not found"
 echo "=================================================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E2/attrs/https://uri=etsi=org/ngsi-ld/default/A1 -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld/entities/E2/attrs/https://uri.etsi.org/ngsi-ld/default/A1 -X DELETE
 echo
 echo
 
@@ -120,7 +120,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "https://uri=etsi=org/ngsi-ld/default/A1",
+    "detail": "https://uri.etsi.org/ngsi-ld/default/A1",
     "title": "Entity/Attribute not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }

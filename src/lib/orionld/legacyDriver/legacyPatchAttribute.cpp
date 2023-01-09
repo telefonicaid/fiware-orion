@@ -646,7 +646,7 @@ static KjNode* attributeFromDb(char* entityId, char* attrName, char* attrNameExp
   if (dbEntityP == NULL)
   {
     char* pair = kaAlloc(&orionldState.kalloc, 1024);
-    snprintf(pair, 1024, "Entity '%s', Attribute '%s' (%s)", entityId, attrName, attrNameExpandedEq);
+    snprintf(pair, 1024, "Entity '%s', Attribute '%s' (%s)", entityId, attrName, attrNameExpanded);
     orionldError(OrionldResourceNotFound, "Entity/Attribute not found", pair, 404);
     return NULL;
   }
@@ -660,7 +660,7 @@ static KjNode* attributeFromDb(char* entityId, char* attrName, char* attrNameExp
   // Get the attribute named attrNameExpandedEq from the "attrs" field of the DB Entity
   KjNode* dbAttributeP = kjLookup(dbAttrs, attrNameExpandedEq);
   if (dbAttributeP == NULL)
-    DB_ERROR(NULL, "Database Error (attribute not found)", attrNameExpandedEq);
+    DB_ERROR(NULL, "Database Error (attribute not found)", attrNameExpanded);
 
   return dbAttributeP;
 }
