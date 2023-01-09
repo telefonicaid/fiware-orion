@@ -1,0 +1,202 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue #1224 without -experimental
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create an entity according to (1) of issue #1224
+# 02. Create a subscription according to (2) of issue #1224
+# 03. Patching the entity according to (3) of issue #1224
+# 04. Dump the accumulator, see no notification
+# 05. Patching the other attribute (pm10)
+# 06. Dump the accumulator, see one notification
+#
+
+echo "01. Create an entity TemperatureSensor:001 with two attributes"
+echo "=============================================================="
+payload='{
+   "id":"urn:ngsi-ld:AirQualityObserved:Guadalajara:ES1537A",
+   "type":"AirQualityObserved",
+   "pm10":{
+      "type":"Property",
+      "value": 1
+   },
+   "so2":{
+      "type":"Property",
+      "value": 2
+   },
+   "@context": ["https://smartdatamodels.org/context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "02. Create a subscription according to (2) of issue #1224"
+echo "========================================================="
+payload='{
+ "description": "A subscription to get air quality",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "AirQualityObserved"
+    }
+  ],
+  "watchedAttributes": [ "pm10" ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify",
+      "accept": "application/json"
+    }
+  },
+  "@context": "https://smartdatamodels.org/context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "03. Patching the entity according to (3) of issue #1224"
+echo "======================================================="
+payload='{
+  "so2":{
+    "type":"Property",
+    "value": 40
+  },
+  "@context": ["https://smartdatamodels.org/context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:AirQualityObserved:Guadalajara:ES1537A/attrs -X PATCH --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "04. Dump the accumulator, see no notification"
+echo "============================================="
+accumulatorDump
+echo
+echo
+
+
+echo "05. Patching the other attribute (pm10)"
+echo "======================================="
+payload='{
+  "pm10":{
+    "type":"Property",
+    "value": 2
+  },
+  "@context": ["https://smartdatamodels.org/context.jsonld"]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:AirQualityObserved:Guadalajara:ES1537A/attrs -X PATCH --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "06. Dump the accumulator, see one notification"
+echo "=============================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity TemperatureSensor:001 with two attributes
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AirQualityObserved:Guadalajara:ES1537A
+
+
+
+02. Create a subscription according to (2) of issue #1224
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:REGEX(.*)
+
+
+
+03. Patching the entity according to (3) of issue #1224
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Dump the accumulator, see no notification
+=============================================
+
+
+05. Patching the other attribute (pm10)
+=======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. Dump the accumulator, see one notification
+==============================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:REGEX(.*)
+Content-Length: 384
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "id": "urn:ngsi-ld:AirQualityObserved:Guadalajara:ES1537A",
+            "pm10": {
+                "type": "Property",
+                "value": 2
+            },
+            "so2": {
+                "type": "Property",
+                "value": 40
+            },
+            "type": "AirQualityObserved"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
