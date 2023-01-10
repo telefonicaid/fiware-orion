@@ -108,7 +108,7 @@ static void correlatorGenerate(char* buffer)
 *
 * uriArgumentGet -
 */
-static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
+static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
 {
   ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
   std::string      key   = ckey;
@@ -489,7 +489,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
 *
 * httpHeaderGet -
 */
-static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
+static MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* value)
 {
   ConnectionInfo*  ciP     = (ConnectionInfo*) cbDataP;
   HttpHeaders*     headerP = &ciP->httpHeaders;
@@ -1205,7 +1205,7 @@ static void* getUriForLog(void* cls, const char* uri, struct MHD_Connection *con
 * Call 3: *con_cls != NULL  AND  *upload_data_size == 0
 */
 static int reqNo       = 1;
-static int connectionTreat
+static MHD_Result connectionTreat
 (
    void*            cls,
    MHD_Connection*  connection,
