@@ -142,7 +142,10 @@ static bool setPayload
     ContextElementResponse cer;
 
     cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
-    cer.entity.attributeVector.push_back(en.attributeVector);
+
+    // cloneCompount set to true. Otherwise nasty things as the one
+    // described in issue #4263 will happend
+    cer.entity.attributeVector.push_back(en.attributeVector, true);
 
     cer.statusCode.code = SccOk;
 
