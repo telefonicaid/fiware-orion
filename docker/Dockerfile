@@ -85,7 +85,9 @@ RUN \
     cd mongo-c-driver-1.23.1 && \
     mkdir cmake-build && \
     cd cmake-build && \
-    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..   && \
+    # Different from ci/deb/build-dep.sh and build from source documentation, we add here also
+    # the MONGOC_TEST_USE_CRYPT_SHARED=FALSE. It needs Python and in this tiny image we don't have it
+    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE ..   && \
     make && \
     make install && \
     # Install rapidjson from source
