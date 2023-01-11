@@ -3445,7 +3445,11 @@ static unsigned int updateEntity
   ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
   unsigned int                    notifStartCounter,
-  const std::string&              ngsiV2AttrsFormat
+  const std::string&              ngsiV2AttrsFormat,
+  bool*                           attributeNotExists,
+  std::string*                    attributeNotExistsList,
+  bool*                           attributeExists,
+  std::string*                    attributeExistsList
 )
 {
   // Used to accumulate error response information
@@ -3454,6 +3458,12 @@ static unsigned int updateEntity
 
   *attributeNotExistingError           = false;
   *attributeNotExistingList            = "[ ";
+
+  *attributeNotExists         = false;
+  *attributeNotExistsList          = "[ ";
+
+  *attributeExists           = false;
+  *attributeExistsList            = "[ ";
 
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
@@ -3603,8 +3613,18 @@ static unsigned int updateEntity
         }
         *attributeAlreadyExistsList += eP->attributeVector[ix]->name;
       }
+      else
+      {
+        *attributeNotExists = true;
+        if (*attributeNotExistsList != "[ ")
+        {
+          *attributeNotExistsList += ", ";
+        }
+        *attributeNotExistsList += eP->attributeVector[ix]->name;
+      }
     }
     *attributeAlreadyExistsList += " ]";
+    *attributeNotExistsList += " ]";
   }
 
   if ((apiVersion == V2) && (action == ActionTypeUpdate))
@@ -3622,8 +3642,18 @@ static unsigned int updateEntity
         }
         *attributeNotExistingList += eP->attributeVector[ix]->name;
       }
+      else
+      {
+        *attributeExists = true;
+        if (*attributeExistsList != "[ ")
+        {
+          *attributeExistsList += ", ";
+        }
+        *attributeExistsList += eP->attributeVector[ix]->name;
+      }
     }
     *attributeNotExistingList += " ]";
+    *attributeExistsList += " ]";
   }
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
@@ -4231,6 +4261,12 @@ unsigned int processContextElement
   bool         attributeNotExistingError = false;
   std::string  attributeNotExistingList  = "[ ";
 
+  bool         attributeNotExists = false;
+  std::string  attributeNotExistsList  = "[ ";
+
+  bool         attributeExists = false;
+  std::string  attributeExistsList  = "[ ";
+
   /* Note that the following loop is not executed if result size is 0, which leads to the
    * 'if' just below to create a new entity */
   for (unsigned int ix = 0; ix < results.size(); ix++)
@@ -4251,7 +4287,11 @@ unsigned int processContextElement
                              apiVersion,
                              fiwareCorrelator,
                              notifStartCounter,
-                             ngsiV2AttrsFormat);
+                             ngsiV2AttrsFormat,
+                             &attributeNotExists,
+                             &attributeNotExistsList,
+                             &attributeExists,
+                             &attributeExistsList);
   }
 
   /*
@@ -4412,16 +4452,34 @@ unsigned int processContextElement
 
   if (attributeAlreadyExistsError == true)
   {
-    std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
-    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
-  }
+    if (attributeNotExists == true)
+    {
+      std::string details = "updated successfully: " + attributeNotExistsList;
+      // buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+      responseP->oe.fill(SccMultiStatus, details);
+    }
+    else
+    {
+      std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
+      buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+      responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    }
+  } 
 
   if (attributeNotExistingError == true)
   {
-    std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
-    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    if (attributeExists == true)
+    {
+      std::string details = "updated successfully: " + attributeExistsList;
+      // buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+      responseP->oe.fill(SccMultiStatus, details);
+    }
+    else
+    {
+      std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
+      buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+      responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    }
   }
 
   // Response in responseP

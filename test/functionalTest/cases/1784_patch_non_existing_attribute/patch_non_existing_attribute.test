@@ -31,8 +31,9 @@ brokerStart CB
 
 #
 # 01. Create E1/A1
-# 02. PATCH E1/A1+A2, see error (error due to A2 not existing, but A1 is modified)
-# 03. Make sure E1/A1 was modified in step 02
+# 02. PATCH E1/A2, see error (error due to A2 not existing)
+# 03. PATCH E1/A1+A2, see (207 Multi Status due to A1 is modified)
+# 04. Make sure E1/A1 was modified in step 02
 #
 
 echo "01. Create E1/A1"
@@ -50,7 +51,19 @@ echo
 echo
 
 
-echo "02. PATCH E1/A1+A2, see error (error due to A2 not existing, but A1 is modified)"
+echo "02. PATCH E1/A2, see error (error due to A2 not existing)"
+echo "================================================================================"
+payload='{
+  "A2": {
+    "value": "02"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "03. PATCH E1/A1+A2, see (207 Multi Status due to A1 is modified)"
 echo "================================================================================"
 payload='{
   "A1": {
@@ -65,7 +78,7 @@ echo
 echo
 
 
-echo "03. Make sure E1/A1 was modified in step 02"
+echo "04. Make sure E1/A1 was modified in step 02"
 echo "==========================================="
 orionCurl --url /v2/entities/E1
 echo
@@ -83,7 +96,7 @@ Date: REGEX(.*)
 
 
 
-02. PATCH E1/A1+A2, see error (error due to A2 not existing, but A1 is modified)
+02. PATCH E1/A2, see error (error due to A2 not existing)
 ================================================================================
 HTTP/1.1 422 Unprocessable Entity
 Content-Length: 107
@@ -97,7 +110,21 @@ Date: REGEX(.*)
 }
 
 
-03. Make sure E1/A1 was modified in step 02
+03. PATCH E1/A1+A2, see (207 Multi Status due to A1 is modified)
+================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 69
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "updated successfully: [ A1 ]",
+    "error": "Multi Status"
+}
+
+
+04. Make sure E1/A1 was modified in step 02
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 71

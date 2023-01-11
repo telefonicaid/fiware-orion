@@ -33,9 +33,10 @@ brokerStart CB 0-255
 # 01. POST /v2/entities/E1 A (and check 404 Not Found)
 # 02. POST /v2/entities E1 A (and check 201 Created)
 # 03. POST /v2/entities/E1 A (and check 204 No Content)
-# 04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
-# 05. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)
-# 06. POST /v2/entities/E1?options=append C (and check 204 No Content)
+# 04. POST /v2/entities/E1?options=append A (and check 422 Unprocessable)
+# 05. POST /v2/entities/E1?options=append A and B (and check 207 Multi Status)
+# 06. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)
+# 07. POST /v2/entities/E1?options=append C (and check 204 No Content)
 #
 
 echo "01. POST /v2/entities/E1 A (and check 404 Not Found)"
@@ -74,7 +75,19 @@ orionCurl --url /v2/entities/E1/attrs  --payload "$payload"
 echo
 echo
 
-echo "04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)"
+echo "04. POST /v2/entities/E1?options=append A (and check 400 Bad Request)"
+echo "==========================================================================="
+payload='{
+  "A": {
+    "value": 30
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs?options=append  --payload "$payload"
+echo
+echo
+
+
+echo "05. POST /v2/entities/E1?options=append A and B (and check 207 Multi Status)"
 echo "==========================================================================="
 payload='{
   "A": {
@@ -89,14 +102,14 @@ echo
 echo
 
 
-echo "05. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)"
+echo "06. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)"
 echo "==================================================="
 orionCurl --url /v2/entities/E1
 echo
 echo
 
 
-echo "06. POST /v2/entities/E1?options=append B (and check 204 No Content)"
+echo "07. POST /v2/entities/E1?options=append B (and check 204 No Content)"
 echo "===================================================================="
 payload='{
   "C": {
@@ -142,7 +155,7 @@ Date: REGEX(.*)
 
 
 
-04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
+04. POST /v2/entities/E1?options=append A (and check 400 Bad Request)
 ===========================================================================
 HTTP/1.1 422 Unprocessable Entity
 Content-Length: 107
@@ -156,7 +169,21 @@ Date: REGEX(.*)
 }
 
 
-05. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)
+05. POST /v2/entities/E1?options=append A and B (and check 207 Multi Status)
+===========================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "updated successfully: [ B ]",
+    "error": "Multi Status"
+}
+
+
+06. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 121
@@ -180,7 +207,7 @@ Date: REGEX(.*)
 }
 
 
-06. POST /v2/entities/E1?options=append B (and check 204 No Content)
+07. POST /v2/entities/E1?options=append B (and check 204 No Content)
 ====================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

@@ -38,8 +38,9 @@ brokerStart CB
 # 06. Get E1 (attr1, attr2, attr3)
 # 07. POST /v2/entities/E1 attribute 'attr3+attr4' (no error)
 # 08. Get E1 (attr1, attr2, attr3, attr4)
-# 09. POST /v2/entities/E1?options=append attribute 'attr4+attr5' (attr4 already exists. error)
-# 10. Get E1 (attr1, attr2, attr3, attr4, attr5)
+# 09. POST /v2/entities/E1?options=append attribute 'attr4' (attr4 already exists. error)
+# 10. POST /v2/entities/E1?options=append attribute 'attr4+attr5' (207 Multi Status)
+# 11. Get E1 (attr1, attr2, attr3, attr4, attr5)
 
 echo "01. Create E1 with attr1"
 echo "========================"
@@ -101,7 +102,15 @@ echo
 echo
 
 
-echo "09. POST /v2/entities/E1/attrs?options=append attribute 'attr4+attr5' (attr4 already exists. error)"
+echo "09. POST /v2/entities/E1/attrs?options=append attribute 'attr4' (attr4 already exists. error)"
+echo "==================================================================================================="
+payload='{  "attr4": 44 }'
+orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload"
+echo
+echo
+
+
+echo "10. POST /v2/entities/E1/attrs?options=append attribute 'attr4+attr5' (207 Multi Status)"
 echo "==================================================================================================="
 payload='{  "attr4": 44, "attr5": 5 }'
 orionCurl --url '/v2/entities/E1/attrs?options=append,keyValues' --payload "$payload"
@@ -109,7 +118,7 @@ echo
 echo
 
 
-echo "10. Get E1 (attr1, attr2, attr3, attr4, attr5)"
+echo "11. Get E1 (attr1, attr2, attr3, attr4, attr5)"
 echo "=============================================="
 orionCurl --url /v2/entities/E1
 echo
@@ -257,7 +266,7 @@ Date: REGEX(.*)
 }
 
 
-09. POST /v2/entities/E1/attrs?options=append attribute 'attr4+attr5' (attr4 already exists. error)
+09. POST /v2/entities/E1/attrs?options=append attribute 'attr4' (attr4 already exists. error)
 ===================================================================================================
 HTTP/1.1 422 Unprocessable Entity
 Content-Length: 111
@@ -271,7 +280,21 @@ Date: REGEX(.*)
 }
 
 
-10. Get E1 (attr1, attr2, attr3, attr4, attr5)
+10. POST /v2/entities/E1/attrs?options=append attribute 'attr4+attr5' (207 Multi Status)
+===================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 72
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "description": "updated successfully: [ attr5 ]",
+    "error": "Multi Status"
+}
+
+
+11. Get E1 (attr1, attr2, attr3, attr4, attr5)
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 277
