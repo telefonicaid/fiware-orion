@@ -7,7 +7,7 @@ Orion Context Broker のリファレンス配布は Debian 11 です。これは
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
 
 * boost: 1.74
-* libmicrohttpd: 0.9.75 (ソースから)
+* libmicrohttpd: 0.9.73 (ソースから)
 * libcurl: 7.74.0
 * openssl: 1.1.1n
 * libuuid: 2.36.1
@@ -46,9 +46,9 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz
-        tar xvf libmicrohttpd-0.9.75.tar.gz
-        cd libmicrohttpd-0.9.75
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.73.tar.gz
+        tar xvf libmicrohttpd-0.9.73.tar.gz
+        cd libmicrohttpd-0.9.73
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
@@ -154,7 +154,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 して次のライブラリを使用します :
 
 * boost: 1.71.0
-* libmicrohttpd: 0.9.75 (ソースから)
+* libmicrohttpd: 0.9.73 (ソースから)
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
@@ -195,9 +195,9 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを
 得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz
-        tar xvf libmicrohttpd-0.9.75.tar.gz
-        cd libmicrohttpd-0.9.75
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.73.tar.gz
+        tar xvf libmicrohttpd-0.9.73.tar.gz
+        cd libmicrohttpd-0.9.73
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib

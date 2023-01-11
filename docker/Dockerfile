@@ -60,9 +60,9 @@ RUN \
       libgcrypt-dev && \
     # Install libmicrohttpd from source
     cd /opt && \
-    curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.75.tar.gz && \
-    tar xvf libmicrohttpd-0.9.75.tar.gz && \
-    cd libmicrohttpd-0.9.75 && \
+    curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.73.tar.gz && \
+    tar xvf libmicrohttpd-0.9.73.tar.gz && \
+    cd libmicrohttpd-0.9.73 && \
     ./configure --disable-messages --disable-postprocessor --disable-dauth && \
     make && \
     make install && \
@@ -112,10 +112,10 @@ RUN \
     # cleanup sources, dev tools and locales to reduce the final image size
     # FIXME: this could need more tunning. Have a look to old CentOS Docerkile and try to
     # reproduce the same steps
-    rm -rf /opt/libmicrohttpd-0.9.75.tar.gz \
+    rm -rf /opt/libmicrohttpd-0.9.73.tar.gz \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
-           /opt/libmicrohttpd-0.9.75 \
+           /opt/libmicrohttpd-0.9.73 \
            /opt/mosquitto-2.0.15.tar.gz \
            /opt/mosquitto-2.0.15 \
            /opt/mongo-c-driver-1.23.1.tar.gz \
