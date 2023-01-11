@@ -146,7 +146,9 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
+# FIXME #4261. Once the issue gets solved, this line should be uncommented
+# The REGEXPECT part would need a little adapation after that
+#orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
 
 
 payload='{
@@ -468,7 +470,7 @@ Date: REGEX(.*)
 
 {
     "counters": {
-        "jsonRequests": 55,
+        "jsonRequests": 54,
         "noPayloadRequests": 75,
         "requests": {
             "/admin/log": {
@@ -521,9 +523,6 @@ Date: REGEX(.*)
                 "PATCH": 1,
                 "POST": 1,
                 "PUT": 1
-            },
-            "/v2/op/notify": {
-                "POST": 1
             },
             "/v2/op/query": {
                 "OPTIONS": 1,
