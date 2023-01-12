@@ -15,3 +15,6 @@
 - Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
 - Remove: /ngsi9 URL paths (deprecated since Orion 1.2.0)
 - Add "Authorization" in CORS allowed headers (#4249)
+- Hardening: upgrade microhttpd dependency from 0.9.70 to 0.9.73
+- Hardening: upgrade libmosquitto dependency from 2.0.12 to 2.0.15
+- Hardening: upgrade libmongoc dependency from 1.17.4 to 1.23.1
