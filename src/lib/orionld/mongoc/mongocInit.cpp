@@ -225,7 +225,6 @@ static char* uriCompose
     }
   }
 
-  compV[compNo++] = (char*) "appname=orionld";
 
   //
   // Count all string length and get the total length of the URI
