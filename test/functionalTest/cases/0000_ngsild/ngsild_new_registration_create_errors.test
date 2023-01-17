@@ -299,6 +299,12 @@ brokerStart CB 0 IPv4 -experimental
 # 175. Attempt to create a registration with a duplicated 'management:cooldown'
 # 176. Attempt to create a registration with a foreign field 'management:cooldownx'
 #
+# 177. Error if cSourceInfo contains "NGSILD-Tenant" and the Registration::tenant field is set as well
+# 178. Error if cSourceInfo contains "Content-Length"
+# 179. Error if cSourceInfo contains "Date"
+# 180. Error if cSourceInfo contains "User-Agent"
+# 
+#
 
 echo "01. Attempt to create a registration with a payload data that is not a JSON object - see failure"
 echo "================================================================================================"
@@ -2697,6 +2703,97 @@ payload='{
   "management": {
     "cooldownx": 5
   }
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '177. Error if cSourceInfo contains "NGSILD-Tenant" and the Registration::tenant field is set as well'
+echo '===================================================================================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "tenant": "T1",
+  "contextSourceInfo": [
+    {
+      "key": "NGSILD-Tenant",
+      "value": "T1"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '178. Error if cSourceInfo contains "Content-Length"'
+echo '==================================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "Content-Length",
+      "value": "122"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '179. Error if cSourceInfo contains "Date"'
+echo '========================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "Date",
+      "value": "Today"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '180. Error if cSourceInfo contains "User-Agent"'
+echo '==============================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "User-Agent",
+      "value": "myself"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '181. No Error if cSourceInfo contains "User-HAgent" - it will be understood as a generic header'
+echo '==============================================================================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "endpoint": "http://a.b.c:8080/ok1",
+  "contextSourceInfo": [
+    {
+      "key": "User-HAgent",
+      "value": "myself"
+    }
+  ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
@@ -5180,6 +5277,71 @@ Date: REGEX(.*)
     "title": "Unrecognized field in Registration::management",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
+
+
+177. Error if cSourceInfo contains "NGSILD-Tenant" and the Registration::tenant field is set as well
+====================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "NGSILD-Tenant",
+    "title": "Invalid key in Registration::contextSourceInfo",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+178. Error if cSourceInfo contains "Content-Length"
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 144
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Content-Length",
+    "title": "Invalid key in Registration::contextSourceInfo",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+179. Error if cSourceInfo contains "Date"
+=========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Date",
+    "title": "Invalid key in Registration::contextSourceInfo",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+180. Error if cSourceInfo contains "User-Agent"
+===============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 140
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "User-Agent",
+    "title": "Invalid key in Registration::contextSourceInfo",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+181. No Error if cSourceInfo contains "User-HAgent" - it will be understood as a generic header
+===============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:REGEX(.*)
+
 
 
 --TEARDOWN--
