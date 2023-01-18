@@ -107,6 +107,26 @@ bool pCheckKeyValueArray(KjNode* csiP, OrionldContext** fwdContextPP)
         return 0;
       }
     }
+    else if (strcmp(keyP->value.s, "NGSILD-Tenant") == 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
+      return false;
+    }
+    else if (strcmp(keyP->value.s, "Date") == 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
+      return false;
+    }
+    else if (strcmp(keyP->value.s, "Content-Length") == 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
+      return false;
+    }
+    else if (strcmp(keyP->value.s, "User-Agent") == 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
+      return false;
+    }
   }
 
   return true;
