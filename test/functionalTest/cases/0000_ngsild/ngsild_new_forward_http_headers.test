@@ -34,7 +34,7 @@ accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_
 # 01. Create a registration (exclusive) for the accumulator, with all types of hjeaders inside Regostration::contextSourceInfo
 # 02. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
 # 03. Dump the accumulator to see all the HTTP headers of the forwarded request
-# 04. PATCH the registration setting the contextSourceInfo with invalid values, see what happens in the forwarded request later
+# 04. PATCH the registration setting the contextSourceInfo, see what happens in the forwarded request later
 # 05. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
 # 06. Dump the accumulator to see all the HTTP headers of the forwarded request
 #
@@ -96,21 +96,13 @@ echo
 echo
 
 
-echo "04. PATCH the registration setting the contextSourceInfo with invalid values, see what happens in the forwarded request later"
-echo "============================================================================================================================="
+echo "04. PATCH the registration setting the contextSourceInfo, see what happens in the forwarded request later"
+echo "========================================================================================================="
 payload='{
   "contextSourceInfo": [
     {
-      "key": "Content-Length",
-      "value": "12"
-    },
-    {
       "key": "Accept",
       "value": "application/ld+json"
-    },
-    {
-      "key": "User-Agent",
-      "value": "user-agent"
     },
     {
       "key": "Content-Type",
@@ -120,7 +112,6 @@ payload='{
       "key": "H1",
       "value": "Step 04"
     }
-    
   ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 -X PATCH --payload "$payload"
@@ -132,7 +123,8 @@ echo "05. Send a request to create an Entity in the CB - will be forwarded to th
 echo "================================================================================================================="
 payload='{
   "id": "urn:E1",
-  "type": "T"
+  "type": "T",
+  "A1": 12
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "FwdHeader: xyz"
 echo
@@ -185,8 +177,8 @@ Fwdheader: xyz
 =======================================
 
 
-04. PATCH the registration setting the contextSourceInfo with invalid values, see what happens in the forwarded request later
-=============================================================================================================================
+04. PATCH the registration setting the contextSourceInfo, see what happens in the forwarded request later
+=========================================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
@@ -204,8 +196,8 @@ Location: /ngsi-ld/v1/entities/urn:E1
 06. Dump the accumulator to see all the HTTP headers of the forwarded request
 =============================================================================
 POST http://REGEX(.*)/ngsi-ld/v1/entities
-Content-Length: 141
-User-Agent: user-agent,orionld/REGEX(.*)
+Content-Length: 222
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/ld+json
 Content-Type: application/json
@@ -214,6 +206,10 @@ X-Forwarded-For: REGEX(.*):9999
 H1: Step 04
 
 {
+    "https://uri.etsi.org/ngsi-ld/default-context/A1": {
+        "type": "Property",
+        "value": 12
+    },
     "id": "urn:E1",
     "type": "https://uri.etsi.org/ngsi-ld/default-context/T"
 }
