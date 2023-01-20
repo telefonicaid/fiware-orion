@@ -1,0 +1,264 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notifications on Entity Deletion
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+brokerStart CB 0 IPv4 -experimental -forwarding
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01.  Create Entity urn:E1, type T
+# 02a. Create a subscription S1 for the accumulator, on entity type T, for deletions
+# 02b. Create a subscription S2 for the accumulator, on entity type T + entity id urn:E1, for deletions
+# 02c. Create a subscription S3 for the accumulator, on entity type T + entity id urn:E2, for deletions
+# 02d. Create a subscription S4 for the accumulator, on entity type T2 + entity id urn:E1, for deletions
+# 03.  Delete urn:E1
+# 04.  Dump the accumulator, see two notifications (S1+S2) on Entity deletion for urn:E1
+#
+
+echo "01. Create Entity urn:E1, type T"
+echo "================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "name": {
+    "type": "Property",
+    "value": "1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02a. Create a subscription S1 for the accumulator, on entity type T, for deletions"
+echo "=================================================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities" : [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02b. Create a subscription S2 for the accumulator, on entity type T + entity id urn:E1, for deletions"
+echo "====================================================================================================="
+payload='{
+  "id": "urn:S2",
+  "type": "Subscription",
+  "entities" : [
+    {
+      "type": "T",
+      "id": "urn:E1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02c. Create a subscription S3 for the accumulator, on entity type T + entity id urn:E2, for deletions"
+echo "====================================================================================================="
+payload='{
+  "id": "urn:S3",
+  "type": "Subscription",
+  "entities" : [
+    {
+      "type": "T",
+      "id": "urn:E2"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02d. Create a subscription S4 for the accumulator, on entity type T2 + entity id urn:E1, for deletions"
+echo "======================================================================================================"
+payload='{
+  "id": "urn:S4",
+  "type": "Subscription",
+  "entities" : [
+    {
+      "type": "T2",
+      "id": "urn:E1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Delete urn:E1"
+echo "================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE
+echo
+echo
+
+
+echo "04. Dump the accumulator, see the notification on Entity deletion for urn:E1"
+echo "============================================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity urn:E1, type T
+================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02a. Create a subscription S1 for the accumulator, on entity type T, for deletions
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+02b. Create a subscription S2 for the accumulator, on entity type T + entity id urn:E1, for deletions
+=====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S2
+
+
+
+02c. Create a subscription S3 for the accumulator, on entity type T + entity id urn:E2, for deletions
+=====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S3
+
+
+
+02d. Create a subscription S4 for the accumulator, on entity type T2 + entity id urn:E1, for deletions
+======================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S4
+
+
+
+03. Delete urn:E1
+=================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Dump the accumulator, see the notification on Entity deletion for urn:E1
+============================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:S2
+Content-Length: 233
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "deletedAt": "202REGEX(.*)Z",
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S2",
+    "type": "Notification"
+}
+=======================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 233
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "deletedAt": "202REGEX(.*)Z",
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

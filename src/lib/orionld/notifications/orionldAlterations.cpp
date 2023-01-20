@@ -130,44 +130,54 @@ OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* 
     LM(("%d attributes are deleted in this REPLACE operation", attrs));
   }
 
-  // Count attributes that have been modified (and that survive the modification)
-  for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  if (attrsP != NULL)
   {
-    ++attrs;
+    // Count attributes that have been modified (and that survive the modification)
+    for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    {
+      ++attrs;
+    }
   }
 
   aeP->entityId          = entityId;
   aeP->entityType        = entityType;
   aeP->alteredAttributes = attrs;
-  aeP->alteredAttributeV = (OrionldAttributeAlteration*) kaAlloc(&orionldState.kalloc, attrs * sizeof(OrionldAttributeAlteration));
 
-  int ix = 0;
-  for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  if (aeP->alteredAttributes != 0)
   {
-    LM(("Alteration for attribute '%s'", attrP->name));
-    char* attrNameEq = kaStrdup(&orionldState.kalloc, attrP->name);  // Must copy to change dot for eq for ...
-    dotForEq(attrNameEq);
+    aeP->alteredAttributeV = (OrionldAttributeAlteration*) kaAlloc(&orionldState.kalloc, attrs * sizeof(OrionldAttributeAlteration));
 
-    if (attrP->type == KjNull)
+    int ix = 0;
+    for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
-      ALTERATION(AttributeDeleted);
-      continue;
+      LM(("Alteration for attribute '%s'", attrP->name));
+      char* attrNameEq = kaStrdup(&orionldState.kalloc, attrP->name);  // Must copy to change dot for eq for ...
+      dotForEq(attrNameEq);
+
+      if (attrP->type == KjNull)
+      {
+        ALTERATION(AttributeDeleted);
+        continue;
+      }
+
+      if (dbAttrsP != NULL)
+      {
+        KjNode* dbAttrP = kjLookup(dbAttrsP, attrNameEq);
+
+        if (dbAttrP == NULL)
+        {
+          ALTERATION(AttributeAdded);
+          continue;
+        }
+
+        bool valuesDiffer = kjValuesDiffer(attrP, dbAttrP);
+
+        if (valuesDiffer)
+          ALTERATION(AttributeValueChanged);
+        else
+          ALTERATION(AttributeModifiedAtChanged);  // Need to check all metadata - could also be AttributeMetadataChanged
+      }
     }
-
-    KjNode* dbAttrP = kjLookup(dbAttrsP, attrNameEq);
-
-    if (dbAttrP == NULL)
-    {
-      ALTERATION(AttributeAdded);
-      continue;
-    }
-
-    bool valuesDiffer = kjValuesDiffer(attrP, dbAttrP);
-
-    if (valuesDiffer)
-      ALTERATION(AttributeValueChanged);
-    else
-      ALTERATION(AttributeModifiedAtChanged);  // Need to check all metadata - could also be AttributeMetadataChanged
   }
 
   aeP->next = NULL;
