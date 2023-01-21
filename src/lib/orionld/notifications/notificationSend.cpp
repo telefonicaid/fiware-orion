@@ -275,8 +275,6 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
       if (strcmp(saP->name, "value")       == 0) continue;
       if (strcmp(saP->name, "object")      == 0) continue;
       if (strcmp(saP->name, "languageMap") == 0) continue;
-      if (strcmp(saP->name, "type")        == 0) continue;
-      if (strcmp(saP->name, "observedAt")  == 0) continue;
       if (strcmp(saP->name, "unitCode")    == 0) continue;
 
       eqForDot(saP->name);
@@ -315,13 +313,11 @@ KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
-    if (strcmp(attrP->name, "id") == 0)
-      continue;
-
-    if (strcmp(attrP->name, "createdAt") == 0)
-      continue;
-    if (strcmp(attrP->name, "modifiedAt") == 0)
-      continue;
+    if (strcmp(attrP->name, "id")         == 0) continue;
+    if (strcmp(attrP->name, "createdAt")  == 0) continue;
+    if (strcmp(attrP->name, "modifiedAt") == 0) continue;
+    if (strcmp(attrP->name, "deletedAt")  == 0) continue;
+    if (strcmp(attrP->name, "observedAt") == 0) continue;
 
     if (strcmp(attrP->name, "type") == 0)
     {
@@ -329,7 +325,7 @@ KjNode* entityFix(KjNode* originalEntityP, CachedSubscription* subP)
       continue;
     }
 
-    attributeFix(attrP, subP);
+    attributeFix(attrP, subP);  // FIXME: No need to call this function for DELETE Op ...
   }
 
   return entityP;
@@ -548,6 +544,7 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
     KjNode* apiEntityP = matchP->altP->finalApiEntityP;
+    LM(("apiEntityP at %p", apiEntityP));
 
     //
     // Filter out unwanted attributes, if so requested (by the Subscription)
