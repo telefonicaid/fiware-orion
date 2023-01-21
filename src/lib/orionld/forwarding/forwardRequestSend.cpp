@@ -111,6 +111,8 @@ int urlPath(char* url, int urlLen, ForwardUrlParts* urlPartsP, KjNode* endpointP
     nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities", endpointP->value.s);
   else if (urlPartsP->fwdPendingP->operation == FwdRetrieveEntity)
     nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->fwdPendingP->entityId);
+  else if (urlPartsP->fwdPendingP->operation == FwdDeleteEntity)
+    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->fwdPendingP->entityId);
   else
     LM_X(1, ("Forwarding is not implemented for '%s' requests", fwdOperations[urlPartsP->fwdPendingP->operation]));
 

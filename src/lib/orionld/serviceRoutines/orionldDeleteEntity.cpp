@@ -43,7 +43,146 @@ extern "C"
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityDelete.h"                   // mongocEntityDelete
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
+#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
+#include "orionld/forwarding/forwardingListsMerge.h"             // forwardingListsMerge
+#include "orionld/forwarding/forwardRequestSend.h"               // forwardRequestSend
+#include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"     // fwdPendingLookupByCurlHandle
+#include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// alterations -
+//
+static void alterations(char* entityId, char* entityTypeExpanded, char* entityTypeCompacted)
+{
+  //
+  // Create the alteration for notifications
+  //
+  orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
+  bzero(orionldState.alterations, sizeof(OrionldAlteration));
+  orionldState.alterations->entityId   = entityId;
+  orionldState.alterations->entityType = entityTypeExpanded;
+
+  //
+  // Create a payload body to represent the deletion (to be sent as notification later)
+  //
+  KjNode* apiEntityP      = kjObject(orionldState.kjsonP, NULL);  // Used for notifications, if needed
+  KjNode* idNodeP         = kjString(orionldState.kjsonP, "id", entityId);
+  KjNode* deletedAtNodeP  = kjString(orionldState.kjsonP, "deletedAt", orionldState.requestTimeString);
+
+  kjChildAdd(apiEntityP, idNodeP);
+  if (entityTypeCompacted != NULL)
+  {
+    KjNode* typeNodeP    = kjString(orionldState.kjsonP, "type", entityTypeCompacted);
+    kjChildAdd(apiEntityP, typeNodeP);
+  }
+  kjChildAdd(apiEntityP, deletedAtNodeP);
+
+  orionldState.alterations->finalApiEntityP = apiEntityP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// distributedDelete -
+//
+static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* entityTypeCompacted)
+{
+  ForwardPending* exclusiveList = regMatchForEntityGet(RegModeExclusive, FwdDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
+  ForwardPending* redirectList  = regMatchForEntityGet(RegModeRedirect,  FwdDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
+  ForwardPending* inclusiveList = regMatchForEntityGet(RegModeInclusive, FwdDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
+  ForwardPending* fwdPendingList;
+
+  fwdPendingList = forwardingListsMerge(exclusiveList,  redirectList);
+  fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
+
+  if (fwdPendingList == NULL)
+    return false;
+
+  // Enqueue all forwarded requests
+  // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
+  char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+
+  int forwards = 0;
+  for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
+  {
+    // Send the forwarded request and await all responses
+    if (fwdPendingP->regP != NULL)
+    {
+      char dateHeader[70];
+      snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
+
+      if (forwardRequestSend(fwdPendingP, dateHeader, xff) == 0)
+      {
+        ++forwards;
+        fwdPendingP->error = false;
+      }
+      else
+      {
+        LM_W(("Forwarded request failed"));
+        fwdPendingP->error = true;
+      }
+    }
+  }
+
+  int stillRunning = 1;
+  int loops        = 0;
+
+  while (stillRunning != 0)
+  {
+    CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
+    if (cm != 0)
+    {
+      LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
+      forwards = 0;
+      break;
+    }
+
+    if (stillRunning != 0)
+    {
+      cm = curl_multi_wait(orionldState.curlFwdMultiP, NULL, 0, 1000, NULL);
+      if (cm != CURLM_OK)
+      {
+        LM_E(("Internal Error (curl_multi_wait: error %d", cm));
+        break;
+      }
+    }
+
+    if ((++loops >= 50) && ((loops % 25) == 0))
+      LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
+  }
+
+  if (loops >= 100)
+    LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
+
+  // Wait for responses
+  if (forwards > 0)
+  {
+    CURLMsg* msgP;
+    int      msgsLeft;
+
+    while ((msgP = curl_multi_info_read(orionldState.curlFwdMultiP, &msgsLeft)) != NULL)
+    {
+      if (msgP->msg != CURLMSG_DONE)
+        continue;
+
+      if (msgP->data.result == CURLE_OK)
+      {
+        fwdPendingLookupByCurlHandle(fwdPendingList, msgP->easy_handle);
+
+        // Check HTTP Status code and WARN if not "200 OK"
+        --forwards;
+      }
+    }
+  }
+
+  return true;
+}
 
 
 
@@ -56,6 +195,7 @@ bool orionldDeleteEntity(void)
   char* entityId            = orionldState.wildcard[0];
   char* entityTypeExpanded  = orionldState.uriParams.type;
   char* entityTypeCompacted = NULL;
+  bool  distributed         = (forwarding == true) && (orionldState.uriParams.local == false);
 
   // Make sure the Entity ID is a valid URI
   PCHECK_URI(entityId, true, 0, "Invalid Entity ID", "Must be a valid URI", 400);
@@ -87,36 +227,15 @@ bool orionldDeleteEntity(void)
   if (entityTypeExpanded != NULL)
     entityTypeCompacted = orionldContextItemAliasLookup(orionldState.contextP, entityTypeExpanded, NULL, NULL);
 
-  //
-  // Create the alteration for notifications
-  //
-  orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
-  bzero(orionldState.alterations, sizeof(OrionldAlteration));
-  orionldState.alterations->entityId   = entityId;
-  orionldState.alterations->entityType = entityTypeExpanded;
+  alterations(entityId, entityTypeExpanded, entityTypeCompacted);
+
+  bool someForwarding = (distributed == false)? false : distributedDelete(entityId, entityTypeExpanded, entityTypeCompacted);
 
   //
-  // Create a payload body to represent the deletion (to be sent as notification later
+  // Delete the entity in the local DB
+  // - Error if the entity is not found locally, and not subject to forwarding
   //
-  KjNode* apiEntityP      = kjObject(orionldState.kjsonP, NULL);  // Used for notifications, if needed
-  KjNode* idNodeP         = kjString(orionldState.kjsonP, "id", entityId);
-  KjNode* deletedAtNodeP  = kjString(orionldState.kjsonP, "deletedAt", orionldState.requestTimeString);
-
-  kjChildAdd(apiEntityP, idNodeP);
-  if (entityTypeCompacted != NULL)
-  {
-    KjNode* typeNodeP    = kjString(orionldState.kjsonP, "type", entityTypeCompacted);
-    kjChildAdd(apiEntityP, typeNodeP);
-  }
-  kjChildAdd(apiEntityP, deletedAtNodeP);
-
-  orionldState.alterations->finalApiEntityP = apiEntityP;
-
-
-  //
-  // Error if the entity is not found locally (needs to be changed for Distributed Operations)
-  //
-  if (dbEntityP == NULL)
+  if ((dbEntityP == NULL) && (someForwarding == false))
   {
     // FIXME: for Distributed operations, I need to know the reg-matches here. Only 404 if no reg-matches
     orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
@@ -124,20 +243,15 @@ bool orionldDeleteEntity(void)
   }
 
   //
-  // Delete the entity in the local DB
+  // Delete the entity locally (if present)
   //
-  if (mongocEntityDelete(entityId) == false)
+  if ((dbEntityP != NULL) && (mongocEntityDelete(entityId) == false))
   {
     orionldError(OrionldInternalError, "Database Error", "mongocEntityDelete failed", 500);
     return false;
   }
 
   orionldState.httpStatusCode = SccNoContent;  // 204
-
-  if (troe)
-  {
-    LM(("Mark the entity as DELETED in TRoE DB"));  // OR, is this already taken care of?
-  }
 
   return true;
 }

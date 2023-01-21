@@ -40,4 +40,5 @@
 * Issue #280   It's OK to use arrays for both 'id' and 'type' URL parameters
 * Issue #1297  Fixed a typo in a string (modifiededAt => modifiedAt)
 * Issue #1260  Invalid longname of a attribute in error responses (eq-sign instead of dot)
-* Issue #280   Implemented notifications for entity deletion, for DELETE /entities/{entityId}
+* Issue #1307  Implemented notifications for entity deletion, for DELETE /entities/{entityId}
+* Issue #280   Implemented forwarding for entity deletion, for DELETE /entities/{entityId}
