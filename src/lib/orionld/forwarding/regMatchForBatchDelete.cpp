@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -29,35 +29,26 @@ extern "C"
 }
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/types/RegistrationMode.h"                      // registrationMode
-#include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/types/RegistrationMode.h"                      // registrationMode
+#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForGet.h"   // regMatchInformationArrayForGet
 #include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
-#include "orionld/forwarding/regMatchForEntityGet.h"             // Own interface
+#include "orionld/forwarding/regMatchForBatchDelete.h"           // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchForEntityGet -
+// regMatchForBatchDelete -
 //
-// To match for Entity Creation, a registration needs:
-// - "operations" must include "retrieveEntity"
-// - "information" must match by
-//   - entity id and
-//   - attributes if present in the registration (and 'attrs' URL param)
-//
-ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
+ForwardPending* regMatchForBatchDelete
 (
   RegistrationMode regMode,
   FwdOperation     operation,
-  const char*      entityId,
-  const char*      entityType,
-  StringArray*     attrV,
-  const char*      geoProp
+  KjNode*          entityIdAndTypeTable
 )
 {
   ForwardPending* fwdPendingHead = NULL;
@@ -65,14 +56,6 @@ ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-#ifdef DEBUG
-    KjNode* regIdP = kjLookup(regP->regTree, "id");
-    char*   regId  = (char*) "unknown registration";
-    if (regIdP != NULL)
-      regId = regIdP->value.s;
-    LM(("Treating registration '%s' for registrations of mode '%s'", regId, registrationModeToString(regMode)));
-#endif
-
     // Loop detection
     if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
     {
@@ -82,38 +65,41 @@ ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
 
     if ((regP->mode & regMode) == 0)
     {
-      LM(("%s: No Reg Match due to regMode", regId));
+      LM(("%s: No Reg Match due to regMode", regP->regId));
       continue;
     }
 
     if (regMatchOperation(regP, operation) == false)
     {
-      LM(("%s: No Reg Match due to Operation", regId));
+      LM(("%s: No Reg Match due to Operation", regP->regId));
       continue;
     }
 
-    ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, entityType, attrV, geoProp);
-    if (fwdPendingP == NULL)
+    // Go over the array of entity id/type in entityIdAndTypeTable and collect matches
+    for (KjNode* idP = entityIdAndTypeTable->value.firstChildP; idP != NULL; idP = idP->next)
     {
-      LM(("%s: No Reg Match due to Information Array", regId));
-      continue;
+      char* entityId   = idP->name;
+      char* entityType = (idP->type == KjString)? idP->value.s : NULL;
+
+      ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, entityType, NULL, NULL);
+      if (fwdPendingP != NULL)
+      {
+        fwdPendingP->entityId   = (char*) entityId;
+        fwdPendingP->entityType = (char*) entityType;
+        fwdPendingP->operation  = operation;
+
+        // Add fwdPendingP to the linked list
+        if (fwdPendingHead == NULL)
+          fwdPendingHead = fwdPendingP;
+        else
+          fwdPendingTail->next = fwdPendingP;
+
+        fwdPendingTail       = fwdPendingP;
+        fwdPendingTail->next = NULL;
+
+        LM(("%s: Reg Match !", regP->regId));
+      }
     }
-
-    // Add extra info in ForwardPending, needed by forwardRequestSend
-    fwdPendingP->entityId   = (char*) entityId;
-    fwdPendingP->entityType = (char*) entityType;
-    fwdPendingP->operation  = operation;
-
-    // Add fwdPendingP to the linked list
-    if (fwdPendingHead == NULL)
-      fwdPendingHead = fwdPendingP;
-    else
-      fwdPendingTail->next = fwdPendingP;
-
-    fwdPendingTail       = fwdPendingP;
-    fwdPendingTail->next = NULL;
-
-    LM(("%s: Reg Match !", regId));
   }
 
   return fwdPendingHead;

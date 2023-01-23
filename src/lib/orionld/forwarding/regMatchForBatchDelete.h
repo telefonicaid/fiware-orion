@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESEXIST_H_
-#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESEXIST_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHFORBATCHDELETE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHFORBATCHDELETE_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,12 +30,21 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/types/RegistrationMode.h"                      // registrationMode
+#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
+
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocEntitiesExist -
+// regMatchForBatchDelete -
 //
-extern KjNode* mongocEntitiesExist(KjNode* entityIdArray, bool entityType);
+extern ForwardPending* regMatchForBatchDelete
+(
+  RegistrationMode regMode,
+  FwdOperation     operation,
+  KjNode*          entityIdAndTypeTable
+);
 
-#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESEXIST_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHFORBATCHDELETE_H_

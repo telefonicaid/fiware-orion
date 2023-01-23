@@ -113,6 +113,8 @@ int urlPath(char* url, int urlLen, ForwardUrlParts* urlPartsP, KjNode* endpointP
     nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->fwdPendingP->entityId);
   else if (urlPartsP->fwdPendingP->operation == FwdDeleteEntity)
     nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->fwdPendingP->entityId);
+  else if (urlPartsP->fwdPendingP->operation == FwdDeleteBatch)
+    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entityOperations/delete", endpointP->value.s);
   else
     LM_X(1, ("Forwarding is not implemented for '%s' requests", fwdOperations[urlPartsP->fwdPendingP->operation]));
 
@@ -623,6 +625,8 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_TIMEOUT_MS, 5000);                     // Timeout - hard-coded to 5 seconds for now ...
   curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
   curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
+
+  // curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_HEADERFUNCTION, responseHeaderSave);   // Callback for headers
 
 
   //

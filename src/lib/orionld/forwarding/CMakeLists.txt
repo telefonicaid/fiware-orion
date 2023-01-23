@@ -40,6 +40,7 @@ SET (SOURCES
     regMatchAttributesForGet.cpp
     regMatchForEntityCreation.cpp
     regMatchForEntityGet.cpp
+    regMatchForBatchDelete.cpp
     xForwardedForCompose.cpp
     xForwardedForMatch.cpp
 )

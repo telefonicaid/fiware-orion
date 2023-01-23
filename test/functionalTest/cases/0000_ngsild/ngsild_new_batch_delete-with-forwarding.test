@@ -1,0 +1,391 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Delete with forwarding
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB 0 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+brokerStart CP2 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create 4 entities: E1, E2, E3, and E4 on CB
+# 02. Create E5 on CP1
+# 03. Create E6 on CP2
+# 04. Create E7+E9 on CP2 (with type T2)
+# 05. Create Registration for entity type T + entity id urn:E5 for CP1
+# 06. Create Registration for entity type T for CP2 (matching all entities except E7)
+# 07. Delete entities E1-E3,E5-E8 using POST /ngsi-ld/v1/entityOperations/delete, see error 404 for E8, as it doesn't exist
+# 08. Get all entities from CB see E4
+# 09. Get all entities from CP1 see []
+# 10. Get all entities from CP2 see E9
+#
+
+echo "01. Create 4 entities: E1, E2, E3, and E4"
+echo "========================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:E3",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 3
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:E4",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 4
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E5 on CP1"
+echo "===================="
+payload='{
+  "id": "urn:E5",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Create E6 on CP2"
+echo "===================="
+payload='{
+  "id": "urn:E6",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Create E7+E9 on CP2 (with type T2)"
+echo "======================================"
+payload='{
+  "id": "urn:E7",
+  "type": "T2",
+  "A": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+payload='{
+  "id": "urn:E9",
+  "type": "T2",
+  "A": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "05. Create Registration for entity type T + entity id urn:E5 for CP1"
+echo "===================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E5",
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "operations": [ "deleteBatch" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "06. Create Registration for entity type T for CP2 (matching all entities except E7)"
+echo "==================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "operations": [ "deleteBatch" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Delete entities E1-E3,E5-E8 using POST /ngsi-ld/v1/entityOperations/delete, see error 404 for E8, as it doesn't exist"
+echo "========================================================================================================================="
+payload='[
+  "urn:E1",
+  "urn:E2",
+  "urn:E3",
+  "urn:E5",
+  "urn:E6",
+  "urn:E7",
+  "urn:E8"
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/delete -X POST --payload "$payload" -H "Accept: application/ld+json" --linkHeaderFix
+echo
+echo
+
+
+echo "08. Get all entities from CB see E4"
+echo "==================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&local=true"
+echo
+echo
+
+
+echo "09. Get all entities from CP1 see []"
+echo "===================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&local=true" --port $CP1_PORT
+echo
+echo
+
+
+echo "10. Get all entities from CP2 see E9"
+echo "===================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&local=true" --port $CP2_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 4 entities: E1, E2, E3, and E4
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E4
+
+
+
+02. Create E5 on CP1
+====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E5
+
+
+
+03. Create E6 on CP2
+====================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E6
+
+
+
+04. Create E7+E9 on CP2 (with type T2)
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E7
+
+
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E9
+
+
+
+05. Create Registration for entity type T + entity id urn:E5 for CP1
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+
+
+
+06. Create Registration for entity type T for CP2 (matching all entities except E7)
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R2
+
+
+
+07. Delete entities E1-E3,E5-E8 using POST /ngsi-ld/v1/entityOperations/delete, see error 404 for E8, as it doesn't exist
+=========================================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 264
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errors": [
+        {
+            "entityId": "urn:E8",
+            "error": {
+                "detail": "Cannot delete entities that do not exist",
+                "status": 404,
+                "title": "Entity Not Found",
+                "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+            }
+        }
+    ],
+    "success": [
+        "urn:E1",
+        "urn:E2",
+        "urn:E3",
+        "urn:E5",
+        "urn:E6",
+        "urn:E7"
+    ]
+}
+
+
+08. Get all entities from CB see E4
+===================================
+HTTP/1.1 200 OK
+Content-Length: 34
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "A": 4,
+        "id": "urn:E4",
+        "type": "T"
+    }
+]
+
+
+09. Get all entities from CP1 see []
+====================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+10. Get all entities from CP2 see E9
+====================================
+HTTP/1.1 200 OK
+Content-Length: 35
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "A": 1,
+        "id": "urn:E9",
+        "type": "T2"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

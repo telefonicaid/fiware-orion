@@ -227,8 +227,6 @@ bool orionldDeleteEntity(void)
   if (entityTypeExpanded != NULL)
     entityTypeCompacted = orionldContextItemAliasLookup(orionldState.contextP, entityTypeExpanded, NULL, NULL);
 
-  alterations(entityId, entityTypeExpanded, entityTypeCompacted);
-
   bool someForwarding = (distributed == false)? false : distributedDelete(entityId, entityTypeExpanded, entityTypeCompacted);
 
   //
@@ -244,12 +242,16 @@ bool orionldDeleteEntity(void)
 
   //
   // Delete the entity locally (if present)
+  // Give 404 if the entity is not present locally nor triggered any forwarded requests
   //
   if ((dbEntityP != NULL) && (mongocEntityDelete(entityId) == false))
   {
     orionldError(OrionldInternalError, "Database Error", "mongocEntityDelete failed", 500);
     return false;
   }
+
+  if ((dbEntityP != NULL) || (someForwarding == true))
+    alterations(entityId, entityTypeExpanded, entityTypeCompacted);
 
   orionldState.httpStatusCode = SccNoContent;  // 204
 
