@@ -416,9 +416,9 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   //
   // Need to keep track of ALL incoming headers, in case they're asked for in forwarded requests
   // This is copying information, but as it is not a default behaviour, that's OK.
-  // Forwarding slows down eberything SO MUCH, so, ... I'm perfectly fine with this copy
+  // Distributed operations slow down everything SO MUCH, so, ... I'm perfectly fine with this copy
   //
-  if (forwarding == true)
+  if (distributed == true)
   {
     KjNode* kvP = kjString(orionldState.kjsonP, key, value);
 
@@ -833,6 +833,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     if (strcmp(value, "true") == 0)
       orionldState.uriParams.collapse = true;
+    else if (strcmp(key, "false") != 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /collapse/", value, 400);
+      return MHD_YES;
+    }
   }
   //
   // NOTE: Seems like both "attributeFormat" AND "attributesFormat" need to be supported
@@ -842,6 +847,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     orionldState.uriParams.attributeFormat = (char*) value;
     if (strcmp(value, "object") == 0)
       orionldState.in.attributeFormatAsObject = true;
+    else
+    {
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /attributeFormat/", value, 400);
+      return MHD_YES;
+    }
   }
   else if (strcmp(key, "relationships") == 0)
   {
@@ -862,6 +872,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     if (strcmp(value, "true") == 0)
       orionldState.uriParams.reset = true;
+    else if (strcmp(key, "false") != 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /reset/", value, 400);
+      return MHD_YES;
+    }
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_RESET;
   }
   else if (strcmp(key, "level") == 0)
@@ -872,7 +887,16 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (strcmp(key, "local") == 0)
   {
     if (strcmp(value, "true") == 0)
+    {
       orionldState.uriParams.local = true;
+      orionldState.distributed = false;
+    }
+    else if (strcmp(key, "false") != 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /local/", value, 400);
+      return MHD_YES;
+    }
+
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_LOCAL;
   }
   else if (strcmp(key, "entity::type") == 0)  // Is NGSIv1 ?entity::type=X the same as NGSIv2 ?type=X ?

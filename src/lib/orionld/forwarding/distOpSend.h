@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDINGRELEASE_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FORWARDINGRELEASE_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPSEND_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPSEND_H_
 
 /*
 *
@@ -25,14 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardingRelease -
+// distOpSend -
 //
-extern void forwardingRelease(ForwardPending* fwdPendingList);
+extern bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDINGRELEASE_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPSEND_H_

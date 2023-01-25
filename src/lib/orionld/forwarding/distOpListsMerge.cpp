@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FWDENTITYMERGE_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FWDENTITYMERGE_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,17 +22,31 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpListsMerge.h"                 // Own interface
+
+
+
+// ----------------------------------------------------------------------------
+//
+// distOpListsMerge -
+//
+DistOp* distOpListsMerge(DistOp* list1, DistOp* list2)
 {
-#include "kjson/KjNode.h"                                        // KjNode
+  if (list2 == NULL)
+    return list1;
+  else if (list1 == NULL)
+    return list2;
+
+  //
+  // Both lists are non-NULL
+  // Find the last item in list1 and make its next pointer point to the first in list2
+  //
+  DistOp* lastInList1 = list1;
+  while (lastInList1->next != NULL)
+    lastInList1 = lastInList1->next;
+
+  lastInList1->next = list2;
+
+  return list1;
 }
-
-
-
-// -----------------------------------------------------------------------------
-//
-// fwdEntityMerge -
-//
-extern bool fwdEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary);
-
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FWDENTITYMERGE_H_

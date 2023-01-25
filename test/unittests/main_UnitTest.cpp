@@ -97,7 +97,7 @@ char            troeHost[256];
 unsigned short  troePort;
 char            troeUser[256];
 char            troePwd[256];
-bool            forwarding              = true;
+bool            distributed             = true;
 bool            idIndex                 = false;
 bool            noNotifyFalseUpdate     = false;
 char            dbUser[64]              = { 0 };

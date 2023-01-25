@@ -29,9 +29,9 @@ extern "C"
 }
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
-#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForGet.h"   // regMatchInformationArrayForGet
@@ -44,15 +44,15 @@ extern "C"
 //
 // regMatchForBatchDelete -
 //
-ForwardPending* regMatchForBatchDelete
+DistOp* regMatchForBatchDelete
 (
   RegistrationMode regMode,
-  FwdOperation     operation,
+  DistOpType       operation,
   KjNode*          entityIdAndTypeTable
 )
 {
-  ForwardPending* fwdPendingHead = NULL;
-  ForwardPending* fwdPendingTail = NULL;
+  DistOp* distOpHead = NULL;
+  DistOp* distOpTail = NULL;
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
@@ -81,26 +81,26 @@ ForwardPending* regMatchForBatchDelete
       char* entityId   = idP->name;
       char* entityType = (idP->type == KjString)? idP->value.s : NULL;
 
-      ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, entityType, NULL, NULL);
-      if (fwdPendingP != NULL)
+      DistOp* distOpP = regMatchInformationArrayForGet(regP, entityId, entityType, NULL, NULL);
+      if (distOpP != NULL)
       {
-        fwdPendingP->entityId   = (char*) entityId;
-        fwdPendingP->entityType = (char*) entityType;
-        fwdPendingP->operation  = operation;
+        distOpP->entityId   = (char*) entityId;
+        distOpP->entityType = (char*) entityType;
+        distOpP->operation  = operation;
 
-        // Add fwdPendingP to the linked list
-        if (fwdPendingHead == NULL)
-          fwdPendingHead = fwdPendingP;
+        // Add distOpP to the linked list
+        if (distOpHead == NULL)
+          distOpHead = distOpP;
         else
-          fwdPendingTail->next = fwdPendingP;
+          distOpTail->next = distOpP;
 
-        fwdPendingTail       = fwdPendingP;
-        fwdPendingTail->next = NULL;
+        distOpTail       = distOpP;
+        distOpTail->next = NULL;
 
         LM(("%s: Reg Match !", regP->regId));
       }
     }
   }
 
-  return fwdPendingHead;
+  return distOpHead;
 }

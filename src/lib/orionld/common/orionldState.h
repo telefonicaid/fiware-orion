@@ -226,7 +226,7 @@ typedef struct OrionldStateOut
 typedef struct OrionldStateIn
 {
   // Incoming HTTP headers
-  KjNode*   httpHeaders;         // Object holding all incoming headers - used for forwarding and "urn:ngsi-ld:request"
+  KjNode*   httpHeaders;         // Object holding all incoming headers - used for Distributed requests and "urn:ngsi-ld:request"
   MimeType  contentType;
   char*     contentTypeString;
   int       contentLength;
@@ -294,6 +294,7 @@ typedef struct OrionldMongoC
 typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
+  bool                    distributed;            // Depends on a URI param, but can be modified (to false) via an HTTP header
   MHD_Connection*         mhdConnection;
   struct timeval          transactionStart;       // For metrics
   struct timespec         timestamp;              // The time when the request entered
@@ -382,9 +383,9 @@ typedef struct OrionldConnectionState
   //
   // CURL Handles + Headers Lists
   //
-  CURLM*                  multiP;                // curl multi api
+  CURLM*                  multiP;                // curl multi api, used for HTTPS notifications
   CURL**                  easyV;
-  CURLM*                  curlFwdMultiP;
+  CURLM*                  curlDoMultiP;          // curl multi api, used for Distributed operation
   int                     easySize;
   int                     easyIx;
   struct curl_slist**     curlHeadersV;
@@ -411,7 +412,7 @@ typedef struct OrionldConnectionState
   //
   // General Behavior
   //
-  bool                    forwardAttrsCompacted;
+  bool                    distOpAttrsCompacted;
   uint32_t                acceptMask;            // "1 << MimeType" mask for all accepted Mime Types, regardless of which is chosen and of weight
 
   //
@@ -493,10 +494,10 @@ typedef struct Timestamps
   struct timespec notifEnd;               // End of            Sending of Notifications
   struct timespec notifDbStart;           // Start of          DB query for Notifications
   struct timespec notifDbEnd;             // End of            DB query for Notifications
-  struct timespec forwardStart;           // Start of          Sending of Forwarded messages
-  struct timespec forwardEnd;             // End of            Sending of Forwarded messages
-  struct timespec forwardDbStart;         // Start of          DB query for Forwaring
-  struct timespec forwardDbEnd;           // End of            DB query for Forwaring
+  struct timespec distOpStart;            // Start of          Sending of Distributed Operation
+  struct timespec distOpEnd;              // End of            Sending of Distributed Operation
+  struct timespec distOpDbStart;          // Start of          DB query for Distributed Operation
+  struct timespec distOpDbEnd;            // End of            DB query for Distributed Operation
   struct timespec renderStart;            // Start of          Resonse Payload body render JSON
   struct timespec renderEnd;              // End of            Resonse Payload body render JSON
   struct timespec restReplyStart;         // Start of          REST Reply
@@ -567,7 +568,7 @@ extern char              troeUser[256];            // From orionld.cpp
 extern char              troePwd[256];             // From orionld.cpp
 extern int               troePoolSize;             // From orionld.cpp
 extern char              pgPortString[16];
-extern bool              forwarding;               // From orionld.cpp
+extern bool              distributed;              // From orionld.cpp
 extern const char*       orionldVersion;
 extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;

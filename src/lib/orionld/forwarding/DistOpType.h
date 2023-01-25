@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FWDOPERATION_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FWDOPERATION_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPTYPE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPTYPE_H_
 
 /*
 *
@@ -35,97 +35,97 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// FwdOperation -
+// DistOpType -
 //
-typedef enum FwdOperation
+typedef enum DistOpType
 {
-  FwdNone,                           // 0
-  FwdCreateEntity,
-  FwdUpdateEntity,
-  FwdAppendAttrs,
-  FwdUpdateAttrs,
-  FwdDeleteAttrs,                    // 5
-  FwdDeleteEntity,
-  FwdCreateBatch,
-  FwdUpsertBatch,
-  FwdUpdateBatch,
-  FwdDeleteBatch,                    // 10
-  FwdUpsertTemporal,
-  FwdAppendAttrsTemporal,
-  FwdDeleteAttrsTemporal,
-  FwdUpdateAttrsTemporal,
-  FwdDeleteAttrInstanceTemporal,     // 15
-  FwdDeleteTemporal,
-  FwdMergeEntity,
-  FwdReplaceEntity,
-  FwdReplaceAttrs,
-  FwdMergeBatch,                     // 20
+  DoNone,                           // 0
+  DoCreateEntity,
+  DoUpdateEntity,
+  DoAppendAttrs,
+  DoUpdateAttrs,
+  DoDeleteAttrs,                    // 5
+  DoDeleteEntity,
+  DoCreateBatch,
+  DoUpsertBatch,
+  DoUpdateBatch,
+  DoDeleteBatch,                    // 10
+  DoUpsertTemporal,
+  DoAppendAttrsTemporal,
+  DoDeleteAttrsTemporal,
+  DoUpdateAttrsTemporal,
+  DoDeleteAttrInstanceTemporal,     // 15
+  DoDeleteTemporal,
+  DoMergeEntity,
+  DoReplaceEntity,
+  DoReplaceAttrs,
+  DoMergeBatch,                     // 20
 
-  FwdRetrieveEntity,
-  FwdQueryEntity,
-  FwdQueryBatch,
-  FwdRetrieveTemporal,
-  FwdQueryTemporal,                  // 25
-  FwdRetrieveEntityTypes,
-  FwdRetrieveEntityTypeDetails,
-  FwdRetrieveEntityTypeInfo,
-  FwdRetrieveAttrTypes,
-  FwdRetrieveAttrTypeDetails,        // 30
-  FwdRetrieveAttrTypeInfo,
+  DoRetrieveEntity,
+  DoQueryEntity,
+  DoQueryBatch,
+  DoRetrieveTemporal,
+  DoQueryTemporal,                  // 25
+  DoRetrieveEntityTypes,
+  DoRetrieveEntityTypeDetails,
+  DoRetrieveEntityTypeInfo,
+  DoRetrieveAttrTypes,
+  DoRetrieveAttrTypeDetails,        // 30
+  DoRetrieveAttrTypeInfo,
 
-  FwdCreateSubscription,
-  FwdUpdateSubscription,
-  FwdRetrieveSubscription,
-  FwdQuerySubscription,              // 35
-  FwdDeleteSubscription
-} FwdOperation;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// fwdOperations -
-//
-extern const char* fwdOperations[37];
+  DoCreateSubscription,
+  DoUpdateSubscription,
+  DoRetrieveSubscription,
+  DoQuerySubscription,              // 35
+  DoDeleteSubscription
+} DistOpType;
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationUrlLen -
+// distOpTypes -
 //
-extern const int fwdOperationUrlLen[37];
+extern const char* distOpTypes[37];
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationToString -
+// distOpTypeUrlLen -
 //
-extern const char* fwdOperationToString(FwdOperation op);
+extern const int distOpTypeUrlLen[37];
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationFromString -
+// distOpTypeToString -
 //
-extern FwdOperation fwdOperationFromString(const char* fwdOp);
+extern const char* distOpTypeToString(DistOpType op);
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationAliasFromString -
+// distOpTypeFromString -
 //
-extern FwdOperation fwdOperationAliasFromString(const char* fwdOp);
+extern DistOpType distOpTypeFromString(const char* fwdOp);
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationMask -
+// distOpTypeAliasFromString -
 //
-extern uint64_t fwdOperationMask(KjNode* operationsP);
+extern DistOpType distOpTypeAliasFromString(const char* fwdOp);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FWDOPERATION_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// distOpTypeMask -
+//
+extern uint64_t distOpTypeMask(KjNode* operationsP);
+
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPTYPE_H_

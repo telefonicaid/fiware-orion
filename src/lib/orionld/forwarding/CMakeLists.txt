@@ -21,15 +21,15 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    forwardingInit.cpp
-    FwdOperation.cpp
-    forwardRequestSend.cpp
-    forwardingRelease.cpp
-    forwardingSuccess.cpp
-    forwardingFailure.cpp
-    forwardingListsMerge.cpp
-    fwdPendingLookupByCurlHandle.cpp
-    fwdEntityMerge.cpp
+    DistOpType.cpp
+    distOpInit.cpp
+    distOpSend.cpp
+    distOpListRelease.cpp
+    distOpSuccess.cpp
+    distOpFailure.cpp
+    distOpListsMerge.cpp
+    distOpLookupByCurlHandle.cpp
+    distOpEntityMerge.cpp
     regMatchEntityInfo.cpp
     regMatchOperation.cpp
     regMatchInformationItem.cpp

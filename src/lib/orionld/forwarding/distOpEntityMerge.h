@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPENTITYMERGE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPENTITYMERGE_H_
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -22,28 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
-#include <curl/curl.h>                                           // curl
-
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdPendingLookupByCurlHandle -
+// distOpEntityMerge -
 //
-ForwardPending* fwdPendingLookupByCurlHandle(ForwardPending* fwdPendingList, CURL* easyHandle)
-{
-  ForwardPending* fwdPendingP = fwdPendingList;
+extern bool distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary);
 
-  while (fwdPendingP != NULL)
-  {
-    if (fwdPendingP->curlHandle == easyHandle)
-      return fwdPendingP;
-
-    fwdPendingP = fwdPendingP->next;
-  }
-
-  return NULL;
-}
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPENTITYMERGE_H_

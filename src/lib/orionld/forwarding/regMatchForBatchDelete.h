@@ -30,9 +30,9 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
-#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 
 
 
@@ -40,10 +40,10 @@ extern "C"
 //
 // regMatchForBatchDelete -
 //
-extern ForwardPending* regMatchForBatchDelete
+extern DistOp* regMatchForBatchDelete
 (
   RegistrationMode regMode,
-  FwdOperation     operation,
+  DistOpType       operation,
   KjNode*          entityIdAndTypeTable
 );
 

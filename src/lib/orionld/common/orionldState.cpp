@@ -133,6 +133,8 @@ void orionldStateInit(MHD_Connection* connection)
   //
   bzero(&orionldState, sizeof(orionldState));   // Performance: ~5 microseconds
 
+  orionldState.distributed = distributed;
+
   //
   // Creating kjson environment for KJson parse and render
   //
@@ -149,12 +151,12 @@ void orionldStateInit(MHD_Connection* connection)
   orionldState.errorAttributeArrayP    = orionldState.errorAttributeArray;
   orionldState.errorAttributeArraySize = sizeof(orionldState.errorAttributeArray);
   orionldState.contextP                = orionldCoreContextP;
-  orionldState.forwardAttrsCompacted   = true;
+  orionldState.distOpAttrsCompacted    = true;
   orionldState.delayedFreeVecSize      = sizeof(orionldState.delayedFreeVec) / sizeof(orionldState.delayedFreeVec[0]);
 
   orionldState.uriParams.spaces        = 2;
 
-  // Paginataion
+  // Pagination
   orionldState.uriParams.offset        = 0;
   orionldState.uriParams.limit         = 20;
 

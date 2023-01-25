@@ -30,8 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
-#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 
 
@@ -40,10 +40,10 @@ extern "C"
 //
 // regMatchForEntityCreation -
 //
-extern ForwardPending* regMatchForEntityCreation
+extern DistOp* regMatchForEntityCreation
 (
   RegistrationMode regMode,
-  FwdOperation     operation,
+  DistOpType       operation,
   const char*      entityId,
   const char*      entityType,
   KjNode*          incomingP

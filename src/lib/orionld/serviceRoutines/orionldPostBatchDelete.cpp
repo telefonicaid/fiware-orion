@@ -45,10 +45,10 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/mongoc/mongocEntitiesExist.h"                // mongocEntitiesExist
 #include "orionld/mongoc/mongocEntitiesDelete.h"               // mongocEntitiesDelete
-#include "orionld/forwarding/ForwardPending.h"                 // ForwardPending
-#include "orionld/forwarding/forwardingListsMerge.h"           // forwardingListsMerge
-#include "orionld/forwarding/forwardRequestSend.h"             // forwardRequestSend
-#include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"   // fwdPendingLookupByCurlHandle
+#include "orionld/forwarding/DistOp.h"                         // DistOp
+#include "orionld/forwarding/distOpListsMerge.h"               // distOpListsMerge
+#include "orionld/forwarding/distOpSend.h"                     // distOpSend
+#include "orionld/forwarding/distOpLookupByCurlHandle.h"       // distOpLookupByCurlHandle
 #include "orionld/forwarding/xForwardedForCompose.h"           // xForwardedForCompose
 #include "orionld/forwarding/regMatchForBatchDelete.h"         // regMatchForBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
@@ -119,10 +119,10 @@ KjNode* dbModelToEntityIdAndTypeTable(KjNode* dbEntityIdArray)
 //
 // distReqLog -
 //
-void distReqLog(ForwardPending* distReqList, const char* title)
+void distReqLog(DistOp* distReqList, const char* title)
 {
   LM(("DR: %s", title));
-  for (ForwardPending* drP = distReqList; drP != NULL; drP = drP->next)
+  for (DistOp* drP = distReqList; drP != NULL; drP = drP->next)
   {
     LM(("DR: Registration:               %s", drP->regP->regId));
     LM(("DR: Verb:                       %s", "TBD"));
@@ -150,9 +150,9 @@ void distReqLog(ForwardPending* distReqList, const char* title)
 //
 // firstItemOfRegLookup -
 //
-ForwardPending* firstItemOfRegLookup(ForwardPending* distReqList, RegCacheItem* regP)
+DistOp* firstItemOfRegLookup(DistOp* distReqList, RegCacheItem* regP)
 {
-  for (ForwardPending* drP = distReqList; drP != NULL; drP = drP->next)
+  for (DistOp* drP = distReqList; drP != NULL; drP = drP->next)
   {
     if (drP->regP == regP)
       return drP;
@@ -167,14 +167,14 @@ ForwardPending* firstItemOfRegLookup(ForwardPending* distReqList, RegCacheItem* 
 //
 // distReqsMergeForBatchDelete -
 //
-void distReqsMergeForBatchDelete(ForwardPending* distReqList)
+void distReqsMergeForBatchDelete(DistOp* distReqList)
 {
   //
   // Payload body needed for the entity id(s)
   //
-  ForwardPending* drP  = distReqList;
-  ForwardPending* next;
-  ForwardPending* prev = NULL;
+  DistOp* drP  = distReqList;
+  DistOp* next;
+  DistOp* prev = NULL;
 
   while (drP != NULL)
   {
@@ -184,7 +184,7 @@ void distReqsMergeForBatchDelete(ForwardPending* distReqList)
     // Either it's the first, in which case the drP->body needs to be created (as an array and entityId added to it)
     // Or, the first must be found, and the entityId added to its array (and the drP item to be removed)
     //
-    ForwardPending* firstP = firstItemOfRegLookup(distReqList, drP->regP);
+    DistOp* firstP = firstItemOfRegLookup(distReqList, drP->regP);
 
     if (drP == firstP)
     {
@@ -254,7 +254,7 @@ static KjNode* entityIdLookupInObjectArray(KjNode* objectArray, char* entityId)
 //
 // responseMerge -
 //
-static void responseMerge(ForwardPending* drP, KjNode* responseSuccess, KjNode* responseErrors)
+static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* responseErrors)
 {
   kjTreeLog(drP->body, "KZ: drP->body BEFORE");
   kjTreeLog(responseSuccess, "KZ: responseSuccess BEFORE");
@@ -482,8 +482,7 @@ bool orionldPostBatchDelete(void)
 
 
   // Get the list of Forwarded requests, for matching registrations
-  bool distributed = (forwarding == true) && (orionldState.uriParams.local == false);
-  if (distributed == false)
+  if (orionldState.distributed == false)
   {
     LM(("KZ3: Need to create the response, well, fix the arrays that define the response later"));
     kjTreeLog(responseErrors, "KZ3: responseErrors");
@@ -491,13 +490,13 @@ bool orionldPostBatchDelete(void)
   }
   else
   {
-    ForwardPending* exclusiveList = regMatchForBatchDelete(RegModeAuxiliary, FwdDeleteBatch, entityIdAndTypeTable);
-    ForwardPending* redirectList  = regMatchForBatchDelete(RegModeRedirect,  FwdDeleteBatch, entityIdAndTypeTable);
-    ForwardPending* inclusiveList = regMatchForBatchDelete(RegModeInclusive, FwdDeleteBatch, entityIdAndTypeTable);
-    ForwardPending* distReqList;
+    DistOp* exclusiveList = regMatchForBatchDelete(RegModeAuxiliary, DoDeleteBatch, entityIdAndTypeTable);
+    DistOp* redirectList  = regMatchForBatchDelete(RegModeRedirect,  DoDeleteBatch, entityIdAndTypeTable);
+    DistOp* inclusiveList = regMatchForBatchDelete(RegModeInclusive, DoDeleteBatch, entityIdAndTypeTable);
+    DistOp* distReqList;
 
-    distReqList = forwardingListsMerge(exclusiveList,  redirectList);
-    distReqList = forwardingListsMerge(distReqList, inclusiveList);
+    distReqList = distOpListsMerge(exclusiveList,  redirectList);
+    distReqList = distOpListsMerge(distReqList, inclusiveList);
 
     distReqLog(distReqList, "Before distReqsMergeForBatchDelete");
     distReqsMergeForBatchDelete(distReqList);
@@ -514,7 +513,7 @@ bool orionldPostBatchDelete(void)
       char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
 
       int forwards = 0;
-      for (ForwardPending* distReqP = distReqList; distReqP != NULL; distReqP = distReqP->next)
+      for (DistOp* distReqP = distReqList; distReqP != NULL; distReqP = distReqP->next)
       {
         // Send the forwarded request and await all responses
         if (distReqP->regP != NULL)
@@ -522,7 +521,7 @@ bool orionldPostBatchDelete(void)
           char dateHeader[70];
           snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-          if (forwardRequestSend(distReqP, dateHeader, xff) == 0)
+          if (distOpSend(distReqP, dateHeader, xff) == 0)
           {
             ++forwards;
             distReqP->error = false;
@@ -540,7 +539,7 @@ bool orionldPostBatchDelete(void)
 
       while (stillRunning != 0)
       {
-        CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
+        CURLMcode cm = curl_multi_perform(orionldState.curlDoMultiP, &stillRunning);
         if (cm != 0)
         {
           LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
@@ -550,7 +549,7 @@ bool orionldPostBatchDelete(void)
 
         if (stillRunning != 0)
         {
-          cm = curl_multi_wait(orionldState.curlFwdMultiP, NULL, 0, 1000, NULL);
+          cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 1000, NULL);
           if (cm != CURLM_OK)
           {
             LM_E(("Internal Error (curl_multi_wait: error %d", cm));
@@ -571,14 +570,14 @@ bool orionldPostBatchDelete(void)
         CURLMsg* msgP;
         int      msgsLeft;
 
-        while ((msgP = curl_multi_info_read(orionldState.curlFwdMultiP, &msgsLeft)) != NULL)
+        while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
         {
           if (msgP->msg != CURLMSG_DONE)
             continue;
 
           if (msgP->data.result == CURLE_OK)
           {
-            ForwardPending* drP = fwdPendingLookupByCurlHandle(distReqList, msgP->easy_handle);
+            DistOp* drP = distOpLookupByCurlHandle(distReqList, msgP->easy_handle);
 
             curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &drP->httpResponseCode);
             LM(("Got a response HTTP Status for Reg '%s': %d", drP->regP->regId, drP->httpResponseCode));

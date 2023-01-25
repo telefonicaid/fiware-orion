@@ -48,12 +48,12 @@ extern "C"
 #include "orionld/apiModel/ntonEntity.h"                         // ntonEntity
 #include "orionld/apiModel/ntosEntity.h"                         // ntosEntity
 #include "orionld/apiModel/ntocEntity.h"                         // ntocEntity
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
-#include "orionld/forwarding/forwardingListsMerge.h"             // forwardingListsMerge
-#include "orionld/forwarding/forwardRequestSend.h"               // forwardRequestSend
-#include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"     // fwdPendingLookupByCurlHandle
-#include "orionld/forwarding/fwdEntityMerge.h"                   // fwdEntityMerge
+#include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
+#include "orionld/forwarding/distOpSend.h"                       // distOpSend
+#include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
+#include "orionld/forwarding/distOpEntityMerge.h"                // distOpEntityMerge
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own interface
 
@@ -74,7 +74,6 @@ bool orionldGetEntity(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntity();
 
-  bool         distributed = (forwarding == true) && (orionldState.uriParams.local == false);
   bool         sysAttrs    = orionldState.uriParamOptions.sysAttrs;
   char*        lang        = orionldState.uriParams.lang;
   char*        entityType  = NULL;  // If the entity is found locally, its type will be included as help in the forwarded requests
@@ -131,7 +130,7 @@ bool orionldGetEntity(void)
         entityType = entityTypeP->value.s;
     }
 
-    if (distributed == true)
+    if (orionldState.distributed == true)
     {
       forcedSysAttrs = true;
       apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, lang, true, &orionldState.pd);
@@ -140,10 +139,10 @@ bool orionldGetEntity(void)
       apiEntityP = dbModelToApiEntity2(dbEntityP, sysAttrs, orionldState.out.format, lang, true, &orionldState.pd);
   }
 
-  ForwardPending*  fwdPendingList = NULL;
-  int              forwards       = 0;
+  DistOp*  distOpList = NULL;
+  int      forwards       = 0;
 
-  if (distributed)
+  if (orionldState.distributed)
   {
     StringArray*  attrV   = (orionldState.uriParams.attrs != NULL)? &orionldState.in.attrList : NULL;
     const char*   geoProp = orionldState.uriParams.geometryProperty;
@@ -163,37 +162,37 @@ bool orionldGetEntity(void)
     // If 'attrs' is used, any matches in Exclusive/Redirect registrations must chop off attributes from 'attrs'
     //
     // We want EVERYTHING from Auxiliary regs (and we may throw it all away in the end),
-    // so we create the ForwardPending list FIRST, before any attrs are removed
+    // so we create the DistOp list FIRST, before any attrs are removed
     //
-    ForwardPending* auxiliarList  = regMatchForEntityGet(RegModeAuxiliary, FwdRetrieveEntity, entityId, entityType, attrV, geoProp);
-    ForwardPending* exclusiveList = regMatchForEntityGet(RegModeExclusive, FwdRetrieveEntity, entityId, entityType, attrV, geoProp);
-    ForwardPending* redirectList  = regMatchForEntityGet(RegModeRedirect,  FwdRetrieveEntity, entityId, entityType, attrV, geoProp);
-    ForwardPending* inclusiveList = regMatchForEntityGet(RegModeInclusive, FwdRetrieveEntity, entityId, entityType, attrV, geoProp);
+    DistOp* auxiliarList  = regMatchForEntityGet(RegModeAuxiliary, DoRetrieveEntity, entityId, entityType, attrV, geoProp);
+    DistOp* exclusiveList = regMatchForEntityGet(RegModeExclusive, DoRetrieveEntity, entityId, entityType, attrV, geoProp);
+    DistOp* redirectList  = regMatchForEntityGet(RegModeRedirect,  DoRetrieveEntity, entityId, entityType, attrV, geoProp);
+    DistOp* inclusiveList = regMatchForEntityGet(RegModeInclusive, DoRetrieveEntity, entityId, entityType, attrV, geoProp);
 
-    fwdPendingList = forwardingListsMerge(exclusiveList,  redirectList);
-    fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
-    fwdPendingList = forwardingListsMerge(fwdPendingList, auxiliarList);
+    distOpList = distOpListsMerge(exclusiveList,  redirectList);
+    distOpList = distOpListsMerge(distOpList, inclusiveList);
+    distOpList = distOpListsMerge(distOpList, auxiliarList);
 
     // Enqueue all forwarded requests
-    if (fwdPendingList != NULL)
+    if (distOpList != NULL)
     {
       // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
       char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
 
-      for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
+      for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
       {
         // Send the forwarded request and await all responses
-        if (fwdPendingP->regP != NULL)
+        if (distOpP->regP != NULL)
         {
-          if (forwardRequestSend(fwdPendingP, dateHeader, xff) == 0)
+          if (distOpSend(distOpP, dateHeader, xff) == 0)
           {
             ++forwards;
-            fwdPendingP->error = false;
+            distOpP->error = false;
           }
           else
           {
             LM_W(("Forwarded request failed"));
-            fwdPendingP->error = true;
+            distOpP->error = true;
           }
         }
       }
@@ -203,7 +202,7 @@ bool orionldGetEntity(void)
 
       while (stillRunning != 0)
       {
-        CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
+        CURLMcode cm = curl_multi_perform(orionldState.curlDoMultiP, &stillRunning);
         if (cm != 0)
         {
           LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
@@ -213,7 +212,7 @@ bool orionldGetEntity(void)
 
         if (stillRunning != 0)
         {
-          cm = curl_multi_wait(orionldState.curlFwdMultiP, NULL, 0, 1000, NULL);
+          cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 1000, NULL);
           if (cm != CURLM_OK)
           {
             LM_E(("Internal Error (curl_multi_wait: error %d", cm));
@@ -252,48 +251,48 @@ bool orionldGetEntity(void)
     CURLMsg* msgP;
     int      msgsLeft;
 
-    while ((msgP = curl_multi_info_read(orionldState.curlFwdMultiP, &msgsLeft)) != NULL)
+    while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
     {
       if (msgP->msg != CURLMSG_DONE)
         continue;
 
       if (msgP->data.result == CURLE_OK)
       {
-        ForwardPending* fwdPendingP = fwdPendingLookupByCurlHandle(fwdPendingList, msgP->easy_handle);
+        DistOp* distOpP = distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
 
-        fwdPendingP->body = kjParse(orionldState.kjsonP, fwdPendingP->rawResponse);
-        if (fwdPendingP->body != NULL)
+        distOpP->body = kjParse(orionldState.kjsonP, distOpP->rawResponse);
+        if (distOpP->body != NULL)
         {
-          if (fwdPendingP->regP->acceptJsonld == true)
+          if (distOpP->regP->acceptJsonld == true)
           {
-            KjNode* atContextP = kjLookup(fwdPendingP->body, "@context");
+            KjNode* atContextP = kjLookup(distOpP->body, "@context");
             if (atContextP != NULL)
-              kjChildRemove(fwdPendingP->body, atContextP);
+              kjChildRemove(distOpP->body, atContextP);
           }
 
           //
           // If the original @context was not used when forwarding (a jsonldContext is present in the registration)
-          // then we now must expand the entity using the context 'fwdPendingP->regP->contextP'
+          // then we now must expand the entity using the context 'distOpP->regP->contextP'
           // and then compact it again, using the @context of the original request
           //
-          if ((fwdPendingP->regP->contextP != NULL) && (fwdPendingP->regP->contextP != orionldState.contextP))
+          if ((distOpP->regP->contextP != NULL) && (distOpP->regP->contextP != orionldState.contextP))
           {
-            orionldEntityExpand(fwdPendingP->body, fwdPendingP->regP->contextP);
-            orionldEntityCompact(fwdPendingP->body, orionldState.contextP);
+            orionldEntityExpand(distOpP->body, distOpP->regP->contextP);
+            orionldEntityCompact(distOpP->body, orionldState.contextP);
           }
 
           // If the mode of the registration is Auxiliar, then the merge must be delayed
-          if (fwdPendingP->regP->mode == RegModeAuxiliary)
+          if (distOpP->regP->mode == RegModeAuxiliary)
           {
             continue;
           }
 
           // Merge in the received body into the local (or nothing)
           if (apiEntityP == NULL)
-            apiEntityP = fwdPendingP->body;
+            apiEntityP = distOpP->body;
           else
           {
-            fwdEntityMerge(apiEntityP, fwdPendingP->body, sysAttrs, fwdPendingP->regP->mode == RegModeAuxiliary);
+            distOpEntityMerge(apiEntityP, distOpP->body, sysAttrs, distOpP->regP->mode == RegModeAuxiliary);
             fwdMerges += 1;
           }
         }
@@ -307,7 +306,7 @@ bool orionldGetEntity(void)
     //
     // Now we take the responses from auxiliar registrations
     //
-    for (ForwardPending* fwdP = fwdPendingList; fwdP != NULL; fwdP = fwdP->next)
+    for (DistOp* fwdP = distOpList; fwdP != NULL; fwdP = fwdP->next)
     {
       if (fwdP->regP->mode != RegModeAuxiliary)
         continue;
@@ -315,7 +314,7 @@ bool orionldGetEntity(void)
       if (apiEntityP == NULL)
         apiEntityP = fwdP->body;
       else
-        fwdEntityMerge(apiEntityP, fwdP->body, sysAttrs, fwdP->regP->mode == RegModeAuxiliary);
+        distOpEntityMerge(apiEntityP, fwdP->body, sysAttrs, fwdP->regP->mode == RegModeAuxiliary);
     }
   }
 

@@ -31,8 +31,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
-#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArray.h"         // regMatchInformationArray
 #include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
@@ -49,17 +49,17 @@ extern "C"
 // - "operations" must include "createEntity
 // - "information" must match by entity id+type and attributes if present in the registration
 //
-ForwardPending* regMatchForEntityCreation
+DistOp* regMatchForEntityCreation
 (
   RegistrationMode regMode,
-  FwdOperation     operation,
+  DistOpType       operation,
   const char*      entityId,
   const char*      entityType,
   KjNode*          incomingP
 )
 {
-  ForwardPending* fwdPendingHead = NULL;
-  ForwardPending* fwdPendingTail = NULL;
+  DistOp* distOpHead = NULL;
+  DistOp* distOpTail = NULL;
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
@@ -82,25 +82,25 @@ ForwardPending* regMatchForEntityCreation
       continue;
     }
 
-    ForwardPending* fwdPendingP = regMatchInformationArray(regP, entityId, entityType, incomingP);
-    if (fwdPendingP == NULL)
+    DistOp* distOpP = regMatchInformationArray(regP, entityId, entityType, incomingP);
+    if (distOpP == NULL)
     {
       LM(("No Reg Match due to Information Array"));
       continue;
     }
 
-    // Add extra info in ForwardPending, needed by forwardRequestSend
-    fwdPendingP->operation = operation;
+    // Add extra info in DistOp, needed by forwardRequestSend
+    distOpP->operation = operation;
 
-    // Add fwdPendingP to the linked list
-    if (fwdPendingHead == NULL)
-      fwdPendingHead = fwdPendingP;
+    // Add distOpP to the linked list
+    if (distOpHead == NULL)
+      distOpHead = distOpP;
     else
-      fwdPendingTail->next = fwdPendingP;
+      distOpTail->next = distOpP;
 
-    fwdPendingTail       = fwdPendingP;
-    fwdPendingTail->next = NULL;
+    distOpTail       = distOpP;
+    distOpTail->next = NULL;
   }
 
-  return fwdPendingHead;
+  return distOpHead;
 }

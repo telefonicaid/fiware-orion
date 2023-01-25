@@ -30,7 +30,7 @@ extern "C"
 }
 
 #include "orionld/common/orionldError.h"                        // orionldError
-#include "orionld/forwarding/FwdOperation.h"                    // fwdOperationFromString, fwdOperationAliasFromString, FwdNone
+#include "orionld/forwarding/DistOpType.h"                      // distOpTypeFromString, distOpTypeAliasFromString, DoNone
 #include "orionld/payloadCheck/pCheckRegistrationOperations.h"  // Own interface
 
 
@@ -55,9 +55,9 @@ bool pCheckRegistrationOperations(KjNode* operationsP)
       return false;
     }
 
-    if (fwdOperationFromString(fwdOpP->value.s) == FwdNone)
+    if (distOpTypeFromString(fwdOpP->value.s) == DoNone)
     {
-      if (fwdOperationAliasFromString(fwdOpP->value.s) == FwdNone)
+      if (distOpTypeAliasFromString(fwdOpP->value.s) == DoNone)
       {
         orionldError(OrionldBadRequestData, "Invalid value for Registration::operations array item", fwdOpP->value.s, 400);
         return false;

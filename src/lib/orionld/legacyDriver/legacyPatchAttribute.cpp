@@ -422,7 +422,7 @@ static bool orionldForwardPatchAttribute
   bool         reqOk;
   char         uriPath[512];
 
-  if (orionldState.forwardAttrsCompacted == true)
+  if (orionldState.distOpAttrsCompacted == true)
   {
     KjNode*         regContextNodeP;
     OrionldContext* regContextP = NULL;
@@ -798,7 +798,7 @@ bool legacyPatchAttribute(void)
   //
   // 2. Query registrations and forward message if found
   //
-  if (forwarding)
+  if (orionldState.distributed == true)
   {
     //
     // If a matching registration is found, no local treatment will be done.

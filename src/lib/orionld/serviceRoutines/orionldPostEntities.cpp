@@ -53,14 +53,14 @@ extern "C"
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityInsert.h"                   // mongocEntityInsert
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
-#include "orionld/forwarding/forwardRequestSend.h"               // forwardRequestSend
-#include "orionld/forwarding/forwardingRelease.h"                // forwardingRelease
-#include "orionld/forwarding/forwardingSuccess.h"                // forwardingSuccess
-#include "orionld/forwarding/forwardingFailure.h"                // forwardingFailure
-#include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"     // fwdPendingLookupByCurlHandle
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpSend.h"                       // distOpSend
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
+#include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
+#include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
+#include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
-#include "orionld/forwarding/forwardingListsMerge.h"             // forwardingListsMerge
+#include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
 
@@ -73,11 +73,11 @@ extern "C"
 // After the redirected registrations are dealt with, we need to chop attributes off the body.
 // And after that continue with Inclusive registrations (and local DB)
 //
-void purgeRedirectedAttributes(ForwardPending* redirectList, KjNode* body)
+void purgeRedirectedAttributes(DistOp* redirectList, KjNode* body)
 {
-  for (ForwardPending* fwdPendingP = redirectList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
+  for (DistOp* distOpP = redirectList; distOpP != NULL; distOpP = distOpP->next)
   {
-    for (KjNode* attrP = fwdPendingP->body->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    for (KjNode* attrP = distOpP->body->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
       KjNode* bodyAttrP = kjLookup(body, attrP->name);
 
@@ -113,12 +113,11 @@ bool orionldPostEntities(void)
   if (pCheckEntity(orionldState.requestTree, false, NULL) == false)
     return false;
 
-  int              forwards       = 0;
-  KjNode*          responseBody   = NULL;
-  ForwardPending*  fwdPendingList = NULL;
-  bool             distributed    = (forwarding == true) || (orionldState.uriParams.local == false);
+  int      forwards      = 0;
+  KjNode*  responseBody  = NULL;
+  DistOp*  distOpList    = NULL;
 
-  if (distributed)
+  if (orionldState.distributed)
   {
     KjNode* entityIdNodeP = kjString(orionldState.kjsonP, "entityId", entityId);  // Only used if 207 response
 
@@ -135,17 +134,17 @@ bool orionldPostEntities(void)
     //        Auxiliary registrations aren't allowed to receive create/update forwardes messages
     //
     // The fix is as follows:
-    //   ForwardPending* exclusiveList = regMatchForEntityCreation(RegModeExclusive, FwdCreateEntity, entityId, entityType, orionldState.requestTree); (chopping attrs off)
-    //   ForwardPending* redirectList  = regMatchForEntityCreation(RegModeRedirect,  FwdCreateEntity, entityId, entityType, orionldState.requestTree);
+    //   DistOp* exclusiveList = regMatchForEntityCreation(RegModeExclusive, DoCreateEntity, entityId, entityType, orionldState.requestTree); (chopping attrs off)
+    //   DistOp* redirectList  = regMatchForEntityCreation(RegModeRedirect,  DoCreateEntity, entityId, entityType, orionldState.requestTree);
     //
     //   purgeRedirectedAttributes(redirectList, orionldState.requestTree);
     //
-    //   ForwardPending* inclusiveList = regMatchForEntityCreation(RegModeInclusive, FwdCreateEntity, entityId, entityType, orionldState.requestTree);
+    //   DistOp* inclusiveList = regMatchForEntityCreation(RegModeInclusive, DoCreateEntity, entityId, entityType, orionldState.requestTree);
     //
-    //   fwdPendingList = forwardingListsMerge(exclusiveList, redirectList);
-    //   fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
+    //   distOpList = distOpListsMerge(exclusiveList, redirectList);
+    //   distOpList = distOpListsMerge(distOpList, inclusiveList);
     //
-    //   - Loop over fwdPendingList
+    //   - Loop over distOpList
     //
     // Example:
     // - The Entity to be created (and distributed) has "id" "urn:E1", "type": "T" and 10 Properties P1-P10
@@ -163,34 +162,34 @@ bool orionldPostEntities(void)
     // - P7-P10 on R5::endpoint
     // - P7-P10 on local broker
     //
-    ForwardPending* exclusiveList = regMatchForEntityCreation(RegModeExclusive, FwdCreateEntity, entityId, entityType, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
-    ForwardPending* redirectList  = regMatchForEntityCreation(RegModeRedirect,  FwdCreateEntity, entityId, entityType, orionldState.requestTree);
+    DistOp* exclusiveList = regMatchForEntityCreation(RegModeExclusive, DoCreateEntity, entityId, entityType, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
+    DistOp* redirectList  = regMatchForEntityCreation(RegModeRedirect,  DoCreateEntity, entityId, entityType, orionldState.requestTree);
 
     if (redirectList != NULL)
       purgeRedirectedAttributes(redirectList, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
 
-    ForwardPending* inclusiveList = regMatchForEntityCreation(RegModeInclusive, FwdCreateEntity, entityId, entityType, orionldState.requestTree);
-    fwdPendingList = forwardingListsMerge(exclusiveList, redirectList);
-    fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
+    DistOp* inclusiveList = regMatchForEntityCreation(RegModeInclusive, DoCreateEntity, entityId, entityType, orionldState.requestTree);
+    distOpList = distOpListsMerge(exclusiveList, redirectList);
+    distOpList = distOpListsMerge(distOpList, inclusiveList);
 
     // Enqueue all forwarded requests
-    if (fwdPendingList != NULL)
+    if (distOpList != NULL)
     {
       // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
       char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
 
-      for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
+      for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
       {
         // Send the forwarded request and await all responses
-        if (fwdPendingP->regP != NULL)
+        if (distOpP->regP != NULL)
         {
-          if (forwardRequestSend(fwdPendingP, dateHeader, xff) == 0)
+          if (distOpSend(distOpP, dateHeader, xff) == 0)
           {
             ++forwards;
-            fwdPendingP->error = false;
+            distOpP->error = false;
           }
           else
-            fwdPendingP->error = true;
+            distOpP->error = true;
         }
       }
 
@@ -199,7 +198,7 @@ bool orionldPostEntities(void)
 
       while (stillRunning != 0)
       {
-        CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
+        CURLMcode cm = curl_multi_perform(orionldState.curlDoMultiP, &stillRunning);
         if (cm != 0)
         {
           LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
@@ -209,7 +208,7 @@ bool orionldPostEntities(void)
 
         if (stillRunning != 0)
         {
-          cm = curl_multi_wait(orionldState.curlFwdMultiP, NULL, 0, 1000, NULL);
+          cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 1000, NULL);
           if (cm != CURLM_OK)
           {
             LM_E(("Internal Error (curl_multi_wait: error %d", cm));
@@ -246,15 +245,15 @@ bool orionldPostEntities(void)
   {
     if (mongocEntityLookup(entityId, NULL, NULL, NULL) != NULL)
     {
-      if (fwdPendingList == NULL)  // Purely local request
+      if (distOpList == NULL)  // Purely local request
       {
         orionldError(OrionldAlreadyExists, "Entity already exists", entityId, 409);
         return false;
       }
       else
       {
-        forwardingFailure(responseBody, NULL, OrionldAlreadyExists, "Entity already exists", entityId, 404);
-        goto awaitFwdResponses;
+        distOpFailure(responseBody, NULL, OrionldAlreadyExists, "Entity already exists", entityId, 404);
+        goto awaitDoResponses;
       }
     }
 
@@ -282,7 +281,7 @@ bool orionldPostEntities(void)
     // So, if anythis has been forwarded, the clone is made regardless whether TRoE is enabled.
     //
     KjNode* cloneForTroeP = NULL;
-    if ((troe == true) || (fwdPendingList != NULL))
+    if ((troe == true) || (distOpList != NULL))
       cloneForTroeP = kjClone(orionldState.kjsonP, apiEntityP);  // apiEntityP contains entity ID and TYPE
 
     if (dbModelFromApiEntity(orionldState.requestTree, NULL, true, orionldState.payloadIdNode->value.s, orionldState.payloadTypeNode->value.s) == false)
@@ -293,12 +292,12 @@ bool orionldPostEntities(void)
       //
       // orionldError(OrionldInternalError, "Internal Error", "Unable to convert API Entity into DB Model Entity", 500);
 
-      if (fwdPendingList == NULL)  // Purely local request
+      if (distOpList == NULL)  // Purely local request
         return false;
       else
       {
-        forwardingFailure(responseBody, NULL, OrionldInternalError, "Internal Error", "dbModelFromApiEntity failed", 500);
-        goto awaitFwdResponses;
+        distOpFailure(responseBody, NULL, OrionldInternalError, "Internal Error", "dbModelFromApiEntity failed", 500);
+        goto awaitDoResponses;
       }
     }
 
@@ -312,23 +311,23 @@ bool orionldPostEntities(void)
     if (mongocEntityInsert(dbEntityP, entityId) == false)
     {
       orionldError(OrionldInternalError, "Database Error", "mongocEntityInsert failed", 500);
-      if (fwdPendingList == NULL)  // Purely local request
+      if (distOpList == NULL)  // Purely local request
         return false;
       else
       {
-        forwardingFailure(responseBody, NULL, OrionldInternalError, "Database Error", "mongocEntityInsert failed", 500);
-        goto awaitFwdResponses;
+        distOpFailure(responseBody, NULL, OrionldInternalError, "Database Error", "mongocEntityInsert failed", 500);
+        goto awaitDoResponses;
       }
     }
-    else if (fwdPendingList != NULL)  // NOT Purely local request
+    else if (distOpList != NULL)  // NOT Purely local request
     {
       //
-      // Need to call forwardingSuccess here. Only, I don't have a ForwardPending object for local ...
-      // Only the "ForwardPending::body" is used in forwardingSuccess so I can fix it:
+      // Need to call distOpSuccess here. Only, I don't have a DistOp object for local ...
+      // Only the "DistOp::body" is used in distOpSuccess so I can fix it:
       //
-      ForwardPending local;
+      DistOp local;
       local.body = cloneForTroeP;
-      forwardingSuccess(responseBody, &local);
+      distOpSuccess(responseBody, &local);
     }
 
     //
@@ -351,32 +350,32 @@ bool orionldPostEntities(void)
     if (cloneForTroeP != NULL)
       orionldState.requestTree = cloneForTroeP;
 
-    if (fwdPendingList == NULL)  // Purely local request
+    if (distOpList == NULL)  // Purely local request
       return true;
   }
 
- awaitFwdResponses:
+ awaitDoResponses:
   if (forwards > 0)
   {
     CURLMsg* msgP;
     int      msgsLeft;
 
-    while ((msgP = curl_multi_info_read(orionldState.curlFwdMultiP, &msgsLeft)) != NULL)
+    while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
     {
       if (msgP->msg != CURLMSG_DONE)
         continue;
 
-      ForwardPending* fwdPendingP = fwdPendingLookupByCurlHandle(fwdPendingList, msgP->easy_handle);
+      DistOp* distOpP = distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
 
       if (msgP->data.result == CURLE_OK)
-        forwardingSuccess(responseBody, fwdPendingP);
+        distOpSuccess(responseBody, distOpP);
       else
       {
         int          statusCode = 500;
         const char*  detail     = curlToBrokerStrerror(msgP->easy_handle, msgP->data.result, &statusCode);
 
         LM_E(("CURL Error %d: %s", msgP->data.result, curl_easy_strerror(msgP->data.result)));
-        forwardingFailure(responseBody, fwdPendingP, OrionldInternalError, "Error during Forwarding", detail, statusCode);
+        distOpFailure(responseBody, distOpP, OrionldInternalError, "Error during Distributed Operation", detail, statusCode);
       }
     }
   }
@@ -396,7 +395,8 @@ bool orionldPostEntities(void)
     }
   }
 
-  if (orionldState.curlFwdMultiP != NULL)
-    forwardingRelease(fwdPendingList);
+  if (orionldState.curlDoMultiP != NULL)
+    distOpListRelease(distOpList);
+
   return true;
 }
