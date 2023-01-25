@@ -23,6 +23,13 @@ been tested to be a stable and fast **NGSI-LD** broker with close compliance to 
 specification.
 
 
+### NGSI-LD Context Broker Feature Comparison
+The NGSI-LD Specification is regularly updated and published by ETSI. The latest specification is version 1.6.1 which was published in **September 2022**.
+Version 1.7.1 is about to be released (some time in February 2023).
+-  An Excel file detailing the current compatibility of the development version of the Orion-LD Context Broker against
+the features of v1.6.1 of the API specification can be downloaded (here)[https://docs.google.com/spreadsheets/d/18tq0_PZFl5WCfYUElcdI6M3Vlin4hP-M].
+
+
 > The latest release of Orion-LD is [1.1.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.1.1) from September 2022
 
 This project is part of [FIWARE](https://www.fiware.org/). For more information check the FIWARE Catalogue entry for

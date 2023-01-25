@@ -95,7 +95,7 @@ static void entityIdFilter(bson_t* mongoFilterP, KjNode* entityIdArray)
 //
 // mongocEntitiesExist -
 //
-KjNode* mongocEntitiesExist(KjNode* entityIdArray)
+KjNode* mongocEntitiesExist(KjNode* entityIdArray, bool entityType)
 {
   bson_t                mongoFilter;
   const bson_t*         mongoDocP;
@@ -106,6 +106,9 @@ KjNode* mongocEntitiesExist(KjNode* entityIdArray)
 
   bson_init(&projection);
   bson_append_bool(&projection, "_id.id", 6, true);
+
+  if (entityType == true)
+    bson_append_bool(&projection, "_id.type", 8, true);
 
   bson_init(&mongoFilter);
   entityIdFilter(&mongoFilter, entityIdArray);
