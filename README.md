@@ -5,7 +5,7 @@
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/orion-ld.svg)](https://hub.docker.com/r/fiware/orion-ld/)
 [![Docker Repository on Quay](https://img.shields.io/badge/quay.io-orionld-green "Docker Repository on Quay")](https://quay.io/repository/fiware/orion-ld?tab=tags)
 [![Support badge](https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
-[![NGSI-LD badge](https://img.shields.io/badge/NGSI-LD-red.svg)](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.04.01_60/gs_cim009v010401p.pdf)
+[![NGSI-LD badge](https://img.shields.io/badge/NGSI-LD-red.svg)](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_CIM009v010601p.pdf)
 <br>
 [![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion-ld.readthedocs.io/en/latest/?badge=latest)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/incubating.svg)
@@ -22,9 +22,6 @@ data concepts. Orion-LD follows the [ETSI](https://en.wikipedia.org/wiki/ETSI) s
 been tested to be a stable and fast **NGSI-LD** broker with close compliance to the version 1.3.1 of the NGSI-LD API
 specification.
 
-Note that the [NGSI-LD API specification](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_cim009v010601p.pdf)
-is a living, changing document (version 1.6 as of Aug 2022), with features being continuously added at a pace such that it is not
-possible to align a context broker to the cutting edge specification for **NGSI-LD** implementation.
 
 ### NGSI-LD Context Broker Feature Comparison
 The NGSI-LD Specification is regularly updated and published by ETSI. The latest specification is version 1.6.1 which was published in **September 2022**.
@@ -40,6 +37,12 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information 
 
 Issues on this projects can be reported as [github issues](https://github.com/FIWARE/context.Orion-LD/issues), while
 questions are preferred on Stackoverflow, using the tag `fiware-orion`.
+
+##### NGSI-LD Context Broker Feature Comparison
+
+The NGSI-LD Specification is regularly updated published by ETSI. The latest specification is [version 1.6.1 ](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_CIM009v010601p.pdf) which was  published in **September 2022**. 
+
+-  An Excel file detailing the current compatibility of the  development version of the Orion-LD Context Broker against the features of the 1.6.1 specification can be downloaded [here](https://docs.google.com/spreadsheets/d/e/2PACX-1vRxOjsDf3lqhwuypJ---pZN2OlqFRl0jyoTV0ewQ1WFnpe7xQary3uxRjunbgJkwQ/pub?output=xlsx)
 
 | :books: [Documentation](https://github.com/FIWARE/context.Orion-LD/tree/develop/doc/manuals-ld) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion-ld) | :whale: [Docker Hub](https://hub.docker.com/r/fiware/orion-ld/) |
 | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
