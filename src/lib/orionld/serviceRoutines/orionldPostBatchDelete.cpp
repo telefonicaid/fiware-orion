@@ -620,6 +620,18 @@ bool orionldPostBatchDelete(void)
 
     orionldState.responseTree    = response;
     orionldState.httpStatusCode  = 207;
+
+    if (troe)
+    {
+      //
+      // For TRoE, orionldState.requestTree needs to be an array of the IDs of all the entities that have been deleted.
+      // In the case of 207, and especially if Distributed Operations, then the "responseSuccess" is the array with that information.
+      // Luckily it has the exact format that troePostBatchDelete needs, so, we just make 'orionldState.requestTree' point to 'responseSuccess'.
+      //
+      orionldState.requestTree = responseSuccess;
+    }
+
+    kjTreeLog(responseSuccess, "responseSuccess");
   }
 
   orionldState.out.contentType = JSON;
