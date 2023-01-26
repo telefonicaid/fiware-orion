@@ -33,7 +33,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchInformationItemForGet.h"    // regMatchInformationItemForGet
 
 
@@ -42,7 +42,7 @@ extern "C"
 //
 // regMatchInformationArrayForGet -
 //
-ForwardPending* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId, const char* entityType, StringArray* attrV, const char* geoProp)
+DistOp* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId, const char* entityType, StringArray* attrV, const char* geoProp)
 {
   KjNode* informationV = kjLookup(regP->regTree, "information");
 
@@ -53,14 +53,14 @@ ForwardPending* regMatchInformationArrayForGet(RegCacheItem* regP, const char* e
     if (attrList == NULL)  // No match
       continue;
 
-    // If we get this far, then it's a match and we can create the ForwardPending item and return
-    ForwardPending* fwdPendingP = (ForwardPending*) kaAlloc(&orionldState.kalloc, sizeof(ForwardPending));
+    // If we get this far, then it's a match and we can create the DistOp item and return
+    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
 
-    fwdPendingP->regP     = regP;
-    fwdPendingP->attrList = attrList;
-    fwdPendingP->geoProp  = (char*) geoProp;
+    distOpP->regP     = regP;
+    distOpP->attrList = attrList;
+    distOpP->geoProp  = (char*) geoProp;
 
-    return fwdPendingP;
+    return distOpP;
   }
 
   return NULL;

@@ -33,25 +33,43 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
+#include "orionld/forwarding/distOpFailure.h"                    // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardingSuccess -
+// distOpFailure -
 //
-void forwardingSuccess(KjNode* responseBody, ForwardPending* fwdPendingP)
+void distOpFailure(KjNode* responseBody, DistOp* distOpP, OrionldResponseErrorType errorCode, const char* title, const char* detail, int httpStatus)
 {
-  KjNode* successV = kjLookup(responseBody, "success");
+  KjNode* failureV = kjLookup(responseBody, "failure");
 
-  if (successV == NULL)
+  if (failureV == NULL)
   {
-    successV = kjArray(orionldState.kjsonP, "success");
-    kjChildAdd(responseBody, successV);
+    failureV = kjArray(orionldState.kjsonP, "failure");
+    kjChildAdd(responseBody, failureV);
   }
 
-  for (KjNode* attrNameP = fwdPendingP->body->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
+  KjNode* regIdP      = (distOpP != NULL)? kjLookup(distOpP->regP->regTree, "id") : NULL;
+  KjNode* regIdNodeP  = (regIdP != NULL)? kjString(orionldState.kjsonP, "registrationId", regIdP->value.s) : NULL;
+  KjNode* error       = kjObject(orionldState.kjsonP, NULL);
+  KjNode* attrV       = kjArray(orionldState.kjsonP, "attributes");
+  KjNode* statusCodeP = kjInteger(orionldState.kjsonP, "statusCode", httpStatus);
+  KjNode* titleP      = kjString(orionldState.kjsonP, "title", title);
+  KjNode* detailP     = kjString(orionldState.kjsonP, "detail", detail);
+
+  if (regIdNodeP != NULL)
+    kjChildAdd(error, regIdNodeP);
+
+  kjChildAdd(error, attrV);
+  kjChildAdd(error, statusCodeP);
+  kjChildAdd(error, titleP);
+  kjChildAdd(error, detailP);
+
+  for (KjNode* attrNameP = distOpP->body->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
   {
     if (strcmp(attrNameP->name, "id") == 0)
       continue;
@@ -60,6 +78,11 @@ void forwardingSuccess(KjNode* responseBody, ForwardPending* fwdPendingP)
 
     char*   alias  = orionldContextItemAliasLookup(orionldState.contextP, attrNameP->name, NULL, NULL);
     KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
-    kjChildAdd(successV, aNameP);
+    kjChildAdd(attrV, aNameP);
   }
+
+  kjChildAdd(failureV, error);
 }
+
+
+

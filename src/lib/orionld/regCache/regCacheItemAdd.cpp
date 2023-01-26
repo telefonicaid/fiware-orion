@@ -38,7 +38,7 @@ extern "C"
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
 #include "orionld/regCache/regCacheIdPatternRegexCompile.h"      // regCacheIdPatternRegexCompile
-#include "orionld/forwarding/FwdOperation.h"                     // fwdOperationMask
+#include "orionld/forwarding/DistOpType.h"                       // distOpTypeMask
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/regCache/regCacheItemAdd.h"                    // Own interface
 
@@ -186,7 +186,7 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode*
   KjNode* modeP        = kjLookup(rciP->regTree, "mode");
   KjNode* informationP = kjLookup(rciP->regTree, "information");
 
-  rciP->opMask  = fwdOperationMask(operationsP);
+  rciP->opMask  = distOpTypeMask(operationsP);
   rciP->mode    = (modeP != NULL)? registrationMode(modeP->value.s) : RegModeInclusive;
 
   if (regCacheIdPatternRegexCompile(rciP, informationP) == false)

@@ -22,31 +22,28 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
-#include "orionld/forwarding/forwardingListsMerge.h"             // Own interface
+#include <unistd.h>                                              // NULL
+#include <curl/curl.h>                                           // curl
+
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// forwardingListsMerge -
+// distOpLookupByCurlHandle -
 //
-ForwardPending* forwardingListsMerge(ForwardPending* list1, ForwardPending* list2)
+DistOp* distOpLookupByCurlHandle(DistOp* distOpList, CURL* easyHandle)
 {
-  if (list2 == NULL)
-    return list1;
-  else if (list1 == NULL)
-    return list2;
+  DistOp* distOpP = distOpList;
 
-  //
-  // Both lists are non-NULL
-  // Find the last item in list1 and make its next pointer point to the first in list2
-  //
-  ForwardPending* lastInList1 = list1;
-  while (lastInList1->next != NULL)
-    lastInList1 = lastInList1->next;
+  while (distOpP != NULL)
+  {
+    if (distOpP->curlHandle == easyHandle)
+      return distOpP;
 
-  lastInList1->next = list2;
+    distOpP = distOpP->next;
+  }
 
-  return list1;
+  return NULL;
 }

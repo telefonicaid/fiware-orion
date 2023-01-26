@@ -42,8 +42,8 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
-#include "orionld/forwarding/forwardRequestSend.h"               // Own interface
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpSend.h"                       // Own interface
 
 
 
@@ -53,14 +53,13 @@ extern "C"
 //
 typedef struct HttpResponse
 {
-  ForwardPending*  fwdPendingP;
-  CURL*            curlHandle;
-  char*            buf;
-  uint32_t         bufPos;
-  uint32_t         bufLen;
-  bool             mustBeFreed;
-  // Linked List of Response headers
-  char             preBuf[4 * 1024];  // Could be much smaller for POST/PATCH/PUT/DELETE (only cover errors, 1k would be more than enough)
+  DistOp*     distOpP;
+  CURL*       curlHandle;
+  char*       buf;
+  uint32_t    bufPos;
+  uint32_t    bufLen;
+  bool        mustBeFreed;
+  char        preBuf[4 * 1024];  // Could be much smaller for POST/PATCH/PUT/DELETE (only cover errors, 1k would be more than enough)
 } HttpResponse;
 
 
@@ -92,9 +91,9 @@ typedef struct SList
 //
 typedef struct ForwardUrlParts
 {
-  ForwardPending*  fwdPendingP;  // From here we need "op", "entityId", "attrName", ...
-  SList*           params;       // Linked list of strings (URI params)
-  SList*           last;         // Last item in the 'params' list - used for linking in new items
+  DistOp*  distOpP;  // From here we need "op", "entityId", "attrName", ...
+  SList*   params;       // Linked list of strings (URI params)
+  SList*   last;         // Last item in the 'params' list - used for linking in new items
 } ForwardUrlParts;
 
 
@@ -107,16 +106,16 @@ int urlPath(char* url, int urlLen, ForwardUrlParts* urlPartsP, KjNode* endpointP
 {
   int nb = 0;
 
-  if (urlPartsP->fwdPendingP->operation == FwdCreateEntity)
+  if (urlPartsP->distOpP->operation == DoCreateEntity)
     nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities", endpointP->value.s);
-  else if (urlPartsP->fwdPendingP->operation == FwdRetrieveEntity)
-    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->fwdPendingP->entityId);
-  else if (urlPartsP->fwdPendingP->operation == FwdDeleteEntity)
-    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->fwdPendingP->entityId);
-  else if (urlPartsP->fwdPendingP->operation == FwdDeleteBatch)
+  else if (urlPartsP->distOpP->operation == DoRetrieveEntity)
+    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->distOpP->entityId);
+  else if (urlPartsP->distOpP->operation == DoDeleteEntity)
+    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->distOpP->entityId);
+  else if (urlPartsP->distOpP->operation == DoDeleteBatch)
     nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entityOperations/delete", endpointP->value.s);
   else
-    LM_X(1, ("Forwarding is not implemented for '%s' requests", fwdOperations[urlPartsP->fwdPendingP->operation]));
+    LM_X(1, ("Distributed Operation is not implemented for '%s' requests", distOpTypes[urlPartsP->distOpP->operation]));
 
   return nb;
 }
@@ -135,12 +134,12 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
   // Calculating the length of the resulting URL (PATH+PARAMS)
   //
   totalLen += strlen(endpointP->value.s);
-  totalLen += fwdOperationUrlLen[urlPartsP->fwdPendingP->operation];
+  totalLen += distOpTypeUrlLen[urlPartsP->distOpP->operation];
 
-  if (urlPartsP->fwdPendingP->entityId != NULL)
-    totalLen += strlen(urlPartsP->fwdPendingP->entityId) + 1;  // +1: the '/' after "/entities" and before the entityId
-  if (urlPartsP->fwdPendingP->attrName != NULL)
-    totalLen += strlen(urlPartsP->fwdPendingP->attrName) + 1;  // +1: the '/' after "/attrs" and before the attrName
+  if (urlPartsP->distOpP->entityId != NULL)
+    totalLen += strlen(urlPartsP->distOpP->entityId) + 1;  // +1: the '/' after "/entities" and before the entityId
+  if (urlPartsP->distOpP->attrName != NULL)
+    totalLen += strlen(urlPartsP->distOpP->attrName) + 1;  // +1: the '/' after "/attrs" and before the attrName
 
   // Adding the lengths of the uri params
   for (SList* paramP = urlPartsP->params; paramP != NULL; paramP = paramP->next)
@@ -259,7 +258,7 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
       httpResponseP->mustBeFreed = true;
     }
 
-    httpResponseP->fwdPendingP->rawResponse = httpResponseP->buf;  // Cause ... it has changed
+    httpResponseP->distOpP->rawResponse = httpResponseP->buf;  // Cause ... it has changed
     httpResponseP->bufLen = newSize + 1024;
   }
 
@@ -287,7 +286,7 @@ void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArra
   int attrsLen = 0;
   for (int ix = 0; ix < attrList->items; ix++)
   {
-    LM(("Compacting attr '%s' for forwarding, using context '%s'", attrList->array[ix], contextP->url));
+    LM(("Compacting attr '%s' for distOps, using context '%s'", attrList->array[ix], contextP->url));
     attrList->array[ix]  = orionldContextItemAliasLookup(contextP, attrList->array[ix], NULL, NULL);
     attrsLen            += strlen(attrList->array[ix]) + 1;
     LM(("Compacted attr: '%s'", attrList->array[ix]));
@@ -325,9 +324,9 @@ void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArra
 
 // -----------------------------------------------------------------------------
 //
-// forwardRequestSend -
+// distOpSend -
 //
-bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, const char* xForwardedForHeader)
+bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader)
 {
   //
   // Figure out the @context to use for the forwarded request
@@ -339,36 +338,36 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   // if no @context was used in the original request
   //
   //
-  OrionldContext* fwdContextP = (fwdPendingP->regP->contextP != NULL)? fwdPendingP->regP->contextP : orionldState.contextP;
+  OrionldContext* fwdContextP = (distOpP->regP->contextP != NULL)? distOpP->regP->contextP : orionldState.contextP;
 
   //
   // For now we only support http and https for forwarded requests. libcurl is used for both of them
   // So, a single function with an "if" or two will do - copy from orionld/notifications/httpsNotify.cpp
   //
   // * CURL Handles:  create handle (also multi handle if it does not exist)
-  // * URL:           fwdPendingP->url
-  // * BODY:          kjFastRender(fwdPendingP->body) + CURLOPT_POSTFIELDS (POST? hmmm ...)
-  // * HTTP Headers:  Std headers + loop over fwdPendingP->regP["csourceInfo"], use curl_slist_append
+  // * URL:           distOpP->url
+  // * BODY:          kjFastRender(distOpP->body) + CURLOPT_POSTFIELDS (POST? hmmm ...)
+  // * HTTP Headers:  Std headers + loop over distOpP->regP["csourceInfo"], use curl_slist_append
   // * CURL Options:  set a number oftions dfor the handle
-  // * SEND:          Actually, just add the "easy handler" to the "multi handler" of orionldState.curlFwdMultiP
-  //                  Once all requests are added - send by invoking 'curl_multi_perform(orionldState.curlFwdMultiP, ...)'
+  // * SEND:          Actually, just add the "easy handler" to the "multi handler" of orionldState.curlDoMultiP
+  //                  Once all requests are added - send by invoking 'curl_multi_perform(orionldState.curlDoMultiP, ...)'
   //
 
   //
   // CURL Handles
   //
-  if (orionldState.curlFwdMultiP == NULL)
+  if (orionldState.curlDoMultiP == NULL)
   {
-    orionldState.curlFwdMultiP = curl_multi_init();
-    if (orionldState.curlFwdMultiP == NULL)
+    orionldState.curlDoMultiP = curl_multi_init();
+    if (orionldState.curlDoMultiP == NULL)
     {
       LM_E(("Internal Error: curl_multi_init failed"));
       return false;
     }
   }
 
-  fwdPendingP->curlHandle = curl_easy_init();
-  if (fwdPendingP->curlHandle == NULL)
+  distOpP->curlHandle = curl_easy_init();
+  if (distOpP->curlHandle == NULL)
   {
     LM_E(("Internal Error: curl_easy_init failed"));
     return false;
@@ -377,16 +376,16 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   //
   // URL
   //
-  KjNode*         endpointP = kjLookup(fwdPendingP->regP->regTree, "endpoint");
-  ForwardUrlParts urlParts  = { fwdPendingP, NULL, NULL };
+  KjNode*         endpointP = kjLookup(distOpP->regP->regTree, "endpoint");
+  ForwardUrlParts urlParts  = { distOpP, NULL, NULL };
 
   //
   // Add URI Params
   //
   if (orionldState.verb == GET)
   {
-    if ((fwdPendingP->attrList != NULL) && (fwdPendingP->attrList->items > 0))
-      attrsParam(fwdContextP, &urlParts, fwdPendingP->attrList);
+    if ((distOpP->attrList != NULL) && (distOpP->attrList->items > 0))
+      attrsParam(fwdContextP, &urlParts, distOpP->attrList);
 
     //
     // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add that)
@@ -397,8 +396,8 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
     //
     // If we know the Entity Type, we pass that piece of information as well
     //
-    if (fwdPendingP->entityType != NULL)
-      uriParamAdd(&urlParts, "type", fwdPendingP->entityType, -1);
+    if (distOpP->entityType != NULL)
+      uriParamAdd(&urlParts, "type", distOpP->entityType, -1);
   }
 
   if (orionldState.uriParams.lang != NULL)
@@ -408,7 +407,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   // Compose the entire URL and pass it to CURL
   //
   char* url = urlCompose(&urlParts, endpointP);
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_URL, url);
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_URL, url);
 
   bool https = (strncmp(endpointP->value.s, "https", 5) == 0);
 
@@ -424,8 +423,8 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   // - NGSILD-Tenant (part of registration, but can also be in csourceInfo?)
   // - Link - can be in csourceInfo (named jsonldContext)
   //
-  KjNode*             csourceInfoP = kjLookup(fwdPendingP->regP->regTree, "contextSourceInfo");
-  KjNode*             tenantP      = kjLookup(fwdPendingP->regP->regTree, "tenant");
+  KjNode*             csourceInfoP = kjLookup(distOpP->regP->regTree, "contextSourceInfo");
+  KjNode*             tenantP      = kjLookup(distOpP->regP->regTree, "tenant");
   struct curl_slist*  headers      = NULL;
 
   // Date
@@ -509,7 +508,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   }
 
   // FIXME: This field "acceptJsonld" should be done at creation/patching time and not here!
-  fwdPendingP->regP->acceptJsonld = (accept != NULL) && (strcmp(accept, "application/ld+json") == 0);
+  distOpP->regP->acceptJsonld = (accept != NULL) && (strcmp(accept, "application/ld+json") == 0);
 
   //
   // Link header must be added if "Content-Type" is "application/json" in original request
@@ -573,7 +572,7 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   int   approxContentLen = 0;
   char* payloadBody      = NULL;
 
-  if (fwdPendingP->body != NULL)
+  if (distOpP->body != NULL)
   {
     //
     // Content-Type (for now we maintain the original Content-Type in the forwarded request
@@ -585,20 +584,20 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
     if (orionldState.in.contentType == JSONLD)
     {
       // Add the context to the body if not there already
-      KjNode* contextP = kjLookup(fwdPendingP->body, "@context");
+      KjNode* contextP = kjLookup(distOpP->body, "@context");
 
       if (contextP == NULL)
       {
-        LM(("Adding @context '%s' to body of msg to be forwarded", fwdPendingP->regP->contextP->url));
-        contextP = kjString(orionldState.kjsonP, "@context", fwdPendingP->regP->contextP->url);
-        kjChildAdd(fwdPendingP->body, contextP);
+        LM(("Adding @context '%s' to body of msg to be forwarded", distOpP->regP->contextP->url));
+        contextP = kjString(orionldState.kjsonP, "@context", distOpP->regP->contextP->url);
+        kjChildAdd(distOpP->body, contextP);
       }
     }
 
-    approxContentLen = kjFastRenderSize(fwdPendingP->body);
+    approxContentLen = kjFastRenderSize(distOpP->body);
     payloadBody      = kaAlloc(&orionldState.kalloc, approxContentLen);
 
-    kjFastRender(fwdPendingP->body, payloadBody);
+    kjFastRender(distOpP->body, payloadBody);
 
     //
     // Content-Length
@@ -609,24 +608,24 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
     headers = curl_slist_append(headers, contentLenHeader);
 
     // BODY
-    curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_POSTFIELDS, payloadBody);
+    curl_easy_setopt(distOpP->curlHandle, CURLOPT_POSTFIELDS, payloadBody);
   }
 
 
   //
   // Need to save the pointer to the curl headers in order to free it afterwards
   //
-  fwdPendingP->curlHeaders = headers;
+  distOpP->curlHeaders = headers;
 
   //
   // CURL Options
   //
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_CUSTOMREQUEST, orionldState.verbString);
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_TIMEOUT_MS, 5000);                     // Timeout - hard-coded to 5 seconds for now ...
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_CUSTOMREQUEST, orionldState.verbString);
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_TIMEOUT_MS, 5000);                     // Timeout - hard-coded to 5 seconds for now ...
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
 
-  // curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_HEADERFUNCTION, responseHeaderSave);   // Callback for headers
+  // curl_easy_setopt(distOpP->curlHandle, CURLOPT_HEADERFUNCTION, responseHeaderSave);   // Callback for headers
 
 
   //
@@ -634,31 +633,31 @@ bool forwardRequestSend(ForwardPending* fwdPendingP, const char* dateHeader, con
   //
   HttpResponse* httpResponseP = (HttpResponse*) kaAlloc(&orionldState.kalloc, sizeof(HttpResponse));
 
-  httpResponseP->fwdPendingP  = fwdPendingP;
-  httpResponseP->curlHandle   = fwdPendingP->curlHandle;
+  httpResponseP->distOpP      = distOpP;
+  httpResponseP->curlHandle   = distOpP->curlHandle;
   httpResponseP->buf          = httpResponseP->preBuf;
   httpResponseP->bufPos       = 0;
   httpResponseP->bufLen       = sizeof(httpResponseP->preBuf);
   httpResponseP->mustBeFreed  = false;
 
-  httpResponseP->fwdPendingP->rawResponse = httpResponseP->buf;
+  httpResponseP->distOpP->rawResponse = httpResponseP->buf;
 
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_WRITEFUNCTION, responseSave);          // Callback for reading the response body (and headers?)
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_WRITEDATA, (void*) httpResponseP);     // User data for responseSave
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_WRITEFUNCTION, responseSave);          // Callback for reading the response body (and headers?)
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_WRITEDATA, (void*) httpResponseP);     // User data for responseSave
 
   if (https)
   {
     // SSL options
-    curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_SSL_VERIFYPEER, 0L);                 // ignore self-signed certificates for SSL end-points
-    curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_SSL_VERIFYHOST, 0L);                 // DO NOT verify the certificate's name against host
+    curl_easy_setopt(distOpP->curlHandle, CURLOPT_SSL_VERIFYPEER, 0L);                 // ignore self-signed certificates for SSL end-points
+    curl_easy_setopt(distOpP->curlHandle, CURLOPT_SSL_VERIFYHOST, 0L);                 // DO NOT verify the certificate's name against host
   }
 
-  curl_easy_setopt(fwdPendingP->curlHandle, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_HTTPHEADER, headers);
 
   //
   // SEND (sort of)
   //
-  curl_multi_add_handle(orionldState.curlFwdMultiP, fwdPendingP->curlHandle);
+  curl_multi_add_handle(orionldState.curlDoMultiP, distOpP->curlHandle);
 
   LM(("FWD: Request '%s' has been enqueued for forwarding", url));
   return 0;

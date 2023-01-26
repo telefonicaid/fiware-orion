@@ -31,8 +31,8 @@ extern "C"
 }
 
 #include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
-#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 
 
@@ -41,10 +41,10 @@ extern "C"
 //
 // regMatchForEntityGet -
 //
-extern ForwardPending* regMatchForEntityGet
+extern DistOp* regMatchForEntityGet
 (
   RegistrationMode regMode,
-  FwdOperation     operation,
+  DistOpType       operation,
   const char*      entityId,
   const char*      entityType,
   StringArray*     attrV,

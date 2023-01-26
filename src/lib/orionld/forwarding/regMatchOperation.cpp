@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
-#include "orionld/forwarding/FwdOperation.h"                     // FwdOperation
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/forwarding/regMatchOperation.h"                // Own interface
 
@@ -41,7 +41,7 @@ extern "C"
 //
 // regMatchOperation -
 //
-bool regMatchOperation(RegCacheItem* regP, FwdOperation op)
+bool regMatchOperation(RegCacheItem* regP, DistOpType op)
 {
   uint64_t opShifted = (1L << op);
   return ((regP->opMask & opShifted) == opShifted);

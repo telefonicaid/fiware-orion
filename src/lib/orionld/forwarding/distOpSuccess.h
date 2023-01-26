@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDINGINIT_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FORWARDINGINIT_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPSUCCESS_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPSUCCESS_H_
 
 /*
 *
@@ -25,13 +25,19 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardingInit -
+// distOpSuccess -
 //
-extern void forwardingInit(void);
+extern void distOpSuccess(KjNode* responseBody, DistOp* doP);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDINGINIT_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPSUCCESS_H_

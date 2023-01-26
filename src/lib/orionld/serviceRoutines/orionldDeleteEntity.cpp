@@ -43,11 +43,11 @@ extern "C"
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityDelete.h"                   // mongocEntityDelete
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
-#include "orionld/forwarding/forwardingListsMerge.h"             // forwardingListsMerge
-#include "orionld/forwarding/forwardRequestSend.h"               // forwardRequestSend
-#include "orionld/forwarding/fwdPendingLookupByCurlHandle.h"     // fwdPendingLookupByCurlHandle
+#include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
+#include "orionld/forwarding/distOpSend.h"                       // distOpSend
+#include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
 
@@ -93,15 +93,15 @@ static void alterations(char* entityId, char* entityTypeExpanded, char* entityTy
 //
 static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* entityTypeCompacted)
 {
-  ForwardPending* exclusiveList = regMatchForEntityGet(RegModeExclusive, FwdDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
-  ForwardPending* redirectList  = regMatchForEntityGet(RegModeRedirect,  FwdDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
-  ForwardPending* inclusiveList = regMatchForEntityGet(RegModeInclusive, FwdDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
-  ForwardPending* fwdPendingList;
+  DistOp* exclusiveList = regMatchForEntityGet(RegModeExclusive, DoDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
+  DistOp* redirectList  = regMatchForEntityGet(RegModeRedirect,  DoDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
+  DistOp* inclusiveList = regMatchForEntityGet(RegModeInclusive, DoDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
+  DistOp* distOpList;
 
-  fwdPendingList = forwardingListsMerge(exclusiveList,  redirectList);
-  fwdPendingList = forwardingListsMerge(fwdPendingList, inclusiveList);
+  distOpList = distOpListsMerge(exclusiveList,  redirectList);
+  distOpList = distOpListsMerge(distOpList, inclusiveList);
 
-  if (fwdPendingList == NULL)
+  if (distOpList == NULL)
     return false;
 
   // Enqueue all forwarded requests
@@ -109,23 +109,23 @@ static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* en
   char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
 
   int forwards = 0;
-  for (ForwardPending* fwdPendingP = fwdPendingList; fwdPendingP != NULL; fwdPendingP = fwdPendingP->next)
+  for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
   {
     // Send the forwarded request and await all responses
-    if (fwdPendingP->regP != NULL)
+    if (distOpP->regP != NULL)
     {
       char dateHeader[70];
       snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-      if (forwardRequestSend(fwdPendingP, dateHeader, xff) == 0)
+      if (distOpSend(distOpP, dateHeader, xff) == 0)
       {
         ++forwards;
-        fwdPendingP->error = false;
+        distOpP->error = false;
       }
       else
       {
         LM_W(("Forwarded request failed"));
-        fwdPendingP->error = true;
+        distOpP->error = true;
       }
     }
   }
@@ -135,7 +135,7 @@ static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* en
 
   while (stillRunning != 0)
   {
-    CURLMcode cm = curl_multi_perform(orionldState.curlFwdMultiP, &stillRunning);
+    CURLMcode cm = curl_multi_perform(orionldState.curlDoMultiP, &stillRunning);
     if (cm != 0)
     {
       LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
@@ -145,7 +145,7 @@ static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* en
 
     if (stillRunning != 0)
     {
-      cm = curl_multi_wait(orionldState.curlFwdMultiP, NULL, 0, 1000, NULL);
+      cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 1000, NULL);
       if (cm != CURLM_OK)
       {
         LM_E(("Internal Error (curl_multi_wait: error %d", cm));
@@ -166,14 +166,14 @@ static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* en
     CURLMsg* msgP;
     int      msgsLeft;
 
-    while ((msgP = curl_multi_info_read(orionldState.curlFwdMultiP, &msgsLeft)) != NULL)
+    while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
     {
       if (msgP->msg != CURLMSG_DONE)
         continue;
 
       if (msgP->data.result == CURLE_OK)
       {
-        fwdPendingLookupByCurlHandle(fwdPendingList, msgP->easy_handle);
+        distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
 
         // Check HTTP Status code and WARN if not "200 OK"
         --forwards;
@@ -195,7 +195,6 @@ bool orionldDeleteEntity(void)
   char* entityId            = orionldState.wildcard[0];
   char* entityTypeExpanded  = orionldState.uriParams.type;
   char* entityTypeCompacted = NULL;
-  bool  distributed         = (forwarding == true) && (orionldState.uriParams.local == false);
 
   // Make sure the Entity ID is a valid URI
   PCHECK_URI(entityId, true, 0, "Invalid Entity ID", "Must be a valid URI", 400);
@@ -227,7 +226,7 @@ bool orionldDeleteEntity(void)
   if (entityTypeExpanded != NULL)
     entityTypeCompacted = orionldContextItemAliasLookup(orionldState.contextP, entityTypeExpanded, NULL, NULL);
 
-  bool someForwarding = (distributed == false)? false : distributedDelete(entityId, entityTypeExpanded, entityTypeCompacted);
+  bool someForwarding = (orionldState.distributed == false)? false : distributedDelete(entityId, entityTypeExpanded, entityTypeCompacted);
 
   //
   // Delete the entity in the local DB

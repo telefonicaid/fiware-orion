@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
@@ -39,6 +39,6 @@ extern "C"
 //
 // regMatchInformationArray -
 //
-extern ForwardPending* regMatchInformationArray(RegCacheItem* regP, const char* entityId, const char* entityType, KjNode* incomingP);
+extern DistOp* regMatchInformationArray(RegCacheItem* regP, const char* entityId, const char* entityType, KjNode* incomingP);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_

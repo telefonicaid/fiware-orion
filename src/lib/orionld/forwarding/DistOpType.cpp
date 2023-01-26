@@ -32,15 +32,15 @@ extern "C"
 #include "kjson/kjLookup.h"                                     // kjLookup
 }
 
-#include "orionld/forwarding/FwdOperation.h"                    // Own interface
+#include "orionld/forwarding/DistOpType.h"                      // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperations -
+// distOpTypes -
 //
-const char* fwdOperations[37] = {
+const char* distOpTypes[37] = {
   "none",
   "createEntity",
   "updateEntity",
@@ -86,9 +86,9 @@ const char* fwdOperations[37] = {
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationUrlLen -
+// distOpTypeUrlLen -
 //
-const int fwdOperationUrlLen[37] = {
+const int distOpTypeUrlLen[37] = {
   0,
   20,   // strlen("/ngsi-ld/v1/entities")
   21,   // strlen("/ngsi-ld/v1/entities/")       + strlen(entityId)
@@ -130,11 +130,11 @@ const int fwdOperationUrlLen[37] = {
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationAlias -
+// distOpTypeAlias -
 //
 // Aliases for pre-defined groups of operations
 //
-const char* fwdOperationAlias[5] = {
+const char* distOpTypeAlias[5] = {
   "none",
   "federationOps",
   "updateOps",
@@ -145,69 +145,69 @@ const char* fwdOperationAlias[5] = {
 
 
 #define M(x) (1LL << x)
-uint64_t federationOpsMask   = M(FwdRetrieveEntity)       | M(FwdQueryEntity)       | M(FwdCreateSubscription) | M(FwdUpdateSubscription) |
-                               M(FwdRetrieveSubscription) | M(FwdQuerySubscription) | M(FwdDeleteSubscription);
-uint64_t updateOpsMask       = M(FwdUpdateEntity)         | M(FwdUpdateAttrs)       | M(FwdReplaceEntity)      | M(FwdReplaceAttrs);
-uint64_t retrieveOpsMask     = M(FwdRetrieveEntity)       | M(FwdQueryEntity);
-uint64_t redirectionOpsMask  = M(FwdCreateEntity)         | M(FwdUpdateEntity)      | M(FwdAppendAttrs)        | M(FwdUpdateAttrs)        |
-                               M(FwdDeleteAttrs)          | M(FwdDeleteEntity)      | M(FwdMergeEntity)        | M(FwdReplaceEntity)      |
-                               M(FwdReplaceAttrs)         | M(FwdRetrieveEntity)    | M(FwdQueryEntity);
+uint64_t federationOpsMask   = M(DoRetrieveEntity)       | M(DoQueryEntity)       | M(DoCreateSubscription) | M(DoUpdateSubscription) |
+                               M(DoRetrieveSubscription) | M(DoQuerySubscription) | M(DoDeleteSubscription);
+uint64_t updateOpsMask       = M(DoUpdateEntity)         | M(DoUpdateAttrs)       | M(DoReplaceEntity)      | M(DoReplaceAttrs);
+uint64_t retrieveOpsMask     = M(DoRetrieveEntity)       | M(DoQueryEntity);
+uint64_t redirectionOpsMask  = M(DoCreateEntity)         | M(DoUpdateEntity)      | M(DoAppendAttrs)        | M(DoUpdateAttrs)        |
+                               M(DoDeleteAttrs)          | M(DoDeleteEntity)      | M(DoMergeEntity)        | M(DoReplaceEntity)      |
+                               M(DoReplaceAttrs)         | M(DoRetrieveEntity)    | M(DoQueryEntity);
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationToString -
+// distOpTypeToString -
 //
-const char* fwdOperationToString(FwdOperation op)
+const char* distOpTypeToString(DistOpType op)
 {
-  if ((op < 1) || (op >= K_VEC_SIZE(fwdOperations)))
+  if ((op < 1) || (op >= K_VEC_SIZE(distOpTypes)))
     return "nop";
 
-  return fwdOperations[op];
+  return distOpTypes[op];
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationFromString -
+// distOpTypeFromString -
 //
-FwdOperation fwdOperationFromString(const char* fwdOp)
+DistOpType distOpTypeFromString(const char* fwdOp)
 {
-  for (long unsigned int ix = 1; ix < K_VEC_SIZE(fwdOperations); ix++)
+  for (long unsigned int ix = 1; ix < K_VEC_SIZE(distOpTypes); ix++)
   {
-    if (strcmp(fwdOp, fwdOperations[ix]) == 0)
-      return (FwdOperation) ix;
+    if (strcmp(fwdOp, distOpTypes[ix]) == 0)
+      return (DistOpType) ix;
   }
 
-  return FwdNone;
+  return DoNone;
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationAliasFromString -
+// distOpTypeAliasFromString -
 //
-FwdOperation fwdOperationAliasFromString(const char* fwdOp)
+DistOpType distOpTypeAliasFromString(const char* fwdOp)
 {
-  for (long unsigned int ix = 1; ix < K_VEC_SIZE(fwdOperationAlias); ix++)
+  for (long unsigned int ix = 1; ix < K_VEC_SIZE(distOpTypeAlias); ix++)
   {
-    if (strcmp(fwdOp, fwdOperationAlias[ix]) == 0)
-      return (FwdOperation) ix;
+    if (strcmp(fwdOp, distOpTypeAlias[ix]) == 0)
+      return (DistOpType) ix;
   }
 
-  return FwdNone;
+  return DoNone;
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdOperationMask -
+// distOpTypeMask -
 //
-uint64_t fwdOperationMask(KjNode* operationsP)
+uint64_t distOpTypeMask(KjNode* operationsP)
 {
   if (operationsP == NULL)
     return federationOpsMask;
@@ -223,9 +223,9 @@ uint64_t fwdOperationMask(KjNode* operationsP)
     else if (strcmp(op, "redirectionOps") == 0)      mask |= redirectionOpsMask;
     else
     {
-      for (unsigned int ix = 1; ix < K_VEC_SIZE(fwdOperations); ix++)
+      for (unsigned int ix = 1; ix < K_VEC_SIZE(distOpTypes); ix++)
       {
-        if (strcmp(op, fwdOperations[ix]) == 0)
+        if (strcmp(op, distOpTypes[ix]) == 0)
         {
           mask |= (1L << ix);
           break;

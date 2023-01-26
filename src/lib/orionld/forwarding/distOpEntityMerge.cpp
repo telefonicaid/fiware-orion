@@ -33,7 +33,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/forwarding/fwdEntityMerge.h"                   // Own interface
+#include "orionld/forwarding/distOpEntityMerge.h"                // Own interface
 
 
 
@@ -107,9 +107,9 @@ static KjNode* newerAttribute(KjNode* currentP, KjNode* pretenderP)
 
 // -----------------------------------------------------------------------------
 //
-// fwdEntityMerge -
+// distOpEntityMerge -
 //
-bool fwdEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary)
+bool distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary)
 {
   KjNode* idP             = kjLookup(additionP,  "id");
   KjNode* typeP           = kjLookup(additionP,  "type");

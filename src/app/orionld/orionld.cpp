@@ -143,7 +143,7 @@ extern "C"
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
 #include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
-#include "orionld/forwarding/forwardingInit.h"                // forwardingInit
+#include "orionld/forwarding/distOpInit.h"                    // distOpInit
 #include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
 #include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
 
@@ -240,7 +240,7 @@ char            troePwd[256];
 int             troePoolSize;
 bool            socketService;
 unsigned short  socketServicePort;
-bool            forwarding;
+bool            distributed;
 bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
@@ -281,12 +281,12 @@ int             cSubCounters;
 #define MULTISERVICE_DESC      "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
-#define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
+#define HTTP_TMO_DESC          "timeout in milliseconds for distributed requests and notifications"
 #define DBPS_DESC              "database connection pool size"
 #define MAX_L                  900000
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
-#define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
+#define CPR_FORWARD_LIMIT_DESC "maximum number of distributed requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n)"
 #define NO_CACHE               "disable subscription cache for lookups"
@@ -318,7 +318,8 @@ int             cSubCounters;
 #define TROE_POOL_DESC         "size of the connection pool for TRoE Postgres database connections"
 #define SOCKET_SERVICE_DESC    "enable the socket service - accept connections via a normal TCP socket"
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
-#define FORWARDING_DESC        "turn on forwarding"
+#define DISTRIBUTED_DESC       "turn on distributed operation"
+#define FORWARDING_DESC        "turn on distributed operation (deprecated)"
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
 #define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
@@ -408,7 +409,8 @@ PaArgument paArgs[] =
   { "-troePwd",               troePwd,                  "TROE_PWD",                  PaString,  PaOpt,  _i "password",   PaNL,   PaNL,             TROE_HOST_PWD            },
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
-  { "-forwarding",            &forwarding,              "FORWARDING",                PaBool,    PaOpt,  false,           false,  true,             FORWARDING_DESC          },
+  { "-forwarding",            &distributed,             "FORWARDING",                PaBool,    PaHid,  false,           false,  true,             FORWARDING_DESC          },
+  { "-distributed",           &distributed,             "DISTRIBUTED",               PaBool,    PaOpt,  false,           false,  true,             DISTRIBUTED_DESC         },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaOpt,  false,           false,  true,             EXPERIMENTAL_DESC        },
   { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC          },
@@ -1197,8 +1199,8 @@ int main(int argC, char* argV[])
   //
   contextBrokerInit(dbName, multitenancy);
 
-  if (forwarding)
-    forwardingInit();
+  if (distributed)
+    distOpInit();
 
   if (https)
   {
@@ -1271,7 +1273,7 @@ int main(int argC, char* argV[])
   LM_K(("Initialization is Done"));
   LM_K(("  Accepting REST requests on port %d (experimental API endpoints are %sabled)", port, (experimental == true)? "en" : "dis"));
   LM_K(("  TRoE:                    %s", (troe          == true)? "Enabled" : "Disabled"));
-  LM_K(("  Forwarding:              %s", (forwarding    == true)? "Enabled" : "Disabled"));
+  LM_K(("  Distributed Operation:   %s", (distributed   == true)? "Enabled" : "Disabled"));
   LM_K(("  Health Check:            %s", (socketService == true)? "Enabled" : "Disabled"));
 
   if (troe)

@@ -261,7 +261,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 06. POST /entities on CB of an entity urn:E1 with attr A1,P1,P3,P6,P7 - A1 ok locally, P1 ok in CP1, P3 ERROR, P6 OTHER ERROR, P7 - 409
 =======================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 481
+Content-Length: 514
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -278,7 +278,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
             "detail": "Unable to connect to registrant",
             "registrationId": "urn:R3",
             "statusCode": 504,
-            "title": "Error during Forwarding"
+            "title": "Error during Distributed Operation"
         },
         {
             "attributes": [
@@ -287,7 +287,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
             "detail": "Unable to resolve host name of registrant",
             "registrationId": "urn:R2",
             "statusCode": 504,
-            "title": "Error during Forwarding"
+            "title": "Error during Distributed Operation"
         },
         {
             "attributes": [
@@ -296,7 +296,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
             "detail": "Entity already exists",
             "registrationId": "urn:R4",
             "statusCode": 409,
-            "title": "Error during Forwarding"
+            "title": "Error during Distributed Operation"
         }
     ],
     "success": [

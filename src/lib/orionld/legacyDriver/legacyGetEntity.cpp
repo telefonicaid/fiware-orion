@@ -386,7 +386,7 @@ bool legacyGetEntity(void)
   //
   PCHECK_URI(eId, true, 0, "Invalid Entity ID", "Not a URL nor a URN", 400);
 
-  if (forwarding)
+  if (orionldState.distributed == true)
     regArray = mongocRegistrationLookup(eId, NULL, NULL);
 
   bool attrsMandatory = false;

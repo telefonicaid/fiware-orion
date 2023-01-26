@@ -37,7 +37,6 @@ extern "C"
 #include "orionld/types/RegistrationMode.h"                     // RegistrationMode
 #include "orionld/context/OrionldContext.h"                     // OrionldContext
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
-#include "orionld/forwarding/FwdOperation.h"                    // fwdOperationFromString, FwdNone
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
 #include "orionld/payloadCheck/pCheckRegistrationMode.h"        // pCheckRegistrationMode
 #include "orionld/payloadCheck/pCheckRegistrationOperations.h"  // pCheckRegistrationOperations

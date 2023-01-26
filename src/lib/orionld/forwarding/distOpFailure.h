@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPFAILURE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPFAILURE_H_
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -22,32 +25,28 @@
 *
 * Author: Ken Zangelin
 */
-#include <curl/curl.h>                                           // curl
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
-#include "orionld/forwarding/forwardingRelease.h"                // Own interface
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardingRelease -
+// distOpFailure -
 //
-void forwardingRelease(ForwardPending* fwdPendingList)
-{
-  ForwardPending* fwdPendingP = fwdPendingList;
+extern void distOpFailure
+(
+  KjNode*                   responseBody,
+  DistOp*                   distOpP,
+  OrionldResponseErrorType  errorCode,
+  const char*               title,
+  const char*               detail,
+  int                       httpStatus
+);
 
-  while (fwdPendingP != NULL)
-  {
-    if (fwdPendingP->curlHandle != NULL)
-      curl_easy_cleanup(fwdPendingP->curlHandle);
-
-    if (fwdPendingP->curlHeaders != NULL)
-      curl_slist_free_all(fwdPendingP->curlHeaders);
-
-    fwdPendingP = fwdPendingP->next;
-  }
-
-  curl_multi_cleanup(orionldState.curlFwdMultiP);
-}
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPFAILURE_H_

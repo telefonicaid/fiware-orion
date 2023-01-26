@@ -52,7 +52,7 @@ extern "C"
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
 #include "orionld/mongoc/mongocRegistrationReplace.h"          // mongocRegistrationReplace
-#include "orionld/forwarding/FwdOperation.h"                   // fwdOperationMask
+#include "orionld/forwarding/DistOpType.h"                     // distOpTypeMask
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"  // Own Interface
 
 
@@ -702,7 +702,7 @@ bool orionldPatchRegistration(void)
 
     KjNode* operationsP = kjLookup(regPatch, "operations");
     if (operationsP != NULL)
-      rciP->opMask  = fwdOperationMask(operationsP);
+      rciP->opMask  = distOpTypeMask(operationsP);
 
     // The 'mode' of the registration cannot be altered
 
@@ -746,7 +746,7 @@ bool orionldPatchRegistration(void)
   rciP->mode = (modeP != NULL)? registrationMode(modeP->value.s) : RegModeInclusive;
 
   if (operationsP != NULL)
-    rciP->opMask = fwdOperationMask(operationsP);
+    rciP->opMask = distOpTypeMask(operationsP);
 
   if (informationP != NULL)
   {

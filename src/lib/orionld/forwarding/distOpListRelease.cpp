@@ -22,23 +22,32 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdio.h>                                               // snprintf
-#include <unistd.h>                                              // gethostname
+#include <curl/curl.h>                                           // curl
 
-#include "orionld/common/orionldState.h"                         // hostHeader
-#include "orionld/forwarding/forwardingInit.h"                   // Own interface
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpListRelease.h"                // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardingInit -
+// distOpListRelease -
 //
-void forwardingInit(void)
+void distOpListRelease(DistOp* distOpList)
 {
-  char hostName[128];
+  DistOp* distOpP = distOpList;
 
-  if (gethostname(hostName, sizeof(hostName) - 1) == -1)
-    snprintf(hostHeader, sizeof(hostHeader), "Host: unknown");
-  snprintf(hostHeader, sizeof(hostHeader), "Host: %s", hostName);
+  while (distOpP != NULL)
+  {
+    if (distOpP->curlHandle != NULL)
+      curl_easy_cleanup(distOpP->curlHandle);
+
+    if (distOpP->curlHeaders != NULL)
+      curl_slist_free_all(distOpP->curlHeaders);
+
+    distOpP = distOpP->next;
+  }
+
+  curl_multi_cleanup(orionldState.curlDoMultiP);
 }

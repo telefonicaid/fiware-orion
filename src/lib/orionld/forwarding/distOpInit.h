@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDINGFAILURE_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FORWARDINGFAILURE_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPINIT_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPINIT_H_
 
 /*
 *
@@ -25,28 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardingFailure -
+// distOpInit -
 //
-extern void forwardingFailure
-(
-  KjNode*                   responseBody,
-  ForwardPending*           fwdPendingP,
-  OrionldResponseErrorType  errorCode,
-  const char*               title,
-  const char*               detail,
-  int                       httpStatus
-);
+extern void distOpInit(void);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDINGFAILURE_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPINIT_H_

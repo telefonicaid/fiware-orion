@@ -32,7 +32,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchInformationItem.h"          // regMatchInformationItem
 
 
@@ -41,7 +41,7 @@ extern "C"
 //
 // regMatchInformationArray -
 //
-ForwardPending* regMatchInformationArray(RegCacheItem* regP, const char* entityId, const char* entityType, KjNode* incomingP)
+DistOp* regMatchInformationArray(RegCacheItem* regP, const char* entityId, const char* entityType, KjNode* incomingP)
 {
   KjNode* informationV = kjLookup(regP->regTree, "information");
 
@@ -59,12 +59,12 @@ ForwardPending* regMatchInformationArray(RegCacheItem* regP, const char* entityI
     kjChildAdd(attrUnion, entityIdP);
     kjChildAdd(attrUnion, entityTypeP);
 
-    ForwardPending* fwdPendingP = (ForwardPending*) kaAlloc(&orionldState.kalloc, sizeof(ForwardPending));
+    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
 
-    fwdPendingP->regP = regP;
-    fwdPendingP->body = attrUnion;
+    distOpP->regP = regP;
+    distOpP->body = attrUnion;
 
-    return fwdPendingP;
+    return distOpP;
   }
 
   return NULL;

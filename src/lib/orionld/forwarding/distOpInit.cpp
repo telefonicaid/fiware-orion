@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FORWARDINGSUCCESS_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FORWARDINGSUCCESS_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -25,19 +22,24 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include <stdio.h>                                               // snprintf
+#include <unistd.h>                                              // gethostname
 
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/common/orionldState.h"                         // hostHeader
+#include "orionld/forwarding/distOpInit.h"                       // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// forwardingSuccess -
+// distOpInit -
 //
-extern void forwardingSuccess(KjNode* responseBody, ForwardPending* fwdPendingP);
+void distOpInit(void)
+{
+  char hostName[128];
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FORWARDINGSUCCESS_H_
+  if (gethostname(hostName, sizeof(hostName) - 1) == -1)
+    snprintf(hostHeader, sizeof(hostHeader), "Host: unknown");
+  else
+    snprintf(hostHeader, sizeof(hostHeader), "Host: %s", hostName);
+}

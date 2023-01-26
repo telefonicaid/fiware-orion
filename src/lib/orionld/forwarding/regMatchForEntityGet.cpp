@@ -32,7 +32,8 @@ extern "C"
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForGet.h"   // regMatchInformationArrayForGet
 #include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
@@ -50,18 +51,18 @@ extern "C"
 //   - entity id and
 //   - attributes if present in the registration (and 'attrs' URL param)
 //
-ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
+DistOp* regMatchForEntityGet  // FIXME: +entity-type
 (
   RegistrationMode regMode,
-  FwdOperation     operation,
+  DistOpType       operation,
   const char*      entityId,
   const char*      entityType,
   StringArray*     attrV,
   const char*      geoProp
 )
 {
-  ForwardPending* fwdPendingHead = NULL;
-  ForwardPending* fwdPendingTail = NULL;
+  DistOp* distOpHead = NULL;
+  DistOp* distOpTail = NULL;
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
@@ -92,29 +93,29 @@ ForwardPending* regMatchForEntityGet  // FIXME: +entity-type
       continue;
     }
 
-    ForwardPending* fwdPendingP = regMatchInformationArrayForGet(regP, entityId, entityType, attrV, geoProp);
-    if (fwdPendingP == NULL)
+    DistOp* distOpP = regMatchInformationArrayForGet(regP, entityId, entityType, attrV, geoProp);
+    if (distOpP == NULL)
     {
       LM(("%s: No Reg Match due to Information Array", regId));
       continue;
     }
 
-    // Add extra info in ForwardPending, needed by forwardRequestSend
-    fwdPendingP->entityId   = (char*) entityId;
-    fwdPendingP->entityType = (char*) entityType;
-    fwdPendingP->operation  = operation;
+    // Add extra info in DistOp, needed by forwardRequestSend
+    distOpP->entityId   = (char*) entityId;
+    distOpP->entityType = (char*) entityType;
+    distOpP->operation  = operation;
 
-    // Add fwdPendingP to the linked list
-    if (fwdPendingHead == NULL)
-      fwdPendingHead = fwdPendingP;
+    // Add distOpP to the linked list
+    if (distOpHead == NULL)
+      distOpHead = distOpP;
     else
-      fwdPendingTail->next = fwdPendingP;
+      distOpTail->next = distOpP;
 
-    fwdPendingTail       = fwdPendingP;
-    fwdPendingTail->next = NULL;
+    distOpTail       = distOpP;
+    distOpTail->next = NULL;
 
     LM(("%s: Reg Match !", regId));
   }
 
-  return fwdPendingHead;
+  return distOpHead;
 }

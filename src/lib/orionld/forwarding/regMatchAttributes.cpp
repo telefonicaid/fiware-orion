@@ -84,7 +84,7 @@ KjNode* regMatchAttributes(RegCacheItem* regP, KjNode* propertyNamesP, KjNode* r
     }
 
     //
-    // 'inclusive' and 'redirect' registrations must CLONE the attribute (as all ForwardPending items have their own body)
+    // 'inclusive' and 'redirect' registrations must CLONE the attribute (as all DistOp items have their own body)
     // The third one (exclusive) STEALS the attribute.
     // However ... once all exclusive registrations are done chopping off attributes, the entity will stay intact.
     // That's interesting!!!

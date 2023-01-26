@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_FWDPENDINGLOOKUPBYCURLHANDLE_H_
-#define SRC_LIB_ORIONLD_FORWARDING_FWDPENDINGLOOKUPBYCURLHANDLE_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTSMERGE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTSMERGE_H_
 
 /*
 *
@@ -25,16 +25,15 @@
 *
 * Author: Ken Zangelin
 */
-#include <curl/curl.h>                                           // curl
-
-#include "orionld/forwarding/ForwardPending.h"                   // ForwardPending
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// fwdPendingLookupByCurlHandle -
+// distOpListsMerge -
 //
-extern ForwardPending* fwdPendingLookupByCurlHandle(ForwardPending* fwdPendingList, CURL* easyHandle);
+extern DistOp* distOpListsMerge(DistOp* exclusiveList, DistOp* nonExclusiveList);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_FWDPENDINGLOOKUPBYCURLHANDLE_H_
+
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTSMERGE_H_
