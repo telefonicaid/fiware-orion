@@ -118,7 +118,7 @@ bool orionldPostTemporalEntities(void)
       {
         aInstanceP->name = attrP->name;  // Need to "inherit" the name for the Array
 
-        if (pCheckAttribute(aInstanceP, true, NoAttributeType, false, NULL) == false)
+        if (pCheckAttribute(entityId, aInstanceP, true, NoAttributeType, false, NULL) == false)
           return false;
 
         attrP->name = aInstanceP->name;  // It's been expanded ionside pCheckAttribute
@@ -126,7 +126,7 @@ bool orionldPostTemporalEntities(void)
     }
     else  // KjObject
     {
-      if (pCheckAttribute(attrP, true, NoAttributeType, false, NULL) == false)
+      if (pCheckAttribute(entityId, attrP, true, NoAttributeType, false, NULL) == false)
         return false;
     }
   }

@@ -546,7 +546,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
   if (tenant != NULL)
   {
-    char tenantHeader[64];
+    char tenantHeader[80];
     snprintf(tenantHeader, sizeof(tenantHeader), "NGSILD-Tenant: %s", tenant);
     headers = curl_slist_append(headers, tenantHeader);
   }

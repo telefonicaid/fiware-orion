@@ -261,7 +261,7 @@ bool legacyPostEntity(void)
     OrionldContextItem*  contextItemP = NULL;
     char*                shortName    = attrP->name;
 
-    if (pCheckAttribute(attrP, true, NoAttributeType, false, contextItemP) == false)
+    if (pCheckAttribute(entityId, attrP, true, NoAttributeType, false, contextItemP) == false)
     {
       attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
 

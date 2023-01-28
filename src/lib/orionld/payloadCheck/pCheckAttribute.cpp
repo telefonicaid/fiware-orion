@@ -190,6 +190,7 @@ static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContext
 //
 inline bool pCheckAttributeString
 (
+  const char*           entityId,
   KjNode*               attrP,
   bool                  isAttribute,
   OrionldAttributeType  attrTypeFromDb,
@@ -237,6 +238,7 @@ inline bool pCheckAttributeString
 //
 inline bool pCheckAttributeInteger
 (
+  const char*           entityId,
   KjNode*               attrP,
   bool                  isAttribute,
   OrionldAttributeType  attrTypeFromDb,
@@ -259,6 +261,7 @@ inline bool pCheckAttributeInteger
 //
 inline bool pCheckAttributeFloat
 (
+  const char*           entityId,
   KjNode*               attrP,
   bool                  isAttribute,
   OrionldAttributeType  attrTypeFromDb,
@@ -281,6 +284,7 @@ inline bool pCheckAttributeFloat
 //
 inline bool pCheckAttributeBoolean
 (
+  const char*           entityId,
   KjNode*               attrP,
   bool                  isAttribute,
   OrionldAttributeType  attrTypeFromDb,
@@ -303,6 +307,7 @@ inline bool pCheckAttributeBoolean
 //
 inline bool pCheckAttributeArray
 (
+  const char*           entityId,
   KjNode*               attrP,
   bool                  isAttribute,
   OrionldAttributeType  attrTypeFromDb,
@@ -328,7 +333,7 @@ inline bool pCheckAttributeArray
 //
 // pCheckAttributeNull -
 //
-inline bool pCheckAttributeNull(KjNode* attrP)
+inline bool pCheckAttributeNull(const char* entityId, KjNode* attrP)
 {
 #if 0
   LM_W(("RHS for attribute '%s' is NULL - that is forbidden in the NGSI-LD API", attrP->name));
@@ -790,6 +795,7 @@ static bool isJsonLiteral(KjNode* attrP, KjNode* typeP)
 //
 static bool pCheckAttributeObject
 (
+  const char*           entityId,                // For log messages only, still important
   KjNode*               attrP,
   bool                  isAttribute,
   OrionldAttributeType  attrTypeFromDb,
@@ -963,7 +969,12 @@ static bool pCheckAttributeObject
     {
       if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) == 0)
       {
-        orionldError(OrionldBadRequestData, "null is not allowed as RHS in a JSON-LD document", fieldP->name, 400);
+        char errorString[512];
+        snprintf(errorString, sizeof(errorString),
+                 "Got a JSON 'null' in RHS (not allowed in JSON-LD docs) for the entity '%s', attribute '%s', attribute field '%s'",
+                 entityId, attrP->name, fieldP->name);
+        LM_E(("%s", errorString));
+        orionldError(OrionldBadRequestData, "Bad Input", errorString, 400);
         return false;
       }
 
@@ -1045,7 +1056,7 @@ static bool pCheckAttributeObject
     }
     else
     {
-      if (pCheckAttribute(fieldP, false, NoAttributeType, false, NULL) == false)
+      if (pCheckAttribute(entityId, fieldP, false, NoAttributeType, false, NULL) == false)
         return false;
     }
 
@@ -1215,6 +1226,7 @@ static bool validAttrName(const char* attrName, bool isAttribute)
 //
 bool pCheckAttribute
 (
+  const char*             entityId,
   KjNode*                 attrP,
   bool                    isAttribute,
   OrionldAttributeType    attrTypeFromDb,
@@ -1268,7 +1280,7 @@ bool pCheckAttribute
         // => KjNode* datasetsP should be a parameter to this function
         //
         aInstanceP->name = attrP->name;
-        if (pCheckAttribute(aInstanceP, true, attrTypeFromDb, attrNameAlreadyExpanded, attrContextInfoP) == false)
+        if (pCheckAttribute(entityId, aInstanceP, true, attrTypeFromDb, attrNameAlreadyExpanded, attrContextInfoP) == false)
           return false;
       }
 
@@ -1293,13 +1305,13 @@ bool pCheckAttribute
   //   We don't know which sub-attributes are special until we know the type of the attribute (Property, Relationship, etc)
   //   Postponed to ... all simple Property functions - pCheckAttribute[String|Integer|Float|Boolean] + pCheckAttributeObject (Geo)
   //
-  if      (attrP->type == KjString)  return pCheckAttributeString(attrP,  isAttribute, attrTypeFromDb, attrContextInfoP);
-  else if (attrP->type == KjInt)     return pCheckAttributeInteger(attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
-  else if (attrP->type == KjFloat)   return pCheckAttributeFloat(attrP,   isAttribute, attrTypeFromDb, attrContextInfoP);
-  else if (attrP->type == KjBoolean) return pCheckAttributeBoolean(attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
-  else if (attrP->type == KjArray)   return pCheckAttributeArray(attrP,   isAttribute, attrTypeFromDb, attrContextInfoP);
-  else if (attrP->type == KjObject)  return pCheckAttributeObject(attrP,  isAttribute, attrTypeFromDb, attrContextInfoP);
-  else if (attrP->type == KjNull)    return pCheckAttributeNull(attrP);
+  if      (attrP->type == KjString)  return pCheckAttributeString(entityId,  attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjInt)     return pCheckAttributeInteger(entityId, attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjFloat)   return pCheckAttributeFloat(entityId,   attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjBoolean) return pCheckAttributeBoolean(entityId, attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjArray)   return pCheckAttributeArray(entityId,   attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjObject)  return pCheckAttributeObject(entityId,  attrP, isAttribute, attrTypeFromDb, attrContextInfoP);
+  else if (attrP->type == KjNull)    return pCheckAttributeNull(entityId,    attrP);
 
   // Invalid JSON type of the attribute - we should never reach this point
   orionldError(OrionldInternalError, "invalid value type for attribute", attrP->name, 500);

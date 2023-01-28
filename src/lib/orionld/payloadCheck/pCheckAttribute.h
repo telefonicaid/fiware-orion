@@ -48,6 +48,7 @@ extern "C"
 //
 extern bool pCheckAttribute
 (
+  const char*             entityId,
   KjNode*                 attrP,
   bool                    isAttribute,
   OrionldAttributeType    attrTypeFromDb,

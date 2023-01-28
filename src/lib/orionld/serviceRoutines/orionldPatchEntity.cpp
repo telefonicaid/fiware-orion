@@ -254,7 +254,7 @@ bool orionldPatchEntity(void)
     OrionldAttributeType attrTypeFromDb = orionldAttributeType(dbAttrTypeP->value.s);  // Crash if dbAttrTypeP == NULL ... OK somehow ...
     OrionldContextItem*  contextItemP   = NULL;
 
-    if (pCheckAttribute(inAttrP, true, attrTypeFromDb, true, contextItemP) == false)
+    if (pCheckAttribute(entityId, inAttrP, true, attrTypeFromDb, true, contextItemP) == false)
     {
       kjChildRemove(orionldState.requestTree, inAttrP);
       attributeNotUpdated(notUpdatedV, shortName, orionldState.pd.title, orionldState.pd.detail);
