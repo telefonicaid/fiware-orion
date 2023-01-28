@@ -171,8 +171,9 @@ bool pCheckEntity
   if ((nodeP = kjLookup(entityP, "modifiedAt")) != NULL)  kjChildRemove(entityP, nodeP);
 
   // Loop over attributes
-  KjNode* idP   = NULL;
-  KjNode* typeP = NULL;
+  KjNode* idP      = NULL;
+  KjNode* typeP    = NULL;
+  char*   entityId = (char*)  "urn:unknown:id";
 
   for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
   {
@@ -191,6 +192,7 @@ bool pCheckEntity
         return false;
 
       idP = attrP;
+      entityId = idP->value.s;
       continue;
     }
 
@@ -233,7 +235,7 @@ bool pCheckEntity
       aTypeFromDb = attrTypeFromDb(dbAttrsP, attrName);
     }
 
-    if (pCheckAttribute(attrP, true, aTypeFromDb, true, contextItemP) == false)
+    if (pCheckAttribute(entityId, attrP, true, aTypeFromDb, true, contextItemP) == false)
       return false;
   }
 

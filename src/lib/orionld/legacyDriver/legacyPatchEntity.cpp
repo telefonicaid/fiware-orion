@@ -199,7 +199,7 @@ bool legacyPatchEntity(void)
     if (dbTypeP != NULL)
       attributeType = orionldAttributeType(dbTypeP->value.s);
 
-    if (pCheckAttribute(newAttrP, true, attributeType, true, contextItemP) == false)
+    if (pCheckAttribute(entityId, newAttrP, true, attributeType, true, contextItemP) == false)
     {
       //
       // A failure will set a 400 (probably) in orionldState.pd.status

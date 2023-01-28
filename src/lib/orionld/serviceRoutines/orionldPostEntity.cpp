@@ -211,7 +211,7 @@ bool orionldPostEntity(void)
     //
     // Is the attribute valid?
     //
-    if (pCheckAttribute(attrP, true, NoAttributeType, false, contextItemP) == false)
+    if (pCheckAttribute(entityId, attrP, true, NoAttributeType, false, contextItemP) == false)
     {
       kjChildRemove(orionldState.requestTree, attrP);
       attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);

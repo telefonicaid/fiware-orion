@@ -43,3 +43,4 @@
 * Issue #1307  Implemented notifications for entity deletion, for DELETE /entities/{entityId}
 * Issue #280   Implemented forwarding for entity deletion, for DELETE /entities/{entityId}
 * Issue #280   Implemented forwarding for Batch entity deletion, for POST /entityOperations/delete
+* Issue #1312  Better error handling for a specific use case about RHS being 'null'

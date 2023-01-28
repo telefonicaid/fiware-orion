@@ -350,7 +350,7 @@ bool orionldPatchAttribute(void)
   // Make sure the incoming attribute is valid
   //
   OrionldAttributeType attrType = orionldAttributeType(attrTypeInDb);
-  if (pCheckAttribute(orionldState.requestTree, true, attrType, true, NULL) == false)
+  if (pCheckAttribute(entityId, orionldState.requestTree, true, attrType, true, NULL) == false)
     return false;
 
   kjTreeLog(orionldState.requestTree, "TR: Right after pCheckAttribute");

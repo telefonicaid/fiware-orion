@@ -790,7 +790,7 @@ bool legacyPatchAttribute(void)
   if (attrTypeInDb != NULL)
     attributeType = orionldAttributeType(attrTypeInDb);
 
-  if (pCheckAttribute(inAttribute, true, attributeType, true, contextItemP) == false)
+  if (pCheckAttribute(entityId, inAttribute, true, attributeType, true, contextItemP) == false)
     return false;
 
 
