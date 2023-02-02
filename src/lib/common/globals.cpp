@@ -540,10 +540,7 @@ double parse8601Time(char* ss)
                     (sscanf(ss, "%4d-%2d-%2d%s", &y, &M, &d, tz) == 3));                            // Trying just date (in this case tz is not allowed)
 
   if (!validDate)
-  {
-    LM_E(("Not a valid date: '%s'", ss));
     return -1;
-  }
 
   int offset = timezoneOffset(tz);
   if (offset == -1)
