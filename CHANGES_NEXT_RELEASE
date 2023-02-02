@@ -44,3 +44,4 @@
 * Issue #280   Implemented forwarding for entity deletion, for DELETE /entities/{entityId}
 * Issue #280   Implemented forwarding for Batch entity deletion, for POST /entityOperations/delete
 * Issue #1312  Better error handling for a specific use case about RHS being 'null'
+* Issue #1317  Removed an unfortunate error message about "not a valid timestamp"
