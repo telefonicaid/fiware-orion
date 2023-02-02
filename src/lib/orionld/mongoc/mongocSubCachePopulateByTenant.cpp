@@ -74,15 +74,17 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
 
   mongocConnectionGet();
 
-  if (orionldState.mongoc.subscriptionsP == NULL)
-    orionldState.mongoc.subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, tenantP->mongoDbName, "csubs");
+  mongoc_collection_t* subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, tenantP->mongoDbName, "csubs");
 
   //
   // Run the query
   //
   // semTake(&mongoSubscriptionsSem);
-  if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.subscriptionsP, &mongoFilter, NULL, NULL)) == NULL)
+  if ((mongoCursorP = mongoc_collection_find_with_opts(subscriptionsP, &mongoFilter, NULL, NULL)) == NULL)
+  {
+    mongoc_collection_destroy(subscriptionsP);
     LM_RE(false, ("Internal Error (mongoc_collection_find_with_opts ERROR)"));
+  }
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
@@ -108,6 +110,8 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
 
     subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant);
   }
+
+  mongoc_collection_destroy(subscriptionsP);
 
   if (mongoc_cursor_error(mongoCursorP, &mongoError))
     LM_RE(false, ("Internal Error (DB Error '%s')", mongoError.message));

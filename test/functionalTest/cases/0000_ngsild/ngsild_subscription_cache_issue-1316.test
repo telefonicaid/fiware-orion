@@ -1,0 +1,187 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Creation Error - issue #1317
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB t_02
+brokerStart CB 0 IPv4 -experimental -multiservice
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 on tenant t_02
+# 02. Retrieve S1
+# 03. Restart the broker
+# 04. Retrieve S1 (using tenant t_02)
+#
+
+echo "01. Create a subscription S1 on tenant t_02"
+echo "==========================================="
+payload='{
+  "id": "urn:subscr:123457",
+  "type": "Subscription",
+  "description": "manual test",
+  "entities": [
+    {
+      "idPattern": ".*",
+      "type": "ParkingSpot"
+    }
+  ],
+  "q": "status==%22occupied%22",
+  "watchedAttributes": ["status"],
+  "notification": {
+    "endpoint": {
+      "uri": "http://nginx:8080/api/tools/mock/httpNoAuth",
+      "accept": "application/ld+json"
+    },
+    "format": "keyValues",
+    "attributes": [
+      "status"
+    ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --tenant t_02
+echo
+echo
+
+
+echo "02. Retrieve S1"
+echo "==============="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:subscr:123457 --tenant t_02
+echo
+echo
+
+
+echo "03. Restart the broker"
+echo "======================"
+brokerStop CB
+brokerStart CB 0 IPv4 -experimental -multiservice
+echo
+echo
+
+
+echo "04. Retrieve S1 (using tenant t_02)"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:subscr:123457 --tenant t_02
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 on tenant t_02
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:subscr:123457
+NGSILD-Tenant: t_02
+
+
+
+02. Retrieve S1
+===============
+HTTP/1.1 200 OK
+Content-Length: 395
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "manual test",
+    "entities": [
+        {
+            "type": "ParkingSpot"
+        }
+    ],
+    "id": "urn:subscr:123457",
+    "isActive": true,
+    "notification": {
+        "attributes": [
+            "status"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "uri": "http://nginx:8080/api/tools/mock/httpNoAuth"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "status==%22occupied%22",
+    "status": "active",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "status"
+    ]
+}
+
+
+03. Restart the broker
+======================
+
+
+04. Retrieve S1 (using tenant t_02)
+===================================
+HTTP/1.1 200 OK
+Content-Length: 395
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "manual test",
+    "entities": [
+        {
+            "type": "ParkingSpot"
+        }
+    ],
+    "id": "urn:subscr:123457",
+    "isActive": true,
+    "notification": {
+        "attributes": [
+            "status"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "uri": "http://nginx:8080/api/tools/mock/httpNoAuth"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "status==%22occupied%22",
+    "status": "active",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "status"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB t_02
