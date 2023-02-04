@@ -28,7 +28,8 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "cache/subCache.h"                                      // CachedSubscription
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
+#include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/mongoc/mongocSubCountersUpdate.h"              // Own interface
 
 
@@ -51,6 +52,9 @@
 // E.g.:
 // db.csubs.update({_id: "urn:ngsi-ld:subs:S1"}, {$inc: {"count": 1}, $max: {"lastSuccess": 14.24, "lastFailure": 15.31, "lastNotification": 15.31}})
 //
+// IMPORTANT NOTE:
+//   As this function may be called outside of the "Request Threads", orionldState cannot be used!
+//
 void mongocSubCountersUpdate
 (
   CachedSubscription*  cSubP,
@@ -62,10 +66,9 @@ void mongocSubCountersUpdate
   bool                 ngsild
 )
 {
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.subscriptionsP == NULL)
-    orionldState.mongoc.subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "csubs");
+  OrionldTenant*        tenantP        = (cSubP->tenant == NULL)? &tenant0 : orionldTenantLookup(cSubP->tenant);
+  mongoc_client_t*      connectionP    = mongoc_client_pool_pop(mongocPool);
+  mongoc_collection_t*  subscriptionsP = mongoc_client_get_collection(connectionP, tenantP->mongoDbName, "csubs");
 
   bson_t  request;    // Entire request with count and timestamps to be updated
   bson_t  reply;
@@ -112,13 +115,14 @@ void mongocSubCountersUpdate
 
   bson_append_document(&request, "$max", 4, &max);
 
-  LM(("SUBC: Calling mongoc_collection_update_one(%s)", cSubP->subscriptionId));
-  bool b = mongoc_collection_update_one(orionldState.mongoc.subscriptionsP, &selector, &request, NULL, &reply, &orionldState.mongoc.error);
+  bson_error_t  bError;
+  bool          b = mongoc_collection_update_one(subscriptionsP, &selector, &request, NULL, &reply, &bError);
+
   if (b == false)
-  {
-    bson_error_t* errP = &orionldState.mongoc.error;
-    LM_E(("SUBC: mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", cSubP->subscriptionId, errP->domain, errP->code, errP->message));
-  }
+    LM_E(("SUBC: mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", cSubP->subscriptionId, bError.domain, bError.code, bError.message));
+
+  mongoc_client_pool_push(mongocPool, connectionP);
+  mongoc_collection_destroy(subscriptionsP);
 
   bson_destroy(&reply);
   bson_destroy(&selector);

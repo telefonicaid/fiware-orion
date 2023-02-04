@@ -32,14 +32,13 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/orionldState.h"                         // mongocPool
 #include "orionld/common/subCacheApiSubscriptionInsert.h"        // subCacheApiSubscriptionInsert
 #include "orionld/dbModel/dbModelToApiSubscription.h"            // dbModelToApiSubscription
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
-#include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocSubCachePopulateByTenant.h"       // Own interface
 
@@ -57,6 +56,9 @@ extern "C"
 *   - "conditions.type" << "ONCHANGE"
 *
 *   I.e. the subscriptions is for ONCHANGE.
+*
+* IMPORTANT NOTE:
+*   As this function is called outside of the "Request Threads", orionldState cannot be used!
 */
 bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
 {
@@ -72,9 +74,9 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
   //
   bson_init(&mongoFilter);
 
-  mongocConnectionGet();
+  mongoc_client_t* connectionP = mongoc_client_pool_pop(mongocPool);
 
-  mongoc_collection_t* subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, tenantP->mongoDbName, "csubs");
+  mongoc_collection_t* subscriptionsP = mongoc_client_get_collection(connectionP, tenantP->mongoDbName, "csubs");
 
   //
   // Run the query
@@ -82,6 +84,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
   // semTake(&mongoSubscriptionsSem);
   if ((mongoCursorP = mongoc_collection_find_with_opts(subscriptionsP, &mongoFilter, NULL, NULL)) == NULL)
   {
+    mongoc_client_pool_push(mongocPool, connectionP);
     mongoc_collection_destroy(subscriptionsP);
     LM_RE(false, ("Internal Error (mongoc_collection_find_with_opts ERROR)"));
   }
@@ -111,13 +114,19 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant);
   }
 
+  mongoc_client_pool_push(mongocPool, connectionP);
   mongoc_collection_destroy(subscriptionsP);
 
+  bool r = true;
+
   if (mongoc_cursor_error(mongoCursorP, &mongoError))
-    LM_RE(false, ("Internal Error (DB Error '%s')", mongoError.message));
+  {
+    r = false;
+    LM_E(("Internal Error (DB Error '%s')", mongoError.message));
+  }
 
   mongoc_cursor_destroy(mongoCursorP);
   bson_destroy(&mongoFilter);
 
-  return true;
+  return r;
 }

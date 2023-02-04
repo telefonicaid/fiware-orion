@@ -46,3 +46,4 @@
 * Issue #1312  Better error handling for a specific use case about RHS being 'null'
 * Issue #1317  Removed an unfortunate error message about "not a valid timestamp"
 * Issue #1316  Fixed a bug in sub-cache population for non-default tenant (issue #1315 is about the same)
+* Issue #1315  Ditto
