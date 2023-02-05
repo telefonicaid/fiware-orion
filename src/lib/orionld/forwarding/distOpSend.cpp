@@ -100,30 +100,6 @@ typedef struct ForwardUrlParts
 
 // -----------------------------------------------------------------------------
 //
-// urlPath -
-//
-int urlPath(char* url, int urlLen, ForwardUrlParts* urlPartsP, KjNode* endpointP)
-{
-  int nb = 0;
-
-  if (urlPartsP->distOpP->operation == DoCreateEntity)
-    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities", endpointP->value.s);
-  else if (urlPartsP->distOpP->operation == DoRetrieveEntity)
-    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->distOpP->entityId);
-  else if (urlPartsP->distOpP->operation == DoDeleteEntity)
-    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entities/%s", endpointP->value.s, urlPartsP->distOpP->entityId);
-  else if (urlPartsP->distOpP->operation == DoDeleteBatch)
-    nb = snprintf(url, urlLen, "%s/ngsi-ld/v1/entityOperations/delete", endpointP->value.s);
-  else
-    LM_X(1, ("Distributed Operation is not implemented for '%s' requests", distOpTypes[urlPartsP->distOpP->operation]));
-
-  return nb;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // urlCompose -
 //
 char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
@@ -134,12 +110,7 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
   // Calculating the length of the resulting URL (PATH+PARAMS)
   //
   totalLen += strlen(endpointP->value.s);
-  totalLen += distOpTypeUrlLen[urlPartsP->distOpP->operation];
-
-  if (urlPartsP->distOpP->entityId != NULL)
-    totalLen += strlen(urlPartsP->distOpP->entityId) + 1;  // +1: the '/' after "/entities" and before the entityId
-  if (urlPartsP->distOpP->attrName != NULL)
-    totalLen += strlen(urlPartsP->distOpP->attrName) + 1;  // +1: the '/' after "/attrs" and before the attrName
+  totalLen += strlen(orionldState.urlPath);
 
   // Adding the lengths of the uri params
   for (SList* paramP = urlPartsP->params; paramP != NULL; paramP = paramP->next)
@@ -157,7 +128,7 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
   //
   // Filling in the URL, piece by piece
   //
-  int nb = urlPath(url, totalLen, urlPartsP, endpointP);
+  int nb = snprintf(url, totalLen, "%s%s", endpointP->value.s, orionldState.urlPath);
 
   if (urlPartsP->params == NULL)
     return url;
@@ -286,10 +257,8 @@ void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArra
   int attrsLen = 0;
   for (int ix = 0; ix < attrList->items; ix++)
   {
-    LM(("Compacting attr '%s' for distOps, using context '%s'", attrList->array[ix], contextP->url));
     attrList->array[ix]  = orionldContextItemAliasLookup(contextP, attrList->array[ix], NULL, NULL);
     attrsLen            += strlen(attrList->array[ix]) + 1;
-    LM(("Compacted attr: '%s'", attrList->array[ix]));
   }
 
   // Make room for "attrs=" and the string-end zero
@@ -485,7 +454,6 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
       if (strcasecmp(keyP->value.s, "jsonldContext") == 0)
       {
         jsonldContext = valueP->value.s;
-        LM(("************* jsonldContext: %s", jsonldContext));
         continue;
       }
 
@@ -527,13 +495,8 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
       char linkHeader[512];
       snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"", jsonldContext);
       headers = curl_slist_append(headers, linkHeader);
-      LM(("Added Link Header '%s'", orionldState.contextP->url));
     }
-    else
-      LM(("No Link Header added - Core Context (jsonldContext == NULL)"));
   }
-  else
-    LM(("No Link Header added - Core Context (orionldState.in.contentType != JSON  (%d))", orionldState.in.contentType));
 
   // Tenant
   char* tenant = NULL;
@@ -561,7 +524,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   struct curl_slist* sP = headers;
   while (sP != NULL)
   {
-    LM(("FWD: Added header '%s'", sP->data));
+    LM_T(LmtDistOpMsgs, ("FWD: Added header '%s'", sP->data));
     sP = sP->next;
   }
 #endif
@@ -588,7 +551,6 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
       if (contextP == NULL)
       {
-        LM(("Adding @context '%s' to body of msg to be forwarded", distOpP->regP->contextP->url));
         contextP = kjString(orionldState.kjsonP, "@context", distOpP->regP->contextP->url);
         kjChildAdd(distOpP->body, contextP);
       }
@@ -657,8 +619,8 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   //
   // SEND (sort of)
   //
+  LM_T(LmtDistOpMsgs, ("Distributed request %s %s '%s'", orionldState.verbString, url, payloadBody));
   curl_multi_add_handle(orionldState.curlDoMultiP, distOpP->curlHandle);
 
-  LM(("FWD: Request '%s' has been enqueued for forwarding", url));
   return 0;
 }

@@ -30,6 +30,8 @@ SET (SOURCES
     distOpListsMerge.cpp
     distOpLookupByCurlHandle.cpp
     distOpEntityMerge.cpp
+    distOpRequests.cpp
+    distOpResponses.cpp
     regMatchEntityInfo.cpp
     regMatchOperation.cpp
     regMatchInformationItem.cpp

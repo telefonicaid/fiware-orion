@@ -173,8 +173,6 @@ KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat rende
   KjNode* datasetsP = kjLookup(dbEntityP, "@datasets");
   bool    longNames = (compacted == false) || ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES));
 
-  LM(("OPT: RenderFormat: %d (%s)", renderFormat, renderFormatToString(renderFormat)));
-
   if (datasetsP != NULL)
     kjChildRemove(dbEntityP, datasetsP);
 

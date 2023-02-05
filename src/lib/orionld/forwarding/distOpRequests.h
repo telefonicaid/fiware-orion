@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPREQUESTS_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPREQUESTS_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,28 +25,15 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchInformationArray -
+// distOpRequests -
 //
-extern DistOp* regMatchInformationArray
-(
-  RegCacheItem*  regP,
-  DistOpType     operation,
-  const char*    entityId,
-  const char*    entityType,
-  KjNode*        incomingP
-);
+extern DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPREQUESTS_H_

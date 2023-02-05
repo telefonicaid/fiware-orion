@@ -71,32 +71,32 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
     char*   regId  = (char*) "unknown registration";
     if (regIdP != NULL)
       regId = regIdP->value.s;
-    LM(("Treating registration '%s' for registrations of mode '%s'", regId, registrationModeToString(regMode)));
+    LM_T(LmtRegMatch, ("Treating registration '%s' for registrations of mode '%s'", regId, registrationModeToString(regMode)));
 #endif
 
     // Loop detection
     if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
     {
-      LM(("No Reg Match due to loop detection"));
+      LM_T(LmtRegMatch, ("No Reg Match due to loop detection"));
       continue;
     }
 
     if ((regP->mode & regMode) == 0)
     {
-      LM(("%s: No Reg Match due to regMode", regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode", regId));
       continue;
     }
 
     if (regMatchOperation(regP, operation) == false)
     {
-      LM(("%s: No Reg Match due to Operation", regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation", regId));
       continue;
     }
 
     DistOp* distOpP = regMatchInformationArrayForGet(regP, entityId, entityType, attrV, geoProp);
     if (distOpP == NULL)
     {
-      LM(("%s: No Reg Match due to Information Array", regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Information Array", regId));
       continue;
     }
 
@@ -114,7 +114,7 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
     distOpTail       = distOpP;
     distOpTail->next = NULL;
 
-    LM(("%s: Reg Match !", regId));
+    LM_T(LmtRegMatch, ("%s: Reg Match !", regId));
   }
 
   return distOpHead;

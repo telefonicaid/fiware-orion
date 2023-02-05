@@ -132,7 +132,7 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbEntityP, bool creation, con
   {
     dbAttrsP     = kjLookup(dbEntityP, "attrs");      // Not present if the entity has no attributes
     dbAttrNamesP = kjLookup(dbEntityP, "attrNames");  // Must be there
-    LM(("dbAttrNamesP at %p", dbAttrNamesP));
+
     KjNode* creDateNodeP = kjLookup(dbEntityP, "creDate");
     if (creDateNodeP != NULL)
     {

@@ -66,26 +66,26 @@ DistOp* regMatchForEntityCreation
     // Loop detection
     if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
     {
-      LM(("No Reg Match due to loop detection"));
+      LM_T(LmtRegMatch, ("No Reg Match due to loop detection"));
       continue;
     }
 
     if ((regP->mode & regMode) == 0)
     {
-      LM(("No Reg Match due to regMode"));
+      LM_T(LmtRegMatch, ("No Reg Match due to regMode"));
       continue;
     }
 
     if (regMatchOperation(regP, operation) == false)
     {
-      LM(("No Reg Match due to Operation"));
+      LM_T(LmtRegMatch, ("No Reg Match due to Operation"));
       continue;
     }
 
-    DistOp* distOpP = regMatchInformationArray(regP, entityId, entityType, incomingP);
+    DistOp* distOpP = regMatchInformationArray(regP, operation, entityId, entityType, incomingP);
     if (distOpP == NULL)
     {
-      LM(("No Reg Match due to Information Array"));
+      LM_T(LmtRegMatch, ("No Reg Match due to Information Array"));
       continue;
     }
 

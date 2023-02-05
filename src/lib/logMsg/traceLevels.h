@@ -34,10 +34,24 @@
 */
 typedef enum TraceLevels
 {
-  /* The "tracelevels" group are largely based on the different processing levels used
-   * at Context Broker */
+  //
+  // All the old trace levels are to be removed and new invented.
+  //
 
-  /* Rest (20-39) */
+  // New
+  LmtDistOpMsgs = 20,                  // Distributed Operations: messages
+  LmtRegMatch,                         // Distributed Operations: registration matching
+  LmtAlt,                              // Notifications: Alterations
+  LmtNotifMsgs,                        // Notifications: Messages
+  LmtHeaders,                          // HTTP Headers
+  LmtUriParams,                        // HTTP URI Parameters
+  LmtResponse,                         // HTTP Response
+  LmtMqtt,                             // MQTT (notifications)
+
+  // Both,
+  LmtRequest = 38,                     // Incoming requests
+
+  // Old
   LmtRest = 20,
   LmtRestCompare,
   LmtUrlParse,
@@ -49,15 +63,13 @@ typedef enum TraceLevels
   LmtSavedResponse,
   LmtIncompletePayload,
   LmtTenant = 30,
-  LmtUriParams,
   LmtServicePath,
   LmtPagination,
   LmtCoap,
   LmtHttps = 35,
   LmtIpVersion,
   LmtCtxProviders,
-  LmtRequest = 38,          // ONLY to be used in ONE place - incoming requests
-  LmtPayload,
+  LmtPayload = 39,
 
   /* Parser (40-59) */
   LmtParse    = 40,

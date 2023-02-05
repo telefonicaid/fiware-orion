@@ -196,7 +196,7 @@ static bool contentTypeCheck(void)
 
   if (errorTitle != NULL)
   {
-    LM_E(("Bad Input (%s: %s)", errorTitle, errorDetails));
+    LM_W(("Bad Input (%s: %s)", errorTitle, errorDetails));
 
     orionldError(OrionldBadRequestData, errorTitle, errorDetails, 400);
     return false;
@@ -1249,7 +1249,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   if (orionldState.responsePayload != NULL)
   {
-    LM(("OPT: FINAL Response body: %s", orionldState.responsePayload));
+    LM_T(LmtResponse, ("Response body: %s", orionldState.responsePayload));
     restReply(NULL, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
   }
   else
