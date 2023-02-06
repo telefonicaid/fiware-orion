@@ -66,11 +66,13 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-    KjNode* regIdP = kjLookup(regP->regTree, "id");
-    char*   regId  = (char*) "unknown registration";
-    if (regIdP != NULL)
-      regId = regIdP->value.s;
-    LM_T(LmtRegMatch, ("Treating registration '%s' for registrations of mode '%s'", regId, registrationModeToString(regMode)));
+    if (regP->regId == NULL)
+    {
+      KjNode* regIdP = kjLookup(regP->regTree, "id");
+      regP->regId = (regIdP != NULL)? regIdP->value.s : (char*) "unknown registration";
+    }
+
+    LM_T(LmtRegMatch, ("Treating registration '%s' for registrations of mode '%s'", regP->regId, registrationModeToString(regMode)));
 
     // Loop detection
     if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
@@ -81,20 +83,20 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
 
     if ((regP->mode & regMode) == 0)
     {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode", regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode", regP->regId));
       continue;
     }
 
     if (regMatchOperation(regP, operation) == false)
     {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation", regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation", regP->regId));
       continue;
     }
 
     DistOp* distOpP = regMatchInformationArrayForGet(regP, entityId, entityType, attrV, geoProp);
     if (distOpP == NULL)
     {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to Information Array", regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Information Array", regP->regId));
       continue;
     }
 
@@ -112,7 +114,7 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
     distOpTail       = distOpP;
     distOpTail->next = NULL;
 
-    LM_T(LmtRegMatch, ("%s: Reg Match !", regId));
+    LM_T(LmtRegMatch, ("%s: Reg Match !", regP->regId));
   }
 
   return distOpHead;
