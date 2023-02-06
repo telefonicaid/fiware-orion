@@ -66,13 +66,11 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-#ifdef DEBUG
     KjNode* regIdP = kjLookup(regP->regTree, "id");
     char*   regId  = (char*) "unknown registration";
     if (regIdP != NULL)
       regId = regIdP->value.s;
     LM_T(LmtRegMatch, ("Treating registration '%s' for registrations of mode '%s'", regId, registrationModeToString(regMode)));
-#endif
 
     // Loop detection
     if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
