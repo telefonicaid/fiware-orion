@@ -126,8 +126,6 @@ OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* 
       if (attrP == NULL)  // Present in DB but not in replacing update - the attr is being deleted
         ++attrs;
     }
-
-    LM(("%d attributes are deleted in this REPLACE operation", attrs));
   }
 
   if (attrsP != NULL)
@@ -150,7 +148,7 @@ OrionldAlteration* orionldAlterations(char* entityId, char* entityType, KjNode* 
     int ix = 0;
     for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
-      LM(("Alteration for attribute '%s'", attrP->name));
+      LM_T(LmtAlt, ("Alteration for attribute '%s'", attrP->name));
       char* attrNameEq = kaStrdup(&orionldState.kalloc, attrP->name);  // Must copy to change dot for eq for ...
       dotForEq(attrNameEq);
 

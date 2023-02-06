@@ -33,6 +33,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchInformationItem.h"          // regMatchInformationItem
 
 
@@ -41,7 +42,14 @@ extern "C"
 //
 // regMatchInformationArray -
 //
-DistOp* regMatchInformationArray(RegCacheItem* regP, const char* entityId, const char* entityType, KjNode* incomingP)
+DistOp* regMatchInformationArray
+(
+  RegCacheItem*  regP,
+  DistOpType     operation,
+  const char*    entityId,
+  const char*    entityType,
+  KjNode*        incomingP
+)
 {
   KjNode* informationV = kjLookup(regP->regTree, "information");
 
@@ -53,11 +61,14 @@ DistOp* regMatchInformationArray(RegCacheItem* regP, const char* entityId, const
       continue;
 
     // If we get this far, then it's a match
-    KjNode* entityIdP   = kjString(orionldState.kjsonP, "id",   entityId);
-    KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", entityType);
+    if (operation == DoCreateEntity)
+    {
+      KjNode* entityIdP   = kjString(orionldState.kjsonP, "id",   entityId);
+      KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", entityType);
 
-    kjChildAdd(attrUnion, entityIdP);
-    kjChildAdd(attrUnion, entityTypeP);
+      kjChildAdd(attrUnion, entityIdP);
+      kjChildAdd(attrUnion, entityTypeP);
+    }
 
     DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
 

@@ -30,6 +30,7 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
 #include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -54,6 +55,10 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
+#include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
+#include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
+#include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
 
@@ -350,15 +355,15 @@ static bool dbEntityFields(KjNode* dbEntityP, const char* entityId, char** entit
 //
 void orionldAlterationsPresent(OrionldAlteration* altP)
 {
-  LM_K(("Entity Altered:  Entity Id:   %s", altP->entityId));
-  LM_K(("Entity Altered:  Entity Type: %s", altP->entityType));
-  LM_K(("Entity Altered:  Attributes:  %d", altP->alteredAttributes));
+  LM_T(LmtAlt, ("Entity Altered:  Entity Id:   %s", altP->entityId));
+  LM_T(LmtAlt, ("Entity Altered:  Entity Type: %s", altP->entityType));
+  LM_T(LmtAlt, ("Entity Altered:  Attributes:  %d", altP->alteredAttributes));
 
   for (int ix = 0; ix < altP->alteredAttributes; ix++)
   {
-    LM_K(("Entity Altered:    Attribute:  %s", altP->alteredAttributeV[ix].attrName));
-    LM_K(("Entity Altered:    Attribute:  %s", altP->alteredAttributeV[ix].attrNameEq));
-    LM_K(("Entity Altered:    Alteration: %s", orionldAlterationType(altP->alteredAttributeV[ix].alterationType)));
+    LM_T(LmtAlt, ("Entity Altered:    Attribute:  %s", altP->alteredAttributeV[ix].attrName));
+    LM_T(LmtAlt, ("Entity Altered:    Attribute:  %s", altP->alteredAttributeV[ix].attrNameEq));
+    LM_T(LmtAlt, ("Entity Altered:    Alteration: %s", orionldAlterationType(altP->alteredAttributeV[ix].alterationType)));
   }
 }
 
@@ -554,17 +559,20 @@ bool orionldPatchEntity2(void)
   //
   dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
 
-  if (dbEntityP == NULL)
+  if ((dbEntityP == NULL) && (orionldState.distributed == false))
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;
   }
 
 
-  KjNode* dbAttrsP    = NULL;
+  KjNode* dbAttrsP = NULL;
 
-  if (dbEntityFields(dbEntityP, entityId, &entityType, &dbAttrsP) == false)
-    return false;
+  if (dbEntityP != NULL)
+  {
+    if (dbEntityFields(dbEntityP, entityId, &entityType, &dbAttrsP) == false)
+      return false;
+  }
 
   //
   // If options=simplified/keyValues is present, the behaviour is very different
@@ -585,6 +593,20 @@ bool orionldPatchEntity2(void)
     return false;
   }
 
+  DistOp*  distOpList = NULL;
+  if (orionldState.distributed)
+  {
+    distOpList = distOpRequests(entityId, entityType, DoMergeEntity);
+
+    kjTreeLog(orionldState.requestTree, "Fixed tree after 'exclusive' regs");
+    for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
+    {
+      char body[1024];
+      kjFastRender(distOpP->body, body);
+      LM_T(LmtDistOpMsgs, ("Registration '%s': %s", distOpP->regP->regId, body));
+    }
+  }
+
   orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP, false);
   orionldAlterationsPresent(orionldState.alterations);
   orionldState.alterations->dbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
@@ -595,7 +617,7 @@ bool orionldPatchEntity2(void)
   //
   if (troe)
   {
-    // 1. Get from DB (dbAttrsP) all attributes that have been touched by the PATCH
+    // 1. Get "from DB" (dbAttrsP) all attributes that have been touched by the PATCH *locally*
     // 2. Convert the attributes to API Model
     // 3. Perform the PATCH on the attributes
     KjNode* troeTree = kjObject(orionldState.kjsonP, NULL);
@@ -672,6 +694,16 @@ bool orionldPatchEntity2(void)
 
   if (troe)
     orionldState.requestTree = patchTree;
+
+  //
+  // In case of 207 response
+  //
+  KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
+  if (distOpList != NULL)
+  {
+    distOpResponses(distOpList, responseBody);
+    distOpListRelease(distOpList);
+  }
 
   return true;
 }

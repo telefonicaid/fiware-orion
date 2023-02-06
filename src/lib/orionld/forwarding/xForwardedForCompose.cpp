@@ -59,6 +59,6 @@ char* xForwardedForCompose(char* xForwardedFor, char* newHost)
   else
     snprintf(xff, xffLen, "X-Forwarded-For: %s", newHost);
 
-  LM(("LOOP: New xForwardedFor: '%s'", xff));
+  LM_T(LmtHeaders, ("xForwardedFor: '%s'", xff));
   return xff;
 }

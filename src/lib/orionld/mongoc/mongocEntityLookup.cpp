@@ -75,10 +75,7 @@ KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringA
   bson_append_utf8(&mongoFilter, "_id.id", 6, entityId, -1);
 
   if (entityType != NULL)
-  {
-    LM(("Adding the entity type to the query: '%s'", entityType));
     bson_append_utf8(&mongoFilter, "_id.type", 8, entityType, -1);
-  }
 
   mongocConnectionGet();
 

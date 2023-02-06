@@ -38,6 +38,7 @@
 #include "common/globals.h"                         // transactionIdSet, correlatorIdSet
 #include "common/limits.h"                          // FIXME: this should be removed if this library wants to be generic again
 #include "orionld/common/performance.h"             // REQUEST_PERFORMANCE
+#include "logMsg/traceLevels.h"                     // Lmt* - for LM_T()
 
 
 
