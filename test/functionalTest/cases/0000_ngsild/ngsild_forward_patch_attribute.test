@@ -1,0 +1,373 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Distributed PATCH of single attribute
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB  20-21 IPv4 -experimental -forwarding
+brokerStart CP1 20-21 IPv4 -experimental
+brokerStart CP2 20-21 IPv4 -experimental
+
+--SHELL--
+#
+# 01. In CB, create an entity urn:E1 with an attribute P1
+# 02. In CP1, create an entity urn:E1 with attributes P1+P2+R1 (P2: 0)
+# 03. In CP2, Create an entity urn:E1 with attributes P1+P2+R1 (R1: 'urn:0')
+# 04. Create an exclusive registration R1 on urn:E1/P2 for CP1
+# 05. Create an inclusive registration R2 on urn:E1/R1 for CP2
+# 06. Patch urn:E1, setting P1='P1 Only CB' - updated on CB
+# 07. Patch urn:E1, setting P2='P2 via CB to CP1 only' - forwarded to CP1
+# 08. Patch urn:E1, setting R1='urn:r1:via:cb' - stored locally + forwarded to CP2
+# 09. GET urn:E1, with local=true - see P1='P1 Only CB' and R1='urn:r1:via:cb'
+# 10. GET urn:E1 - see P1, P2, R1
+# 11. GET urn:E1 from CP1
+# 12. GET urn:E1 from CP2
+#
+
+echo "01. In CB, create an entity urn:E1 with an attribute P1"
+echo "======================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:initial:value" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. In CP1, create an entity urn:E1 with attributes P1+P2+R1 (P2: 0)"
+echo "===================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 5,
+  "P2": 0,
+  "R1": { "object": "urn:cp1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. In CP2, Create an entity urn:E1 with attributes P1+P2+R1 (R1: 'urn:0')"
+echo "=========================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 6,
+  "P2": 6,
+  "R1": { "object": "urn:cp2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Create an exclusive registration R1 on urn:E1/P2 for CP1"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:registration:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P2" ]
+    }
+  ],
+  "mode": "exclusive",
+  "operations": [ "updateAttrs", "retrieveEntity" ],
+  "endpoint": "http://localhost:'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Create an inclusive registration R2 on urn:E1/R1 for CP2"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:registration:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "relationshipNames": [ "R1" ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "updateAttrs", "retrieveEntity" ],
+  "endpoint": "http://localhost:'$CP2_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "06. Patch urn:E1, setting P1='P1 Only CB' - updated on CB"
+echo "========================================================="
+payload='{
+  "value": "P1 Only CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. Patch urn:E1, setting P2='P2 via CB to CP1 only' - forwarded to CP1"
+echo "======================================================================="
+payload='{
+  "value": "P2 via CB to CP1 only"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P2 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08. Patch urn:E1, setting R1='urn:r1:via:cb' - stored locally + forwarded to CP2"
+echo "================================================================================"
+payload='{
+  "object": "urn:r1:via:cb"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "09. GET urn:E1, with local=true - see P1='P1 Only CB' and R1='urn:r1:via:cb''"
+echo "============================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?local=true
+echo
+echo
+
+
+echo "10. GET urn:E1 - see P1, P2, R1"
+echo "==============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "11. GET urn:E1 from CP1"
+echo "======================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP1_PORT
+echo
+echo
+
+
+echo "12. GET urn:E1 from CP2"
+echo "======================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP2_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. In CB, create an entity urn:E1 with an attribute P1
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. In CP1, create an entity urn:E1 with attributes P1+P2+R1 (P2: 0)
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. In CP2, Create an entity urn:E1 with attributes P1+P2+R1 (R1: 'urn:0')
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. Create an exclusive registration R1 on urn:E1/P2 for CP1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R1
+
+
+
+05. Create an inclusive registration R2 on urn:E1/R1 for CP2
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R2
+
+
+
+06. Patch urn:E1, setting P1='P1 Only CB' - updated on CB
+=========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. Patch urn:E1, setting P2='P2 via CB to CP1 only' - forwarded to CP1
+=======================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08. Patch urn:E1, setting R1='urn:r1:via:cb' - stored locally + forwarded to CP2
+================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. GET urn:E1, with local=true - see P1='P1 Only CB' and R1='urn:r1:via:cb''
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 126
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "P1 Only CB"
+    },
+    "R1": {
+        "object": "urn:r1:via:cb",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+10. GET urn:E1 - see P1, P2, R1
+===============================
+HTTP/1.1 200 OK
+Content-Length: 183
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "P1 Only CB"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "P2 via CB to CP1 only"
+    },
+    "R1": {
+        "object": "urn:r1:via:cb",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+11. GET urn:E1 from CP1
+=======================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 5
+    },
+    "P2": {
+        "type": "Property",
+        "value": "P2 via CB to CP1 only"
+    },
+    "R1": {
+        "object": "urn:cp1",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+12. GET urn:E1 from CP2
+=======================
+HTTP/1.1 200 OK
+Content-Length: 150
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 6
+    },
+    "P2": {
+        "type": "Property",
+        "value": 6
+    },
+    "R1": {
+        "object": "urn:r1:via:cb",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

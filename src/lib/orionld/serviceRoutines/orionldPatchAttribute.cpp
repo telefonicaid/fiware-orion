@@ -38,16 +38,19 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/legacyDriver/legacyPatchAttribute.h"           // legacyPatchAttribute
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
+#include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // dbModelFromApiSubAttribute
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
-#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/mongoc/mongocEntityGet.h"                      // mongocEntityGet
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
-#include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // dbModelFromApiSubAttribute
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
+#include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/legacyDriver/legacyPatchAttribute.h"           // legacyPatchAttribute
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own interface
 
 
@@ -63,10 +66,10 @@ static void mdItemRemove(KjNode* mdArray, const char* subAttrName)
   if (mdItemP != NULL)
   {
     kjChildRemove(mdArray, mdItemP);
-    LM(("PA: Removed '%s' from '%s'", subAttrName, mdArray->name));
+    LM_T(LmtSR, ("Removed '%s' from '%s'", subAttrName, mdArray->name));
   }
   else
-    LM(("PA: Can't find subAttr '%s' in 'md'", subAttrName));
+    LM_T(LmtSR, ("Can't find subAttr '%s' in 'md'", subAttrName));
 }
 
 
@@ -80,7 +83,7 @@ static void mdItemAdd(KjNode* mdArray, const char* subAttrName)
   KjNode* mdItemP = kjString(orionldState.kjsonP, NULL, subAttrName);
 
   kjChildAdd(mdArray, mdItemP);
-  LM(("PA: Added '%s' to '%s'", subAttrName, mdArray->name));
+  LM_T(LmtSR, ("Added '%s' to '%s'", subAttrName, mdArray->name));
 }
 
 
@@ -94,8 +97,6 @@ static void mdItemAdd(KjNode* mdArray, const char* subAttrName)
 //
 static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, KjNode* removedV)
 {
-  kjTreeLog(dbAttrP, "dbAttrP BEFORE attributeMerge");
-
   KjNode* mdP      = kjLookup(dbAttrP, "md");
   KjNode* mdNamesP = kjLookup(dbAttrP, "mdNames");
   bool    mustAdd  = false;
@@ -131,7 +132,7 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
       continue;
     }
 
-    LM(("PA: Treating sub-attr '%s'", subAttrP->name));
+    LM_T(LmtSR, ("Treating sub-attr '%s'", subAttrP->name));
 
     bool isValue = false;
 
@@ -148,7 +149,7 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
       KjNode* dbValueP = kjLookup(dbAttrP, "value");
       if (dbValueP != NULL)
       {
-        LM(("PA: Setting the value of the attribute"));
+        LM_T(LmtSR, ("Setting the value of the attribute"));
         dbValueP->type  = subAttrP->type;
         dbValueP->value = subAttrP->value;
       }
@@ -162,18 +163,18 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
     char eqName[512];
     strncpy(eqName, subAttrP->name, sizeof(eqName) - 1);
     dotForEq(eqName);
-    LM(("PA: Looking up '%s' in dbAttr's md", eqName));
+    LM_T(LmtSR, ("Looking up '%s' in dbAttr's md", eqName));
     KjNode* dbSubAttrP = kjLookup(mdP, eqName);
 
     if (dbSubAttrP != NULL)
     {
-      LM(("PA: Found it"));
-      LM(("PA: Removing already existing sub-attr '%s'", dbSubAttrP->name));
+      LM_T(LmtSR, ("Found it"));
+      LM_T(LmtSR, ("Removing already existing sub-attr '%s'", dbSubAttrP->name));
       kjChildRemove(mdP, dbSubAttrP);
-      LM(("PA: Removed sub-attr '%s'", dbSubAttrP->name));
+      LM_T(LmtSR, ("Removed sub-attr '%s'", dbSubAttrP->name));
     }
     else
-      LM(("PA: Did not find it"));
+      LM_T(LmtSR, ("Did not find it"));
 
 
     //
@@ -191,7 +192,7 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
 
     if (dbSubAttrP == NULL)
     {
-      LM(("PA: dbSubAttrP == NULL, so, adding '%s' to mdNames", subAttrP->name));
+      LM_T(LmtSR, ("dbSubAttrP == NULL, so, adding '%s' to mdNames", subAttrP->name));
       mdItemAdd(mdNamesP, subAttrP->name);
     }
 
@@ -200,25 +201,43 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
     dbModelFromApiSubAttribute(subAttrP, dbSubAttrP, addedV, removedV, &ignore);
 
     if (strcmp(subAttrP->name, "observedAt") == 0)
-      LM(("PA: observedAt ... special treatment (not String - object with Float)"));
+      LM_T(LmtSR, ("observedAt ... special treatment (not String - object with Float)"));
     else if (strcmp(subAttrP->name, "unitCode") == 0)
-      LM(("PA: observedAt ... special treatment (not String - object with String)"));
+      LM_T(LmtSR, ("observedAt ... special treatment (not String - object with String)"));
 
-    LM(("PA: Adding sub-attr '%s' to 'md'", subAttrP->name));
+    LM_T(LmtSR, ("Adding sub-attr '%s' to 'md'", subAttrP->name));
     kjChildRemove(incomingP, subAttrP);
     kjChildAdd(mdP, subAttrP);
 
     if (mustAdd == true)
     {
-      LM(("PA: Adding 'md' to dbAttr"));
+      LM_T(LmtSR, ("Adding 'md' to dbAttr"));
       kjChildAdd(dbAttrP, mdP);
       mustAdd = false;
     }
 
     subAttrP = next;
   }
+}
 
-  kjTreeLog(dbAttrP, "dbAttrP");
+
+
+// ----------------------------------------------------------------------------
+//
+// dbModelEntityTypeExtract -
+//
+char* dbModelEntityTypeExtract(KjNode* dbEntityP)
+{
+  KjNode* _idP = kjLookup(dbEntityP, "_id");
+
+  if (_idP != NULL)
+  {
+    KjNode* typeP = kjLookup(_idP, "type");
+    if (typeP != NULL)
+      return typeP->value.s;
+  }
+
+  return NULL;
 }
 
 
@@ -273,8 +292,9 @@ bool orionldPatchAttribute(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyPatchAttribute();
 
-  char* entityId = orionldState.wildcard[0];
-  char* attrName = orionldState.wildcard[1];
+  char* entityId   = orionldState.wildcard[0];
+  char* entityType = NULL;
+  char* attrName   = orionldState.wildcard[1];
 
   //
   // Make sure the Entity ID is a valid URI
@@ -314,120 +334,129 @@ bool orionldPatchAttribute(void)
   //
   KjNode* dbEntityP = mongocEntityGet(entityId, NULL, true);
 
-  if (dbEntityP == NULL)
+  if (dbEntityP != NULL)
+    entityType = dbModelEntityTypeExtract(dbEntityP);
+  else if (orionldState.distributed == false)
   {
     orionldError(OrionldResourceNotFound, "Entity Not Found", entityId, 404);
     return false;
   }
 
-  //
-  // First of all, make sure the attribute exists
-  //
-  KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");
-  if (dbAttrsP == NULL)  // Entity without attributes
+  if (orionldState.distributed == true)
   {
-    orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
-    return false;
-  }
-
-  KjNode* dbAttrP = kjLookup(dbAttrsP, longAttrNameEq);
-  if (dbAttrP == NULL)
-  {
-    orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
-    return false;
-  }
-
-  KjNode* dbAttrTypeP = kjLookup(dbAttrP, "type");
-
-  if (dbAttrTypeP == NULL)
-  {
-    orionldError(OrionldInternalError, "Database Error (attribute without a type in the database)", longAttrNameEq, 500);
-    return false;
-  }
-  const char* attrTypeInDb = dbAttrTypeP->value.s;
-
-  //
-  // Make sure the incoming attribute is valid
-  //
-  OrionldAttributeType attrType = orionldAttributeType(attrTypeInDb);
-  if (pCheckAttribute(entityId, orionldState.requestTree, true, attrType, true, NULL) == false)
-    return false;
-
-  kjTreeLog(orionldState.requestTree, "TR: Right after pCheckAttribute");
-  // Keep untouched initial state of the entity in the database - for alterations (to check for false updates)
-  KjNode* initialDbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
-  kjTreeLog(dbEntityP, "ALT3: dbEntityP");
-  // Merge orionldState.requestTree into dbEntityP, then convert to API Entity, for Alterations
-  KjNode* addedV    = kjArray(orionldState.kjsonP, ".added");
-  KjNode* removedV  = kjArray(orionldState.kjsonP, ".removed");
-
-  //
-  // attributeMerge DESTROYs orionldState.requestTree
-  // We need it intact for ALTERATION and TROE as well (if on)
-  //
-  KjNode* incomingP = kjClone(orionldState.kjsonP, orionldState.requestTree);
-
-  attributeMerge(dbAttrP, orionldState.requestTree, addedV, removedV);
-  kjTreeLog(dbEntityP, "ALT3: dbEntityP after attributeMerge");
-
-  //
-  // To call mongocAttributesAdd we need the attribute in an array
-  //
-  kjTreeLog(dbAttrP, "PA: DB Attribute to mongo");
-  int r = mongocAttributesAdd(entityId, NULL, dbAttrP, true);
-  if (r == false)
-    LM_E(("Database Error ()"));
-
-
-  kjTreeLog(dbEntityP, "ALT3: After mongocAttributesAdd");
-
-  //
-  // For alteration, we need:
-  //   * the Entity Type (must take it from the DB - expanded
-  //   * The Final API entity - converted from the final DB Entity
-  //
-  kjTreeLog(dbEntityP, "dbEntityP");
-  KjNode*     _idNodeP         = kjLookup(dbEntityP, "_id");
-
-  if (_idNodeP == NULL)
-    LM_E(("Database Error (no _id in the DB for entity '%s')", entityId));
-  else
-  {
-    KjNode*      eTypeNodeP = kjLookup(_idNodeP, "type");
-    const char*  entityType = (eTypeNodeP != NULL)? eTypeNodeP->value.s : NULL;
-
-    if (entityType != NULL)
+    KjNode* body = kjObject(orionldState.kjsonP, NULL);
+    kjChildAdd(body, orionldState.requestTree);
+    DistOp* distOpList = distOpRequests(entityId, entityType, DoUpdateAttrs, body);  // DoUpdateAttrs should be Singular !!!
+    if (distOpList != NULL)
     {
-      KjNode* finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
-
-      // We need the "Incoming Entity", we have just an attribute ...
-      KjNode* attributeNodeP = incomingP;
-      KjNode* inEntityP      = kjObject(orionldState.kjsonP, NULL);
-
-      //
-      // For 'alterations, the attribute name needs to be like in the DB (dotForEq)
-      //
-      orionldState.requestTree->name = kaStrdup(&orionldState.kalloc, longAttrNameEq);
-
-      kjChildAdd(inEntityP, attributeNodeP);
-
-      kjTreeLog(inEntityP, "ALT2: inEntityP");
-      kjTreeLog(incomingP, "ALT2: incomingP");
-      kjTreeLog(finalApiEntityP, "ALT2: finalApiEntityP");
-      alteration(entityId, entityType, finalApiEntityP, inEntityP, initialDbEntityP);
+      KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
+      distOpResponses(distOpList, responseBody);
+      distOpListRelease(distOpList);
     }
-    else
-      LM_E(("Database Error (no _id::type in the DB for entity '%s')", entityId));
+  }
+
+  KjNode* incomingP = NULL;
+  if ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL))  // Attribute left for local request
+  {
+    //
+    // First of all, make sure the attribute exists
+    //
+    KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");
+    if ((dbAttrsP == NULL) && (orionldState.distributed == false))  // Entity without attributes
+    {
+      orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
+      return false;
+    }
+
+    KjNode* dbAttrP = kjLookup(dbAttrsP, longAttrNameEq);
+    if ((dbAttrP == NULL) && (orionldState.distributed == false))
+    {
+      orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
+      return false;
+    }
+
+    if (dbAttrP != NULL)
+    {
+      KjNode* dbAttrTypeP = kjLookup(dbAttrP, "type");
+
+      if (dbAttrTypeP == NULL)
+      {
+        orionldError(OrionldInternalError, "Database Error (attribute without a type in the database)", longAttrNameEq, 500);
+        return false;
+      }
+      const char* attrTypeInDb = dbAttrTypeP->value.s;
+
+      //
+      // Make sure the incoming attribute is valid
+      //
+      OrionldAttributeType attrType = orionldAttributeType(attrTypeInDb);
+      if (pCheckAttribute(entityId, orionldState.requestTree, true, attrType, true, NULL) == false)
+        return false;
+
+      // Keep untouched initial state of the entity in the database - for alterations (to check for false updates)
+      KjNode* initialDbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
+
+      // Merge orionldState.requestTree into dbEntityP, then convert to API Entity, for Alterations
+      KjNode* addedV    = kjArray(orionldState.kjsonP, ".added");
+      KjNode* removedV  = kjArray(orionldState.kjsonP, ".removed");
+
+      //
+      // attributeMerge DESTROYs orionldState.requestTree
+      // We need it intact for ALTERATION and TROE as well (if on)
+      //
+      incomingP = kjClone(orionldState.kjsonP, orionldState.requestTree);
+
+      attributeMerge(dbAttrP, orionldState.requestTree, addedV, removedV);
+
+      //
+      // To call mongocAttributesAdd we need the attribute in an array
+      //
+      int r = mongocAttributesAdd(entityId, NULL, dbAttrP, true);
+      if (r == false)
+        LM_E(("Database Error ()"));
+
+      //
+      // For alteration, we need:
+      //   * the Entity Type (must take it from the DB - expanded
+      //   * The Final API entity - converted from the final DB Entity
+      //
+      KjNode*     _idNodeP         = kjLookup(dbEntityP, "_id");
+
+      if (_idNodeP == NULL)
+        LM_E(("Database Error (no _id in the DB for entity '%s')", entityId));
+      else
+      {
+        KjNode*      eTypeNodeP = kjLookup(_idNodeP, "type");
+        const char*  entityType = (eTypeNodeP != NULL)? eTypeNodeP->value.s : NULL;
+
+        if (entityType != NULL)
+        {
+          KjNode* finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
+
+          // We need the "Incoming Entity", we have just an attribute ...
+          KjNode* attributeNodeP = incomingP;
+          KjNode* inEntityP      = kjObject(orionldState.kjsonP, NULL);
+
+          //
+          // For 'alterations, the attribute name needs to be like in the DB (dotForEq)
+          //
+          orionldState.requestTree->name = kaStrdup(&orionldState.kalloc, longAttrNameEq);
+
+          kjChildAdd(inEntityP, attributeNodeP);
+
+          alteration(entityId, entityType, finalApiEntityP, inEntityP, initialDbEntityP);
+        }
+        else
+          LM_E(("Database Error (no _id::type in the DB for entity '%s')", entityId));
+      }
+    }
   }
 
   orionldState.httpStatusCode = 204;
   orionldState.responseTree   = NULL;
 
-  if (troe == true)
-  {
+  if ((troe == true) && (incomingP != NULL))
     orionldState.requestTree = incomingP;
-    kjTreeLog(orionldState.requestTree, "TR: Tree for TRoE");
-  }
 
   return true;
 }
