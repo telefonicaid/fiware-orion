@@ -55,7 +55,7 @@ DistOp* regMatchForEntityCreation
   DistOpType       operation,
   const char*      entityId,
   const char*      entityType,
-  KjNode*          incomingP
+  KjNode*          payloadBody
 )
 {
   DistOp* distOpHead = NULL;
@@ -82,7 +82,7 @@ DistOp* regMatchForEntityCreation
       continue;
     }
 
-    DistOp* distOpP = regMatchInformationArray(regP, operation, entityId, entityType, incomingP);
+    DistOp* distOpP = regMatchInformationArray(regP, operation, entityId, entityType, payloadBody);
     if (distOpP == NULL)
     {
       LM_T(LmtRegMatch, ("No Reg Match due to Information Array"));

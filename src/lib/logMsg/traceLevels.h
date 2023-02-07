@@ -47,6 +47,7 @@ typedef enum TraceLevels
   LmtUriParams,                        // HTTP URI Parameters
   LmtResponse,                         // HTTP Response
   LmtMqtt,                             // MQTT (notifications)
+  LmtSR,                               // Service Routine (whatever it is doing)
 
   // Both,
   LmtRequest = 38,                     // Incoming requests

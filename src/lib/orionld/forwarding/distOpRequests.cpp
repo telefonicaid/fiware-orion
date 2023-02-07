@@ -104,19 +104,23 @@ static void purgeRedirectedAttributes(DistOp* redirectList, KjNode* body)
 // - P7-P10 on R5::endpoint
 // - P7-P10 on local broker
 //
-DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation)
+DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, KjNode* payloadBody)
 {
   char dateHeader[70];
-  snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
-
-  DistOp* exclusiveList = regMatchForEntityCreation(RegModeExclusive, operation, entityId, entityType, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
-  DistOp* redirectList  = regMatchForEntityCreation(RegModeRedirect,  operation, entityId, entityType, orionldState.requestTree);
-
-  if (redirectList != NULL)
-    purgeRedirectedAttributes(redirectList, orionldState.requestTree);  // chopping attrs off orionldState.requestTree
+  snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);  // MOVE to orionldStateInit, for example
 
   DistOp* distOpList    = NULL;
-  DistOp* inclusiveList = regMatchForEntityCreation(RegModeInclusive, operation, entityId, entityType, orionldState.requestTree);
+  DistOp* exclusiveList = NULL;
+  DistOp* redirectList  = NULL;
+  DistOp* inclusiveList = NULL;
+
+  exclusiveList = regMatchForEntityCreation(RegModeExclusive, operation, entityId, entityType, payloadBody);
+  redirectList  = regMatchForEntityCreation(RegModeRedirect,  operation, entityId, entityType, payloadBody);
+
+  if (redirectList != NULL)
+    purgeRedirectedAttributes(redirectList, payloadBody);  // chopping attrs off payloadBody
+
+  inclusiveList = regMatchForEntityCreation(RegModeInclusive, operation, entityId, entityType, payloadBody);
 
   distOpList = distOpListsMerge(exclusiveList, redirectList);
   distOpList = distOpListsMerge(distOpList, inclusiveList);
@@ -175,15 +179,15 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation)
     LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
 
   // Anything left for a local entity?
-  if (orionldState.requestTree->value.firstChildP != NULL)
+  if (payloadBody->value.firstChildP != NULL)
   {
     if (operation == DoCreateEntity)
     {
       KjNode* entityIdP   = kjString(orionldState.kjsonP,  "id",   entityId);
       KjNode* entityTypeP = kjString(orionldState.kjsonP,  "type", entityType);
 
-      kjChildAdd(orionldState.requestTree, entityIdP);
-      kjChildAdd(orionldState.requestTree, entityTypeP);
+      kjChildAdd(payloadBody, entityIdP);
+      kjChildAdd(payloadBody, entityTypeP);
     }
   }
   else

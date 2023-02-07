@@ -34,6 +34,6 @@
 //
 // distOpRequests -
 //
-extern DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation);
+extern DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, KjNode* payloadBody);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPREQUESTS_H_

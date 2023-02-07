@@ -92,7 +92,7 @@ bool orionldPostEntities(void)
 
   DistOp*  distOpList = NULL;
   if (orionldState.distributed)
-    distOpList = distOpRequests(entityId, entityType, DoCreateEntity);
+    distOpList = distOpRequests(entityId, entityType, DoCreateEntity, orionldState.requestTree);
 
   //
   // If the entity already exists, a "409 Conflict" is returned, either complete or as part of a 207
