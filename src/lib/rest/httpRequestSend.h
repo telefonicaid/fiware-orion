@@ -49,6 +49,8 @@ extern void httpRequestInit(long defaultTimeoutInMilliseconds);
 */
 extern int httpRequestSend
 (
+  int                                        providerLimit,
+  int                                        providerOffset,
   CURL*                                      curl,
   const std::string&                         idStringForLogs,
   const std::string&                         from,

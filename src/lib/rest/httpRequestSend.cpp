@@ -239,6 +239,8 @@ static int contentLenParse(char* s)
 */
 int httpRequestSend
 (
+   int                                        providerLimit,
+   int                                        providerOffset,
    CURL*                                      _curl,
    const std::string&                         idStringForLogs,
    const std::string&                         from,
@@ -573,7 +575,17 @@ int httpRequestSend
   {
     url = ip;
   }
-  url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  if (verb == "POST" && resource == "/v2/op/query")
+  {
+    std::string pLimit = std::to_string(providerLimit);
+    std::string pOffset = std::to_string(providerOffset);
+    url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource + "?limit=" + pLimit + "&offset=" + pOffset + "&options=count";
+  }
+  else
+  {
+    url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+  }
 
   if (insecureNotif)
   {
