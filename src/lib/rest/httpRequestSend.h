@@ -51,6 +51,7 @@ extern int httpRequestSend
 (
   int                                        providerLimit,
   int                                        providerOffset,
+  ApiVersion                                 apiVersion,
   CURL*                                      curl,
   const std::string&                         idStringForLogs,
   const std::string&                         from,

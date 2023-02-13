@@ -304,6 +304,7 @@ static bool queryForward
 
   r = httpRequestSend(providerLimit,
 		      providerOffset,
+		      ciP->apiVersion,
 		      NULL,
                       "regId: " + regId,
                       fromIp,  // thread variable
@@ -355,7 +356,7 @@ static bool queryForward
 
   logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), cleanPayload, statusCode);
 
-  if (strstr (out.c_str(), "Fiware-Total-Count"))
+  if (ciP->apiVersion == V2 && strstr(out.c_str(), "Fiware-Total-Count"))
   {
     getProviderCount(out.c_str(), totalCount);
   }
@@ -511,7 +512,7 @@ std::string postQueryContext
   std::vector<std::string>    regIdsV;
   QueryContextResponseVector  responseV;
   long long                   count = 0;
-  long long*                  countP = &count;
+  long long*                  countP = NULL;
 
   bool skipForwarding = ciP->uriParamOptions[OPT_SKIPFORWARDING];
 
@@ -526,7 +527,14 @@ std::string postQueryContext
   // In API version 2, this has changed completely. Here, the total count of local entities is returned
   // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
   //
-
+  if ((ciP->apiVersion == V2))
+  {
+    countP = &count;
+  }
+  else if ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on"))
+  {
+    countP = &count;
+  }
 
 
   //
@@ -698,22 +706,25 @@ std::string postQueryContext
 
   // setting the pagination variables for forwarding the request to CP -
 
-  int totalLimit    	=  atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+  int providerLimit    	=  atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
   int totalOffset   	=  atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int providerLimit     =  0;
   int providerOffset    =  0;
-  int brokerCountP      =  *countP;
+  int brokerCount      =  0;
 
-  // Setting providerOffset
-  if (totalOffset >= (*countP))
+  if (ciP->apiVersion == V2)
   {
-    providerOffset = totalOffset - (*countP);
-  }
+    brokerCount   =  *countP;
+    // Setting providerOffset
+    if (totalOffset >= (*countP))
+    {
+      providerOffset = totalOffset - (*countP);
+    }
 
-  // Setting providerLimit
-  if (localQcrsP->contextElementResponseVector.size() >= 0)
-  {
-    providerLimit = totalLimit - localQcrsP->contextElementResponseVector.size();
+    // Setting providerLimit
+    if (localQcrsP->contextElementResponseVector.size() >= 0)
+    {
+      providerLimit = providerLimit - localQcrsP->contextElementResponseVector.size();
+    }
   }
 
   //
@@ -770,16 +781,19 @@ std::string postQueryContext
 
       if (queryForward(ciP, requestV[fIx], regIdsV[fIx], providerLimit, providerOffset, countP, fIx + 1, qP) == true)
       {
-	providerLimit = providerLimit - qP->contextElementResponseVector.size();
+        if (ciP->apiVersion == V2)
+        {
+          providerLimit = providerLimit - qP->contextElementResponseVector.size();
 
-        if (providerOffset > (*countP - brokerCountP))
-        {
-	   providerOffset -= (*countP - brokerCountP);
-        }
-        else
-        {
-           providerOffset = 0;
-        }
+          if (providerOffset > (*countP - brokerCount))
+          {
+            providerOffset -= (*countP - brokerCount);
+          }
+          else
+          {
+            providerOffset = 0;
+          }
+	}
         //
         // Each ContextElementResponse of qP should be tested to see whether there
         // is already an existing ContextElementResponse in responseV

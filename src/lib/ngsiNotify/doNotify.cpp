@@ -61,6 +61,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
   std::string         url;
   int                 providerLimit  = DEFAULT_PAGINATION_LIMIT_INT;
   int                 providerOffset = DEFAULT_PAGINATION_OFFSET_INT;
+  ApiVersion          apiVersion     = V1;
 
   snprintf(portV, sizeof(portV), "%d", params->port);
   endpoint = params->ip + ":" + portV;
@@ -68,6 +69,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
 
   int r =  httpRequestSend(providerLimit,
 		       providerOffset,
+		       apiVersion,
 		       curl,
                        "subId: " + params->subscriptionId,
                        params->from,

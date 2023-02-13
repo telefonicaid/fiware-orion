@@ -241,6 +241,7 @@ int httpRequestSend
 (
    int                                        providerLimit,
    int                                        providerOffset,
+   ApiVersion                                 apiVersion,
    CURL*                                      _curl,
    const std::string&                         idStringForLogs,
    const std::string&                         from,
@@ -576,7 +577,7 @@ int httpRequestSend
     url = ip;
   }
 
-  if (verb == "POST" && resource == "/v2/op/query")
+  if (apiVersion == V2 && verb == "POST" && resource == "/v2/op/query")
   {
     std::string pLimit = std::to_string(providerLimit);
     std::string pOffset = std::to_string(providerOffset);

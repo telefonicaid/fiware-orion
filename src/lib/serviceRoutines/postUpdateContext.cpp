@@ -211,6 +211,7 @@ static bool updateForward
 
   r = httpRequestSend(providerLimit,
 		      providerOffset,
+		      ciP->apiVersion,
 		      NULL,
                       "regId: " + regId,
                       fromIp,   // thread variable
