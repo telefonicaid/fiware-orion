@@ -63,7 +63,6 @@ DistOp* regMatchForEntityCreation
 
   LM_T(LmtRegMatch, ("Registration Mode: %d (%s)", regMode, registrationModeToString(regMode)));
   LM_T(LmtRegMatch, ("Operation:         %d (%s)", operation, distOpTypes[operation]));
-  kjTreeLog(incomingP, "Payload Body", LmtRegMatch);
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
