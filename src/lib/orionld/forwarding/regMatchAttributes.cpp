@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchAttributes.h"               // Own interface
 
 
@@ -42,29 +43,49 @@ extern "C"
 //
 // regMatchAttributes -
 //
-KjNode* regMatchAttributes(RegCacheItem* regP, KjNode* propertyNamesP, KjNode* relationshipNamesP, KjNode* incomingP)
+KjNode* regMatchAttributes(RegCacheItem* regP, DistOpType operation, KjNode* propertyNamesP, KjNode* relationshipNamesP, KjNode* payloadBody)
 {
-  KjNode* attrObject = NULL;
-
   //
   // Registration of entire entity?
   // Only 'inclusive' registrations can do that
   //
   if ((propertyNamesP == NULL) && (relationshipNamesP == NULL))
   {
-    KjNode* body = kjClone(orionldState.kjsonP, incomingP);
+    if (operation == DoUpdateAttrs)
+    {
+      //
+      // IMPORTANT !!!
+      // To make "PATCH Attribute" able to use "regMatchForEntityCreation", the incoming body was "enhanced":
+      //
+      //   Incoming: { "value": 12 }
+      // Was Changed to:
+      //   Modified: { "attrName" { "value": 12 } }
+      //
+      // That way, the body of "PATCH Attribute" is on the same level as the body of "POST /entities" and regMatchForEntityCreation can be used as is.
+      // Now, before cloning the payload body for distributed requests, this modification needs to be rolled back.
+      //
+      LM_T(LmtRegMatch, ("It's PATCH Attribute, so, the payload body is one level down"));
+      payloadBody = payloadBody->value.firstChildP;
+    }
+
+    KjNode* body = kjClone(orionldState.kjsonP, payloadBody);
 
     // Add entity type and id
-    KjNode* idP   = kjClone(orionldState.kjsonP, orionldState.payloadIdNode);
-    KjNode* typeP = kjClone(orionldState.kjsonP, orionldState.payloadTypeNode);
+    if (operation != DoUpdateAttrs)
+    {
+      KjNode* idP   = kjClone(orionldState.kjsonP, orionldState.payloadIdNode);
+      KjNode* typeP = kjClone(orionldState.kjsonP, orionldState.payloadTypeNode);
 
-    kjChildAdd(body, idP);
-    kjChildAdd(body, typeP);
+      kjChildAdd(body, idP);
+      kjChildAdd(body, typeP);
+    }
 
     return body;
   }
 
-  KjNode* attrP = incomingP->value.firstChildP;
+
+  KjNode* attrObject = NULL;
+  KjNode* attrP      = payloadBody->value.firstChildP;
   KjNode* next;
   while (attrP != NULL)
   {
@@ -101,7 +122,7 @@ KjNode* regMatchAttributes(RegCacheItem* regP, KjNode* propertyNamesP, KjNode* r
     if (regP->mode == RegModeExclusive)
     {
       matchP = attrP;
-      kjChildRemove(incomingP, attrP);
+      kjChildRemove(payloadBody, attrP);
     }
     else
       matchP = kjClone(orionldState.kjsonP, attrP);
@@ -114,8 +135,24 @@ KjNode* regMatchAttributes(RegCacheItem* regP, KjNode* propertyNamesP, KjNode* r
     attrP = next;
   }
 
-//  if (attrObject == NULL)
-//    LM(("%s: No match due to no matching attributes", regP->regId));
+  if (attrObject == NULL)
+    LM_T(LmtRegMatch, ("No match due to no matching attributes"));
+  else if (operation == DoUpdateAttrs)
+  {
+    //
+    // IMPORTANT !!!
+    // To make "PATCH Attribute" able to use "regMatchForEntityCreation", the incoming body was "enhanced":
+    //
+    //   Incoming: { "value": 12 }
+    // Was Changed to:
+    //   Modified: { "attrName" { "value": 12 } }
+    //
+    // That way, the body of "PATCH Attribute" is on the same level as the body of "POST /entities" and regMatchForEntityCreation can be used as is.
+    // Now, before cloning the payload body for distributed requests, this modification needs to be rolled back.
+    //
+    LM_T(LmtRegMatch, ("It's PATCH Attribute, so, the payload body is one level down"));
+    return attrObject->value.firstChildP;
+  }
 
   return attrObject;
 }

@@ -48,14 +48,14 @@ DistOp* regMatchInformationArray
   DistOpType     operation,
   const char*    entityId,
   const char*    entityType,
-  KjNode*        incomingP
+  KjNode*        payloadBody
 )
 {
   KjNode* informationV = kjLookup(regP->regTree, "information");
 
   for (KjNode* infoP = informationV->value.firstChildP; infoP != NULL; infoP = infoP->next)
   {
-    KjNode* attrUnion = regMatchInformationItem(regP, infoP, entityId, entityType, incomingP);
+    KjNode* attrUnion = regMatchInformationItem(regP, operation, infoP, entityId, entityType, payloadBody);
 
     if (attrUnion == NULL)
       continue;

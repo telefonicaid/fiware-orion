@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchAttributes.h"               // regMatchAttributes
 #include "orionld/forwarding/regMatchEntityInfo.h"               // regMatchEntityInfo
 #include "orionld/forwarding/regMatchInformationItem.h"          // Own interface
@@ -41,7 +42,7 @@ extern "C"
 //
 // regMatchInformationItem -
 //
-KjNode* regMatchInformationItem(RegCacheItem* regP, KjNode* infoP, const char* entityId, const char* entityType, KjNode* incomingP)
+KjNode* regMatchInformationItem(RegCacheItem* regP, DistOpType operation, KjNode* infoP, const char* entityId, const char* entityType, KjNode* payloadBody)
 {
   KjNode* entities = kjLookup(infoP, "entities");
 
@@ -63,7 +64,7 @@ KjNode* regMatchInformationItem(RegCacheItem* regP, KjNode* infoP, const char* e
 
   KjNode* propertyNamesP     = kjLookup(infoP, "propertyNames");
   KjNode* relationshipNamesP = kjLookup(infoP, "relationshipNames");
-  KjNode* attrUnionP         = regMatchAttributes(regP, propertyNamesP, relationshipNamesP, incomingP);
+  KjNode* attrUnionP         = regMatchAttributes(regP, operation, propertyNamesP, relationshipNamesP, payloadBody);
 
   return attrUnionP;
 }

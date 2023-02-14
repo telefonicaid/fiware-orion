@@ -92,7 +92,7 @@ bool orionldPostEntities(void)
   DistOp*  distOpList = NULL;
 
   if (orionldState.distributed)
-    distOpList = distOpRequests(entityId, entityType, DoCreateEntity);
+    distOpList = distOpRequests(entityId, entityType, DoCreateEntity, orionldState.requestTree);
 
   bool    emptyEntity    = ((orionldState.requestTree == NULL)  || (orionldState.requestTree->value.firstChildP == NULL));
   KjNode* cloneForTroeP  = NULL;

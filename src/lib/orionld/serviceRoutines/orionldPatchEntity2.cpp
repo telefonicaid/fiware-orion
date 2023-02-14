@@ -55,9 +55,11 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
 #include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
-#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
 
@@ -580,7 +582,7 @@ bool orionldPatchEntity2(void)
   DistOp*  distOpList = NULL;
   if (orionldState.distributed)
   {
-    distOpList = distOpRequests(entityId, entityType, DoMergeEntity);
+    distOpList = distOpRequests(entityId, entityType, DoMergeEntity, orionldState.requestTree);
 
     kjTreeLog(orionldState.requestTree, "Fixed tree after 'exclusive' regs", LmtRegMatch);
     for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
