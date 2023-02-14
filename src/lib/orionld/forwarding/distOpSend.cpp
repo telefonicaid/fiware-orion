@@ -187,11 +187,20 @@ void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value,
 //
 // responseSave -
 //
+// NOTE
+// According to https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html:
+// - chunk:    points to the delivered data
+// - members:  the size of that data
+// - size:     is always 1.
+//
 static int responseSave(void* chunk, size_t size, size_t members, void* userP)
 {
+  LM(("GOT a Response!"));
   char*            chunkP        = (char*) chunk;
-  size_t           chunkLen      = size * members;
+  size_t           chunkLen      = members;
   HttpResponse*    httpResponseP = (HttpResponse*) userP;
+
+  LM_T(LmtDistOpResponseBuf, ("Got %d*%d (%d) bytes of response from reg %s", size, members, size*members, httpResponseP->distOpP->regP->regId));
 
   //
   // Allocate room for the new piece
@@ -203,7 +212,11 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
   uint32_t newSize = httpResponseP->bufPos + chunkLen;
 
   if (newSize < httpResponseP->bufLen)
+  {
+    LM_T(LmtDistOpResponseBuf, ("Copying %d bytes to httpResponseP->buf", chunkLen));
     strncpy(&httpResponseP->buf[httpResponseP->bufPos], chunkP, chunkLen);
+    LM_T(LmtDistOpResponseBuf, ("httpResponseP->buf: '%s'", httpResponseP->buf));
+  }
   else if (newSize >= httpResponseP->bufLen)
   {
     char* oldBuf = httpResponseP->buf;
@@ -214,7 +227,9 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
       if (httpResponseP->buf == NULL)
         LM_RE(1, ("Out of memory (kaAlloc failed allocating %d bytes for response buffer)", newSize + 1024));
 
+      LM_T(LmtDistOpResponseBuf, ("Copying %d bytes to httpResponseP->buf", chunkLen));
       snprintf(httpResponseP->buf, newSize + 1023, "%s%s", oldBuf, chunkP);
+      LM_T(LmtDistOpResponseBuf, ("httpResponseP->buf: '%s'", httpResponseP->buf));
     }
     else  // > 20k: use malloc
     {
@@ -222,19 +237,23 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
       if (httpResponseP->buf == NULL)
         LM_RE(1, ("Out of memory (allocating %d bytes for response buffer)", newSize + 1024));
 
+      LM_T(LmtDistOpResponseBuf, ("Copying %d bytes to httpResponseP->buf", chunkLen));
       snprintf(httpResponseP->buf, newSize + 1023, "%s%s", oldBuf, chunkP);
+      LM_T(LmtDistOpResponseBuf, ("httpResponseP->buf: '%s'", httpResponseP->buf));
 
       if (httpResponseP->mustBeFreed == true)
         free(oldBuf);
       httpResponseP->mustBeFreed = true;
     }
 
-    httpResponseP->distOpP->rawResponse = httpResponseP->buf;  // Cause ... it has changed
     httpResponseP->bufLen = newSize + 1024;
   }
 
   httpResponseP->bufPos = newSize;
 
+  httpResponseP->distOpP->rawResponse = httpResponseP->buf;  // Cause ... it might have changed
+  LM_T(LmtDistOpResponseBuf, ("%s: rawResponse now points to httpResponseP->buf (%p)", httpResponseP->distOpP->regP->regId, httpResponseP->buf));
+  LM_T(LmtDistOpResponseBuf, ("httpResponseP->distOpP->rawResponse at %p: %s", httpResponseP->distOpP->rawResponse, httpResponseP->distOpP->rawResponse));
   return chunkLen;
 }
 
@@ -291,6 +310,15 @@ void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArra
 
 
 
+// debugging
+size_t responseHeaderSave(char* buffer, size_t size, size_t nitems, void* userdata)
+{
+  LM_T(LmtDistOpResponseHeaders, ("Response Header: %s", buffer));
+  return nitems;
+}
+
+
+
 // -----------------------------------------------------------------------------
 //
 // distOpSend -
@@ -315,7 +343,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   //
   // * CURL Handles:  create handle (also multi handle if it does not exist)
   // * URL:           distOpP->url
-  // * BODY:          kjFastRender(distOpP->body) + CURLOPT_POSTFIELDS (POST? hmmm ...)
+  // * BODY:          kjFastRender(distOpP->requestBody) + CURLOPT_POSTFIELDS (POST? hmmm ...)
   // * HTTP Headers:  Std headers + loop over distOpP->regP["csourceInfo"], use curl_slist_append
   // * CURL Options:  set a number oftions dfor the handle
   // * SEND:          Actually, just add the "easy handler" to the "multi handler" of orionldState.curlDoMultiP
@@ -431,7 +459,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
         //
         if (orionldState.in.httpHeaders != NULL)
         {
-          kjTreeLog(orionldState.in.httpHeaders, "orionldState.in.httpHeaders");
+          kjTreeLog(orionldState.in.httpHeaders, "orionldState.in.httpHeaders", LmtDistOpMsgs);
           KjNode* kvP = kjLookup(orionldState.in.httpHeaders, keyP->value.s);
 
           if (kvP != NULL)
@@ -535,7 +563,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   int   approxContentLen = 0;
   char* payloadBody      = NULL;
 
-  if (distOpP->body != NULL)
+  if (distOpP->requestBody != NULL)
   {
     //
     // Content-Type (for now we maintain the original Content-Type in the forwarded request
@@ -547,19 +575,19 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     if (orionldState.in.contentType == JSONLD)
     {
       // Add the context to the body if not there already
-      KjNode* contextP = kjLookup(distOpP->body, "@context");
+      KjNode* contextP = kjLookup(distOpP->requestBody, "@context");
 
       if (contextP == NULL)
       {
         contextP = kjString(orionldState.kjsonP, "@context", distOpP->regP->contextP->url);
-        kjChildAdd(distOpP->body, contextP);
+        kjChildAdd(distOpP->requestBody, contextP);
       }
     }
 
-    approxContentLen = kjFastRenderSize(distOpP->body);
+    approxContentLen = kjFastRenderSize(distOpP->requestBody);
     payloadBody      = kaAlloc(&orionldState.kalloc, approxContentLen);
 
-    kjFastRender(distOpP->body, payloadBody);
+    kjFastRender(distOpP->requestBody, payloadBody);
 
     //
     // Content-Length
@@ -584,10 +612,11 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   //
   curl_easy_setopt(distOpP->curlHandle, CURLOPT_CUSTOMREQUEST, orionldState.verbString);
   curl_easy_setopt(distOpP->curlHandle, CURLOPT_TIMEOUT_MS, 5000);                     // Timeout - hard-coded to 5 seconds for now ...
-  curl_easy_setopt(distOpP->curlHandle, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
+  // curl_easy_setopt(distOpP->curlHandle, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
   curl_easy_setopt(distOpP->curlHandle, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
 
-  // curl_easy_setopt(distOpP->curlHandle, CURLOPT_HEADERFUNCTION, responseHeaderSave);   // Callback for headers
+  // Debugging
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_HEADERFUNCTION, responseHeaderSave);   // Callback for headers
 
 
   //
@@ -604,7 +633,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
   httpResponseP->distOpP->rawResponse = httpResponseP->buf;
 
-  curl_easy_setopt(distOpP->curlHandle, CURLOPT_WRITEFUNCTION, responseSave);          // Callback for reading the response body (and headers?)
+  curl_easy_setopt(distOpP->curlHandle, CURLOPT_WRITEFUNCTION, responseSave);          // Callback for reading the response body
   curl_easy_setopt(distOpP->curlHandle, CURLOPT_WRITEDATA, (void*) httpResponseP);     // User data for responseSave
 
   if (https)
@@ -619,7 +648,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   //
   // SEND (sort of)
   //
-  LM_T(LmtDistOpMsgs, ("Distributed request %s %s '%s'", orionldState.verbString, url, payloadBody));
+  LM_T(LmtDistOpRequest, ("%s: distributed request %s %s '%s'", distOpP->regP->regId, orionldState.verbString, url, payloadBody));
   curl_multi_add_handle(orionldState.curlDoMultiP, distOpP->curlHandle);
 
   return 0;

@@ -55,7 +55,6 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
-#include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
 #include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
@@ -542,21 +541,6 @@ bool orionldPatchEntity2(void)
   char*    entityType  = orionldState.uriParams.type;
   KjNode*  dbEntityP;
 
-  //
-  // FIXME: would really like to only extract the attrs in the patch ...
-  //        But, for that I'd need to:
-  //        * check the attr name for forbidden chars
-  //        * expand it
-  //        * do dotForEq
-  //        * create a KjNode array with all toplevel field names
-  //        * sort out non-attribute names (id, type, scope, ...)
-  //
-  //        All that is done by pCheckEntity, but pCheckEntity needs the DB Entity :(
-  //        The chicken and the egg ...
-  //
-  //        Not really worth it.
-  //        At least, postponed (not forgotten) for now.
-  //
   dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
 
   if ((dbEntityP == NULL) && (orionldState.distributed == false))
@@ -598,11 +582,11 @@ bool orionldPatchEntity2(void)
   {
     distOpList = distOpRequests(entityId, entityType, DoMergeEntity);
 
-    kjTreeLog(orionldState.requestTree, "Fixed tree after 'exclusive' regs");
+    kjTreeLog(orionldState.requestTree, "Fixed tree after 'exclusive' regs", LmtRegMatch);
     for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
     {
       char body[1024];
-      kjFastRender(distOpP->body, body);
+      kjFastRender(distOpP->requestBody, body);
       LM_T(LmtDistOpMsgs, ("Registration '%s': %s", distOpP->regP->regId, body));
     }
   }

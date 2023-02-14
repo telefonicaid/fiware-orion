@@ -46,10 +46,12 @@ typedef struct DistOp
 {
   RegCacheItem*       regP;
   DistOpType          operation;
-  KjNode*             body;              // For Create/Update Requests (also used for GET - tree of response)
+  KjNode*             requestBody;       // For Create/Update Requests (also used for GET - tree of response)
+
   char*               rawResponse;       // Response buffer as raw ASCII as it was received by libcurl (parsed and stored as DistOp::body)
-  int                 httpResponseCode;  // Response HTTP Status Code
+  uint64_t            httpResponseCode;  // Response HTTP Status Code  (64 bit due to libcurl curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE))
   KjNode*             responseBody;      // Parsed body of the response
+
   char*               entityId;          // Used by GET /entities/{entityId} (and as intermediate result for BATCH Delete)
   char*               entityType;        // Used by GET /entities/{entityId}
   char*               attrName;          // Used by PATCH /entities/{entityId}/attrs/{attrName}

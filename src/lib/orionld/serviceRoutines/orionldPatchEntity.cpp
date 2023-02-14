@@ -31,12 +31,13 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove
 #include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/kjRender.h"                                      // kjFastRender
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/orionldError.h"                         // ORIONLD_ERROR
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
@@ -44,14 +45,20 @@ extern "C"
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeType
 #include "orionld/legacyDriver/legacyPatchEntity.h"              // legacyPatchEntity
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_OBJECT, PCHECK_URI, ...
+#include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/dbModel/dbModelFromApiAttribute.h"             // dbModelFromApiAttribute
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity2
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
+#include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
+#include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
+#include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
+#include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/notifications/alteration.h"                    // alteration
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own interface
 
 
@@ -72,7 +79,6 @@ static void attributesMerge(KjNode* finalApiEntityP, KjNode* apiAttrs)
 {
   for (KjNode* apiAttrP = apiAttrs->value.firstChildP; apiAttrP != NULL; apiAttrP = apiAttrP->next)
   {
-    LM(("Looking up attribute '%s'", apiAttrP->name));
     KjNode* oldAttrP = kjLookup(finalApiEntityP, apiAttrP->name);
 
     if (oldAttrP != NULL)
@@ -81,6 +87,107 @@ static void attributesMerge(KjNode* finalApiEntityP, KjNode* apiAttrs)
     kjChildAdd(finalApiEntityP, kjClone(orionldState.kjsonP, apiAttrP));
   }
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pCheckEntityType2 -
+//
+char* pCheckEntityType2(KjNode* payloadTypeNode, KjNode* dbEntityP, char* entityTypeFromUriParam)
+{
+  KjNode* dbTypeNodeP           = (dbEntityP != NULL)? dbEntityTypeExtract(dbEntityP) : NULL;
+  char*   entityTypeFromDB      = (dbTypeNodeP != NULL)? dbTypeNodeP->value.s : NULL;
+  char*   entityTypeFromPayload = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
+
+  LM_T(LmtEntityType, ("entityType From DB:        '%s'", entityTypeFromDB));
+  LM_T(LmtEntityType, ("entityType From URI Param: '%s'", entityTypeFromUriParam));
+  LM_T(LmtEntityType, ("entityType From Payload:   '%s'", entityTypeFromPayload));
+
+  //
+  // 3 different way to find the Entity Type:
+  //   1. From the database
+  //   2. From the URI Param "type"
+  //   3. From the payload body
+  //
+  // The "truth" is in the database and that is always present.
+  // - It could be an entity that lives elsewhere though ... then it won't be found in the DB, and that's OK
+  //
+  // Question is, what to do if URI Param "type" or payload body "type" differ (from DB "type" or between the two)
+  // For now (as multi type isn't supported yet), I'll give error if mismatch
+  //
+  if ((entityTypeFromPayload != NULL) && (entityTypeFromDB != NULL))
+  {
+    if (strcmp(entityTypeFromDB, entityTypeFromPayload) != 0)
+    {
+      ORIONLD_ERROR(OrionldBadRequestData, "Mismatching Entity::type in payload body", "Does not coincide with the Entity::type in the database", 400);
+      LM_E(("Entity type in database:       '%s'", entityTypeFromDB));
+      LM_E(("Entity type from payload body: '%s'", entityTypeFromPayload));
+      return NULL;
+    }
+  }
+
+  if ((entityTypeFromUriParam != NULL) && (entityTypeFromDB != NULL))
+  {
+    if (strcmp(entityTypeFromDB, entityTypeFromUriParam) != 0)
+    {
+      ORIONLD_ERROR(OrionldBadRequestData, "Mismatching Entity type in URL parameter 'type'", "Does not coincide with the Entity::type in the database", 400);
+      LM_E(("Entity type in database:       '%s'", entityTypeFromDB));
+      LM_E(("Entity type from URI param:    '%s'", entityTypeFromUriParam));
+      return NULL;
+    }
+  }
+
+  if ((entityTypeFromPayload != NULL) && (entityTypeFromUriParam != NULL))
+  {
+    if (strcmp(entityTypeFromPayload, entityTypeFromUriParam) != 0)
+    {
+      ORIONLD_ERROR(OrionldBadRequestData, "Mismatching Entity type in URL parameter 'type'", "Does not coincide with the Entity::type in payload body", 400);
+      LM_E(("Entity type from URI param:    '%s'", entityTypeFromUriParam));
+      LM_E(("Entity type from payload body: '%s'", entityTypeFromPayload));
+      return NULL;
+    }
+  }
+
+  if (entityTypeFromDB != NULL)
+    return entityTypeFromDB;
+  else if (entityTypeFromUriParam != NULL)
+    return entityTypeFromUriParam;
+
+  return entityTypeFromPayload;
+}
+
+
+
+static bool attributeLookup(KjNode* dbAttrsP, char* attrName)
+{
+  dotForEq(attrName);
+
+  KjNode* dbAttrP = kjLookup(dbAttrsP, attrName);
+  if (dbAttrP == NULL)
+    LM_T(0, ("Attribute '%s' does not exist locally", attrName));
+
+  eqForDot(attrName);
+
+  return (dbAttrP != NULL);
+}
+
+
+
+#if 0
+void rawResponse(DistOp* distOpList, const char* what)
+{
+  LM(("=============== rawResponse: %s", what));
+  for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
+  {
+    if (distOpP->rawResponse != NULL)
+      LM_T(LmtDistOpMsgs, ("%s: rawResponse: '%s'", distOpP->regP->regId, distOpP->rawResponse));
+    else
+      LM_T(LmtDistOpMsgs, ("%s: rawResponse: NULL", distOpP->regP->regId));
+  }
+  LM(("===================================================================="));
+}
+#endif
 
 
 
@@ -107,8 +214,14 @@ bool orionldPatchEntity(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyPatchEntity();
 
-  const char* entityId   = orionldState.wildcard[0];
-  const char* entityType = orionldState.uriParams.type;
+  KjNode*  incomingP        = NULL;
+  KjNode*  finalApiEntityP  = NULL;
+  KjNode*  dbEntityCopy     = NULL;
+  DistOp*  distOpList       = NULL;
+  char*    entityId         = orionldState.wildcard[0];
+  char*    entityType       = orionldState.uriParams.type;
+  KjNode*  attrP;
+  KjNode*  next;
 
   //
   // Initial Validity Checks;
@@ -123,217 +236,161 @@ bool orionldPatchEntity(void)
   // Get the entity from mongo (only really need creDate and type of the attributes ...)
   //
   KjNode* dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
-  if (dbEntityP == NULL)
+  if ((dbEntityP == NULL) && (orionldState.distributed == false))
   {
-    orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
+    ORIONLD_ERROR(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;
   }
+
 
   //
   // If entity type is present in the payload body, it must be a String and identical to the entity type in the database.
   // [ It is already extracted (by orionldMhdConnectionTreat) and checked for String ]
   //
-  KjNode*     dbTypeNodeP = dbEntityTypeExtract(dbEntityP);
+  entityType = pCheckEntityType2(orionldState.payloadTypeNode, dbEntityP, entityType);
 
-  entityType  = dbTypeNodeP->value.s;  // FIXME: What if entityType was given as URI param?
-
-  if (orionldState.payloadTypeNode != NULL)
+  KjNode* dbAttrsP = (dbEntityP != NULL)? kjLookup(dbEntityP, "attrs") : NULL;
+  if (pCheckEntity(orionldState.requestTree, false, dbAttrsP) == false)
   {
-    if (strcmp(orionldState.payloadTypeNode->value.s, entityType) != 0)
+    LM_W(("Invalid payload body. %s: %s", orionldState.pd.title, orionldState.pd.detail));
+    return false;
+  }
+
+  //
+  // Distributed Operations
+  //
+  KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
+  if (orionldState.distributed)
+  {
+    distOpList = distOpRequests(entityId, entityType, DoUpdateEntity);
+    kjTreeLog(orionldState.requestTree, "Left for local", LmtDistOpMsgs);
+
+    //
+    // Read the responses from Distributed Requests
+    //
+    if (distOpList != NULL)
     {
-      orionldError(OrionldBadRequestData, "Mismatching Entity::type in payload body", "Does not coincide with the Entity::type in the database", 400);
-      return false;
+      distOpResponses(distOpList, responseBody);
+      distOpListRelease(distOpList);
+      kjTreeLog(responseBody, "responseBody after distOpResponses", LmtDistOpMsgs);
     }
   }
 
-
-  //
-  // In the DB, all attributes are placed under "attrs".
-  //
-  // First of all, we need to know thast the attribute exists prior to the request - can't PATCH something that doesn't exist
-  // But also, to check the validity of the incoming attributes, we need to know the "old" state of the attributes.
-  //
-  KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");
-  if (dbAttrsP == NULL)  // This can happen, unfortunately, if the Entity has no attributes - bad DB model ...
-    dbAttrsP = kjObject(orionldState.kjsonP, NULL);
-
-  //
-  // Loop over incoming attributes
-  //
-  // The loop will for each incoming attribute:
-  // - check validity and remove from orionldState.requestTree if invalid (+ add to error array for response)
-  // - Call pCheckAttribute, that expands and normalizes the attribute
-  // - Call dbModelFromApiAttribute, that transforms it into a DM Model attribute (DESTRUCTIVE)
-  //
-  // As we need the incoming (expanded and normalized) list of attributes for Notifications, we need to clone
-  // before calling dbModelFromApiAttribute.
-  //
-  KjNode* updatedV    = kjArray(orionldState.kjsonP, "updated");
-  KjNode* notUpdatedV = kjArray(orionldState.kjsonP, "notUpdated");
-
-  KjNode* incomingP   = kjObject(orionldState.kjsonP, NULL);
-  KjNode* inAttrP     = orionldState.requestTree->value.firstChildP;
-  KjNode* next;
-
-  while (inAttrP != NULL)
+  // Anything to actually PATCH locally? (or were all attributes Invalid|Forwarded [via Exclusive/Redirect registrations])?
+  if ((orionldState.requestTree == NULL) || (orionldState.requestTree->value.firstChildP == NULL))
   {
-    next = inAttrP->next;
-
-    if (strcmp(inAttrP->name, "scope") == 0)
-    {
-      // Not Implemented: scope - just ignore it
-      kjChildRemove(orionldState.requestTree, inAttrP);
-      inAttrP = next;
-      continue;
-    }
-
-    if (strcmp(inAttrP->name, "id") == 0)
-    {
-      // Can't patch the entity id ...
-      attributeNotUpdated(notUpdatedV, "id", "the ID of an entity cannot be altered", NULL);
-      kjChildRemove(orionldState.requestTree, inAttrP);
-      inAttrP = next;
-      continue;
-    }
-
-    if (strcmp(inAttrP->name, "type") == 0)
-    {
-      // Can't patch the entity type ...
-      attributeNotUpdated(notUpdatedV, "type", "the TYPE of an entity cannot be altered", NULL);
-      kjChildRemove(orionldState.requestTree, inAttrP);
-      inAttrP = next;
-      continue;
-    }
-
-    if ((strcmp(inAttrP->name, "createdAt") == 0) || (strcmp(inAttrP->name, "modifiedAt") == 0))
-    {
-      // Can't set built-in timestamps
-      attributeNotUpdated(notUpdatedV, inAttrP->name, "built-in timestamps are ignored", NULL);
-      kjChildRemove(orionldState.requestTree, inAttrP);
-      inAttrP = next;
-      continue;
-    }
-
-    //
-    // Does the attribute exist? (Can't be PATCHed otherwise)
-    //
-    char* shortName = inAttrP->name;
-
-    inAttrP->name = orionldAttributeExpand(orionldState.contextP, inAttrP->name, true, NULL);
-    char eqName[512];
-    char dotName[512];
-    strncpy(dotName, inAttrP->name, sizeof(dotName) - 1);  // dbModelFromApiAttribute destroys the att name (dotForEq)
-    strncpy(eqName,  inAttrP->name, sizeof(eqName)  - 1);
-    dotForEq(eqName);
-    KjNode* dbAttrP = kjLookup(dbAttrsP, eqName);
-
-    if (dbAttrP == NULL)
-    {
-      kjChildRemove(orionldState.requestTree, inAttrP);
-      attributeNotUpdated(notUpdatedV, shortName, "Attribute not found", NULL);
-      inAttrP = next;
-      continue;
-    }
-
-
-    //
-    // Does the attribute have a type in the DB?
-    //
-    KjNode* dbAttrTypeP = kjLookup(dbAttrP, "type");
-    if (dbAttrTypeP == NULL)
-    {
-      orionldError(OrionldInternalError, "Database Error", "attribute without type in DB", 500);
-      inAttrP = next;
-      continue;
-    }
-
-
-    //
-    // Is the attribute valid?
-    //
-    OrionldAttributeType attrTypeFromDb = orionldAttributeType(dbAttrTypeP->value.s);  // Crash if dbAttrTypeP == NULL ... OK somehow ...
-    OrionldContextItem*  contextItemP   = NULL;
-
-    if (pCheckAttribute(entityId, inAttrP, true, attrTypeFromDb, true, contextItemP) == false)
-    {
-      kjChildRemove(orionldState.requestTree, inAttrP);
-      attributeNotUpdated(notUpdatedV, shortName, orionldState.pd.title, orionldState.pd.detail);
-      inAttrP = next;
-      continue;
-    }
-
-    //
-    // inAttrP is now an expanded and normalized API Attribute
-    // Before we let dbModelFromApiAttribute destructively transform it into a DB Model Attribute,
-    // we clone it and add it to 'incomingP';
-    //
-    KjNode* apiAttributeP = kjClone(orionldState.kjsonP, inAttrP);
-    kjChildAdd(incomingP, apiAttributeP);
-
-    //
-    // Transform the incoming attribute into a DB Attribute and save it for a later call to mongoc
-    // - Make sure the creDate is taken from dbAttrP and put into inAttrP?
-    //
-    if (dbModelFromApiAttribute(inAttrP, dbAttrsP, NULL, NULL, NULL, true) == false)
-    {
-      kjChildRemove(orionldState.requestTree, inAttrP);
-      attributeNotUpdated(notUpdatedV, shortName, orionldState.pd.title, orionldState.pd.detail);
-      inAttrP = next;
-      continue;
-    }
-
-    attributeUpdated(updatedV, shortName);
-    inAttrP = next;
+    orionldState.requestTree = NULL;  // Nothing updated, nothing to be done for TRoE nor for Notifications
+    goto done;
   }
 
-  kjTreeLog(orionldState.requestTree, "PAE: orionldState.requestTree for mongo");
+  //
+  // Transform the remaining attributes to DB format, for storage in local database
+  // But before that, as this is DESTRUCTIVE, save a copy of the attributes for Alterations and TRoE
+  //
+  incomingP = kjClone(orionldState.kjsonP, orionldState.requestTree);  // For Alterations and TRoE
 
-  // Anything to actually ADD , or was everything BAD ?
-  if (orionldState.requestTree->value.firstChildP != NULL)
+  attrP = orionldState.requestTree->value.firstChildP;
+
+  while (attrP != NULL)
   {
-    if (mongocAttributesAdd(entityId, NULL, orionldState.requestTree, false) == false)
-    {
-      orionldError(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
-      return false;
-    }
+    next = attrP->next;
 
-    //
-    // For alteration() we need:
-    // - Initial DB entity, before the merge  (dbEntityP)
-    // - Incoming Entity, expanded and normalized, for watchedAttributes  (incomingP)
-    // - Final API Entity, for q, etc AND for the Notifications (finalApiEntityP)
-    //     Note; the Final API Entity needs to be Expanded and Normalized - each subscription may have a different context to for compaction
-    //
-    KjNode* dbEntityCopy    = kjClone(orionldState.kjsonP, dbEntityP);  // dbModelToApiEntity2 is DESTRUCTIVE
-    KjNode* finalApiEntityP = dbModelToApiEntity2(dbEntityCopy, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
-
-    if (finalApiEntityP == NULL)
+    if (attributeLookup(dbAttrsP, attrP->name) == false)
     {
-      // There will be no notifications for this update :(  - Well.  cause something important failed ...
-      LM_E(("dbModelToApiEntity2: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+      kjChildRemove(orionldState.requestTree, attrP);
+      distOpFailure(responseBody, NULL, "Attribute Not Found", NULL, 404, attrP->name);
+
+      // Must remove it from the cloned incomingP as well (can't be used for Alterations and TRoE)
+      attrP = kjLookup(incomingP, attrP->name);
+      if (attrP != NULL)
+        kjChildRemove(incomingP, attrP);
     }
     else
+      dbModelFromApiAttribute(attrP, dbAttrsP, NULL, NULL, NULL, true);
+
+    attrP = next;
+  }
+
+  //
+  // If no attributes left in orionldState.requestTree, we're done
+  // This happens if all attributes were either faulty or forwarded via Exclusive/Redirect registrations.
+  //
+  if ((orionldState.requestTree == NULL) || (orionldState.requestTree->value.firstChildP == NULL))
+    goto done;
+
+  if (mongocAttributesAdd(entityId, NULL, orionldState.requestTree, false) == false)
+  {
+    if (distOpList == NULL)
     {
-      attributesMerge(finalApiEntityP, incomingP);
-
-      kjTreeLog(dbEntityP, "PAE: dbEntityP for Alterations");
-      kjTreeLog(incomingP, "PAE: incomingP for Alterations");
-      kjTreeLog(finalApiEntityP, "PAE: finalApiEntityP for Alterations");
-
-      alteration(entityId, entityType, finalApiEntityP, incomingP, dbEntityP);
+      ORIONLD_ERROR(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
+      return false;
     }
 
     //
-    // For TRoE we need:
-    // - Incoming Entity, normalized
+    // FIXME: Can't return here ... what about distOps?
     //
-    kjTreeLog(incomingP, "PAE: incomingP for TRoE");
-    orionldState.requestTree = incomingP;
+    // Instead - add all attrs from orionldState.requestTree to notUpdatedV, unless already found in updatedV
+    // + if present in notUpdatedV, remove that slot (replace it by a 500 slot, which is more important)
+    //
+    for (KjNode* attrP = incomingP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    {
+      distOpFailure(responseBody, NULL, "Database Error", "mongocAttributesAdd failed", 500, attrP->name);
+    }
   }
-  else
-    orionldState.requestTree = NULL;  // Nothing updated, nothing to be done for TRoE
+  else  // All OK - need to add the successfullt added/updated attributes with "distOpSuccess"
+  {
+    // Only, I need a DistOp for that ...
+    // All that is needed is the body, sop, we can create a "fake" DistOp:
+    //
+    DistOp distOp;
+    distOp.requestBody = orionldState.requestTree;
+    kjTreeLog(responseBody, "responseBody BEFORE", LmtDistOpMsgs);
+    distOpSuccess(responseBody, &distOp);
+    kjTreeLog(responseBody, "responseBody AFTER", LmtDistOpMsgs);
+  }
 
-  if (notUpdatedV->value.firstChildP == NULL)
+
+  //
+  // For alteration() we need:
+  // - Initial DB entity, before the merge  (dbEntityP)
+  // - Incoming Entity, expanded and normalized, for watchedAttributes  (incomingP)
+  // - Final API Entity, for q, etc AND for the Notifications (finalApiEntityP)
+  //     Note; the Final API Entity needs to be Expanded and Normalized - each subscription may have a different context to for compaction
+  //
+  dbEntityCopy    = kjClone(orionldState.kjsonP, dbEntityP);  // dbModelToApiEntity2 is DESTRUCTIVE
+  finalApiEntityP = dbModelToApiEntity2(dbEntityCopy, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
+  if (finalApiEntityP == NULL)
+  {
+    // There will be no notifications for this update :(  - Well.  cause something important failed ...
+    LM_E(("dbModelToApiEntity2: %s: %s", orionldState.pd.title, orionldState.pd.detail));
+    goto done;
+  }
+
+
+  //
+  // Notifications
+  //
+  attributesMerge(finalApiEntityP, incomingP);
+  alteration(entityId, entityType, finalApiEntityP, incomingP, dbEntityP);
+
+  //
+  // For TRoE we need:
+  // - Incoming Entity, normalized
+  //
+  orionldState.requestTree = incomingP;
+
+ done:
+  kjTreeLog(responseBody, "Final responseBody", LmtDistOpMsgs);
+
+  KjNode* updatedV    = kjLookup(responseBody, "success");
+  KjNode* notUpdatedV = kjLookup(responseBody, "failure");
+
+  if (updatedV != NULL)
+    updatedV->name = (char*) "updated";
+  if (notUpdatedV != NULL)
+    notUpdatedV->name = (char*) "notUpdated";
+
+  if ((notUpdatedV == NULL) || (notUpdatedV->value.firstChildP == NULL))
   {
     orionldState.httpStatusCode = 204;
     orionldState.responseTree   = NULL;
@@ -342,6 +399,15 @@ bool orionldPatchEntity(void)
   {
     orionldState.httpStatusCode = 207;
     orionldState.responseTree   = kjObject(orionldState.kjsonP, NULL);
+
+    // According to the API spec, "updated" and "notUpdated" are mandatory, even if empty ...
+    if (updatedV == NULL)
+      updatedV = kjArray(orionldState.kjsonP, "updated");
+    else
+      // Sort updatedV before returning
+      kjStringArraySort(updatedV);
+
+    if (notUpdatedV == NULL)      notUpdatedV = kjArray(orionldState.kjsonP, "notUpdated");
 
     kjChildAdd(orionldState.responseTree, updatedV);
     kjChildAdd(orionldState.responseTree, notUpdatedV);

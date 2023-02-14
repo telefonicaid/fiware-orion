@@ -70,10 +70,10 @@ DistOp* regMatchInformationArray
       kjChildAdd(attrUnion, entityTypeP);
     }
 
-    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
+    DistOp* distOpP      = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
 
-    distOpP->regP = regP;
-    distOpP->body = attrUnion;
+    distOpP->regP        = regP;
+    distOpP->requestBody = attrUnion;
 
     return distOpP;
   }

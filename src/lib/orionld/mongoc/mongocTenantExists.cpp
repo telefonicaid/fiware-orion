@@ -32,7 +32,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "orionld/common/orionldState.h"                         // orionldState, dbName
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocTenantExists.h"                   // Own interface
@@ -85,8 +84,6 @@ bool mongocTenantExists(const char* tenantName)
 
   if (responseP == NULL)
     return false;
-
-  kjTreeLog(responseP, "Response from listDatabases");
 
   KjNode* databasesP = kjLookup(responseP, "databases");
   if (databasesP == NULL)

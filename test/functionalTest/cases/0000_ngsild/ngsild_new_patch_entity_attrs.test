@@ -178,7 +178,7 @@ bye
 03. PATCH E1 with P1, P3, R1 - see P1 and R1 replacing while P3 is ignored
 ==========================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 92
+Content-Length: 107
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -186,8 +186,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "P3",
-            "reason": "Attribute not found"
+            "attributes": [
+                "P3"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [

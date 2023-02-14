@@ -51,8 +51,8 @@ extern "C"
 //
 DistOp* regMatchForEntityCreation
 (
-  RegistrationMode regMode,
-  DistOpType       operation,
+  RegistrationMode regMode,     // Exclusive, Redirect, Inclusive, Auxiliar
+  DistOpType       operation,   // createEntity, patchAttribute, ...
   const char*      entityId,
   const char*      entityType,
   KjNode*          incomingP
@@ -61,33 +61,39 @@ DistOp* regMatchForEntityCreation
   DistOp* distOpHead = NULL;
   DistOp* distOpTail = NULL;
 
+  LM_T(LmtRegMatch, ("Registration Mode: %d (%s)", regMode, registrationModeToString(regMode)));
+  LM_T(LmtRegMatch, ("Operation:         %d (%s)", operation, distOpTypes[operation]));
+  kjTreeLog(incomingP, "Payload Body", LmtRegMatch);
+
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
     // Loop detection
     if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
     {
-      LM_T(LmtRegMatch, ("No Reg Match due to loop detection"));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to loop detection", regP->regId));
       continue;
     }
 
     if ((regP->mode & regMode) == 0)
     {
-      LM_T(LmtRegMatch, ("No Reg Match due to regMode"));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode (0x%x vs 0x%x)", regP->regId, regP->mode, regMode));
       continue;
     }
 
     if (regMatchOperation(regP, operation) == false)
     {
-      LM_T(LmtRegMatch, ("No Reg Match due to Operation"));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation (operation == %d: '%s')", regP->regId, operation, distOpTypes[operation]));
       continue;
     }
 
     DistOp* distOpP = regMatchInformationArray(regP, operation, entityId, entityType, incomingP);
     if (distOpP == NULL)
     {
-      LM_T(LmtRegMatch, ("No Reg Match due to Information Array"));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Information Array", regP->regId));
       continue;
     }
+
+    LM_T(LmtRegMatch, ("%s: Match!", regP->regId));
 
     // Add extra info in DistOp, needed by forwardRequestSend
     distOpP->operation = operation;

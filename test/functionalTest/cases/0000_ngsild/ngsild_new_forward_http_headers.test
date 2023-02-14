@@ -31,7 +31,7 @@ accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_
 
 --SHELL--
 #
-# 01. Create a registration (exclusive) for the accumulator, with all types of hjeaders inside Regostration::contextSourceInfo
+# 01. Create a registration (exclusive) for the accumulator, with all types of headers inside Regostration::contextSourceInfo
 # 02. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
 # 03. Dump the accumulator to see all the HTTP headers of the forwarded request
 # 04. PATCH the registration setting the contextSourceInfo, see what happens in the forwarded request later
@@ -39,8 +39,8 @@ accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_
 # 06. Dump the accumulator to see all the HTTP headers of the forwarded request
 #
 
-echo "01. Create a registration (exclusive) for the accumulator, with all types of hjeaders inside Regostration::contextSourceInfo"
-echo "============================================================================================================================"
+echo "01. Create a registration (exclusive) for the accumulator, with all types of headers inside Regostration::contextSourceInfo"
+echo "==========================================================================================================================="
 payload='{
   "id": "urn:R1",
   "type": "ContextSourceRegistration",
@@ -139,8 +139,8 @@ echo
 
 
 --REGEXPECT--
-01. Create a registration (exclusive) for the accumulator, with all types of hjeaders inside Regostration::contextSourceInfo
-============================================================================================================================
+01. Create a registration (exclusive) for the accumulator, with all types of headers inside Regostration::contextSourceInfo
+===========================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -186,11 +186,23 @@ Date: REGEX(.*)
 
 05. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
 =================================================================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
+HTTP/1.1 207 Multi-Status
+Content-Length: 115
+Content-Type: application/json
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/entities/urn:E1
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
+{
+    "entityId": "urn:E1",
+    "failure": [
+        {
+            "detail": "urn:E1",
+            "statusCode": 404,
+            "title": "Entity already exists"
+        }
+    ],
+    "success": []
+}
 
 
 06. Dump the accumulator to see all the HTTP headers of the forwarded request

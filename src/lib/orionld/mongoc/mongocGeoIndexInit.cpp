@@ -126,8 +126,6 @@ bool mongocGeoIndexInit(void)
         if (typeP == NULL)
         {
           LM_E(("Database Error (attribute '%s' has no 'type' field)", attrP->name));
-          kjTreeLog(attrP, "Database Error (complete JSON of attribute without type)");
-          kjTreeLog(entityNodeP, "Database Error (complete JSON of Entity with attribute without type)");
           continue;
         }
 

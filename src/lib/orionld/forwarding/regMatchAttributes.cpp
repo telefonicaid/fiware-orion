@@ -114,8 +114,8 @@ KjNode* regMatchAttributes(RegCacheItem* regP, KjNode* propertyNamesP, KjNode* r
     attrP = next;
   }
 
-  if (attrObject == NULL)
-    LM(("RM: No match due to no matching attributes"));
+//  if (attrObject == NULL)
+//    LM(("%s: No match due to no matching attributes", regP->regId));
 
   return attrObject;
 }

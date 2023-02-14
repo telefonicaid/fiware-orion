@@ -44,16 +44,18 @@ const char* curlToBrokerStrerror(CURL* curlHandle, int curlErrorCode, int* statu
   else if (curlErrorCode == 6)
   {
     *statusCodeP = 504;
+    LM_E(("Unable to resolve host name of registrant"));
     return "Unable to resolve host name of registrant";
   }
   else if (curlErrorCode == 7)
   {
     *statusCodeP = 504;
+    LM_E(("Unable to connect to registrant"));
     return "Unable to connect to registrant";
   }
   else if (curlErrorCode == 22)
   {
-    long httpStatus;
+    long long httpStatus = 500;
     curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &httpStatus);
 
     *statusCodeP = httpStatus;

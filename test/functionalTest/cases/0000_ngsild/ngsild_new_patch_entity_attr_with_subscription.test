@@ -281,7 +281,7 @@ Ngsild-Attribute-Format: Normalized
 07. Attempt to add a property A3 - should be ignored
 ====================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 83
+Content-Length: 98
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -289,8 +289,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "A3",
-            "reason": "Attribute not found"
+            "attributes": [
+                "A3"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": []

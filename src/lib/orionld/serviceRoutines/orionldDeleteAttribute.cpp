@@ -32,7 +32,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/legacyDriver/legacyDeleteAttribute.h"          // legacyDeleteAttribute
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -85,7 +84,6 @@ bool orionldDeleteAttribute(void)
     return false;
   }
 
-  kjTreeLog(dbEntityP, "dbEntityP");
   KjNode* attrNamesP = kjLookup(dbEntityP, "attrNames");
   if (attrNamesP == NULL)
   {

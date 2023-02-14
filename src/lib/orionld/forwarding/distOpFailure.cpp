@@ -32,9 +32,10 @@ extern "C"
 }
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/forwarding/distOpFailure.h"                    // Own interface
 
 
@@ -43,8 +44,33 @@ extern "C"
 //
 // distOpFailure -
 //
-void distOpFailure(KjNode* responseBody, DistOp* distOpP, OrionldResponseErrorType errorCode, const char* title, const char* detail, int httpStatus)
+void distOpFailure(KjNode* responseBody, DistOp* distOpP, const char* title, const char* detail, int httpStatus, const char* attrName)
 {
+  char* alias  = (attrName != NULL)? orionldContextItemAliasLookup(orionldState.contextP, attrName, NULL, NULL) : NULL;
+
+  if (alias != NULL)
+    LM_T(LmtDistOp207, ("Adding attribute '%s' to failureV", alias));
+  else
+    LM_T(LmtDistOp207, ("Adding item to failureV", alias));
+
+  if (httpStatus == 404)
+  {
+    KjNode* successV = kjLookup(responseBody, "success");
+    if ((successV != NULL) && (successV->value.firstChildP != NULL) && (alias != NULL))
+    {
+      LM(("Looking up '%s' in successV", alias));
+      kjTreeLog(successV, "successV", LmtDistOp207);
+      if (kjStringValueLookupInArray(successV, alias) != NULL)
+      {
+        // The 404 attribute was updated elsewhere => not a 404
+        LM_T(LmtDistOp207, ("NOT Adding attribute '%s' to failureV as it was found in successV", alias));
+        return;
+      }
+    }
+    else
+      LM(("No successV present"));
+  }
+
   KjNode* failureV = kjLookup(responseBody, "failure");
 
   if (failureV == NULL)
@@ -54,35 +80,42 @@ void distOpFailure(KjNode* responseBody, DistOp* distOpP, OrionldResponseErrorTy
   }
 
   KjNode* regIdP      = (distOpP != NULL)? kjLookup(distOpP->regP->regTree, "id") : NULL;
-  KjNode* regIdNodeP  = (regIdP != NULL)? kjString(orionldState.kjsonP, "registrationId", regIdP->value.s) : NULL;
-  KjNode* error       = kjObject(orionldState.kjsonP, NULL);
-  KjNode* attrV       = kjArray(orionldState.kjsonP, "attributes");
+  KjNode* regIdNodeP  = (regIdP != NULL)? kjString(orionldState.kjsonP,  "registrationId", regIdP->value.s) : NULL;
+  KjNode* error       = kjObject(orionldState.kjsonP,  NULL);
+  KjNode* attrV       = kjArray(orionldState.kjsonP,   "attributes");
   KjNode* statusCodeP = kjInteger(orionldState.kjsonP, "statusCode", httpStatus);
-  KjNode* titleP      = kjString(orionldState.kjsonP, "title", title);
-  KjNode* detailP     = kjString(orionldState.kjsonP, "detail", detail);
+  KjNode* titleP      = kjString(orionldState.kjsonP,  "title", title);
+  KjNode* detailP     = (detail != NULL)? kjString(orionldState.kjsonP,  "detail", detail) : NULL;
 
   if (regIdNodeP != NULL)
     kjChildAdd(error, regIdNodeP);
-
-  kjChildAdd(error, attrV);
   kjChildAdd(error, statusCodeP);
   kjChildAdd(error, titleP);
-  kjChildAdd(error, detailP);
+  if (detailP != NULL)
+    kjChildAdd(error, detailP);
 
-  for (KjNode* attrNameP = distOpP->body->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
+  if (distOpP != NULL)
   {
-    if (strcmp(attrNameP->name, "id") == 0)
-      continue;
-    if (strcmp(attrNameP->name, "type") == 0)
-      continue;
+    for (KjNode* attrNameP = distOpP->requestBody->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
+    {
+      if (strcmp(attrNameP->name, "id") == 0)
+        continue;
+      if (strcmp(attrNameP->name, "type") == 0)
+        continue;
 
-    char*   alias  = orionldContextItemAliasLookup(orionldState.contextP, attrNameP->name, NULL, NULL);
+      char*   attrShortName  = orionldContextItemAliasLookup(orionldState.contextP, attrNameP->name, NULL, NULL);
+      KjNode* aNameP         = kjString(orionldState.kjsonP, NULL, attrShortName);
+      kjChildAdd(attrV, aNameP);
+    }
+  }
+  else if (attrName != NULL)  // local attribute, its name is given as parameter to this function
+  {
     KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
     kjChildAdd(attrV, aNameP);
   }
 
+  if (attrV->value.firstChildP != NULL)
+    kjChildAdd(error, attrV);
+
   kjChildAdd(failureV, error);
 }
-
-
-

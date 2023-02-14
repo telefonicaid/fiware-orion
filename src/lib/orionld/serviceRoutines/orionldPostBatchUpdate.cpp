@@ -43,7 +43,6 @@ extern "C"
 #include "orionld/common/batchEntitiesFinalCheck.h"            // batchEntitiesFinalCheck
 #include "orionld/common/batchMultipleInstances.h"             // batchMultipleInstances
 #include "orionld/common/batchUpdateEntity.h"                  // batchUpdateEntity
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_*
 #include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity
 #include "orionld/legacyDriver/legacyPostBatchUpdate.h"        // legacyPostBatchUpdate
@@ -244,6 +243,5 @@ bool orionldPostBatchUpdate(void)
   if ((orionldState.tenantP != &tenant0) && (orionldState.httpStatusCode != 204))
     orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
 
-  kjTreeLog(orionldState.requestTree, "TROE Input");
   return true;
 }

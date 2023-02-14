@@ -292,20 +292,15 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 04. Attempt to "entity-patch" location, turning it into a string - see error about type mismatch
 ================================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 130
+HTTP/1.1 400 Bad Request
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "location",
-            "reason": "Attempt to transform a GeoProperty into a Property: location"
-        }
-    ],
-    "updated": []
+    "detail": "location",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -379,20 +374,15 @@ Date: REGEX(.*)
 
 07. Entity-Patch observationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
 ==============================================================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 146
+HTTP/1.1 400 Bad Request
+Content-Length: 150
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "observationSpace",
-            "reason": "Attempt to transform a GeoProperty into a Property: observationSpace"
-        }
-    ],
-    "updated": []
+    "detail": "observationSpace",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -412,20 +402,15 @@ Date: REGEX(.*)
 
 09. Entity-Patch operationSpace, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
 ============================================================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 142
+HTTP/1.1 400 Bad Request
+Content-Length: 148
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "operationSpace",
-            "reason": "Attempt to transform a GeoProperty into a Property: operationSpace"
-        }
-    ],
-    "updated": []
+    "detail": "operationSpace",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -445,20 +430,15 @@ Date: REGEX(.*)
 
 11. Entity-Patch anyGeo, but being a String, not a geo-location, by patching the attribute - see error about Not Geo
 ====================================================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 171
+HTTP/1.1 400 Bad Request
+Content-Length: 185
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "anyGeo",
-            "reason": "Attempt to transform a GeoProperty into a Property: https://uri.etsi.org/ngsi-ld/default-context/anyGeo"
-        }
-    ],
-    "updated": []
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/anyGeo",
+    "title": "Attempt to transform a GeoProperty into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

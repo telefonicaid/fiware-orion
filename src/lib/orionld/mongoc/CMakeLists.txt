@@ -69,6 +69,7 @@ SET (SOURCES
     mongocRegistrationReplace.cpp
     mongocRegistrationsIter.cpp
     mongocAuxAttributesFilter.cpp
+    mongocWriteLog.cpp
 )
 
 # Include directories

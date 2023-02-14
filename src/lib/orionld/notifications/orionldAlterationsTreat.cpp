@@ -39,7 +39,6 @@ extern "C"
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/notifications/subCacheAlterationMatch.h"       // subCacheAlterationMatch
 #include "orionld/notifications/notificationSend.h"              // notificationSend
 #include "orionld/notifications/notificationSuccess.h"           // notificationSuccess
@@ -172,26 +171,25 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
   {
-    LM(("ALT: Alteration %d:", alterations));
-    LM(("ALT:   Entity In:      %p", aP->inEntityP));
-    LM(("ALT:   CompleteEntity: %p", aP->finalApiEntityP));
-    LM(("ALT:   Entity Id:      %s", aP->entityId));
-    LM(("ALT:   Entity Type:    %s", aP->entityType));
-    LM(("ALT:   Attributes:     %d", aP->alteredAttributes));
+    LM_T(LmtAlt, (" Alteration %d:", alterations));
+    LM_T(LmtAlt, ("   Entity In:      %p", aP->inEntityP));
+    LM_T(LmtAlt, ("   CompleteEntity: %p", aP->finalApiEntityP));
+    LM_T(LmtAlt, ("   Entity Id:      %s", aP->entityId));
+    LM_T(LmtAlt, ("   Entity Type:    %s", aP->entityType));
+    LM_T(LmtAlt, ("   Attributes:     %d", aP->alteredAttributes));
 
     for (int ix = 0; ix < aP->alteredAttributes; ix++)
     {
-      LM(("ALT:   Attribute        %s", aP->alteredAttributeV[ix].attrName));
-      LM(("ALT:   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
+      LM_T(LmtAlt, ("   Attribute        %s", aP->alteredAttributeV[ix].attrName));
+      LM_T(LmtAlt, ("   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
     }
 
-    kjTreeLog(aP->inEntityP, "ALT:   inEntityP");
+    kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);
     ++alterations;
   }
-  LM(("ALT: %d Alterations present", alterations));
+  LM_T(LmtAlt, (" %d Alterations present", alterations));
   // </DEBUG>
 #endif
-
 
   OrionldAlterationMatch* matchList;
   int                     matches;

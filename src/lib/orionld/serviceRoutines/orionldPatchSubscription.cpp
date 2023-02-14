@@ -57,7 +57,6 @@ extern "C"
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
 #include "orionld/mqtt/mqttDisconnect.h"                       // mqttDisconnect
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/kjTree/kjNavigate.h"                         // kjNavigate
 #include "orionld/kjTree/kjChildAddOrReplace.h"                // kjChildAddOrReplace
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"  // Own Interface
@@ -758,7 +757,6 @@ bool orionldPatchSubscription(void)
   // If the subscription used to be an MQTT subscription, the MQTT connection might need closing
   // Only if MQTT data is modified though (or it stops being an MQTT subscription)
   //
-  kjTreeLog(dbSubscriptionP, "DB Subscription");
   KjNode*      oldUriP    = kjLookup(dbSubscriptionP, "reference");
   bool         oldWasMqtt = false;
   const char*  uriPath[4] = { "notification", "endpoint", "uri", NULL };

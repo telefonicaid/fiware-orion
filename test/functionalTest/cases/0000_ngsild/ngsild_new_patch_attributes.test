@@ -103,7 +103,6 @@ echo "02.  PATCH E1, all 7 attributes - make sure createdAt+modifiedAt are ignor
 echo "================================================================================================================="
 payload='{
   "id": "urn:ngsi-ld:entity:E1",
-  "type": "Device",
   "location": {
     "type": "GeoProperty",
     "value": {
@@ -166,7 +165,6 @@ echo "04.  PATCH E1, all 7 attributes, and with user context in Link header - ma
 echo "====================================================================================================================================================================="
 payload='{
   "id": "urn:ngsi-ld:entity:E1",
-  "type": "Device",
   "location": {
     "type": "GeoProperty",
     "value": {
@@ -230,7 +228,6 @@ echo "==========================================================================
 payload='{
   "@context": [ "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld" ],
   "id": "urn:ngsi-ld:entity:E1",
-  "type": "Device",
   "location": {
     "type": "GeoProperty",
     "value": {
@@ -403,7 +400,7 @@ bye
 02.  PATCH E1, all 7 attributes - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
 =================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 449
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -411,32 +408,19 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
-        },
-        {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
-        },
-        {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [
         "location",
         "observationSpace",
         "operationSpace",
-        "weight",
-        "owner"
+        "owner",
+        "weight"
     ]
 }
 
@@ -597,7 +581,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04.  PATCH E1, all 7 attributes, and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 =====================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 547
+Content-Length: 297
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -605,32 +589,25 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
+            "attributes": [
+                "weight"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
+            "attributes": [
+                "owner"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "weight",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "owner",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [
@@ -797,7 +774,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 06.  PATCH E1, all 7 attributes, and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 ======================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 547
+Content-Length: 297
 Content-Type: application/json
 Date: REGEX(.*)
 Link: REGEX(.*)
@@ -805,32 +782,25 @@ Link: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
+            "attributes": [
+                "weight"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
+            "attributes": [
+                "owner"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "weight",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "owner",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [

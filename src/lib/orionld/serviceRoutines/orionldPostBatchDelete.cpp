@@ -36,8 +36,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/tenantList.h"                         // tenant0
-#include "orionld/common/entitySuccessPush.h"                  // entitySuccessPush
-#include "orionld/common/entityErrorPush.h"                    // entityErrorPush
 #include "orionld/common/entityLookupById.h"                   // entityLookupBy_id_Id
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_*
 #include "orionld/legacyDriver/legacyPostBatchDelete.h"        // legacyPostBatchDelete
@@ -130,11 +128,11 @@ void distReqLog(DistOp* distReqList, const char* title)
     LM(("DR: Entity ID:                  %s", drP->entityId));
     LM(("DR: Entity Type:                %s", drP->entityType));
 
-    if (drP->body != NULL)
+    if (drP->requestBody != NULL)
     {
-      int   bodySize = kjFastRenderSize(drP->body);
+      int   bodySize = kjFastRenderSize(drP->requestBody);
       char* body     = kaAlloc(&orionldState.kalloc, bodySize + 256);
-      kjFastRender(drP->body, body);
+      kjFastRender(drP->requestBody, body);
       LM(("DR: payload body:               %s", body));
     }
     else
@@ -181,7 +179,7 @@ void distReqsMergeForBatchDelete(DistOp* distReqList)
     next = drP->next;
 
     //
-    // Either it's the first, in which case the drP->body needs to be created (as an array and entityId added to it)
+    // Either it's the first, in which case the drP->requestBody needs to be created (as an array and entityId added to it)
     // Or, the first must be found, and the entityId added to its array (and the drP item to be removed)
     //
     DistOp* firstP = firstItemOfRegLookup(distReqList, drP->regP);
@@ -189,7 +187,7 @@ void distReqsMergeForBatchDelete(DistOp* distReqList)
     if (drP == firstP)
     {
       LM(("Keeping drP  { reg: %s, entityId: %s } - creating BODY", drP->regP->regId, drP->entityId));
-      drP->body = kjArray(orionldState.kjsonP, NULL);
+      drP->requestBody = kjArray(orionldState.kjsonP, NULL);
 
       prev = drP;  // Only setting 'prev' here as in the "esle case", drP is skipped
     }
@@ -202,7 +200,7 @@ void distReqsMergeForBatchDelete(DistOp* distReqList)
 
     // Now add the entityId to the array of "firstP"
     KjNode* eidNodeP = kjString(orionldState.kjsonP, NULL, drP->entityId);
-    kjChildAdd(firstP->body, eidNodeP);
+    kjChildAdd(firstP->requestBody, eidNodeP);
 
     drP  = next;
   }
@@ -226,6 +224,7 @@ KjNode* entityIdAndTypeTableToIdArray(KjNode* entityIdAndTypeTable)
 
   return outArray;
 }
+
 
 
 // -----------------------------------------------------------------------------
@@ -256,17 +255,14 @@ static KjNode* entityIdLookupInObjectArray(KjNode* objectArray, char* entityId)
 //
 static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* responseErrors)
 {
-  kjTreeLog(drP->body, "KZ: drP->body BEFORE");
-  kjTreeLog(responseSuccess, "KZ: responseSuccess BEFORE");
-  kjTreeLog(responseErrors, "KZ: responseErrors BEFORE");
   LM(("KZ: drP->httpResponseCode == %d", drP->httpResponseCode));
 
   if (drP->httpResponseCode == 204)
   {
-    LM(("KZ: 204 - move all drP->body entity ids from drP to responseSuccess"));
-    LM(("KZ: 204 - remove all drP->body entity ids from responseErrors"));
+    LM(("KZ: 204 - move all drP->requestBody entity ids from drP to responseSuccess"));
+    LM(("KZ: 204 - remove all drP->requestBody entity ids from responseErrors"));
 
-    for (KjNode* eidNodeP = drP->body->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
+    for (KjNode* eidNodeP = drP->requestBody->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
     {
       KjNode* nodeP;
 
@@ -349,10 +345,6 @@ static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* response
   {
     LM(("%d - like 204 but to responseErrors instead of responseSuccess ...", drP->httpResponseCode));
   }
-
-  kjTreeLog(drP->body, "KZ: drP->body AFTER");
-  kjTreeLog(responseSuccess, "KZ: responseSuccess AFTER");
-  kjTreeLog(responseErrors, "KZ: responseErrors AFTER");
 }
 
 
@@ -405,12 +397,9 @@ bool orionldPostBatchDelete(void)
   }
 
   // Now we have an Array with valid Entity IDs - time to ask mongo if they actually exist (locally)
-  kjTreeLog(orionldState.requestTree, "Entities to DELETE");
   KjNode* dbEntityIdArray = mongocEntitiesExist(orionldState.requestTree, true);
 
   // Simplify the DB _id array to an KV object   "entityId": "entityType "
-  kjTreeLog(dbEntityIdArray, "Existing Entities from DB");
-
   KjNode* entityIdAndTypeTable = NULL;
   bool   dbOperationOk         = false;
 
@@ -421,7 +410,6 @@ bool orionldPostBatchDelete(void)
   else
   {
     entityIdAndTypeTable = dbModelToEntityIdAndTypeTable(dbEntityIdArray);
-    kjTreeLog(entityIdAndTypeTable, "entityIdAndTypeTable");
 
     responseSuccess = entityIdAndTypeTableToIdArray(entityIdAndTypeTable);
     dbOperationOk = mongocEntitiesDelete(responseSuccess);
@@ -465,9 +453,6 @@ bool orionldPostBatchDelete(void)
       LM(("KZ3: NOT Adding entity '%s' to responseErrors (cause found in responseSuccess)", eidP->value.s));
   }
 
-  kjTreeLog(responseSuccess, "Initial SUCCESS Array");
-  kjTreeLog(responseErrors, "Initial ERRORS Array");
-
   // Add any entity ids that were not found in the DB to entityIdAndTypeTable as "entityId": null, now that the entity type is unknown
   for (KjNode* inEntityIdNodeP = orionldState.requestTree->value.firstChildP; inEntityIdNodeP != NULL; inEntityIdNodeP = inEntityIdNodeP->next)
   {
@@ -478,16 +463,11 @@ bool orionldPostBatchDelete(void)
       kjChildAdd(entityIdAndTypeTable, nullNodeP);
     }
   }
-  kjTreeLog(entityIdAndTypeTable, "entityIdAndTypeTable (with unfound entities added)");
 
 
   // Get the list of Forwarded requests, for matching registrations
   if (orionldState.distributed == false)
-  {
     LM(("KZ3: Need to create the response, well, fix the arrays that define the response later"));
-    kjTreeLog(responseErrors, "KZ3: responseErrors");
-    kjTreeLog(responseSuccess, "KZ3: responseSuccess");
-  }
   else
   {
     DistOp* exclusiveList = regMatchForBatchDelete(RegModeAuxiliary, DoDeleteBatch, entityIdAndTypeTable);
@@ -588,9 +568,9 @@ bool orionldPostBatchDelete(void)
               drP->responseBody = kjParse(orionldState.kjsonP, drP->rawResponse);
 
               //
-              // All Entity IDs in "success" of drP->body to be merged into "success" of finalResponseP, if not already present
-              // Also, if any of those in "success" of drP->body are in finalResponseP::error, those need to be removed from finalResponseP::error
-              // Also, Entity IDs in "error" of drP->body that are not found anywhere in finalResponseP, those need to be added to finalResponseP::error
+              // All Entity IDs in "success" of drP->requestBody to be merged into "success" of finalResponseP, if not already present
+              // Also, if any of those in "success" of drP->requestBody are in finalResponseP::error, those need to be removed from finalResponseP::error
+              // Also, Entity IDs in "error" of drP->requestBody that are not found anywhere in finalResponseP, those need to be added to finalResponseP::error
               //
               responseMerge(drP, responseSuccess, responseErrors);
             }
@@ -629,8 +609,6 @@ bool orionldPostBatchDelete(void)
       //
       orionldState.requestTree = responseSuccess;
     }
-
-    kjTreeLog(responseSuccess, "responseSuccess");
   }
 
   orionldState.out.contentType = JSON;

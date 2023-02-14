@@ -34,7 +34,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/troeIgnored.h"                        // troeIgnored
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 
 #include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
 #include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
@@ -53,8 +52,6 @@ extern "C"
 //
 static KjNode* entityIdLookup(KjNode* tree, const char* entityId)
 {
-  kjTreeLog(tree, "XX: tree");
-
   LM(("orionldState.batchEntities->value.firstChildP == %p", tree->value.firstChildP));
   for (KjNode* itemP = tree->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
@@ -124,8 +121,6 @@ bool troePostBatchUpsert(void)
       }
       else if (orionldState.batchEntities != NULL)
       {
-        kjTreeLog(orionldState.batchEntities, "orionldState.batchEntities");
-
         // If the entity already existed, the entity op mode must be "REPLACE"
         if (entityIdLookup(orionldState.batchEntities, entityIdP->value.s) == NULL)
           troeEntityMode = (char*) "Create";

@@ -34,7 +34,6 @@
 #include "orionld/mongoc/mongocSubscriptionLookup.h"             // mongocSubscriptionLookup
 #include "orionld/mongoc/mongocSubscriptionDelete.h"             // mongocSubscriptionDelete
 #include "orionld/legacyDriver/legacyDeleteSubscription.h"       // legacyDeleteSubscription
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"   // Own Interface
 
 

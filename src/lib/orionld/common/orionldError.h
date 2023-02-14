@@ -32,6 +32,14 @@
 
 // ----------------------------------------------------------------------------
 //
+// ORIONLD_ERROR -
+//
+#define ORIONLD_ERROR(errorType, title, detail, status) do { orionldErrorNew(errorType, title, detail, status, __FILE__, __LINE__, __FUNCTION__); } while (0)
+
+
+
+// ----------------------------------------------------------------------------
+//
 // orionldError -
 //
 extern void orionldError
@@ -40,6 +48,23 @@ extern void orionldError
   const char*               title,
   const char*               detail,
   int                       status
+);
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldErrorNew -
+//
+extern void orionldErrorNew
+(
+  OrionldResponseErrorType  errorType,
+  const char*               title,
+  const char*               detail,
+  int                       status,
+  const char*               fileName,
+  int                       lineNo,
+  const char*               functionName
 );
 
 

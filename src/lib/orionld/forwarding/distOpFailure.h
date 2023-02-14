@@ -30,7 +30,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
@@ -43,10 +42,10 @@ extern void distOpFailure
 (
   KjNode*                   responseBody,
   DistOp*                   distOpP,
-  OrionldResponseErrorType  errorCode,
   const char*               title,
   const char*               detail,
-  int                       httpStatus
+  int                       httpStatus,
+  const char*               attrName
 );
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPFAILURE_H_

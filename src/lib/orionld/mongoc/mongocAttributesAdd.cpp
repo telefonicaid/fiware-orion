@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <bson/bson.h>                                           // bson_t, ...
 
 extern "C"
 {
@@ -32,10 +33,11 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
+#include "orionld/mongoc/mongocWriteLog.h"                       // mongocWriteLog
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // Own interface
+
 
 
 
@@ -114,10 +116,9 @@ bool mongocAttributesAdd
   //
   // Note that attrsToUpdate may be a single attribute and not an array
   //
-  kjTreeLog(attrsToUpdate, "PE: attrsToUpdate");
   KjNode* dbAttrP = (singleAttribute == true)? attrsToUpdate : attrsToUpdate->value.firstChildP;
 
-  LM(("PE: %s attribute: '%s'", (singleAttribute == true)? "Only": "First", dbAttrP->name));
+  LM_T(LmtMongoc, ("%s attribute: '%s'", (singleAttribute == true)? "Only": "First", dbAttrP->name));
   while (dbAttrP != NULL)
   {
     // Update the Attribute's modDate
@@ -142,7 +143,7 @@ bool mongocAttributesAdd
 
   bson_append_document(&request, "$set", 4, &set);
   bson_destroy(&set);
-
+  MONGOC_WLOG("Adding Attributes", orionldState.tenantP->mongoDbName, "entities", &selector, &request, LmtMongoc);
   bool b = mongoc_collection_update_one(orionldState.mongoc.entitiesP, &selector, &request, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
   {

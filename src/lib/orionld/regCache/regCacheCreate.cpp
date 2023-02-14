@@ -30,10 +30,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/mongoc/mongocRegistrationsIter.h"              // mongocRegistrationsIter
 #include "orionld/dbModel/dbModelToApiRegistration.h"            // dbModelToApiRegistration
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/regCache/RegCache.h"                           // RegCache
 #include "orionld/regCache/regCacheItemAdd.h"                    // regCacheItemAdd
 #include "orionld/regCache/regCacheItemContextCheck.h"           // regCacheItemContextCheck
@@ -72,7 +72,7 @@ int regIterFunc(RegCache* rcP, KjNode* dbRegP)
   // Convert API Reg to Cache Reg
   apiModelToCacheRegistration(apiRegP);
 
-  kjTreeLog(apiRegP, "RC: Cache Reg");
+  kjTreeLog(apiRegP, "Cache Reg", LmtRegCache);
 
   // Insert cacheRegP in tenantP->regCache (rcP)
   regCacheItemAdd(rcP, regId, apiRegP, true, fwdContextP);

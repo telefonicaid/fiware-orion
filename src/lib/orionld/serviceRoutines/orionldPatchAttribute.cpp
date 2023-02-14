@@ -42,7 +42,6 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/mongoc/mongocEntityGet.h"                      // mongocEntityGet
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
@@ -94,8 +93,6 @@ static void mdItemAdd(KjNode* mdArray, const char* subAttrName)
 //
 static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, KjNode* removedV)
 {
-  kjTreeLog(dbAttrP, "dbAttrP BEFORE attributeMerge");
-
   KjNode* mdP      = kjLookup(dbAttrP, "md");
   KjNode* mdNamesP = kjLookup(dbAttrP, "mdNames");
   bool    mustAdd  = false;
@@ -217,8 +214,6 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
 
     subAttrP = next;
   }
-
-  kjTreeLog(dbAttrP, "dbAttrP");
 }
 
 
@@ -353,10 +348,9 @@ bool orionldPatchAttribute(void)
   if (pCheckAttribute(entityId, orionldState.requestTree, true, attrType, true, NULL) == false)
     return false;
 
-  kjTreeLog(orionldState.requestTree, "TR: Right after pCheckAttribute");
   // Keep untouched initial state of the entity in the database - for alterations (to check for false updates)
   KjNode* initialDbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
-  kjTreeLog(dbEntityP, "ALT3: dbEntityP");
+
   // Merge orionldState.requestTree into dbEntityP, then convert to API Entity, for Alterations
   KjNode* addedV    = kjArray(orionldState.kjsonP, ".added");
   KjNode* removedV  = kjArray(orionldState.kjsonP, ".removed");
@@ -368,25 +362,20 @@ bool orionldPatchAttribute(void)
   KjNode* incomingP = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   attributeMerge(dbAttrP, orionldState.requestTree, addedV, removedV);
-  kjTreeLog(dbEntityP, "ALT3: dbEntityP after attributeMerge");
 
   //
   // To call mongocAttributesAdd we need the attribute in an array
   //
-  kjTreeLog(dbAttrP, "PA: DB Attribute to mongo");
   int r = mongocAttributesAdd(entityId, NULL, dbAttrP, true);
   if (r == false)
     LM_E(("Database Error ()"));
 
-
-  kjTreeLog(dbEntityP, "ALT3: After mongocAttributesAdd");
 
   //
   // For alteration, we need:
   //   * the Entity Type (must take it from the DB - expanded
   //   * The Final API entity - converted from the final DB Entity
   //
-  kjTreeLog(dbEntityP, "dbEntityP");
   KjNode*     _idNodeP         = kjLookup(dbEntityP, "_id");
 
   if (_idNodeP == NULL)
@@ -411,9 +400,6 @@ bool orionldPatchAttribute(void)
 
       kjChildAdd(inEntityP, attributeNodeP);
 
-      kjTreeLog(inEntityP, "ALT2: inEntityP");
-      kjTreeLog(incomingP, "ALT2: incomingP");
-      kjTreeLog(finalApiEntityP, "ALT2: finalApiEntityP");
       alteration(entityId, entityType, finalApiEntityP, inEntityP, initialDbEntityP);
     }
     else
@@ -424,10 +410,7 @@ bool orionldPatchAttribute(void)
   orionldState.responseTree   = NULL;
 
   if (troe == true)
-  {
     orionldState.requestTree = incomingP;
-    kjTreeLog(orionldState.requestTree, "TR: Tree for TRoE");
-  }
 
   return true;
 }

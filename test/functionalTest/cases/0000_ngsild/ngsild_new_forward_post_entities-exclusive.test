@@ -383,7 +383,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 14. GET all entities in CB, locally - see only urn:E1 with attr A1
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 42
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -392,6 +392,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     {
         "A1": "For CB",
         "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "id": "urn:E2",
         "type": "T"
     }
 ]

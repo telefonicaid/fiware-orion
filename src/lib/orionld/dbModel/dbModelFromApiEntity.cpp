@@ -26,7 +26,7 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjBuilder.h"                                     // kjChildRemove, kjArray, ...
+#include "kjson/kjBuilder.h"                                     // kjChildRemove, kjArray, kjObject, ...
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -117,6 +117,7 @@ bool dbModelFromApiEntity(KjNode* entityP, KjNode* dbEntityP, bool creation, con
   // Then move "attrs" inside entityP
   //
   KjNode* attrsP = kjObject(orionldState.kjsonP, "attrs");
+
   attrsP->value.firstChildP = entityP->value.firstChildP;
   attrsP->lastChild         = entityP->lastChild;
 

@@ -47,9 +47,19 @@ typedef enum TraceLevels
   LmtUriParams,                        // HTTP URI Parameters
   LmtResponse,                         // HTTP Response
   LmtMqtt,                             // MQTT (notifications)
+  LmtMongoc,                           // Entire mongoc library
+  LmtRegCache,                         // Registration Cache
+  LmtEntityType     = 30,              // Entity Types
+  LmtDistOpRequest,                    // ONLY the verb, path, and body of a distributed request
+  LmtDistOpResponse,                   // ONLY the body and status code of the response to a distributed request
+  LmtDistOp207,                        // Merging of the final 207 response
+  LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
+  LmtDistOpResponseDetail,             // Details on responses to distributed requests
+  LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
 
   // Both,
   LmtRequest = 38,                     // Incoming requests
+  LmtSubCache = 205,                   // Subscription Cache
 
   // Old
   LmtRest = 20,
@@ -131,7 +141,6 @@ typedef enum TraceLevels
   LmtTimeStatSem,
 
   /* Cache (205 - 207) */
-  LmtSubCache = 205,
   LmtSubCacheMatch,
   LmtCacheSync,
 

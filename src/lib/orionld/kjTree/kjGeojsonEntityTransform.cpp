@@ -47,10 +47,8 @@ extern "C"
 //
 static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
 {
-  kjTreeLog(attributeP, "attributeP");
   if (attributeP->type != KjObject)
   {
-    LM(("Not an object"));
     return NULL;
   }
 
