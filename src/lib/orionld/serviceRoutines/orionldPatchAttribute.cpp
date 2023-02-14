@@ -38,7 +38,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // dbModelFromApiSubAttribute

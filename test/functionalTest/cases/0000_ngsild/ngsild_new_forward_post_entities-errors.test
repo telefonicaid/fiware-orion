@@ -270,6 +270,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 {
     "entityId": "urn:E1",
     "failure": [
+#SORT_START
         {
             "attributes": [
                 "P6"
@@ -297,6 +298,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
             "statusCode": 409,
             "title": "Error during Distributed Operation"
         }
+#SORT_END
     ],
     "success": [
         "A1",
