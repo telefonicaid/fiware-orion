@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // TraceLevels, LM_T
+#include "orionld/common/fileName.h"                             // fileName
 #include "orionld/mongoc/mongocWriteLog.h"                       // Own interface
 
 
@@ -46,26 +47,13 @@ void mongocWriteLog
   const char*  collectionName,
   bson_t*      selectorP,
   bson_t*      requestP,
-  const char*  fileName,
+  const char*  path,
   int          lineNo,
   const char*  functionName,
   int          traceLevel
 )
 {
-  //
-  // The fileName is really its PATH. That's too long and we need to find the last occurrence of '/'
-  // and start right after => only the file name
-  //
-  char* current      = (char*) fileName;
-  char* fileNameOnly = (char*) fileName;
-
-  while (*current != 0)
-  {
-    if (*current == '/')
-      fileNameOnly = &current[1];
-
-    ++current;
-  }
+  char* fileNameOnly = fileName(path);
 
   char line[2048];
 

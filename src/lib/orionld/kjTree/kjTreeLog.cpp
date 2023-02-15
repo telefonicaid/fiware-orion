@@ -32,9 +32,11 @@ extern "C"
 #include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 }
 
-#include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/logMsg.h"                                     // lmOut
 
 #include "orionld/common/orionldState.h"                       // orionldState
+#include "orionld/common/fileName.h"                           // fileName
+#include "orionld/kjTree/kjTreeLog.h"                          // Own interface
 
 
 
@@ -42,26 +44,13 @@ extern "C"
 //
 // kjTreeLogFunction -
 //
-void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo, const char* functionName, int traceLevel)
+void kjTreeLogFunction(KjNode* tree, const char* msg, const char* path, int lineNo, const char* functionName, int traceLevel)
 {
-  //
-  // The fileName is really its PATH. That's too long and we need to find the last occurrence of '/'
-  // and start right after => only the file name
-  //
-  char* current      = (char*) fileName;
-  char* fileNameOnly = (char*) fileName;
-
-  while (*current != 0)
-  {
-    if (*current == '/')
-      fileNameOnly = &current[1];
-
-    ++current;
-  }
+  char* fileNameOnly = fileName(path);
 
   if (tree == NULL)
   {
-    LM(("%s[%d]: %s: NULL Tree", fileNameOnly, lineNo, msg));
+    lmOut((char*) "NULL Tree", 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
     return;
   }
 
