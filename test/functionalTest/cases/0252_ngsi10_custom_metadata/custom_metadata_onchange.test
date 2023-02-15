@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom metadata ONCHANGE subscription
+Custom metadata subscription
 
 --SHELL-INIT--
 dbInit CB
@@ -29,7 +29,7 @@ brokerStart CB
 accumulatorStart --pretty-print 127.0.0.1 "$LISTENER_PORT"
 
 --SHELL--
-echo "=== 1. Create ONCHANGE subscription"
+echo "=== 1. Create subscription"
 url="/v1/subscribeContext"
 payload='{
     "entities": [
@@ -231,7 +231,7 @@ accumulatorDump
 echo
 
 --REGEXPECT--
-=== 1. Create ONCHANGE subscription
+=== 1. Create subscription
 HTTP/1.1 200 OK
 Content-Length: 84
 Content-Type: application/json

@@ -31,7 +31,7 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Add ONCHANGE subscription to E.*/ET with service-path /entity
+# 01. Add subscription to E.*/ET with service-path /entity
 # 02. Create entity E1/ET with service-path /entity
 # 03. Create entity E2/ET with service-path /entity
 # 04. Query E.*/ET with service-path /entity

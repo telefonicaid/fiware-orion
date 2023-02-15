@@ -31,7 +31,7 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Add ONCHANGE subscription to E.*/ET
+# 01. Add subscription to E.*/ET
 # 02. Create entity E1/ET
 # 03. Query accumulator
 #
