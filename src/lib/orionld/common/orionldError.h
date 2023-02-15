@@ -32,31 +32,21 @@
 
 // ----------------------------------------------------------------------------
 //
-// ORIONLD_ERROR -
-//
-#define ORIONLD_ERROR(errorType, title, detail, status) do { orionldErrorNew(errorType, title, detail, status, __FILE__, __LINE__, __FUNCTION__); } while (0)
-
-
-
-// ----------------------------------------------------------------------------
-//
 // orionldError -
 //
-extern void orionldError
-(
-  OrionldResponseErrorType  errorType,
-  const char*               title,
-  const char*               detail,
-  int                       status
-);
+#define orionldError(errorType, title, detail, status)                                        \
+do                                                                                            \
+{                                                                                             \
+  orionldErrorFunction(errorType, title, detail, status, __FILE__, __LINE__, __FUNCTION__);   \
+} while (0)
 
 
 
 // ----------------------------------------------------------------------------
 //
-// orionldErrorNew -
+// orionldErrorFunction -
 //
-extern void orionldErrorNew
+extern void orionldErrorFunction
 (
   OrionldResponseErrorType  errorType,
   const char*               title,
@@ -66,29 +56,5 @@ extern void orionldErrorNew
   int                       lineNo,
   const char*               functionName
 );
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OERROR
-//
-#define OERROR(retVal, errorType, title, detail, status)                              \
-do {                                                                                  \
-  orionldError2(errorType, title, detail, status, __FILE__, __LINE__, __FUNCTION__);  \
-  return retVal;                                                                      \
-} while (0)
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OERRORV
-//
-#define OERRORV(errorType, title, detail, status)                                     \
-do {                                                                                  \
-  orionldError2(errorType, title, detail, status, __FILE__, __LINE__, __FUNCTION__);  \
-  return;                                                                             \
-} while (0)
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDERROR_H_

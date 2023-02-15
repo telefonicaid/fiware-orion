@@ -37,7 +37,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldError.h"                         // ORIONLD_ERROR
+#include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
@@ -120,7 +120,7 @@ char* pCheckEntityType2(KjNode* payloadTypeNode, KjNode* dbEntityP, char* entity
   {
     if (strcmp(entityTypeFromDB, entityTypeFromPayload) != 0)
     {
-      ORIONLD_ERROR(OrionldBadRequestData, "Mismatching Entity::type in payload body", "Does not coincide with the Entity::type in the database", 400);
+      orionldError(OrionldBadRequestData, "Mismatching Entity::type in payload body", "Does not coincide with the Entity::type in the database", 400);
       LM_E(("Entity type in database:       '%s'", entityTypeFromDB));
       LM_E(("Entity type from payload body: '%s'", entityTypeFromPayload));
       return NULL;
@@ -131,7 +131,7 @@ char* pCheckEntityType2(KjNode* payloadTypeNode, KjNode* dbEntityP, char* entity
   {
     if (strcmp(entityTypeFromDB, entityTypeFromUriParam) != 0)
     {
-      ORIONLD_ERROR(OrionldBadRequestData, "Mismatching Entity type in URL parameter 'type'", "Does not coincide with the Entity::type in the database", 400);
+      orionldError(OrionldBadRequestData, "Mismatching Entity type in URL parameter 'type'", "Does not coincide with the Entity::type in the database", 400);
       LM_E(("Entity type in database:       '%s'", entityTypeFromDB));
       LM_E(("Entity type from URI param:    '%s'", entityTypeFromUriParam));
       return NULL;
@@ -142,7 +142,7 @@ char* pCheckEntityType2(KjNode* payloadTypeNode, KjNode* dbEntityP, char* entity
   {
     if (strcmp(entityTypeFromPayload, entityTypeFromUriParam) != 0)
     {
-      ORIONLD_ERROR(OrionldBadRequestData, "Mismatching Entity type in URL parameter 'type'", "Does not coincide with the Entity::type in payload body", 400);
+      orionldError(OrionldBadRequestData, "Mismatching Entity type in URL parameter 'type'", "Does not coincide with the Entity::type in payload body", 400);
       LM_E(("Entity type from URI param:    '%s'", entityTypeFromUriParam));
       LM_E(("Entity type from payload body: '%s'", entityTypeFromPayload));
       return NULL;
@@ -238,7 +238,7 @@ bool orionldPatchEntity(void)
   KjNode* dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
   if ((dbEntityP == NULL) && (orionldState.distributed == false))
   {
-    ORIONLD_ERROR(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
+    orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;
   }
 
@@ -322,7 +322,7 @@ bool orionldPatchEntity(void)
   {
     if (distOpList == NULL)
     {
-      ORIONLD_ERROR(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
+      orionldError(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
       return false;
     }
 
