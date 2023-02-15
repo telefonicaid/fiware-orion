@@ -40,6 +40,7 @@
 #include "rest/HttpStatusCode.h"
 
 #include "ngsiNotify/QueueNotifier.h"
+#include "ngsiNotify/notifierMgr.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
@@ -65,7 +66,7 @@ static void flowControlAwait(unsigned int q0, unsigned int notifSent, const std:
   unsigned int qi = 0;
 #else
   // get current size of the queue
-  unsigned int qi = ((QueueNotifier*) getNotifier())->queueSize(service);
+  unsigned int qi = ((QueueNotifier*) notifierMgr)->queueSize(service);
 #endif
   LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
                      pass, accumulatedDelay, qi));
@@ -84,7 +85,7 @@ static void flowControlAwait(unsigned int q0, unsigned int notifSent, const std:
     accumulatedDelay += fcStepDelay;
 
 #ifndef UNIT_TEST
-    qi = ((QueueNotifier*) getNotifier())->queueSize(service);
+    qi = ((QueueNotifier*) notifierMgr)->queueSize(service);
 #endif
     LM_T(LmtNotifier, ("flow control pass %d, delay %d, notification queue size is: %d",
                        pass, accumulatedDelay, qi));
@@ -129,7 +130,7 @@ HttpStatusCode mongoUpdateContext
   if (strcmp(notificationMode, "threadpool") == 0)
   {
 #ifndef UNIT_TEST
-    q0 = ((QueueNotifier*) getNotifier())->queueSize(tenant);
+    q0 = ((QueueNotifier*) notifierMgr)->queueSize(tenant);
 #endif
     LM_T(LmtNotifier, ("notification queue size before processing update: %d", q0));
   }

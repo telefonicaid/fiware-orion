@@ -21,6 +21,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
+    notifierMgr.cpp
     doNotify.cpp
     Notifier.cpp
     senderThread.cpp
@@ -32,6 +33,7 @@ SET (SOURCES
 )
 
 SET (HEADERS
+    notifierMgr.h
     doNotify.h
     ContextSubscriptionInfo.h
     Notifier.h

@@ -99,6 +99,7 @@
 #include "ngsiNotify/QueueNotifier.h"
 #include "ngsiNotify/QueueWorkers.h"
 #include "ngsiNotify/senderThread.h"
+#include "ngsiNotify/notifierMgr.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -572,9 +573,9 @@ void exitFunc(void)
   if ((strcmp(notificationMode, "threadpool") == 0))
   {
     // Note the destructor in QueueNotifier will do the releasing work on service queues
-    if (getNotifier() != NULL)
+    if (notifierMgr != NULL)
     {
-      delete getNotifier();
+      delete notifierMgr;
     }
   }
 
@@ -639,7 +640,7 @@ const char* description =
 */
 static void contextBrokerInit(void)
 {
-  Notifier* pNotifier = NULL;
+  notifierMgr = NULL;
 
   /* If we use a queue for notifications, start worker threads */
   if (strcmp(notificationMode, "threadpool") == 0)
@@ -652,15 +653,12 @@ static void contextBrokerInit(void)
       LM_X(1,("Runtime Error starting notification queue workers (%d)", rc));
     }
 
-    pNotifier = pQNotifier;
+    notifierMgr = pQNotifier;
   }
   else
   {
-    pNotifier = new Notifier();
+    notifierMgr = new Notifier();
   }
-
-  /* Set notifier object (singleton) */
-  setNotifier(pNotifier);
 
   /* Set HTTP timeout */
   httpRequestInit(httpTimeout);

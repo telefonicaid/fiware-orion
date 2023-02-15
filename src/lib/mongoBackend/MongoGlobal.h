@@ -91,22 +91,6 @@ void mongoInit
 
 /* ****************************************************************************
 *
-* getNotifier -
-*/
-extern Notifier* getNotifier(void);
-
-
-
-/* ****************************************************************************
-*
-* setNotifier -
-*/
-extern void setNotifier(Notifier* n);
-
-
-
-/* ****************************************************************************
-*
 * setDbPrefix -
 */
 extern void setDbPrefix(const std::string& dbPrefix);

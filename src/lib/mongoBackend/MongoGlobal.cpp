@@ -82,7 +82,6 @@ using ngsiv2::EntID;
 * Globals
 */
 static std::string          dbPrefix;
-static Notifier*            notifier;
 static bool                 multitenant;
 
 
@@ -170,28 +169,6 @@ void mongoInit
       ensureDateExpirationIndex(tenant);
     }
   }
-}
-
-
-
-/* ***************************************************************************
-*
-* getNotifier -
-*/
-Notifier* getNotifier()
-{
-  return notifier;
-}
-
-
-
-/* ***************************************************************************
-*
-* setNotifier -
-*/
-void setNotifier(Notifier* n)
-{
-  notifier = n;
 }
 
 

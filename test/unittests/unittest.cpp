@@ -27,6 +27,7 @@
 #include <map>
 
 #include "cache/subCache.h"
+#include "ngsiNotify/notifierMgr.h"
 #include "rest/uriParamNames.h"
 
 #include "unittests/unittest.h"
@@ -114,7 +115,7 @@ void utInit(bool notifierMocked, bool timerMocked)
       fprintf(stderr, "error allocating NotifierMock: %s\n", strerror(errno));
       exit(1);
     }
-    setNotifier(notifierMock);
+    notifierMgr = notifierMock;
   }
 
   if (timerMocked)
@@ -181,7 +182,6 @@ void utExit(void)
   notifierMock = NULL;
 
   setTimer(NULL);
-  setNotifier(NULL);
 
   subCacheDisable();
 

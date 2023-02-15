@@ -65,6 +65,8 @@
 #include "mongoDriver/BSONObjBuilder.h"
 #include "mongoDriver/BSONArrayBuilder.h"
 
+#include "ngsiNotify/notifierMgr.h"
+
 
 /* ****************************************************************************
 *
@@ -1877,16 +1879,16 @@ static bool processNotification
   nsf.fiwareCorrelator  = fiwareCorrelator;
   nsf.correlatorCounter = correlatorCounter;
 
-  getNotifier()->sendNotifyContextRequest(notifyCerP,
-                                          notification,
-                                          nsf,
-                                          maxFailsLimit,
-                                          failsCounter,
-                                          renderFormat,
-                                          attrL.stringV,
-                                          blacklist,
-                                          covered,
-                                          metadataV);
+  notifierMgr->sendNotifyContextRequest(notifyCerP,
+                                        notification,
+                                        nsf,
+                                        maxFailsLimit,
+                                        failsCounter,
+                                        renderFormat,
+                                        attrL.stringV,
+                                        blacklist,
+                                        covered,
+                                        metadataV);
 
   return true;
 }
