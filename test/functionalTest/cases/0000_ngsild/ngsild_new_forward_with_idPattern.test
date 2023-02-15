@@ -40,7 +40,7 @@ brokerStart CP2 0 IPv4 -experimental
 # 04. Create an Entity with ID E21 - should be forwarded to R2::endpoint
 # 05. GET E11 from CP1 - see it
 # 06. GET E21 from CP2 - see it
-# 07. Get all Entities from CB - see none (local=true)
+# 07. Get all Entities from CB - see E11 and E21 without attributes (local=true)
 # 08. DELETE E11  (no forwarding as it is not yet implemented)
 # 09. DELETE E12  (no forwarding as it is not yet implemented)
 # 10. Kill and restart the broker (so it reads the registrations from DB and populates the regCache)
@@ -49,7 +49,7 @@ brokerStart CP2 0 IPv4 -experimental
 # 12. Create an Entity with ID E21 - should be forwarded to R2::endpoint
 # 13. GET E11 from CP1 - see it
 # 14. GET E21 from CP2 - see it
-# 15. Get all Entities from CB - see none (local=true)
+# 15. Get all Entities from CB - see E11 and E21 without attributes (local=true)
 #
 # 16. See R1 in DB - pay attention to the 'contextRegistration' stuff ('information' in API)
 # 17. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB)
@@ -60,7 +60,7 @@ brokerStart CP2 0 IPv4 -experimental
 #
 # 21. Create an Entity with ID E31 - should be forwarded to R1::endpoint
 # 22. GET E31 from CP1 - see it
-# 23. Get all Entities from CB - see none (local=true)
+# 23. Get all Entities from CB - see E11, E21, and E31  without attributes (local=true)
 #
 
 echo "01. Create a registration R1 for Entity Ids E1.*"
@@ -153,8 +153,8 @@ echo
 echo
 
 
-echo "07. Get all Entities from CB - see none (local=true)"
-echo "===================================================="
+echo "07. Get all Entities from CB - see E11 and E21 without attributes (local=true)"
+echo "=============================================================================="
 orionCurl --url /ngsi-ld/v1/entities?local=true
 echo
 echo
@@ -222,8 +222,8 @@ echo
 echo
 
 
-echo "15. Get all Entities from CB - see none (local=true)"
-echo "===================================================="
+echo "15. Get all Entities from CB - see E11 and E21 without attributes (local=true)"
+echo "=============================================================================="
 orionCurl --url /ngsi-ld/v1/entities?local=true
 echo
 echo
@@ -298,8 +298,8 @@ echo
 echo
 
 
-echo "23. Get all Entities from CB - see none (local=true)"
-echo "===================================================="
+echo "23. Get all Entities from CB - see E11, E21, and E31  without attributes (local=true)"
+echo "====================================================================================="
 orionCurl --url /ngsi-ld/v1/entities?local=true
 echo
 echo
@@ -386,14 +386,24 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-07. Get all Entities from CB - see none (local=true)
-====================================================
+07. Get all Entities from CB - see E11 and E21 without attributes (local=true)
+==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
+Content-Length: 57
 Content-Type: application/json
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
-[]
+[
+    {
+        "id": "urn:E11",
+        "type": "T"
+    },
+    {
+        "id": "urn:E21",
+        "type": "T"
+    }
+]
 
 
 08. DELETE E11  (no forwarding as it is not yet implemented)
@@ -416,20 +426,50 @@ Date: REGEX(.*)
 
 11. Create an Entity with ID E11 - should be forwarded to R1::endpoint
 ======================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
+HTTP/1.1 207 Multi-Status
+Content-Length: 126
+Content-Type: application/json
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/entities/urn:E11
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
+{
+    "entityId": "urn:E11",
+    "failure": [
+        {
+            "detail": "urn:E11",
+            "statusCode": 404,
+            "title": "Entity already exists"
+        }
+    ],
+    "success": [
+        "P1",
+        "P2"
+    ]
+}
 
 
 12. Create an Entity with ID E21 - should be forwarded to R2::endpoint
 ======================================================================
-HTTP/1.1 201 Created
-Content-Length: 0
+HTTP/1.1 207 Multi-Status
+Content-Length: 126
+Content-Type: application/json
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/entities/urn:E21
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
+{
+    "entityId": "urn:E21",
+    "failure": [
+        {
+            "detail": "urn:E21",
+            "statusCode": 404,
+            "title": "Entity already exists"
+        }
+    ],
+    "success": [
+        "P1",
+        "P2"
+    ]
+}
 
 
 13. GET E11 from CP1 - see it
@@ -476,14 +516,24 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-15. Get all Entities from CB - see none (local=true)
-====================================================
+15. Get all Entities from CB - see E11 and E21 without attributes (local=true)
+==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
+Content-Length: 57
 Content-Type: application/json
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
-[]
+[
+    {
+        "id": "urn:E11",
+        "type": "T"
+    },
+    {
+        "id": "urn:E21",
+        "type": "T"
+    }
+]
 
 
 16. See R1 in DB - pay attention to the 'contextRegistration' stuff ('information' in API)
@@ -680,14 +730,28 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 }
 
 
-23. Get all Entities from CB - see none (local=true)
-====================================================
+23. Get all Entities from CB - see E11, E21, and E31  without attributes (local=true)
+=====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
+Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
-[]
+[
+    {
+        "id": "urn:E11",
+        "type": "T"
+    },
+    {
+        "id": "urn:E21",
+        "type": "T"
+    },
+    {
+        "id": "urn:E31",
+        "type": "T"
+    }
+]
 
 
 --TEARDOWN--

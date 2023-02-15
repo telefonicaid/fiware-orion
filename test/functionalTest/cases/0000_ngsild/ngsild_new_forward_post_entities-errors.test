@@ -28,7 +28,7 @@ export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP4
-brokerStart CB  0 IPv4 -experimental -forwarding
+brokerStart CB  31-35 IPv4 -experimental -forwarding
 brokerStart CP1 0 IPv4 -experimental
 brokerStart CP4 0 IPv4 -experimental
 
@@ -38,7 +38,7 @@ brokerStart CP4 0 IPv4 -experimental
 # 02. Create an exclusive registration R2 in CB for CP2 of entity type T, id 'urn:E1' and properties P3+P4, with an invalid hostname 'globalhost'
 # 03. Create an exclusive registration R3 in CB for CP3 of entity type T, id 'urn:E1' and properties P5+P6, just CP3 isn't started
 # 04. Create an exclusive registration R4 in CB for CP4 of entity type T, id 'urn:E1' and properties P7+P8, just both attrs are created before the forwarding starts
-# 05. Create 'urn:E1' on CP4 without attributes (to provoke a 409 for the forwarded requewst in step 06)
+# 05. Create 'urn:E1' on CP4 without attributes (to provoke a 409 for the forwarded request in step 06)
 # 06. POST /entities on CB of an entity urn:E1 with attr A1,P1,P3,P6,P7 - A1 ok locally, P1 ok in CP1, P3 ERROR, P6 OTHER ERROR, P7 - 409
 # 07. GET all entities in CB, locally - see urn:E1 with attr A1
 # 08. GET all entities in CP1, see urn:E1 with attr P1
@@ -163,8 +163,8 @@ echo
 echo
 
 
-echo "05. Create 'urn:E1' on CP4 without attributes (to provoke a 409 for the forwarded requewst in step 06)"
-echo "======================================================================================================"
+echo "05. Create 'urn:E1' on CP4 without attributes (to provoke a 409 for the forwarded request in step 06)"
+echo "====================================================================================================="
 payload='{
   "id": "urn:E1",
   "type": "T"
@@ -249,8 +249,8 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R4
 
 
 
-05. Create 'urn:E1' on CP4 without attributes (to provoke a 409 for the forwarded requewst in step 06)
-======================================================================================================
+05. Create 'urn:E1' on CP4 without attributes (to provoke a 409 for the forwarded request in step 06)
+=====================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -268,9 +268,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 Location: /ngsi-ld/v1/entities/urn:E1
 
 {
-#SORT_START
     "entityId": "urn:E1",
     "failure": [
+#SORT_START
         {
             "attributes": [
                 "P6"
@@ -278,7 +278,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
             "detail": "Unable to connect to registrant",
             "registrationId": "urn:R3",
             "statusCode": 504,
-            "title": "Error during Distributed Operation"
+            "title": "Unable to send distributed request"
         },
         {
             "attributes": [
@@ -287,7 +287,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
             "detail": "Unable to resolve host name of registrant",
             "registrationId": "urn:R2",
             "statusCode": 504,
-            "title": "Error during Distributed Operation"
+            "title": "Unable to send distributed request"
         },
         {
             "attributes": [
@@ -298,12 +298,12 @@ Location: /ngsi-ld/v1/entities/urn:E1
             "statusCode": 409,
             "title": "Error during Distributed Operation"
         }
+#SORT_END
     ],
     "success": [
         "A1",
         "P1"
     ]
-#SORT_END
 }
 
 

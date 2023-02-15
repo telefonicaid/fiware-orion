@@ -1,0 +1,735 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Distributed PATCH of entity (old /attrs)
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+dbInit CP4
+brokerStart CB  26,31-34,38 IPv4 -experimental -forwarding
+brokerStart CP1 0-255 IPv4 -experimental
+brokerStart CP2 0-255 IPv4 -experimental
+brokerStart CP3 0-255 IPv4 -experimental
+brokerStart CP4 0-255 IPv4 -experimental
+
+--SHELL--
+#
+# 01. In CB, create an entity urn:E1 with an attribute P1
+# 02. In CP1, create an entity urn:E1 with attributes P1+P2+R1 (P2: 0)
+# 03. In CP2, Create an entity urn:E1 with attributes P1+P2+R1
+# 04. In CP3, Create an entity urn:E1 with attributes P1+P2+R1
+# 05. In CP4, Create an entity urn:E1 with just an attribute P5 (the rest will give 404)
+# 06. Create an exclusive registration R1 on urn:E1/P2 for CP1
+# 07. Create an exclusive registration R2 on urn:E1/R1 for CP2
+# 08. Create an inclusive registration R3 on T/P3 for CP3 - to provoke a 404
+# 09. Create an inclusive registration R4 on T and P5-P7 for CP4 - to provoke some 404 (for P6 and P7)
+# 10. Patch urn:E1, P1-P3+P5-P7+R1
+# 11. GET urn:E1, with local=true - see only P1
+# 12. GET urn:E1 - see P1-P2, P5, R1
+# 13. GET urn:E1 from CP1
+# 14. GET urn:E1 from CP2
+# 15. GET urn:E1 from CP3
+# 16. GET urn:E1 from CP4 (P5 has changed)
+#
+# ===========================================================
+# Expected result for step 10:
+#
+# Exclusive-Forwarded:
+#   P2 to urn:R1::endpoint
+#   R1 to urn:R2::endpoint
+#
+# CB:
+#   Updated: P1
+#   404:     P3,P6-P7
+# CP1:
+#   Updated: P2
+# CP2:
+#   Updated: R1
+# CP3
+#   404:     P3
+# CP4:
+#   Updated: P5
+#   404:     P6-P7
+# ===========================================================
+#
+# 
+# 17. DELETE the entity urn:E1 in CP3 - to provoke a real error (and not a 207)
+# 18. PATCH urn:E1/P3 - to provoke a distOp to CP3 and thus get the 404 Entity Not Found
+#
+# 19. DELETE the entity urn:E1 in CB
+# 20. PATCH urn:E1/P2 - distOp to CP1
+# 21. GET urn:E1 on CB, see the distributed attributes: P2 from CP1, R1 from CP2, P5 from CP4
+#
+
+
+
+echo "01. In CB, create an entity urn:E1 with an attribute P1"
+echo "======================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. In CP1, create an entity urn:E1 with attributes P1+P2+R1 (P2: 0)"
+echo "===================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 5,
+  "P2": 0,
+  "R1": { "object": "urn:cp1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. In CP2, Create an entity urn:E1 with attributes P1+P2+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 6,
+  "P2": 6,
+  "R1": { "object": "urn:cp2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. In CP3, Create an entity urn:E1 with attributes P1+P2+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 4,
+  "P2": 4,
+  "R1": { "object": "urn:4" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "05. In CP4, Create an entity urn:E1 with just an attribute P5 (the rest will give 404)"
+echo "======================================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P5": "untouched"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP4_PORT
+echo
+echo
+
+
+echo "06. Create an exclusive registration R1 on urn:E1/P2 for CP1"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:registration:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P2" ]
+    }
+  ],
+  "mode": "exclusive",
+  "operations": [ "updateEntity", "retrieveEntity" ],
+  "endpoint": "http://localhost:'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Create an exclusive registration R2 on urn:E1/R1 for CP2"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:registration:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "relationshipNames": [ "R1" ]
+    }
+  ],
+  "mode": "exclusive",
+  "operations": [ "updateEntity", "retrieveEntity" ],
+  "endpoint": "http://localhost:'$CP2_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Create an inclusive registration R3 on T/P3 for CP3 - to provoke a 404"
+echo "=========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:registration:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P3" ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "updateEntity", "retrieveEntity" ],
+  "endpoint": "http://localhost:'$CP3_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Create an inclusive registration R4 on T and P5-P7 for CP4 - to provoke some 404 (for P6 and P7)"
+echo "===================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:registration:R4",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P5", "P6", "P7" ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "updateEntity", "retrieveEntity" ],
+  "endpoint": "http://localhost:'$CP4_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "10. Patch urn:E1, P1-P3+P5-P7+R1"
+echo "================================"
+payload='{
+  "P1": 8,
+  "P2": "P2 (patched in step 10)",
+  "P3": "P3 (patched in step 10)",
+  "R1": { "object": "urn:patched:step08:E2" },
+  "P5": "patched",
+  "P6": "Should give a 404 from CP4",
+  "P7": "Should give a 404 from CP4"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "11. GET urn:E1, with local=true - see only P1"
+echo "============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?local=true
+echo
+echo
+
+
+echo "12. GET urn:E1 - see P1-P2, P5, R1"
+echo "=================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "13. GET urn:E1 from CP1"
+echo "======================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP1_PORT
+echo
+echo
+
+
+echo "14. GET urn:E1 from CP2"
+echo "======================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP2_PORT
+echo
+echo
+
+
+echo "15. GET urn:E1 from CP3"
+echo "======================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP3_PORT
+echo
+echo
+
+
+echo "16. GET urn:E1 from CP4 (P5 has changed)"
+echo "========================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP4_PORT
+echo
+echo
+
+
+echo "17. DELETE the entity urn:E1 in CP3 - to provoke a real error (and not a 207)"
+echo "============================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP3_PORT -X DELETE
+echo
+echo
+
+
+echo "18. PATCH urn:E1/P3 - to provoke a distOp to CP3 and thus get the 404 Entity Not Found"
+echo "======================================================================================"
+payload='{
+  "P1": 18,
+  "P3": "Meant for CP3 but ... the entity no longer exist in CP3"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "19. DELETE the entity urn:E1 in CB"
+echo "=================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE
+echo
+echo
+
+
+echo "20. PATCH urn:E1/P2 - distOp to CP1"
+echo "==================================="
+payload='{
+  "P2": "step 19"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "21. GET urn:E1 on CB, see the distributed attributes: P2 from CP1, R1 from CP2, P5 from CP4"
+echo "==========================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. In CB, create an entity urn:E1 with an attribute P1
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. In CP1, create an entity urn:E1 with attributes P1+P2+R1 (P2: 0)
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. In CP2, Create an entity urn:E1 with attributes P1+P2+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. In CP3, Create an entity urn:E1 with attributes P1+P2+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+05. In CP4, Create an entity urn:E1 with just an attribute P5 (the rest will give 404)
+======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. Create an exclusive registration R1 on urn:E1/P2 for CP1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R1
+
+
+
+07. Create an exclusive registration R2 on urn:E1/R1 for CP2
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R2
+
+
+
+08. Create an inclusive registration R3 on T/P3 for CP3 - to provoke a 404
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R3
+
+
+
+09. Create an inclusive registration R4 on T and P5-P7 for CP4 - to provoke some 404 (for P6 and P7)
+====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R4
+
+
+
+10. Patch urn:E1, P1-P3+P5-P7+R1
+================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 603
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "attributes": [
+                "P3"
+            ],
+            "registrationId": "urn:ngsi-ld:registration:R3",
+            "statusCode": 404,
+            "title": "Attribute Not Found"
+        },
+        {
+            "attributes": [
+                "P6"
+            ],
+            "registrationId": "urn:ngsi-ld:registration:R4",
+            "statusCode": 404,
+            "title": "Attribute Not Found"
+        },
+        {
+            "attributes": [
+                "P7"
+            ],
+            "registrationId": "urn:ngsi-ld:registration:R4",
+            "statusCode": 404,
+            "title": "Attribute Not Found"
+        },
+        {
+            "attributes": [
+                "P3"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
+        },
+        {
+            "attributes": [
+                "P6"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
+        },
+        {
+            "attributes": [
+                "P7"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
+        }
+    ],
+    "updated": [
+        "P1",
+        "P2",
+        "P5",
+        "R1"
+    ]
+}
+
+
+11. GET urn:E1, with local=true - see only P1
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 61
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 8
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+12. GET urn:E1 - see P1-P2, P5, R1
+==================================
+HTTP/1.1 200 OK
+Content-Length: 225
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 8
+    },
+    "P2": {
+        "type": "Property",
+        "value": "P2 (patched in step 10)"
+    },
+    "P5": {
+        "type": "Property",
+        "value": "patched"
+    },
+    "R1": {
+        "object": "urn:patched:step08:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+13. GET urn:E1 from CP1
+=======================
+HTTP/1.1 200 OK
+Content-Length: 168
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 5
+    },
+    "P2": {
+        "type": "Property",
+        "value": "P2 (patched in step 10)"
+    },
+    "R1": {
+        "object": "urn:cp1",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+14. GET urn:E1 from CP2
+=======================
+HTTP/1.1 200 OK
+Content-Length: 158
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 6
+    },
+    "P2": {
+        "type": "Property",
+        "value": 6
+    },
+    "R1": {
+        "object": "urn:patched:step08:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+15. GET urn:E1 from CP3
+=======================
+HTTP/1.1 200 OK
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 4
+    },
+    "P2": {
+        "type": "Property",
+        "value": 4
+    },
+    "R1": {
+        "object": "urn:4",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+16. GET urn:E1 from CP4 (P5 has changed)
+========================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P5": {
+        "type": "Property",
+        "value": "patched"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+17. DELETE the entity urn:E1 in CP3 - to provoke a real error (and not a 207)
+=============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+18. PATCH urn:E1/P3 - to provoke a distOp to CP3 and thus get the 404 Entity Not Found
+======================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 238
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "attributes": [
+                "P3"
+            ],
+            "detail": "urn:E1",
+            "registrationId": "urn:ngsi-ld:registration:R3",
+            "statusCode": 404,
+            "title": "Entity does not exist"
+        },
+        {
+            "attributes": [
+                "P3"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
+        }
+    ],
+    "updated": [
+        "P1"
+    ]
+}
+
+
+19. DELETE the entity urn:E1 in CB
+==================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+20. PATCH urn:E1/P2 - distOp to CP1
+===================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+21. GET urn:E1 on CB, see the distributed attributes: P2 from CP1, R1 from CP2, P5 from CP4
+===========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 174
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P2": {
+        "type": "Property",
+        "value": "step 19"
+    },
+    "P5": {
+        "type": "Property",
+        "value": "patched"
+    },
+    "R1": {
+        "object": "urn:patched:step08:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+brokerStop CP4
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+dbDrop CP4

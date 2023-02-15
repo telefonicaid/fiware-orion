@@ -78,7 +78,6 @@ bool orionldPostEntities(void)
   if (pCheckEntityId(orionldState.payloadIdNode,     true, &entityId)   == false)   return false;
   if (pCheckEntityType(orionldState.payloadTypeNode, true, &entityType) == false)   return false;
 
-
   //
   // Check and fix the incoming payload (entity)
   //
@@ -91,130 +90,153 @@ bool orionldPostEntities(void)
   kjChildAdd(responseBody, entityIdNodeP);
 
   DistOp*  distOpList = NULL;
+
   if (orionldState.distributed)
     distOpList = distOpRequests(entityId, entityType, DoCreateEntity, orionldState.requestTree);
+
+  bool    emptyEntity    = ((orionldState.requestTree == NULL)  || (orionldState.requestTree->value.firstChildP == NULL));
+  KjNode* cloneForTroeP  = NULL;
+  KjNode* apiEntityP     = NULL;
+  KjNode* dbEntityP      = NULL;
 
   //
   // If the entity already exists, a "409 Conflict" is returned, either complete or as part of a 207
   //
-  if (orionldState.requestTree != NULL)
+  kjTreeLog(orionldState.requestTree, "Left after DistOps", LmtDistOpMsgs);
+
+  dbEntityP = mongocEntityLookup(entityId, NULL, NULL, NULL);
+  if (dbEntityP != NULL)
   {
-    if (mongocEntityLookup(entityId, NULL, NULL, NULL) != NULL)
+    if (distOpList == NULL)  // Purely local request
     {
-      if (distOpList == NULL)  // Purely local request
-      {
-        orionldError(OrionldAlreadyExists, "Entity already exists", entityId, 409);
-        return false;
-      }
-      else
-      {
-        distOpFailure(responseBody, NULL, OrionldAlreadyExists, "Entity already exists", entityId, 404);
-        goto awaitDoResponses;
-      }
+      orionldError(OrionldAlreadyExists, "Entity already exists", entityId, 409);
+      return false;
     }
-
-    //
-    // NOTE
-    //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
-    //   from the payload body, so, the entity type is not expanded by pCheckEntity()
-    //   The expansion is instead done by payloadTypeNodeFix, called by orionldMhdConnectionTreat
-    //
-
-    // dbModelFromApiEntity destroys the tree, need to make a copy for notifications
-    KjNode* apiEntityP = kjClone(orionldState.kjsonP, orionldState.requestTree);
-
-    // Entity id and type was removed - they need to go back
-    orionldState.payloadIdNode->next   = orionldState.payloadTypeNode;
-    orionldState.payloadTypeNode->next = apiEntityP->value.firstChildP;
-    apiEntityP->value.firstChildP      = orionldState.payloadIdNode;
-
-
-    //
-    // The current shape of the incoming tree is now fit for TRoE, while it still needs to be adjusted for mongo,
-    // If TRoE is enabled we clone it here, for later use in TRoE processing
-    //
-    // The same tree (read-only) might also be necessary for a 207 response in a distributed operation.
-    // So, if anythis has been forwarded, the clone is made regardless whether TRoE is enabled.
-    //
-    KjNode* cloneForTroeP = NULL;
-    if ((troe == true) || (distOpList != NULL))
-      cloneForTroeP = kjClone(orionldState.kjsonP, apiEntityP);  // apiEntityP contains entity ID and TYPE
-
-    if (dbModelFromApiEntity(orionldState.requestTree, NULL, true, orionldState.payloadIdNode->value.s, orionldState.payloadTypeNode->value.s) == false)
+    else
     {
-      //
-      // Not calling orionldError as a better error message is overwritten if I do.
-      // Once we have "Error Stacking", orionldError should be called.
-      //
-      // orionldError(OrionldInternalError, "Internal Error", "Unable to convert API Entity into DB Model Entity", 500);
-
-      if (distOpList == NULL)  // Purely local request
-        return false;
-      else
-      {
-        distOpFailure(responseBody, NULL, OrionldInternalError, "Internal Error", "dbModelFromApiEntity failed", 500);
-        goto awaitDoResponses;
-      }
+      distOpFailure(responseBody, NULL, "Entity already exists", entityId, 404, NULL);
+      goto awaitDoResponses;
     }
+  }
 
-    KjNode* dbEntityP = orionldState.requestTree;  // More adequate to talk about DB-Entity from here on
+  //
+  // NOTE
+  //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  //   from the payload body, so, the entity type is not expanded by pCheckEntity()
+  //   The expansion is instead done by payloadTypeNodeFix, called by orionldMhdConnectionTreat
+  //
 
-    // datasets?
-    if (orionldState.datasets != NULL)
-      kjChildAdd(dbEntityP, orionldState.datasets);
+  // dbModelFromApiEntity destroys the tree, need to make a copy for notifications and TRoE
 
-    // Ready to send it to the database
-    if (mongocEntityInsert(dbEntityP, entityId) == false)
-    {
-      orionldError(OrionldInternalError, "Database Error", "mongocEntityInsert failed", 500);
-      if (distOpList == NULL)  // Purely local request
-        return false;
-      else
-      {
-        distOpFailure(responseBody, NULL, OrionldInternalError, "Database Error", "mongocEntityInsert failed", 500);
-        goto awaitDoResponses;
-      }
-    }
-    else if (distOpList != NULL)  // NOT Purely local request
-    {
-      //
-      // Need to call distOpSuccess here. Only, I don't have a DistOp object for local ...
-      // Only the "DistOp::body" is used in distOpSuccess so I can fix it:
-      //
-      DistOp local;
-      local.body = cloneForTroeP;
-      distOpSuccess(responseBody, &local);
-    }
+  apiEntityP = (emptyEntity == false)? kjClone(orionldState.kjsonP, orionldState.requestTree) : kjObject(orionldState.kjsonP, NULL);
 
+  //
+  // Entity id and type was removed - they need to go back
+  // Here they are linked together   ( id -->  type )
+  // They are here entered the tree of apiEntityP
+  //
+  orionldState.payloadIdNode->next   = orionldState.payloadTypeNode;
+  orionldState.payloadTypeNode->next = (apiEntityP != NULL)? apiEntityP->value.firstChildP : NULL;
+
+
+  //
+  // An entity can be created without attributes.
+  // Also, all attributes may be chopped off to exclusively registered endpoints.
+  // The entity is still created in local
+  //
+  if (emptyEntity == true)
+    apiEntityP->lastChild = orionldState.payloadTypeNode;
+
+  apiEntityP->value.firstChildP = orionldState.payloadIdNode;
+
+  //
+  // The current shape of the incoming tree is now fit for TRoE, while it still needs to be adjusted for mongo,
+  // If TRoE is enabled we clone it here, for later use in TRoE processing
+  //
+  // The same tree (read-only) might also be necessary for a 207 response in a distributed operation.
+  // So, if anythis has been forwarded, the clone is made regardless whether TRoE is enabled.
+  //
+  if ((troe == true) || (distOpList != NULL))
+    cloneForTroeP = kjClone(orionldState.kjsonP, apiEntityP);  // apiEntityP contains entity ID and TYPE
+
+  if (orionldState.requestTree == NULL)
+    orionldState.requestTree = kjObject(orionldState.kjsonP, NULL);
+  if (dbModelFromApiEntity(orionldState.requestTree, NULL, true, orionldState.payloadIdNode->value.s, orionldState.payloadTypeNode->value.s) == false)
+  {
     //
-    // Prepare for notifications
+    // Not calling orionldError as a better error message is overwritten if I do.
+    // Once we have "Error Stacking", orionldError should be called.
     //
-    orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
-    orionldState.alterations->entityId          = entityId;
-    orionldState.alterations->entityType        = entityType;
-    orionldState.alterations->inEntityP         = apiEntityP;
-    orionldState.alterations->dbEntityP         = NULL;
-    orionldState.alterations->finalApiEntityP   = apiEntityP;  // entity id, createdAt, modifiedAt ...
-    orionldState.alterations->alteredAttributes = 0;
-    orionldState.alterations->alteredAttributeV = NULL;
-    orionldState.alterations->next              = NULL;
-
-    // All good
-    orionldState.httpStatusCode = 201;
-    httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
-
-    if (cloneForTroeP != NULL)
-      orionldState.requestTree = cloneForTroeP;
+    // orionldError(OrionldInternalError, "Internal Error", "Unable to convert API Entity into DB Model Entity", 500);
 
     if (distOpList == NULL)  // Purely local request
-      return true;
+      return false;
+    else
+      goto awaitDoResponses;
+  }
+
+  dbEntityP = orionldState.requestTree;  // More adequate to talk about DB-Entity after the call to dbModelFromApiEntity
+
+  // datasets?
+  if (orionldState.datasets != NULL)
+    kjChildAdd(dbEntityP, orionldState.datasets);
+
+  // Ready to send it to the database
+  if (mongocEntityInsert(dbEntityP, entityId) == false)
+  {
+    orionldError(OrionldInternalError, "Database Error", "mongocEntityInsert failed", 500);
+    if (distOpList == NULL)  // Purely local request
+      return false;
+    else
+    {
+      distOpFailure(responseBody, NULL, "Database Error", "mongocEntityInsert failed", 500, NULL);
+      goto awaitDoResponses;
+    }
+  }
+
+  if (distOpList != NULL)  // NOT Purely local request
+  {
+    //
+    // Need to call distOpSuccess here. Only, I don't have a DistOp object for local ...
+    // Only the "DistOp::body" is used in distOpSuccess so I can fix it:
+    //
+    DistOp local;
+    local.requestBody = cloneForTroeP;
+    distOpSuccess(responseBody, &local);
+  }
+
+  //
+  // Prepare for notifications
+  //
+  orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
+  orionldState.alterations->entityId          = entityId;
+  orionldState.alterations->entityType        = entityType;
+  orionldState.alterations->inEntityP         = apiEntityP;
+  orionldState.alterations->dbEntityP         = NULL;
+  orionldState.alterations->finalApiEntityP   = apiEntityP;  // entity id, createdAt, modifiedAt ...
+  orionldState.alterations->alteredAttributes = 0;
+  orionldState.alterations->alteredAttributeV = NULL;
+  orionldState.alterations->next              = NULL;
+
+  // All good
+  orionldState.httpStatusCode = 201;
+  httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
+
+  if (cloneForTroeP != NULL)
+    orionldState.requestTree = cloneForTroeP;
+
+  if (distOpList == NULL)  // Purely local request
+  {
+    orionldState.responseTree = NULL;
+    return true;
   }
 
  awaitDoResponses:
   if (distOpList != NULL)
     distOpResponses(distOpList, responseBody);
 
-  if (kjLookup(responseBody, "failure") != NULL)
+  KjNode* failureP = kjLookup(responseBody, "failure");
+  if ((failureP != NULL) && (failureP->value.firstChildP != NULL))
   {
     orionldState.httpStatusCode = 207;
     orionldState.responseTree   = responseBody;

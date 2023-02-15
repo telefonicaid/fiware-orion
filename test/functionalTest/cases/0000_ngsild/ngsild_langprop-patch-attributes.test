@@ -26,7 +26,7 @@ Attributes PATCH of Language Property
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 IPv4 -experimental
+brokerStart CB 20,28 IPv4 -experimental
 
 --SHELL--
 
@@ -175,7 +175,7 @@ bye
 03. PATCH /attrs, adding L2 and overwriting L1 (setting L1:es to Castellano)
 ============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 87
+Content-Length: 102
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -183,8 +183,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "L2",
-            "reason": "Attribute not found"
+            "attributes": [
+                "L2"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [
@@ -251,39 +254,29 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 06. Attempt with RHS of L1:languageMap to a non-object, e.g. the number 13 - see error
 ======================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 182
+HTTP/1.1 400 Bad Request
+Content-Length: 200
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "L1",
-            "reason": "The languageMap of a LanguageProperty attribute must be a JSON Object: https://uri.etsi.org/ngsi-ld/default-context/L1"
-        }
-    ],
-    "updated": []
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L1",
+    "title": "The languageMap of a LanguageProperty attribute must be a JSON Object",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 07. Attempt with RHS of L1:languageMap:es to a non-string, e.g. the number 14 - see error
 =========================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 202
+HTTP/1.1 400 Bad Request
+Content-Length: 220
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "L1",
-            "reason": "Items of the value of a LanguageProperty attribute must be JSON String or Array of String: https://uri.etsi.org/ngsi-ld/default-context/L1"
-        }
-    ],
-    "updated": []
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/L1",
+    "title": "Items of the value of a LanguageProperty attribute must be JSON String or Array of String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

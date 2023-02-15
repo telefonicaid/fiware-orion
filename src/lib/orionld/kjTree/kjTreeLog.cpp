@@ -42,11 +42,26 @@ extern "C"
 //
 // kjTreeLogFunction -
 //
-void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo)
+void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo, const char* functionName, int traceLevel)
 {
+  //
+  // The fileName is really its PATH. That's too long and we need to find the last occurrence of '/'
+  // and start right after => only the file name
+  //
+  char* current      = (char*) fileName;
+  char* fileNameOnly = (char*) fileName;
+
+  while (*current != 0)
+  {
+    if (*current == '/')
+      fileNameOnly = &current[1];
+
+    ++current;
+  }
+
   if (tree == NULL)
   {
-    LM(("%s[%d]: %s: NULL Tree", fileName, lineNo, msg));
+    LM(("%s[%d]: %s: NULL Tree", fileNameOnly, lineNo, msg));
     return;
   }
 
@@ -55,15 +70,25 @@ void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int 
   // Too big trees will not be rendered - this is just tracing
   if (bufSize < 10 * 1024)
   {
-    char* buf = kaAlloc(&orionldState.kalloc, bufSize + 512);
+    char* treeBuf = kaAlloc(&orionldState.kalloc, bufSize + 512);
 
-    if (buf != NULL)
+    if (treeBuf != NULL)
     {
-      bzero(buf, bufSize);
-      kjFastRender(tree, buf);
-      LM(("%s[%d]: %s: %s", fileName, lineNo, msg, buf));
+      bzero(treeBuf, bufSize);
+      kjFastRender(tree, treeBuf);
+
+      char* buf = kaAlloc(&orionldState.kalloc, bufSize + strlen(msg) + 512);
+      if (buf != NULL)
+      {
+        snprintf(buf, bufSize + strlen(msg) + 512, "%s: %s", msg, treeBuf);
+        lmOut(buf, 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+      }
+      else
+        lmOut((char*) "KjNode Tree Render not possible - kaAlloc error 2", 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
     }
+    else
+      lmOut((char*) "KjNode Tree Render not possible - kaAlloc error 1", 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
   }
   else
-    LM(("%s[%d]: %s: %s", fileName, lineNo, msg, "Tree too big to be rendered"));
+    lmOut((char*) "KjNode Tree too large to be rendered", 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
 }

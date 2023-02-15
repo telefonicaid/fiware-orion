@@ -63,7 +63,6 @@ extern "C"
 #include "orionld/context/orionldContextPresent.h"             // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextFromTree.h"            // orionldContextFromTree
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/kjTree/kjTreeToUpdateContextRequest.h"       // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityIdArrayExtract.h"             // kjEntityIdArrayExtract
@@ -156,7 +155,6 @@ bool legacyPostBatchUpdate(void)
   //     Check also that the entity type is the same, if given in the request
   //
   KjNode* idTypeAndCreDateFromDb = mongoCppLegacyEntityListLookupWithIdTypeCreDate(idArray, true);  // true: include attrNames array
-  kjTreeLog(idTypeAndCreDateFromDb, "TYPES: From mongoCppLegacyEntityListLookupWithIdTypeCreDate");
   KjNode* entityP;
 
   if (idTypeAndCreDateFromDb == NULL)
@@ -212,7 +210,7 @@ bool legacyPostBatchUpdate(void)
       kjChildRemove(incomingTree, entityP);
       continue;
     }
-    kjTreeLog(dbEntityP, "TYPES: DB Entity");
+
     // If @context in payload body, it needs to be respected
     KjNode* contextNodeP  = kjLookup(entityP, "@context");
     if (contextNodeP != NULL)

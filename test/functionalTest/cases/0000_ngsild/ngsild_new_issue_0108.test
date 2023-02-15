@@ -136,7 +136,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. Attempt to PATCH P1 and P2 (that doesn't exist) - see that P2 is ignored
 ============================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 87
+Content-Length: 102
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -144,8 +144,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "P2",
-            "reason": "Attribute not found"
+            "attributes": [
+                "P2"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [

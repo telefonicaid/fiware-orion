@@ -47,14 +47,14 @@ extern "C"
 //
 // purgeRedirectedAttributes -
 //
-// After the redirected registrations are dealt with, we need to chop attributes off the body.
+// After the redirected registrations are dealt with, we need to chop attributes off the request tree (distOpP->requestBody).
 // And after that continue with Inclusive registrations (and local DB)
 //
 static void purgeRedirectedAttributes(DistOp* redirectList, KjNode* body)
 {
   for (DistOp* distOpP = redirectList; distOpP != NULL; distOpP = distOpP->next)
   {
-    for (KjNode* attrP = distOpP->body->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
       KjNode* bodyAttrP = kjLookup(body, attrP->name);
 

@@ -26,18 +26,22 @@
 
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjBuilder.h"                                     // kjArray, kljString, kjChildAdd, ...
+#include "kjson/kjBuilder.h"                                     // kjArray, kjString, kjChildAdd, ...
 }
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpSuccess.h"                    // Own interface
 
 
 
+extern void updatedAttr404Purge(KjNode* failureV, char* attrName);
 // -----------------------------------------------------------------------------
 //
 // distOpSuccess -
@@ -45,6 +49,7 @@ extern "C"
 void distOpSuccess(KjNode* responseBody, DistOp* distOpP)
 {
   KjNode* successV = kjLookup(responseBody, "success");
+  KjNode* failureV = kjLookup(responseBody, "failure");
 
   if (successV == NULL)
   {
@@ -52,15 +57,26 @@ void distOpSuccess(KjNode* responseBody, DistOp* distOpP)
     kjChildAdd(responseBody, successV);
   }
 
-  for (KjNode* attrNameP = distOpP->body->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
+  for (KjNode* attrNameP = distOpP->requestBody->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
   {
     if (strcmp(attrNameP->name, "id") == 0)
       continue;
     if (strcmp(attrNameP->name, "type") == 0)
       continue;
 
-    char*   alias  = orionldContextItemAliasLookup(orionldState.contextP, attrNameP->name, NULL, NULL);
-    KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
-    kjChildAdd(successV, aNameP);
+    char* attrLongName = kaStrdup(&orionldState.kalloc, attrNameP->name);
+    eqForDot(attrLongName);
+    char* alias = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, NULL, NULL);
+
+    if (kjStringValueLookupInArray(successV, alias) == NULL)
+    {
+      KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
+      LM_T(LmtDistOp207, ("Adding '%s' to successV", alias));
+      kjChildAdd(successV, aNameP);
+
+      updatedAttr404Purge(failureV, alias);
+    }
+    else
+      LM_T(LmtDistOp207, ("NOT adding attribute '%s' to successV (it's already present)", alias));
   }
 }

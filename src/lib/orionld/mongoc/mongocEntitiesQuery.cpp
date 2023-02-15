@@ -38,7 +38,6 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/q/qTreeToBson.h"                               // qTreeToBson
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
@@ -816,7 +815,6 @@ KjNode* mongocEntitiesQuery
 
       if (entityNodeP != NULL)
       {
-        kjTreeLog(entityNodeP, "entity to add to array");
         kjChildAdd(entityArray, entityNodeP);
         ++hits;
       }

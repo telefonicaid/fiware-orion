@@ -101,7 +101,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entities:E1
 02. Update the entity partially, the same way as the Test Suite Case 'Partial Attribute Update'
 ===============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 93
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -109,8 +109,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "location",
-            "reason": "Attribute not found"
+            "attributes": [
+                "location"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [

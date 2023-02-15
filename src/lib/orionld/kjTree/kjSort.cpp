@@ -35,20 +35,21 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjSort.h"                               // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjSort - sort a KjNode tree
+// kjSort - sort a KjNode Object
 //
 // Objects are sorted alphabetically by key.
 // Arrays cannot be sorted.
 //
 void kjSort(KjNode* nodeP)
 {
-  if ((nodeP->type != KjObject) && (nodeP->type != KjArray))
+  if ((nodeP->type != KjObject) && (nodeP->type != KjArray))  // Arrays can contain objects, that can be sorted,
     return;
 
   if (nodeP->value.firstChildP == NULL)
@@ -92,5 +93,46 @@ void kjSort(KjNode* nodeP)
 
     if ((startP == NULL) || (startP->next == NULL))
       break;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// kjStringArraySort - sort a KjNode Array
+//
+// Elements (KjString) are sorted alphabetically by value.
+//
+void kjStringArraySort(KjNode* arrayP)
+{
+  KjNode* rawP = kjArray(orionldState.kjsonP, NULL);
+
+  //
+  // Put all items in rawP, leaving arrayP empty
+  //
+  rawP->value.firstChildP   = arrayP->value.firstChildP;
+  rawP->lastChild           = arrayP->lastChild;
+  arrayP->value.firstChildP = NULL;
+  arrayP->lastChild         = NULL;
+
+  //
+  // Loop over rawP, find smallest, then just move it to arrayP
+  //
+  while (rawP->value.firstChildP != NULL)
+  {
+    // Set the very first item as the smaalest one (minP)
+    KjNode* minP = rawP->value.firstChildP;
+
+    // Compare with all the rest and set minP accordingly
+    for (KjNode* tmpP = minP->next; tmpP != NULL; tmpP = tmpP->next)
+    {
+      if (strcmp(minP->value.s, tmpP->value.s) > 0)
+        minP = tmpP;
+    }
+
+    // Move the smallest from rawP to arrayP
+    kjChildRemove(rawP, minP);
+    kjChildAdd(arrayP, minP);
   }
 }

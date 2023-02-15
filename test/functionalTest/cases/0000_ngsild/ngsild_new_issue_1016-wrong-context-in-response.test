@@ -27,7 +27,7 @@ Issue 1016 - wrong context in Link header of the response
 # Copied from ngsild_issue_1016-wrong-context-in-response.test
 export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+brokerStart CB 38 IPv4 -experimental
 
 --SHELL--
 
@@ -85,7 +85,7 @@ echo "==========================================================================
 payload='{
   "@context": [ "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld" ],
   "id": "urn:ngsi-ld:entity:E1",
-  "type": "Device",
+  "type": "https://uri.etsi.org/ngsi-ld/default-context/Device",
   "location": {
     "type": "GeoProperty",
     "value": {
@@ -143,7 +143,7 @@ Date: REGEX(.*)
 02. Patch E1, all 7 attributes, with user context in payload body - make sure the context of the response is correct
 ====================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 400
+Content-Length: 297
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -151,24 +151,25 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
+            "attributes": [
+                "weight"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
+            "attributes": [
+                "owner"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "weight",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "owner",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [

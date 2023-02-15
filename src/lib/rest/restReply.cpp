@@ -74,8 +74,9 @@ void restReply(ConnectionInfo* ciP, const char* answer)
   if ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))
     spath = (char*) ciP->servicePathV[0].c_str();
 
-  response = MHD_create_response_from_buffer(answerLen, (char*) answer, MHD_RESPMEM_MUST_COPY);
+  LM_T(LmtResponse, ("Response Body: '%s'", (answer != NULL)? answer : "None" ));
 
+  response = MHD_create_response_from_buffer(answerLen, (char*) answer, MHD_RESPMEM_MUST_COPY);
   bool metrics = (orionldState.apiVersion != NGSI_LD_V1) && metricsMgr.isOn();
   if (!response)
   {

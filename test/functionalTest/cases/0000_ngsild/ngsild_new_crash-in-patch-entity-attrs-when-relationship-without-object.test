@@ -76,20 +76,15 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:001
 
 02. Update the attribute R1 using PATCH /ngsi-ld/v1/entities/urn:ngsi-ld:T:001/attrs, but without 'object' - see error and make sure no crash
 =============================================================================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 154
+HTTP/1.1 400 Bad Request
+Content-Length: 172
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "R1",
-            "reason": "Forbidden field for a Relationship: value: https://uri.etsi.org/ngsi-ld/default-context/R1"
-        }
-    ],
-    "updated": []
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "Forbidden field for a Relationship: value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

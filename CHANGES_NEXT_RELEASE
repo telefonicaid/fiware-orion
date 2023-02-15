@@ -48,4 +48,5 @@
 * Issue #1316  Fixed a bug in sub-cache population for non-default tenant (issue #1315 is about the same)
 * Issue #1315  Ditto
 * Issue #280   Implemented forwarding for PATCH /entities/{entityId}
+* Issue #280   Implemented forwarding for PATCH /entities/{entityId}/attrs
 * Issue #280   Implemented forwarding for PATCH /entities/{entityId}/attrs/{attrName}

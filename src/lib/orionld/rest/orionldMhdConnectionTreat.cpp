@@ -1109,6 +1109,8 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   PERFORMANCE(serviceRoutineStart);
  serviceRoutine:
+  if (orionldState.requestTree != NULL)
+    kjTreeLog(orionldState.requestTree, "Request Payload Body", LmtRequest);
   serviceRoutineResult = orionldState.serviceP->serviceRoutine();
   PERFORMANCE(serviceRoutineEnd);
   if (orionldState.in.performance == true)
@@ -1248,10 +1250,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   // Enqueue response
   //
   if (orionldState.responsePayload != NULL)
-  {
-    LM_T(LmtResponse, ("Response body: %s", orionldState.responsePayload));
     restReply(NULL, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
-  }
   else
     restReply(NULL, NULL);
 

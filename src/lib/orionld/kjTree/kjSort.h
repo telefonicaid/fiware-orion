@@ -40,4 +40,16 @@ extern "C"
 //
 extern void kjSort(KjNode* nodeP);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// kjStringArraySort - sort a KjNode Array
+//
+// Elements (KjString) are sorted alphabetically by value.
+//
+// FIXME: move to kjson library
+//
+extern void kjStringArraySort(KjNode* nodeP);
+
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJSORT_H_

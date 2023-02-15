@@ -260,14 +260,24 @@ bool orionldGetEntity(void)
       {
         DistOp* distOpP = distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
 
-        distOpP->body = kjParse(orionldState.kjsonP, distOpP->rawResponse);
-        if (distOpP->body != NULL)
+        curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &distOpP->httpResponseCode);
+
+        if ((distOpP->rawResponse != NULL) && (distOpP->rawResponse[0] != 0))
+          distOpP->responseBody = kjParse(orionldState.kjsonP, distOpP->rawResponse);
+
+        if (distOpP->responseBody != NULL)
         {
+          if (distOpP->httpResponseCode >= 400)
+          {
+            LM_W(("Got an error response (%d) from a forwarded request: '%s'", distOpP->httpResponseCode, distOpP->rawResponse));
+            continue;
+          }
+
           if (distOpP->regP->acceptJsonld == true)
           {
-            KjNode* atContextP = kjLookup(distOpP->body, "@context");
+            KjNode* atContextP = kjLookup(distOpP->responseBody, "@context");
             if (atContextP != NULL)
-              kjChildRemove(distOpP->body, atContextP);
+              kjChildRemove(distOpP->responseBody, atContextP);
           }
 
           //
@@ -277,8 +287,8 @@ bool orionldGetEntity(void)
           //
           if ((distOpP->regP->contextP != NULL) && (distOpP->regP->contextP != orionldState.contextP))
           {
-            orionldEntityExpand(distOpP->body, distOpP->regP->contextP);
-            orionldEntityCompact(distOpP->body, orionldState.contextP);
+            orionldEntityExpand(distOpP->responseBody, distOpP->regP->contextP);
+            orionldEntityCompact(distOpP->responseBody, orionldState.contextP);
           }
 
           // If the mode of the registration is Auxiliar, then the merge must be delayed
@@ -289,10 +299,10 @@ bool orionldGetEntity(void)
 
           // Merge in the received body into the local (or nothing)
           if (apiEntityP == NULL)
-            apiEntityP = distOpP->body;
+            apiEntityP = distOpP->responseBody;
           else
           {
-            distOpEntityMerge(apiEntityP, distOpP->body, sysAttrs, distOpP->regP->mode == RegModeAuxiliary);
+            distOpEntityMerge(apiEntityP, distOpP->responseBody, sysAttrs, distOpP->regP->mode == RegModeAuxiliary);
             fwdMerges += 1;
           }
         }
@@ -300,7 +310,13 @@ bool orionldGetEntity(void)
           LM_E(("Internal Error (parse error for the received response of a forwarded request)"));
       }
       else
-        LM_E(("CURL Error %d awaiting response to forwarded request: %s", msgP->data.result, curl_easy_strerror(msgP->data.result)));
+      {
+        DistOp* distOpP = distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
+        LM_E(("CURL Error %d awaiting response to forwarded request (reg: %s): %s",
+              msgP->data.result,
+              distOpP->regP->regId,
+              curl_easy_strerror(msgP->data.result)));
+      }
     }
 
     //
@@ -312,9 +328,9 @@ bool orionldGetEntity(void)
         continue;
 
       if (apiEntityP == NULL)
-        apiEntityP = fwdP->body;
+        apiEntityP = fwdP->responseBody;
       else
-        distOpEntityMerge(apiEntityP, fwdP->body, sysAttrs, fwdP->regP->mode == RegModeAuxiliary);
+        distOpEntityMerge(apiEntityP, fwdP->responseBody, sysAttrs, fwdP->regP->mode == RegModeAuxiliary);
     }
   }
 

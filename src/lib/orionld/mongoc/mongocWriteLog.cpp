@@ -1,0 +1,94 @@
+/*
+*
+* Copyright 2022 FIWARE Foundation e.V.
+*
+* This file is part of Orion-LD Context Broker.
+*
+* Orion-LD Context Broker is free software: you can redistribute it and/or
+* modify it under the terms of the GNU Affero General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* Orion-LD Context Broker is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+* General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+*
+* For those usages not covered by this license please contact with
+* orionld at fiware dot org
+*
+* Author: Ken Zangelin
+*/
+#include <bson/bson.h>                                           // bson_t, ...
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
+}
+
+#include "logMsg/logMsg.h"                                       // TraceLevels, LM_T
+#include "orionld/mongoc/mongocWriteLog.h"                       // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// mongocWriteLog -
+//
+void mongocWriteLog
+(
+  const char*  msg,
+  const char*  dbName,
+  const char*  collectionName,
+  bson_t*      selectorP,
+  bson_t*      requestP,
+  const char*  fileName,
+  int          lineNo,
+  const char*  functionName,
+  int          traceLevel
+)
+{
+  //
+  // The fileName is really its PATH. That's too long and we need to find the last occurrence of '/'
+  // and start right after => only the file name
+  //
+  char* current      = (char*) fileName;
+  char* fileNameOnly = (char*) fileName;
+
+  while (*current != 0)
+  {
+    if (*current == '/')
+      fileNameOnly = &current[1];
+
+    ++current;
+  }
+
+  char line[2048];
+
+  snprintf(line, sizeof(line), "---------- %s ----------", msg);
+  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+
+  snprintf(line, sizeof(line), "  * Database Name:         '%s'", dbName);
+  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+
+  snprintf(line, sizeof(line), "  * Collection Name:       '%s'", collectionName);
+  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+
+  if (selectorP != NULL)
+  {
+    char* selector = bson_as_json(selectorP, NULL);
+    snprintf(line, sizeof(line), "  * Selector:              '%s'", selector);
+    lmOut(line, 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+    bson_free(selector);
+  }
+
+  char* request = bson_as_json(requestP, NULL);
+
+  snprintf(line, sizeof(line), "  * Request:               '%s'", request);
+  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+  bson_free(request);
+}

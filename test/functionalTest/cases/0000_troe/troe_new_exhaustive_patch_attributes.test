@@ -560,7 +560,7 @@ NGSILD-Tenant: t1
 03. Patch E1, all 7 attributes, on default tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
 ===================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 449
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -568,32 +568,19 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
-        },
-        {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
-        },
-        {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [
         "location",
         "observationSpace",
         "operationSpace",
-        "weight",
-        "owner"
+        "owner",
+        "weight"
     ]
 }
 
@@ -656,7 +643,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 05. Patch E2, all 7 attributes, on T1 tenant - make sure createdAt+modifiedAt are ignored and that the other five are REPLACED
 ==============================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 449
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -664,32 +651,19 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
-        },
-        {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
-        },
-        {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [
         "location",
         "observationSpace",
         "operationSpace",
-        "weight",
-        "owner"
+        "owner",
+        "weight"
     ]
 }
 
@@ -753,7 +727,7 @@ NGSILD-Tenant: t1
 07. Patch E1, all 7 attributes, on default tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 ======================================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 547
+Content-Length: 297
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -761,32 +735,25 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
+            "attributes": [
+                "weight"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
+            "attributes": [
+                "owner"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "weight",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "owner",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [
@@ -855,7 +822,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 09. Patch E2, all 7 attributes, on T1 tenant and with user context in Link header - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 =================================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 547
+Content-Length: 297
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -863,32 +830,25 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
+            "attributes": [
+                "weight"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
+            "attributes": [
+                "owner"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "weight",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "owner",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [
@@ -958,7 +918,7 @@ NGSILD-Tenant: t1
 11. Patch E1, all 7 attributes, on default tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 =======================================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 547
+Content-Length: 297
 Content-Type: application/json
 Date: REGEX(.*)
 Link: REGEX(.*)
@@ -966,32 +926,25 @@ Link: REGEX(.*)
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
+            "attributes": [
+                "weight"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
+            "attributes": [
+                "owner"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "weight",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "owner",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [
@@ -1060,7 +1013,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 13. Patch E2, all 7 attributes, on T1 tenant and with user context in payload body - make sure createdAt+modifiedAt+weight+owner are ignored and that the other three are REPLACED
 ==================================================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 547
+Content-Length: 297
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1068,32 +1021,25 @@ Link: <https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/pub
 {
     "notUpdated": [
         {
-            "attributeName": "id",
-            "reason": "the ID of an entity cannot be altered"
+            "attributes": [
+                "weight"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "type",
-            "reason": "the TYPE of an entity cannot be altered"
+            "attributes": [
+                "owner"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         },
         {
-            "attributeName": "createdAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "modifiedAt",
-            "reason": "built-in timestamps are ignored"
-        },
-        {
-            "attributeName": "weight",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "owner",
-            "reason": "Attribute not found"
-        },
-        {
-            "attributeName": "noSuchAttr",
-            "reason": "Attribute not found"
+            "attributes": [
+                "noSuchAttr"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
         }
     ],
     "updated": [

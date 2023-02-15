@@ -36,7 +36,7 @@ extern "C"
 //
 // kjTreeLog -
 //
-#define kjTreeLog(tree, msg)             kjTreeLogFunction(tree, msg, __FILE__, __LINE__)
+#define kjTreeLog(tree, msg, traceLevel)    do { if (LM_MASK(LogLevelDebug) && lmOk('T', traceLevel) == LmsOk)  kjTreeLogFunction(tree, msg, __FILE__, __LINE__, __FUNCTION__, traceLevel); } while (0)
 
 
 
@@ -44,6 +44,6 @@ extern "C"
 //
 // kjTreeLogFunction -
 //
-extern void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo);
+extern void kjTreeLogFunction(KjNode* tree, const char* msg, const char* fileName, int lineNo, const char* functionName, int traceLevel);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREELOG_H_

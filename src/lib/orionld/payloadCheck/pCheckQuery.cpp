@@ -36,7 +36,6 @@ extern "C"
 #include "orionld/types/TreeNode.h"                              // TreeNode
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/payloadCheck/pcheckQ.h"                        // pcheckQ
 #include "orionld/payloadCheck/pcheckGeoQ.h"                     // pcheckGeoQ
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -225,8 +224,6 @@ void treeNodeSet(TreeNode* treeNodeP, const char* name, const char* longName, in
 //
 TreeNode* pCheckQuery(KjNode* queryP)
 {
-  kjTreeLog(queryP, "Incoming BEFORE pCheckQuery");
-
   if (queryP->type != KjObject)
   {
     orionldError(OrionldBadRequestData, "Not a JSON Object", "POST Query Payload body", 400);
@@ -298,6 +295,5 @@ TreeNode* pCheckQuery(KjNode* queryP)
     return NULL;
   }
 
-  kjTreeLog(queryP, "Incoming AFTER pCheckQuery");
   return treeNodeV;
 }

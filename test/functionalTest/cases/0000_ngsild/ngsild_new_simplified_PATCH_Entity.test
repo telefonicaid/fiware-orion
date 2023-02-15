@@ -498,39 +498,29 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 10. Attempt to turn the Relationship R1 into a Property using "R1": { "value": "10" } - see error
 =================================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 164
+HTTP/1.1 400 Bad Request
+Content-Length: 182
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "R1",
-            "reason": "Attempt to transform a Relationship into a Property: https://uri.etsi.org/ngsi-ld/default-context/R1"
-        }
-    ],
-    "updated": []
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "Attempt to transform a Relationship into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
 11. Attempt to turn the Relationship R1 into a Property using "R1": "11" - see error
 ====================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 164
+HTTP/1.1 400 Bad Request
+Content-Length: 182
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "R1",
-            "reason": "Attempt to transform a Relationship into a Property: https://uri.etsi.org/ngsi-ld/default-context/R1"
-        }
-    ],
-    "updated": []
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "Attempt to transform a Relationship into a Property",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

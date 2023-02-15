@@ -33,7 +33,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                          // orionldState
 #include "orionld/common/orionldError.h"                          // orionldError
-#include "orionld/kjTree/kjTreeLog.h"                             // kjTreeLog
 #include "orionld/dbModel/dbModelFromApiAttribute.h"              // dbModelFromApiAttribute
 #include "orionld/dbModel/dbModelFromApiAttributeDatasetArray.h"  // Own interface
 
@@ -83,10 +82,6 @@ bool dbModelFromApiAttributeDatasetArray(KjNode* attrArrayP, KjNode* dbAttrsP, K
   while (attrP != NULL)
   {
     next = attrP->next;
-
-    kjTreeLog(attrP, "attr instance");
-    if (next != NULL)
-      kjTreeLog(next, "next attr instance");
 
     KjNode* datasetIdNodeP = kjLookup(attrP, "datasetId");
 

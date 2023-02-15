@@ -92,3 +92,47 @@ void orionldError2
 
   LM_E(("***** ERROR %s: %s | sc: %d | %s[%d]:%s", title, detail, status, fileName, lineNo, funcName));
 }
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldErrorNew -
+//
+void orionldErrorNew
+(
+  OrionldResponseErrorType  errorType,
+  const char*               title,
+  const char*               detail,
+  int                       status,
+  const char*               fileName,
+  int                       lineNo,
+  const char*               functionName
+)
+{
+  orionldState.pd.type    = errorType;
+  orionldState.pd.title   = (title  != NULL)? kaStrdup(&orionldState.kalloc, title)  : NULL;
+  orionldState.pd.detail  = (detail != NULL)? kaStrdup(&orionldState.kalloc, detail) : NULL;
+  orionldState.pd.status  = status;
+
+  orionldState.httpStatusCode = status;  // FIXME: To Remove - Use orionldState.pd.status instead?
+
+  //
+  // The fileName is really its PATH. That's too long and we need to find the last occurrence of '/'
+  // and start right after => only the file name
+  //
+  char* current      = (char*) fileName;
+  char* fileNameOnly = (char*) fileName;
+
+  while (*current != 0)
+  {
+    if (*current == '/')
+      fileNameOnly = &current[1];
+
+    ++current;
+  }
+
+  char msg[512];
+  snprintf(msg, sizeof(msg), "***** ERROR: %s: %s (status: %d)", title, detail, status);
+  lmOut(msg, 'E', fileNameOnly, lineNo, functionName, 0, NULL);
+}
