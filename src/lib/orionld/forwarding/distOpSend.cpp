@@ -317,6 +317,62 @@ size_t responseHeaderSave(char* buffer, size_t size, size_t nitems, void* userda
   return nitems;
 }
 
+void subAttrsCompact(KjNode* requestBody, OrionldContext* fwdContextP)
+{
+  for (KjNode* subAttrP = requestBody->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
+  {
+    LM(("subAttr '%s'", subAttrP->name));
+
+    if (strcmp(subAttrP->name, "type")        == 0)   continue;
+    if (strcmp(subAttrP->name, "value")       == 0)   continue;
+    if (strcmp(subAttrP->name, "object")      == 0)   continue;
+    if (strcmp(subAttrP->name, "languageMap") == 0)   continue;
+    if (strcmp(subAttrP->name, "datasetId")   == 0)   continue;
+
+    subAttrP->name = orionldContextItemAliasLookup(fwdContextP, subAttrP->name, NULL, NULL);
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// bodyCompact -
+//
+void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdContextP)
+{
+  LM(("In bodyCompact. Operation: %s", distOpTypes[operation]));
+
+  kjTreeLog(requestBody, "requestBody", 42);
+
+  if (operation == DoUpdateAttrs)
+  {
+    LM(("Calling subAttrsCompact"));
+    subAttrsCompact(requestBody, fwdContextP);
+    LM(("After subAttrsCompact"));
+  }
+  else if ((operation == DoCreateEntity) || (operation == DoMergeEntity))
+  {
+    for (KjNode* attrP = requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    {
+      if (strcmp(attrP->name, "id")       == 0)  continue;
+      if (strcmp(attrP->name, "scope")    == 0)  continue;
+      if (strcmp(attrP->name, "location") == 0)  continue;
+
+      if (strcmp(attrP->name, "type")  == 0)
+      {
+        attrP->value.s = orionldContextItemAliasLookup(fwdContextP, attrP->value.s, NULL, NULL);
+        continue;
+      }
+
+      LM(("Compacting '%s'", attrP->name));
+      attrP->name = orionldContextItemAliasLookup(fwdContextP, attrP->name, NULL, NULL);
+
+      subAttrsCompact(attrP, fwdContextP);
+    }
+  }
+}
+
 
 
 // -----------------------------------------------------------------------------
@@ -329,7 +385,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Figure out the @context to use for the forwarded request
   // 1. Default value is, of course, the Core Context
   // 2. Next up is the @context used in the original request, the one provoking the forwarded request
-  // 3. The registration might have its own @context (from "jsonldContext" in the cSourceInfo array
+  // 3. The registration might have its own @context (from "jsonldContext" in the cSourceInfo array)
   //
   // Actually, point 1 is not necessary as orionldState.contextP (@context used in the original request) will point to the Core Context
   // if no @context was used in the original request
@@ -369,6 +425,12 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     LM_E(("Internal Error: curl_easy_init failed"));
     return false;
   }
+
+  //
+  // The Content-Type of the distributed request is the same as the original request, unless "jsonldContext"
+  // is part of "contextSourceInfo" of the registration (in which case Content-Type is always JSON).
+  //
+  MimeType contentType = orionldState.in.contentType;
 
   //
   // URL
@@ -482,12 +544,20 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
       if (strcasecmp(keyP->value.s, "jsonldContext") == 0)
       {
         jsonldContext = valueP->value.s;
+        contentType = JSON;
         continue;
       }
 
       if (strcasecmp(keyP->value.s, "Accept") == 0)
+      {
         accept = valueP->value.s;
+        char  header[256];  // Assuming 256 is enough
+        snprintf(header, sizeof(header), "Accept: %s", valueP->value.s);
+        headers = curl_slist_append(headers, header);
+        continue;
+      }
 
+      // None of the above, adding the header
       char  header[256];  // Assuming 256 is enough
       snprintf(header, sizeof(header), "%s: %s", keyP->value.s, valueP->value.s);
       headers = curl_slist_append(headers, header);
@@ -503,19 +573,22 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     headers = curl_slist_append(headers, accept);
   }
 
-  // FIXME: This field "acceptJsonld" should be done at creation/patching time and not here!
+  // FIXME: This field "acceptJsonld" should be done at registration creation/patching time and not here!
   distOpP->regP->acceptJsonld = (accept != NULL) && (strcmp(accept, "application/ld+json") == 0);
 
   //
   // Link header must be added if "Content-Type" is "application/json" in original request
+  // OR: if jsonldContext is present in "contextSourceInfo"
   //
   if (orionldState.verb == GET)
-    orionldState.in.contentType = JSON;
+    contentType = JSON;
 
-  if (orionldState.in.contentType == JSON)
+  if (contentType == JSON)
   {
     // Link header to be added if present in Registration::contextSourceInfo OR if not Core Context
-    if ((jsonldContext == NULL) && (orionldState.contextP != orionldCoreContextP))
+    if (distOpP->regP->contextP != NULL)
+      jsonldContext = distOpP->regP->contextP->url;
+    else if ((jsonldContext == NULL) && (orionldState.contextP != orionldCoreContextP))
       jsonldContext = orionldState.contextP->url;
 
     if (jsonldContext != NULL)
@@ -566,22 +639,38 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   if (distOpP->requestBody != NULL)
   {
     //
+    // Here we know the @context and we can compact the payload body
+    //
+    bodyCompact(distOpP->operation, distOpP->requestBody, fwdContextP);
+
+    //
     // Content-Type (for now we maintain the original Content-Type in the forwarded request
     // First we remove it from the "headers" curl_slist, so that we can formulate it ourselves
     //
-    const char* contentType = (orionldState.in.contentType == JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
-    headers = curl_slist_append(headers, contentType);
+    const char* contentTypeString = (contentType == JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
+    headers = curl_slist_append(headers, contentTypeString);
 
-    if (orionldState.in.contentType == JSONLD)
+    if (contentType == JSONLD)
     {
+      //
       // Add the context to the body if not there already
+      // - It can't be there, can it?
+      // - If it is, it might not be the correct one!
+      //
+      // ALSO:
+      //   This doesn't work for arrays, only for objects!
+      //
       KjNode* contextP = kjLookup(distOpP->requestBody, "@context");
 
-      if (contextP == NULL)
-      {
+      if (contextP != NULL)
+        kjChildRemove(distOpP->requestBody, contextP);
+
+      if (distOpP->regP->contextP == NULL)
+        contextP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL_V1_0);
+      else
         contextP = kjString(orionldState.kjsonP, "@context", distOpP->regP->contextP->url);
-        kjChildAdd(distOpP->requestBody, contextP);
-      }
+
+      kjChildAdd(distOpP->requestBody, contextP);
     }
 
     approxContentLen = kjFastRenderSize(distOpP->requestBody);

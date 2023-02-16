@@ -55,7 +55,7 @@ extern "C"
 bool regCacheItemRemove(RegCache* rcP, const char* regId)
 {
   if (rcP == NULL)
-    return false;
+    LM_RE(false, ("NULL rcP - that's a SW bug!"));
 
   RegCacheItem* rciP = rcP->regList;
   RegCacheItem* prev = NULL;
@@ -68,7 +68,11 @@ bool regCacheItemRemove(RegCache* rcP, const char* regId)
     {
       // Remove rciP from rcP
       if (rciP == rcP->regList)  // First item is the item to remove - step over it
+      {
         rcP->regList = rciP->next;
+        if (rcP->regList == NULL)
+          rcP->last = NULL;
+      }
       else if (rciP->next == NULL)  // Last item is the item to remove
       {
         if (prev != NULL)

@@ -443,6 +443,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 {
     "notUpdated": [
+#SORT_START
         {
             "attributes": [
                 "P3"
@@ -488,6 +489,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "statusCode": 404,
             "title": "Attribute Not Found"
         }
+#SORT_END
     ],
     "updated": [
         "P1",

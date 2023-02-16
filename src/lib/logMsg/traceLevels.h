@@ -48,7 +48,6 @@ typedef enum TraceLevels
   LmtResponse,                         // HTTP Response
   LmtMqtt,                             // MQTT (notifications)
   LmtMongoc,                           // Entire mongoc library
-  LmtRegCache,                         // Registration Cache
   LmtEntityType     = 30,              // Entity Types
   LmtDistOpRequest,                    // ONLY the verb, path, and body of a distributed request
   LmtDistOpResponse,                   // ONLY the body and status code of the response to a distributed request
@@ -56,7 +55,9 @@ typedef enum TraceLevels
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
-  LmtSR,                               // Service Routine (whatever it is doing)
+  LmtSR = 40,                          // Service Routine (whatever it is doing)
+  LmtRegCreate,                        // Creation of registrations
+  LmtRegCache,                         // Registration Cache
 
   // Both,
   LmtRequest = 38,                     // Incoming requests
