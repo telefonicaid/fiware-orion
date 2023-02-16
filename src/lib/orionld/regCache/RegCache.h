@@ -73,14 +73,14 @@ typedef struct RegIdPattern
 typedef struct RegCacheItem
 {
   KjNode*               regTree;
-  char*                 regId;         // FIXME: Set when creating registration - points inside regTree, used for debugging only
+  char*                 regId;         // Set when creating registration - points inside regTree (used for debugging only)
   RegDeltas             deltas;
 
   // "Shortcuts" and transformed info, all copies from the regTree - for improved performance
   RegistrationMode      mode;
   uint64_t              opMask;
-  OrionldContext*       contextP;      // FIXME: Set when creating/patching registration
-  bool                  acceptJsonld;  // Accept is set to application/ld+json
+  OrionldContext*       contextP;      // Set when creating/patching registration
+  bool                  acceptJsonld;  // application/ld+json
   char*                 ipAndPort;     // IP:port - for X-Forwarded-For
   RegIdPattern*         idPatternRegexList;
   struct RegCacheItem*  next;

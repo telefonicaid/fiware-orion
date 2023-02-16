@@ -98,7 +98,7 @@ bool pCheckKeyValueArray(KjNode* csiP, OrionldContext** fwdContextPP)
     }
 
     // Special keys
-    if (strcmp(keyP->value.s, "jsonldContext") == 0)
+    if (strcasecmp(keyP->value.s, "jsonldContext") == 0)
     {
       // If an @context is given for the registration, make sure it's valid
       if (regCacheItemContextCheck(NULL, valueP->value.s, fwdContextPP) == false)
@@ -107,22 +107,27 @@ bool pCheckKeyValueArray(KjNode* csiP, OrionldContext** fwdContextPP)
         return 0;
       }
     }
-    else if (strcmp(keyP->value.s, "NGSILD-Tenant") == 0)
+    else if (strcasecmp(keyP->value.s, "Date") == 0)
     {
       orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
       return false;
     }
-    else if (strcmp(keyP->value.s, "Date") == 0)
+    else if (strcasecmp(keyP->value.s, "Content-Length") == 0)
     {
       orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
       return false;
     }
-    else if (strcmp(keyP->value.s, "Content-Length") == 0)
+    else if (strcasecmp(keyP->value.s, "User-Agent") == 0)
     {
       orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
       return false;
     }
-    else if (strcmp(keyP->value.s, "User-Agent") == 0)
+    else if (strcasecmp(keyP->value.s, "NGSILD-Tenant") == 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
+      return false;
+    }
+    else if (strcasecmp(keyP->value.s, "Content-Type") == 0)
     {
       orionldError(OrionldBadRequestData, "Invalid key in Registration::contextSourceInfo", keyP->value.s, 400);
       return false;

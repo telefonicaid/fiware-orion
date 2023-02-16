@@ -260,7 +260,7 @@ bool orionldPatchEntity(void)
   // Distributed Operations
   //
   KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
-  if (orionldState.distributed)
+  if (orionldState.distributed == true)
   {
     distOpList = distOpRequests(entityId, entityType, DoUpdateEntity, orionldState.requestTree);
     kjTreeLog(orionldState.requestTree, "Left for local", LmtDistOpMsgs);

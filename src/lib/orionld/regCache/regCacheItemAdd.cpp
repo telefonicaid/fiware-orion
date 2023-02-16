@@ -190,7 +190,7 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode*
   rciP->mode    = (modeP != NULL)? registrationMode(modeP->value.s) : RegModeInclusive;
 
   if (regCacheIdPatternRegexCompile(rciP, informationP) == false)
-    LM_X(1, ("Internal Error (if this happens it's a bug of Orion-LD - the idPattern was checked in pcheckEntityInfo and all OK"));
+    LM_X(1, ("Internal Error (if this happens it's a SW bug of Orion-LD - the idPattern was checked in pcheckEntityInfo and all was OK"));
 
   return rciP;
 }

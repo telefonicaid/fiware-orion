@@ -114,7 +114,10 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, K
   DistOp* redirectList  = NULL;
   DistOp* inclusiveList = NULL;
 
+  // FIXME: Change regMatch for Exclusive so that it doesn't look at the operation
   exclusiveList = regMatchForEntityCreation(RegModeExclusive, operation, entityId, entityType, payloadBody);
+  // FIXME: Check the matching Exclusive DistOps for operation, and error out (409) if the operation isn't supported
+
   redirectList  = regMatchForEntityCreation(RegModeRedirect,  operation, entityId, entityType, payloadBody);
 
   if (redirectList != NULL)

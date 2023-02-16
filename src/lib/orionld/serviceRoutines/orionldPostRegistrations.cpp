@@ -160,7 +160,6 @@ bool orionldPostRegistrations(void)
 
   if (regIdP == NULL)
   {
-    LM(("REG: No id present, inventing one"));
     // Invent a registration id
     strncpy(registrationIdV, "urn:ngsi-ld:ContextSourceRegistration:", sizeof(registrationIdV) - 1);
     uuidGenerate(&registrationIdV[38], sizeof(registrationIdV) - 38, false);
@@ -175,14 +174,18 @@ bool orionldPostRegistrations(void)
   }
 
   OrionldContext* fwdContextP = NULL;
-  bool b = pcheckRegistration(regP, false, true, &propertyTree, &fwdContextP);
+  bool            b           = pcheckRegistration(regP, false, true, &propertyTree, &fwdContextP);
   if (b == false)
     LM_RE(false, ("pCheckRegistration FAILED"));
 
   // Make sure it doesn't exist already
   bool found;
+
   if (mongocRegistrationExists(registrationId, &found) == false)
+  {
+    LM_E(("mongocRegistrationExists FAILED"));
     return false;
+  }
 
   if (found == true)
   {
@@ -216,6 +219,7 @@ bool orionldPostRegistrations(void)
   kjChildAdd(orionldState.requestTree, propertyTree);
 
   apiModelToCacheRegistration(orionldState.requestTree);
+
   regCacheItemAdd(orionldState.tenantP->regCache, registrationId, orionldState.requestTree, false, fwdContextP);  // Clones the registration
 
   // This is where "id" is changed to "_id"

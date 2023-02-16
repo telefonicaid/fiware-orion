@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription Creatio Errors test - incompatibility between format and accept fields
+Subscription Creation Errors test - incompatibility between format and accept fields
 
 --SHELL-INIT--
 export BROKER=orionld
