@@ -151,8 +151,10 @@
 /* ****************************************************************************
 *
 * MAX_HTTP_TIMEOUT - 1800000 milliseconds, 30 minutes
+* MAX_MQTT_TIMEOUT - 1800000 milliseconds, 30 minutes
 */
 #define MAX_HTTP_TIMEOUT     1800000
+#define MAX_MQTT_TIMEOUT     1800000
 
 
 /* ****************************************************************************

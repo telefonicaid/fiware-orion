@@ -58,12 +58,13 @@ class MqttConnectionManager
 {
  private:
   std::map<std::string, MqttConnection*>  connections;
+  long                                    timeout;
   sem_t                                   sem;
 
  public:
   MqttConnectionManager();
 
-  int  init(void);
+  int  init(long _timeout);
   void teardown(void);
 
   const char*  semGet(void);

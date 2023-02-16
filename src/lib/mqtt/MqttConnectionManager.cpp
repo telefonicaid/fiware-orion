@@ -105,10 +105,19 @@ MqttConnectionManager::MqttConnectionManager(void)
 *
 * MqttConnectionManager::init -
 */
-int MqttConnectionManager::init(void)
+int MqttConnectionManager::init(long _timeout)
 {
   LM_T(LmtMqttNotif, ("Initializing MQTT library"));
   mosquitto_lib_init();
+
+  if (_timeout != -1)
+  {
+    timeout = _timeout;
+  }
+  else
+  {
+    timeout = DEFAULT_TIMEOUT;
+  }
 
   return semInit();
 }
@@ -282,7 +291,7 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
      mosquitto_loop_start(cP->mosq);
 
      // We block until the connect callback release the connection semaphore
-     ts.tv_sec += 5;  // FIXME: unhardwire this to -mqttTimeout CLI
+     ts.tv_sec += timeout/1000;  // timeout is in miliseconds but tv_sec is in seconds
      cP->connectionCallbackCalled = false;
      sem_timedwait(&cP->connectionSem, &ts);
      if (!cP->connectionCallbackCalled)

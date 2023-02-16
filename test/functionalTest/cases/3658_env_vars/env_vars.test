@@ -102,7 +102,8 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-key' <private server key file (for https)>]                               ORION_HTTPS_KEYFILE                '' /''/
                                [option '-cert' <certificate key file (for https)>]                                 ORION_HTTPS_CERTFILE               '' /''/
                                [option '-multiservice' (service multi tenancy mode)]                               ORION_MULTI_SERVICE                FALSE /FALSE/
-                               [option '-httpTimeout' <timeout in milliseconds for forwards and notifications>]    ORION_HTTP_TIMEOUT                 -1 <= -1 /-1/ <= 1800000
+                               [option '-httpTimeout' <timeout in milliseconds for HTTP forwards and notificati]   ORION_HTTP_TIMEOUT                 -1 <= -1 /-1/ <= 1800000
+                               [option '-mqttTimeout' <timeout in milliseconds for MQTT broker connection in no]   ORION_MQTT_TIMEOUT                 -1 <= -1 /-1/ <= 1800000
                                [option '-reqTimeout' <connection timeout for REST requests (in seconds)>]          ORION_REQ_TIMEOUT                  0 /0/ >= 0
                                [option '-reqMutexPolicy' <mutex policy (none/read/write/all)>]                     ORION_MUTEX_POLICY                 'all' /'all'/
                                [option '-writeConcern' <db write concern (0:unacknowledged, 1:acknowledged)>]      ORION_MONGO_WRITE_CONCERN          0 <= 1 /1/ <= 1
