@@ -68,6 +68,9 @@ void mqttOnConnectCallback(struct mosquitto* mosq, void *userdata, int rc)
   // To be used in getConnetion()
   cP->conectionResult = rc;
 
+  // Signal that callback has been called
+  cP->connectionCallbackCalled = true;
+
   // This allows the code waiting in getConnection() to continue
   sem_post(&cP->connectionSem);
 }
@@ -248,6 +251,16 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
        }
      }
 
+     // We need this for connection timeout
+     struct timespec  ts;
+     if (clock_gettime(CLOCK_REALTIME, &ts) != 0)
+     {
+       LM_E(("Runtime Error (clock_gettime: %s)", strerror(errno)));
+       mosquitto_destroy(cP->mosq);
+       cP->mosq = NULL;
+       return cP;
+     }
+
      mosquitto_connect_callback_set(cP->mosq, mqttOnConnectCallback);
      mosquitto_publish_callback_set(cP->mosq, mqttOnPublishCallback);
 
@@ -269,7 +282,22 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
      mosquitto_loop_start(cP->mosq);
 
      // We block until the connect callback release the connection semaphore
-     sem_wait(&cP->connectionSem);
+     ts.tv_sec += 5;  // FIXME: unhardwire this to -mqttTimeout CLI
+     cP->connectionCallbackCalled = false;
+     sem_timedwait(&cP->connectionSem, &ts);
+     if (!cP->connectionCallbackCalled)
+     {
+       alarmMgr.mqttConnectionError(endpoint, "connection timeout");
+
+       // Not sure if this is actually needed (as the connection was never done in this case)
+       // but let's use them just in case
+       mosquitto_disconnect(cP->mosq);
+       mosquitto_loop_stop(cP->mosq, false);
+       mosquitto_destroy(cP->mosq);
+
+       cP->mosq = NULL;
+       return cP;
+     }
 
      // Check if the connection went ok (if not, e.g wrong user/pass, alarm is raised)
      if (cP->conectionResult)

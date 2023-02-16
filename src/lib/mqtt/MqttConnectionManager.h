@@ -45,6 +45,7 @@ typedef struct MqttConnection
   double             lastTime;
   sem_t              connectionSem;
   int                conectionResult;
+  bool               connectionCallbackCalled;
 } MqttConnection;
 
 
