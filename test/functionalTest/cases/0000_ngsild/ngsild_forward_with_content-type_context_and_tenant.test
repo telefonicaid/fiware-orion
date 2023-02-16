@@ -312,10 +312,10 @@ Date: REGEX(.*)
 
 08. Dump and reset the accumulator. See Content-Type: application/json and no @context (Core Context is used) AND the NGSILD-Tenant header
 ==========================================================================================================================================
-PATCH http://xps/ngsi-ld/v1/entities/urn:E1
+PATCH http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1
 Content-Length: 36
-User-Agent: orionld/post-v1.1.0
-Host: xps
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: do_t1
 Content-Type: application/json
@@ -340,10 +340,10 @@ Date: REGEX(.*)
 
 10. Dump and reset the accumulator. See Content-Type: application/ld+json and a @context field in the payload body (Core Context)
 =================================================================================================================================
-PATCH http://xps/ngsi-ld/v1/entities/urn:E1
+PATCH http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1
 Content-Length: 109
-User-Agent: orionld/post-v1.1.0
-Host: xps
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: do_t1
 Content-Type: application/ld+json
@@ -388,7 +388,7 @@ Date: REGEX(.*)
 PATCH http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1
 Content-Length: 37
 User-Agent: orionld/REGEX(.*)
-Host: xps
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
