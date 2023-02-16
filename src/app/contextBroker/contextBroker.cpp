@@ -99,7 +99,6 @@
 #include "ngsiNotify/QueueNotifier.h"
 #include "ngsiNotify/QueueWorkers.h"
 #include "ngsiNotify/senderThread.h"
-#include "ngsiNotify/doNotify.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
