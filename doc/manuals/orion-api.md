@@ -2334,10 +2334,10 @@ Some considerations to take into account when using custom notifications:
   [CLI parameter](admin/cli.md). In this case:
   * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
   * No `${...}` macro substitution is performed.
-
-Note that if a custom payload is used for the notification (the field `payload`, `json` or `ngsi`
-is given in the corresponding subscription), then a value of `custom`
-is used for the `Ngsiv2-AttrsFormat` header in the notification.
+* If text based or JSON payloads are used (i.e. field `payload` or `json` is used) then
+  `Ngsiv2-AttrsFormat` header is set to `custom`. However, note that if NGSI patching is used
+  (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
+  notification (given that the notification format is actually the same).
 
 ## Oneshot Subscriptions
 
