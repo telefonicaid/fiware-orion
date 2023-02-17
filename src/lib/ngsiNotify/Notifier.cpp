@@ -389,7 +389,7 @@ static SenderThreadParams* buildSenderParamsCustom
       // Warning already logged in macroSubstitute()
       return NULL;
     }
-    renderFormat = NGSI_V2_CUSTOM;
+    renderFormat = NGSI_V2_NORMALIZED;
     mimeType = "application/json";
   }
 
