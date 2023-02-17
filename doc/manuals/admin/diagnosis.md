@@ -9,7 +9,7 @@
     * [Diagnose memory exhaustion problem](#diagnose-memory-exhaustion-problem)
     * [Diagnose spontaneous binary corruption problem](#diagnose-spontaneous-binary-corruption-problem)
 * [I/O Flows](#io-flows)
-    * [Diagnose notification reception problems](#diagnose-notification-reception-problems)
+    * [Diagnose HTTP notification reception problems](#diagnose-notification-reception-problems)
     * [Diagnose database connection problems](#diagnose-database-connection-problems)
 
 The Diagnosis Procedures are the first steps that a System Administrator
@@ -231,7 +231,7 @@ consumers/producers.
 
 ![](Orion-ioflows.png "Orion-ioflows.png")
 
-### Diagnose notification reception problems
+### Diagnose HTTP notification reception problems
 
 In order to diagnose possible notification problems (i.e. you expect notifications
 arriving to a given endpoint but it is not working) have a look to the information
