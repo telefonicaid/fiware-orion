@@ -1,3 +1,9 @@
+3.8.1 (February 17th, 2023)
+
+- Add: -mqttTimeout (env var ORION_MQTT_TIMEOUT) for MQTT broker connection timeout
+- Fix: queue workers deadlock when MQTT broker was not responding to connection attemp
+- Fix: Ngsiv2-AttrsFormat header set to "normalized" in NGSI patching custom notification
+
 3.8.0 (January 12th, 2023)
 
 - Add: json field in httpCustom and mqttCustom subscriptions to implement JSON-based payloads in notifications (#2560)
