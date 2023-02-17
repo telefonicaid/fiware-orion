@@ -115,10 +115,13 @@ The list of available options is the following:
 -   **-pidpath <pid_file>**. Specifies the file to store the PID of the
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
-    for forwarding messages and for notifications. Default timeout (if this parameter is not specified)
+    for HTTP forwarding messages and for notifications. Default timeout (if this parameter is not specified)
     is 5000 (5 seconds). Max value is 1800000 (30 minutes). This parameter can be defined individually for subscriptions. If defined on the subscription's
     JSON, the default parameter would be ignored. See section in the 
     [`subscription.notification.http`](../orion-api.md#subscriptionnotificationhttp).
+-   **-mqttTimeout <interval>**. Specifies the timeout in milliseconds
+    for connection to MQTT brokers in MQTT notifications. Default timeout (if this parameter is not specified)
+    is 5000 (5 seconds). Max value is 1800000 (30 minutes).
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
@@ -221,6 +224,7 @@ Two facts have to be taken into account:
 |	ORION_HTTPS_CERTFILE	|	cert	|
 |	ORION_MULTI_SERVICE	|	multiservice	|
 |	ORION_HTTP_TIMEOUT	|	httpTimeout	|
+|	ORION_MQTT_TIMEOUT	|	mqttTimeout	|
 |	ORION_REQ_TIMEOUT	|	reqTimeout	|
 |	ORION_MUTEX_POLICY	|	reqMutexPolicy	|
 |	ORION_MONGO_WRITE_CONCERN	|	writeConcern	|
