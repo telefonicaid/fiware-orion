@@ -2329,6 +2329,10 @@ the value of the "temperature" attribute (of type Number) is 23.4
 通知にカスタム・ペイロードが使用されている場合 (フィールド `payload` は対応するサブスクリプションにあります)、通知の
 `Ngsiv2-AttrsFormat` ヘッダに `custom` の値が使用されます。
 
+-   テキスト・ベースまたは JSON ペイロードが使用される場合 (つまり、 `payload` または `json` フィールドが使用される場合)、
+    `Ngsiv2-AttrsFormat` ヘッダは `custom` に設定されます。ただし、NGSI patch が使用される場合 (つまり、`ngsi` フィールド)、
+    通常の通知と同様に、`Ngsiv2-AttrsFormat: normalized` が使用されることに注意してください (通知形式が実際には同じである場合)
+
 <a name="oneshot-subscriptions"></a>
 
 ## Oneshot サブスクリプション (Oneshot Subscriptions)
