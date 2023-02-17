@@ -544,7 +544,7 @@ Host: REGEX(.*)
 Accept: application/ld+json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
-X-Forwarded-For: xps:9999
+X-Forwarded-For: REGEX(.*)
 =======================================
 
 

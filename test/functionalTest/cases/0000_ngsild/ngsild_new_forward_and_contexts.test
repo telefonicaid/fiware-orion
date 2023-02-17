@@ -163,9 +163,9 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
 
 04. See the registration in mongo
 =================================
-MongoDB shell version v4.4.18
-connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.18
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:R1",
 	"createdAt" : REGEX(.*),
