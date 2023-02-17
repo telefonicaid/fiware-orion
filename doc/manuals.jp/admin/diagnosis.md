@@ -9,7 +9,7 @@
     * [メモリ枯渇問題を診断](#diagnose-memory-exhaustion-problem)
     * [自発的なバイナリの破損の問題を診断](#diagnose-spontaneous-binary-corruption-problem)
 * [I/O フロー](#io-flows)
-    * [通知受信の問題を診断](#diagnose-notification-reception-problems)
+    * [HTTP 通知受信の問題を診断](#diagnose-http-notification-reception-problems)
     * [データベース接続の問題を診断](#diagnose-database-connection-problems)
 
 診断手順は、システム管理者が Orion のエラーの原因を特定するための最初の手順です。これらのテストでエラーの元が特定されると、システム管理者は、正確な障害箇所と可能な解決策を特定するために、より具体的で具体的なテストに頼らなければならないことがよくあります。このような特定のテストは、このセクションの範囲外です。
@@ -163,8 +163,8 @@ Orion Context Broker は、次のフローを使用します :
 
 ![](../../manuals/admin/Orion-ioflows.png "Orion-ioflows.png")
 
-<a name="diagnose-notification-reception-problems"></a>
-### 通知受信の問題を診断
+<a name="diagnose-http-notification-reception-problems"></a>
+### HTTP 通知受信の問題を診断
 
 起こりうる通知の問題を診断するには (つまり、通知が特定のエンドポイントに
 届いていても機能していないと予想します)、`GET /v2/subscriptions/<subId>`
