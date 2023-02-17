@@ -36,20 +36,26 @@ accumulatorStart --pretty-print --url /ngsi-ld/v1/entities/urn:E1
 # 02. Create a matching registration for the accumulator, with all default values for Content-Type + @context
 # 03. PATCH /entities/urn:E1 to provoke a distributed request
 # 04. Dump and reset the accumulator. See Content-Type: application/json and no @context (Core Context is used)
-# 05. DELETE the registration
+# 05. GET urn:E1 - provoke distributed request to accumulator
+# 06. Dump and reset the accumulator. See no link header in the GET request, as only the Core context is used
+# 07. DELETE the registration
 #
-# 06. Create a registration with a tenant and the rest default values
-# 07. PATCH /entities/urn:E1 to provoke a distributed request
-# 08. Dump and reset the accumulator. See Content-Type: application/json and no @context (Core Context is used) AND the NGSILD-Tenant header
+# 08. Create a registration with a tenant and the rest default values
+# 09. PATCH /entities/urn:E1 to provoke a distributed request
+# 10. Dump and reset the accumulator. See Content-Type: application/json and no @context (Core Context is used) AND the NGSILD-Tenant header
+# 11. GET urn:E1 - provoke distributed request to accumulator
+# 12. Dump and reset the accumulator. See no link header in the GET request, but the NGSILD-Tenant header is present
 #
-# 09. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request
-# 10. Dump and reset the accumulator. See Content-Type: application/ld+json and a @context field in the payload body (Core Context)
-# 11. DELETE the registration
-#
-# 12. Create a registration with a 'jsonldContext': 'xxx' in contextSourceInfo
 # 13. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request
-# 14. Dump and reset the accumulator. See Content-Type: application/json and The HTTP Header 'Link: xxx'
+# 14. Dump and reset the accumulator. See Content-Type: application/ld+json and a @context field in the payload body (Core Context)
 # 15. DELETE the registration
+#
+# 16. Create a registration with a 'jsonldContext': 'xxx' in contextSourceInfo, and an 'accept': 'application/ld+json'
+# 17. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request
+# 18. Dump and reset the accumulator. See Content-Type: application/json and The HTTP Header 'Link: xxx' and 'Accept: application/ld+json'
+# 19. GET urn:E1 - provoke distributed request to accumulator witk Link: xxx
+# 20. Dump and reset the accumulator. See HTTP Header 'Link: xxx' and 'Accept: application/ld+json'
+# 21. DELETE the registration
 #
 echo "01. Create an entity urn:E1 with an attribute P1"
 echo "================================================"
@@ -106,14 +112,29 @@ echo
 echo
 
 
-echo "05. DELETE the registration"
+echo "05. GET urn:E1 - provoke distributed request to accumulator"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "06. Dump and reset the accumulator. See no link header in the GET request, as only the Core context is used"
+echo "==========================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. DELETE the registration"
 echo "==========================="
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R1 -X DELETE
 echo
 echo
 
 
-echo "06. Create a registration with a tenant and the rest default values"
+echo "08. Create a registration with a tenant and the rest default values"
 echo "==================================================================="
 payload='{
   "id": "urn:ngsi-ld:registration:R2",
@@ -139,7 +160,7 @@ echo
 echo
 
 
-echo "07. PATCH /entities/urn:E1 to provoke a distributed request"
+echo "09. PATCH /entities/urn:E1 to provoke a distributed request"
 echo "==========================================================="
 payload='{
   "P1": 7
@@ -149,7 +170,7 @@ echo
 echo
 
 
-echo "08. Dump and reset the accumulator. See Content-Type: application/json and no @context (Core Context is used) AND the NGSILD-Tenant header"
+echo "10. Dump and reset the accumulator. See Content-Type: application/json and no @context (Core Context is used) AND the NGSILD-Tenant header"
 echo "=========================================================================================================================================="
 accumulatorDump
 accumulatorReset
@@ -157,7 +178,22 @@ echo
 echo
 
 
-echo "09. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request"
+echo "11. GET urn:E1 - provoke distributed request to accumulator"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "12. Dump and reset the accumulator. See no link header in the GET request, but the NGSILD-Tenant header is present"
+echo "=================================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "13. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request"
 echo "===================================================================================="
 payload='{
   "P1": 9,
@@ -168,7 +204,7 @@ echo
 echo
 
 
-echo "10. Dump and reset the accumulator. See Content-Type: application/ld+json and a @context field in the payload body (Core Context)"
+echo "14. Dump and reset the accumulator. See Content-Type: application/ld+json and a @context field in the payload body (Core Context)"
 echo "================================================================================================================================="
 accumulatorDump
 accumulatorReset
@@ -177,14 +213,14 @@ echo
 
 
 
-echo "11. DELETE the registration"
+echo "15. DELETE the registration"
 echo "==========================="
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R2 -X DELETE
 echo
 echo
 
 
-echo "12. Create a registration with a 'jsonldContext': 'xxx' in contextSourceInfo"
+echo "16. Create a registration with a 'jsonldContext': 'xxx' in contextSourceInfo"
 echo "============================================================================"
 payload='{
   "id": "urn:ngsi-ld:registration:R3",
@@ -204,6 +240,10 @@ payload='{
     {
       "key": "jsonldContext",
       "value": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+    },
+    {
+      "key": "accept",
+      "value": "application/ld+json"
     }
   ],
   "mode": "inclusive",
@@ -215,7 +255,7 @@ echo
 echo
 
 
-echo "13. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request"
+echo "17. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request"
 echo "===================================================================================="
 payload='{
   "P1": 13,
@@ -226,7 +266,7 @@ echo
 echo
 
 
-echo "14. Dump and reset the accumulator. See Content-Type: application/json and The HTTP Header 'Link: xxx'"
+echo "18. Dump and reset the accumulator. See Content-Type: application/json and The HTTP Header 'Link: xxx'"
 echo "======================================================================================================"
 accumulatorDump
 accumulatorReset
@@ -234,7 +274,22 @@ echo
 echo
 
 
-echo "15. DELETE the registration"
+echo "19. GET urn:E1 - provoke distributed request to accumulator witk Link: xxx"
+echo "=========================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "20. Dump and reset the accumulator. See HTTP Header 'Link: xxx'"
+echo "==============================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "21. DELETE the registration"
 echo "==========================="
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R3 -X DELETE
 echo
@@ -287,14 +342,43 @@ X-Forwarded-For: REGEX(.*)
 =======================================
 
 
-05. DELETE the registration
+05. GET urn:E1 - provoke distributed request to accumulator
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 61
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 3
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+06. Dump and reset the accumulator. See no link header in the GET request, as only the Core context is used
+===========================================================================================================
+GET http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1?attrs=P1&options=sysAttrs&type=T
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Date: REGEX(.*)
+X-Forwarded-For: REGEX(.*)
+=======================================
+
+
+07. DELETE the registration
 ===========================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-06. Create a registration with a tenant and the rest default values
+08. Create a registration with a tenant and the rest default values
 ===================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -303,14 +387,14 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R2
 
 
 
-07. PATCH /entities/urn:E1 to provoke a distributed request
+09. PATCH /entities/urn:E1 to provoke a distributed request
 ===========================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-08. Dump and reset the accumulator. See Content-Type: application/json and no @context (Core Context is used) AND the NGSILD-Tenant header
+10. Dump and reset the accumulator. See Content-Type: application/json and no @context (Core Context is used) AND the NGSILD-Tenant header
 ==========================================================================================================================================
 PATCH http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1
 Content-Length: 36
@@ -331,14 +415,44 @@ X-Forwarded-For: REGEX(.*)
 =======================================
 
 
-09. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request
+11. GET urn:E1 - provoke distributed request to accumulator
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 61
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 7
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+12. Dump and reset the accumulator. See no link header in the GET request, but the NGSILD-Tenant header is present
+==================================================================================================================
+GET http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1?attrs=P1&options=sysAttrs&type=T
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Ngsild-Tenant: do_t1
+Date: REGEX(.*)
+X-Forwarded-For: REGEX(.*)
+=======================================
+
+
+13. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request
 ====================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-10. Dump and reset the accumulator. See Content-Type: application/ld+json and a @context field in the payload body (Core Context)
+14. Dump and reset the accumulator. See Content-Type: application/ld+json and a @context field in the payload body (Core Context)
 =================================================================================================================================
 PATCH http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1
 Content-Length: 109
@@ -360,14 +474,14 @@ X-Forwarded-For: REGEX(.*)
 =======================================
 
 
-11. DELETE the registration
+15. DELETE the registration
 ===========================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-12. Create a registration with a 'jsonldContext': 'xxx' in contextSourceInfo
+16. Create a registration with a 'jsonldContext': 'xxx' in contextSourceInfo
 ============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -376,20 +490,20 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R3
 
 
 
-13. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request
+17. PATCH /entities/urn:E1 with application/ld+json to provoke a distributed request
 ====================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-14. Dump and reset the accumulator. See Content-Type: application/json and The HTTP Header 'Link: xxx'
+18. Dump and reset the accumulator. See Content-Type: application/json and The HTTP Header 'Link: xxx'
 ======================================================================================================
 PATCH http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1
 Content-Length: 37
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
-Accept: application/json
+Accept: application/ld+json
 Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
@@ -404,7 +518,37 @@ X-Forwarded-For: REGEX(.*)
 =======================================
 
 
-15. DELETE the registration
+19. GET urn:E1 - provoke distributed request to accumulator witk Link: xxx
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 62
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 13
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+20. Dump and reset the accumulator. See HTTP Header 'Link: xxx'
+===============================================================
+GET http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1?attrs=P1&options=sysAttrs&type=T
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/ld+json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Date: REGEX(.*)
+X-Forwarded-For: REGEX(.*)
+=======================================
+
+
+21. DELETE the registration
 ===========================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
