@@ -456,7 +456,10 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     // If we know the Entity Type, we pass that piece of information as well
     //
     if (distOpP->entityType != NULL)
-      uriParamAdd(&urlParts, "type", distOpP->entityType, -1);
+    {
+      char* typeAlias = orionldContextItemAliasLookup(fwdContextP, distOpP->entityType, NULL, NULL);
+      uriParamAdd(&urlParts, "type", typeAlias, -1);
+    }
   }
 
   if (orionldState.uriParams.lang != NULL)

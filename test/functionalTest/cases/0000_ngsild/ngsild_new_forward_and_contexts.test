@@ -1,0 +1,310 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarding of POST Entities ans the @context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+brokerStart CB  20-35 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Push a context urn:C1 to the context server
+# 02. Push a context urn:C2 to the context server
+# 03. Create an exclusive registration R1 in CB for CP1, using context urn:C1, for P1 and P2
+# 04. See the registration in mongo
+# 05. Create entity urn:E1 on CB triggering a forward to CP1
+# 06. GET urn:E1 locally from CB - see P3,R1-R3
+# 07. GET urn:E1 locally from CP1 without @context - see P1,P2, with longnames
+# 08. GET urn:E1 without any @context, see longnames for P1 and P2 (from CP1) and shortnames for P1,R1-R3
+#
+
+echo "01. Push a context urn:C1 to the context server"
+echo "==============================================="
+payload='{
+  "@context": {
+    "P1": "urn:P1",
+    "P2": "urn:P2",
+    "P3": "urn:P3",
+    "P4": "urn:P4"
+  }
+}'
+cServerCurl --url /jsonldContexts/urn:C1 --payload "$payload" --verb POST > /dev/null  2>&1
+echo
+echo
+
+
+echo "02. Push a context urn:C1 to the context server"
+echo "==============================================="
+payload='{
+  "@context": {
+    "R1": "urn:R1",
+    "R2": "urn:R2",
+    "R3": "urn:R3",
+    "R4": "urn:R4"
+  }
+}'
+cServerCurl --url /jsonldContexts/urn:C2 --payload "$payload" --verb POST > /dev/null  2>&1
+echo
+echo
+
+
+echo "03. Create an exclusive registration R1 in CB for CP1, using context urn:C1, for P1 and P2"
+echo "=========================================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "properties": [ "P1", "P2" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "exclusive",
+  "operations": [ "createEntity", "retrieveEntity" ],
+  "@context": "http://localhost:7080/jsonldContexts/urn:C1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "04. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "05. Create entity urn:E1 on CB (with already expanded P1,P2) triggering a forward to CP1"
+echo "========================================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "urn:P1": 1,
+  "urn:P2": 2,
+  "P3": 3,
+  "R1": "urn:E1",
+  "R2": "urn:E2",
+  "R3": "urn:E3"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. GET urn:E1 locally from CB - see P3,R1-R3"
+echo "============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?local=true
+echo
+echo
+
+
+echo "07. GET urn:E1 locally from CP1 without @context - see P1,P2, with longnames"
+echo "============================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?local=true --port $CP1_PORT
+echo
+echo
+
+
+echo "08. GET urn:E1 without any @context, see longnames for P1 and P2 (from CP1) and shortnames for P1,R1-R3"
+echo "======================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Push a context urn:C1 to the context server
+===============================================
+
+
+02. Push a context urn:C1 to the context server
+===============================================
+
+
+03. Create an exclusive registration R1 in CB for CP1, using context urn:C1, for P1 and P2
+==========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+04. See the registration in mongo
+=================================
+MongoDB shell version v4.4.18
+connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
+MongoDB server version: 4.4.18
+{
+	"_id" : "urn:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"id" : "urn:E1",
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/T"
+				}
+			],
+			"attrs" : [
+				{
+					"name" : "urn:P1",
+					"type" : "Property"
+				},
+				{
+					"name" : "urn:P2",
+					"type" : "Property"
+				}
+			],
+			"providingApplication" : "http://localhost:9801"
+		}
+	],
+	"mode" : "exclusive",
+	"operations" : [
+		"createEntity",
+		"retrieveEntity"
+	],
+	"properties" : {
+		
+	},
+	"status" : "active"
+}
+bye
+
+
+05. Create entity urn:E1 on CB (with already expanded P1,P2) triggering a forward to CP1
+========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. GET urn:E1 locally from CB - see P3,R1-R3
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 187
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P3": {
+        "type": "Property",
+        "value": 3
+    },
+    "R1": {
+        "type": "Property",
+        "value": "urn:E1"
+    },
+    "R2": {
+        "type": "Property",
+        "value": "urn:E2"
+    },
+    "R3": {
+        "type": "Property",
+        "value": "urn:E3"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+07. GET urn:E1 locally from CP1 without @context - see P1,P2, with longnames
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "id": "urn:E1",
+    "type": "T",
+    "urn:P1": {
+        "type": "Property",
+        "value": 1
+    },
+    "urn:P2": {
+        "type": "Property",
+        "value": 2
+    }
+}
+
+
+08. GET urn:E1 without any @context, see longnames for P1 and P2 (from CP1) and shortnames for P1,R1-R3
+=======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 265
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P3": {
+        "type": "Property",
+        "value": 3
+    },
+    "R1": {
+        "type": "Property",
+        "value": "urn:E1"
+    },
+    "R2": {
+        "type": "Property",
+        "value": "urn:E2"
+    },
+    "R3": {
+        "type": "Property",
+        "value": "urn:E3"
+    },
+    "id": "urn:E1",
+    "type": "T",
+    "urn:P1": {
+        "type": "Property",
+        "value": 1
+    },
+    "urn:P2": {
+        "type": "Property",
+        "value": 2
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1
