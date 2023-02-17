@@ -160,6 +160,7 @@ char            allowedOrigin[64];
 int             maxAge;
 long            dbTimeout;
 long            httpTimeout;
+long            mqttTimeout;
 int             dbPoolSize;
 char            reqMutexPolicy[16];
 int             writeConcern;
@@ -237,7 +238,8 @@ int             mqttMaxAge;
 #define MULTISERVICE_DESC      "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
-#define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
+#define HTTP_TMO_DESC          "timeout in milliseconds for HTTP forwards and notifications"
+#define MQTT_TMO_DESC          "timeout in milliseconds for MQTT broker connection in notifications"
 #define DBPS_DESC              "database connection pool size"
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
@@ -313,6 +315,7 @@ PaArgument paArgs[] =
   { "-multiservice",                &mtenant,               "MULTI_SERVICE",            PaBool,   PaOpt, false,                           false, true,                  MULTISERVICE_DESC            },
 
   { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_HTTP_TIMEOUT,      HTTP_TMO_DESC                },
+  { "-mqttTimeout",                 &mqttTimeout,           "MQTT_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_MQTT_TIMEOUT,      MQTT_TMO_DESC                },
   { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,                  REQ_TMO_DESC                 },
   { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,                  MUTEX_POLICY_DESC            },
   { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                     WRITE_CONCERN_DESC           },
@@ -663,7 +666,7 @@ static void contextBrokerInit(void)
   setNotifier(pNotifier);
 
   /* Set HTTP timeout */
-  httpRequestInit(httpTimeout);
+  setHttpTimeout(httpTimeout);
 
   //WARN about insecureNotifications mode
   if (insecureNotif == true)
@@ -1200,7 +1203,7 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   alarmMgr.init(relogAlarms);
-  mqttMgr.init();
+  mqttMgr.init(mqttTimeout);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
