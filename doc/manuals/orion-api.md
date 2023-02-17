@@ -100,7 +100,7 @@
             - [Get Attribute Value `GET /v2/entities/{entityId}/attrs/{attrName}/value`](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
             - [Update Attribute Value `PUT /v2/entities/{entityId}/attrs/{attrName}/value`](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [Types](#types)
-            - [List Entity Types `GET /v2/type`](#list-entity-types-get-v2type)
+            - [List Entity Types `GET /v2/types`](#list-entity-types-get-v2types)
             - [Retrieve entity information for a given type `GET /v2/types/{type}`](#retrieve-entity-information-for-a-given-type-get-v2typestype)
     - [Subscriptions Operations](#subscriptions-operations)
         - [Subscription payload datamodel](#subscription-payload-datamodel)
@@ -3469,7 +3469,7 @@ _**Response code**_
 
 ### Types
 
-#### List Entity Types `GET /v2/type`
+#### List Entity Types `GET /v2/types`
 
 Retrieves a list of entity types, as described in the response payload section below.
 
