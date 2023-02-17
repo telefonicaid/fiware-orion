@@ -35,6 +35,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
@@ -51,6 +52,8 @@ extern "C"
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/notifications/alteration.h"                    // alteration
 #include "orionld/legacyDriver/legacyPatchAttribute.h"           // legacyPatchAttribute
+#include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
+#include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own interface
 
 
@@ -323,7 +326,6 @@ bool orionldPatchAttribute(void)
   // it is an attribute, and we have the name of it, but the json parser didn't know that !
   //
   orionldState.requestTree->name = orionldState.in.pathAttrExpanded;
-  //
 
   //
   // GET the entire entity
@@ -342,6 +344,8 @@ bool orionldPatchAttribute(void)
     return false;
   }
 
+  KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
+
   if (orionldState.distributed == true)
   {
     KjNode* body = kjObject(orionldState.kjsonP, NULL);
@@ -349,7 +353,6 @@ bool orionldPatchAttribute(void)
     DistOp* distOpList = distOpRequests(entityId, entityType, DoUpdateAttrs, body);  // DoUpdateAttrs should be Singular !!!
     if (distOpList != NULL)
     {
-      KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
       distOpResponses(distOpList, responseBody);
       distOpListRelease(distOpList);
     }
@@ -452,8 +455,56 @@ bool orionldPatchAttribute(void)
     }
   }
 
-  orionldState.httpStatusCode = 204;
-  orionldState.responseTree   = NULL;
+  //
+  // Response status code and payload body:
+  // - No errors (failureV array is empty):   204 and no payload body
+  // - One single error, and no successes:    the single element in the failure array contains the HTTP Status code and the response ProblemDetail body
+  // - A mix of success/failures OR no success but more than one error: 207
+  //
+  KjNode* failureArray = kjLookup(responseBody, "failure");
+  KjNode* successArray = kjLookup(responseBody, "success");
+  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
+  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
+
+  if (failureArray != NULL)
+    failureArray->name = (char*) "notUpdated";
+  if (successArray != NULL)
+    successArray->name = (char*) "updated";
+
+  if (failures == 0)
+  {
+    orionldState.httpStatusCode = 204;
+    orionldState.responseTree   = NULL;
+  }
+  else if ((successes == 0) && (failures == 1))
+  {
+    KjNode* errorP      = failureArray->value.firstChildP;
+    KjNode* attributesP = kjLookup(errorP, "attributes");
+    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
+    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
+
+    if (attributesP != NULL)
+      kjChildRemove(errorP, attributesP);
+    if (statusCodeP != NULL)
+      kjChildRemove(errorP, statusCodeP);
+
+    orionldState.httpStatusCode = statusCode;
+    orionldState.responseTree   = errorP;
+
+    httpHeaderLinkAdd(orionldState.contextP->url);
+
+    return false;
+  }
+  else
+  {
+    if (successes > 1)
+      kjStringArraySort(successArray);
+
+    orionldState.responseTree   = responseBody;
+    orionldState.httpStatusCode = 207;
+
+    httpHeaderLinkAdd(orionldState.contextP->url);
+  }
 
   if ((troe == true) && (incomingP != NULL))
     orionldState.requestTree = incomingP;

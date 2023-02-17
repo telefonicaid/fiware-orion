@@ -36,6 +36,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
@@ -59,6 +60,7 @@ extern "C"
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/notifications/alteration.h"                    // alteration
 #include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
+#include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own interface
 
 
@@ -337,7 +339,7 @@ bool orionldPatchEntity(void)
       distOpFailure(responseBody, NULL, "Database Error", "mongocAttributesAdd failed", 500, attrP->name);
     }
   }
-  else  // All OK - need to add the successfullt added/updated attributes with "distOpSuccess"
+  else  // All OK - need to add the successfully added/updated attributes with "distOpSuccess"
   {
     // Only, I need a DistOp for that ...
     // All that is needed is the body, sop, we can create a "fake" DistOp:
@@ -382,35 +384,52 @@ bool orionldPatchEntity(void)
  done:
   kjTreeLog(responseBody, "Final responseBody", LmtDistOpMsgs);
 
-  KjNode* updatedV    = kjLookup(responseBody, "success");
-  KjNode* notUpdatedV = kjLookup(responseBody, "failure");
+  //
+  // Response status code and payload body:
+  // - No errors (failureV array is empty):   204 and no payload body
+  // - One single error, and no successes:    the single element in the failure array contains the HTTP Status code and the response ProblemDetail body
+  // - A mix of success/failures OR no success but more than one error: 207
+  //
+  KjNode* failureArray = kjLookup(responseBody, "failure");
+  KjNode* successArray = kjLookup(responseBody, "success");
+  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
+  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
 
-  if (updatedV != NULL)
-    updatedV->name = (char*) "updated";
-  if (notUpdatedV != NULL)
-    notUpdatedV->name = (char*) "notUpdated";
+  if (failureArray != NULL)
+    failureArray->name = (char*) "notUpdated";
+  if (successArray != NULL)
+    successArray->name = (char*) "updated";
 
-  if ((notUpdatedV == NULL) || (notUpdatedV->value.firstChildP == NULL))
+  if (failures == 0)
   {
     orionldState.httpStatusCode = 204;
     orionldState.responseTree   = NULL;
   }
+  else if ((successes == 0) && (failures == 1))
+  {
+    KjNode* errorP      = failureArray->value.firstChildP;
+    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
+    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
+
+    if (statusCodeP != NULL)
+      kjChildRemove(errorP, statusCodeP);
+
+    orionldState.httpStatusCode = statusCode;
+    orionldState.responseTree   = errorP;
+
+    httpHeaderLinkAdd(orionldState.contextP->url);
+
+    return false;
+  }
   else
   {
+    if (successes > 1)
+      kjStringArraySort(successArray);
+
     orionldState.httpStatusCode = 207;
-    orionldState.responseTree   = kjObject(orionldState.kjsonP, NULL);
+    orionldState.responseTree   = responseBody;
 
-    // According to the API spec, "updated" and "notUpdated" are mandatory, even if empty ...
-    if (updatedV == NULL)
-      updatedV = kjArray(orionldState.kjsonP, "updated");
-    else
-      // Sort updatedV before returning
-      kjStringArraySort(updatedV);
-
-    if (notUpdatedV == NULL)      notUpdatedV = kjArray(orionldState.kjsonP, "notUpdated");
-
-    kjChildAdd(orionldState.responseTree, updatedV);
-    kjChildAdd(orionldState.responseTree, notUpdatedV);
+    httpHeaderLinkAdd(orionldState.contextP->url);
   }
 
   return true;

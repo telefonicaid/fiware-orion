@@ -346,6 +346,19 @@ void distOpResponses(DistOp* distOpList, KjNode* responseBody)
     kjChildAdd(responseBody, failureV);
   }
 
+  //
+  // First, gather all errors from not-sent requests
+  //
+  for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
+  {
+    // Perhaps we need a special xError - for the distop requests that weren't even attempted (409 due to no-op of Exclusive reg)
+    if (distOpP->error == true)
+      distOpFailure(responseBody, distOpP, distOpP->title, distOpP->detail, distOpP->httpResponseCode, NULL);
+  }
+
+  //
+  // Read responses
+  //
   while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
   {
     if (msgP->msg != CURLMSG_DONE)

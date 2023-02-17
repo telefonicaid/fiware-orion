@@ -39,6 +39,54 @@ extern "C"
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // Own interface
 
 
+#if 0
+void distOpListDebug(DistOp* distOpP, const char* what)
+{
+  LM(("----- DistOp List: %s", what));
+
+  while (distOpP != NULL)
+  {
+    LM(("  Registration:      %s", distOpP->regP->regId));
+    LM(("  Operation:         %s", distOpTypes[distOpP->operation]));
+
+    if (distOpP->error == true)
+    {
+      LM(("  Title:             %s", distOpP->title));
+      LM(("  Detail:            %s", distOpP->detail));
+      LM(("  Status:            %d", distOpP->httpResponseCode));
+    }
+
+    if (distOpP->requestBody != NULL)
+    {
+      LM(("  Attributes:"));
+      int ix = 0;
+      for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      {
+        if ((strcmp(attrP->name, "id") != 0) && (strcmp(attrP->name, "type") != 0))
+        {
+          LM(("    Attribute %d:   '%s'", ix, attrP->name));
+          ++ix;
+        }
+      }
+    }
+
+    if (distOpP->attrList != NULL)
+    {
+      LM(("  URL Attributes:        %d", distOpP->attrList->items));
+      for (int ix = 0; ix < distOpP->attrList->items; ix++)
+      {
+        LM(("    Attribute %d:   '%s'", ix, distOpP->attrList->array[ix]));
+      }
+    }
+
+    distOpP = distOpP->next;
+  }
+
+  LM(("---------------------"));
+}
+#endif
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -75,11 +123,11 @@ DistOp* regMatchForEntityCreation
 
     if ((regP->mode & regMode) == 0)
     {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode (0x%x vs 0x%x)", regP->regId, regP->mode, regMode));
+      // LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode (0x%x vs 0x%x)", regP->regId, regP->mode, regMode));
       continue;
     }
 
-    if (regMatchOperation(regP, operation) == false)
+    if ((regMode != RegModeExclusive) && (regMatchOperation(regP, operation) == false))
     {
       LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation (operation == %d: '%s')", regP->regId, operation, distOpTypes[operation]));
       continue;
@@ -93,6 +141,22 @@ DistOp* regMatchForEntityCreation
     }
 
     LM_T(LmtRegMatch, ("%s: Match!", regP->regId));
+
+    //
+    // If Exclusive, we now need to check the Operation (DistOpType)
+    // If not a match, the distOpP needs to be marked as ERROR (409)
+    //
+    if ((regMode == RegModeExclusive) && (regMatchOperation(regP, operation) == false))
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation (operation == %d: '%s')", regP->regId, operation, distOpTypes[operation]));
+      for (DistOp* doP = distOpP; doP != NULL; doP = doP->next)
+      {
+        doP->error            = true;
+        doP->title            = (char*) "Operation not supported";
+        doP->detail           = (char*) "A matching exclusive registration forbids the Operation";
+        doP->httpResponseCode = 409;
+      }
+    }
 
     // Add extra info in DistOp, needed by forwardRequestSend
     distOpP->operation = operation;

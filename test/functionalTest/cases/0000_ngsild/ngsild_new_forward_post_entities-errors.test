@@ -261,7 +261,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 06. POST /entities on CB of an entity urn:E1 with attr A1,P1,P3,P6,P7 - A1 ok locally, P1 ok in CP1, P3 ERROR, P6 OTHER ERROR, P7 - 409
 =======================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 514
+Content-Length: 517
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -269,7 +269,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 {
     "entityId": "urn:E1",
-    "failure": [
+    "notUpdated": [
 #SORT_START
         {
             "attributes": [
@@ -300,7 +300,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
         }
 #SORT_END
     ],
-    "success": [
+    "updated": [
         "A1",
         "P1"
     ]

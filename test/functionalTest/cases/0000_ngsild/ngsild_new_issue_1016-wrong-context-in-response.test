@@ -83,7 +83,7 @@ echo
 echo "02. Patch E1, all 7 attributes, with user context in payload body - make sure the context of the response is correct"
 echo "===================================================================================================================="
 payload='{
-  "@context": [ "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld" ],
+  "@context": "https://raw.githubusercontent.com/FIWARE/tutorials.NGSI-LD/master/app/public/data-models/ngsi-context.jsonld",
   "id": "urn:ngsi-ld:entity:E1",
   "type": "https://uri.etsi.org/ngsi-ld/default-context/Device",
   "location": {
