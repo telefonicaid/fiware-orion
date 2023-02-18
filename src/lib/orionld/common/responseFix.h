@@ -30,12 +30,14 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/forwarding/DistOp.h"                           // DistOpType
+
 
 
 // -----------------------------------------------------------------------------
 //
 // responseFix -
 //
-extern void responseFix(KjNode* responseBody, int okCode, const char* entityId);
+extern void responseFix(KjNode* responseBody, DistOpType operation, int okCode, const char* entityId);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_RESPONSEFIX_H_

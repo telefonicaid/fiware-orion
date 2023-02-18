@@ -46,6 +46,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
+#include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
@@ -716,53 +717,7 @@ bool orionldPatchEntity2(void)
       distOpFailure(responseBody, &local, "Database Error", "mongoc", 500, NULL);
   }
 
-  //
-  // Response status code and payload body:
-  // - No errors (failureV array is empty):   204 and no payload body
-  // - One single error, and no successes:    the single element in the failure array contains the HTTP Status code and the response ProblemDetail body
-  // - A mix of success/failures OR no success but more than one error: 207
-  //
-  KjNode* failureArray = kjLookup(responseBody, "failure");
-  KjNode* successArray = kjLookup(responseBody, "success");
-  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
-  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
-
-  if (failureArray != NULL)
-    failureArray->name = (char*) "notUpdated";
-  if (successArray != NULL)
-    successArray->name = (char*) "updated";
-
-  if (failures == 0)
-  {
-    orionldState.httpStatusCode = 204;
-    orionldState.responseTree   = NULL;
-  }
-  else if ((successes == 0) && (failures == 1))
-  {
-    KjNode* errorP      = failureArray->value.firstChildP;
-    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
-    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
-
-    if (statusCodeP != NULL)
-      kjChildRemove(errorP, statusCodeP);
-
-    orionldState.httpStatusCode = statusCode;
-    orionldState.responseTree   = errorP;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-
-    return false;
-  }
-  else
-  {
-    if (successes > 1)
-      kjStringArraySort(successArray);
-
-    orionldState.httpStatusCode = 207;
-    orionldState.responseTree   = responseBody;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-  }
+  responseFix(responseBody, DoMergeEntity, 204, entityId);
 
   if (orionldState.curlDoMultiP != NULL)
     distOpListRelease(distOpList);

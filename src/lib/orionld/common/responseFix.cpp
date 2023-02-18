@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
 #include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
+#include "orionld/forwarding/DistOp.h"                           // DistOpType
 #include "orionld/common/responseFix.h"                          // Own interface
 
 
@@ -41,7 +42,7 @@ extern "C"
 //
 // responseFix -
 //
-void responseFix(KjNode* responseBody, int okCode, const char* entityId)
+void responseFix(KjNode* responseBody, DistOpType operation, int okCode, const char* entityId)
 {
   KjNode* successArray = kjLookup(responseBody, "success");
   KjNode* failureArray = kjLookup(responseBody, "failure");
@@ -67,6 +68,13 @@ void responseFix(KjNode* responseBody, int okCode, const char* entityId)
 
     if (statusCodeP != NULL)
       kjChildRemove(errorP, statusCodeP);
+
+    if (operation == DoUpdateAttrs)
+    {
+      KjNode* attributesP = kjLookup(errorP, "attributes");
+      if (attributesP != NULL)
+        kjChildRemove(errorP, attributesP);
+    }
 
     orionldState.httpStatusCode = statusCode;
     orionldState.responseTree   = errorP;

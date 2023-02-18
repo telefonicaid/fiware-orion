@@ -43,6 +43,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // PERFORMANCE
+#include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/legacyDriver/legacyPostEntities.h"             // legacyPostEntities
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                 // pCheckEntityId
@@ -237,48 +238,7 @@ bool orionldPostEntities(void)
   if (distOpList != NULL)
     distOpResponses(distOpList, responseBody);
 
-  KjNode* failureArray = kjLookup(responseBody, "failure");
-  KjNode* successArray = kjLookup(responseBody, "success");
-  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
-  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
-
-  if (failureArray != NULL)
-    failureArray->name = (char*) "notUpdated";
-  if (successArray != NULL)
-    successArray->name = (char*) "updated";
-
-  if (failures == 0)
-  {
-    orionldState.httpStatusCode = 201;
-    orionldState.responseTree   = NULL;
-    httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
-  }
-  else if ((successes == 0) && (failures == 1))
-  {
-    KjNode* errorP      = failureArray->value.firstChildP;
-    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
-    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
-
-    if (statusCodeP != NULL)
-      kjChildRemove(errorP, statusCodeP);
-
-    orionldState.httpStatusCode = statusCode;
-    orionldState.responseTree   = errorP;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-
-    return false;
-  }
-  else
-  {
-    if (successes > 1)
-      kjStringArraySort(successArray);
-
-    orionldState.httpStatusCode = 207;
-    orionldState.responseTree   = responseBody;
-    httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
-    httpHeaderLinkAdd(orionldState.contextP->url);
-  }
+  responseFix(responseBody, DoCreateEntity, 201, entityId);
 
   if (orionldState.curlDoMultiP != NULL)
     distOpListRelease(distOpList);

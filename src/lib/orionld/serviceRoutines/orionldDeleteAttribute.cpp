@@ -280,7 +280,7 @@ bool orionldDeleteAttribute(void)
   }
 
   kjTreeLog(responseBody, "Fixing responses", 20);
-  responseFix(responseBody, 204, entityId);
+  responseFix(responseBody, DoDeleteAttrs, 204, entityId);
 
   return true;
 }
