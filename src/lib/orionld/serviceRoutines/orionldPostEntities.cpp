@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <unistd.h>                                              // NULL, gethostname
+#include <strings.h>                                             // bzero
 
 extern "C"
 {
@@ -203,8 +204,9 @@ bool orionldPostEntities(void)
     // Only the "DistOp::body" is used in distOpSuccess so I can fix it:
     //
     DistOp local;
+    bzero(&local, sizeof(local));
     local.requestBody = cloneForTroeP;
-    distOpSuccess(responseBody, &local);
+    distOpSuccess(responseBody, &local, NULL);
   }
 
   //

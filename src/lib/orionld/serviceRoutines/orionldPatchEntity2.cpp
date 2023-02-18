@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <strings.h>                                             // bzero
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE
@@ -705,10 +707,11 @@ bool orionldPatchEntity2(void)
     // Only the "DistOp::body" is used in distOpSuccess so I can fix it:
     //
     DistOp local;
+    bzero(&local, sizeof(local));
     local.requestBody = requestForLocal;
 
     if (b == true)
-      distOpSuccess(responseBody, &local);
+      distOpSuccess(responseBody, &local, NULL);
     else
       distOpFailure(responseBody, &local, "Database Error", "mongoc", 500, NULL);
   }

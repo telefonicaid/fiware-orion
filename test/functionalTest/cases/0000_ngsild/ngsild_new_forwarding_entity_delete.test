@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notifications on Entity Deletion
+Distributes operations for Entity Deletion
 
 --SHELL-INIT--
 export BROKER=orionld

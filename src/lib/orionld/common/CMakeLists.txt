@@ -67,6 +67,7 @@ SET (SOURCES
     metadataAdd.cpp
     curlToBrokerStrerror.cpp
     fileName.cpp
+    responseFix.cpp
 )
 
 # Include directories

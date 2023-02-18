@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPSUCCESS_H_
-#define SRC_LIB_ORIONLD_FORWARDING_DISTOPSUCCESS_H_
+#ifndef SRC_LIB_ORIONLD_COMMON_RESPONSEFIX_H_
+#define SRC_LIB_ORIONLD_COMMON_RESPONSEFIX_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,19 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/forwarding/DistOp.h"                           // DistOp
-
 
 
 // -----------------------------------------------------------------------------
 //
-// distOpSuccess -
+// responseFix -
 //
-// PARAMETERS
-//   responseBody      a KjNode object with two fields: "success" and "failure"
-//   distOpP           linked list of DistOp's
-//   attrName          instead of 'distOp', here's the only attribute name already
-//
-extern void distOpSuccess(KjNode* responseBody, DistOp* distOpP, char* attrName);
+extern void responseFix(KjNode* responseBody, int okCode, const char* entityId);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPSUCCESS_H_
+#endif  // SRC_LIB_ORIONLD_COMMON_RESPONSEFIX_H_

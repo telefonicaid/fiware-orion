@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strncpy
+#include <strings.h>                                             // bzero
 
 extern "C"
 {
@@ -344,10 +345,11 @@ bool orionldPatchEntity(void)
     // Only, I need a DistOp for that ...
     // All that is needed is the body, sop, we can create a "fake" DistOp:
     //
-    DistOp distOp;
-    distOp.requestBody = orionldState.requestTree;
+    DistOp local;
+    bzero(&local, sizeof(local));
+    local.requestBody = orionldState.requestTree;
     kjTreeLog(responseBody, "responseBody BEFORE", LmtDistOpMsgs);
-    distOpSuccess(responseBody, &distOp);
+    distOpSuccess(responseBody, &local, NULL);
     kjTreeLog(responseBody, "responseBody AFTER", LmtDistOpMsgs);
   }
 

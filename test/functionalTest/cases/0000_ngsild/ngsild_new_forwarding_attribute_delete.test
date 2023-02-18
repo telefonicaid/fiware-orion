@@ -1,0 +1,244 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Distributes operations for Attribute Deletion
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+brokerStart CB 20-50 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+
+--SHELL--
+
+#
+# 01. Create Entity urn:E1 with attributes P1,R1 in local broker
+# 02. Create Entity urn:E1 with attributes P1-P2,R2 in CP1 (P1 is common, R1 only in CP1, P2+R2 only in CP1)
+# 03. Create a registration R1 for CP1, on entity type T, for deletions on attributes P1-P2,R2-R3 (R3 isn't created in CP1)
+# 04. DELETE Attribute P1 - should be deleted in CB and CP1
+# 05. GET urn:E1 (local=true) from CB - see R1 only
+# 06. GET urn:E1 (local=true) from CP1 - see P2,R2 only
+#
+# 07. Attempt to DELETE Attribute P1 again - 404
+#
+# 08. DELETE Attribute P2  should be deleted in CP1
+# 09. urn:E1 (local=true) from CP1 - see R2 only
+#
+# 10. Attempt to DELETE Attribute P3 - distOp to CP1 and 404
+#
+# Test also an Exclusive registration that doesn't support thje operation "deleteAttrs"
+#
+
+echo "01. Create Entity urn:E1 with attributes P1,R1 in local broker"
+echo "=============================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1,
+  "R1": { "object": "urn:E1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities?local=true --payload "$payload"
+echo
+echo
+
+
+echo "02. Create Entity urn:E1 with attributes P1-P2,R2 in CP1 (P1 is common, R1 only in CP1, P2+R2 only in CP1)"
+echo "=========================================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 11,
+  "P2": 12,
+  "R2": { "object": "urn:E2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Create a registration R1 for CP1, on entity type T, for deletions on attributes P1-P2,R2-R3 (R3 isn't created in CP1)"
+echo "========================================================================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T",
+          "id": "urn:E1"
+        }
+      ],
+      "propertyNames": [ "P1", "P2" ],
+      "relationshipNames": [ "R1", "R2" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "inclusive",
+  "operations": [ "deleteAttrs", "retrieveEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "04. DELETE Attribute P1 - should be deleted in CB and CP1"
+echo "========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 -X DELETE
+echo
+echo
+
+
+echo "05. GET urn:E1 (local=true) from CB - see R1 only"
+echo "================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?local=true
+echo
+echo
+
+
+echo "06. GET urn:E1 (local=true) from CP1 - see P2,R2 only"
+echo "====================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?local=true --port $CP1_PORT
+echo
+echo
+
+
+echo "07. Attempt to DELETE Attribute P1 again - 404"
+echo "=============================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 -X DELETE
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity urn:E1 with attributes P1,R1 in local broker
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create Entity urn:E1 with attributes P1-P2,R2 in CP1 (P1 is common, R1 only in CP1, P2+R2 only in CP1)
+==========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Create a registration R1 for CP1, on entity type T, for deletions on attributes P1-P2,R2-R3 (R3 isn't created in CP1)
+=========================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+04. DELETE Attribute P1 - should be deleted in CB and CP1
+=========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET urn:E1 (local=true) from CB - see R1 only
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "R1": {
+        "object": "urn:E1",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+06. GET urn:E1 (local=true) from CP1 - see P2,R2 only
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 12
+    },
+    "R2": {
+        "object": "urn:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+07. Attempt to DELETE Attribute P1 again - 404
+==============================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 259
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "attributes": [
+                "P1"
+            ],
+            "statusCode": 404,
+            "title": "Attribute Not Found"
+        },
+        {
+            "attributes": [
+                "P1"
+            ],
+            "detail": "https://uri.etsi.org/ngsi-ld/default-context/P1",
+            "registrationId": "urn:R1",
+            "statusCode": 404,
+            "title": "Entity/Attribute not found"
+        }
+    ],
+    "updated": []
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

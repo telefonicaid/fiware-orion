@@ -217,8 +217,8 @@ bool orionldDeleteEntity(void)
   //
   if ((orionldState.uriParams.type == NULL) && (dbEntityP != NULL))
   {
-    KjNode* _idP   = kjLookup(dbEntityP, "_id");
-    KjNode*  typeP = (_idP != NULL)? kjLookup(_idP, "type") : NULL;
+    KjNode* _idP  = kjLookup(dbEntityP, "_id");
+    KjNode* typeP = (_idP != NULL)? kjLookup(_idP, "type") : NULL;
 
     entityTypeExpanded  = (typeP != NULL)? typeP->value.s : NULL;  // Always Expanded in DB
   }
