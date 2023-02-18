@@ -1,0 +1,307 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Forwarding of POST Entities ans the @context
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+brokerStart CB  20,21,31-35 IPv4 -experimental -forwarding
+brokerStart CP1 0 IPv4 -experimental
+
+--SHELL--
+#
+# 01. Create an exclusive registration R1 on urn:E1/P1+R1, that only supports creation of subscriptions
+# 02. Create an Entity urn:E1, matching R1 - see the corresponding 409 for P1+R1
+# 03. PATCH /entities/urn:E1 - see the corresponding 409 for P1+R1
+# 04. PATCH /entities/urn:E1/attrs - see the corresponding 409 for P1+R1
+# 05. PATCH /entities/urn:E1/attrs/P1 - see the 409 for P1
+# 06. PATCH /entities/urn:E1/attrs/R1 - see the 409 for R1
+# 07. PATCH /entities/urn:E1/attrs/P2 - OK
+# 08. GET /entities/urn:E1, see all attrs except P1,R1
+#
+
+echo "01. Create an exclusive registration R1 on urn:E1/P1+R1, that only supports creation of subscriptions"
+echo "====================================================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ],
+      "relationshipNames": [ "R1" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "exclusive",
+  "operations": [ "createSubscription" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an Entity urn:E1, matching R1 - see the corresponding 409 for P1+R1"
+echo "=============================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1,
+  "P2": 2,
+  "R1": { "object": "urn:E2" },
+  "R2": { "object": "urn:E3" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. PATCH /entities/urn:E1 - see the corresponding 409 for P1+R1"
+echo "================================================================"
+payload='{
+  "P1": 3,
+  "P2": 4,
+  "R1": { "object": "urn:E4" },
+  "R2": { "object": "urn:E5" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. PATCH /entities/urn:E1/attrs - see the corresponding 409 for P1+R1"
+echo "======================================================================"
+payload='{
+  "P1": 5,
+  "P2": 6,
+  "R1": { "object": "urn:E6" },
+  "R2": { "object": "urn:E7" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. PATCH /entities/urn:E1/attrs/P1 - see the 409 for P1"
+echo "========================================================"
+payload='{
+  "value": 8
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. PATCH /entities/urn:E1/attrs/R1 - see the 409 for R1"
+echo "========================================================"
+payload='{
+  "object": "urn:E8"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/R1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "07. PATCH /entities/urn:E1/attrs/P2 - OK"
+echo "========================================"
+payload='{
+  "value": 9
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P2 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. GET /entities/urn:E1, see all attrs except P1,R1"
+echo "===================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an exclusive registration R1 on urn:E1/P1+R1, that only supports creation of subscriptions
+=====================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create an Entity urn:E1, matching R1 - see the corresponding 409 for P1+R1
+==============================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 229
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:E1
+
+{
+    "entityId": "urn:E1",
+    "notUpdated": [
+        {
+            "attributes": [
+                "P1",
+                "R1"
+            ],
+            "detail": "A matching exclusive registration forbids the Operation",
+            "registrationId": "urn:R1",
+            "statusCode": 409,
+            "title": "Operation not supported"
+        }
+    ],
+    "updated": [
+        "P2",
+        "R2"
+    ]
+}
+
+
+03. PATCH /entities/urn:E1 - see the corresponding 409 for P1+R1
+================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 209
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "attributes": [
+                "P1",
+                "R1"
+            ],
+            "detail": "A matching exclusive registration forbids the Operation",
+            "registrationId": "urn:R1",
+            "statusCode": 409,
+            "title": "Operation not supported"
+        }
+    ],
+    "updated": [
+        "P2",
+        "R2"
+    ]
+}
+
+
+04. PATCH /entities/urn:E1/attrs - see the corresponding 409 for P1+R1
+======================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 209
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "attributes": [
+                "P1",
+                "R1"
+            ],
+            "detail": "A matching exclusive registration forbids the Operation",
+            "registrationId": "urn:R1",
+            "statusCode": 409,
+            "title": "Operation not supported"
+        }
+    ],
+    "updated": [
+        "P2",
+        "R2"
+    ]
+}
+
+
+05. PATCH /entities/urn:E1/attrs/P1 - see the 409 for P1
+========================================================
+HTTP/1.1 409 Conflict
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "detail": "A matching exclusive registration forbids the Operation",
+    "registrationId": "urn:R1",
+    "title": "Operation not supported"
+}
+
+
+06. PATCH /entities/urn:E1/attrs/R1 - see the 409 for R1
+========================================================
+HTTP/1.1 409 Conflict
+Content-Length: 128
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "detail": "A matching exclusive registration forbids the Operation",
+    "registrationId": "urn:R1",
+    "title": "Operation not supported"
+}
+
+
+07. PATCH /entities/urn:E1/attrs/P2 - OK
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08. GET /entities/urn:E1, see all attrs except P1,R1
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P2": {
+        "type": "Property",
+        "value": 9
+    },
+    "R2": {
+        "object": "urn:E7",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

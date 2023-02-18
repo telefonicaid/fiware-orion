@@ -36,6 +36,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "common/globals.h"                                      // parse8601Time
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "orionld/mongoc/mongocEntityUpdate.h"                   // mongocEntityUpdate
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -48,6 +49,8 @@ extern "C"
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/kjTree/kjArrayAdd.h"                           // kjArrayAdd
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
+#include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
@@ -60,6 +63,8 @@ extern "C"
 #include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
+#include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
+#include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
 
@@ -584,7 +589,6 @@ bool orionldPatchEntity2(void)
   {
     distOpList = distOpRequests(entityId, entityType, DoMergeEntity, orionldState.requestTree);
 
-    kjTreeLog(orionldState.requestTree, "Fixed tree after 'exclusive' regs", LmtRegMatch);
     for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
     {
       char body[1024];
@@ -592,6 +596,8 @@ bool orionldPatchEntity2(void)
       LM_T(LmtDistOpMsgs, ("Registration '%s': %s", distOpP->regP->regId, body));
     }
   }
+
+  KjNode* requestForLocal = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP, false);
   orionldAlterationsPresent(orionldState.alterations);
@@ -666,14 +672,17 @@ bool orionldPatchEntity2(void)
   bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found in arrays named ".added" and ".removed"
   if (b == false)
   {
-    bson_error_t* errP = &orionldState.mongoc.error;  // Can't be in orionldState - DB Dependant!!!
+    if (distOpList == NULL)
+    {
+      bson_error_t* errP = &orionldState.mongoc.error;  // Can't be in orionldState - DB Dependant!!!
 
-    LM_E(("mongocEntityUpdate(%s): [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
+      LM_E(("mongocEntityUpdate(%s): [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
 
-    if (errP->code == 12)  orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
-    else                   orionldError(OrionldInternalError, "Internal Error", errP->message, 500);
+      if (errP->code == 12)  orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
+      else                   orionldError(OrionldInternalError, "Internal Error", errP->message, 500);
 
-    return false;
+      return false;
+    }
   }
 
   orionldState.httpStatusCode = 204;
@@ -681,15 +690,79 @@ bool orionldPatchEntity2(void)
   if (troe)
     orionldState.requestTree = patchTree;
 
-  //
-  // In case of 207 response
-  //
+
   KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
   if (distOpList != NULL)
-  {
     distOpResponses(distOpList, responseBody);
-    distOpListRelease(distOpList);
+
+  //
+  // Adding in the local successes
+  //
+  if (distOpList != NULL)  // NOT Purely local request
+  {
+    //
+    // Need to call distOpSuccess here. Only, I don't have a DistOp object for local ...
+    // Only the "DistOp::body" is used in distOpSuccess so I can fix it:
+    //
+    DistOp local;
+    local.requestBody = requestForLocal;
+
+    if (b == true)
+      distOpSuccess(responseBody, &local);
+    else
+      distOpFailure(responseBody, &local, "Database Error", "mongoc", 500, NULL);
   }
+
+  //
+  // Response status code and payload body:
+  // - No errors (failureV array is empty):   204 and no payload body
+  // - One single error, and no successes:    the single element in the failure array contains the HTTP Status code and the response ProblemDetail body
+  // - A mix of success/failures OR no success but more than one error: 207
+  //
+  KjNode* failureArray = kjLookup(responseBody, "failure");
+  KjNode* successArray = kjLookup(responseBody, "success");
+  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
+  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
+
+  if (failureArray != NULL)
+    failureArray->name = (char*) "notUpdated";
+  if (successArray != NULL)
+    successArray->name = (char*) "updated";
+
+  if (failures == 0)
+  {
+    orionldState.httpStatusCode = 204;
+    orionldState.responseTree   = NULL;
+  }
+  else if ((successes == 0) && (failures == 1))
+  {
+    KjNode* errorP      = failureArray->value.firstChildP;
+    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
+    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
+
+    if (statusCodeP != NULL)
+      kjChildRemove(errorP, statusCodeP);
+
+    orionldState.httpStatusCode = statusCode;
+    orionldState.responseTree   = errorP;
+
+    httpHeaderLinkAdd(orionldState.contextP->url);
+
+    return false;
+  }
+  else
+  {
+    if (successes > 1)
+      kjStringArraySort(successArray);
+
+    orionldState.httpStatusCode = 207;
+    orionldState.responseTree   = responseBody;
+
+    httpHeaderLinkAdd(orionldState.contextP->url);
+  }
+
+  if (orionldState.curlDoMultiP != NULL)
+    distOpListRelease(distOpList);
 
   return true;
 }

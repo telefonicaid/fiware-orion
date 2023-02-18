@@ -57,7 +57,11 @@ typedef struct DistOp
   char*               attrName;          // Used by PATCH /entities/{entityId}/attrs/{attrName}
   StringArray*        attrList;          // URI Param "attrs" for GET Requests
   char*               geoProp;           // URI Param "geometryProperty" for GET Requests
+
   bool                error;
+  char*               title;
+  char*               detail;
+
   CURL*               curlHandle;
   struct curl_slist*  curlHeaders;
   struct DistOp*      next;

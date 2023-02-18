@@ -65,6 +65,11 @@ static bool kjValuesDiffer(KjNode* leftAttr, KjNode* rightAttr)
   KjNode* left  = kjLookup(leftAttr,  "value");  // "object", "languageMap" ... First lookup "type" ...
   KjNode* right = kjLookup(rightAttr, "value");
 
+  if (left == NULL)  left  = kjLookup(leftAttr,  "object");
+  if (left == NULL)  left  = kjLookup(leftAttr,  "languageMap");
+  if (right == NULL) right = kjLookup(rightAttr, "object");
+  if (right == NULL) right = kjLookup(rightAttr, "languageMap");
+
   if (left == NULL)
     LM_RE(true, ("Internal Error (left KjNode has no value member)"));
   if (right == NULL)

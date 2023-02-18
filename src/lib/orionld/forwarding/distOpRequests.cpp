@@ -114,10 +114,7 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, K
   DistOp* redirectList  = NULL;
   DistOp* inclusiveList = NULL;
 
-  // FIXME: Change regMatch for Exclusive so that it doesn't look at the operation
   exclusiveList = regMatchForEntityCreation(RegModeExclusive, operation, entityId, entityType, payloadBody);
-  // FIXME: Check the matching Exclusive DistOps for operation, and error out (409) if the operation isn't supported
-
   redirectList  = regMatchForEntityCreation(RegModeRedirect,  operation, entityId, entityType, payloadBody);
 
   if (redirectList != NULL)
@@ -139,62 +136,67 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, K
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
   {
     // Send the forwarded request and await all responses
-    if (distOpP->regP != NULL)
+    if ((distOpP->regP != NULL) && (distOpP->error == false))
     {
+      LM(("Calling distOpSend for reg %s", distOpP->regP->regId));
       if (distOpSend(distOpP, dateHeader, xff) == 0)
       {
-        ++forwards;
         distOpP->error = false;
       }
       else
         distOpP->error = true;
+
+      ++forwards;  // Also when error?
     }
   }
 
   int stillRunning = 1;
   int loops        = 0;
 
-  while (stillRunning != 0)
+  if (forwards > 0)
   {
-    CURLMcode cm = curl_multi_perform(orionldState.curlDoMultiP, &stillRunning);
-    if (cm != 0)
+    while (stillRunning != 0)
     {
-      LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
-      forwards = 0;
-      break;
-    }
-
-    if (stillRunning != 0)
-    {
-      cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 1000, NULL);
-      if (cm != CURLM_OK)
+      CURLMcode cm = curl_multi_perform(orionldState.curlDoMultiP, &stillRunning);
+      if (cm != 0)
       {
-        LM_E(("Internal Error (curl_multi_wait: error %d", cm));
+        LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
+        forwards = 0;
         break;
       }
+
+      if (stillRunning != 0)
+      {
+        cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 1000, NULL);
+        if (cm != CURLM_OK)
+        {
+          LM_E(("Internal Error (curl_multi_wait: error %d", cm));
+          break;
+        }
+      }
+
+      if ((++loops >= 50) && ((loops % 25) == 0))
+        LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
     }
 
-    if ((++loops >= 50) && ((loops % 25) == 0))
-      LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
-  }
+    if (loops >= 100)
+      LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
 
-  if (loops >= 100)
-    LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
-
-  // Anything left for a local entity?
-  if (payloadBody->value.firstChildP != NULL)
-  {
-    if (operation == DoCreateEntity)
+    // Anything left for a local entity?
+    if (payloadBody->value.firstChildP != NULL)
     {
-      KjNode* entityIdP   = kjString(orionldState.kjsonP,  "id",   entityId);
-      KjNode* entityTypeP = kjString(orionldState.kjsonP,  "type", entityType);
+      if (operation == DoCreateEntity)
+      {
+        KjNode* entityIdP   = kjString(orionldState.kjsonP,  "id",   entityId);
+        KjNode* entityTypeP = kjString(orionldState.kjsonP,  "type", entityType);
 
-      kjChildAdd(payloadBody, entityIdP);
-      kjChildAdd(payloadBody, entityTypeP);
+        kjChildAdd(payloadBody, entityIdP);
+        kjChildAdd(payloadBody, entityTypeP);
+      }
     }
+    else
+      orionldState.requestTree = NULL;  // Meaning: nothing left for local DB
   }
-  else
-    orionldState.requestTree = NULL;  // Meaning: nothing left for local DB
 
   return distOpList;
 }

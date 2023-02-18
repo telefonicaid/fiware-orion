@@ -51,6 +51,7 @@ DistOp* regMatchInformationArray
   KjNode*        payloadBody
 )
 {
+  DistOp* distOpList   = NULL;
   KjNode* informationV = kjLookup(regP->regTree, "information");
 
   for (KjNode* infoP = informationV->value.firstChildP; infoP != NULL; infoP = infoP->next)
@@ -75,8 +76,14 @@ DistOp* regMatchInformationArray
     distOpP->regP        = regP;
     distOpP->requestBody = attrUnion;
 
-    return distOpP;
+    if (distOpList == NULL)
+      distOpList = distOpP;
+    else
+    {
+      distOpP->next = distOpList;
+      distOpList    = distOpP;
+    }
   }
 
-  return NULL;
+  return distOpList;
 }

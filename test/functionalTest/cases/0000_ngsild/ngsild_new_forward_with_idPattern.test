@@ -427,21 +427,22 @@ Date: REGEX(.*)
 11. Create an Entity with ID E11 - should be forwarded to R1::endpoint
 ======================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 126
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:E11
 
 {
     "entityId": "urn:E11",
-    "failure": [
+    "notUpdated": [
         {
             "detail": "urn:E11",
             "statusCode": 404,
             "title": "Entity already exists"
         }
     ],
-    "success": [
+    "updated": [
         "P1",
         "P2"
     ]
@@ -451,21 +452,22 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 12. Create an Entity with ID E21 - should be forwarded to R2::endpoint
 ======================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 126
+Content-Length: 129
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Location: /ngsi-ld/v1/entities/urn:E21
 
 {
     "entityId": "urn:E21",
-    "failure": [
+    "notUpdated": [
         {
             "detail": "urn:E21",
             "statusCode": 404,
             "title": "Entity already exists"
         }
     ],
-    "success": [
+    "updated": [
         "P1",
         "P2"
     ]

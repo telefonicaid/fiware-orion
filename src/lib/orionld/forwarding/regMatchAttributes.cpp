@@ -61,7 +61,8 @@ KjNode* regMatchAttributes(RegCacheItem* regP, DistOpType operation, KjNode* pro
       // Was Changed to:
       //   Modified: { "attrName" { "value": 12 } }
       //
-      // That way, the body of "PATCH Attribute" is on the same level as the body of "POST /entities" and regMatchForEntityCreation can be used as is.
+      // That way, the body of "PATCH Attribute" is on the same level as the body of "POST /entities", thus
+      // regMatchForEntityCreation can be used as is.
       // Now, before cloning the payload body for distributed requests, this modification needs to be rolled back.
       //
       LM_T(LmtRegMatch, ("It's PATCH Attribute, so, the payload body is one level down"));
@@ -87,6 +88,7 @@ KjNode* regMatchAttributes(RegCacheItem* regP, DistOpType operation, KjNode* pro
   KjNode* attrObject = NULL;
   KjNode* attrP      = payloadBody->value.firstChildP;
   KjNode* next;
+
   while (attrP != NULL)
   {
     next = attrP->next;

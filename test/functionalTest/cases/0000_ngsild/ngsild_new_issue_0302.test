@@ -199,23 +199,17 @@ Date: REGEX(.*)
 
 04. Attempt to patch a non-existing attribute P3 of E1 - see 207
 ================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 98
+HTTP/1.1 404 Not Found
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributes": [
-                "P3"
-            ],
-            "statusCode": 404,
-            "title": "Attribute Not Found"
-        }
+    "attributes": [
+        "P3"
     ],
-    "updated": []
+    "title": "Attribute Not Found"
 }
 
 

@@ -182,22 +182,15 @@ Date: REGEX(.*)
 
 05. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
 =================================================================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 115
+HTTP/1.1 404 Not Found
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "entityId": "urn:E1",
-    "failure": [
-        {
-            "detail": "urn:E1",
-            "statusCode": 404,
-            "title": "Entity already exists"
-        }
-    ],
-    "success": []
+    "detail": "urn:E1",
+    "title": "Entity already exists"
 }
 
 

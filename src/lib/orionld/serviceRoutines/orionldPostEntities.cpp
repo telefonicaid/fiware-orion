@@ -37,7 +37,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
+#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd, httpHeaderLinkAdd
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -57,6 +57,8 @@ extern "C"
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
+#include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
+#include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // Own interface
 
 
@@ -218,16 +220,14 @@ bool orionldPostEntities(void)
   orionldState.alterations->alteredAttributeV = NULL;
   orionldState.alterations->next              = NULL;
 
-  // All good
-  orionldState.httpStatusCode = 201;
-  httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
-
   if (cloneForTroeP != NULL)
     orionldState.requestTree = cloneForTroeP;
 
   if (distOpList == NULL)  // Purely local request
   {
+    orionldState.httpStatusCode = 201;
     orionldState.responseTree = NULL;
+    httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
     return true;
   }
 
@@ -235,20 +235,47 @@ bool orionldPostEntities(void)
   if (distOpList != NULL)
     distOpResponses(distOpList, responseBody);
 
-  KjNode* failureP = kjLookup(responseBody, "failure");
-  if ((failureP != NULL) && (failureP->value.firstChildP != NULL))
+  KjNode* failureArray = kjLookup(responseBody, "failure");
+  KjNode* successArray = kjLookup(responseBody, "success");
+  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
+  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
+
+  if (failureArray != NULL)
+    failureArray->name = (char*) "notUpdated";
+  if (successArray != NULL)
+    successArray->name = (char*) "updated";
+
+  if (failures == 0)
   {
-    orionldState.httpStatusCode = 207;
-    orionldState.responseTree   = responseBody;
+    orionldState.httpStatusCode = 201;
+    orionldState.responseTree   = NULL;
+    httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
+  }
+  else if ((successes == 0) && (failures == 1))
+  {
+    KjNode* errorP      = failureArray->value.firstChildP;
+    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
+    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
+
+    if (statusCodeP != NULL)
+      kjChildRemove(errorP, statusCodeP);
+
+    orionldState.httpStatusCode = statusCode;
+    orionldState.responseTree   = errorP;
+
+    httpHeaderLinkAdd(orionldState.contextP->url);
+
+    return false;
   }
   else
   {
-    // All good
-    if (orionldState.httpStatusCode != 201)  // Cause, this might be done already - inside local processing of entity
-    {
-      orionldState.httpStatusCode = 201;
-      httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
-    }
+    if (successes > 1)
+      kjStringArraySort(successArray);
+
+    orionldState.httpStatusCode = 207;
+    orionldState.responseTree   = responseBody;
+    httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
+    httpHeaderLinkAdd(orionldState.contextP->url);
   }
 
   if (orionldState.curlDoMultiP != NULL)
