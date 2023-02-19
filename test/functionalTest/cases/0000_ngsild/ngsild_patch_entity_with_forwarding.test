@@ -329,7 +329,7 @@ echo
 
 echo "19. DELETE the entity urn:E1 in CB"
 echo "=================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?local=true -X DELETE
 echo
 echo
 

@@ -32,6 +32,6 @@
 //
 // mongocEntityDelete -
 //
-extern bool mongocEntityDelete(const char* entityId);
+extern bool mongocEntityDelete(const char* entityId, char** detailP);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITYDELETE_H_

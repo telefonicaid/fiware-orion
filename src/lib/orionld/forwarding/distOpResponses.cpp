@@ -289,7 +289,7 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
   LM_T(LmtDistOpResponse, ("Reg %s: Distributed Response Code: %d",   distOpP->regP->regId, httpResponseCode));
   LM_T(LmtDistOpResponse, ("Reg %s: Distributed Response Body: '%s'", distOpP->regP->regId, distOpP->rawResponse));
 
-  if ((distOpP->operation == DoCreateEntity) || (distOpP->operation == DoUpdateEntity) || (distOpP->operation == DoDeleteAttrs))
+  if ((distOpP->operation == DoCreateEntity) || (distOpP->operation == DoUpdateEntity) || (distOpP->operation == DoDeleteAttrs) || (distOpP->operation == DoDeleteEntity))
   {
     LM(("Calling entityResponseAccumulate"));
     entityResponseAccumulate(distOpP, responseBody, successV, failureV, httpResponseCode, msgP);
@@ -299,7 +299,7 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     //
     // Not Implemented ...
     //
-    LM(("distOpP->operation: %d (THIS MUST BE IMPLEMENTED !!!)", distOpP->operation));
+    LM(("************************************** distOpP->operation: %s (THIS MUST BE IMPLEMENTED !!!)", distOpTypes[distOpP->operation]));
     if (msgP->data.result == CURLE_OK)
     {
       LM(("Got a response: httpResponseCode == %d", httpResponseCode));
@@ -352,12 +352,18 @@ void distOpResponses(DistOp* distOpList, KjNode* responseBody)
   //
   // First, gather all errors from not-sent requests
   //
+  int sent = 0;
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
   {
     // Perhaps we need a special xError - for the distop requests that weren't even attempted (409 due to no-op of Exclusive reg)
     if (distOpP->error == true)
       distOpFailure(responseBody, distOpP, distOpP->title, distOpP->detail, distOpP->httpResponseCode, NULL);
+    else
+      ++sent;
   }
+
+  if (sent == 0)
+    return;
 
   //
   // Read responses

@@ -57,7 +57,7 @@ extern "C"
 //
 // distributedDelete -
 //
-static bool distributedDelete(KjNode* responseBody, char* entityId, char* entityTypeExpanded, char* entityTypeCompacted, char* attrNameExpanded)
+static DistOp* distributedDelete(KjNode* responseBody, char* entityId, char* entityTypeExpanded, char* entityTypeCompacted, char* attrNameExpanded)
 {
   //
   // regMatchForEntityGet needs a StrringArray of the attribute names, as 5th parameter.
@@ -71,8 +71,6 @@ static bool distributedDelete(KjNode* responseBody, char* entityId, char* entity
   array[0]    = attrNameExpanded;
 
   DistOp* exclusiveList = regMatchForEntityGet(RegModeExclusive, DoDeleteAttrs, entityId, entityTypeExpanded, &attrV, NULL);
-  // FIXME: regMatchForEntityGet to not match on Operation, then check if error (409) or OK
-
   DistOp* redirectList  = regMatchForEntityGet(RegModeRedirect,  DoDeleteAttrs, entityId, entityTypeExpanded, &attrV, NULL);
   DistOp* inclusiveList = regMatchForEntityGet(RegModeInclusive, DoDeleteAttrs, entityId, entityTypeExpanded, &attrV, NULL);
   DistOp* distOpList;
@@ -81,7 +79,7 @@ static bool distributedDelete(KjNode* responseBody, char* entityId, char* entity
   distOpList = distOpListsMerge(distOpList, inclusiveList);
 
   if (distOpList == NULL)
-    return false;
+    return NULL;
 
   // Enqueue all forwarded requests
   // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
@@ -103,7 +101,7 @@ static bool distributedDelete(KjNode* responseBody, char* entityId, char* entity
       }
       else
       {
-        LM_W(("Forwarded request failed"));
+        LM_W(("Reg %s: Forwarded request failed", distOpP->regP->regId));
         distOpP->error = true;
       }
     }
@@ -154,10 +152,9 @@ static bool distributedDelete(KjNode* responseBody, char* entityId, char* entity
     }
 
     distOpResponses(distOpList, responseBody);
-    LM(("After distOpResponses"));
   }
 
-  return true;
+  return distOpList;
 }
 
 
@@ -242,41 +239,31 @@ bool orionldDeleteAttribute(void)
     entityTypeExpanded  = (typeP != NULL)? typeP->value.s : NULL;  // Always Expanded in DB
   }
 
+  DistOp* distOpList = NULL;
   if (orionldState.distributed == true)
   {
     char* entityTypeCompacted = NULL;
     if (entityTypeExpanded != NULL)
       entityTypeCompacted = orionldContextItemAliasLookup(orionldState.contextP, entityTypeExpanded, NULL, NULL);
 
-    LM(("Calling distributedDelete"));
-    if (distributedDelete(responseBody, entityId, entityTypeExpanded, entityTypeCompacted, orionldState.in.pathAttrExpanded) == false)
-      orionldState.distributed = false;  // As there are no matching registrations
-    LM(("After distributedDelete"));
+    distOpList = distributedDelete(responseBody, entityId, entityTypeExpanded, entityTypeCompacted, orionldState.in.pathAttrExpanded);
   }
 
   if (attrNameP != NULL)
   {
-    LM(("Calling mongocAttributeDelete"));
     int r = mongocAttributeDelete(entityId, orionldState.in.pathAttrExpanded);
     if (r == false)
     {
-      LM(("mongocAttributeDelete FAILED"));
-      if (orionldState.distributed == false)
+      if (distOpList == NULL)
       {
         orionldError(OrionldInternalError, "Database Error (deleting attribute from entity)", entityId, 500);
         return false;
       }
       else
-      {
-        LM(("Adding DB error to responseBody::failure"));
         distOpFailure(responseBody, NULL, "Database Error", "(ToDo: get error from mongoc)", 500, attrName);
-      }
     }
     else
-    {
-      LM(("Addding Success to responseBody for local attribute"));
       distOpSuccess(responseBody, NULL, attrName);
-    }
   }
 
   kjTreeLog(responseBody, "Fixing responses", 20);

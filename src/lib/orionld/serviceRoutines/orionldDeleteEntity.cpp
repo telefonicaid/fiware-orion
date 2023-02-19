@@ -37,6 +37,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
@@ -49,6 +50,9 @@ extern "C"
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
+#include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
+#include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
+#include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
 
 
@@ -91,7 +95,7 @@ static void alterations(char* entityId, char* entityTypeExpanded, char* entityTy
 //
 // distributedDelete -
 //
-static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* entityTypeCompacted)
+static DistOp* distributedDelete(char* entityId, char* entityTypeExpanded, char* entityTypeCompacted)
 {
   DistOp* exclusiveList = regMatchForEntityGet(RegModeExclusive, DoDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
   DistOp* redirectList  = regMatchForEntityGet(RegModeRedirect,  DoDeleteEntity, entityId, entityTypeExpanded, NULL, NULL);
@@ -102,7 +106,7 @@ static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* en
   distOpList = distOpListsMerge(distOpList, inclusiveList);
 
   if (distOpList == NULL)
-    return false;
+    return NULL;
 
   // Enqueue all forwarded requests
   // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
@@ -124,7 +128,7 @@ static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* en
       }
       else
       {
-        LM_W(("Forwarded request failed"));
+        LM_W(("Reg %s: Forwarded request failed", distOpP->regP->regId));
         distOpP->error = true;
       }
     }
@@ -160,28 +164,7 @@ static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* en
   if (loops >= 100)
     LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
 
-  // Wait for responses
-  if (forwards > 0)
-  {
-    CURLMsg* msgP;
-    int      msgsLeft;
-
-    while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
-    {
-      if (msgP->msg != CURLMSG_DONE)
-        continue;
-
-      if (msgP->data.result == CURLE_OK)
-      {
-        distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
-
-        // Check HTTP Status code and WARN if not "200 OK"
-        --forwards;
-      }
-    }
-  }
-
-  return true;
+  return distOpList;
 }
 
 
@@ -192,9 +175,10 @@ static bool distributedDelete(char* entityId, char* entityTypeExpanded, char* en
 //
 bool orionldDeleteEntity(void)
 {
-  char* entityId            = orionldState.wildcard[0];
-  char* entityTypeExpanded  = orionldState.uriParams.type;
-  char* entityTypeCompacted = NULL;
+  char*   entityId            = orionldState.wildcard[0];
+  char*   entityTypeExpanded  = orionldState.uriParams.type;
+  char*   entityTypeCompacted = NULL;
+  KjNode* responseBody        = kjObject(orionldState.kjsonP, NULL);
 
   // Make sure the Entity ID is a valid URI
   PCHECK_URI(entityId, true, 0, "Invalid Entity ID", "Must be a valid URI", 400);
@@ -226,15 +210,14 @@ bool orionldDeleteEntity(void)
   if (entityTypeExpanded != NULL)
     entityTypeCompacted = orionldContextItemAliasLookup(orionldState.contextP, entityTypeExpanded, NULL, NULL);
 
-  bool someForwarding = (orionldState.distributed == false)? false : distributedDelete(entityId, entityTypeExpanded, entityTypeCompacted);
+  DistOp* distOpList = (orionldState.distributed == false)? NULL : distributedDelete(entityId, entityTypeExpanded, entityTypeCompacted);
 
   //
   // Delete the entity in the local DB
   // - Error if the entity is not found locally, and not subject to forwarding
   //
-  if ((dbEntityP == NULL) && (someForwarding == false))
+  if ((dbEntityP == NULL) && (distOpList == NULL))
   {
-    // FIXME: for Distributed operations, I need to know the reg-matches here. Only 404 if no reg-matches
     orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
     return false;
   }
@@ -243,16 +226,25 @@ bool orionldDeleteEntity(void)
   // Delete the entity locally (if present)
   // Give 404 if the entity is not present locally nor triggered any forwarded requests
   //
-  if ((dbEntityP != NULL) && (mongocEntityDelete(entityId) == false))
+  char* detail = NULL;
+  if ((dbEntityP != NULL) && (mongocEntityDelete(entityId, &detail) == false))
   {
-    orionldError(OrionldInternalError, "Database Error", "mongocEntityDelete failed", 500);
-    return false;
+    if (distOpList == NULL)  // pure local request
+    {
+      orionldError(OrionldInternalError, "Database Error", detail, 500);
+      return false;
+    }
+    else
+      distOpFailure(responseBody, NULL, "Database Error", detail, 500, NULL);
   }
 
-  if ((dbEntityP != NULL) || (someForwarding == true))
+  if (dbEntityP != NULL)
     alterations(entityId, entityTypeExpanded, entityTypeCompacted);
 
-  orionldState.httpStatusCode = SccNoContent;  // 204
+  if (distOpList != NULL)
+    distOpResponses(distOpList, responseBody);
+
+  responseFix(responseBody, DoDeleteEntity, 204, entityId);
 
   return true;
 }

@@ -87,7 +87,7 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
       continue;
     }
 
-    if (regMatchOperation(regP, operation) == false)
+    if ((regMode != RegModeExclusive) && (regMatchOperation(regP, operation) == false))
     {
       LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation", regP->regId));
       continue;
@@ -98,6 +98,18 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
     {
       LM_T(LmtRegMatch, ("%s: No Reg Match due to Information Array", regP->regId));
       continue;
+    }
+
+    if ((regMode == RegModeExclusive) && (regMatchOperation(regP, operation) == false))
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation (operation == %d: '%s')", regP->regId, operation, distOpTypes[operation]));
+      for (DistOp* doP = distOpP; doP != NULL; doP = doP->next)
+      {
+        doP->error            = true;
+        doP->title            = (char*) "Operation not supported";
+        doP->detail           = (char*) "A matching exclusive registration forbids the Operation";
+        doP->httpResponseCode = 409;
+      }
     }
 
     // Add extra info in DistOp, needed by forwardRequestSend
