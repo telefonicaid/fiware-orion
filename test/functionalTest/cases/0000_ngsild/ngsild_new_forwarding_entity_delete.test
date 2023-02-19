@@ -21,13 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notifications on Entity Deletion
+Distributes operations for Entity Deletion
 
 --SHELL-INIT--
 export BROKER=orionld
 dbInit CB
 dbInit CP1
-brokerStart CB 0 IPv4 -experimental -forwarding
+brokerStart CB 20,31-35 IPv4 -experimental -forwarding
 brokerStart CP1 0 IPv4 -experimental
 
 --SHELL--
@@ -40,6 +40,10 @@ brokerStart CP1 0 IPv4 -experimental
 # 05. DELETE urn:E1 in local broker - a forwarded request should be sent to CP1 for deletion of the same entity
 # 06. Attempt to retrieve urn:E1 from CP1 - see 404 Not Found
 # 07. Attempt to retrieve urn:E1 from local broker - see 404 Not Found
+#
+# 08. DELETE the registration R1, to not introduce noise for the next steps
+# 09. Create an exclusive registration R2 for CP1, on entity type T, not supporting entity deletions
+# 10. Attempt to DELETE urn:E1 in local broker - see the 409 from CP1
 #
 
 echo "01. Create Entity urn:E1 (type T) in local broker"
@@ -75,7 +79,7 @@ echo
 echo "03. Create a registration R1 for CP1, on entity type T, for deletions"
 echo "====================================================================="
 payload='{
-  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "id": "urn:R1",
   "type": "ContextSourceRegistration",
   "information": [
     {
@@ -122,6 +126,43 @@ echo
 echo
 
 
+echo "08. DELETE the registration R1, to not introduce noise for the next steps"
+echo "========================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 -X DELETE
+echo
+echo
+
+
+echo "09. Create an exclusive registration R2 for CP1, on entity type T, not supporting entity deletions"
+echo "=================================================================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "exclusive",
+  "operations": [ "createEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "10. Attempt to DELETE urn:E1 in local broker - see the 409 from CP1"
+echo "==================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE
+echo
+echo
+
+
 --REGEXPECT--
 01. Create Entity urn:E1 (type T) in local broker
 =================================================
@@ -146,7 +187,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
 
 
 
@@ -200,6 +241,37 @@ Date: REGEX(.*)
     "detail": "urn:E1",
     "title": "Entity Not Found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+08. DELETE the registration R1, to not introduce noise for the next steps
+=========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. Create an exclusive registration R2 for CP1, on entity type T, not supporting entity deletions
+==================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+10. Attempt to DELETE urn:E1 in local broker - see the 409 from CP1
+===================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 72
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "detail": "urn:E1",
+    "registrationId": "urn:R2",
+    "title": "Entity not found"
 }
 
 

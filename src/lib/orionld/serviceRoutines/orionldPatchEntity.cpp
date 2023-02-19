@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                              // strncpy
+#include <strings.h>                                             // bzero
 
 extern "C"
 {
@@ -43,6 +44,7 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
+#include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeType
 #include "orionld/legacyDriver/legacyPatchEntity.h"              // legacyPatchEntity
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_OBJECT, PCHECK_URI, ...
@@ -344,10 +346,11 @@ bool orionldPatchEntity(void)
     // Only, I need a DistOp for that ...
     // All that is needed is the body, sop, we can create a "fake" DistOp:
     //
-    DistOp distOp;
-    distOp.requestBody = orionldState.requestTree;
+    DistOp local;
+    bzero(&local, sizeof(local));
+    local.requestBody = orionldState.requestTree;
     kjTreeLog(responseBody, "responseBody BEFORE", LmtDistOpMsgs);
-    distOpSuccess(responseBody, &distOp);
+    distOpSuccess(responseBody, &local, NULL);
     kjTreeLog(responseBody, "responseBody AFTER", LmtDistOpMsgs);
   }
 
@@ -384,53 +387,7 @@ bool orionldPatchEntity(void)
  done:
   kjTreeLog(responseBody, "Final responseBody", LmtDistOpMsgs);
 
-  //
-  // Response status code and payload body:
-  // - No errors (failureV array is empty):   204 and no payload body
-  // - One single error, and no successes:    the single element in the failure array contains the HTTP Status code and the response ProblemDetail body
-  // - A mix of success/failures OR no success but more than one error: 207
-  //
-  KjNode* failureArray = kjLookup(responseBody, "failure");
-  KjNode* successArray = kjLookup(responseBody, "success");
-  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
-  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
-
-  if (failureArray != NULL)
-    failureArray->name = (char*) "notUpdated";
-  if (successArray != NULL)
-    successArray->name = (char*) "updated";
-
-  if (failures == 0)
-  {
-    orionldState.httpStatusCode = 204;
-    orionldState.responseTree   = NULL;
-  }
-  else if ((successes == 0) && (failures == 1))
-  {
-    KjNode* errorP      = failureArray->value.firstChildP;
-    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
-    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
-
-    if (statusCodeP != NULL)
-      kjChildRemove(errorP, statusCodeP);
-
-    orionldState.httpStatusCode = statusCode;
-    orionldState.responseTree   = errorP;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-
-    return false;
-  }
-  else
-  {
-    if (successes > 1)
-      kjStringArraySort(successArray);
-
-    orionldState.httpStatusCode = 207;
-    orionldState.responseTree   = responseBody;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-  }
+  responseFix(responseBody, DoUpdateEntity, 204, entityId);
 
   return true;
 }

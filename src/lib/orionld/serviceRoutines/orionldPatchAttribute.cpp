@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // dbModelFromApiSubAttribute
@@ -455,56 +456,7 @@ bool orionldPatchAttribute(void)
     }
   }
 
-  //
-  // Response status code and payload body:
-  // - No errors (failureV array is empty):   204 and no payload body
-  // - One single error, and no successes:    the single element in the failure array contains the HTTP Status code and the response ProblemDetail body
-  // - A mix of success/failures OR no success but more than one error: 207
-  //
-  KjNode* failureArray = kjLookup(responseBody, "failure");
-  KjNode* successArray = kjLookup(responseBody, "success");
-  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
-  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
-
-  if (failureArray != NULL)
-    failureArray->name = (char*) "notUpdated";
-  if (successArray != NULL)
-    successArray->name = (char*) "updated";
-
-  if (failures == 0)
-  {
-    orionldState.httpStatusCode = 204;
-    orionldState.responseTree   = NULL;
-  }
-  else if ((successes == 0) && (failures == 1))
-  {
-    KjNode* errorP      = failureArray->value.firstChildP;
-    KjNode* attributesP = kjLookup(errorP, "attributes");
-    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
-    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
-
-    if (attributesP != NULL)
-      kjChildRemove(errorP, attributesP);
-    if (statusCodeP != NULL)
-      kjChildRemove(errorP, statusCodeP);
-
-    orionldState.httpStatusCode = statusCode;
-    orionldState.responseTree   = errorP;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-
-    return false;
-  }
-  else
-  {
-    if (successes > 1)
-      kjStringArraySort(successArray);
-
-    orionldState.responseTree   = responseBody;
-    orionldState.httpStatusCode = 207;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-  }
+  responseFix(responseBody, DoUpdateAttrs, 204, entityId);
 
   if ((troe == true) && (incomingP != NULL))
     orionldState.requestTree = incomingP;

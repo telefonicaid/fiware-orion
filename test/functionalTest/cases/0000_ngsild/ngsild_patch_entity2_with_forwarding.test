@@ -50,6 +50,10 @@ brokerStart CP3 20-21 IPv4 -experimental
 # 12. GET urn:E1 from CP2
 # 13. GET urn:E1 from CP3
 #
+# 14. DELETE urn:E1 in CP1
+# 15. PATCH urn:E1/P2 - see 404 from R1
+# 16. PATCH urn:E1/P1+P2 - see 207, including 404 from R1 and P1 as local success
+#
 
 echo "01. In CB, create an entity urn:E1 with an attribute P1"
 echo "======================================================="
@@ -223,6 +227,34 @@ echo
 echo "13. GET urn:E1 from CP3"
 echo "======================="
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP3_PORT
+echo
+echo
+
+
+echo "14. DELETE urn:E1 in CP1"
+echo "========================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE --port $CP1_PORT
+echo
+echo
+
+
+echo "15. PATCH urn:E1/P2 - see 404 from R1"
+echo "====================================="
+payload='{
+  "P2": "P2 (patch-attempt in step 15)"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "16. PATCH urn:E1/P1+P2 - see 207, including 404 from R1 and P1 as local success"
+echo "==============================================================================="
+payload='{
+  "P1": "P1 (patch in step 16)",
+  "P2": "P2 (patch-attempt in step 16)"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
 echo
 echo
 
@@ -429,6 +461,57 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     },
     "id": "urn:E1",
     "type": "T"
+}
+
+
+14. DELETE urn:E1 in CP1
+========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+15. PATCH urn:E1/P2 - see 404 from R1
+=====================================
+HTTP/1.1 404 Not Found
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "attributes": [
+        "P2"
+    ],
+    "detail": "urn:E1",
+    "registrationId": "urn:ngsi-ld:registration:R1",
+    "title": "Entity does not exist"
+}
+
+
+16. PATCH urn:E1/P1+P2 - see 207, including 404 from R1 and P1 as local success
+===============================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 169
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "attributes": [
+                "P2"
+            ],
+            "detail": "urn:E1",
+            "registrationId": "urn:ngsi-ld:registration:R1",
+            "statusCode": 404,
+            "title": "Entity does not exist"
+        }
+    ],
+    "updated": [
+        "P1"
+    ]
 }
 
 

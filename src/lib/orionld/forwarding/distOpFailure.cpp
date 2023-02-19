@@ -94,24 +94,34 @@ void distOpFailure(KjNode* responseBody, DistOp* distOpP, const char* title, con
   if (detailP != NULL)
     kjChildAdd(error, detailP);
 
-  if (distOpP != NULL)
-  {
-    for (KjNode* attrNameP = distOpP->requestBody->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
-    {
-      if (strcmp(attrNameP->name, "id") == 0)
-        continue;
-      if (strcmp(attrNameP->name, "type") == 0)
-        continue;
-
-      char*   attrShortName  = orionldContextItemAliasLookup(orionldState.contextP, attrNameP->name, NULL, NULL);
-      KjNode* aNameP         = kjString(orionldState.kjsonP, NULL, attrShortName);
-      kjChildAdd(attrV, aNameP);
-    }
-  }
-  else if (attrName != NULL)  // local attribute, its name is given as parameter to this function
+  if (attrName != NULL)  // local attribute, its name is given as parameter to this function
   {
     KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
     kjChildAdd(attrV, aNameP);
+  }
+  else if (distOpP != NULL)
+  {
+    if (distOpP->attrName != NULL)
+    {
+      char*   alias  = orionldContextItemAliasLookup(orionldState.contextP, distOpP->attrName, NULL, NULL);
+      KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
+
+      kjChildAdd(attrV, aNameP);
+    }
+    else if (distOpP->requestBody != NULL)
+    {
+      for (KjNode* attrNameP = distOpP->requestBody->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
+      {
+        if (strcmp(attrNameP->name, "id") == 0)
+          continue;
+        if (strcmp(attrNameP->name, "type") == 0)
+          continue;
+
+        char*   attrShortName  = orionldContextItemAliasLookup(orionldState.contextP, attrNameP->name, NULL, NULL);
+        KjNode* aNameP         = kjString(orionldState.kjsonP, NULL, attrShortName);
+        kjChildAdd(attrV, aNameP);
+      }
+    }
   }
 
   if (attrV->value.firstChildP != NULL)

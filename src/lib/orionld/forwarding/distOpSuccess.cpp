@@ -44,9 +44,33 @@ extern "C"
 extern void updatedAttr404Purge(KjNode* failureV, char* attrName);
 // -----------------------------------------------------------------------------
 //
+// attrNameToSuccess -
+//
+static void attrNameToSuccess(KjNode* successV, KjNode* failureV, char* attrName)
+{
+  char* attrLongName = kaStrdup(&orionldState.kalloc, attrName);
+  eqForDot(attrLongName);
+  char* alias = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, NULL, NULL);
+
+  if (kjStringValueLookupInArray(successV, alias) == NULL)
+  {
+    KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
+    LM_T(LmtDistOp207, ("Adding '%s' to successV", alias));
+    kjChildAdd(successV, aNameP);
+
+    updatedAttr404Purge(failureV, alias);
+  }
+  else
+    LM_T(LmtDistOp207, ("NOT adding attribute '%s' to successV (it's already present)", alias));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // distOpSuccess -
 //
-void distOpSuccess(KjNode* responseBody, DistOp* distOpP)
+void distOpSuccess(KjNode* responseBody, DistOp* distOpP, char* attrName)
 {
   KjNode* successV = kjLookup(responseBody, "success");
   KjNode* failureV = kjLookup(responseBody, "failure");
@@ -57,26 +81,23 @@ void distOpSuccess(KjNode* responseBody, DistOp* distOpP)
     kjChildAdd(responseBody, successV);
   }
 
-  for (KjNode* attrNameP = distOpP->requestBody->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
+  if (attrName != NULL)
+    attrNameToSuccess(successV, failureV, attrName);
+  else if (distOpP != NULL)
   {
-    if (strcmp(attrNameP->name, "id") == 0)
-      continue;
-    if (strcmp(attrNameP->name, "type") == 0)
-      continue;
-
-    char* attrLongName = kaStrdup(&orionldState.kalloc, attrNameP->name);
-    eqForDot(attrLongName);
-    char* alias = orionldContextItemAliasLookup(orionldState.contextP, attrLongName, NULL, NULL);
-
-    if (kjStringValueLookupInArray(successV, alias) == NULL)
-    {
-      KjNode* aNameP = kjString(orionldState.kjsonP, NULL, alias);
-      LM_T(LmtDistOp207, ("Adding '%s' to successV", alias));
-      kjChildAdd(successV, aNameP);
-
-      updatedAttr404Purge(failureV, alias);
-    }
+    if (distOpP->attrName != NULL)
+      attrNameToSuccess(successV, failureV, distOpP->attrName);
     else
-      LM_T(LmtDistOp207, ("NOT adding attribute '%s' to successV (it's already present)", alias));
+    {
+      for (KjNode* attrNameP = distOpP->requestBody->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
+      {
+        if (strcmp(attrNameP->name, "id") == 0)
+          continue;
+        if (strcmp(attrNameP->name, "type") == 0)
+          continue;
+
+        attrNameToSuccess(successV, failureV, attrNameP->name);
+      }
+    }
   }
 }

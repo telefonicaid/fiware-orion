@@ -37,7 +37,7 @@
 //
 // mongocEntityDelete -
 //
-bool mongocEntityDelete(const char* entityId)
+bool mongocEntityDelete(const char* entityId, char** detailP)
 {
   mongocConnectionGet();
 
@@ -60,6 +60,7 @@ bool mongocEntityDelete(const char* entityId)
   {
     LM_E(("Database Error (mongoc_collection_remove returned %d.%d:%s)", error.domain, error.code, error.message));
     orionldError(OrionldInternalError, "Database Error", error.message, 500);
+    *detailP = error.message;
     return false;
   }
 

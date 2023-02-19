@@ -255,7 +255,7 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
   }
   else if (httpResponseCode == 0)
   {
-    LM(("%s: Seems like the request wasn't even sent ...", distOpP->regP->regId));
+    LM(("%s: Seems like the request wasn't even sent ... (%s)", distOpP->regP->regId, distOpP->regP->ipAndPort));
 
     int         statusCode = 500;
     const char* title      = "Unable to send distributed request";
@@ -289,7 +289,12 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
   LM_T(LmtDistOpResponse, ("Reg %s: Distributed Response Code: %d",   distOpP->regP->regId, httpResponseCode));
   LM_T(LmtDistOpResponse, ("Reg %s: Distributed Response Body: '%s'", distOpP->regP->regId, distOpP->rawResponse));
 
-  if ((distOpP->operation == DoCreateEntity) || (distOpP->operation == DoUpdateEntity))
+  if ((distOpP->operation == DoCreateEntity) ||
+      (distOpP->operation == DoUpdateEntity) ||
+      (distOpP->operation == DoDeleteAttrs)  ||
+      (distOpP->operation == DoDeleteEntity) ||
+      (distOpP->operation == DoMergeEntity)  ||
+      (distOpP->operation == DoUpdateAttrs))
   {
     LM(("Calling entityResponseAccumulate"));
     entityResponseAccumulate(distOpP, responseBody, successV, failureV, httpResponseCode, msgP);
@@ -299,11 +304,14 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     //
     // Not Implemented ...
     //
-    LM(("distOpP->operation: %d", distOpP->operation));
+    LM(("************************************** distOpP->operation: %s (THIS MUST BE IMPLEMENTED !!!)", distOpTypes[distOpP->operation]));
     if (msgP->data.result == CURLE_OK)
     {
-      LM(("All good ... (httpResponseCode == %d)", httpResponseCode));
-      distOpSuccess(responseBody, distOpP);
+      LM(("Got a response: httpResponseCode == %d", httpResponseCode));
+      if ((httpResponseCode >= 200) && (httpResponseCode <= 299))
+        distOpSuccess(responseBody, distOpP, NULL);
+      else if (httpResponseCode == 404)
+        distOpFailure(responseBody, distOpP, "Not Found", NULL, 404, NULL);
     }
     else
     {
@@ -349,12 +357,18 @@ void distOpResponses(DistOp* distOpList, KjNode* responseBody)
   //
   // First, gather all errors from not-sent requests
   //
+  int sent = 0;
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
   {
     // Perhaps we need a special xError - for the distop requests that weren't even attempted (409 due to no-op of Exclusive reg)
     if (distOpP->error == true)
       distOpFailure(responseBody, distOpP, distOpP->title, distOpP->detail, distOpP->httpResponseCode, NULL);
+    else
+      ++sent;
   }
+
+  if (sent == 0)
+    return;
 
   //
   // Read responses

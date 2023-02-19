@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <strings.h>                                             // bzero
+
 extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_VEC_SIZE
@@ -44,6 +46,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/orionldPatchApply.h"                    // orionldPatchApply
+#include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration, orionldAlterationType
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
@@ -597,95 +600,97 @@ bool orionldPatchEntity2(void)
     }
   }
 
-  KjNode* requestForLocal = kjClone(orionldState.kjsonP, orionldState.requestTree);
+  KjNode* patchTree       = NULL;
+  bool    dbUpdateResult  = false;
+  KjNode* requestForLocal = (orionldState.requestTree != NULL)? kjClone(orionldState.kjsonP, orionldState.requestTree) : NULL;
 
-  orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP, false);
-  orionldAlterationsPresent(orionldState.alterations);
-  orionldState.alterations->dbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
-
-  //
-  // For TRoE we need a tree with all those attributes that have been patched (part of incoming tree)
-  // but, with their current value in the database PATCHED with their new values
-  //
-  if (troe)
+  if (requestForLocal != NULL)
   {
-    // 1. Get "from DB" (dbAttrsP) all attributes that have been touched by the PATCH *locally*
-    // 2. Convert the attributes to API Model
-    // 3. Perform the PATCH on the attributes
-    KjNode* troeTree = kjObject(orionldState.kjsonP, NULL);
+    orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP, false);
+    orionldAlterationsPresent(orionldState.alterations);
+    orionldState.alterations->dbEntityP = kjClone(orionldState.kjsonP, dbEntityP);
 
-    for (KjNode* patchedAttrP = orionldState.requestTree->value.firstChildP; patchedAttrP != NULL; patchedAttrP = patchedAttrP->next)
+    //
+    // For TRoE we need a tree with all those attributes that have been patched (part of incoming tree)
+    // but, with their current value in the database PATCHED with their new values
+    //
+    if (troe)
     {
-      KjNode* dbAttrP;
-      dotForEq(patchedAttrP->name);
+      // 1. Get "from DB" (dbAttrsP) all attributes that have been touched by the PATCH *locally*
+      // 2. Convert the attributes to API Model
+      // 3. Perform the PATCH on the attributes
+      KjNode* troeTree = kjObject(orionldState.kjsonP, NULL);
 
-      if ((dbAttrP = kjLookup(dbAttrsP, patchedAttrP->name)) != NULL)
+      for (KjNode* patchedAttrP = orionldState.requestTree->value.firstChildP; patchedAttrP != NULL; patchedAttrP = patchedAttrP->next)
       {
-        KjNode* troeAttrP = kjClone(orionldState.kjsonP, dbAttrP);
+        KjNode* dbAttrP;
+        dotForEq(patchedAttrP->name);
 
-        dbModelToApiAttribute(troeAttrP, orionldState.uriParamOptions.sysAttrs, false);
-        kjChildAdd(troeTree, troeAttrP);
+        if ((dbAttrP = kjLookup(dbAttrsP, patchedAttrP->name)) != NULL)
+        {
+          KjNode* troeAttrP = kjClone(orionldState.kjsonP, dbAttrP);
+
+          dbModelToApiAttribute(troeAttrP, orionldState.uriParamOptions.sysAttrs, false);
+          kjChildAdd(troeTree, troeAttrP);
+        }
+        eqForDot(patchedAttrP->name);
       }
-      eqForDot(patchedAttrP->name);
+
+      orionldState.patchBase = troeTree;
     }
 
-    orionldState.patchBase = troeTree;
-  }
-
-  //
-  // FIXME: If I destroy the tree, how do I handle notifications/forwarding later ... ?
-  //        I extract the part that is to be forwarded from the tree before I destroy
-  //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
-  //
-  if (dbModelFromApiEntity(orionldState.requestTree, dbEntityP, false, NULL, NULL) == false)
-  {
-    LM_W(("dbModelFromApiEntity: %s: %s", orionldState.pd.title, orionldState.pd.detail));
-    return false;
-  }
-
-
-  //
-  // Due to the questionable database model of Orion (that Orion-LD has inherited - backwards compatibility),
-  // the attributes that have been added/removed must be added/removed to a redundant database field called "attrNames".
-  //
-  // It's not possible to both remove and add items from a field in a single operation in mongo, so a list of all
-  // added attributes and another list of all deleted attributes must be maintained for the purpose of updating "attrNames".
-  //
-  // The very same is true for the sub-attributes of an attribute - the database field "mdNames" is an array of all sub-attributes.
-  //
-  // The lists of added/deleted attributes are stored in arrays in the tree: ".added" + ".removed"
-  // The lists of added/deleted sub-attributes, same same - ".added" + ".removed", under the attribute
-  //
-  // orionldEntityPatch returns a KjNode array of objects describing the modifications for the patch.
-  // For details, see "To PATCH an Entity" above.
-  //
-  KjNode* patchTree     = kjArray(orionldState.kjsonP, NULL);
-  KjNode* dbAttrsObject = kjObject(orionldState.kjsonP, NULL);
-
-  kjChildAdd(dbAttrsObject, dbAttrsP);
-  orionldState.requestTree->name = NULL;
-  orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
-
-  orionldState.alterations->inEntityP       = patchTree;  // Not sure this is needed - alteredAttributeV should be used instead ... Right?
-  orionldState.alterations->finalApiEntityP = NULL;
-
-  bool b = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found in arrays named ".added" and ".removed"
-  if (b == false)
-  {
-    if (distOpList == NULL)
+    //
+    // FIXME: If I destroy the tree, how do I handle notifications/forwarding later ... ?
+    //        I extract the part that is to be forwarded from the tree before I destroy
+    //        If non-exclusive, might be I both forward and do it locally - kjClone(attrP)
+    //
+    if (dbModelFromApiEntity(orionldState.requestTree, dbEntityP, false, NULL, NULL) == false)
     {
-      bson_error_t* errP = &orionldState.mongoc.error;  // Can't be in orionldState - DB Dependant!!!
-
-      LM_E(("mongocEntityUpdate(%s): [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
-
-      if (errP->code == 12)  orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
-      else                   orionldError(OrionldInternalError, "Internal Error", errP->message, 500);
-
+      LM_W(("dbModelFromApiEntity: %s: %s", orionldState.pd.title, orionldState.pd.detail));
       return false;
     }
-  }
 
-  orionldState.httpStatusCode = 204;
+    //
+    // Due to the questionable database model of Orion (that Orion-LD has inherited - backwards compatibility),
+    // the attributes that have been added/removed must be added/removed to a redundant database field called "attrNames".
+    //
+    // It's not possible to both remove and add items from a field in a single operation in mongo, so a list of all
+    // added attributes and another list of all deleted attributes must be maintained for the purpose of updating "attrNames".
+    //
+    // The very same is true for the sub-attributes of an attribute - the database field "mdNames" is an array of all sub-attributes.
+    //
+    // The lists of added/deleted attributes are stored in arrays in the tree: ".added" + ".removed"
+    // The lists of added/deleted sub-attributes, same same - ".added" + ".removed", under the attribute
+    //
+    // orionldEntityPatch returns a KjNode array of objects describing the modifications for the patch.
+    // For details, see "To PATCH an Entity" above.
+    //
+    patchTree             = kjArray(orionldState.kjsonP, NULL);
+    KjNode* dbAttrsObject = kjObject(orionldState.kjsonP, NULL);
+
+    kjChildAdd(dbAttrsObject, dbAttrsP);
+    orionldState.requestTree->name = NULL;
+    orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
+
+    orionldState.alterations->inEntityP       = patchTree;  // Not sure this is needed - alteredAttributeV should be used instead ... Right?
+    orionldState.alterations->finalApiEntityP = NULL;
+
+    dbUpdateResult = mongocEntityUpdate(entityId, patchTree);  // Added/Removed (sub-)attrs are found in arrays named ".added" and ".removed"
+    if (dbUpdateResult == false)
+    {
+      if (distOpList == NULL)
+      {
+        bson_error_t* errP = &orionldState.mongoc.error;  // Can't be in orionldState - DB Dependant!!!
+
+        LM_E(("mongocEntityUpdate(%s): [%d.%d]: %s", entityId, errP->domain, errP->code, errP->message));
+
+        if (errP->code == 12)  orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
+        else                   orionldError(OrionldInternalError, "Internal Error", errP->message, 500);
+
+        return false;
+      }
+    }
+  }
 
   if (troe)
     orionldState.requestTree = patchTree;
@@ -705,61 +710,14 @@ bool orionldPatchEntity2(void)
     // Only the "DistOp::body" is used in distOpSuccess so I can fix it:
     //
     DistOp local;
+    bzero(&local, sizeof(local));
     local.requestBody = requestForLocal;
 
-    if (b == true)
-      distOpSuccess(responseBody, &local);
-    else
-      distOpFailure(responseBody, &local, "Database Error", "mongoc", 500, NULL);
+    if (dbUpdateResult == true)
+      distOpSuccess(responseBody, &local, NULL);
   }
 
-  //
-  // Response status code and payload body:
-  // - No errors (failureV array is empty):   204 and no payload body
-  // - One single error, and no successes:    the single element in the failure array contains the HTTP Status code and the response ProblemDetail body
-  // - A mix of success/failures OR no success but more than one error: 207
-  //
-  KjNode* failureArray = kjLookup(responseBody, "failure");
-  KjNode* successArray = kjLookup(responseBody, "success");
-  int     failures     = (failureArray == NULL)? 0 : kjChildCount(failureArray);
-  int     successes    = (successArray == NULL)? 0 : kjChildCount(successArray);
-
-  if (failureArray != NULL)
-    failureArray->name = (char*) "notUpdated";
-  if (successArray != NULL)
-    successArray->name = (char*) "updated";
-
-  if (failures == 0)
-  {
-    orionldState.httpStatusCode = 204;
-    orionldState.responseTree   = NULL;
-  }
-  else if ((successes == 0) && (failures == 1))
-  {
-    KjNode* errorP      = failureArray->value.firstChildP;
-    KjNode* statusCodeP = kjLookup(errorP, "statusCode");
-    int     statusCode  = (statusCodeP != NULL)? statusCodeP->value.i : 400;
-
-    if (statusCodeP != NULL)
-      kjChildRemove(errorP, statusCodeP);
-
-    orionldState.httpStatusCode = statusCode;
-    orionldState.responseTree   = errorP;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-
-    return false;
-  }
-  else
-  {
-    if (successes > 1)
-      kjStringArraySort(successArray);
-
-    orionldState.httpStatusCode = 207;
-    orionldState.responseTree   = responseBody;
-
-    httpHeaderLinkAdd(orionldState.contextP->url);
-  }
+  responseFix(responseBody, DoMergeEntity, 204, entityId);
 
   if (orionldState.curlDoMultiP != NULL)
     distOpListRelease(distOpList);
