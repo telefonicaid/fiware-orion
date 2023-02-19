@@ -289,7 +289,12 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
   LM_T(LmtDistOpResponse, ("Reg %s: Distributed Response Code: %d",   distOpP->regP->regId, httpResponseCode));
   LM_T(LmtDistOpResponse, ("Reg %s: Distributed Response Body: '%s'", distOpP->regP->regId, distOpP->rawResponse));
 
-  if ((distOpP->operation == DoCreateEntity) || (distOpP->operation == DoUpdateEntity) || (distOpP->operation == DoDeleteAttrs) || (distOpP->operation == DoDeleteEntity))
+  if ((distOpP->operation == DoCreateEntity) ||
+      (distOpP->operation == DoUpdateEntity) ||
+      (distOpP->operation == DoDeleteAttrs)  ||
+      (distOpP->operation == DoDeleteEntity) ||
+      (distOpP->operation == DoMergeEntity)  ||
+      (distOpP->operation == DoUpdateAttrs))
   {
     LM(("Calling entityResponseAccumulate"));
     entityResponseAccumulate(distOpP, responseBody, successV, failureV, httpResponseCode, msgP);
