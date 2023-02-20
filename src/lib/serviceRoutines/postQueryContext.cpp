@@ -527,9 +527,13 @@ std::string postQueryContext
   // In API version 2, this has changed completely. Here, the total count of local entities is returned
   // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
   //
+  std::string georel  =  ciP->uriParam["georel"];
   if ((ciP->apiVersion == V2))
   {
-    countP = &count;
+    if (!((ciP->inMimeType == JSON && strstr(ciP->payload, "near")) || strstr(georel.c_str(), "near")))
+    {
+      countP = &count;
+    }
   }
   else if ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on"))
   {
@@ -709,7 +713,7 @@ std::string postQueryContext
   int providerLimit    	=  atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
   int totalOffset   	=  atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
   int providerOffset    =  0;
-  int brokerCount      =  0;
+  int brokerCount       =  0;
 
   if (ciP->apiVersion == V2)
   {
@@ -788,6 +792,7 @@ std::string postQueryContext
           if (providerOffset > (*countP - brokerCount))
           {
             providerOffset -= (*countP - brokerCount);
+	    brokerCount += (*countP - brokerCount);
           }
           else
           {

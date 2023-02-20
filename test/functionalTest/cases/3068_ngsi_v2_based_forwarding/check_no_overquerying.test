@@ -107,7 +107,7 @@ Date: REGEX(.*)
 
 03. Dump accumulator and check that E/A was forwarded (not including B or C)
 ============================================================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+POST http://localhost:REGEX(\d+)/v2/op/query?limit=20&offset=0&options=count
 Fiware-Servicepath: /
 Content-Length: 50
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
