@@ -91,7 +91,7 @@ void responseFix(KjNode* responseBody, DistOpType operation, int okCode, const c
 
     httpHeaderLinkAdd(orionldState.contextP->url);  // For attribute names to be expanded by receiver
 
-    if ((okCode == 201) && (entityId != NULL))
+    if ((okCode == 201) && (entityId != NULL) && (successes >= 1))
       httpHeaderLocationAdd("/ngsi-ld/v1/entities/", entityId, orionldState.tenantP->tenant);
   }
 }

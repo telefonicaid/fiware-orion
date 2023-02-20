@@ -294,7 +294,8 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
       (distOpP->operation == DoDeleteAttrs)  ||
       (distOpP->operation == DoDeleteEntity) ||
       (distOpP->operation == DoMergeEntity)  ||
-      (distOpP->operation == DoUpdateAttrs))
+      (distOpP->operation == DoUpdateAttrs)  ||
+      (distOpP->operation == DoAppendAttrs))
   {
     LM(("Calling entityResponseAccumulate"));
     entityResponseAccumulate(distOpP, responseBody, successV, failureV, httpResponseCode, msgP);

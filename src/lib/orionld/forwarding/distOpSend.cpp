@@ -465,6 +465,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   if (orionldState.uriParams.lang != NULL)
     uriParamAdd(&urlParts, "lang", orionldState.uriParams.lang, -1);
 
+  if ((distOpP->operation == DoAppendAttrs) && (orionldState.uriParamOptions.noOverwrite == true))
+    uriParamAdd(&urlParts, "options", "noOverwrite", 11);
+
   //
   // Compose the entire URL and pass it to CURL
   //

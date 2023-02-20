@@ -37,18 +37,22 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/common/attributeUpdated.h"                     // attributeUpdated
-#include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
+#include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_OBJECT, PCHECK_EMPTY_OBJECT, ...
-#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
+#include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/legacyDriver/legacyPostEntity.h"               // legacyPostEntity
 #include "orionld/dbModel/dbModelFromApiAttribute.h"             // dbModelFromApiAttribute
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
+#include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
+#include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
+#include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/serviceRoutines/orionldPostEntity.h"           // Own Interface
 
 
@@ -137,7 +141,7 @@ bool orionldPostEntity(void)
   // Get the entity from the database
   //
   KjNode* dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
-  if (dbEntityP == NULL)
+  if ((dbEntityP == NULL) && (orionldState.distributed == false))
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);
     return false;
@@ -145,15 +149,15 @@ bool orionldPostEntity(void)
 
   // Keep untouched initial state of the entity in the database - for alterations (to check for false updates)
   KjNode* initialDbEntityP = NULL;  // kjClone(orionldState.kjsonP, dbEntityP);
-  KjNode* dbAttrsP         = kjLookup(dbEntityP, "attrs");
+  KjNode* dbAttrsP         = (dbEntityP != NULL)? kjLookup(dbEntityP, "attrs") : NULL;
 
   //
   // Check the Entity, expand averything and transform it into Normalized form
   //
   // Actually, no, let's use pCheckAttribute on every individual attribute instead
   //
-  // if (pCheckEntity(orionldState.requestTree, false, dbAttrsP) == false)
-  //   return false;
+  if (pCheckEntity(orionldState.requestTree, false, dbAttrsP) == false)
+    return false;
 
   //
   // We need the Entity Type for ALTERATIONS - match subscriptions
@@ -162,142 +166,139 @@ bool orionldPostEntity(void)
   //
   // If entity type is present in the payload body, it must be a String and identical to the entity type in the database
   //
-  KjNode* dbTypeNodeP = dbEntityTypeExtract(dbEntityP);
-  entityType = dbTypeNodeP->value.s;
+  KjNode* dbTypeNodeP = (dbEntityP != NULL)? dbEntityTypeExtract(dbEntityP) : NULL;
+  entityType = (dbTypeNodeP != NULL)? dbTypeNodeP->value.s : NULL;
 
   //
   // If the Entity Type is present in the payload body ... need to make sure it's a match
   //
   if (orionldState.payloadTypeNode != NULL)
   {
-    if (strcmp(orionldState.payloadTypeNode->value.s, entityType) != 0)
+    if ((entityType != NULL) && (strcmp(orionldState.payloadTypeNode->value.s, entityType) != 0))
     {
       orionldError(OrionldBadRequestData, "Mismatching Entity::type in payload body", "Does not coincide with the Entity::type in the database", 400);
       return false;
     }
   }
 
-  //
-  // Loop over the incoming payload tree
-  // Foreach attribute
-  // - lookup in DB
-  // - if present in DB:
-  //   - if IGNORE:
-  //     - Add to 'notUpdatedArray' (steal from legacyPostEntity)
-  //     - REMOVE from orionldState.requestTree (for TRoE and ALTERATION)
-  //   - if REPLACE:
-  //     - add to dbNewAttrV
-  //     - Add to 'updatedArray' (steal from legacyPostEntity)
-  // - if not present in DB
-  //   - add to dbNewAttrV
-  //
-  // - Write to DB - just a bunch of $set in attrs (and $push? to attrNames)
-  // - Merge dbEntityP with dbNewAttrV => finalDbEntityP that is needed for ALTERATIONS
-  //
-  KjNode* updatedP        = kjArray(orionldState.kjsonP, "updated");
-  KjNode* notUpdatedP     = kjArray(orionldState.kjsonP, "notUpdated");
-  KjNode* newDbAttrNamesV = kjArray(orionldState.kjsonP, NULL);
-  KjNode* dbAttrsUpdate   = kjObject(orionldState.kjsonP, NULL);
-  KjNode* attrP           = orionldState.requestTree->value.firstChildP;
-  KjNode* next;
+  KjNode*  treeForTroe = NULL;
+  DistOp*  distOpList  = NULL;
+  if (orionldState.distributed == true)
+    distOpList = distOpRequests(entityId, entityType, DoAppendAttrs, orionldState.requestTree);
+  kjTreeLog(orionldState.requestTree, "Left after distOpRequests", 20);
 
-  while (attrP)
+  KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
+  KjNode* attrExists   = kjObject(orionldState.kjsonP, NULL);
+
+  if (orionldState.requestTree != NULL)
   {
-    OrionldContextItem*  contextItemP = NULL;
-    char*                shortName    = attrP->name;
-
-    next = attrP->next;
-
     //
-    // Is the attribute valid?
+    // Loop over the incoming payload tree
+    // Foreach attribute
+    // - lookup in DB
+    // - if present in DB:
+    //   - if IGNORE:
+    //     - Add to 'success' (steal from legacyPostEntity)
+    //     - REMOVE from orionldState.requestTree (for TRoE and ALTERATION)
+    //   - if REPLACE:
+    //     - add to dbNewAttrV
+    //     - Add to 'successs' (steal from legacyPostEntity)
+    // - if not present in DB
+    //   - add to dbNewAttrV
     //
-    if (pCheckAttribute(entityId, attrP, true, NoAttributeType, false, contextItemP) == false)
+    // - Write to DB - just a bunch of $set in attrs (and $push? to attrNames)
+    // - Merge dbEntityP with dbNewAttrV => finalDbEntityP that is needed for ALTERATIONS
+    //
+    KjNode* newDbAttrNamesV = kjArray(orionldState.kjsonP, NULL);
+    KjNode* dbAttrsUpdate   = kjObject(orionldState.kjsonP, NULL);
+    KjNode* attrP           = orionldState.requestTree->value.firstChildP;
+    KjNode* next;
+
+    while (attrP)
     {
-      kjChildRemove(orionldState.requestTree, attrP);
-      attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
-      attrP = next;
+      next = attrP->next;
 
-      continue;
-    }
+      // The attribute name was expanded by pcheckEntity - now we can check whether it already exists locally
+      char eqName[512];
+      strncpy(eqName, attrP->name, sizeof(eqName) - 1);
+      dotForEq(eqName);
+      KjNode* dbAttrP = kjLookup(dbAttrsP, eqName);
 
-    // pCheckAttribute EXPANDS the attribute name - now we can check whether it already existed
-    char eqName[512];
-    strncpy(eqName, attrP->name, sizeof(eqName) - 1);
-    dotForEq(eqName);
-    KjNode* dbAttrP = kjLookup(dbAttrsP, eqName);
-
-    if (dbAttrP != NULL)
-    {
-      if (ignoreExistingAttributes == true)
+      if (dbAttrP != NULL)
       {
-        kjChildRemove(orionldState.requestTree, attrP);
-        attributeNotUpdated(notUpdatedP, shortName, "attribute already exists", "overwrite is not allowed");
+        if (ignoreExistingAttributes == true)
+        {
+          // Move attribute to 'attrExists' for later call to distOpFailure
+          kjChildRemove(orionldState.requestTree, attrP);
+          kjChildAdd(attrExists, attrP);
+        }
+        else
+        {
+          bool ignore = false;
+          if (attributeToDbArray(dbAttrsUpdate, attrP, dbAttrsP, newDbAttrNamesV, &ignore) == false)
+          {
+            distOpFailure(responseBody, NULL, orionldState.pd.title, orionldState.pd.detail, 400, attrP->name);
+            kjChildRemove(orionldState.requestTree, attrP);
+          }
+          else
+            distOpSuccess(responseBody, NULL, attrP->name);
+        }
       }
       else
       {
         bool ignore = false;
         if (attributeToDbArray(dbAttrsUpdate, attrP, dbAttrsP, newDbAttrNamesV, &ignore) == false)
         {
-          attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
+          distOpFailure(responseBody, NULL, orionldState.pd.title, orionldState.pd.detail, 400, attrP->name);
           kjChildRemove(orionldState.requestTree, attrP);
         }
         else
-          attributeUpdated(updatedP, shortName);
+          distOpSuccess(responseBody, NULL, attrP->name);
       }
+
+      attrP = next;
     }
-    else
+
+    if (dbAttrsUpdate->value.firstChildP != NULL)
     {
-      bool ignore = false;
-      if (attributeToDbArray(dbAttrsUpdate, attrP, dbAttrsP, newDbAttrNamesV, &ignore) == false)
+      if (mongocAttributesAdd(entityId, newDbAttrNamesV, dbAttrsUpdate, false) == false)
       {
-        attributeNotUpdated(notUpdatedP, shortName, orionldState.pd.title, orionldState.pd.detail);
-        kjChildRemove(orionldState.requestTree, attrP);
+        orionldError(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
+        return false;
       }
-      else
-        attributeUpdated(updatedP, shortName);
+
+      // WARNING: dbAttrsMerge DESTROYS dbEntityP - the initial state of the entity ...
+      // Seems like it also destroys the incoming requestTree, so, need to clone for TRoE
+      // Would be nice to have it NOT destroying the incoming tree (modified by pCheckAttribute)
+      //
+      if (troe)
+        treeForTroe = kjClone(orionldState.kjsonP, orionldState.requestTree);
+
+      dbAttrsMerge(dbAttrsP, dbAttrsUpdate, orionldState.uriParamOptions.noOverwrite == false);
+
+      OrionldProblemDetails  pd;
+      KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, false, &pd);
+
+      alteration(entityId, entityType, finalApiEntityP, orionldState.requestTree, initialDbEntityP);
     }
-
-    attrP = next;
   }
 
-  KjNode* treeForTroe = NULL;
-  if (dbAttrsUpdate->value.firstChildP != NULL)
+  if (attrExists->value.firstChildP != NULL)
   {
-    if (mongocAttributesAdd(entityId, newDbAttrNamesV, dbAttrsUpdate, false) == false)
-    {
-      orionldError(OrionldInternalError, "Database Error", "mongocAttributesAdd failed", 500);
-      return false;
-    }
+    DistOp local;
+    bzero(&local, sizeof(local));
+    local.requestBody = attrExists;
 
-    // WARNING: dbAttrsMerge DESTROYS dbEntityP - the initial state of the entity ...
-    // Seems like it also destroys the incoming requestTree, so, need to clone for TRoE
-    // Would be nice to have it NOT destroying the incoming tree (modified by pCheckAttribute)
-    //
-    if (troe)
-      treeForTroe = kjClone(orionldState.kjsonP, orionldState.requestTree);
-
-    dbAttrsMerge(dbAttrsP, dbAttrsUpdate, orionldState.uriParamOptions.noOverwrite == false);
-
-    OrionldProblemDetails  pd;
-    KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, false, &pd);
-
-    alteration(entityId, entityType, finalApiEntityP, orionldState.requestTree, initialDbEntityP);
+    distOpFailure(responseBody, &local, "attribute already exists", "overwrite is not allowed", 400, NULL);
   }
 
-  if (notUpdatedP->value.firstChildP == NULL)  // No errors
-  {
-    orionldState.httpStatusCode = 204;
-    orionldState.responseTree   = NULL;
-  }
-  else
-  {
-    KjNode* responseTree = kjObject(orionldState.kjsonP, NULL);
-    kjChildAdd(responseTree, notUpdatedP);
-    kjChildAdd(responseTree, updatedP);
+  if (distOpList != NULL)
+    distOpResponses(distOpList, responseBody);
 
-    orionldState.httpStatusCode = 207;
-    orionldState.responseTree   = responseTree;
-  }
+  responseFix(responseBody, DoAppendAttrs, 204, entityId);
+
+  if (orionldState.curlDoMultiP != NULL)
+    distOpListRelease(distOpList);
 
   if (troe)
     orionldState.requestTree = treeForTroe;
