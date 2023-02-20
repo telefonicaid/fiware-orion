@@ -536,7 +536,7 @@ NGSILD-Tenant: t1
 03. Append attributes R1,status,owner,batteryLevel to E1 on default tenant and without context
 ==============================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 145
+Content-Length: 170
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -544,8 +544,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "owner",
-            "reason": "attribute already exists: overwrite is not allowed"
+            "attributes": [
+                "owner"
+            ],
+            "detail": "overwrite is not allowed",
+            "statusCode": 400,
+            "title": "attribute already exists"
         }
     ],
     "updated": [
@@ -559,7 +563,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. Append attributes R1,status,owner,batteryLevel to E2 on T1 tenant and without context
 =========================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 145
+Content-Length: 170
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -567,8 +571,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "owner",
-            "reason": "attribute already exists: overwrite is not allowed"
+            "attributes": [
+                "owner"
+            ],
+            "detail": "overwrite is not allowed",
+            "statusCode": 400,
+            "title": "attribute already exists"
         }
     ],
     "updated": [
