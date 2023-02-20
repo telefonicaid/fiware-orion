@@ -51,3 +51,4 @@
 * Issue #280   Implemented forwarding for PATCH /entities/{entityId}/attrs
 * Issue #280   Implemented forwarding for PATCH /entities/{entityId}/attrs/{attrName}
 * Issue #280   Implemented forwarding for DELETE /entities/{entityId}/attrs/{attrName}
+* Issue #280   Implemented forwarding for POST /entities/{entityId}/attrs

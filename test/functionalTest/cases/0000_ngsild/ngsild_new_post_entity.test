@@ -329,20 +329,18 @@ bye
 
 05. Attempt to modify the attribute P2=22 with noOverwrite set, see it fail
 ===========================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 114
+HTTP/1.1 400 Bad Request
+Content-Length: 92
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "notUpdated": [
-        {
-            "attributeName": "P2",
-            "reason": "attribute already exists: overwrite is not allowed"
-        }
+    "attributes": [
+        "P2"
     ],
-    "updated": []
+    "detail": "overwrite is not allowed",
+    "title": "attribute already exists"
 }
 
 
@@ -428,7 +426,7 @@ bye
 07. Add the attribute P5 and attempt to modify P1 with noOverwrite set. P1: error, P3: ok - see that in the 207 response
 ========================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 118
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -436,8 +434,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "P1",
-            "reason": "attribute already exists: overwrite is not allowed"
+            "attributes": [
+                "P1"
+            ],
+            "detail": "overwrite is not allowed",
+            "statusCode": 400,
+            "title": "attribute already exists"
         }
     ],
     "updated": [

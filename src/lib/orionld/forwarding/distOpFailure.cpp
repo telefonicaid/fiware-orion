@@ -79,8 +79,8 @@ void distOpFailure(KjNode* responseBody, DistOp* distOpP, const char* title, con
     kjChildAdd(responseBody, failureV);
   }
 
-  KjNode* regIdP      = (distOpP != NULL)? kjLookup(distOpP->regP->regTree, "id") : NULL;
-  KjNode* regIdNodeP  = (regIdP != NULL)? kjString(orionldState.kjsonP,  "registrationId", regIdP->value.s) : NULL;
+  KjNode* regIdP      = ((distOpP != NULL) && (distOpP->regP != NULL))? kjLookup(distOpP->regP->regTree, "id") : NULL;
+  KjNode* regIdNodeP  = (regIdP  != NULL)? kjString(orionldState.kjsonP,  "registrationId", regIdP->value.s) : NULL;
   KjNode* error       = kjObject(orionldState.kjsonP,  NULL);
   KjNode* attrV       = kjArray(orionldState.kjsonP,   "attributes");
   KjNode* statusCodeP = kjInteger(orionldState.kjsonP, "statusCode", httpStatus);

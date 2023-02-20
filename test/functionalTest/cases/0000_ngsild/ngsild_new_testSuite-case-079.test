@@ -421,7 +421,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 08. With options=noOverwrite, attempt to append two attrs P1 and P2. P1 already exists and should be ignored. P2 should be appended (test case 081)
 ===================================================================================================================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 118
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -429,8 +429,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 {
     "notUpdated": [
         {
-            "attributeName": "P1",
-            "reason": "attribute already exists: overwrite is not allowed"
+            "attributes": [
+                "P1"
+            ],
+            "detail": "overwrite is not allowed",
+            "statusCode": 400,
+            "title": "attribute already exists"
         }
     ],
     "updated": [
