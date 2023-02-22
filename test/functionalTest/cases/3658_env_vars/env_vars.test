@@ -83,7 +83,7 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-logAppend' (append to log-file)]                                          ORION_LOG_APPEND                   FALSE /FALSE/
                                [option '-fg' (don't start as daemon)]                                              ORION_FOREGROUND                   FALSE /FALSE/
                                [option '-localIp' <IP to receive new connections>]                                 ORION_LOCALIP                      '0.0.0.0' /'0.0.0.0'/
-                               [option '-port' <port to receive new connections>]                                  ORION_PORT                         1026 /1026/
+                               [option '-port' <port to receive new connections>]                                  ORION_PORT                         1 <= 1026 /1026/ <= 65535
                                [option '-pidpath' <pid file path>]                                                 ORION_PID_PATH                     '/tmp/contextBroker.pid' /'/tmp/contextBroker/
                                [option '-dbhost' <database host>]                                                  ORION_MONGO_HOST                   'localhost' /'localhost'/
                                [option '-rplSet' <replica set>]                                                    ORION_MONGO_REPLICA_SET            '' /''/
