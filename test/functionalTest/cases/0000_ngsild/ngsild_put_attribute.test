@@ -1,0 +1,865 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT Attribute
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+dbInit CP2
+pgInit $CB_DB_NAME
+brokerStart CB  20,21,26,31-35,38 IPv4 -experimental -forwarding -troe
+brokerStart CP1 20,21,26,31-35,38 IPv4 -experimental
+brokerStart CP2 38 IPv4 -experimental
+accumulatorStart --pretty-print
+
+--SHELL--
+#
+# 01. Create an entity urn:E1 with attributes P0,P1,R0,R1 in CB
+# 02. Replace P1, using PUT Attribute
+# 03. GET urn:E1, see the new P1
+# 04. Replace R1 (make it a Property)
+# 05. GET urn:E1, see the new R1
+#
+# 06. Create a subscription urn:S0 matching urn:E1/P0 for the accumulator
+# 07. Create a subscription urn:S1 matching urn:E1/P1 for the accumulator
+#
+# 08. Replace urn:E1/P0
+# 09. Dump/Reset accumulator, see notification on urn:S0
+# 10. Replace urn:E1/P1
+# 11. Dump/Reset accumulator, see notification on urn:S1
+#
+# 12. Create an entity urn:E1 with attributes P0 in CP1
+# 13. Create an entity urn:E1 with attributes P0 in CP2
+# 14. Create an inclusive registration urn:R0 on urn:E1/P0, for CP1, that supports 'replaceAttr'
+# 15. Replace urn:E1/P0 in CB - distOp to urn:R0/CP1
+# 16. GET urn:E1 in CP1 - see changes from step 16
+# 17. GET urn:E1 in CP2 - see no changes (still as created in step 13)
+#
+# 18. Delete the registration urn:R0 (to be able to create an exclusive one on the same data)
+# 19. Delete the entity urn:E1 in CB (to be able to create an exclusive one on the same data)
+# 20. Re-create (local only) urn:E1 in CB
+# 21. Create an exclusive registration urn:R1 on urn:E1/P0, for CP2, that does not support 'replaceAttr'
+# 22. Replace urn:E1/P0 in CB - 409 due to urn:R1 not supporting 'replaceAttr'
+#
+# 23. See E1 in the temporal database
+# 24. See the attributes in the temporal database
+# 25. See the sub-attributes in the temporal database
+#
+# Only local updates are stored in TRoE:
+#   01. Create an entity urn:E1 with attributes P0,P1,R0,R1 in CB
+#         troe.entities:      1   CREATE
+#         troe.attributes:    4   CREATE
+#         troe.subAttributes: 4   -
+#
+#   02. Replace P1, using PUT Attribute
+#         troe.attributes:    1   REPLACE
+#         troe.subAttributes: 1   -
+#       
+#   04. Replace R1 (make it a Property)
+#         troe.attributes:    1   REPLACE
+#         troe.subAttributes: 1   -
+#
+#   08. Replace urn:E1/P0
+#         troe.attributes:    1   REPLACE
+#         troe.subAttributes: 1   -
+#
+#   10. Replace urn:E1/P1
+#         troe.attributes:    1   REPLACE
+#         troe.subAttributes: 1   -
+#
+#   19. Delete the entity urn:E1 in CB (to be able to create an exclusive one on the same data)
+#         troe.entities:      1   DELETE
+#
+#   20. Re-create (local only) urn:E1 in CB
+#         troe.entities:      1   CREATE
+#         troe.attributes:    3   CREATE
+#         troe.subAttributes: 3   -
+#
+# So, in total:
+#  entities:       CREATE + DELETE + CREATE
+#  attributes:     CREATE x4 + REPLACE + REPLACE + REPLACE + REPLACE + CREATE x3   == 11 slots
+#  subAttributes:  4+1+1+1+1+3   == 11 slots
+#
+echo "01. Create an entity urn:E1 with attributes P0,P1,R0,R1"
+echo "======================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P0": {
+    "value": "P0 in Step 01",
+    "subAttr": "subAttr in Step 01"
+  },
+  "P1": {
+    "value": "P1 in Step 01",
+    "subAttr2": "subAttr2 in Step 01"
+  },
+  "R0": {
+    "object": "urn:cb:r0:step01",
+    "subAttr3": "subAttr3 in Step 01"
+  },
+  "R1": {
+    "object": "urn:cb:r1:step01",
+    "subAttr4": "subAttr4 in Step 01"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Replace P1, using PUT Attribute"
+echo "==================================="
+payload='{
+  "value": "P1 in Step 02",
+  "subAttr5": "subAttr5 in Step 02"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "03. GET urn:E1, see the new P1"
+echo "=============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "04. Replace R1 (make it a Property)"
+echo "==================================="
+payload='{
+  "value": "R1 in Step 04",
+  "subAttr6": "subAttr6 in Step 04"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/R1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "05. GET urn:E1, see the new R1"
+echo "=============================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "06. Create a subscription urn:S0 matching urn:E1/P0 for the accumulator"
+echo "======================================================================="
+payload='{
+  "id": "urn:S0",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["P0"],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Create a subscription urn:S1 matching urn:E1/P1 for the accumulator"
+echo "======================================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["P1"],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Replace urn:E1/P0"
+echo "====================="
+payload='{
+  "value": "P0 in Step 08",
+  "subAttr7": "subAttr7 in Step 08"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P0 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "09. Dump/Reset accumulator, see notification on urn:S0"
+echo "======================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "10. Replace urn:E1/P1"
+echo "====================="
+payload='{
+  "value": "P1 in Step 10",
+  "subAttr8": "subAttr8 in Step 10"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "11. Dump/Reset accumulator, see notification on urn:S1"
+echo "======================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "12. Create an entity urn:E1 with attributes P0 in CP1"
+echo "====================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P0": {
+    "value": "CP1::P0 in Step 12",
+    "subAttr9": "subAttr9 in Step 12"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "13. Create an entity urn:E1 with attributes P0 in CP2"
+echo "====================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P0": {
+    "value": "CP2::P0 in Step 13",
+    "subAttr10": "subAttr10 in Step 13"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "14. Create an inclusive registration urn:R0 on urn:E1/P0, for CP1, that supports 'replaceAttr'"
+echo "=============================================================================================="
+payload='{
+  "id": "urn:R0",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P0" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "inclusive",
+  "operations": [ "replaceAttr" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "15. Replace urn:E1/P0 in CB - distOp to urn:R0/CP1"
+echo "=================================================="
+payload='{
+  "value": "P0 in Step 15",
+  "subAttr11": "subAttr11 in Step 15"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P0 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "16. GET urn:E1 in CP1 - see changes from step 16"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP1_PORT
+echo
+echo
+
+
+echo "17. GET urn:E1 in CP2 - see no changes (still as created in step 13)"
+echo "===================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP2_PORT
+echo
+echo
+
+
+echo "18. Delete the registration urn:R0 (to be able to create an exclusive one on the same data)"
+echo "==========================================================================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R0 -X DELETE
+echo
+echo
+
+
+echo "19. Delete the entity urn:E1 in CB (to be able to create an exclusive one on the same data)"
+echo "==========================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?local=true -X DELETE
+echo
+echo
+
+
+echo "20. Re-create (local only) urn:E1 in CB"
+echo "======================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+    "value": "P1 in Step 20",
+    "subAttr12": "subAttr12 in Step 20"
+  },
+  "R0": {
+    "object": "urn:cb:r0:step20",
+    "subAttr13": "subAttr13 in Step 20"
+  },
+  "R1": {
+    "object": "urn:cb:r1:step20",
+    "subAttr14": "subAttr14 in Step 20"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "21. Create an exclusive registration urn:R1 on urn:E1/P0, for CP2, that does not support 'replaceAttr'"
+echo "======================================================================================================"
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P0" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'",
+  "mode": "exclusive",
+  "operations": [ "deleteAttrs" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "22. Replace urn:E1/P0 in CB - 409 due to urn:R1 not supporting 'replaceAttr'"
+echo "============================================================================"
+payload='{
+  "value": "P0 in Step 22",
+  "subAttr15": "subAttr15 in Step 22"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P0 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "23. See E1 in the temporal database"
+echo "==================================="
+postgresCmd -sql "SELECT opMode,id,type,ts FROM entities"
+echo
+echo
+
+
+echo "24. See the attributes in the temporal database"
+echo "==============================================="
+postgresCmd -sql "SELECT opMode,id,valueType,entityId,subProperties,unitcode,datasetid,text,number,boolean,observedAt,ts FROM attributes"
+echo
+echo
+
+
+echo "25. See the sub-attributes in the temporal database"
+echo "==================================================="
+postgresCmd -sql "SELECT id,valueType,entityId,attrInstanceId,unitcode,text,number,boolean,observedAt FROM subAttributes"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:E1 with attributes P0,P1,R0,R1
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Replace P1, using PUT Attribute
+===================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. GET urn:E1, see the new P1
+==============================
+HTTP/1.1 200 OK
+Content-Length: 480
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P0": {
+        "subAttr": {
+            "type": "Property",
+            "value": "subAttr in Step 01"
+        },
+        "type": "Property",
+        "value": "P0 in Step 01"
+    },
+    "P1": {
+        "subAttr5": {
+            "type": "Property",
+            "value": "subAttr5 in Step 02"
+        },
+        "type": "Property",
+        "value": "P1 in Step 02"
+    },
+    "R0": {
+        "object": "urn:cb:r0:step01",
+        "subAttr3": {
+            "type": "Property",
+            "value": "subAttr3 in Step 01"
+        },
+        "type": "Relationship"
+    },
+    "R1": {
+        "object": "urn:cb:r1:step01",
+        "subAttr4": {
+            "type": "Property",
+            "value": "subAttr4 in Step 01"
+        },
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. Replace R1 (make it a Property)
+===================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET urn:E1, see the new R1
+==============================
+HTTP/1.1 200 OK
+Content-Length: 472
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P0": {
+        "subAttr": {
+            "type": "Property",
+            "value": "subAttr in Step 01"
+        },
+        "type": "Property",
+        "value": "P0 in Step 01"
+    },
+    "P1": {
+        "subAttr5": {
+            "type": "Property",
+            "value": "subAttr5 in Step 02"
+        },
+        "type": "Property",
+        "value": "P1 in Step 02"
+    },
+    "R0": {
+        "object": "urn:cb:r0:step01",
+        "subAttr3": {
+            "type": "Property",
+            "value": "subAttr3 in Step 01"
+        },
+        "type": "Relationship"
+    },
+    "R1": {
+        "subAttr6": {
+            "type": "Property",
+            "value": "subAttr6 in Step 04"
+        },
+        "type": "Property",
+        "value": "R1 in Step 04"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+06. Create a subscription urn:S0 matching urn:E1/P0 for the accumulator
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S0
+
+
+
+07. Create a subscription urn:S1 matching urn:E1/P1 for the accumulator
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+08. Replace urn:E1/P0
+=====================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09. Dump/Reset accumulator, see notification on urn:S0
+======================================================
+POST REGEX(.*)/notify?subscriptionId=urn:S0
+Content-Length: 642
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P0": {
+                "subAttr7": {
+                    "type": "Property",
+                    "value": "subAttr7 in Step 08"
+                },
+                "type": "Property",
+                "value": "P0 in Step 08"
+            },
+            "P1": {
+                "subAttr5": {
+                    "type": "Property",
+                    "value": "subAttr5 in Step 02"
+                },
+                "type": "Property",
+                "value": "P1 in Step 02"
+            },
+            "R0": {
+                "object": "urn:cb:r0:step01",
+                "subAttr3": {
+                    "type": "Property",
+                    "value": "subAttr3 in Step 01"
+                },
+                "type": "Relationship"
+            },
+            "R1": {
+                "subAttr6": {
+                    "type": "Property",
+                    "value": "subAttr6 in Step 04"
+                },
+                "type": "Property",
+                "value": "R1 in Step 04"
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S0",
+    "type": "Notification"
+}
+=======================================
+
+
+10. Replace urn:E1/P1
+=====================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+11. Dump/Reset accumulator, see notification on urn:S1
+======================================================
+POST REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 642
+User-Agent: orionld/REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P0": {
+                "subAttr7": {
+                    "type": "Property",
+                    "value": "subAttr7 in Step 08"
+                },
+                "type": "Property",
+                "value": "P0 in Step 08"
+            },
+            "P1": {
+                "subAttr8": {
+                    "type": "Property",
+                    "value": "subAttr8 in Step 10"
+                },
+                "type": "Property",
+                "value": "P1 in Step 10"
+            },
+            "R0": {
+                "object": "urn:cb:r0:step01",
+                "subAttr3": {
+                    "type": "Property",
+                    "value": "subAttr3 in Step 01"
+                },
+                "type": "Relationship"
+            },
+            "R1": {
+                "subAttr6": {
+                    "type": "Property",
+                    "value": "subAttr6 in Step 04"
+                },
+                "type": "Property",
+                "value": "R1 in Step 04"
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+12. Create an entity urn:E1 with attributes P0 in CP1
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+13. Create an entity urn:E1 with attributes P0 in CP2
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+14. Create an inclusive registration urn:R0 on urn:E1/P0, for CP1, that supports 'replaceAttr'
+==============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R0
+
+
+
+15. Replace urn:E1/P0 in CB - distOp to urn:R0/CP1
+==================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+16. GET urn:E1 in CP1 - see changes from step 16
+================================================
+HTTP/1.1 200 OK
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P0": {
+        "subAttr11": {
+            "type": "Property",
+            "value": "subAttr11 in Step 15"
+        },
+        "type": "Property",
+        "value": "P0 in Step 15"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+17. GET urn:E1 in CP2 - see no changes (still as created in step 13)
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 143
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P0": {
+        "subAttr10": {
+            "type": "Property",
+            "value": "subAttr10 in Step 13"
+        },
+        "type": "Property",
+        "value": "CP2::P0 in Step 13"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+18. Delete the registration urn:R0 (to be able to create an exclusive one on the same data)
+===========================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+19. Delete the entity urn:E1 in CB (to be able to create an exclusive one on the same data)
+===========================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+20. Re-create (local only) urn:E1 in CB
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+21. Create an exclusive registration urn:R1 on urn:E1/P0, for CP2, that does not support 'replaceAttr'
+======================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+22. Replace urn:E1/P0 in CB - 409 due to urn:R1 not supporting 'replaceAttr'
+============================================================================
+HTTP/1.1 409 Conflict
+Content-Length: 148
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "attributes": [
+        "P0"
+    ],
+    "detail": "A matching exclusive registration forbids the Operation",
+    "registrationId": "urn:R1",
+    "title": "Operation not supported"
+}
+
+
+23. See E1 in the temporal database
+===================================
+opmode,id,type,ts
+Create,urn:E1,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+Delete,urn:E1,NULL,202REGEX(.*)
+Create,urn:E1,https://uri.etsi.org/ngsi-ld/default-context/T,202REGEX(.*)
+
+
+24. See the attributes in the temporal database
+===============================================
+opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,observedat,ts
+Create,https://uri.etsi.org/ngsi-ld/default-context/P0,String,urn:E1,t,,None,P0 in Step 01,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:E1,t,,None,P1 in Step 01,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R0,Relationship,urn:E1,t,,None,urn:cb:r0:step01,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:E1,t,,None,urn:cb:r1:step01,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:E1,t,,None,P1 in Step 02,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/R1,String,urn:E1,t,,None,R1 in Step 04,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P0,String,urn:E1,t,,None,P0 in Step 08,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:E1,t,,None,P1 in Step 10,,,,202REGEX(.*)
+Replace,https://uri.etsi.org/ngsi-ld/default-context/P0,String,urn:E1,t,,None,P0 in Step 15,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/P1,String,urn:E1,t,,None,P1 in Step 20,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R0,Relationship,urn:E1,t,,None,urn:cb:r0:step20,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/R1,Relationship,urn:E1,t,,None,urn:cb:r1:step20,,,,202REGEX(.*)
+
+
+25. See the sub-attributes in the temporal database
+===================================================
+id,valuetype,entityid,attrinstanceid,unitcode,text,number,boolean,observedat
+https://uri.etsi.org/ngsi-ld/default-context/subAttr,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr in Step 01,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr2,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr2 in Step 01,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr3,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr3 in Step 01,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr4,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr4 in Step 01,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr5,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr5 in Step 02,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr6,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr6 in Step 04,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr7,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr7 in Step 08,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr8,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr8 in Step 10,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr11,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr11 in Step 15,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr12,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr12 in Step 20,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr13,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr13 in Step 20,,,
+https://uri.etsi.org/ngsi-ld/default-context/subAttr14,String,urn:E1,urn:ngsi-ld:attribute:instance:REGEX(.*),,subAttr14 in Step 20,,,
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+accumulatorStop

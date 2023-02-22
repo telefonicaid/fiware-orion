@@ -551,7 +551,7 @@ bool orionldPatchEntity2(void)
   char*    entityType  = orionldState.uriParams.type;
   KjNode*  dbEntityP;
 
-  dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
+  dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL, NULL);
 
   if ((dbEntityP == NULL) && (orionldState.distributed == false))
   {

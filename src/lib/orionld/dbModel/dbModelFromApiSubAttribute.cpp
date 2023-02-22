@@ -51,8 +51,6 @@ extern "C"
 //
 bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, KjNode* mdRemovedV, bool* ignoreP)
 {
-  LM(("CA: Treating sub-attribute '%s'", saP->name));
-
   char* saEqName  = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
   char* saDotName = kaStrdup(&orionldState.kalloc, saP->name);  // Can't destroy the context - need to copy before calling dotForEq
 

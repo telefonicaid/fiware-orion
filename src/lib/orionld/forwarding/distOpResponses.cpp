@@ -102,8 +102,11 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
   else
     distOpP->responseBody = NULL;
 
-  if ((httpResponseCode == 201) && (distOpP->operation == DoCreateEntity))
+  if (httpResponseCode == 201)
   {
+    if (distOpP->operation != DoCreateEntity)
+      LM_W(("Got a 201 response to a forwarded message for distOp operation '%s'", distOpTypes[distOpP->operation]));
+
     // All the attributes were updated - add them all to "successV"
     for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
@@ -120,18 +123,40 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
       }
     }
   }
-  else if ((httpResponseCode == 204) && (distOpP->operation == DoUpdateEntity))
+  else if (httpResponseCode == 204)
   {
-    // All the attributes were updated - add them all to "successV"
-    for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
+    if (distOpP->operation == DoReplaceAttr)
     {
-      char* shortName = orionldContextItemAliasLookup(orionldState.contextP, attrP->name, NULL, NULL);
+      char*   shortName = orionldContextItemAliasLookup(orionldState.contextP, distOpP->requestBody->value.firstChildP->name, NULL, NULL);
+      KjNode* nodeP     = kjString(orionldState.kjsonP, NULL, shortName);
 
-      if (kjStringValueLookupInArray(successV, shortName) == NULL)
+      kjChildAdd(successV, nodeP);
+    }
+    else if (distOpP->operation == DoDeleteAttrs)
+    {
+      char*   shortName = orionldContextItemAliasLookup(orionldState.contextP, distOpP->attrName, NULL, NULL);
+      KjNode* nodeP     = kjString(orionldState.kjsonP, NULL, shortName);
+
+      kjChildAdd(successV, nodeP);
+    }
+    else if (distOpP->operation == DoDeleteEntity)
+    {
+      KjNode* nodeP = kjString(orionldState.kjsonP, NULL, distOpP->entityId);
+      kjChildAdd(successV, nodeP);
+    }
+    else
+    {
+      // All the attributes were updated - add them all to "successV"
+      for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
-        KjNode* nodeP = kjString(orionldState.kjsonP, NULL, shortName);
-        kjChildAdd(successV, nodeP);
-        LM_T(LmtDistOp207, ("Added attribute '%s' to successV due to a 204 response", shortName));
+        char* shortName = orionldContextItemAliasLookup(orionldState.contextP, attrP->name, NULL, NULL);
+
+        if (kjStringValueLookupInArray(successV, shortName) == NULL)
+        {
+          KjNode* nodeP = kjString(orionldState.kjsonP, NULL, shortName);
+          kjChildAdd(successV, nodeP);
+          LM_T(LmtDistOp207, ("Added attribute '%s' to successV due to a 204 response", shortName));
+        }
       }
     }
   }
@@ -255,7 +280,7 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
   }
   else if (httpResponseCode == 0)
   {
-    LM(("%s: Seems like the request wasn't even sent ... (%s)", distOpP->regP->regId, distOpP->regP->ipAndPort));
+    LM_T(LmtDistOpMsgs, ("%s: Seems like the request wasn't even sent ... (%s)", distOpP->regP->regId, distOpP->regP->ipAndPort));
 
     int         statusCode = 500;
     const char* title      = "Unable to send distributed request";
@@ -295,9 +320,9 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
       (distOpP->operation == DoDeleteEntity) ||
       (distOpP->operation == DoMergeEntity)  ||
       (distOpP->operation == DoUpdateAttrs)  ||
+      (distOpP->operation == DoReplaceAttr)  ||
       (distOpP->operation == DoAppendAttrs))
   {
-    LM(("Calling entityResponseAccumulate"));
     entityResponseAccumulate(distOpP, responseBody, successV, failureV, httpResponseCode, msgP);
   }
   else

@@ -75,6 +75,7 @@ void restReply(ConnectionInfo* ciP, const char* answer)
     spath = (char*) ciP->servicePathV[0].c_str();
 
   LM_T(LmtResponse, ("Response Body: '%s'", (answer != NULL)? answer : "None" ));
+  LM_T(LmtResponse, ("Response Code:  %d", orionldState.httpStatusCode));
 
   response = MHD_create_response_from_buffer(answerLen, (char*) answer, MHD_RESPMEM_MUST_COPY);
   bool metrics = (orionldState.apiVersion != NGSI_LD_V1) && metricsMgr.isOn();

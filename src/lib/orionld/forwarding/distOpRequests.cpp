@@ -138,11 +138,8 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, K
     // Send the forwarded request and await all responses
     if ((distOpP->regP != NULL) && (distOpP->error == false))
     {
-      LM(("Calling distOpSend for reg %s", distOpP->regP->regId));
       if (distOpSend(distOpP, dateHeader, xff) == 0)
-      {
         distOpP->error = false;
-      }
       else
         distOpP->error = true;
 

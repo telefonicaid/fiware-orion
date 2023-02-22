@@ -36,6 +36,7 @@ SET (SOURCES
     troePostEntities.cpp
     troePostEntity.cpp
     troePatchAttribute.cpp
+    troePutAttribute.cpp
     pgInit.cpp
     pgConnectionGet.cpp
     pgConnectionRelease.cpp

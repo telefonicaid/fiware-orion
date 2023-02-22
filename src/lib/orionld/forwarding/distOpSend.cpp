@@ -341,16 +341,8 @@ void subAttrsCompact(KjNode* requestBody, OrionldContext* fwdContextP)
 //
 void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdContextP)
 {
-  LM(("In bodyCompact. Operation: %s", distOpTypes[operation]));
-
-  kjTreeLog(requestBody, "requestBody", 42);
-
-  if (operation == DoUpdateAttrs)
-  {
-    LM(("Calling subAttrsCompact"));
+  if ((operation == DoUpdateAttrs) || (operation == DoReplaceAttr))
     subAttrsCompact(requestBody, fwdContextP);
-    LM(("After subAttrsCompact"));
-  }
   else if ((operation == DoCreateEntity) || (operation == DoMergeEntity))
   {
     for (KjNode* attrP = requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
@@ -365,7 +357,6 @@ void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdC
         continue;
       }
 
-      LM(("Compacting '%s'", attrP->name));
       attrP->name = orionldContextItemAliasLookup(fwdContextP, attrP->name, NULL, NULL);
 
       subAttrsCompact(attrP, fwdContextP);
@@ -644,6 +635,12 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
   if (distOpP->requestBody != NULL)
   {
+    // The payload body of attribute requests were transformed into an "Entity" for regMatch purposes.
+    // Before forwarding, that trandformation needs to go back
+    //
+    if (distOpP->operation == DoReplaceAttr)
+      distOpP->requestBody = distOpP->requestBody->value.firstChildP;
+
     //
     // Here we know the @context and we can compact the payload body
     //

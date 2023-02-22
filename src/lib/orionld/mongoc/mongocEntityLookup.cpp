@@ -56,7 +56,7 @@ extern "C"
 // The other one, mongocEntityRetrieve, does much more than just DB. It needs to be be REMOVED.
 // mongocEntityRetrieve is only used by legacyGetEntity() which is being deprecated anyway.
 //
-KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringArray* attrsV, const char* geojsonGeometry)
+KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringArray* attrsV, const char* geojsonGeometry, char** detailP)
 {
   bson_t                mongoFilter;
   const bson_t*         mongoDocP;
@@ -96,7 +96,11 @@ KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringA
   if ((attrsV != NULL) && (attrsV->items > 0))
   {
     if (mongocAuxAttributesFilter(&mongoFilter, attrsV, &projection, geojsonGeometry) == false)
+    {
+      if (detailP != NULL)
+        *detailP = (char*) "mongocAuxAttributesFilter failed";
       return NULL;
+    }
   }
   else
   {
@@ -116,6 +120,8 @@ KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringA
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
     entityNodeP = NULL;
+    if (detailP != NULL)
+      *detailP = (char*) "mongoc_collection_find_with_opts failed";
     goto done;
   }
 
@@ -128,6 +134,8 @@ KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringA
   if (mongoc_cursor_error(mongoCursorP, &mcError))
   {
     LM_E(("Internal Error (DB Error '%s')", mcError.message));
+    if (detailP != NULL)
+      *detailP = mcError.message;
     entityNodeP = NULL;
     goto done;
   }

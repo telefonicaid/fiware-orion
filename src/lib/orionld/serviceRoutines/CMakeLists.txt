@@ -66,6 +66,7 @@ SET (SOURCES
     orionldPatchEntity2.cpp
     orionldOptions.cpp
     orionldPutEntity.cpp
+    orionldPutAttribute.cpp
 )
 
 # Include directories

@@ -97,7 +97,7 @@ bool orionldGetEntity(void)
     }
   }
 
-  KjNode* dbEntityP      = mongocEntityLookup(entityId, entityType, &orionldState.in.attrList, orionldState.uriParams.geometryProperty);
+  KjNode* dbEntityP      = mongocEntityLookup(entityId, entityType, &orionldState.in.attrList, orionldState.uriParams.geometryProperty, NULL);
   KjNode* apiEntityP     = NULL;
   bool    forcedSysAttrs = false;
 

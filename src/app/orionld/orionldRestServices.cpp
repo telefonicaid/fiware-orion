@@ -69,6 +69,7 @@
 #include "orionld/serviceRoutines/orionldDeleteContext.h"
 #include "orionld/serviceRoutines/orionldOptions.h"
 #include "orionld/serviceRoutines/orionldPutEntity.h"
+#include "orionld/serviceRoutines/orionldPutAttribute.h"
 
 #include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
@@ -152,6 +153,7 @@ static const int patchServices = (sizeof(patchServiceV) / sizeof(patchServiceV[0
 //
 static OrionLdRestServiceSimplified putServiceV[] =
 {
+  { "/ngsi-ld/v1/entities/*/attrs/*",            orionldPutAttribute     },
   { "/ngsi-ld/v1/entities/*",                    orionldPutEntity        }
 };
 static const int putServices = (sizeof(putServiceV) / sizeof(putServiceV[0]));

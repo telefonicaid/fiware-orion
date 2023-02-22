@@ -49,6 +49,7 @@
 #include "orionld/serviceRoutines/orionldPutEntity.h"                // orionldPutEntity
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"             // orionldDeleteEntity
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"           // orionldPatchAttribute
+#include "orionld/serviceRoutines/orionldPutAttribute.h"             // orionldPutAttribute
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"          // orionldDeleteAttribute
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"        // orionldPostSubscriptions
 #include "orionld/serviceRoutines/orionldGetSubscriptions.h"         // orionldGetSubscriptions
@@ -84,6 +85,7 @@
 #include "orionld/troe/troeDeleteAttribute.h"                        // troeDeleteAttribute
 #include "orionld/troe/troeDeleteEntity.h"                           // troeDeleteEntity
 #include "orionld/troe/troePatchAttribute.h"                         // troePatchAttribute
+#include "orionld/troe/troePutAttribute.h"                           // troePutAttribute
 #include "orionld/troe/troePatchEntity.h"                            // troePatchEntity
 #include "orionld/troe/troePatchEntity2.h"                           // troePatchEntity2
 #include "orionld/troe/troePutEntity.h"                              // troePutEntity
@@ -251,6 +253,11 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldPatchAttribute)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
+  }
+  else if (serviceP->serviceRoutine == orionldPutAttribute)
+  {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
@@ -498,6 +505,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
       serviceP->troeRoutine = troeDeleteEntity;
     else if (serviceP->serviceRoutine == orionldPatchAttribute)
       serviceP->troeRoutine = troePatchAttribute;
+    else if (serviceP->serviceRoutine == orionldPutAttribute)
+      serviceP->troeRoutine = troePutAttribute;
     else if (serviceP->serviceRoutine == orionldPatchEntity)
       serviceP->troeRoutine = troePatchEntity;
     else if (serviceP->serviceRoutine == orionldPatchEntity2)

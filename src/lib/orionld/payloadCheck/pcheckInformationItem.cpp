@@ -287,11 +287,14 @@ bool pCheckOverlappingEntities(KjNode* entitiesP, KjNode* propertiesP, KjNode* r
 
       if (entityIdP != NULL)
       {
-        if (mongocEntityLookup(entityId, entityType, &attrsV, NULL) != NULL)
+        char* detail = NULL;
+        if (mongocEntityLookup(entityId, entityType, &attrsV, NULL, &detail) != NULL)
         {
           orionldError(OrionldAlreadyExists, "Conflicting Entity (due to entity id and type)", entityId, 409);
           return true;
         }
+        if (detail != NULL)
+          LM_E(("mongocEntityLookup: %s", detail));
       }
       else
       {

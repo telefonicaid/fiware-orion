@@ -108,7 +108,7 @@ bool orionldPostEntities(void)
   //
   kjTreeLog(orionldState.requestTree, "Left after DistOps", LmtDistOpMsgs);
 
-  dbEntityP = mongocEntityLookup(entityId, NULL, NULL, NULL);
+  dbEntityP = mongocEntityLookup(entityId, NULL, NULL, NULL, NULL);
   if (dbEntityP != NULL)
   {
     if (distOpList == NULL)  // Purely local request
