@@ -178,7 +178,7 @@ static void optionsParse(const char* options)
 
       *cP = 0;  // Zero-terminate
 
-      LM(("OPT: Got a value for options: %s", optionStart));
+      LM_T(LmtUriParamOptions, ("Got a value for options: %s", optionStart));
 
       if      (strcmp(optionStart, "update")        == 0)  orionldState.uriParamOptions.update        = true;
       else if (strcmp(optionStart, "replace")       == 0)  orionldState.uriParamOptions.replace       = true;
@@ -227,17 +227,17 @@ static void optionsParse(const char* options)
   else if (orionldState.uriParamOptions.keyValues == true)
   {
     orionldState.out.format = RF_KEYVALUES;
-    LM(("OPT: Set orionldState.out.format to RF_KEYVALUES"));
+    LM_T(LmtUriParamOptions, ("Set orionldState.out.format to RF_KEYVALUES"));
   }
   else if (orionldState.uriParamOptions.concise == true)
   {
     orionldState.out.format = RF_CONCISE;
-    LM(("OPT: Set orionldState.out.format to RF_CONCISE"));
+    LM_T(LmtUriParamOptions, ("Set orionldState.out.format to RF_CONCISE"));
   }
 
-  LM(("OPT: orionldState.uriParamOptions.keyValues:  %s", (orionldState.uriParamOptions.keyValues == true)? "ON" : "OFF"));
-  LM(("OPT: orionldState.uriParamOptions.concise:    %s", (orionldState.uriParamOptions.concise   == true)? "ON" : "OFF"));
-  LM(("OPT: orionldState.uriParamOptions.normalized: %s", (orionldState.uriParamOptions.concise   == true)? "ON" : "OFF"));
+  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.keyValues:  %s", (orionldState.uriParamOptions.keyValues == true)? "ON" : "OFF"));
+  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.concise:    %s", (orionldState.uriParamOptions.concise   == true)? "ON" : "OFF"));
+  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.normalized: %s", (orionldState.uriParamOptions.concise   == true)? "ON" : "OFF"));
 }
 
 

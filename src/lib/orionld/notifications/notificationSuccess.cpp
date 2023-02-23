@@ -47,7 +47,8 @@ void notificationSuccess(CachedSubscription* subP, const double timestamp)
 
   promCounterIncrease(promNotifications);
 
-  LM(("SUBC: dirty: %d, cSubCounters: %d", subP->dirty, cSubCounters));
+  // LM(("SUBC: dirty: %d, cSubCounters: %d", subP->dirty, cSubCounters));
+
   //
   // Flush to DB?
   // - If subP->dirty (number of counter updates since last flush) >= cSubCounters
@@ -55,7 +56,7 @@ void notificationSuccess(CachedSubscription* subP, const double timestamp)
   //
   if ((cSubCounters != 0) && (subP->dirty >= cSubCounters))
   {
-    LM(("SUBC: Calling mongocSubCountersUpdate"));
+    // LM(("SUBC: Calling mongocSubCountersUpdate"));
     mongocSubCountersUpdate(subP, subP->count, subP->lastNotificationTime, subP->lastFailure, subP->lastSuccess, false, true);
     subP->dirty    = 0;
     subP->dbCount += subP->count;

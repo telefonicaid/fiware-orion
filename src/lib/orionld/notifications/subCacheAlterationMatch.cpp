@@ -73,7 +73,7 @@ static bool entityIdMatch(CachedSubscription* subP, const char* entityId, int eI
     }
   }
 
-  LM(("Sub '%s': no match due to Entity ID", subP->subscriptionId));
+  LM_T(LmtSubCacheMatch, ("Sub '%s': no match due to Entity ID", subP->subscriptionId));
   return false;
 }
 
@@ -96,7 +96,7 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
       return true;
   }
 
-  LM(("Sub '%s': no match due to Entity Type", subP->subscriptionId));
+  LM_T(LmtSubCacheMatch, ("Sub '%s': no match due to Entity Type", subP->subscriptionId));
   return false;
 }
 
@@ -117,19 +117,19 @@ static bool matchLookup(OrionldAlterationMatch* matchP, OrionldAlterationMatch* 
 {
 #if 0
   // <DEBUG>
-  LM(("Match List:"));
+  LM_T(LmtSubCacheMatch, ("Match List:"));
   for (OrionldAlterationMatch* mP = matchP; mP != NULL; mP = mP->next)
   {
     if (matchP->altAttrP)
-      LM(("o %p: %s %s", mP, mP->subP->subscriptionId, mP->altAttrP->alterationType));
+      LM_T(LmtSubCacheMatch, ("o %p: %s %s", mP, mP->subP->subscriptionId, mP->altAttrP->alterationType));
     else
-      LM(("o %p: %s (no attr)", mP, mP->subP->subscriptionId));
+      LM_T(LmtSubCacheMatch, ("o %p: %s (no attr)", mP, mP->subP->subscriptionId));
   }
-  LM(("Compare with:"));
+  LM_T(LmtSubCacheMatch, ("Compare with:"));
   if (itemP->altAttrP)
-    LM(("o %p: %s %s", itemP, itemP->subP->subscriptionId, itemP->altAttrP->alterationType));
+    LM_T(LmtSubCacheMatch, ("o %p: %s %s", itemP, itemP->subP->subscriptionId, itemP->altAttrP->alterationType));
   else
-    LM(("o %p: %s (no attr)", itemP, itemP->subP->subscriptionId));
+    LM_T(LmtSubCacheMatch, ("o %p: %s (no attr)", itemP, itemP->subP->subscriptionId));
   // </DEBUG>
 #endif
 
@@ -268,7 +268,7 @@ bool falseUpdate(KjNode* attrP, KjNode* dbAttrsP)
 
   if (dbAttrP == NULL)  // New attribute - didn't exist
   {
-    // LM(("FU: NO  - NOT a False Update as '%s' did not exist before", attrP->name));
+    // LM_T(LmtSubCacheMatch, ("FU: NO  - NOT a False Update as '%s' did not exist before", attrP->name));
     return false;
   }
 
@@ -276,7 +276,7 @@ bool falseUpdate(KjNode* attrP, KjNode* dbAttrsP)
 
   if (dbAttrValueP == NULL)  // DB ERROR but ... never mind (will never happen)
   {
-    // LM(("FU: NO  - NOT a False Update as '%s' presents a DB error - no value field in the DB", attrP->name));
+    // LM_T(LmtSubCacheMatch, ("FU: NO  - NOT a False Update as '%s' presents a DB error - no value field in the DB", attrP->name));
     return false;
   }
 
@@ -284,13 +284,13 @@ bool falseUpdate(KjNode* attrP, KjNode* dbAttrsP)
 
   if (attrValueP == NULL)  // No change in attribute value - false update
   {
-    // LM(("FU: YES - False Update as '%s' has no 'value' field in the normalized input", attrP->name));
+    // LM_T(LmtSubCacheMatch, ("FU: YES - False Update as '%s' has no 'value' field in the normalized input", attrP->name));
     return true;
   }
 
   if (dbAttrValueP->type != attrValueP->type)  // Change in JSON type - real update
   {
-    // LM(("FU: NO  - NOT a False Update as '%s' the type of the attribute value is altered", attrP->name));
+    // LM_T(LmtSubCacheMatch, ("FU: NO  - NOT a False Update as '%s' the type of the attribute value is altered", attrP->name));
     return false;
   }
 
@@ -299,8 +299,8 @@ bool falseUpdate(KjNode* attrP, KjNode* dbAttrsP)
   if ((attrValueP->type == KjBoolean) && (attrValueP->value.b != dbAttrValueP->value.b))    return false;
 
   // FIXME: Object + Array
-  // LM(("FU: PERHAPS - as Object + Array modification checks are still to be implemented (for '%s')", attrP->name));
-  // LM(("FU: YES - False Update as no value change was detected for '%s'", attrP->name));
+  // LM_T(LmtSubCacheMatch, ("FU: PERHAPS - as Object + Array modification checks are still to be implemented (for '%s')", attrP->name));
+  // LM_T(LmtSubCacheMatch, ("FU: YES - False Update as no value change was detected for '%s'", attrP->name));
 
   return true;
 }
@@ -391,7 +391,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
         matchList = matchToMatchList(matchList, subP, altP, NULL, &matches);
     }
     else
-      LM(("Sub '%s' - no match due to Watched Attributes", subP->subscriptionId));
+      LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to Watched Attributes", subP->subscriptionId));
   }
 
   for (int aaIx = 0; aaIx < altP->alteredAttributes; aaIx++)
@@ -409,14 +409,14 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
     if ((watchAttrs > 0) && (nIx == watchAttrs))  // No match found
     {
-      LM(("Sub '%s' - no match due to watchedAttributes", subP->subscriptionId));
+      LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to watchedAttributes", subP->subscriptionId));
       continue;
     }
 
     // Is the Alteration type ON for this subscription?
     if (subP->triggers[aaP->alterationType] == false)
     {
-      LM(("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(aaP->alterationType)));
+      LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to Trigger '%s'", subP->subscriptionId, orionldAlterationType(aaP->alterationType)));
       continue;
     }
 
@@ -424,9 +424,9 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
   }
 
   if (matches == 0)
-    LM(("Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
+    LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to Watched Attribute List (or Trigger!)", subP->subscriptionId));
   else
-    LM(("Subscription '%s' is a MATCH", subP->subscriptionId));
+    LM_T(LmtSubCacheMatch, ("Subscription '%s' is a MATCH", subP->subscriptionId));
   *matchesP += matches;
 
   return matchList;
@@ -1111,25 +1111,25 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
     {
       if ((multitenancy == true) && (tenantMatch(subP->tenant, orionldState.tenantName) == false))
       {
-        LM(("Sub '%s' - no match due to tenant", subP->subscriptionId));
+        LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to tenant", subP->subscriptionId));
         continue;
       }
 
       if (subP->isActive == false)
       {
-        LM(("Sub '%s' - no match due to isActive == false", subP->subscriptionId));
+        LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to isActive == false", subP->subscriptionId));
         continue;
       }
 
       if (strcmp(subP->status.c_str(), "active") != 0)
       {
-        LM(("Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
+        LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to status == '%s' (!= 'active')", subP->subscriptionId, subP->status.c_str()));
         continue;
       }
 
       if ((subP->expirationTime > 0) && (subP->expirationTime < orionldState.requestTime))
       {
-        LM(("Sub '%s' - no match due to expiration (now:%f, expired:%f)", subP->subscriptionId, orionldState.requestTime, subP->expirationTime));
+        LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to expiration (now:%f, expired:%f)", subP->subscriptionId, orionldState.requestTime, subP->expirationTime));
         subP->status   = "expired";
         subP->isActive = false;
         continue;
@@ -1137,7 +1137,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
 
       if ((subP->throttling > 0) && ((orionldState.requestTime - subP->lastNotificationTime) < subP->throttling))
       {
-        LM(("Sub '%s' - no match due to throttling", subP->subscriptionId));
+        LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to throttling", subP->subscriptionId));
         continue;
       }
 
@@ -1162,7 +1162,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       {
         if (qMatch(subP->qP, altP) == false)
         {
-          LM(("Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
+          LM_T(LmtSubCacheMatch, ("Sub '%s' - no match due to ldq == '%s'", subP->subscriptionId, subP->qText));
           continue;
         }
       }

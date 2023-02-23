@@ -70,5 +70,5 @@ void alteration(const char* entityId, const char* entityType, KjNode* apiEntityP
 
   orionldState.alterationsTail = alterationP;
 
-  LM(("Added alteration for entity '%s'", entityId));
+  LM_T(LmtAlt, ("Added alteration for entity '%s'", entityId));
 }
