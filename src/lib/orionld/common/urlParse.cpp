@@ -59,6 +59,8 @@ bool urlParse
   int urlIx  = 0;
   int toIx   = 0;
 
+  LM_T(LmtAlt, ("Incoming url: '%s'", url));
+
   //
   // 1. Find ':', copy left-hand-side to 'protocol'
   //
@@ -85,7 +87,8 @@ bool urlParse
   }
 
   protocol[toIx] = 0;
-
+  LM_T(LmtAlt, ("Got the protocol: '%s'", protocol));
+  LM_T(LmtAlt, ("Rest: '%s'", &url[urlIx]));
 
   //
   // 2. Make sure "//" comes after ':'
@@ -96,6 +99,7 @@ bool urlParse
     return false;
   }
   urlIx += 3;  // Step over ://
+  LM_T(LmtAlt, ("Rest: '%s'", url));
 
 
   //
@@ -118,16 +122,21 @@ bool urlParse
   }
 
   ip[toIx] = 0;
+  LM_T(LmtAlt, ("Got the IP: '%s'", ip));
+  LM_T(LmtAlt, ("Rest: '%s'", &url[urlIx]));
 
   if (url[urlIx] == 0)
+  {
+    LM_T(LmtAlt, ("Were done (url[%d] == 0) (url: '%s')", urlIx, url));
     return true;
-
+  }
 
   //
   // 4. Optionally, a :<port number>
   //
   if (url[urlIx] == ':')  // It's a port number
   {
+    LM_T(LmtAlt, ("There's a port number"));
     char portNumberString[6];
 
     toIx = 0;
@@ -142,8 +151,14 @@ bool urlParse
     portNumberString[toIx] = 0;
     *portP = atoi(portNumberString);
 
+    LM_T(LmtAlt, ("Port: %d", *portP));
     if (url[urlIx] == 0)
+    {
+      LM_T(LmtAlt, ("We're done"));
       return true;
+    }
+
+    LM_T(LmtAlt, ("Rest: '%s'", &url[urlIx]));
   }
 
   //
@@ -152,13 +167,17 @@ bool urlParse
   if (url[urlIx] == '/')
   {
     *urlPathPP = (char*) &url[urlIx];
+    LM_T(LmtAlt, ("Got an URL PATH: '%s'", *urlPathPP));
   }
   else
   {
+    LM_T(LmtAlt, ("No URL PATH"));
     *detailsPP = (char*) "URL parse error - no slash found to start the URL PATH";
+    LM_T(LmtAlt, ("Done, but with error ..."));
     return false;
   }
 
+  LM_T(LmtAlt, ("Done"));
   return true;
 }
 
@@ -177,6 +196,8 @@ bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, ch
   char*            colon;
   char*            ip;
   char*            rest;
+
+  LM_T(LmtAlt, ("URL:      '%s'", url));
 
   // Check for custom url, e.g. "${abc}" - only if NGSIv2
   if (orionldState.apiVersion != NGSI_LD_V1)
@@ -208,7 +229,10 @@ bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, ch
     ip           = &protocolEnd[3];
   }
   else
+  {
+    *protocolP = (char*) "none";
     ip = url;
+  }
 
   colon = strchr(ip, ':');
   if (colon != NULL)
@@ -220,9 +244,7 @@ bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, ch
   else
   {
     *portP = 80;  // What should be the default port?
-    *ipP   = ip;
-    *restP = NULL;
-    return true;
+    rest   = ip;
   }
 
   *ipP   = ip;
@@ -230,11 +252,16 @@ bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, ch
   rest = strchr(rest, '/');
   if (rest != NULL)
   {
-    *rest  = 0;
+    *rest  = 0;    // The removed '/' is put back in later (by httpsNotify(), notificationSend()
     *restP = &rest[1];
   }
   else
     *restP = NULL;
+
+  LM_T(LmtAlt, ("Protocol: '%s'", *protocolP));
+  LM_T(LmtAlt, ("Host:     '%s'", *ipP));
+  LM_T(LmtAlt, ("Port:      %d", *portP));
+  LM_T(LmtAlt, ("Path:     '%s'", *restP));
 
   return true;
 }

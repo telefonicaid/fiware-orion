@@ -195,7 +195,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   int                     matches;
 
   matchList = subCacheAlterationMatch(altList, &matches);
-
   if (matchList == NULL)
     return;
 
@@ -207,7 +206,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   NotificationPending* notificationList = NULL;
 
-#ifdef DEBUG
   int ix = 1;
   LM_T(LmtAlt, ("%d items in matchList:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
@@ -218,7 +216,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM_T(LmtAlt, ("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
     ++ix;
   }
-#endif
 
 
   //
@@ -279,7 +276,8 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
     CURL* curlHandleP;
     int   fd = notificationSend(matchHead, notificationTime, &curlHandleP);  // curl handle as output param?
-    if (fd != -1)
+    LM_T(LmtAlt, ("notificationSend returned fd %d (-2 is OK if HTTPS)", fd));
+    if (fd != -1)  // -1 is ERROR, -2 is OK for HTTPS, anything else is a file descriptor to read from
     {
       NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
 
@@ -303,10 +301,14 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     cm = curl_multi_perform(orionldState.multiP, &activeNotifications);
     if (cm != 0)
     {
-      LM_E(("curl_multi_perform: error %d", cm));
+      LM_E(("Error starting HTTPS notifications: curl_multi_perform: error %d", cm));
       curlError = true;
     }
+    else
+      LM_T(LmtAlt, ("Started HTTPS notifications"));
   }
+  else
+    LM_T(LmtAlt, ("No HTTPS notifications"));
 
   //
   // Await HTTP responses and update subscriptions accordingly (in sub cache)
@@ -400,6 +402,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   // Await HTTPS notification responses
   if (orionldState.multiP != NULL)
   {
+    LM_T(LmtAlt, ("Awaiting HTTPS notification responses"));
     int activeNotifications = 1;
 
     while (activeNotifications != 0)
@@ -425,7 +428,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         //
         cm = curl_multi_wait(orionldState.multiP, NULL, 0, 1000, NULL);
         if (cm != 0)
-          LM_E(("curl_multi_poll error %d", cm));
+          LM_E(("curl_multi_wait error %d", cm));
       }
     }
 
@@ -438,8 +441,15 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       if (msgP->msg != CURLMSG_DONE)
         continue;
 
-      LM_T(LmtAlt, ("Notification Host: '%s'", npP->subP->ip));
       NotificationPending* npP = notificationLookupByCurlHandle(notificationList, msgP->easy_handle);
+
+      if (npP == NULL)
+      {
+        LM_W(("No 'Pending Notification' found for a curl easy handle"));
+        continue;
+      }
+
+      LM_T(LmtAlt, ("Notification Host: '%s'", npP->subP->ip));
       LM_T(LmtAlt, ("Notification Result for subscription '%s': CURLcode %d (%s)", npP->subP->subscriptionId, msgP->data.result, curl_easy_strerror(msgP->data.result)));
       LM_T(LmtAlt, ("Update Counters for subscription '%s'", npP->subP->subscriptionId));
 

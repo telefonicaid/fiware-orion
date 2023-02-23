@@ -40,7 +40,7 @@
 int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double notificationTime)
 {
   // Connect
-  LM(("Connecting to notification receptor for '%s' notification", cSubP->protocolString));
+  LM_T(LmtAlt, ("Connecting to notification '%s:%d' receptor for '%s' notification", cSubP->ip, cSubP->port, cSubP->protocolString));
   int fd = orionldServerConnect(cSubP->ip, cSubP->port);
 
   if (fd == -1)
@@ -49,6 +49,8 @@ int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, dou
     notificationFailure(cSubP, "Unable to connect to notification endpoint", notificationTime);
     return -1;
   }
+
+  LM_T(LmtAlt, ("Connected to notification receptor '%s:%d' on fd %d", cSubP->ip, cSubP->port, fd));
 
   // Send
   int nb;
@@ -61,7 +63,7 @@ int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, dou
     return -1;
   }
 
-  LM(("Connected to %s:%d on fd %d", cSubP->ip, cSubP->port, fd));
-  LM(("Written %d bytes to fd %d of %s:%d for sub %s", nb, fd, cSubP->ip, cSubP->port, cSubP->subscriptionId));
+  LM_T(LmtAlt, ("Written %d bytes to fd %d of %s:%d for sub %s", nb, fd, cSubP->ip, cSubP->port, cSubP->subscriptionId));
+
   return fd;
 }

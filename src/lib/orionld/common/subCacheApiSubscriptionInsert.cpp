@@ -267,6 +267,12 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
         cSubP->url          = strdup(uriP->value.s);  // urlParse destroys the input
         urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
         cSubP->protocol     = protocolFromString(cSubP->protocolString);
+        LM_T(LmtAlt, ("Sub '%s'. protocol: '%s', IP: '%s', port: %d, rest: '%s'",
+            cSubP->subscriptionId,
+            cSubP->protocolString,
+            cSubP->ip,
+            cSubP->port,
+            cSubP->rest));
       }
 
       if (cSubP->protocol == MQTT)

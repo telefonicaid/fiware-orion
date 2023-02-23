@@ -135,7 +135,7 @@ bool orionldPostBatchUpsert(void)
   KjNode*      outArrayErroredP = kjArray(orionldState.kjsonP, "errors");
   int          noOfEntities     = batchEntityCountAndFirstCheck(orionldState.requestTree, outArrayErroredP);
 
-  LM(("Number of valid Entities after 1st check-round: %d", noOfEntities));
+  LM_T(LmtSR, ("Number of valid Entities after 1st check-round: %d", noOfEntities));
 
 
   //
@@ -160,7 +160,7 @@ bool orionldPostBatchUpsert(void)
   // (extract the entity ids) later to be used by mongocEntitiesQuery().
   //
   noOfEntities = batchEntityStringArrayPopulate(orionldState.requestTree, &eIdArray, outArrayErroredP, false);
-  LM(("Number of valid Entities after 2nd check-round: %d", noOfEntities));
+  LM_T(LmtSR, ("Number of valid Entities after 2nd check-round: %d", noOfEntities));
 
 
   //
@@ -183,7 +183,7 @@ bool orionldPostBatchUpsert(void)
   // Finally we have everything we need to 100% CHECK the incoming entities
   //
   noOfEntities = batchEntitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update, false, false);
-  LM(("Number of valid Entities after 3rd check-round: %d", noOfEntities));
+  LM_T(LmtSR, ("Number of valid Entities after 3rd check-round: %d", noOfEntities));
 
   KjNode* outArrayCreatedP  = kjArray(orionldState.kjsonP, "created");  // For the HTTP response payload body
   KjNode* outArrayUpdatedP  = kjArray(orionldState.kjsonP, "updated");  // For the HTTP response payload body

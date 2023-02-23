@@ -937,10 +937,21 @@ function accumulator2Dump()
 
   if [ "$1" == "IPV6" ]
   then
-    curl -g [::1]:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+    url="[::1]:${LISTENER2_PORT}/dump"
+    g_flag="-g"
   else
-    curl localhost:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+    url="localhost:${LISTENER2_PORT}/dump"
   fi
+
+  if [ "$2" == "HTTPS" ]
+  then
+    schema="https://"
+    k_flag="-k"
+  else
+    schema="http://"
+  fi
+
+  curl $k_flag $g_flag $schema$url -s -S 2> /dev/null
 }
 
 

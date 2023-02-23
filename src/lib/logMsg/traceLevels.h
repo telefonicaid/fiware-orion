@@ -59,6 +59,7 @@ typedef enum TraceLevels
   LmtRegCreate,                        // Creation of registrations
   LmtRegCache,                         // Registration Cache
   LmtWatchedAttributes,                // Watched attributes in subscriptions
+  LmtUriParamOptions,                  // HTTP URI Parameter 'options'
 
   // Both,
   LmtRequest = 38,                     // Incoming requests

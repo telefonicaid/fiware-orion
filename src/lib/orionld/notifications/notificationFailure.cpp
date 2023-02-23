@@ -54,7 +54,7 @@ void notificationFailure(CachedSubscription* subP, const char* errorReason, doub
   // Force the subscription into "paused" due to too many consecutive errors
   if (subP->consecutiveErrors >= 3)
   {
-    LM(("SUBC: Force the subscription into PAUSE due to 3 consecutive errors"));
+    // LM(("SUBC: Force the subscription into PAUSE due to 3 consecutive errors"));
     subP->isActive = false;
     subP->status   = "paused";
     forcedToPause  = true;
@@ -63,7 +63,7 @@ void notificationFailure(CachedSubscription* subP, const char* errorReason, doub
   promCounterIncrease(promNotifications);
   promCounterIncrease(promNotificationsFailed);
 
-  LM(("SUBC: dirty: %d, cSubCounters: %d", subP->dirty, cSubCounters));
+  // LM(("SUBC: dirty: %d, cSubCounters: %d", subP->dirty, cSubCounters));
 
   //
   // Flush to DB?
@@ -73,7 +73,7 @@ void notificationFailure(CachedSubscription* subP, const char* errorReason, doub
   //
   if (((cSubCounters != 0) && (subP->dirty >= cSubCounters)) || (forcedToPause == true))
   {
-    LM(("SUBC: Calling mongocSubCountersUpdate"));
+    // LM(("SUBC: Calling mongocSubCountersUpdate"));
     mongocSubCountersUpdate(subP, subP->count, subP->lastNotificationTime, subP->lastFailure, subP->lastSuccess, forcedToPause, true);
     subP->dirty    = 0;
     subP->dbCount += subP->count;

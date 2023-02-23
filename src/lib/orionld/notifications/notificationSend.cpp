@@ -544,7 +544,6 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
     KjNode* apiEntityP = matchP->altP->finalApiEntityP;
-    LM(("apiEntityP at %p", apiEntityP));
 
     //
     // Filter out unwanted attributes, if so requested (by the Subscription)
@@ -626,14 +625,18 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   char    requestHeader[512];
   size_t  requestHeaderLen;
 
-  // The slash before the URL (rest) is needed as it was removed in "urlParse" in subCache.cpp
-  if (mAltP->subP->renderFormat < RF_CROSS_APIS_NORMALIZED)
-    requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s?subscriptionId=%s HTTP/1.1\r\n",
-                                mAltP->subP->rest,
-                                mAltP->subP->subscriptionId);
-  else
-    requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s HTTP/1.1\r\n", mAltP->subP->rest);
+  if (mAltP->subP->protocol == HTTP)
+  {
+    // The slash before the URL (rest) is needed as it was removed in "urlParse" in orionld/common/urlParse.cpp
+    if (mAltP->subP->renderFormat < RF_CROSS_APIS_NORMALIZED)
+      requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s?subscriptionId=%s HTTP/1.1\r\n",
+                                  mAltP->subP->rest,
+                                  mAltP->subP->subscriptionId);
+    else
+      requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s HTTP/1.1\r\n", mAltP->subP->rest);
 
+    LM(("**** URL PATH for notification == '%s'", mAltP->subP->rest));
+  }
 
   //
   // Content-Length
