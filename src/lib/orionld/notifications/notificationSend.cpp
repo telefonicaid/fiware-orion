@@ -623,7 +623,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   // Request Header
   //
   char    requestHeader[512];
-  size_t  requestHeaderLen;
+  size_t  requestHeaderLen = 0;
 
   if (mAltP->subP->protocol == HTTP)
   {
