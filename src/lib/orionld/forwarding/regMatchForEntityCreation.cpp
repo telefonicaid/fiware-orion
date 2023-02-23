@@ -148,7 +148,7 @@ DistOp* regMatchForEntityCreation
     //
     if ((regMode == RegModeExclusive) && (regMatchOperation(regP, operation) == false))
     {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation (operation == %d: '%s')", regP->regId, operation, distOpTypes[operation]));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to 'matching exclusive registration forbids the Operation' (operation == %d: '%s')", regP->regId, operation, distOpTypes[operation]));
       for (DistOp* doP = distOpP; doP != NULL; doP = doP->next)
       {
         doP->error            = true;

@@ -239,7 +239,7 @@ bool orionldPatchEntity(void)
   //
   // Get the entity from mongo (only really need creDate and type of the attributes ...)
   //
-  KjNode* dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL);
+  KjNode* dbEntityP = mongocEntityLookup(entityId, entityType, NULL, NULL, NULL);
   if ((dbEntityP == NULL) && (orionldState.distributed == false))
   {
     orionldError(OrionldResourceNotFound, "Entity does not exist", entityId, 404);

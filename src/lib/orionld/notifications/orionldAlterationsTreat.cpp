@@ -209,13 +209,13 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
 #ifdef DEBUG
   int ix = 1;
-  LM(("%d items in matchList:", matches));
+  LM_T(LmtAlt, ("%d items in matchList:", matches));
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
     if (matchP->altAttrP != NULL)
-      LM(("o %d/%d Subscription '%s', due to '%s'", ix, matches, matchP->subP->subscriptionId, orionldAlterationName(matchP->altAttrP->alterationType)));
+      LM_T(LmtAlt, ("o %d/%d Subscription '%s', due to '%s'", ix, matches, matchP->subP->subscriptionId, orionldAlterationName(matchP->altAttrP->alterationType)));
     else
-      LM(("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
+      LM_T(LmtAlt, ("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
     ++ix;
   }
 #endif
@@ -299,7 +299,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     int        activeNotifications;
     CURLMcode  cm;
 
-    LM(("Starting HTTPS notifications"));
+    LM_T(LmtAlt, ("Starting HTTPS notifications"));
     cm = curl_multi_perform(orionldState.multiP, &activeNotifications);
     if (cm != 0)
     {
@@ -414,7 +414,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         break;
       }
       else
-        LM(("%d HTTPS notifications are still active", activeNotifications));
+        LM_T(LmtAlt, ("%d HTTPS notifications are still active", activeNotifications));
 
       if (activeNotifications > 0)
       {
@@ -423,7 +423,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         // Using curl_multi_wait instead.
         // For now, at least
         //
-        LM(("Calling curl_multi_wait"));
         cm = curl_multi_wait(orionldState.multiP, NULL, 0, 1000, NULL);
         if (cm != 0)
           LM_E(("curl_multi_poll error %d", cm));
@@ -434,16 +433,15 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     CURLMsg* msgP;
     int      msgsLeft;
 
-    LM(("Reading out the results of the notifications"));
     while ((msgP = curl_multi_info_read(orionldState.multiP, &msgsLeft)) != NULL)
     {
       if (msgP->msg != CURLMSG_DONE)
         continue;
 
+      LM_T(LmtAlt, ("Notification Host: '%s'", npP->subP->ip));
       NotificationPending* npP = notificationLookupByCurlHandle(notificationList, msgP->easy_handle);
-      LM(("Notification Host: '%s'", npP->subP->ip));
-      LM(("Notification Result for subscription '%s': CURLcode %d (%s)", npP->subP->subscriptionId, msgP->data.result, curl_easy_strerror(msgP->data.result)));
-      LM(("Update Counters for subscription '%s'", npP->subP->subscriptionId));
+      LM_T(LmtAlt, ("Notification Result for subscription '%s': CURLcode %d (%s)", npP->subP->subscriptionId, msgP->data.result, curl_easy_strerror(msgP->data.result)));
+      LM_T(LmtAlt, ("Update Counters for subscription '%s'", npP->subP->subscriptionId));
 
       if (msgP->data.result == 0)
         notificationSuccess(npP->subP, notificationTime);

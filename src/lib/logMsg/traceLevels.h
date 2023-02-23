@@ -58,6 +58,7 @@ typedef enum TraceLevels
   LmtSR = 40,                          // Service Routine (whatever it is doing)
   LmtRegCreate,                        // Creation of registrations
   LmtRegCache,                         // Registration Cache
+  LmtWatchedAttributes,                // Watched attributes in subscriptions
 
   // Both,
   LmtRequest = 38,                     // Incoming requests

@@ -190,7 +190,7 @@ bool orionldDeleteEntity(void)
   // GET the entity locally
   //   FIXME: Overkill to extract the entire entity from the DB
   //
-  KjNode* dbEntityP  = mongocEntityLookup(entityId, entityTypeExpanded, NULL, NULL);
+  KjNode* dbEntityP  = mongocEntityLookup(entityId, entityTypeExpanded, NULL, NULL, NULL);
 
   //
   // More info on Entity Type

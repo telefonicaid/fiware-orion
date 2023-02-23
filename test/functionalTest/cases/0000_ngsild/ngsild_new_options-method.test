@@ -260,7 +260,7 @@ Date: REGEX(.*)
 =============================================================
 HTTP/1.1 200 OK
 Accept-Patch: application/json, application/ld+json
-Allow: DELETE,PATCH,OPTIONS
+Allow: PUT,DELETE,PATCH,OPTIONS
 Content-Length: 0
 Date: REGEX(.*)
 

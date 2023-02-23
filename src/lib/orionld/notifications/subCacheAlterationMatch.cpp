@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // LmtWatchedAttributes
 
 #include "cache/subCache.h"                                    // CachedSubscription, subCacheMatch, tenantMatch
 #include "common/globals.h"                                    // parse8601Time
@@ -343,6 +344,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
 
         for (int ix = 0; ix < watchAttrs; ix++)
         {
+          LM_T(LmtWatchedAttributes, ("Comparing modified '%s' with watched '%s'", attrP->name, subP->notifyConditionV[ix].c_str()));
           if (strcmp(attrP->name, subP->notifyConditionV[ix].c_str()) == 0)
           {
             if ((dbAttrsP == NULL) || (noNotifyFalseUpdate == false) || (falseUpdate(attrP, dbAttrsP) == false))

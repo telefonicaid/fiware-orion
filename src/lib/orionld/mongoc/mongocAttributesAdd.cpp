@@ -31,6 +31,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/traceLevels.h"                                  // LmtMongoc
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet

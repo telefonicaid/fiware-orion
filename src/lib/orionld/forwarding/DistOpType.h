@@ -58,7 +58,7 @@ typedef enum DistOpType
   DoDeleteTemporal,
   DoMergeEntity,
   DoReplaceEntity,
-  DoReplaceAttrs,
+  DoReplaceAttr,
   DoMergeBatch,                     // 20
 
   DoRetrieveEntity,

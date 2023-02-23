@@ -44,6 +44,10 @@ SET (SOURCES
     dbModelToApiGeoQ.cpp
     dbModelFromApiRegistration.cpp
     dbModelToApiRegistration.cpp
+    dbModelEntityTypeLookup.cpp
+    dbModelAttributeCreatedAtLookup.cpp
+    dbModelAttributeCreatedAtSet.cpp
+    dbModelAttributeLookup.cpp
 )
 
 # Include directories
