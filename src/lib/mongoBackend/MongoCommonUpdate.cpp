@@ -924,7 +924,7 @@ static bool addTriggeredSubscriptions_withCache
     }
 
     // Note that in this case (different from _noCache case) the fails counter in the sum of the
-    // last "consolidated" number in DB (is not invalidated by a recent notification success)
+    // last "consolidated" number in DB (if not invalidated by a recent notification success)
     // plus the not yet consolidated fail conunter in cache
     long long failsCounter = cSubP->failsCounter + (cSubP->failsCounterFromDbValid ? cSubP->failsCounterFromDb : 0);
     TriggeredSubscription* subP = new TriggeredSubscription((long long) cSubP->throttling,

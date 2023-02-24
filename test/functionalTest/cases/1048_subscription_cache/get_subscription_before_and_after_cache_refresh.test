@@ -102,19 +102,19 @@ brokerStart CB 0 IPv4 -subCacheIval 2 --cache
 #
 # At step 03 the situation is:
 #
-# cache.lastSuccess: 2020-01-01T09:00:00Z
-# DB.lastFailure:    2020-01-01T10:00:00Z
+# * cache.lastSuccess: 2020-01-01T09:00:00Z
+# * DB.lastFailure:    2020-01-01T10:00:00Z
 #
 # so cache.lastSuccess < DB.lastFailure and failsCounter is
 #
 # DB.failsCounter (8) + cache.failsCounter (0) = 8
 #
-# At step 04 cach.lastSuccess gets updates from B document and now the situation is
+# At step 04 cache.lastSuccess gets updated from B document and now the situation is
 #
-# cache.lastSuccess: 2020-01-01T11:00:00Z
-# DB.lastFailure:    2020-01-01T10:00:00Z
+# * cache.lastSuccess: 2020-01-01T11:00:00Z
+# * DB.lastFailure:    2020-01-01T10:00:00Z
 #
-# so the situation reverses to (cache.lastSuccess > DB.lastFailure) and now failsCounter calculation is:
+# so the situation reverses (cache.lastSuccess > DB.lastFailure) and now failsCounter calculation is:
 #
 # cache.failsCounter (0) = 0
 

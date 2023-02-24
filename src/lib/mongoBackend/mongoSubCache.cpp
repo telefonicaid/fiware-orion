@@ -131,7 +131,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
     cSubP->failsCounterFromDb = 0;
   }
 
-  // set to valid at refresh time, may be invalidated if some sucess occurs before the next cache refresh cycle
+  // set to valid at refresh time (to be invalidated if some sucess occurs before the next cache refresh cycle)
   cSubP->failsCounterFromDbValid = true;
 
   //
