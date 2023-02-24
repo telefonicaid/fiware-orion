@@ -101,6 +101,8 @@ struct CachedSubscription
   char*                            servicePath;
   char*                            subscriptionId;
   int64_t                          failsCounter;
+  int64_t                          failsCounterFromDb;
+  bool                             failsCounterFromDbValid;
   int64_t                          maxFailsLimit;
   int64_t                          throttling;
   int64_t                          expirationTime;

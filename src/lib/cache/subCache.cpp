@@ -872,6 +872,11 @@ void subCacheItemInsert
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 
+  // empty cache entry, no relation with DB actually exists
+  // (thus validity flag set to false)
+  cSubP->failsCounterFromDb      = 0;
+  cSubP->failsCounterFromDbValid = false;
+
   cSubP->httpInfo.fill(httpInfo);
   cSubP->mqttInfo.fill(mqttInfo);
 
@@ -1266,6 +1271,11 @@ void subCacheSync(void)
 
       std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
 
+      // Note that in step 2 subCacheRefresh() sets failsCounterFromDb from DB,
+      // but that is done *before* updating the counter with mongoSubUpdateOnCacheSync()
+      // Thus, we have to do a mirror increase in the cache
+      cSubP->failsCounterFromDb += cssP->failsCounter;
+
       mongoSubUpdateOnCacheSync(tenant,
                                 cSubP->subscriptionId,
                                 cssP->count,
@@ -1433,9 +1443,11 @@ void subNotificationErrorStatus
   else
   {
     // no fails mean notification ok, thus reseting the counter
-    subP->failsCounter    = 0;
-    subP->lastSuccess     = now;
-    subP->lastSuccessCode = statusCode;
+    // in addition, DB consolidated data is marked as invalid
+    subP->failsCounter            = 0;
+    subP->lastSuccess             = now;
+    subP->lastSuccessCode         = statusCode;
+    subP->failsCounterFromDbValid = false;
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
