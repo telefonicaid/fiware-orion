@@ -195,7 +195,6 @@ void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value,
 //
 static int responseSave(void* chunk, size_t size, size_t members, void* userP)
 {
-  LM(("GOT a Response!"));
   char*            chunkP        = (char*) chunk;
   size_t           chunkLen      = members;
   HttpResponse*    httpResponseP = (HttpResponse*) userP;
@@ -310,13 +309,22 @@ void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArra
 
 
 
-// debugging
-size_t responseHeaderSave(char* buffer, size_t size, size_t nitems, void* userdata)
+// -----------------------------------------------------------------------------
+//
+// responseHeaderDebug -
+//
+static size_t responseHeaderDebug(char* buffer, size_t size, size_t nitems, void* userdata)
 {
   LM_T(LmtDistOpResponseHeaders, ("Response Header: %s", buffer));
   return nitems;
 }
 
+
+
+// -----------------------------------------------------------------------------
+//
+// subAttrsCompact -
+//
 void subAttrsCompact(KjNode* requestBody, OrionldContext* fwdContextP)
 {
   for (KjNode* subAttrP = requestBody->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
@@ -707,8 +715,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // curl_easy_setopt(distOpP->curlHandle, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
   curl_easy_setopt(distOpP->curlHandle, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
 
-  // Debugging
-  curl_easy_setopt(distOpP->curlHandle, CURLOPT_HEADERFUNCTION, responseHeaderSave);   // Callback for headers
+  // Debugging Incoming HTTP Headers?
+  if (lmTraceIsSet(LmtDistOpResponseHeaders) == true)
+    curl_easy_setopt(distOpP->curlHandle, CURLOPT_HEADERFUNCTION, responseHeaderDebug);   // Callback for headers
 
 
   //

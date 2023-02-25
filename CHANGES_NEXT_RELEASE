@@ -53,3 +53,5 @@
 * Issue #280   Implemented forwarding for DELETE /entities/{entityId}/attrs/{attrName}
 * Issue #280   Implemented forwarding for POST /entities/{entityId}/attrs
 * Issue #280   Implemented PUT /entities/{entityId}/attrs/{attrName}
+* Issue #1322  Fixed an error in subscription stats (for -experimental)
+* Issue #1322  Implemented better notification response reception and much better log messages
