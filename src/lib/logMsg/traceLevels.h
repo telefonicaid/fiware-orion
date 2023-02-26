@@ -42,8 +42,7 @@ typedef enum TraceLevels
   LmtDistOpMsgs = 20,                  // Distributed Operations: messages
   LmtRegMatch,                         // Distributed Operations: registration matching
   LmtAlt,                              // Notifications: Alterations
-  LmtNotifMsgs,                        // Notifications: Messages
-  LmtHeaders,                          // HTTP Headers
+  LmtHeaders = 24,                     // HTTP Headers
   LmtUriParams,                        // HTTP URI Parameters
   LmtResponse,                         // HTTP Response
   LmtMqtt,                             // MQTT (notifications)
@@ -60,6 +59,11 @@ typedef enum TraceLevels
   LmtRegCache,                         // Registration Cache
   LmtWatchedAttributes,                // Watched attributes in subscriptions
   LmtUriParamOptions,                  // HTTP URI Parameter 'options'
+  LmtNotificationMsg     = 200,        // Notifications: Messages
+  LmtNotificationStats   = 201,        // Errors and timestamps for subscriptions
+  LmtNotificationSend    = 202,        // Sending of notifications
+  LmtNotificationHeaders = 203,        // notification request/response headers
+  LmtNotificationBody    = 204,        // notification request/response body
 
   // Both,
   LmtRequest = 38,                     // Incoming requests
@@ -124,8 +128,6 @@ typedef enum TraceLevels
 
   /* Notifications (160-179) */
   LmtNotifier = 160,
-  LmtNotificationFormat,
-  LmtNotifications,
 
   /* Input/Output payloads (180-199) */
   LmtServiceInputPayload = 180,

@@ -91,14 +91,27 @@ static void curlSaveForLaterCleanup(CURL* curlHandleP, struct curl_slist* header
 
 // -----------------------------------------------------------------------------
 //
+// responseHeaderDebug -
+//
+static size_t responseHeaderDebug(char* buffer, size_t size, size_t nitems, void* userdata)
+{
+  char* subId = (char*) userdata;
+  LM_T(LmtNotificationHeaders, ("%s: Notification Response HTTP Header: %s", subId, buffer));
+  return nitems;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // httpsNotify -
 //
 int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double timestamp, CURL** curlHandlePP)
 {
-  LM_T(LmtAlt, ("Protocol for HTTPS notification: %s (%d)", cSubP->protocolString, cSubP->protocol));
-  LM_T(LmtAlt, ("IP for HTTPS notification: %s", cSubP->ip));
-  LM_T(LmtAlt, ("Port for HTTPS notification: %d", cSubP->port));
-  LM_T(LmtAlt, ("Rest for HTTPS notification: %s", cSubP->rest));
+  LM_T(LmtNotificationSend, ("%s: Protocol for HTTPS notification: %s (%d)", cSubP->subscriptionId, cSubP->protocolString, cSubP->protocol));
+  LM_T(LmtNotificationSend, ("%s: IP for HTTPS notification: %s", cSubP->subscriptionId, cSubP->ip));
+  LM_T(LmtNotificationSend, ("%s: Port for HTTPS notification: %d", cSubP->subscriptionId, cSubP->port));
+  LM_T(LmtNotificationSend, ("%s: Rest for HTTPS notification: %s", cSubP->subscriptionId, cSubP->rest));
 
   char  url[512];  // FIXME: DON'T Create the URL over and over - store it in the CachedSubscription
   char* rest = cSubP->rest;
@@ -116,7 +129,7 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
     orionldState.multiP = curl_multi_init();
     if (orionldState.multiP == NULL)
     {
-      LM_E(("Internal Error: curl_multi_init failed"));
+      LM_E(("%s: Internal Error: curl_multi_init failed", cSubP->subscriptionId));
       return -1;
     }
   }
@@ -124,14 +137,14 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
   CURL* curlHandleP = curl_easy_init();
   if (curlHandleP == NULL)
   {
-    LM_E(("Internal Error: curl_easy_init failed"));
+    LM_E(("%s: Internal Error: curl_easy_init failed", cSubP->subscriptionId));
     return -1;
   }
 
   //
   // URL, Verb, ...
   //
-  LM_T(LmtAlt, ("URL: %s", url));
+  LM_T(LmtNotificationSend, ("%s: URL: %s", cSubP->subscriptionId, url));
   curl_easy_setopt(curlHandleP, CURLOPT_URL, url);
   curl_easy_setopt(curlHandleP, CURLOPT_CUSTOMREQUEST, "POST");
   curl_easy_setopt(curlHandleP, CURLOPT_TIMEOUT_MS, 5000);                     // Timeout - hard-coded to 5 seconds for now ...
@@ -152,7 +165,7 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
     char header[256];
     strcpy(header, (char*) ioVec[ix].iov_base);
     header[ioVec[ix].iov_len - 2] = 0;
-    LM_T(LmtHeaders, ("HEADER: '%s'", header));
+    LM_T(LmtNotificationHeaders, ("%s: Notification Request Header: '%s'", cSubP->subscriptionId, header));
     headers = curl_slist_append(headers, header);
   }
   curl_easy_setopt(curlHandleP, CURLOPT_HTTPHEADER, headers);
@@ -163,7 +176,7 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
   //
   // Payload Body
   //
-  LM_T(LmtAlt, ("BODY: %s", ioVec[ioVecLen - 1].iov_base));
+  LM_T(LmtNotificationBody, ("%s: Notification Request Body: %s", cSubP->subscriptionId, ioVec[ioVecLen - 1].iov_base));
   curl_easy_setopt(curlHandleP, CURLOPT_POSTFIELDS, (u_int8_t*) ioVec[ioVecLen - 1].iov_base);
 
   //
@@ -175,9 +188,20 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
     curl_easy_setopt(curlHandleP, CURLOPT_DEBUGFUNCTION, curlDebug);
   }
 
+  // Debugging Incoming HTTP Headers?
+  if (lmTraceIsSet(LmtNotificationHeaders) == true)
+  {
+    curl_easy_setopt(curlHandleP, CURLOPT_HEADERDATA,     cSubP->subscriptionId);
+    curl_easy_setopt(curlHandleP, CURLOPT_HEADERFUNCTION, responseHeaderDebug);   // Callback for received headers
+  }
+
+  //
+  // FIXME: Use curl_easy_setopt(CURLOPT_WRITEFUNCTION+CURLOPT_WRITEDATA) for debugging the response payload body
+  //        See distOpSend.cpp and do the same here (reuse responseSave() and the struct HttpResponse
+  //
+
   // Add easy handler to the multi handler
   curl_multi_add_handle(orionldState.multiP, curlHandleP);
-  LM_T(LmtAlt, ("Added curl easy-handler to the multi-handler"));
 
   *curlHandlePP = curlHandleP;
   return -2;  // All good, just not a file description to await responses for - libcurl does that for us

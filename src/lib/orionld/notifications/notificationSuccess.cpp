@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                          // LM_*
+#include "logMsg/traceLevels.h"                                     // LmtNotificationStats
 
 #include "cache/CachedSubscription.h"                               // CachedSubscription
 
@@ -39,6 +40,8 @@
 //
 void notificationSuccess(CachedSubscription* subP, const double timestamp)
 {
+  LM_T(LmtNotificationStats, ("%s: notification success", subP->subscriptionId));
+
   subP->lastSuccess           = timestamp;
   subP->lastNotificationTime  = timestamp;
   subP->consecutiveErrors     = 0;
@@ -56,10 +59,15 @@ void notificationSuccess(CachedSubscription* subP, const double timestamp)
   //
   if ((cSubCounters != 0) && (subP->dirty >= cSubCounters))
   {
-    // LM(("SUBC: Calling mongocSubCountersUpdate"));
+    LM_T(LmtNotificationStats, ("%s: Calling mongocSubCountersUpdate", subP->subscriptionId));
     mongocSubCountersUpdate(subP, subP->count, subP->lastNotificationTime, subP->lastFailure, subP->lastSuccess, false, true);
     subP->dirty    = 0;
     subP->dbCount += subP->count;
     subP->count    = 0;
   }
+  else
+    LM_T(LmtNotificationStats, ("%s: Not calling mongocSubCountersUpdate (cSubCounters: %d, dirty: %d)",
+                                subP->subscriptionId,
+                                cSubCounters,
+                                subP->dirty));
 }

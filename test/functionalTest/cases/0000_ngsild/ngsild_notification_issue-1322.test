@@ -1,0 +1,174 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue #1322: Problematic Notification causing a crash
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+dbInit CB captn
+brokerStart CB 0 IPv4 -mongocOnly -multiservice
+accumulatorStart --pretty-print 127.0.0.1 $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 (endpoint URL pointing nowhere)
+# 02. Create (upsert) an entity to provoke a notification
+# 03. GET subscription - see failure
+#
+
+echo "01. Create a subscription S1 (endpoint URL pointing nowhere)"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:subscription:8f6f80a4-a7a4-11ed-9cbf-16804aa0063b",
+  "type": "Subscription",
+  "subscriptionName": "Notify NR WeatherObserved zu addixio",
+  "description": "NR WeatherObserved zu addixio",
+  "entities": [
+    {
+      "idPattern": "WeatherObserved",
+      "type": "WeatherObserved"
+    }
+  ],
+  "watchedAttributes": [ "dateObserved" ],
+  "notification": {
+    "attributes": [ "location", "atmosphericPressure", "dateObserved" ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://node-red-captn.captn.svc/yvonne",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --tenant captn
+echo
+echo
+
+
+echo "02. Create (upsert) an entity to provoke a notification"
+echo "======================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:ADDIX:owm:54461020",
+    "type": "WeatherObserved",
+    "dateObserved": {
+      "type": "Property",
+      "value": {
+        "@type": "DateTime",
+        "@value": "2023-02-08T13:13:14.000Z"
+      }
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 1037
+    }
+  }
+]'
+orionCurl --url '/ngsi-ld/v1/entityOperations/upsert?options=update' -H 'fiware-service: captn'  -H 'fiware-servicepath: /' -H 'NGSILD-Tenant: captn' -H 'Authorization: Bearer {myToken}' --payload "$payload"
+echo
+echo
+
+
+echo "03. GET subscription - see failure"
+echo "=================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:8f6f80a4-a7a4-11ed-9cbf-16804aa0063b  --tenant captn
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 (endpoint URL pointing nowhere)
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:8f6f80a4-a7a4-11ed-9cbf-16804aa0063b
+NGSILD-Tenant: captn
+
+
+
+02. Create (upsert) an entity to provoke a notification
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 50
+Content-Type: application/json
+Date: REGEX(.*)
+NGSILD-Tenant: captn
+
+[
+    "urn:ngsi-ld:WeatherObserved:ADDIX:owm:54461020"
+]
+
+
+03. GET subscription - see failure
+==================================
+HTTP/1.1 200 OK
+Content-Length: 748
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "NR WeatherObserved zu addixio",
+    "entities": [
+        {
+            "idPattern": "WeatherObserved",
+            "type": "WeatherObserved"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscription:8f6f80a4-a7a4-11ed-9cbf-16804aa0063b",
+    "isActive": true,
+    "notification": {
+        "attributes": [
+            "location",
+            "atmosphericPressure",
+            "dateObserved"
+        ],
+        "consecutiveErrors": 1,
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://node-red-captn.captn.svc/yvonne"
+        },
+        "format": "normalized",
+        "lastErrorReason": "Unable to connect to notification endpoint",
+        "lastFailure": "202REGEX(.*)Z",
+        "lastNotification": "202REGEX(.*)Z",
+        "status": "failed",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Notify NR WeatherObserved zu addixio",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "dateObserved"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
+dbDrop CB captn

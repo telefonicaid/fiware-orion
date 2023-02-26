@@ -22,7 +22,7 @@
 
 # ------------------------------------------------------------------------------
 #
-# harnessInit - 
+# harnessInit -
 #
 
 if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
@@ -48,7 +48,7 @@ fi
 
 # ------------------------------------------------------------------------------
 #
-# harnessExit - 
+# harnessExit -
 #
 function harnessExit()
 {
@@ -59,7 +59,7 @@ function harnessExit()
 
 # ------------------------------------------------------------------------------
 #
-# dbInit - 
+# dbInit -
 #
 function dbInit()
 {
@@ -124,7 +124,7 @@ function dbInit()
 
 # ------------------------------------------------------------------------------
 #
-# dbDrop - 
+# dbDrop -
 #
 function dbDrop()
 {
@@ -183,7 +183,7 @@ function dbList
 
 # ------------------------------------------------------------------------------
 #
-# dbResetAll - 
+# dbResetAll -
 #
 function dbResetAll()
 {
@@ -637,7 +637,7 @@ function brokerStart()
 
 # ------------------------------------------------------------------------------
 #
-# brokerStop - 
+# brokerStop -
 #
 function brokerStop
 {
@@ -715,7 +715,7 @@ function brokerStop
 
 # ------------------------------------------------------------------------------
 #
-# accumulatorStop - 
+# accumulatorStop -
 #
 function accumulatorStop()
 {
@@ -742,7 +742,7 @@ function accumulatorStop()
 
 # ------------------------------------------------------------------------------
 #
-# accumulatorStart - 
+# accumulatorStart -
 #
 function accumulatorStart()
 {
@@ -1042,7 +1042,7 @@ function accumulator3Count()
 
 # ------------------------------------------------------------------------------
 #
-# accumulatorReset - 
+# accumulatorReset -
 #
 function accumulatorReset()
 {
@@ -1053,6 +1053,22 @@ function accumulatorReset()
     curl localhost:${LISTENER_PORT}/reset -s -S -X POST
   fi
 }
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulator2Reset -
+#
+function accumulator2Reset()
+{
+  if [ "$1" == "HTTPS" ]
+  then
+    curl -k https://localhost:${LISTENER2_PORT}/reset -s -S -X POST
+  else
+    curl localhost:${LISTENER2_PORT}/reset -s -S -X POST
+  fi
+}
+
 
 
 # ------------------------------------------------------------------------------
@@ -1071,7 +1087,7 @@ function valgrindSleep()
 
 # ------------------------------------------------------------------------------
 #
-# mongoCmd - 
+# mongoCmd -
 #
 # This functions is needed due to some problems with jenkins that seems to avoid
 # the usage of 'mongo --quiet ...' directly. Thus, we need to use mongo without
@@ -1785,6 +1801,7 @@ export -f accumulatorCount
 export -f accumulator2Count
 export -f accumulator3Count
 export -f accumulatorReset
+export -f accumulator2Reset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd

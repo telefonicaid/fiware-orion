@@ -56,6 +56,7 @@ typedef struct NotificationPending
   CachedSubscription*          subP;
   int                          fd;
   CURL*                        curlHandleP;
+  bool                         used;
   struct NotificationPending*  next;
 } NotificationPending;
 
@@ -63,41 +64,330 @@ typedef struct NotificationPending
 
 // -----------------------------------------------------------------------------
 //
-// notificationResponseTreat -
+// statusCodeExtract -
 //
-static int notificationResponseTreat(NotificationPending* npP, double notificationTime)
+static int statusCodeExtract(char* startLine)
 {
-  char buf[2048];  // should be enough for the HTTP headers ...
-  int  nb = read(npP->fd, buf, sizeof(buf) - 1);
+  char* space = strchr(startLine, ' ');
 
-  if (nb == -1)
+  if (space == NULL)
+    return -1;
+
+  return atoi(&space[1]);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// readWithTimeout - FIXME: to its own module under orionld/common
+//
+int readWithTimeout(int fd, char* buf, int bufLen, int tmoSecs, int tmoMicroSecs)
+{
+  while (1)  // "try-again" if EINTR, otherwise, either return error or finish
+  {
+    int            fds;
+    fd_set         rFds;
+    struct timeval tv    = { tmoSecs, tmoMicroSecs };
+    int            fdMax = fd;
+
+    FD_ZERO(&rFds);
+    FD_SET(fd, &rFds);
+
+    fds = select(fdMax + 1, &rFds, NULL, NULL, &tv);
+    if (fds == -1)
+    {
+      if (errno == EINTR)
+        continue;
+
+      LM_E(("select error: %s", strerror(errno)));
+      return -1;
+    }
+    else if (fds == 0)
+      return 0;
+
+    if (!FD_ISSET(fd, &rFds))
+      return -1;  // This can't happen ...
+
+    break;
+  }
+
+  return read(fd, buf, bufLen);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// notificationResponseRead - FIXME: to its own module
+//
+bool notificationResponseRead
+(
+  NotificationPending* npP,
+  char*                buf,
+  int                  bufLen,
+  int*                 httpStatusCodeP,
+  int*                 contentLengthP,
+  char**               headersP,
+  char**               bodyP,
+  double               notificationTime
+)
+{
+  //
+  // 1. Do an initial read, with buf and bufLen
+  // 2. Make sure we have headerBodyDelimiter
+  //    - if 100% of body, we're done
+  //    - else, read more
+  //      - if timeout, return error
+  //
+  int      contentLen  = -1;
+  int      httpStatus  = -1;
+  char*    headers     = NULL;
+  char*    body        = NULL;
+  ssize_t  bytesRead   = 0;
+
+  //
+  // Initial read
+  //
+  bytesRead = readWithTimeout(npP->fd, buf, bufLen - 1, 0, 100000);
+  if (bytesRead <= 0)
   {
     notificationFailure(npP->subP, "Unable to read from notification endpoint", notificationTime);
-    LM_E(("Internal Error (unable to read response for notification)"));
-    return -1;
+    LM_E(("Internal Error (%s: unable to read response for notification on fd %d)", npP->subP->subscriptionId, npP->fd));
+    return false;
   }
-
-  char* endOfFirstLine = strchr(buf, '\r');
-
-  if (endOfFirstLine == NULL)
-  {
-    notificationFailure(npP->subP, "Invalid response from notification endpoint", notificationTime);
-    LM_E(("Internal Error (unable to find end of first line from notification endpoint: %s)", strerror(errno)));
-    return -1;
-  }
-
-  *endOfFirstLine = 0;
+  buf[bytesRead] = 0;
 
   //
-  // Reading the rest of the message, using select
+  // Find the Header/Body delimiter
+  // Read more if necessary
   //
-  while ((nb = read(npP->fd, buf, sizeof(buf) - 1)) > 0)
+  char* headerBodyDelimiterP = strstr(buf, "\r\n\r\n");
+
+  if (headerBodyDelimiterP == NULL)
+    headerBodyDelimiterP = strstr(buf, "\n\n");
+
+  if (headerBodyDelimiterP == NULL)
   {
-    buf[nb] = 0;
+    // Read mode
+    int nb = readWithTimeout(npP->fd, &buf[bytesRead], bufLen - bytesRead, 0, 100000);  // 100 millisecond timeout
+    if (nb == 0)
+    {
+      LM_W(("%s: the read of notification response timed out", npP->subP->subscriptionId));
+      notificationFailure(npP->subP, "timeout reading the notification response", notificationTime);
+      return false;
+    }
+    else if (nb == -1)
+    {
+      char errorString[512];
+      snprintf(errorString, sizeof(errorString), "error reading notification response: %s", strerror(errno));
+      LM_E(("%s: %s", npP->subP->subscriptionId, errorString));
+      notificationFailure(npP->subP, errorString, notificationTime);
+      return false;
+    }
+
+    bytesRead += nb;
+
+    // Try to find the Header/Body delimiter again
+    headerBodyDelimiterP = strstr(buf, "\r\n\r\n");
+    if (headerBodyDelimiterP == NULL)
+      headerBodyDelimiterP = strstr(buf, "\n\n");
+
+    if (headerBodyDelimiterP == NULL)
+    {
+      LM_W(("Can't find the Headers/Body delimiter"));
+      notificationFailure(npP->subP, "Can't find the Headers/Body delimiter", notificationTime);
+      return false;
+    }
   }
 
+  // Zero delimit the Header/Body Delimiter
+  *headerBodyDelimiterP = 0;
 
-  return 0;
+  // Step over all \r | \n  and assign the bodyP
+  ++headerBodyDelimiterP;
+  while ((*headerBodyDelimiterP == '\r') || (*headerBodyDelimiterP == '\n'))
+    ++headerBodyDelimiterP;
+
+  body = headerBodyDelimiterP;
+
+  //
+  // Find the end of the Start-Line and zero-terminate it
+  // Make headersP reference what comes after it
+  //
+  char* cP = strstr(buf, "\r\n");
+  if (cP == NULL)
+  {
+    cP = strstr(buf, "\n");
+    if (cP != NULL)
+    {
+      *cP = 0;
+      ++cP;
+    }
+  }
+  else
+  {
+    *cP = 0;
+    cP += 2;  // Jump over the '\r' and '\n'
+  }
+
+  if (cP == NULL)
+  {
+    LM_W(("%s: Can't find the end of the Start-Line", npP->subP->subscriptionId));
+    notificationFailure(npP->subP, "Can't find the end of the Start-Line", notificationTime);
+    return false;
+  }
+
+  headers = cP;
+  LM_T(LmtNotificationMsg, ("%s: notification response Start-Line:   '%s'", npP->subP->subscriptionId, buf));
+  LM_T(LmtNotificationMsg, ("%s: notification response HTTP Headers: '%s'", npP->subP->subscriptionId, headers));
+  LM_T(LmtNotificationMsg, ("%s: notification response body so far: '%s'", body));
+
+
+  //
+  // Extract the Status Code from the first line
+  //
+  httpStatus = statusCodeExtract(buf);
+
+  // Extract the Content-Length (if not part of the headers and status code is not 204, it's considered an error)
+  char* contentLenP = strstr(headers, "Content-Length:");
+  if (contentLenP == NULL)
+  {
+    // Error if not 204
+    if (httpStatus != 204)
+    {
+      LM_W(("Content-Length not found but the status code (%d) is not a 204", httpStatus));
+      notificationFailure(npP->subP, "Content-Length not found but the status code is not a 204", notificationTime);
+      return false;
+    }
+  }
+  contentLen = atoi(&contentLenP[16]);
+  LM_T(LmtNotificationMsg, ("%s: Content-Length: %d", npP->subP->subscriptionId, contentLen));
+
+
+  //
+  // Make sure we've read the entire body
+  //
+  ssize_t headersLen    = (ssize_t) headerBodyDelimiterP - (ssize_t) buf;  // Including the Start-Line
+  ssize_t bodyBytesRead = bytesRead - headersLen;
+
+  LM_T(LmtNotificationMsg, ("%s: total no of bytes of Start-Line + Headers: %d", npP->subP->subscriptionId, headersLen));
+  LM_T(LmtNotificationMsg, ("%s: total no of bytes read: %d", npP->subP->subscriptionId, bytesRead));
+  LM_T(LmtNotificationMsg, ("%s: no of bytes of body read: %d", npP->subP->subscriptionId, bodyBytesRead));
+
+  if (bodyBytesRead < contentLen)
+  {
+    //
+    // We need to read more
+    // Do we have room enough in 'buf'?
+    // If not, we'll have to allocate more (using kaAlloc)
+    //
+    int bodyBytesStillToRead = contentLen - bodyBytesRead;
+
+    if (bytesRead + bodyBytesStillToRead >= bufLen)
+    {
+      LM_T(LmtNotificationMsg, ("%s: must reallocate for the response body (we have %d bytes left in buffer, need %d)",
+          npP->subP->subscriptionId,
+          bufLen - bytesRead,
+          bodyBytesStillToRead));
+
+      char* newBody = kaAlloc(&orionldState.kalloc, contentLen + 1);
+      if (newBody == NULL)
+      {
+        LM_E(("Unable to allocate %d bytes for notification response body", contentLen + 1));
+        notificationFailure(npP->subP, "Unable to allocate buffer for notification response body", notificationTime);
+        return false;
+      }
+
+      // Copy what's already read, from body to newBody
+      strncpy(newBody, body, bodyBytesRead + 1);
+      body = newBody;
+
+      // Read the rest of the body
+      int nb = readWithTimeout(npP->fd, &newBody[bodyBytesRead], contentLen - bodyBytesRead, 0, 100000);  // 100 millisecond timeout
+      if (nb == 0)
+      {
+        LM_W(("The read timed out"));
+        notificationFailure(npP->subP, "timeout while reading notification response", notificationTime);
+        return false;
+      }
+      else if (nb == -1)
+      {
+        LM_E(("Other error reading (%s)", strerror(errno)));
+        return false;
+      }
+
+      bodyBytesRead += nb;
+
+      if (bodyBytesRead != contentLen)
+      {
+        LM_W(("Still not enough bytes read for the notification response body. I give up"));
+        notificationFailure(npP->subP, "Unable to read the entire response", notificationTime);
+        return false;
+      }
+    }
+  }
+
+  LM_T(LmtNotificationMsg, ("%s: entire message read", npP->subP->subscriptionId));
+  *headersP        = headers;
+  *bodyP           = body;
+  *httpStatusCodeP = httpStatus;
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// notificationResponseTreat -
+//
+static void notificationResponseTreat(NotificationPending* npP, double notificationTime)
+{
+  char  buf[2048];  // should be enough for the HTTP headers ...
+  int   contentLength  = -1;
+  int   httpStatusCode = -1;
+  char* body           = NULL;
+  char* headers        = NULL;
+  char* subId          = npP->subP->subscriptionId;
+
+  if (notificationResponseRead(npP, buf, sizeof(buf), &httpStatusCode, &contentLength, &headers, &body, notificationTime) == false)
+  {
+    // if notificationResponseRead() returns false, it has invoked notificationFailure()
+    return;
+  }
+
+  if (lmTraceIsSet(LmtNotificationHeaders) == true)
+  {
+    char* headerP = headers;
+    char* eol;
+    while ((eol = strstr(headerP, "\n")) != NULL)
+    {
+      *eol = 0;
+      LM_T(LmtNotificationHeaders, ("%s: Notification Response HTTP Header: '%s'", subId, headerP));
+      headerP = &eol[1];
+    }
+
+    LM_T(LmtNotificationHeaders, ("%s: Notification Response HTTP Header: '%s'", subId, headerP));
+  }
+
+  LM_T(LmtNotificationBody, ("%s: Notification Response Body: '%s'", subId, body));
+
+  //
+  // Any 2xx response is considered OK
+  //
+  if (httpStatusCode == -1)
+  {
+    notificationFailure(npP->subP, "HTTP Start-Line of notification response not found", notificationTime);
+    LM_E(("Internal Error (%s:  HTTP Start-Line of notification response not found)", subId));
+  }
+  else if ((httpStatusCode < 200) || (httpStatusCode >= 300))
+  {
+    notificationFailure(npP->subP, "non 2xx response to notification", notificationTime);
+    LM_E(("Internal Error (%s: non 2xx response (%d) to notification on fd %d)", subId, httpStatusCode, npP->fd));
+  }
+  else
+    notificationSuccess(npP->subP, notificationTime);
 }
 
 
@@ -133,6 +423,9 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 {
   for (NotificationPending* npP = notificationList; npP != NULL; npP = npP->next)
   {
+    if (npP->used == true)
+      continue;
+
     if (npP->curlHandleP == curlHandleP)
       return npP;
   }
@@ -206,17 +499,24 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   NotificationPending* notificationList = NULL;
 
-  int ix = 1;
-  LM_T(LmtAlt, ("%d items in matchList:", matches));
-  for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
+  if (lmTraceIsSet(LmtAlt) == true)
   {
-    if (matchP->altAttrP != NULL)
-      LM_T(LmtAlt, ("o %d/%d Subscription '%s', due to '%s'", ix, matches, matchP->subP->subscriptionId, orionldAlterationName(matchP->altAttrP->alterationType)));
-    else
-      LM_T(LmtAlt, ("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
-    ++ix;
-  }
+    int ix = 1;
+    LM_T(LmtAlt, ("%d items in matchList:", matches));
+    for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
+    {
+      if (matchP->altAttrP != NULL)
+        LM_T(LmtAlt, ("o %d/%d Subscription '%s', due to '%s'",
+                      ix,
+                      matches,
+                      matchP->subP->subscriptionId,
+                      orionldAlterationName(matchP->altAttrP->alterationType)));
+      else
+        LM_T(LmtAlt, ("o %d/%d Subscription '%s'", ix, matches, matchP->subP->subscriptionId));
 
+      ++ix;
+    }
+  }
 
   //
   // Applying the PATCH, if any
@@ -226,7 +526,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //   Would be better to apply the patch before so we would not need "altList->dbEntityP"
   //
 
-#if 1
+
   //
   // Only orionldPatchEntity2 uses this ... Right?
   // Instead of having this function create finalApiEntityP, it should be done by the service routine
@@ -243,7 +543,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       orionldPatchApply(altList->finalApiEntityP, patchP);
     }
   }
-#endif
 
   //
   // Timestamp for sending of notification - for stats in subscriptions
@@ -274,17 +573,23 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       matchHead     = current;
     }
 
-    CURL* curlHandleP;
-    int   fd = notificationSend(matchHead, notificationTime, &curlHandleP);  // curl handle as output param?
-    LM_T(LmtAlt, ("notificationSend returned fd %d (-2 is OK if HTTPS)", fd));
-    if (fd != -1)  // -1 is ERROR, -2 is OK for HTTPS, anything else is a file descriptor to read from
+    CURL* curlHandleP = NULL;
+    int   fd          = notificationSend(matchHead, notificationTime, &curlHandleP);  // curl handle as output param?
+    LM_T(LmtNotificationSend, ("%s: notificationSend returned fd %d (-2 is OK if HTTPS)", matchHead->subP->subscriptionId, fd));
+
+    //
+    // -1 is ERROR, -2 is OK for HTTPS, anything else is a file descriptor to read from, except if MQTT.
+    // For MQTT, the notificationSuccess/Failure is already taken care of by mqttNotify and nothing to read.
+    // Should not be in this list.
+    //
+    if ((fd != -1) && (matchHead->subP->protocol != MQTT))
     {
       NotificationPending* npP = (NotificationPending*) kaAlloc(&orionldState.kalloc, sizeof(NotificationPending));
 
       npP->subP        = matchHead->subP;
       npP->fd          = fd;
       npP->curlHandleP = curlHandleP;
-
+      npP->used        = false;
       npP->next        = notificationList;
       notificationList = npP;
     }
@@ -297,7 +602,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     int        activeNotifications;
     CURLMcode  cm;
 
-    LM_T(LmtAlt, ("Starting HTTPS notifications"));
+    LM_T(LmtNotificationSend, ("Starting HTTPS notifications"));
     cm = curl_multi_perform(orionldState.multiP, &activeNotifications);
     if (cm != 0)
     {
@@ -305,10 +610,10 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       curlError = true;
     }
     else
-      LM_T(LmtAlt, ("Started HTTPS notifications"));
+      LM_T(LmtNotificationSend, ("Started HTTPS notifications"));
   }
   else
-    LM_T(LmtAlt, ("No HTTPS notifications"));
+    LM_T(LmtNotificationSend, ("No HTTPS notifications"));
 
   //
   // Await HTTP responses and update subscriptions accordingly (in sub cache)
@@ -354,14 +659,16 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       npP = notificationList;
       while (npP != NULL)
       {
-        if ((npP->fd >= 0) && (FD_ISSET(npP->fd, &rFds)))
+        if ((npP->fd >= 0) && (FD_ISSET(npP->fd, &rFds)))  // Only HTTP notifications
         {
-          if (notificationResponseTreat(npP, notificationTime) == 0)
-            notificationSuccess(npP->subP, notificationTime);
+          notificationResponseTreat(npP, notificationTime);
 
-          close(npP->fd);  // OR: close socket inside responseTreat?
-          npP->fd = -1;
+          close(npP->fd);
           --fds;
+
+          npP->fd   = -1;
+          npP->used = true;
+
           break;
         }
 
@@ -376,6 +683,9 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     }
   }
 
+  //
+  // Find timed out HTTP notification responses
+  //
   NotificationPending* npP = notificationList;
   while (npP != NULL)
   {
@@ -385,8 +695,11 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       if (strncmp(npP->subP->protocolString, "mqtt", 4) != 0)
       {
         notificationFailure(npP->subP, "Timeout awaiting response from notification endpoint", notificationTime);
+
         close(npP->fd);
-        npP->fd = -1;
+
+        npP->fd   = -1;
+        npP->used = true;
       }
     }
 
@@ -395,14 +708,16 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
   if (curlError == true)
   {
-    LM_E(("Something went wrong with the HTTPS notifications"));
+    LM_E(("Something went wrong with a HTTPS notification"));
     return;
   }
 
+  //
   // Await HTTPS notification responses
+  //
   if (orionldState.multiP != NULL)
   {
-    LM_T(LmtAlt, ("Awaiting HTTPS notification responses"));
+    LM_T(LmtNotificationSend, ("Awaiting HTTPS notification responses"));
     int activeNotifications = 1;
 
     while (activeNotifications != 0)
@@ -417,7 +732,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         break;
       }
       else
-        LM_T(LmtAlt, ("%d HTTPS notifications are still active", activeNotifications));
+        LM_T(LmtNotificationSend, ("%d HTTPS notifications are still active", activeNotifications));
 
       if (activeNotifications > 0)
       {
@@ -449,12 +764,27 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         continue;
       }
 
-      LM_T(LmtAlt, ("Notification Host: '%s'", npP->subP->ip));
-      LM_T(LmtAlt, ("Notification Result for subscription '%s': CURLcode %d (%s)", npP->subP->subscriptionId, msgP->data.result, curl_easy_strerror(msgP->data.result)));
-      LM_T(LmtAlt, ("Update Counters for subscription '%s'", npP->subP->subscriptionId));
+      LM_T(LmtNotificationSend, ("%s: Notification Host: '%s'", npP->subP->subscriptionId, npP->subP->ip));
+      LM_T(LmtNotificationSend, ("%s: Notification Result: CURLcode %d (%s)", npP->subP->subscriptionId, msgP->data.result, curl_easy_strerror(msgP->data.result)));
+      LM_T(LmtNotificationSend, ("%s: Update Counters", npP->subP->subscriptionId));
 
       if (msgP->data.result == 0)
-        notificationSuccess(npP->subP, notificationTime);
+      {
+        uint64_t  httpResponseCode = 500;
+        curl_easy_getinfo(npP->curlHandleP, CURLINFO_RESPONSE_CODE, &httpResponseCode);
+
+        LM_T(LmtNotificationSend, ("%s: Notification Response HTTP Status: %d", npP->subP->subscriptionId, (int) httpResponseCode));
+
+        if ((httpResponseCode >= 200) && (httpResponseCode < 300))
+          notificationSuccess(npP->subP, notificationTime);
+        else
+        {
+          char errorString[256];
+
+          snprintf(errorString, sizeof(errorString), "Got an HTTP Status %d", (int) httpResponseCode);
+          notificationFailure(npP->subP, errorString, notificationTime);
+        }
+      }
       else
       {
         char errorString[512];
@@ -462,6 +792,19 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
         snprintf(errorString, sizeof(errorString), "CURL Error %d: %s", msgP->data.result, curl_easy_strerror(msgP->data.result));
         notificationFailure(npP->subP, errorString, notificationTime);
       }
+
+      npP->used = true;
     }
+  }
+
+  for (NotificationPending* npP = notificationList; npP != NULL; npP = npP->next)
+  {
+    if (npP->used == true)
+      continue;
+
+    if (npP->subP->protocol == MQTT)
+      continue;
+
+    notificationFailure(npP->subP, "Notification never reached its destination", notificationTime);
   }
 }

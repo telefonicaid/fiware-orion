@@ -584,24 +584,25 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
 //
 int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** curlHandlePP)
 {
-  bool    ngsiv2     = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
+  bool ngsiv2 = (mAltP->subP->renderFormat >= RF_CROSS_APIS_NORMALIZED);
 
-#if 0
   // <DEBUG>
-  for (OrionldAlterationMatch* mP = mAltP; mP != NULL; mP = mP->next)
+  if (lmTraceIsSet(LmtAlt) == true)
   {
-    LM(("Q: AlterationMatch %p", mP));
-    LM(("Q:   Subscription     %s", mP->subP->subscriptionId));
-    LM(("Q:   Entity:          %s", mP->altP->entityId));
-    LM(("Q:   inEntityP:       %p", mP->altP->inEntityP));
-    LM(("Q:   finalApiEntityP: %p", mP->altP->finalApiEntityP));
-    LM(("Q:"));
+    for (OrionldAlterationMatch* mP = mAltP; mP != NULL; mP = mP->next)
+    {
+      LM_T(LmtAlt, ("AlterationMatch %p", mP));
+      LM_T(LmtAlt, ("  Subscription     %s", mP->subP->subscriptionId));
+      LM_T(LmtAlt, ("  Entity:          %s", mP->altP->entityId));
+      LM_T(LmtAlt, ("  inEntityP:       %p", mP->altP->inEntityP));
+      LM_T(LmtAlt, ("  finalApiEntityP: %p", mP->altP->finalApiEntityP));
+      LM_T(LmtAlt, ("- - - - - -"));
+    }
   }
   // </DEBUG>
-#endif
 
   //
-  // Payload Body
+  // Outgoing Payload Body
   //
   KjNode* notificationP = (ngsiv2 == false)? notificationTree(mAltP) : notificationTreeForNgsiV2(mAltP);
 
@@ -620,7 +621,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   //
 
   //
-  // Request Header
+  // Outgoing Header
   //
   char    requestHeader[512];
   size_t  requestHeaderLen = 0;
@@ -635,7 +636,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
     else
       requestHeaderLen = snprintf(requestHeader, sizeof(requestHeader), "POST /%s HTTP/1.1\r\n", mAltP->subP->rest);
 
-    LM(("**** URL PATH for notification == '%s'", mAltP->subP->rest));
+    LM_T(LmtNotificationSend, ("%s: URL PATH for notification == '%s'", mAltP->subP->subscriptionId, mAltP->subP->rest));
   }
 
   //
@@ -810,6 +811,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   else if (mAltP->subP->protocol == HTTPS)   return httpsNotify(mAltP->subP, ioVec, ioVecLen, timestamp, curlHandlePP);
   else if (mAltP->subP->protocol == MQTT)    return mqttNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
 
-  LM_W(("Q: Unsupported protocol for notifications: '%s'", mAltP->subP->protocol));
+  LM_W(("%s: Unsupported protocol for notifications: '%s'", mAltP->subP->subscriptionId, mAltP->subP->protocol));
   return -1;
 }

@@ -140,7 +140,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
   {
     orionldError(OrionldInternalError, "Internal Error", "headersParse failed", 500);
     notificationFailure(cSubP, "Error parsing headers", notificationTime);
-    return 1;
+    return -1;
   }
 
   int      headersLen = kjFastRenderSize(metadata);                      // Approximate
@@ -151,7 +151,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
   {
     orionldError(OrionldInternalError, "kaAlloc failed", "out of memory?", 500);
     notificationFailure(cSubP, "Out of memory", notificationTime);
-    return 2;
+    return -1;
   }
 
   strcpy(buf, "{\"metadata\":");     // strlen: 12
@@ -175,7 +175,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
     {
       orionldError(OrionldInternalError, "MQTT Broker Problem", "unable to connect to the MQTT broker", 500);
       notificationFailure(cSubP, "Unable to connect to the MQTT broker", notificationTime);
-      return 3;
+      return -1;
     }
   }
 
@@ -193,7 +193,7 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
     LM_E(("Internal Error (MQTT waitForCompletion error %d)", rc));
     orionldError(OrionldInternalError, "MQTT Broker Problem", "MQTT waitForCompletion error", 500);
     notificationFailure(cSubP, "MQTT waitForCompletion error", notificationTime);
-    return 4;
+    return -1;
   }
 
   notificationSuccess(cSubP, notificationTime);

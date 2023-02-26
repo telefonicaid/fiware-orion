@@ -40,7 +40,7 @@
 int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double notificationTime)
 {
   // Connect
-  LM_T(LmtAlt, ("Connecting to notification '%s:%d' receptor for '%s' notification", cSubP->ip, cSubP->port, cSubP->protocolString));
+  LM_T(LmtNotificationSend, ("%s: Connecting to notification '%s:%d' receptor for '%s' notification", cSubP->subscriptionId, cSubP->ip, cSubP->port, cSubP->protocolString));
   int fd = orionldServerConnect(cSubP->ip, cSubP->port);
 
   if (fd == -1)
@@ -50,7 +50,17 @@ int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, dou
     return -1;
   }
 
-  LM_T(LmtAlt, ("Connected to notification receptor '%s:%d' on fd %d", cSubP->ip, cSubP->port, fd));
+  LM_T(LmtNotificationSend, ("%s: Connected to notification receptor '%s:%d' on fd %d", cSubP->subscriptionId, cSubP->ip, cSubP->port, fd));
+
+  if (lmTraceIsSet(LmtNotificationHeaders) == true)
+  {
+    for (int ix = 0; ix < ioVecLen - 1; ix++)
+    {
+      LM_T(LmtNotificationHeaders, ("%s: Notification Request Header: '%s'", cSubP->subscriptionId, ioVec[ix].iov_base));
+    }
+  }
+
+  LM_T(LmtNotificationBody, ("%s: Notification Request Body: %s", cSubP->subscriptionId, ioVec[ioVecLen - 1].iov_base));
 
   // Send
   int nb;
@@ -63,7 +73,7 @@ int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, dou
     return -1;
   }
 
-  LM_T(LmtAlt, ("Written %d bytes to fd %d of %s:%d for sub %s", nb, fd, cSubP->ip, cSubP->port, cSubP->subscriptionId));
+  LM_T(LmtNotificationSend, ("%s: Written %d bytes to fd %d of %s:%d", cSubP->subscriptionId, nb, fd, cSubP->ip, cSubP->port));
 
   return fd;
 }

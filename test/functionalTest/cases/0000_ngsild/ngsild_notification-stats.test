@@ -1,0 +1,450 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription counters and timestamps
+
+--SHELL-INIT--
+${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+export BROKER=orionld
+dbInit CB
+dbInit CP1
+brokerStart CB     200-204 IPv4 -experimental
+brokerStart CP1    0-255 IPv4 -experimental
+accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem --url /notify
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 for HTTPS for accumulator1
+# 02. Create a subscription S2 for HTTP for CP1
+# 03. Create a subscription S3 for HTTPS for CP1 (notifications fail as CP1 is HTTP only)
+# 04. Create a subscription S4 for HTTP for accumulator1 (notifications fail as accumulator1 is HTTPS only)
+# 05. Create an entity matching all 4 subscriptions
+# 06. Dump accumulator - see one notification
+# 07. GET urn:E1 on CP1 - see it (it was created via notification)
+# 08. GET S1, see one success (lastSuccess + timesSent: 1)
+# 09. GET S2, see one success (lastSuccess + timesSent: 1)
+# 10. GET S3, see one failure (lastFailure + timesSent: 1, consecutiveErrors: 1)
+# 11. GET S4, see one failure (lastFailure + timesSent: 1, consecutiveErrors: 1)
+#
+
+echo "01. Create a subscription S1 for HTTPS for accumulator1"
+echo "======================================================="
+payload='{
+  "id": "urn:S1:https:ok",
+  "type": "Subscription",
+  "name": "Sub S1",
+  "description": "Sub S1 for HTTPS notification to HTTPS accumulator",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "https://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription S2 for HTTP for CP1"
+echo "============================================="
+payload='{
+  "id": "urn:S2:http:ok",
+  "type": "Subscription",
+  "name": "Sub S2",
+  "description": "Sub S2 for HTTP notification to CP1",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${CP1_PORT}'/ngsi-ld/ex/v1/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create a subscription S3 for HTTPS for CP1 (notifications fail as CP1 is HTTP only)"
+echo "======================================================================================="
+payload='{
+  "id": "urn:S3:https:fails",
+  "type": "Subscription",
+  "name": "Sub S3",
+  "description": "Sub S3 for HTTPS notification to CP1",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "https://127.0.0.1:'${CP1_PORT}'/ngsi-ld/ex/v1/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create a subscription S4 for HTTP for accumulator1 (notifications fail as accumulator1 is HTTPS only)"
+echo "========================================================================================================="
+payload='{
+  "id": "urn:S4:http:fails",
+  "type": "Subscription",
+  "name": "Sub S4",
+  "description": "Sub S4 for HTTP notification to HTTPS accumulator",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create an entity matching all 4 subscriptions"
+echo "================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump accumulator - see one notification"
+echo "==========================================="
+sleep .1
+accumulatorDump IPv4 HTTPS
+accumulatorReset HTTPS
+echo
+echo
+
+
+echo "07. GET urn:E1 on CP1 - see it (it was created via notification)"
+echo "================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --port $CP1_PORT
+echo
+echo
+
+
+echo "08. GET S1, see one success (lastSuccess + timesSent: 1)"
+echo "========================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1:https:ok
+echo
+echo
+
+
+echo "09. GET S2, see one success (lastSuccess + timesSent: 1)"
+echo "========================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S2:http:ok
+echo
+echo
+
+
+echo "10. GET S3, see one failure (lastFailure + timesSent: 1, consecutiveErrors: 1)"
+echo "=============================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S3:https:fails
+echo
+echo
+
+
+echo "11. GET S4, see one failure (lastFailure + timesSent: 1, consecutiveErrors: 1)"
+echo "=============================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S4:http:fails
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 for HTTPS for accumulator1
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1:https:ok
+
+
+
+02. Create a subscription S2 for HTTP for CP1
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S2:http:ok
+
+
+
+03. Create a subscription S3 for HTTPS for CP1 (notifications fail as CP1 is HTTP only)
+=======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S3:https:fails
+
+
+
+04. Create a subscription S4 for HTTP for accumulator1 (notifications fail as accumulator1 is HTTPS only)
+=========================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S4:http:fails
+
+
+
+05. Create an entity matching all 4 subscriptions
+=================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. Dump accumulator - see one notification
+===========================================
+POST https://REGEX(.*)/notify
+Content-Length: 238
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1:https:ok",
+    "type": "Notification"
+}
+=======================================
+
+
+07. GET urn:E1 on CP1 - see it (it was created via notification)
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 61
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": 1
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+08. GET S1, see one success (lastSuccess + timesSent: 1)
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 465
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S1 for HTTPS notification to HTTPS accumulator",
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1:https:ok",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "lastSuccess": "202REGEX(.*)Z",
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Sub S1",
+    "type": "Subscription"
+}
+
+
+09. GET S2, see one success (lastSuccess + timesSent: 1)
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 462
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S2 for HTTP notification to CP1",
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S2:http:ok",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9801/ngsi-ld/ex/v1/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "lastSuccess": "202REGEX(.*)Z",
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Sub S2",
+    "type": "Subscription"
+}
+
+
+10. GET S3, see one failure (lastFailure + timesSent: 1, consecutiveErrors: 1)
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 547
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S3 for HTTPS notification to CP1",
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S3:https:fails",
+    "isActive": true,
+    "notification": {
+        "consecutiveErrors": 1,
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://127.0.0.1:9801/ngsi-ld/ex/v1/notify"
+        },
+        "format": "normalized",
+        "lastErrorReason": "CURL Error 35: SSL connect error",
+        "lastFailure": "202REGEX(.*)Z",
+        "lastNotification": "202REGEX(.*)Z",
+        "status": "failed",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Sub S3",
+    "type": "Subscription"
+}
+
+
+11. GET S4, see one failure (lastFailure + timesSent: 1, consecutiveErrors: 1)
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 553
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S4 for HTTP notification to HTTPS accumulator",
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S4:http:fails",
+    "isActive": true,
+    "notification": {
+        "consecutiveErrors": 1,
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastErrorReason": "Unable to read from notification endpoint",
+        "lastFailure": "202REGEX(.*)Z",
+        "lastNotification": "202REGEX(.*)Z",
+        "status": "failed",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Sub S4",
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+accumulatorStop $LISTENER_PORT
+dbDrop CB
+dbDrop CP1
