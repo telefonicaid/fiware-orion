@@ -40,7 +40,7 @@
 */
 static std::string subscriptionId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
+  LM_T(LmtLegacy, ("%s: %s", path.c_str(), value.c_str()));
   parseDataP->ucar.res.subscriptionId.set(value);
   return "OK";
 }

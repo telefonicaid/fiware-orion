@@ -48,7 +48,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 {
   std::string s;
 
-  LM_T(LmtParse, ("Got a duration: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a duration: '%s'", value.c_str()));
 
   parseDataP->ucsr.res.duration.set(value);
 
@@ -70,7 +70,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 */
 static std::string restriction(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a restriction"));
+  LM_T(LmtLegacy, ("Got a restriction"));
 
   ++parseDataP->ucsr.res.restrictions;
 
@@ -85,7 +85,7 @@ static std::string restriction(const std::string& path, const std::string& value
 */
 static std::string attributeExpression(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an attributeExpression: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attributeExpression: '%s'", value.c_str()));
 
   parseDataP->ucsr.res.restriction.attributeExpression.set(value);
 
@@ -100,7 +100,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 */
 static std::string scope(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a scope"));
+  LM_T(LmtLegacy, ("Got a scope"));
 
   parseDataP->ucsr.scopeP = new Scope();
   parseDataP->ucsr.res.restriction.scopeVector.push_back(parseDataP->ucsr.scopeP);
@@ -116,7 +116,7 @@ static std::string scope(const std::string& path, const std::string& value, Pars
 */
 static std::string scopeType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a scope type: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a scope type: '%s'", value.c_str()));
 
   parseDataP->ucsr.scopeP->type = value;
 
@@ -140,12 +140,12 @@ static std::string scopeValue(const std::string& path, const std::string& value,
     // instead 'circle' or 'polygon' should be used.
     //
     parseDataP->ucsr.scopeP->value = FIWARE_LOCATION;
-    LM_T(LmtParse, ("Preparing scopeValue for '%s'", parseDataP->ucsr.scopeP->type.c_str()));
+    LM_T(LmtLegacy, ("Preparing scopeValue for '%s'", parseDataP->ucsr.scopeP->type.c_str()));
   }
   else
   {
     parseDataP->ucsr.scopeP->value = value;
-    LM_T(LmtParse, ("Got a scopeValue: '%s' for scopeType '%s'", value.c_str(), parseDataP->ucsr.scopeP->type.c_str()));
+    LM_T(LmtLegacy, ("Got a scopeValue: '%s' for scopeType '%s'", value.c_str(), parseDataP->ucsr.scopeP->type.c_str()));
   }
 
   return "OK";
@@ -159,7 +159,7 @@ static std::string scopeValue(const std::string& path, const std::string& value,
 */
 static std::string circle(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a circle"));
+  LM_T(LmtLegacy, ("Got a circle"));
   parseDataP->ucsr.scopeP->areaType = orion::CircleType;
   return "OK";
 }
@@ -172,7 +172,7 @@ static std::string circle(const std::string& path, const std::string& value, Par
 */
 static std::string circleCenterLatitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a circleCenterLatitude: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a circleCenterLatitude: %s", value.c_str()));
   parseDataP->ucsr.scopeP->circle.center.latitudeSet(value);
 
   return "OK";
@@ -186,7 +186,7 @@ static std::string circleCenterLatitude(const std::string& path, const std::stri
 */
 static std::string circleCenterLongitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a circleCenterLongitude: %s", value.c_str()));
   parseDataP->ucsr.scopeP->circle.center.longitudeSet(value);
   return "OK";
 }
@@ -199,7 +199,7 @@ static std::string circleCenterLongitude(const std::string& path, const std::str
 */
 static std::string circleRadius(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a circleRadius: %s", value.c_str()));
   parseDataP->ucsr.scopeP->circle.radiusSet(value);
   return "OK";
 }
@@ -212,7 +212,7 @@ static std::string circleRadius(const std::string& path, const std::string& valu
 */
 static std::string circleInverted(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a circleInverted: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a circleInverted: %s", value.c_str()));
 
   parseDataP->ucsr.scopeP->circle.invertedSet(value);
   if (!isTrue(value) && !isFalse(value))
@@ -232,7 +232,7 @@ static std::string circleInverted(const std::string& path, const std::string& va
 */
 static std::string polygon(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygon"));
+  LM_T(LmtLegacy, ("Got a polygon"));
   parseDataP->ucsr.scopeP->areaType = orion::PolygonType;
   return "OK";
 }
@@ -245,7 +245,7 @@ static std::string polygon(const std::string& path, const std::string& value, Pa
 */
 static std::string polygonInverted(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonInverted: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a polygonInverted: %s", value.c_str()));
 
   parseDataP->ucsr.scopeP->polygon.invertedSet(value);
   if (!isTrue(value) && !isFalse(value))
@@ -265,7 +265,7 @@ static std::string polygonInverted(const std::string& path, const std::string& v
 */
 static std::string polygonVertexList(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonVertexList"));
+  LM_T(LmtLegacy, ("Got a polygonVertexList"));
   return "OK";
 }
 
@@ -277,7 +277,7 @@ static std::string polygonVertexList(const std::string& path, const std::string&
 */
 static std::string polygonVertex(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
+  LM_T(LmtLegacy, ("Got a polygonVertex - creating new vertex for the vertex list"));
   parseDataP->ucsr.vertexP = new orion::Point();
   parseDataP->ucsr.scopeP->polygon.vertexAdd(parseDataP->ucsr.vertexP);
   // parseDataP->ucsr.scopeP->polygon.vertexList.push_back(parseDataP->ucsr.vertexP);
@@ -292,7 +292,7 @@ static std::string polygonVertex(const std::string& path, const std::string& val
 */
 static std::string polygonVertexLatitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a polygonVertexLatitude: %s", value.c_str()));
   parseDataP->ucsr.vertexP->latitudeSet(value);
   return "OK";
 }
@@ -305,7 +305,7 @@ static std::string polygonVertexLatitude(const std::string& path, const std::str
 */
 static std::string polygonVertexLongitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a polygonVertexLongitude: %s", value.c_str()));
   parseDataP->ucsr.vertexP->longitudeSet(value);
   return "OK";
 }
@@ -318,7 +318,7 @@ static std::string polygonVertexLongitude(const std::string& path, const std::st
 */
 static std::string subscriptionId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a subscriptionId: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a subscriptionId: '%s'", value.c_str()));
 
   parseDataP->ucsr.res.subscriptionId.set(value);
 
@@ -333,7 +333,7 @@ static std::string subscriptionId(const std::string& path, const std::string& va
 */
 static std::string notifyCondition(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a notifyCondition"));
+  LM_T(LmtLegacy, ("Got a notifyCondition"));
   parseDataP->ucsr.notifyConditionP = new NotifyCondition();
   parseDataP->ucsr.res.notifyConditionVector.push_back(parseDataP->ucsr.notifyConditionP);
   return "OK";
@@ -347,7 +347,7 @@ static std::string notifyCondition(const std::string& path, const std::string& v
 */
 static std::string notifyConditionRestriction(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a Notify Condition restriction"));
+  LM_T(LmtLegacy, ("Got a Notify Condition restriction"));
 
   parseDataP->ucsr.notifyConditionP->restriction.set(value);
   return "OK";
@@ -361,7 +361,7 @@ static std::string notifyConditionRestriction(const std::string& path, const std
 */
 static std::string notifyConditionType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a Notify Condition Type: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a Notify Condition Type: '%s'", value.c_str()));
   parseDataP->ucsr.notifyConditionP->type = value;
   return "OK";
 }
@@ -374,7 +374,7 @@ static std::string notifyConditionType(const std::string& path, const std::strin
 */
 static std::string notifyConditionCondValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a Cond Value: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a Cond Value: '%s'", value.c_str()));
   parseDataP->ucsr.notifyConditionP->condValueList.push_back(value);
   return "OK";
 }
@@ -387,7 +387,7 @@ static std::string notifyConditionCondValue(const std::string& path, const std::
 */
 static std::string throttling(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a throttling: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a throttling: '%s'", value.c_str()));
   parseDataP->ucsr.res.throttling.set(value);
   return "OK";
 }

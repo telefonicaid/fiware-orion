@@ -46,7 +46,7 @@
 */
 static std::string subscriptionId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a subscriptionId: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a subscriptionId: '%s'", value.c_str()));
   parseDataP->ncar.res.subscriptionId.set(value);
   return "OK";
 }
@@ -59,7 +59,7 @@ static std::string subscriptionId(const std::string& path, const std::string& va
 */
 static std::string contextRegistrationResponse(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a contextRegistrationResponse"));
+  LM_T(LmtLegacy, ("Got a contextRegistrationResponse"));
 
   parseDataP->ncar.crrP = new ContextRegistrationResponse();
   parseDataP->ncar.res.contextRegistrationResponseVector.push_back(parseDataP->ncar.crrP);
@@ -75,7 +75,7 @@ static std::string contextRegistrationResponse(const std::string& path, const st
 */
 static std::string entityId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an entityId"));
+  LM_T(LmtLegacy, ("Got an entityId"));
 
   parseDataP->ncar.entityIdP = new EntityId();
   parseDataP->ncar.crrP->contextRegistration.entityIdVector.push_back(parseDataP->ncar.entityIdP);
@@ -91,7 +91,7 @@ static std::string entityId(const std::string& path, const std::string& value, P
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an entityId.Id: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an entityId.Id: '%s'", value.c_str()));
 
   parseDataP->ncar.entityIdP->id = value;
   return "OK";
@@ -105,7 +105,7 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an entityId.Type: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an entityId.Type: '%s'", value.c_str()));
 
   parseDataP->ncar.entityIdP->type = value;
   return "OK";
@@ -119,7 +119,7 @@ static std::string entityIdType(const std::string& path, const std::string& valu
 */
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an entityId.IsPattern: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an entityId.IsPattern: '%s'", value.c_str()));
 
   parseDataP->ncar.entityIdP->isPattern = value;
   return "OK";
@@ -133,7 +133,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("got an attribute"));
+  LM_T(LmtLegacy, ("got an attribute"));
 
   parseDataP->ncar.craP = new ContextRegistrationAttribute();
   parseDataP->ncar.crrP->contextRegistration.contextRegistrationAttributeVector.push_back(parseDataP->ncar.craP);
@@ -148,7 +148,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 */
 static std::string attributeName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("got an attributeName: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("got an attributeName: '%s'", value.c_str()));
 
   parseDataP->ncar.craP->name = value;
   return "OK";
@@ -162,7 +162,7 @@ static std::string attributeName(const std::string& path, const std::string& val
 */
 static std::string attributeType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("got an attributeType: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("got an attributeType: '%s'", value.c_str()));
 
   parseDataP->ncar.craP->type = value;
   return "OK";
@@ -176,7 +176,7 @@ static std::string attributeType(const std::string& path, const std::string& val
 */
 static std::string attributeIsDomain(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("got an attributeIsDomain: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("got an attributeIsDomain: '%s'", value.c_str()));
 
   parseDataP->ncar.craP->isDomain = value;
   return "OK";
@@ -190,7 +190,7 @@ static std::string attributeIsDomain(const std::string& path, const std::string&
 */
 static std::string attributeMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an attributeMetadata: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attributeMetadata: '%s'", value.c_str()));
 
   parseDataP->ncar.attributeMetadataP = new Metadata();
   parseDataP->ncar.craP->metadataVector.push_back(parseDataP->ncar.attributeMetadataP);
@@ -206,7 +206,7 @@ static std::string attributeMetadata(const std::string& path, const std::string&
 */
 static std::string attributeMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an attributeMetadataName: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attributeMetadataName: '%s'", value.c_str()));
   parseDataP->ncar.attributeMetadataP->name = value;
   return "OK";
 }
@@ -219,7 +219,7 @@ static std::string attributeMetadataName(const std::string& path, const std::str
 */
 static std::string attributeMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an attributeMetadataType: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attributeMetadataType: '%s'", value.c_str()));
   parseDataP->ncar.attributeMetadataP->type = value;
   return "OK";
 }
@@ -232,7 +232,7 @@ static std::string attributeMetadataType(const std::string& path, const std::str
 */
 static std::string attributeMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an attributeMetadataValue: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attributeMetadataValue: '%s'", value.c_str()));
   parseDataP->ncar.attributeMetadataP->stringValue = value;
   parseDataP->ncar.attributeMetadataP->valueType = orion::ValueTypeString;
   return "OK";
@@ -246,7 +246,7 @@ static std::string attributeMetadataValue(const std::string& path, const std::st
 */
 static std::string registrationMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a registrationMetadata: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a registrationMetadata: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP = new Metadata();
   parseDataP->ncar.crrP->contextRegistration.registrationMetadataVector.push_back(parseDataP->ncar.regMetadataP);
 
@@ -261,7 +261,7 @@ static std::string registrationMetadata(const std::string& path, const std::stri
 */
 static std::string registrationMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a registrationMetadataName: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a registrationMetadataName: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP->name = value;
   return "OK";
 }
@@ -274,7 +274,7 @@ static std::string registrationMetadataName(const std::string& path, const std::
 */
 static std::string registrationMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a registrationMetadataType: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a registrationMetadataType: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP->type = value;
   return "OK";
 }
@@ -287,7 +287,7 @@ static std::string registrationMetadataType(const std::string& path, const std::
 */
 static std::string registrationMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a registrationMetadataValue: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a registrationMetadataValue: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP->stringValue = value;
   parseDataP->ncar.regMetadataP->valueType = orion::ValueTypeString;
   return "OK";
@@ -301,7 +301,7 @@ static std::string registrationMetadataValue(const std::string& path, const std:
 */
 static std::string providingApplication(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a providingApplication: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a providingApplication: '%s'", value.c_str()));
 
   parseDataP->ncar.crrP->contextRegistration.providingApplication.set(value);
   return "OK";

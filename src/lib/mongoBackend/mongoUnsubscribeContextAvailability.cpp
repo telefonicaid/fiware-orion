@@ -63,8 +63,6 @@ HttpStatusCode mongoUnsubscribeContextAvailability
 
   reqSemTake(__FUNCTION__, "ngsi9 unsubscribe request", SemWriteOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Unsubscribe Context Availability"));
-
   /* No matter if success or failure, the subscriptionId in the response is always the one
    * in the request */
   responseP->subscriptionId = requestP->subscriptionId;

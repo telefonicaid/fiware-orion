@@ -55,3 +55,4 @@
 * Issue #280   Implemented PUT /entities/{entityId}/attrs/{attrName}
 * Issue #1322  Fixed an error in subscription stats (for -experimental)
 * Issue #1322  Implemented better notification response reception and much better log messages
+* Issue #1322  Default port for HTTPS is 443, for HTTP: 80

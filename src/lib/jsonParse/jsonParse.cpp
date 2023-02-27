@@ -154,8 +154,6 @@ static bool treat
   ParseData*          parseDataP
 )
 {
-  LM_T(LmtTreat, ("Treating path '%s', value '%s'", path.c_str(), value.c_str()));
-
   for (unsigned int ix = 0; parseVector[ix].path != "LAST"; ++ix)
   {
     //
@@ -179,9 +177,7 @@ static bool treat
 
     if (path == parseVector[ix].path)
     {
-      LM_T(LmtTreat, ("calling treat function for '%s': '%s'", path.c_str(), value.c_str()));
       std::string res = parseVector[ix].treat(path, value, parseDataP);
-      LM_T(LmtTreat, ("called treat function for '%s'. result: '%s'", path.c_str(), res.c_str()));
 
       return true;
     }
@@ -270,7 +266,7 @@ void eatCompound
 
   if (containerP == NULL)
   {
-    LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
+    LM_T(LmtLegacy, ("COMPOUND: '%s'", nodeName.c_str()));
     containerP = new CompoundValueNode(ValueTypeObject);
     orionldState.compoundValueRoot = containerP;
   }
@@ -289,42 +285,42 @@ void eatCompound
       }
 
       containerP->add(orion::ValueTypeString, nodeName, nodeValue);
-      LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s') under '%s'",
+      LM_T(LmtLegacy, ("Added string '%s' (value: '%s') under '%s'",
                               nodeName.c_str(),
                               nodeValue.c_str(),
                               containerP->cpath()));
     }
     else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0))  // Unnamed String with EMPTY VALUE
     {
-      LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY STRING - no name, no value"));
+      LM_T(LmtLegacy, ("'Bad' input - looks like a container but it is an EMPTY STRING - no name, no value"));
       containerP->add(orion::ValueTypeString, "item", "");
     }
     else if ((nodeName != "") && (nodeValue == "") && (noOfChildren == 0))  // Named Empty string
     {
-      LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
+      LM_T(LmtLegacy, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
       containerP = containerP->add(ValueTypeString, nodeName, "");
     }
     else if ((nodeName != "") && (nodeValue == ""))  // Named Container
     {
-      LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
+      LM_T(LmtLegacy, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
       containerP = containerP->add(ValueTypeObject, nodeName, "");
     }
     else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
     {
-      LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
+      LM_T(LmtLegacy, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
       containerP->valueType = ValueTypeVector;
       containerP = containerP->add(ValueTypeObject, "item", "");
     }
     else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
     {
       containerP->valueType = ValueTypeVector;
-      LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
+      LM_T(LmtLegacy, ("Set '%s' to be a vector", containerP->cpath()));
       containerP->add(orion::ValueTypeString, "item", nodeValue);
-      LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'",
+      LM_T(LmtLegacy, ("Added a name-less string (value: '%s') under '%s'",
                               nodeValue.c_str(), containerP->cpath()));
     }
     else
-      LM_T(LmtCompoundValue, ("IMPOSSIBLE !!!"));
+      LM_T(LmtLegacy, ("IMPOSSIBLE !!!"));
   }
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
@@ -384,7 +380,7 @@ static std::string jsonParse
   if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0) && (treated == true))
   {
 
-    LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));
+    LM_T(LmtLegacy, ("Calling eatCompound for '%s'", path.c_str()));
     eatCompound(ciP, NULL, v, "");
     compoundValueEnd(ciP, parseDataP);
 
@@ -529,7 +525,6 @@ std::string jsonParse
 
   tree.put_child(requestType, subtree);
 
-  // LM_T(LmtParse, ("parsing '%s'", content));
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v, tree.get_child(requestType))
   {
     std::string res = jsonParse(ciP, v, path, parseVector, parseDataP);

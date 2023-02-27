@@ -58,7 +58,6 @@ UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
   errorCode.keyNameSet("errorCode");
-  LM_T(LmtDestructor, ("destroyed"));
 }
 
 
@@ -71,7 +70,6 @@ UpdateContextResponse::~UpdateContextResponse()
 {
   errorCode.release();
   contextElementResponseVector.release();
-  LM_T(LmtDestructor, ("destroyed"));
 }
 
 
@@ -148,7 +146,6 @@ std::string UpdateContextResponse::check
 */
 void UpdateContextResponse::release(void)
 {
-  LM_T(LmtRelease, ("In UpdateContextResponse::release"));
   contextElementResponseVector.release();
   errorCode.release();
 }

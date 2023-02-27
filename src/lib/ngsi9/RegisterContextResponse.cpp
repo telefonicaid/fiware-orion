@@ -52,7 +52,6 @@ RegisterContextResponse::RegisterContextResponse()
 */
 RegisterContextResponse::~RegisterContextResponse()
 {
-    LM_T(LmtDestructor,("destroyed"));
 }
 
 

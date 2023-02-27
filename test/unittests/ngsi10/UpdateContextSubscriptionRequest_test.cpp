@@ -65,9 +65,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   orionldState.in.contentType  = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  lmTraceLevelSet(LmtDump, true);
   out = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, NULL);
-  lmTraceLevelSet(LmtDump, false);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   //

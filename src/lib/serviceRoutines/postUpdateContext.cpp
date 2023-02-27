@@ -160,7 +160,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string     out;
   int             r;
 
-  LM_T(LmtCPrForwardRequestPayload, ("forward updateContext request payload: %s", payload.c_str()));
+  LM_T(LmtSR, ("forward updateContext request payload: %s", payload.c_str()));
 
   std::map<std::string, std::string> noHeaders;
   r = httpRequestSend(ip,
@@ -187,7 +187,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     return;
   }
 
-  LM_T(LmtCPrForwardRequestPayload, ("forward updateContext response payload: %s", out.c_str()));
+  LM_T(LmtSR, ("forward updateContext response payload: %s", out.c_str()));
 
 
   //

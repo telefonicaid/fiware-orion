@@ -81,9 +81,7 @@ TEST(QueryContextRequest, ok_json)
 
   orionldState.in.contentType  = JSON;
 
-  lmTraceLevelSet(LmtDump, true);
   std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, NULL);
-  lmTraceLevelSet(LmtDump, false);
 
   EXPECT_EQ("OK", out) << "this test should be OK";
 

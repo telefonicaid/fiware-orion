@@ -57,10 +57,8 @@ TEST(NotifyContextRequest, json_ok)
 
   orionldState.in.contentType  = JSON;
 
-  lmTraceLevelSet(LmtDump, true);
   std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_EQ("OK", result);
-  lmTraceLevelSet(LmtDump, false);
 
   //
   // With the data obtained, render, present and release methods are exercised

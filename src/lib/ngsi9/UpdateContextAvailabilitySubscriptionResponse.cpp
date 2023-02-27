@@ -62,8 +62,6 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
    subscriptionId.release();
    duration.release();
    errorCode.release();
-
-   LM_T(LmtDestructor,("destroyed"));
 }
 
 

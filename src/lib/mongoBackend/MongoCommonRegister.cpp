@@ -99,7 +99,7 @@ static bool processSubscriptions
                                          tenantP,
                                          fiwareCorrelator))
     {
-      LM_T(LmtMongo, ("Notification failure"));
+      LM_T(LmtLegacy, ("Notification failure"));
       ret = false;
     }
 
@@ -224,7 +224,7 @@ static bool addTriggeredSubscriptions
       "}" +
       "return false; " +
     "}";
-  LM_T(LmtMongo, ("JS function: %s", function.c_str()));
+  LM_T(LmtLegacy, ("JS function: %s", function.c_str()));
 
 
   std::string     entPatternQ = CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN;
@@ -283,7 +283,7 @@ static bool addTriggeredSubscriptions
 
       httpInfo.url = getStringFieldF(&sub, CASUB_REFERENCE);
 
-      LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
+      LM_T(LmtLegacy, ("adding subscription: '%s'", sub.toString().c_str()));
 
       //
       // FIXME P4: Once ctx availability notification formats get defined for NGSIv2,
@@ -337,7 +337,7 @@ HttpStatusCode processRegisterContext
   /* Calculate expiration (using the current time and the duration field in the request) */
   double expiration = orionldState.requestTime + requestP->duration.parse();
 
-  LM_T(LmtMongo, ("Registration expiration: %lu", expiration));
+  LM_T(LmtLegacy, ("Registration expiration: %lu", expiration));
 
   /* Create the mongoDB registration document */
   BSONObjBuilder reg;
@@ -382,12 +382,12 @@ HttpStatusCode processRegisterContext
       if (en->type == "")
       {
         entities.append(BSON(REG_ENTITY_ID << en->id));
-        LM_T(LmtMongo, ("Entity registration: {id: %s}", en->id.c_str()));
+        LM_T(LmtLegacy, ("Entity registration: {id: %s}", en->id.c_str()));
       }
       else
       {
         entities.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
-        LM_T(LmtMongo, ("Entity registration: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
+        LM_T(LmtLegacy, ("Entity registration: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
       }
     }
 
@@ -398,7 +398,7 @@ HttpStatusCode processRegisterContext
       ContextRegistrationAttribute* cra = cr->contextRegistrationAttributeVector[jx];
 
       attrs.append(BSON(REG_ATTRS_NAME << cra->name << REG_ATTRS_TYPE << cra->type << "isDomain" << cra->isDomain));
-      LM_T(LmtMongo, ("Attribute registration: {name: %s, type: %s, isDomain: %s}",
+      LM_T(LmtLegacy, ("Attribute registration: {name: %s, type: %s, isDomain: %s}",
                       cra->name.c_str(),
                       cra->type.c_str(),
                       cra->isDomain.c_str()));
@@ -416,7 +416,7 @@ HttpStatusCode processRegisterContext
         REG_ATTRS << attrs.arr() <<
         REG_PROVIDING_APPLICATION << requestP->contextRegistrationVector[ix]->providingApplication.get()));
 
-    LM_T(LmtMongo, ("providingApplication registration: %s",
+    LM_T(LmtLegacy, ("providingApplication registration: %s",
                     requestP->contextRegistrationVector[ix]->providingApplication.c_str()));
 
     std::string err;

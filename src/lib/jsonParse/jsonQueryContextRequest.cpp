@@ -54,11 +54,11 @@ using namespace orion;
 */
 static std::string entityId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
+  LM_T(LmtLegacy, ("%s: %s", path.c_str(), value.c_str()));
 
   reqDataP->qcr.entityIdP = new EntityId();
 
-  LM_T(LmtNew, ("New entityId at %p", reqDataP->qcr.entityIdP));
+  LM_T(LmtLegacy, ("New entityId at %p", reqDataP->qcr.entityIdP));
   reqDataP->qcr.entityIdP->id        = "";
   reqDataP->qcr.entityIdP->type      = "";
   reqDataP->qcr.entityIdP->isPattern = "false";
@@ -77,7 +77,7 @@ static std::string entityId(const std::string& path, const std::string& value, P
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->qcr.entityIdP->id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->qcr.entityIdP->id.c_str()));
+  LM_T(LmtLegacy, ("Set 'id' to '%s' for an entity", reqDataP->qcr.entityIdP->id.c_str()));
 
   return "OK";
 }
@@ -91,7 +91,7 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->qcr.entityIdP->type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->qcr.entityIdP->type.c_str()));
+  LM_T(LmtLegacy, ("Set 'type' to '%s' for an entity", reqDataP->qcr.entityIdP->type.c_str()));
 
   return "OK";
 }
@@ -104,7 +104,7 @@ static std::string entityIdType(const std::string& path, const std::string& valu
 */
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   reqDataP->qcr.entityIdP->isPattern = value;
   if (!isTrue(value) && !isFalse(value))
@@ -123,7 +123,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an attribute: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attribute: '%s'", value.c_str()));
 
   if (value == "")
   {
@@ -144,7 +144,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 */
 static std::string attributeList(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an attributeList: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attributeList: '%s'", value.c_str()));
   return "OK";
 }
 
@@ -168,7 +168,7 @@ static std::string restriction(const std::string& path, const std::string& value
 */
 static std::string attributeExpression(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an attributeExpression: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attributeExpression: '%s'", value.c_str()));
 
   reqDataP->qcr.res.restriction.attributeExpression.set(value);
 
@@ -189,7 +189,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 */
 static std::string operationScope(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an operationScope"));
+  LM_T(LmtLegacy, ("Got an operationScope"));
 
   reqDataP->qcr.scopeP = new Scope();
   reqDataP->qcr.res.restriction.scopeVector.push_back(reqDataP->qcr.scopeP);
@@ -208,7 +208,7 @@ static std::string operationScope(const std::string& path, const std::string& va
 static std::string scopeType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->qcr.scopeP->type = value;
-  LM_T(LmtParse, ("Set scope 'type' to '%s' for a scope", reqDataP->qcr.scopeP->type.c_str()));
+  LM_T(LmtLegacy, ("Set scope 'type' to '%s' for a scope", reqDataP->qcr.scopeP->type.c_str()));
 
   return "OK";
 }
@@ -230,7 +230,7 @@ static std::string scopeValue(const std::string& path, const std::string& value,
     // instead 'circle' or 'polygon' should be used.
     //
     reqDataP->qcr.scopeP->value = FIWARE_LOCATION;
-    LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqDataP->qcr.scopeP->type.c_str()));
+    LM_T(LmtLegacy, ("Preparing scopeValue for '%s'", reqDataP->qcr.scopeP->type.c_str()));
   }
   else if (reqDataP->qcr.scopeP->type == FIWARE_LOCATION_V2)
   {
@@ -274,7 +274,7 @@ static std::string scopeValue(const std::string& path, const std::string& value,
   else
   {
     reqDataP->qcr.scopeP->value = value;
-    LM_T(LmtParse, ("Got a scopeValue: '%s' for scopeType '%s'", value.c_str(), reqDataP->qcr.scopeP->type.c_str()));
+    LM_T(LmtLegacy, ("Got a scopeValue: '%s' for scopeType '%s'", value.c_str(), reqDataP->qcr.scopeP->type.c_str()));
   }
 
   return "OK";
@@ -288,7 +288,7 @@ static std::string scopeValue(const std::string& path, const std::string& value,
 */
 static std::string circle(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a circle"));
+  LM_T(LmtLegacy, ("Got a circle"));
   reqDataP->qcr.scopeP->areaType = orion::CircleType;
 
   return "OK";
@@ -302,7 +302,7 @@ static std::string circle(const std::string& path, const std::string& value, Par
 */
 static std::string circleCenterLatitude(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a circleCenterLatitude: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a circleCenterLatitude: %s", value.c_str()));
   reqDataP->qcr.scopeP->circle.center.latitudeSet(value);
 
   return "OK";
@@ -316,7 +316,7 @@ static std::string circleCenterLatitude(const std::string& path, const std::stri
 */
 static std::string circleCenterLongitude(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a circleCenterLongitude: %s", value.c_str()));
   reqDataP->qcr.scopeP->circle.center.longitudeSet(value);
 
   return "OK";
@@ -330,7 +330,7 @@ static std::string circleCenterLongitude(const std::string& path, const std::str
 */
 static std::string circleRadius(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a circleRadius: %s", value.c_str()));
   reqDataP->qcr.scopeP->circle.radiusSet(value);
 
   return "OK";
@@ -344,7 +344,7 @@ static std::string circleRadius(const std::string& path, const std::string& valu
 */
 static std::string circleInverted(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a circleInverted: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a circleInverted: %s", value.c_str()));
 
   parseDataP->qcr.scopeP->circle.invertedSet(value);
   if (!isTrue(value) && !isFalse(value))
@@ -364,7 +364,7 @@ static std::string circleInverted(const std::string& path, const std::string& va
 */
 static std::string polygon(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygon"));
+  LM_T(LmtLegacy, ("Got a polygon"));
   parseDataP->qcr.scopeP->areaType = orion::PolygonType;
 
   return "OK";
@@ -378,7 +378,7 @@ static std::string polygon(const std::string& path, const std::string& value, Pa
 */
 static std::string polygonInverted(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonInverted: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a polygonInverted: %s", value.c_str()));
 
   parseDataP->qcr.scopeP->polygon.invertedSet(value);
   if (!isTrue(value) && !isFalse(value))
@@ -398,7 +398,7 @@ static std::string polygonInverted(const std::string& path, const std::string& v
 */
 static std::string polygonVertexList(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonVertexList"));
+  LM_T(LmtLegacy, ("Got a polygonVertexList"));
 
   return "OK";
 }
@@ -411,7 +411,7 @@ static std::string polygonVertexList(const std::string& path, const std::string&
 */
 static std::string polygonVertex(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
+  LM_T(LmtLegacy, ("Got a polygonVertex - creating new vertex for the vertex list"));
   parseDataP->qcr.vertexP = new orion::Point();
   parseDataP->qcr.scopeP->polygon.vertexAdd(parseDataP->qcr.vertexP);
   // parseDataP->qcr.scopeP->polygon.vertexList.push_back(parseDataP->qcr.vertexP);
@@ -427,7 +427,7 @@ static std::string polygonVertex(const std::string& path, const std::string& val
 */
 static std::string polygonVertexLatitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a polygonVertexLatitude: %s", value.c_str()));
   parseDataP->qcr.vertexP->latitudeSet(value);
 
   return "OK";
@@ -441,7 +441,7 @@ static std::string polygonVertexLatitude(const std::string& path, const std::str
 */
 static std::string polygonVertexLongitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got a polygonVertexLongitude: %s", value.c_str()));
   parseDataP->qcr.vertexP->longitudeSet(value);
 
   return "OK";
@@ -455,7 +455,7 @@ static std::string polygonVertexLongitude(const std::string& path, const std::st
 */
 static std::string georel(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a georel"));
+  LM_T(LmtLegacy, ("Got a georel"));
   if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
   {
     return "georel in scope value used with non-api-v2 scope";
@@ -475,7 +475,7 @@ static std::string georel(const std::string& path, const std::string& value, Par
 */
 static std::string georelValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a georel value"));
+  LM_T(LmtLegacy, ("Got a georel value"));
   if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
   {
     return "georel in scope value used with non-api-v2 scope";
@@ -514,7 +514,7 @@ static std::string georelValue(const std::string& path, const std::string& value
 */
 static std::string geometry(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a geometry"));
+  LM_T(LmtLegacy, ("Got a geometry"));
 
   if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
   {
@@ -535,7 +535,7 @@ static std::string geometry(const std::string& path, const std::string& value, P
 */
 static std::string coords(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a coords"));
+  LM_T(LmtLegacy, ("Got a coords"));
 
   if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
   {
@@ -553,7 +553,7 @@ static std::string coords(const std::string& path, const std::string& value, Par
 */
 static std::string coord(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a coord-pair"));
+  LM_T(LmtLegacy, ("Got a coord-pair"));
 
   if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
   {
@@ -574,7 +574,7 @@ static std::string coord(const std::string& path, const std::string& value, Pars
 */
 static std::string coordValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a coordinate"));
+  LM_T(LmtLegacy, ("Got a coordinate"));
 
   if (parseDataP->qcr.scopeP->type != FIWARE_LOCATION_V2)
   {

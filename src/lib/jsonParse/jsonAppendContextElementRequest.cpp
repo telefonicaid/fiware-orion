@@ -47,7 +47,7 @@
 */
 static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got an attributeDomainName"));
+  LM_T(LmtLegacy, ("Got an attributeDomainName"));
   reqData->acer.res.attributeDomainName.set(value);
   return "OK";
 }
@@ -60,7 +60,7 @@ static std::string attributeDomainName(const std::string& path, const std::strin
 */
 static std::string contextAttribute(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got an attribute"));
+  LM_T(LmtLegacy, ("Got an attribute"));
   reqData->acer.attributeP = new ContextAttribute();
   reqData->acer.res.contextAttributeVector.push_back(reqData->acer.attributeP);
   return "OK";
@@ -74,7 +74,7 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 */
 static std::string contextAttributeName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got an attribute name: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attribute name: %s", value.c_str()));
   reqData->acer.attributeP->name = value;
   return "OK";
 }
@@ -87,7 +87,7 @@ static std::string contextAttributeName(const std::string& path, const std::stri
 */
 static std::string contextAttributeType(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got an attribute type: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attribute type: %s", value.c_str()));
   reqData->acer.attributeP->type = value;
   return "OK";
 }
@@ -100,7 +100,7 @@ static std::string contextAttributeType(const std::string& path, const std::stri
 */
 static std::string contextAttributeValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attribute value: %s", value.c_str()));
   parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
   parseDataP->acer.attributeP->stringValue = value;
   parseDataP->acer.attributeP->valueType = orion::ValueTypeString;
@@ -115,7 +115,7 @@ static std::string contextAttributeValue(const std::string& path, const std::str
 */
 static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata"));
+  LM_T(LmtLegacy, ("Got a metadata"));
   reqData->acer.metadataP = new Metadata();
   reqData->acer.attributeP->metadataVector.push_back(reqData->acer.metadataP);
   return "OK";
@@ -129,7 +129,7 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 */
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata name '%s'", value.c_str()));
   reqData->acer.metadataP->name = value;
   return "OK";
 }
@@ -142,7 +142,7 @@ static std::string contextMetadataName(const std::string& path, const std::strin
 */
 static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata type '%s'", value.c_str()));
   reqData->acer.metadataP->type = value;
   return "OK";
 }
@@ -155,7 +155,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 */
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata value '%s'", value.c_str()));
   reqData->acer.metadataP->stringValue = value;
   reqData->acer.metadataP->valueType = orion::ValueTypeString;
   return "OK";
@@ -169,7 +169,7 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 */
 static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata"));
+  LM_T(LmtLegacy, ("Got a metadata"));
   reqData->acer.domainMetadataP = new Metadata();
   reqData->acer.res.domainMetadataVector.push_back(reqData->acer.domainMetadataP);
   return "OK";
@@ -183,7 +183,7 @@ static std::string domainMetadata(const std::string& path, const std::string& va
 */
 static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata name '%s'", value.c_str()));
   reqData->acer.domainMetadataP->name = value;
   return "OK";
 }
@@ -196,7 +196,7 @@ static std::string domainMetadataName(const std::string& path, const std::string
 */
 static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata type '%s'", value.c_str()));
   reqData->acer.domainMetadataP->type = value;
   return "OK";
 }
@@ -209,7 +209,7 @@ static std::string domainMetadataType(const std::string& path, const std::string
 */
 static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata value '%s'", value.c_str()));
   reqData->acer.domainMetadataP->stringValue = value;
   reqData->acer.domainMetadataP->valueType = orion::ValueTypeString;
   return "OK";
@@ -224,7 +224,7 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->acer.res.entity.id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->acer.res.entity.id.c_str()));
+  LM_T(LmtLegacy, ("Set 'id' to '%s' for an entity", reqDataP->acer.res.entity.id.c_str()));
 
   return "OK";
 }
@@ -238,7 +238,7 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->acer.res.entity.type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->acer.res.entity.type.c_str()));
+  LM_T(LmtLegacy, ("Set 'type' to '%s' for an entity", reqDataP->acer.res.entity.type.c_str()));
 
   return "OK";
 }
@@ -251,7 +251,7 @@ static std::string entityIdType(const std::string& path, const std::string& valu
 */
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
   {

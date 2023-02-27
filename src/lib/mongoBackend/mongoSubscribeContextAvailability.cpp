@@ -80,7 +80,6 @@ HttpStatusCode mongoSubscribeContextAvailability
 
   /* Calculate expiration (using the current time and the duration field in the request) */
   long long expiration = orionldState.requestTime + requestP->duration.parse();
-  LM_T(LmtMongo, ("Subscription expiration: %d", expiration));
 
   /* Create the mongoDB subscription document */
   BSONObjBuilder sub;

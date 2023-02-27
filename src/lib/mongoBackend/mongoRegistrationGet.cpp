@@ -78,7 +78,7 @@ void mongoRegistrationGet
 
   reqSemTake(__FUNCTION__, "Mongo Get Registration", SemReadOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Mongo Get Registration"));
+  LM_T(LmtLegacy, ("Mongo Get Registration"));
 
   std::auto_ptr<mongo::DBClientCursor>  cursor;
 
@@ -107,7 +107,7 @@ void mongoRegistrationGet
       oeP->fill(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", bob.toString().c_str()));
+    LM_T(LmtLegacy, ("retrieved document: '%s'", bob.toString().c_str()));
 
     //
     // Fill in the Registration with data retrieved from the data base
@@ -135,7 +135,7 @@ void mongoRegistrationGet
     if (moreSafe(cursor))  // Can only be one ...
     {
       releaseMongoConnection(connection);
-      LM_T(LmtMongo, ("more than one registration: '%s'", regId.c_str()));
+      LM_T(LmtLegacy, ("more than one registration: '%s'", regId.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       oeP->fill(SccConflict, "");
       return;
@@ -144,7 +144,7 @@ void mongoRegistrationGet
   else
   {
     releaseMongoConnection(connection);
-    LM_T(LmtMongo, ("registration not found: '%s'", regId.c_str()));
+    LM_T(LmtLegacy, ("registration not found: '%s'", regId.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
     oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_REGISTRATION, ERROR_NOT_FOUND);
 
@@ -182,7 +182,7 @@ void mongoRegistrationsGet
 
   reqSemTake(__FUNCTION__, "Mongo Get Registrations", SemReadOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Mongo Get Registrations"));
+  LM_T(LmtLegacy, ("Mongo Get Registrations"));
 
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   mongo::Query                          q;
@@ -221,7 +221,7 @@ void mongoRegistrationsGet
       continue;
     }
 
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, bob.toString().c_str()));
+    LM_T(LmtLegacy, ("retrieved document [%d]: '%s'", docs, bob.toString().c_str()));
     ++docs;
 
     //

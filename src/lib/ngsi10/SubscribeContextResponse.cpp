@@ -33,8 +33,8 @@
 *
 * SubscribeContextResponse::~SubscribeContextResponse -
 */
-SubscribeContextResponse::~SubscribeContextResponse() {
-    LM_T(LmtDestructor,("destroyed"));
+SubscribeContextResponse::~SubscribeContextResponse()
+{
 }
 
 /* ****************************************************************************

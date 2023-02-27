@@ -130,7 +130,7 @@ static void* workerFunc(void* pSyncQ)
 
       if (simulatedNotification)
       {
-        LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
+        LM_T(LmtLegacy, ("simulatedNotification is 'true', skipping outgoing request"));
         __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
       }
       else if (params->protocol == "mqtt")  // Notification to be sent via MQTT broker

@@ -345,11 +345,11 @@ std::string ContextAttributeVector::render
       if (addedLookup(added, vec[ix]->name) == "")
       {
         added.push_back(vec[ix]->name);
-        LM_T(LmtJsonAttributes, ("Keeping attribute '%s'", vec[ix]->name.c_str()));
+        LM_T(LmtLegacy, ("Keeping attribute '%s'", vec[ix]->name.c_str()));
       }
       else
       {
-        LM_T(LmtJsonAttributes, ("Removing attribute '%s'", vec[ix]->name.c_str()));
+        LM_T(LmtLegacy, ("Removing attribute '%s'", vec[ix]->name.c_str()));
         vec[ix]->release();
         delete vec[ix];
         vec.erase(vec.begin() + ix);

@@ -104,9 +104,9 @@ char* pCheckEntityType2(KjNode* payloadTypeNode, KjNode* dbEntityP, char* entity
   char*   entityTypeFromDB      = (dbTypeNodeP != NULL)? dbTypeNodeP->value.s : NULL;
   char*   entityTypeFromPayload = (orionldState.payloadTypeNode != NULL)? orionldState.payloadTypeNode->value.s : NULL;
 
-  LM_T(LmtEntityType, ("entityType From DB:        '%s'", entityTypeFromDB));
-  LM_T(LmtEntityType, ("entityType From URI Param: '%s'", entityTypeFromUriParam));
-  LM_T(LmtEntityType, ("entityType From Payload:   '%s'", entityTypeFromPayload));
+  LM_T(LmtSR, ("entityType From DB:        '%s'", entityTypeFromDB));
+  LM_T(LmtSR, ("entityType From URI Param: '%s'", entityTypeFromUriParam));
+  LM_T(LmtSR, ("entityType From Payload:   '%s'", entityTypeFromPayload));
 
   //
   // 3 different way to find the Entity Type:

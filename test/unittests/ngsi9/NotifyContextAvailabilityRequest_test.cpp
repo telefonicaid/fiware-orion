@@ -51,10 +51,8 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
-  lmTraceLevelSet(LmtDump, true);
   out = jsonTreat(testBuf, &ci, &parseData, NotifyContextAvailability,  NULL);
   EXPECT_EQ("OK", out);
-  lmTraceLevelSet(LmtDump, false);
 
   NotifyContextAvailabilityRequest* ncarP = &parseData.ncar.res;
 

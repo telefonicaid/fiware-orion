@@ -67,7 +67,7 @@ HttpStatusCode mongoUnsubscribeContext
 
   reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request", SemWriteOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Unsubscribe Context"));
+  LM_T(LmtLegacy, ("Unsubscribe Context"));
 
   /* No matter if success or failure, the subscriptionId in the response is always the one
    * in the request
@@ -149,7 +149,7 @@ HttpStatusCode mongoUnsubscribeContext
   //
   // Removing subscription from mongo subscription cache
   //
-  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
+  LM_T(LmtLegacy, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
                      requestP->subscriptionId.get().c_str(),
                      tenantP->tenant));
 
@@ -230,7 +230,7 @@ bool mongoDeleteLdSubscription
   //
   // Removing subscription from mongo subscription cache
   //
-  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", subId, tenantP->tenant));
+  LM_T(LmtLegacy, ("removing subscription '%s' (tenant '%s') from mongo subscription cache", subId, tenantP->tenant));
 
   cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 

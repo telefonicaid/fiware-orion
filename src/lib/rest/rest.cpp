@@ -348,7 +348,7 @@ static MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
   }
   else
   {
-    LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", key, value));
+    LM_W(("'unsupported' HTTP header: '%s', value '%s'", key, value));
   }
 
   return MHD_YES;
@@ -1239,7 +1239,6 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   }
 
   // Copy the chunk
-  LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, orionldState.in.contentLength));
   memcpy(&orionldState.in.payload[orionldState.in.payloadSize], upload_data, dataLen);
 
   // Add to the size of the accumulated read buffer

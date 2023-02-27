@@ -37,7 +37,8 @@
 *
 * UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse -
 */
-UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse() {
+UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse()
+{
    subscribeError.errorCode.keyNameSet("errorCode");
 }
 
@@ -45,7 +46,8 @@ UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse() {
 *
 * UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse -
 */
-UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse(StatusCode& errorCode) {
+UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse(StatusCode& errorCode)
+{
    subscribeError.subscriptionId.set("000000000000000000000000");
    subscribeError.errorCode.fill(&errorCode);
    subscribeError.errorCode.keyNameSet("errorCode");
@@ -55,8 +57,8 @@ UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse(StatusCode&
 *
 * UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse -
 */
-UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
-    LM_T(LmtDestructor,("destroyed"));
+UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse()
+{
 }
 
 /* ****************************************************************************

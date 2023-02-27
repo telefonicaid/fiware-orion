@@ -125,8 +125,6 @@ static DBClientBase* mongoConnect
   std::string   err;
   DBClientBase* connection = NULL;
 
-  // LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
-
   bool connected     = false;
   int  retries       = RECONNECT_RETRIES;
 
@@ -155,7 +153,7 @@ static DBClientBase* mongoConnect
       }
       else
       {
-        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
+        LM_T(LmtLegacy, ("Try %d connecting to mongo failed", tryNo));
       }
 
       usleep(RECONNECT_DELAY * 1000);  // usleep accepts microseconds, RECONNECT_DELAY is in millis
@@ -163,8 +161,6 @@ static DBClientBase* mongoConnect
   }
   else
   {
-    // LM_T(LmtMongo, ("Using replica set %s", rplSet));
-
     // autoReconnect is always on for DBClientReplicaSet connections.
     std::vector<std::string>  hostTokens;
     int components = stringSplit(host, ',', hostTokens);
@@ -232,8 +228,6 @@ static DBClientBase* mongoConnect
   }
   alarmMgr.dbErrorReset();
 
-  // LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
-
   /* Authentication is different depending if multiservice is used or not. In the case of not
    * using multiservice, we authenticate in the single-service database. In the case of using
    * multiservice, it isn't a default database that we know at contextBroker start time (when
@@ -272,7 +266,6 @@ static DBClientBase* mongoConnect
     LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
     return NULL;
   }
-  // LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
 
   return connection;
 }

@@ -243,7 +243,11 @@ bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, ch
   }
   else
   {
-    *portP = 80;  // What should be the default port?
+    if (strcmp(*protocolP, "https") == 0)
+      *portP = 443;
+    else
+      *portP = 80;
+
     rest   = ip;
   }
 

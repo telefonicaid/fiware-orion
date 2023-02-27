@@ -164,7 +164,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     int64_t expiration = orionldState.requestTime + requestP->duration.parse();
 
     newSub.append(CASUB_EXPIRATION, (long long) expiration);
-    LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
+    LM_T(LmtLegacy, ("New subscription expiration: %l", expiration));
   }
 
   /* Reference is not updatable, so it is appended directly */

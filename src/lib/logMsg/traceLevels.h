@@ -30,190 +30,69 @@
 
 /* ****************************************************************************
 *
-* TraceLevels - 
+* TraceLevels -
 */
 typedef enum TraceLevels
 {
   //
-  // All the old trace levels are to be removed and new invented.
+  // Requests and responses
   //
-
-  // New
-  LmtDistOpMsgs = 20,                  // Distributed Operations: messages
-  LmtRegMatch,                         // Distributed Operations: registration matching
-  LmtAlt,                              // Notifications: Alterations
-  LmtHeaders = 24,                     // HTTP Headers
-  LmtUriParams,                        // HTTP URI Parameters
+  LmtRequest = 30,                     // Incoming requests
   LmtResponse,                         // HTTP Response
-  LmtMqtt,                             // MQTT (notifications)
-  LmtMongoc,                           // Entire mongoc library
-  LmtEntityType     = 30,              // Entity Types
+  LmtHeaders,                          // HTTP Headers
+  LmtUriParams,                        // HTTP URI Parameters
+  LmtUriParamOptions,                  // HTTP URI Parameter 'options'
+
+  //
+  // Alterations and Notifications
+  //
+  LmtAlt = 40,                         // Notifications: Alterations
+  LmtRegMatch,                         // Distributed Operations: registration matching
+  LmtWatchedAttributes,                // Watched attributes in subscriptions
+  LmtNotificationMsg,                  // Notifications: Messages
+  LmtNotificationStats,                // Errors and timestamps for subscriptions
+  LmtNotificationSend,                 // Sending of notifications
+  LmtNotificationHeaders,              // notification request/response headers
+  LmtNotificationBody,                 // notification request/response body
+
+  //
+  // Subscription Cache
+  //
+  LmtSubCache = 50,                    // Subscription Cache
+  LmtSubCacheMatch,                    // Subscription Cache Matches
+
+  //
+  // Registration Cache
+  //
+  LmtRegCache = 60,                    // Registration Cache
+
+  //
+  // Distributed Operations
+  //
+  LmtDistOpMsgs = 70,                  // Distributed Operations: messages
   LmtDistOpRequest,                    // ONLY the verb, path, and body of a distributed request
   LmtDistOpResponse,                   // ONLY the body and status code of the response to a distributed request
   LmtDistOp207,                        // Merging of the final 207 response
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
-  LmtSR = 40,                          // Service Routine (whatever it is doing)
-  LmtRegCreate,                        // Creation of registrations
-  LmtRegCache,                         // Registration Cache
-  LmtWatchedAttributes,                // Watched attributes in subscriptions
-  LmtUriParamOptions,                  // HTTP URI Parameter 'options'
-  LmtNotificationMsg     = 200,        // Notifications: Messages
-  LmtNotificationStats   = 201,        // Errors and timestamps for subscriptions
-  LmtNotificationSend    = 202,        // Sending of notifications
-  LmtNotificationHeaders = 203,        // notification request/response headers
-  LmtNotificationBody    = 204,        // notification request/response body
+  LmtMqtt,                             // MQTT notifications
 
-  // Both,
-  LmtRequest = 38,                     // Incoming requests
-  LmtSubCache = 205,                   // Subscription Cache
-
-  // Old
-  LmtRest = 20,
-  LmtRestCompare,
-  LmtUrlParse,
-  LmtHttpRequest,
-  LmtHttpHeaders,
-  LmtHttpDaemon = 25,
-  LmtHttpUnsupportedHeader,
-  LmtMhd,
-  LmtSavedResponse,
-  LmtIncompletePayload,
-  LmtTenant = 30,
-  LmtServicePath,
-  LmtPagination,
-  LmtCoap,
-  LmtHttps = 35,
-  LmtIpVersion,
-  LmtCtxProviders,
-  LmtPayload = 39,
-
-  /* Parser (40-59) */
-  LmtParse    = 40,
-  LmtParsedPayload,
-  LmtParseCheck,
-  LmtNew,
-  LmtTreat = 45,
-  LmtDump,
-  LmtNullNode,
-  LmtCompoundValue,
-  LmtCompoundValueAdd,
-  LmtCompoundValueLookup = 50,
-  LmtCompoundValueRender,
-  LmtCompoundValueRaw,
-  LmtCompoundValueContainer,
-  LmtCompoundValueStep,
-  LmtCompoundValueShow = 55,
-  LmtJsonAttributes,
-
-  /* RestService and Service (60-79) */
-  LmtService     = 60,
-  LmtConvenience,
-
-  /* ConvenienceMap (80-99) */
-  LmtClone = 80,
-
-  /* MongoBackend (100-119) */
-  LmtMongo = 100,
-
-  /* Cleanup (120-139) */
-  LmtDestructor = 120,
-  LmtRelease,
-
-  /* Types (140-159) */
-  LmtEntityId = 140,
-  LmtRestriction,
-  LmtScope,
-
-  /* Notifications (160-179) */
-  LmtNotifier = 160,
-
-  /* Input/Output payloads (180-199) */
-  LmtServiceInputPayload = 180,
-  LmtServiceOutPayload,
-  LmtClientInputPayload,
-  LmtClientOutputPayload = 183,  // Very important for harness test notification_different_sizes
-  LmtPartialPayload,
-  LmtClientOutputPayloadDump,
-  LmtCPrForwardRequestPayload,
-  LmtCPrForwardResponsePayload,
-
-  /* Semaphores (200-204) */
-  LmtReqSem = 200,
-  LmtMongoSem,
-  LmtTransSem,
-  LmtCacheSem,
-  LmtTimeStatSem,
-
-  /* Cache (205 - 207) */
-  LmtSubCacheMatch,
-  LmtCacheSync,
-
-  /* Others (207-211) */
-  LmtCm = 207,
-  LmtRush,
-  LmtSoftError,
-  LmtNotImplemented,
-  LmtCurlContext,
-
-#ifdef ORIONLD
-  LmtKjlParse     = 212,
-  LmtKjlParseValue,
-  LmtKjlParseObject,
-  LmtKjlParseArray,
-  LmtKjlAllocBuffer,
-  LmtKjlMalloc,
-  LmtKjlAllocBytesLeft,
-  LmtKjlRender,
-  LmtKjlRenderNode,
-  LmtKjlRenderArray,
-  LmtKjlRenderObject,
-  LmtKjlRenderValue,
-  LmtKjlShortArray,
-  LmtKjlNewline,
-  LmtKjlBuilder,
-
-  LmtWriteCallback = 228,
-  LmtRequestSend,
-  LmtPayloadCheck,
-  LmtUriExpansion,
-  LmtCompoundCreation,
-  LmtErrorResponse,
-  LmtUriPath,
-  LmtVerb,
-  LmtServiceRoutine,
-  LmtServiceLookup,
-  LmtPayloadParse,
-  LmtJsonResponse,
-  LmtFree,
-  LmtMetadata,
-
-  LmtContext = 242,
-  LmtContextList,
-  LmtContextTreat,
-  LmtContextDownload,
-  LmtContextLookup,
-  LmtContextItemLookup,
-  LmtContextValueLookup,
-  LmtContextPresent,
-  LmtPreloadedContexts,
-  LmtAlias,
-  LmtGeoJson,
-  LmtAccept,
-  LmtBadVerb,
-  LmtStringFilter = 254,
-
-#endif
-
-  LmtBug = 255
+  //
+  // Misc
+  //
+  LmtMongoc = 80,                      // Entire mongoc library
+  LmtSR,                               // Service Routine (whatever it is doing)
+  LmtSemaphore,                        // Semaphores
+  LmtKjlParse,                         // Trace level start for K libs
+  LmtLegacy                            // Old code (mongoBackend, json parsers, etc)
 } TraceLevels;
 
 
 
 /* ****************************************************************************
 *
-* traceLevelName - 
+* traceLevelName -
 */
 extern char* traceLevelName(TraceLevels level);
 

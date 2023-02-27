@@ -83,11 +83,8 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
 
   orionldState.in.contentType  = JSON;
 
-  lmTraceLevelSet(LmtDump, true);
   std::string out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
-
-  lmTraceLevelSet(LmtDump, false);
 
   UnsubscribeContextAvailabilityRequest*  ucarP = &reqData.ucar.res;
 

@@ -144,7 +144,7 @@ int reqSemTake(const char* who, const char* what, SemOpType reqType, bool* taken
     return -1;
   }
 
-  LM_T(LmtReqSem, ("%s taking the 'req' semaphore for '%s'", who, what));
+  LM_T(LmtSemaphore, ("%s taking the 'req' semaphore for '%s'", who, what));
 
   struct timespec startTime;
   struct timespec endTime;
@@ -165,7 +165,7 @@ int reqSemTake(const char* who, const char* what, SemOpType reqType, bool* taken
     clock_addtime(&accReqSemTime, &diffTime);
   }
 
-  LM_T(LmtReqSem, ("%s has the 'req' semaphore", who));
+  LM_T(LmtSemaphore, ("%s has the 'req' semaphore", who));
 
   *taken = true;
   return r;
@@ -273,7 +273,7 @@ int transSemTake(const char* who, const char* what)
 {
   int r;
 
-  LM_T(LmtTransSem, ("%s taking the 'trans' semaphore for '%s'", who, what));
+  LM_T(LmtSemaphore, ("%s taking the 'trans' semaphore for '%s'", who, what));
 
   struct timespec startTime;
   struct timespec endTime;
@@ -294,7 +294,7 @@ int transSemTake(const char* who, const char* what)
     clock_addtime(&accTransSemTime, &diffTime);
   }
 
-  LM_T(LmtTransSem, ("%s has the 'trans' semaphore", who));
+  LM_T(LmtSemaphore, ("%s has the 'trans' semaphore", who));
 
   return r;
 }
@@ -309,7 +309,7 @@ int cacheSemTake(const char* who, const char* what)
 {
   int r;
 
-  LM_T(LmtCacheSem, ("%s taking the 'cache' semaphore for '%s'", who, what));
+  LM_T(LmtSemaphore, ("%s taking the 'cache' semaphore for '%s'", who, what));
 
   struct timespec startTime;
   struct timespec endTime;
@@ -330,7 +330,7 @@ int cacheSemTake(const char* who, const char* what)
     clock_addtime(&accCacheSemTime, &diffTime);
   }
 
-  LM_T(LmtCacheSem, ("%s has the 'cache' semaphore", who));
+  LM_T(LmtSemaphore, ("%s has the 'cache' semaphore", who));
 
   return r;
 }
@@ -350,11 +350,11 @@ int reqSemGive(const char* who, const char* what, bool semTaken)
 
   if (what != NULL)
   {
-    LM_T(LmtReqSem, ("%s gives the 'req' semaphore for '%s'", who, what));
+    LM_T(LmtSemaphore, ("%s gives the 'req' semaphore for '%s'", who, what));
   }
   else
   {
-    LM_T(LmtReqSem, ("%s gives the 'req' semaphore", who));
+    LM_T(LmtSemaphore, ("%s gives the 'req' semaphore", who));
   }
 
   return sem_post(&reqSem);
@@ -370,11 +370,11 @@ int transSemGive(const char* who, const char* what)
 {
   if (what != NULL)
   {
-    LM_T(LmtTransSem, ("%s gives the 'trans' semaphore for '%s'", who, what));
+    LM_T(LmtSemaphore, ("%s gives the 'trans' semaphore for '%s'", who, what));
   }
   else
   {
-    LM_T(LmtTransSem, ("%s gives the 'trans' semaphore", who));
+    LM_T(LmtSemaphore, ("%s gives the 'trans' semaphore", who));
   }
 
   return sem_post(&transSem);
@@ -390,11 +390,11 @@ int cacheSemGive(const char* who, const char* what)
 {
   if (what != NULL)
   {
-    LM_T(LmtCacheSem, ("%s gives the 'cache' semaphore for '%s'", who, what));
+    LM_T(LmtSemaphore, ("%s gives the 'cache' semaphore for '%s'", who, what));
   }
   else
   {
-    LM_T(LmtCacheSem, ("%s gives the 'cache' semaphore", who));
+    LM_T(LmtSemaphore, ("%s gives the 'cache' semaphore", who));
   }
 
   return sem_post(&cacheSem);
@@ -410,7 +410,7 @@ int timeStatSemTake(const char* who, const char* what)
 {
   int r;
 
-  LM_T(LmtTimeStatSem, ("%s taking the 'timeStat' semaphore for '%s'", who, what));
+  LM_T(LmtSemaphore, ("%s taking the 'timeStat' semaphore for '%s'", who, what));
 
   struct timespec startTime;
   struct timespec endTime;
@@ -431,7 +431,7 @@ int timeStatSemTake(const char* who, const char* what)
     clock_addtime(&accTimeStatSemTime, &diffTime);
   }
 
-  LM_T(LmtTimeStatSem, ("%s has the 'timeStat' semaphore", who));
+  LM_T(LmtSemaphore, ("%s has the 'timeStat' semaphore", who));
 
   return r;
 }
@@ -446,11 +446,11 @@ int timeStatSemGive(const char* who, const char* what)
 {
   if (what != NULL)
   {
-    LM_T(LmtTimeStatSem, ("%s gives the 'timeStat' semaphore for '%s'", who, what));
+    LM_T(LmtSemaphore, ("%s gives the 'timeStat' semaphore for '%s'", who, what));
   }
   else
   {
-    LM_T(LmtTimeStatSem, ("%s gives the 'timeStat' semaphore", who));
+    LM_T(LmtSemaphore, ("%s gives the 'timeStat' semaphore", who));
   }
 
   return sem_post(&timeStatSem);
@@ -768,7 +768,6 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
 
   if (strcmp(notificationMode, "persistent") == 0)
   {
-    LM_T(LmtCurlContext, ("using persistent curl_contexts"));
     return get_curl_context_reuse(key, pcc);
   }
 

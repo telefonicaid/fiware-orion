@@ -552,6 +552,90 @@ function localBrokerStop
 
 # ------------------------------------------------------------------------------
 #
+# orionldStart -
+#
+function orionldStart
+{
+  role=$1
+  shift
+
+  if [ "$role" == "" ]
+  then
+    role=CB
+  fi
+
+  extraParams=$*
+  if [ "$CB_TRACELEVELS" != "" ]
+  then
+    extraParams="-logLevel DEBUG -t $CB_TRACELEVELS "${extraParams}
+  fi
+
+  echo extraParams: $extraParams > /tmp/orionldStart
+
+  if [ "$role" == "CB" ]
+  then
+    brokerParams=$extraParams
+    port=$CB_PORT
+    db=$CB_DB_NAME
+    logDir="/tmp"
+    pidFile=CB_PID_FILE
+  elif [ "$role" == "CB2" ]
+  then
+    port=$CB2_PORT
+    db=$CB2_DB_NAME
+    logDir=$CB2_LOG_DIR
+    pidFile=CB2_PID_FILE
+  elif [ "$role" == "CP1" ]
+  then
+    port=$CP1_PORT
+    db=$CP1_DB_NAME
+    logDir=$CP1_LOG_DIR
+    pidFile=CP1_PID_FILE
+  else
+    echo "Add role $role"
+    exit 121
+  fi
+
+  #
+  # In case the broker is already running, kill it !
+  #
+  localBrokerStop $role
+
+  # Make sure the log directory exists
+  if [ "$role" != "CB" ]
+  then
+    mkdir -p $logDir
+  fi
+
+  # In case the PID file still exists ... (happens after crashes)
+  \rm -f /tmp/orion_${port}.pid
+
+  BROKER_START_CMD="orionld -port $port -db $db -logDir $logDir -pidpath $pidFile -harakiri $extraParams"
+  echo "BROKER_START_CMD: $BROKER_START_CMD" >> /tmp/orionldStart
+
+  #
+  # Only the main CB can run under valgrind
+  #
+  if [ "$VALGRIND" == "" ] || [ "$port" != "$CB_PORT" ]
+  then
+    $BROKER_START_CMD
+  else
+    valgrind -v --leak-check=full --show-leak-kinds=definite,indirect --track-origins=yes --trace-children=yes --suppressions=$REPO_HOME/test/valgrind/suppressions.supp $BROKER_START_CMD > /tmp/valgrind.out 2>&1 &
+  fi
+
+  # Waiting for broker/valgrind to start
+  brokerStartAwait $port
+  if [ "$result" != 0 ]
+  then
+    echo "Unable to start broker as $role"
+    exit 1
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # brokerStart
 #
 function brokerStart()
@@ -1788,6 +1872,7 @@ export -f dbList
 export -f dbDrop
 export -f dbResetAll
 export -f brokerStart
+export -f orionldStart
 export -f localBrokerStop
 export -f localBrokerStart
 export -f brokerStop

@@ -24,9 +24,8 @@
 Test of orionld version service, with branch name
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 IPv4 -troe
+orionldStart CB -troe
 
 --SHELL--
 

@@ -40,7 +40,7 @@
 */
 QueueNotifier::QueueNotifier(size_t queueSize, int numThreads): queue(queueSize), workers(&queue, numThreads)
 {
-  LM_T(LmtNotifier,("Setting up queue and threads for notifications"));
+  LM_T(LmtLegacy, ("Setting up queue and threads for notifications"));
 }
 
 

@@ -124,7 +124,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::string     out;
   int             r;
 
-  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext request payload: %s", payload.c_str()));
+  LM_T(LmtSR, ("forward queryContext request payload: %s", payload.c_str()));
 
   std::map<std::string, std::string> noHeaders;
   r = httpRequestSend(ip,
@@ -150,7 +150,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     return false;
   }
 
-  LM_T(LmtCPrForwardRequestPayload, ("forward queryContext response payload: %s", out.c_str()));
+  LM_T(LmtSR, ("forward queryContext response payload: %s", out.c_str()));
 
 
   //

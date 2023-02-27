@@ -71,7 +71,7 @@ void mongoRegistrationDelete
 
   reqSemTake(__FUNCTION__, "Mongo Delete Registration", SemWriteOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Mongo Delete Registration"));
+  LM_T(LmtLegacy, ("Mongo Delete Registration"));
 
   std::auto_ptr<mongo::DBClientCursor>  cursor;
   mongo::BSONObj                        q;
@@ -110,12 +110,12 @@ void mongoRegistrationDelete
       return;
     }
 
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtLegacy, ("retrieved document: '%s'", r.toString().c_str()));
 
     if (moreSafe(cursor))  // There can only be one registration for a given ID
     {
       releaseMongoConnection(connection);
-      LM_T(LmtMongo, ("more than one registration: '%s'", regId.c_str()));
+      LM_T(LmtLegacy, ("more than one registration: '%s'", regId.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
       oeP->fill(SccConflict, "");
       return;
@@ -133,7 +133,7 @@ void mongoRegistrationDelete
   else
   {
     releaseMongoConnection(connection);
-    LM_T(LmtMongo, ("registration not found: '%s'", regId.c_str()));
+    LM_T(LmtLegacy, ("registration not found: '%s'", regId.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Delete Registration", reqSemTaken);
     oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_REGISTRATION, ERROR_NOT_FOUND);
 
