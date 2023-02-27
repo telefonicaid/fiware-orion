@@ -25,9 +25,8 @@ PATCH Attribute with Simplified Format
 
 --SHELL-INIT--
 # copied from ngsild_simplified_PATCH_Attribute.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

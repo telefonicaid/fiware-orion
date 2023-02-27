@@ -25,9 +25,8 @@ Batch Create with an array of three entities, see issue #776
 
 --SHELL-INIT--
 # Copied from ngsild_batch_create_issue776.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

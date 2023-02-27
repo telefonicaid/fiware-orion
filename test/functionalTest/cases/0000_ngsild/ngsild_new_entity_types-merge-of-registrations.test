@@ -25,9 +25,8 @@ Entity Types - test with merge of entity types between two registrations
 
 --SHELL-INIT--
 # Copied from ngsild_entity_types-merge-of-registrations.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

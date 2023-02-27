@@ -25,9 +25,8 @@ Batch Upsert - different Contexts for different entities
 
 --SHELL-INIT--
 # Copied from ngsild_batch_upsert-context_in_payload_data.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 #

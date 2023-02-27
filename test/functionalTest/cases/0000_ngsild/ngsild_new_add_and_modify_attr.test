@@ -25,9 +25,8 @@ Add and modify attributes in existing entity
 
 --SHELL-INIT--
 # Copied from ngsild_add_and_modify_attr.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

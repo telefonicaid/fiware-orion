@@ -24,10 +24,9 @@
 Propagation of Subscriptions between two brokers running against one and the same MongoDB
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB  0 IPv4 -subCacheIval 2
-brokerStart CB2 0 IPv4 -subCacheIval 2
+orionldStart CB  -subCacheIval 2
+orionldStart CB2 -subCacheIval 2
 
 --SHELL--
 

@@ -24,9 +24,8 @@
 Getting registrations with the id=id1,id2,idX URI param
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

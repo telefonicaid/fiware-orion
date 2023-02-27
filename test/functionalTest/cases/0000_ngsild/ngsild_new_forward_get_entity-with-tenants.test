@@ -24,16 +24,15 @@
 Retrieve a distributed entity on tenant t1
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CB t1
 dbInit CP1
 dbInit CP1 t1
 dbInit CP2
 dbInit CP2 t1
-brokerStart CB  0 IPv4 -experimental -multiservice -forwarding
-brokerStart CP1 0 IPv4 -experimental -multiservice
-brokerStart CP2 0 IPv4 -experimental -multiservice
+orionldStart CB  -experimental -multiservice -forwarding
+orionldStart CP1 -experimental -multiservice
+orionldStart CP2 -experimental -multiservice
 
 --SHELL--
 #

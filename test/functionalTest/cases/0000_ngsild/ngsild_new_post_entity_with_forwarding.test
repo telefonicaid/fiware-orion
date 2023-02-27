@@ -24,15 +24,14 @@
 Distributed POST Entity - adding/replacing attributes
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP2
 dbInit CP3
-brokerStart CB  20,31-35 IPv4 -experimental -forwarding
-brokerStart CP1 20-21 IPv4 -experimental
-brokerStart CP2 20-21 IPv4 -experimental
-brokerStart CP3 20-21 IPv4 -experimental
+orionldStart CB  -experimental -forwarding
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
+orionldStart CP3 -experimental
 
 --SHELL--
 #

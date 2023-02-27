@@ -25,9 +25,8 @@ Entity Batch Upsert-Update with instances of the same entity
 
 --SHELL-INIT--
 # Copied from ngsild_batch_upsert-update_with_same_entity_id.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

@@ -24,9 +24,8 @@
 Crash of Issue #44 - not sure what it is yet ...
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+orionldStart CB
 
 --SHELL--
 

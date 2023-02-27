@@ -24,9 +24,8 @@
 Attributes with datasetId - entity retrieval without specific datasetId
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

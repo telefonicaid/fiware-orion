@@ -24,9 +24,8 @@
 Issue 503
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

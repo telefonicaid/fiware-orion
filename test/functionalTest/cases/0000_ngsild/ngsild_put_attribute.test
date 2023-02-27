@@ -24,14 +24,13 @@
 PUT Attribute
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP2
 pgInit $CB_DB_NAME
-brokerStart CB  20,21,26,31-35,38 IPv4 -experimental -forwarding -troe
-brokerStart CP1 20,21,26,31-35,38 IPv4 -experimental
-brokerStart CP2 38 IPv4 -experimental
+orionldStart CB  -experimental -forwarding -troe
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
 accumulatorStart --pretty-print
 
 --SHELL--

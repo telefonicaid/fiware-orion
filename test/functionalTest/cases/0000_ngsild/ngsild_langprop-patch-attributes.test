@@ -24,9 +24,8 @@
 Attributes PATCH of Language Property
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 20,28 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

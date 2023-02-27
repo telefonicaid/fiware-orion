@@ -25,9 +25,8 @@ BATCH Create with MANU geo-properties, issue #922
 
 --SHELL-INIT--
 # Copied from ngsild_issue_0922-many-geoprops.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

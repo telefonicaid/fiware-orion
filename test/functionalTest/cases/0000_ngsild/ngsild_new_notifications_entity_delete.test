@@ -24,9 +24,8 @@
 Notifications on Entity Deletion
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -forwarding
+orionldStart CB -experimental -forwarding
 accumulatorStart --pretty-print
 
 --SHELL--

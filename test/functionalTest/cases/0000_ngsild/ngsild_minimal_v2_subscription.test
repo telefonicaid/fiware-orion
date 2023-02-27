@@ -25,7 +25,7 @@ Minimal V2 Subscription
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

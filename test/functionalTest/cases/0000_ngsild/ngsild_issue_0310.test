@@ -24,9 +24,8 @@
 Issue #310 - Arrays of one element are not reduced to a single item
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

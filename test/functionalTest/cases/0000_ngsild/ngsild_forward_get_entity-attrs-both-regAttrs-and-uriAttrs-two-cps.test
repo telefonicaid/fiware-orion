@@ -24,13 +24,12 @@
 NGSI-LD Forward of GET /entities/{entityId}?attrs=<merge between Registered Attributes and URI Parameter attrs>
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP2
-brokerStart CB 0 IPv4 -forwarding
-brokerStart CP1
-brokerStart CP2
+orionldStart CB -forwarding
+orionldStart CP1
+orionldStart CP2
 
 --SHELL--
 

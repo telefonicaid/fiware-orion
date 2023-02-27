@@ -25,9 +25,8 @@ Add attributes to existing entity with and without options=noOverwrite
 
 --SHELL-INIT--
 # Copied from ngsild_add_attr-noOverwrite.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

@@ -24,10 +24,9 @@
 Attribute Delete with datasetId and TRoE
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 pgInit $CB_DB_NAME
-brokerStart CB 0-1 IPv4 -troe
+orionldStart CB -troe
 
 --SHELL--
 

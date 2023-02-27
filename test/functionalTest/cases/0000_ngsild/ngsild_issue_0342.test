@@ -24,9 +24,8 @@
 Issue #342 - broker crashes when an entity is created having an attribute with a value that is an empty array
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

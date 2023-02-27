@@ -25,10 +25,9 @@ Issue #885 - some combination of context in Link header and batch upsert of not 
 
 --SHELL-INIT--
 # Colpied from ngsild_issue_885_batch_upsert.test
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

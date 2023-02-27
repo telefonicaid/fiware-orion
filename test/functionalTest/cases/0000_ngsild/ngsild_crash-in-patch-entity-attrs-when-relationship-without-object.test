@@ -24,9 +24,8 @@
 Crash in PATCH /entities/*/attrs when relationship without object
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

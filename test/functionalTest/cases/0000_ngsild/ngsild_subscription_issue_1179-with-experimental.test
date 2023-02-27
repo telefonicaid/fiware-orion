@@ -24,10 +24,9 @@
 GET Subscriptions - issue #1179
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CB captn
-brokerStart CB 0 IPv4 -multiservice -experimental
+orionldStart CB -multiservice -experimental
 accumulatorStart --pretty-print
 
 --SHELL--

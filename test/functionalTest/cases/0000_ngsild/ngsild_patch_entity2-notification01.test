@@ -24,9 +24,8 @@
 Notifications for PATCH /entities/{entityId} 01 - Attribute Added, Deleted, and Modified
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print
 
 --SHELL--

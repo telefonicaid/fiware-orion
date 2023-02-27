@@ -24,9 +24,8 @@
 Add attributes to existing entity
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

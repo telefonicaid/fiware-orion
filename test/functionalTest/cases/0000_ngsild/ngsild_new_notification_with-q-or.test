@@ -24,9 +24,8 @@
 Notification for subscriptions with q containing the OR operator
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
@@ -122,7 +121,7 @@ echo
 echo "07. Kill broker and restart it - to take the sub from mongo and repopulate the sub-cache"
 echo "========================================================================================"
 brokerStop CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 echo
 echo
 

@@ -24,9 +24,8 @@
 Batch upsert/replace two entities with different creation dates
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

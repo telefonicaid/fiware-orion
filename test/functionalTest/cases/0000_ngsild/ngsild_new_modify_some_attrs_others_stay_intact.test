@@ -25,9 +25,8 @@ Using POST /ngsi-ld/v1/entities/E-ID/attrs, modify some attrs others stay intact
 
 --SHELL-INIT--
 # Colpied from ngsild_modify_some_attrs_others_stay_intact.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

@@ -24,9 +24,8 @@
 Notifications via MQTT using the sender thread (notificationMode transient)
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -notificationMode transient
+orionldStart CB -notificationMode transient
 mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic example_mosquitto_topic
 
 --SHELL--

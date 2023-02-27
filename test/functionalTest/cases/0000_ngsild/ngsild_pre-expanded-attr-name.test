@@ -24,9 +24,8 @@
 Issue 1064 - expanded attribute names in updates
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

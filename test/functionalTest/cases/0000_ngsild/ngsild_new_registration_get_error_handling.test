@@ -26,7 +26,7 @@ Handle errors of Context Source Registrations GET
 --SHELL-INIT--
 # Copied from ngsild_registration_get_error_handling.test
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

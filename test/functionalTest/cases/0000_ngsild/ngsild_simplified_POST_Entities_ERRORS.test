@@ -24,9 +24,8 @@
 Error handling for Entity Creation with Simplified Format
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

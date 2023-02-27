@@ -24,9 +24,8 @@
 Content-Type, @context, and tenant in Distributed Operations
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 20-21,31-32,42 IPv4 -experimental -forwarding
+orionldStart CB -experimental -forwarding
 accumulatorStart --pretty-print --url /ngsi-ld/v1/entities/urn:E1
 
 --SHELL--

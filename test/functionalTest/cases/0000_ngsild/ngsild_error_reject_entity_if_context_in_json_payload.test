@@ -24,9 +24,8 @@
 Entity Creation Error - should report an error if @context is provided in a JSON payload
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+orionldStart CB
 
 --SHELL--
 

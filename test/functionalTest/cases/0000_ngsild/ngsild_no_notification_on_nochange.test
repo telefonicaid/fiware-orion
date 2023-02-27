@@ -24,9 +24,8 @@
 No notification on update that doesn't change anything
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -noNotifyFalseUpdate
+orionldStart CB -noNotifyFalseUpdate
 accumulatorStart --pretty-print
 
 --SHELL--

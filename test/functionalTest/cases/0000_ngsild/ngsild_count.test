@@ -24,9 +24,8 @@
 Count option, for both V2 and LD and for all services that supports it
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

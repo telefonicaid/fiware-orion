@@ -25,9 +25,8 @@ Context in HTTP Link header AND Content-Type == application/ld+json must give er
 
 --SHELL-INIT--
 # Copied from ngsild_content-type_jsonld_and_link_header_must_give_error.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

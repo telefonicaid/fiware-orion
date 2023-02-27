@@ -24,11 +24,10 @@
 Distributed PATCH of entity (old /attrs) with a remote error
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
-brokerStart CB  26,31-34,38 IPv4 -experimental -forwarding
-brokerStart CP1 0-255 IPv4 -experimental
+orionldStart CB  -experimental -forwarding
+orionldStart CP1 -experimental
 
 --SHELL--
 #

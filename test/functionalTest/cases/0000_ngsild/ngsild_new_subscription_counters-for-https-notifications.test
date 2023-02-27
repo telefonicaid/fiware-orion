@@ -25,9 +25,8 @@ Subscription Counters and timestamps for HTTPS notifications
 
 --SHELL-INIT--
 ${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -cSubCounters 5
+orionldStart CB -experimental -cSubCounters 5
 accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem
 
 --SHELL--
@@ -184,7 +183,7 @@ echo "13. Restart broker"
 echo "=================="
 brokerStop
 sleep .5
-brokerStart CB 0 IPv4 -experimental -cSubCounters 5
+orionldStart CB -experimental -cSubCounters 5
 echo
 echo
 

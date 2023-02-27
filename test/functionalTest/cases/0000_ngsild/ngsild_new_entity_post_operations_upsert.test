@@ -25,9 +25,8 @@ Entity Creation and Retrieval
 
 --SHELL-INIT--
 # Copied from ngsild_entity_post_operations_upsert.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

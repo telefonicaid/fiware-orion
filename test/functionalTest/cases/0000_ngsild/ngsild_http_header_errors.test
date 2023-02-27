@@ -24,9 +24,8 @@
 HTTP Header Error Handling
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -multiservice
+orionldStart CB -multiservice
 
 --SHELL--
 

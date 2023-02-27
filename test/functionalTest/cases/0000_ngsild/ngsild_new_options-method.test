@@ -25,9 +25,8 @@ OPTIONS method for all API endpoints
 
 --SHELL-INIT--
 # Copied from ngsild_options-method.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

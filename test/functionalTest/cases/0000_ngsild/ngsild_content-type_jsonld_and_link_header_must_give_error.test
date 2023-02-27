@@ -24,9 +24,8 @@
 Context in HTTP Link header AND Content-Type == application/ld+json must give error for all requests
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

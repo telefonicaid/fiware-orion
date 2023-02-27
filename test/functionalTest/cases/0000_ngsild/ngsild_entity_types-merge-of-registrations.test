@@ -24,9 +24,8 @@
 Entity Types - test with merge of entity types between two registrations
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

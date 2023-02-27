@@ -24,9 +24,8 @@
 Entity Creation Error - should reject an entity which node type is not recognized
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

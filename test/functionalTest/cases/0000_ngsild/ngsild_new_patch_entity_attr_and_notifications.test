@@ -25,9 +25,8 @@ Update an entity attribute using PATCH, and see the notifications
 
 --SHELL-INIT--
 # Copied from ngsild_patch_entity_attr_and_notifications.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--

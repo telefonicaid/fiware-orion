@@ -25,11 +25,10 @@ Subscription counters and timestamps
 
 --SHELL-INIT--
 ${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
-export BROKER=orionld
 dbInit CB
 dbInit CP1
-brokerStart CB     200-204 IPv4 -experimental
-brokerStart CP1    0-255 IPv4 -experimental
+orionldStart CB  -experimental
+orionldStart CP1 -experimental
 accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem --url /notify
 
 --SHELL--

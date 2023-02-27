@@ -25,9 +25,8 @@ Notifications via MQTT - Issue 1178
 
 --SHELL-INIT--
 # Copied from ngsild_subscription_with_mqtt_issue.1178.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic example_mosquitto_topic
 
 --SHELL--
@@ -115,7 +114,7 @@ echo
 echo "06. Restart the broker"
 echo "======================"
 brokerStop CB
-brokerStart CB
+orionldStart CB
 echo
 echo
 

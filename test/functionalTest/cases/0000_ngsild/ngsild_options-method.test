@@ -24,9 +24,8 @@
 OPTIONS method for all API endpoints
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

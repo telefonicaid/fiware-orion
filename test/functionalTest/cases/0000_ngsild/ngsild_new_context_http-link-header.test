@@ -24,10 +24,9 @@
 Alternative Context implementation - context in HTTP Link header
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

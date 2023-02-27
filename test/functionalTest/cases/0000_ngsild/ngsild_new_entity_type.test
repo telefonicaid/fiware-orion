@@ -25,9 +25,8 @@ Entity Type - simple test with only local entities, no registrations
 
 --SHELL-INIT--
 # Copied from ngsild_entity_type.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

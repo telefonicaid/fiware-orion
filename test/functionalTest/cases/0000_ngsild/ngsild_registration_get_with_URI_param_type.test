@@ -24,9 +24,8 @@
 Getting registrations with the type=T1, T3, T5, TX URI param
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

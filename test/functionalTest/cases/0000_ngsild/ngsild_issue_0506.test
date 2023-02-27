@@ -24,9 +24,8 @@
 Issue 506 - patching the attributes of an entity
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

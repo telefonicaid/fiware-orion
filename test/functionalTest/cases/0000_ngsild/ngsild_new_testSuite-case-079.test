@@ -25,9 +25,8 @@ NGSI-LD Test Suite Case 079, 080, and 081 (contextProvision/append_entity_attrs_
 
 --SHELL-INIT--
 # Copied from ngsild_testSuite-case-079.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

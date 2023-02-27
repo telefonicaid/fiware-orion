@@ -24,11 +24,10 @@
 Retrieve a distributed entity, giving the type of the entity
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
-brokerStart CB  0 IPv4 -experimental -forwarding
-brokerStart CP1 0 IPv4 -experimental
+orionldStart CB  -experimental -forwarding
+orionldStart CP1 -experimental
 
 --SHELL--
 

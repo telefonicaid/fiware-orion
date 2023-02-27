@@ -24,9 +24,8 @@
 Issue 131 - Crash
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 --prettyPrint
+orionldStart CB
 
 --SHELL--
 

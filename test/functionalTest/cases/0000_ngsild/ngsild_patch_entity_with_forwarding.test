@@ -24,17 +24,16 @@
 Distributed PATCH of entity (old /attrs)
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP2
 dbInit CP3
 dbInit CP4
-brokerStart CB  26,31-34,38 IPv4 -experimental -forwarding
-brokerStart CP1 0-255 IPv4 -experimental
-brokerStart CP2 0-255 IPv4 -experimental
-brokerStart CP3 0-255 IPv4 -experimental
-brokerStart CP4 0-255 IPv4 -experimental
+orionldStart CB  -experimental -forwarding
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
+orionldStart CP3 -experimental
+orionldStart CP4 -experimental
 
 --SHELL--
 #

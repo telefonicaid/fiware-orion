@@ -25,9 +25,8 @@ Subscription timestamps
 
 --SHELL-INIT--
 # Copied from ngsild_subscription_timestamps.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print
 
 --SHELL--

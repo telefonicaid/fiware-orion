@@ -26,9 +26,8 @@ Batch Upsert with duplicated entities in the array of entities
 --SHELL-INIT--
 # Copied from ngsild_batch_upsert-duplicate-entities-in-array.test
 # WILL FAIL once the new BATCH Upsert implements the multiple entity instances in a batch
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

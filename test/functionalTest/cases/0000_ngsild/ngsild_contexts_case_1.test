@@ -24,9 +24,8 @@
 Parse Contexts - case one - string reference to a vector reference
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

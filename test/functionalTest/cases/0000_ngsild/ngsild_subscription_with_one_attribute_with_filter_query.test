@@ -24,9 +24,8 @@
 Subscription Test - Any attribute watched. Non existent attribute asked
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 accumulatorStart --pretty-print
 
 --SHELL--

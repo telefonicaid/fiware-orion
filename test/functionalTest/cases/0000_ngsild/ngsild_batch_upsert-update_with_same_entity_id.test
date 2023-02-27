@@ -24,9 +24,8 @@
 Entity Batch Upsert-Update with instances of the same entity
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

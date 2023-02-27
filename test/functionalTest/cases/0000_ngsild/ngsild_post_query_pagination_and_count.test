@@ -24,9 +24,8 @@
 POST Query of entities with pagination and count
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

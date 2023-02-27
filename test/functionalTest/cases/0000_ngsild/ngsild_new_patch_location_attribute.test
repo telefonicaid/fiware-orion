@@ -25,9 +25,8 @@ Update the 'location' property using PATCH
 
 --SHELL-INIT--
 # Copied from ngsild_patch_location_attribute.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPb4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 #

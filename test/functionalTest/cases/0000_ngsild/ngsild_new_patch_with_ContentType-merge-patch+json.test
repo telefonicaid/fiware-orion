@@ -25,9 +25,8 @@ Patching attributes and single attribute using Content-Type "application/merge-p
 
 --SHELL-INIT--
 # Copied from ngsild_patch_with_ContentType-merge-patch+json.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

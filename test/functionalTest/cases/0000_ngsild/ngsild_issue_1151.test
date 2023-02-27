@@ -24,9 +24,8 @@
 GET Entities with URI param id with a single entity id
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 IPv4
+orionldStart CB
 
 --SHELL--
 

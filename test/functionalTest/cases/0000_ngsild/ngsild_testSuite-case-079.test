@@ -24,9 +24,8 @@
 NGSI-LD Test Suite Case 079, 080, and 081 (contextProvision/append_entity_attrs_with_ldcontext_test.js)
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

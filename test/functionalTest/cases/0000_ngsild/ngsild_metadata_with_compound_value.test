@@ -24,9 +24,8 @@
 Metadta with compound value
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-249
+orionldStart CB
 
 --SHELL--
 

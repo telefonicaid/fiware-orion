@@ -25,9 +25,8 @@ GET registration crash
 
 --SHELL-INIT--
 # Copied from ngsild_registration_get_crash.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

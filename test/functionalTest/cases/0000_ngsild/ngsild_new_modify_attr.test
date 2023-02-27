@@ -25,9 +25,8 @@ Modify an existing attribute
 
 --SHELL-INIT--
 # Copied from ngsild_modify_attr.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

@@ -24,9 +24,8 @@
 PATCH the three special location attributes - attempt to turn into String
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

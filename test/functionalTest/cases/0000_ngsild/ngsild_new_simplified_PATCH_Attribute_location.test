@@ -25,9 +25,8 @@ PATCH the three special location attributes - attempt to turn into String
 
 --SHELL-INIT--
 # Colpied from ngsild_simplified_PATCH_Attribute_location.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

@@ -25,9 +25,8 @@ Attribute Overwrite with POST /ngsi-ld/v1/entities/*/attrs
 
 --SHELL-INIT--
 # Copied from ngsild_attribute_overwrite.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

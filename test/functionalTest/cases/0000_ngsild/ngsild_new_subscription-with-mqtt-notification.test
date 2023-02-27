@@ -24,9 +24,8 @@
 New Notifications via MQTT
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 IPv4 -experimental
+orionldStart CB -experimental
 mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities
 
 --SHELL--
@@ -137,8 +136,7 @@ echo
 echo "06. Restart the broker"
 echo "======================"
 brokerStop CB
-export BROKER=orionld
-brokerStart CB 0-255 IPv4 -experimental
+orionldStart CB -experimental
 sleep 2  # give the poor broker some time to start (not really necessary)
 echo
 echo

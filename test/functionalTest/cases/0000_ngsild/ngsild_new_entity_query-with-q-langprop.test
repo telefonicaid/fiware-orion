@@ -24,9 +24,8 @@
 Language Property and Entities Query - Simple
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

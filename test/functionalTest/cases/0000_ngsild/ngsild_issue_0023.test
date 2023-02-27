@@ -24,9 +24,8 @@
 If no Accept header provided --> application/json content shall be provided
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

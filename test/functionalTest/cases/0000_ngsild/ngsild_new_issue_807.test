@@ -25,10 +25,9 @@ Issue 807 - too many contexts in cache
 
 --SHELL-INIT--
 # Copied from ngsild_issue_807.test
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

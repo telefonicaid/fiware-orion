@@ -24,9 +24,8 @@
 NGSILD-TestSuite: Should send a notification. Simple subscription to concrete attribute. Subsequent update
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 accumulatorStart --pretty-print
 
 --SHELL--

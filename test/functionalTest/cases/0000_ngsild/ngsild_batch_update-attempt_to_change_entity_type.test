@@ -24,9 +24,8 @@
 Attempt to change entity type during a Batch Update
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 #

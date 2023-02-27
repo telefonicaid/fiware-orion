@@ -24,9 +24,8 @@
 Deletion of a NEW registration
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -multiservice
+orionldStart CB -experimental -multiservice
 
 --SHELL--
 

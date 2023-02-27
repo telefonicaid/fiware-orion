@@ -24,9 +24,8 @@
 Get Entity without Accept header - application/json is default Accept header
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

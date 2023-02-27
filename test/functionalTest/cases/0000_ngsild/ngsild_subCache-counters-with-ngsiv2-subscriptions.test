@@ -24,9 +24,8 @@
 Sub Cache with mongoc - testing counters for 3 subscriptions after a sub-cache refresh
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -subCacheIval 5
+orionldStart CB -experimental -subCacheIval 5
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
@@ -385,7 +384,7 @@ Location: /v2/entities/E1?type=T
 
 08. Dump accumulator to see notification for S1
 ===============================================
-POST http://localhost:9997/notify
+POST http://localhost:9997/notify?subscriptionId=REGEX(.*)
 Fiware-Servicepath: /
 Content-Length: 123
 User-Agent: orion/REGEX(.*)

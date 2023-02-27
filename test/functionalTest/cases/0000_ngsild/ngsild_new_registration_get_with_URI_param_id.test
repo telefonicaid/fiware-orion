@@ -25,9 +25,8 @@ Getting registrations with the id=id1,id2,idX URI param
 
 --SHELL-INIT--
 # Copied from ngsild_registration_get_with_URI_param_id.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

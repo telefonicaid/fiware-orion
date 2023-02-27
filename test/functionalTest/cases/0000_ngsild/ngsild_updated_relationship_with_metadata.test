@@ -24,9 +24,8 @@
 Adding a Relationship with metadata, then changing+adding metadata
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

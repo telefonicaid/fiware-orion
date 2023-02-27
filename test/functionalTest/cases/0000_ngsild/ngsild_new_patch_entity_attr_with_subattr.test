@@ -25,9 +25,8 @@ PATCH an entity attribute replacing sub-attributes
 
 --SHELL-INIT--
 # Copied from ngsild_patch_entity_attr_with_subattr.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 #

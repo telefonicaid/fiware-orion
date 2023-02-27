@@ -24,9 +24,8 @@
 GET Entity with type as FQN
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+orionldStart CB
 
 --SHELL--
 

@@ -24,10 +24,9 @@
 Persisting a user created context
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 
@@ -70,7 +69,7 @@ echo
 echo "04. Restart the broker"
 echo "======================"
 brokerStop CB
-brokerStart CB
+orionldStart CB
 echo
 echo
 

@@ -25,9 +25,8 @@ New experimental subscriptions with HTTPS notifications
 
 --SHELL-INIT--
 ${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -debugCurl
+orionldStart CB -experimental -debugCurl
 accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem
 
 --SHELL--

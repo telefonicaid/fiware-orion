@@ -24,9 +24,8 @@
 Protocl Error - should reject content which is not JSON nor JSON-LD
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 --prettyPrint
+orionldStart CB
 
 --SHELL--
 

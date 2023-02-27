@@ -24,9 +24,8 @@
 Attempt to register with more than one item in Registration::information vector
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

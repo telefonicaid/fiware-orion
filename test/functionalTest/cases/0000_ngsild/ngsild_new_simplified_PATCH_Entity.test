@@ -25,9 +25,8 @@ Entity Patch using Smart Input Format
 
 --SHELL-INIT--
 # Copied from ngsild_simplified_PATCH_Entity.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

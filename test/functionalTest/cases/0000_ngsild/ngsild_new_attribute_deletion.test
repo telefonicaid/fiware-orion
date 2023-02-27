@@ -25,9 +25,8 @@ Attribute Deletion - create an entity with three attrs and then delete one of th
 
 --SHELL-INIT--
 # Copied from ngsild_attribute_deletion.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

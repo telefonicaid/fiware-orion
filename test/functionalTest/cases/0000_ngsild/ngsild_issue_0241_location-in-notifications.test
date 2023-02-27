@@ -24,9 +24,8 @@
 Notifications - correct representation of location inside notifications
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 accumulatorStart --pretty-print
 
 --SHELL--

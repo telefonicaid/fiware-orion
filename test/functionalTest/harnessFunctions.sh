@@ -582,7 +582,7 @@ function orionldStart
   elif [ "$role" == "CB2" ]
   then
     port=$CB2_PORT
-    db=$CB2_DB_NAME
+    db=$CB_DB_NAME
     logDir=$CB2_LOG_DIR
     pidFile=CB2_PID_FILE
   elif [ "$role" == "CP1" ]
@@ -591,6 +591,36 @@ function orionldStart
     db=$CP1_DB_NAME
     logDir=$CP1_LOG_DIR
     pidFile=CP1_PID_FILE
+  elif [ "$role" == "CP2" ]
+  then
+    port=$CP2_PORT
+    db=$CP2_DB_NAME
+    logDir=$CP2_LOG_DIR
+    pidFile=CP2_PID_FILE
+  elif [ "$role" == "CP3" ]
+  then
+    port=$CP3_PORT
+    db=$CP3_DB_NAME
+    logDir=$CP3_LOG_DIR
+    pidFile=CP3_PID_FILE
+  elif [ "$role" == "CP4" ]
+  then
+    port=$CP4_PORT
+    db=$CP4_DB_NAME
+    logDir=$CP4_LOG_DIR
+    pidFile=CP4_PID_FILE
+  elif [ "$role" == "CP5" ]
+  then
+    port=$CP5_PORT
+    db=$CP5_DB_NAME
+    logDir=$CP5_LOG_DIR
+    pidFile=CP5_PID_FILE
+  elif [ "$role" == "CP6" ]
+  then
+    port=$CP6_PORT
+    db=$CP6_DB_NAME
+    logDir=$CP6_LOG_DIR
+    pidFile=CP6_PID_FILE
   else
     echo "Add role $role"
     exit 121

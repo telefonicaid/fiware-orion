@@ -24,9 +24,8 @@
 Attribute Deletion - create an entity with three attrs and then delete one of them
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 --prettyPrint
+orionldStart CB
 
 --SHELL--
 

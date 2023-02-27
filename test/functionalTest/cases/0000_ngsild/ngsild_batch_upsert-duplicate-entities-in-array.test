@@ -24,9 +24,8 @@
 Batch Upsert with duplicated entities in the array of entities
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

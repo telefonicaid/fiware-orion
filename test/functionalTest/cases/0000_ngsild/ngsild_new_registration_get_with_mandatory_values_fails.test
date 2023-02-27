@@ -25,9 +25,8 @@ GET registration by id with mandatory values
 
 --SHELL-INIT--
 # Copied from ngsild_registration_get_with_mandatory_values_fails.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

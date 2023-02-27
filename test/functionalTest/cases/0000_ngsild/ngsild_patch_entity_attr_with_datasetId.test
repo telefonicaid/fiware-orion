@@ -24,9 +24,8 @@
 Update an entity attribute using PATCH, with datasetId
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 #

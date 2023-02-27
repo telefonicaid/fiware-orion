@@ -403,7 +403,6 @@ int paOptionsParse(PaiArgument* paList, char* argV[], int argC)
       if (valueP != NULL)
       {
         snprintf(paLogDir, sizeof(paLogDir), "%s", (char*) valueP);
-        printf("log directory: '%s'\n", paLogDir);
       }
     }
     else if (aP->varP == (void*) &paEUsageVar)

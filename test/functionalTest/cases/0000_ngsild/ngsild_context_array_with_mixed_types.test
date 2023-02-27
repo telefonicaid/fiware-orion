@@ -24,9 +24,8 @@
 Context is an array with mixed types of the members: URI-string and inline object
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+orionldStart CB
 
 --SHELL--
 

@@ -24,7 +24,6 @@
 Forwarding of POST Entities requests - entity distributed using registrations of all 3 modes
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP2
@@ -32,13 +31,13 @@ dbInit CP3
 dbInit CP4
 dbInit CP5
 dbInit CP6
-brokerStart CB  0 IPv4 -experimental -forwarding
-brokerStart CP1 0 IPv4 -experimental
-brokerStart CP2 0 IPv4 -experimental
-brokerStart CP3 0 IPv4 -experimental
-brokerStart CP4 0 IPv4 -experimental
-brokerStart CP5 0 IPv4 -experimental
-brokerStart CP6 0 IPv4 -experimental
+orionldStart CB  -experimental -forwarding
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
+orionldStart CP3 -experimental
+orionldStart CP4 -experimental
+orionldStart CP5 -experimental
+orionldStart CP6 -experimental
 
 --SHELL--
 #

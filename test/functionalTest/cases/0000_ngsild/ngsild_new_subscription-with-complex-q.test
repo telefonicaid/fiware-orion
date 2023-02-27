@@ -24,9 +24,8 @@
 New subscription with a complex q, for creation, update and sub-cache-refresh
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -subCacheIval 5
+orionldStart CB -experimental -subCacheIval 5
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--

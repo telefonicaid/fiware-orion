@@ -25,11 +25,10 @@ Having one broker subscribe to another broker, and keep a copy of the entities i
 
 --SHELL-INIT--
 # Copied from ngsild_notify.test
-export BROKER=orionld
 dbInit CB
 dbInit CP1
-brokerStart CB 0 IPv4 -experimental
-brokerStart CP1 0 IPv4 -experimental
+orionldStart CB -experimental
+orionldStart CP1 -experimental
 
 --SHELL--
 

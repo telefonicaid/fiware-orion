@@ -25,9 +25,8 @@ Batch upsert/replace two entities with different creation dates
 
 --SHELL-INIT--
 # Copied from ngsild_batch_upsert_replace_two_entities_different_credates.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

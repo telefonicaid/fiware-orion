@@ -24,10 +24,9 @@
 Subscription Counters and tenants - error reported in the "end of" issue #1179
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CB captn
-brokerStart CB 0 IPv4 -multiservice
+orionldStart CB -multiservice
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--

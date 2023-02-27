@@ -25,9 +25,8 @@ Sub-Attribute system attributes for Batch Create
 
 --SHELL-INIT--
 # Copied from ngsild_subattr-timestamps-batch-create.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 
