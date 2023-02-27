@@ -52,9 +52,7 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 
   orionldState.in.contentType  = JSON;
 
-  lmTraceLevelSet(LmtDump, true);
   out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, NULL);
-  lmTraceLevelSet(LmtDump, false);
   EXPECT_STREQ("OK", out.c_str());
 
   UnsubscribeContextRequest*  ucrP = &reqData.uncr.res;

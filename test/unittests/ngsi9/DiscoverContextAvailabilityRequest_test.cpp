@@ -78,10 +78,8 @@ TEST(DiscoverContextAvailabilityRequest, ok_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  lmTraceLevelSet(LmtDump, true);
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
-  lmTraceLevelSet(LmtDump, false);
 }
 
 

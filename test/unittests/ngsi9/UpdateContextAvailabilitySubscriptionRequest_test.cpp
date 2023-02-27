@@ -56,9 +56,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf,     sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  lmTraceLevelSet(LmtDump, true);
   out = jsonTreat(testBuf, &ci, &parseData, UpdateContextAvailabilitySubscription, NULL);
-  lmTraceLevelSet(LmtDump, false);
   EXPECT_EQ("OK", out) << "this test should be OK";
 
   UpdateContextAvailabilitySubscriptionRequest* ucasP = &parseData.ucas.res;

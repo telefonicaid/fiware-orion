@@ -60,9 +60,7 @@ TEST(UpdateContextRequest, ok_json)
 
    orionldState.in.contentType  = JSON;
 
-   lmTraceLevelSet(LmtDump, true);
    std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
-   lmTraceLevelSet(LmtDump, false);
 
    EXPECT_EQ("OK", result);
 
