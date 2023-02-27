@@ -24,9 +24,8 @@
 Spaces in Entity Type and attribute names should result in error
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

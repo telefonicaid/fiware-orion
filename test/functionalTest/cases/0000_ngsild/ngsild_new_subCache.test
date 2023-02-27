@@ -24,9 +24,8 @@
 Repopulation of subCache after restart
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 
@@ -62,7 +61,7 @@ echo
 echo "02. Kill broker and restart it - to take the sub from mongo and repopulate the sub-cache"
 echo "========================================================================================"
 brokerStop CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 echo
 echo
 

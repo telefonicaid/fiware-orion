@@ -24,11 +24,10 @@
 Having one broker subscribe to another broker, and keep a copy of the entities incoming via notification
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
-brokerStart CB
-brokerStart CP1
+orionldStart CB
+orionldStart CP1
 
 --SHELL--
 

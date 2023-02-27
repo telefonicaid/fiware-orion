@@ -25,9 +25,8 @@ Sub-Attribute system attributes for PATCH /entities/*/attrs/*
 
 --SHELL-INIT--
 # Copied from ngsild_subattr-timestamps-patch-entity-attribute.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

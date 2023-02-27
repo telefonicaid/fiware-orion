@@ -24,15 +24,14 @@
 Forwarding of POST Entities requests - entity distributed in mix of CB + 3 CPs using EXCLUSIVE Registrations
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP2
 dbInit CP3
-brokerStart CB  0 IPv4 -experimental -forwarding
-brokerStart CP1 0 IPv4 -experimental
-brokerStart CP2 0 IPv4 -experimental
-brokerStart CP3 0 IPv4 -experimental
+orionldStart CB  -experimental -forwarding
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
+orionldStart CP3 -experimental
 
 --SHELL--
 #

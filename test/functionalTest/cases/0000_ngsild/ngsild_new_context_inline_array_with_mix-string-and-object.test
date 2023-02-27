@@ -24,10 +24,9 @@
 Alternative Context implementation - inline context that is an array with two items of which one is a string and the other is an object
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

@@ -24,9 +24,8 @@
 Issue 914 - Entity Attributes with details give TWO @context in the response
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

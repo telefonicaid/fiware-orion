@@ -24,9 +24,8 @@
 Retrieval of entities in the GeoJSON format WITH URI param attrs not including the geometryProperty
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

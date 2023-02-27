@@ -24,10 +24,9 @@
 Issue #885 - some combination of context in Link header and batch upsert of not existing entities
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

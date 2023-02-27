@@ -24,9 +24,8 @@
 Update an entity using Real PATCH - delete one Property with attr: "urn:ngsi-ld:null"
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--

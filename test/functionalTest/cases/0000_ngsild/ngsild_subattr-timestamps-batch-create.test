@@ -24,9 +24,8 @@
 Sub-Attribute system attributes for Batch Create
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

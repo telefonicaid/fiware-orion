@@ -25,9 +25,8 @@ Crash in PATCH /entities/*/attrs when relationship without object
 
 --SHELL-INIT--
 # Copied from ngsild_crash-in-patch-entity-attrs-when-relationship-without-object.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

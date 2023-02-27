@@ -24,10 +24,9 @@
 NGSI-LD Forward of GET /entities/{eid} with HTTP headers
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CB t1
-brokerStart CB 0 IPv4 -forwarding -multiservice
+orionldStart CB -forwarding -multiservice
 accumulatorStart --pretty-print --url "/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1" 
 
 --SHELL--

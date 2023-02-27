@@ -25,10 +25,9 @@ Initial population of registration cache on a tenant != default tenant
 
 --SHELL-INIT--
 # Copied from ngsild_registration_get.test
-export BROKER=orionld
 dbInit CB
 dbInit CB t1
-brokerStart CB 0 IPv4 -experimental -multiservice
+orionldStart CB -experimental -multiservice
 
 --SHELL--
 
@@ -132,7 +131,7 @@ echo
 echo "04. Restart the broker (reg-cache re-read at startup)"
 echo "====================================================="
 brokerStop CB
-brokerStart CB 0 IPv4 -experimental -multiservice
+orionldStart CB -experimental -multiservice
 sleep 1
 echo
 echo

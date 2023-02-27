@@ -25,9 +25,8 @@ Issue 1016 - wrong context in Link header of the response
 
 --SHELL-INIT--
 # Copied from ngsild_issue_1016-wrong-context-in-response.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 38 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

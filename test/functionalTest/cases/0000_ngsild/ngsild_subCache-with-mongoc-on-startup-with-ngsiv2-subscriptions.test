@@ -24,9 +24,8 @@
 Create an MHSIv2 subscription and then kill the broker. Get the subscription from sub-cache once up again
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 
@@ -78,7 +77,7 @@ echo
 echo "03. Restart the broker"
 echo "======================"
 brokerStop CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 sleep 1
 echo Orion-LD has been restarted
 echo

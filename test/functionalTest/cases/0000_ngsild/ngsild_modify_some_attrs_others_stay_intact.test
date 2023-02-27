@@ -24,9 +24,8 @@
 Using POST /ngsi-ld/v1/entities/E-ID/attrs, modify some attrs others stay intact
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

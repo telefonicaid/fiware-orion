@@ -24,9 +24,8 @@
 Registration with an array of entity types, without entity ID
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

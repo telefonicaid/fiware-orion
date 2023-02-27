@@ -25,9 +25,8 @@ Entity Creation and Retrieval
 
 --SHELL-INIT--
 # Copied from ngsild_batch_upsert-options=replace_payload_error_type_field.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

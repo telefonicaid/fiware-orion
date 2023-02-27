@@ -25,9 +25,8 @@ Issue 914 - Entity Attributes with details give TWO @context in the response
 
 --SHELL-INIT--
 # Copied from ngsild_entity_attributes_with_double_context.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

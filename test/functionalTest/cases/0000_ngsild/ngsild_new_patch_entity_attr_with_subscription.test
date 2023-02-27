@@ -25,9 +25,8 @@ Update an entity attribute using PATCH
 
 --SHELL-INIT--
 # Copied from ngsild_patch_entity_attr_with_subscription.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print
 
 --SHELL--

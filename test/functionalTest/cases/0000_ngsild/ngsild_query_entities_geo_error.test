@@ -24,9 +24,8 @@
 Geoquery: problem with maxDistance, Haversine states 853m, Pythagorus 1531m
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

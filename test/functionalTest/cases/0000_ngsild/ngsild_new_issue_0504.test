@@ -25,9 +25,8 @@ Issue 504
 
 --SHELL-INIT--
 # Copied from ngsild_issue_0504.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

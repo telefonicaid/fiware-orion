@@ -24,13 +24,12 @@
 Distributed PATCH of single attribute
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP2
-brokerStart CB  20-21,42 IPv4 -experimental -forwarding
-brokerStart CP1 20-21 IPv4 -experimental
-brokerStart CP2 20-21 IPv4 -experimental
+orionldStart CB  -experimental -forwarding
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
 
 --SHELL--
 #

@@ -24,9 +24,8 @@
 Create an entity without context, amke sure it has the DEFAULT context, not the CORE context
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

@@ -25,9 +25,8 @@ No notification if no real change
 
 --SHELL-INIT--
 # Copied from ngsild_no_notification_on_nochange_2.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -noNotifyFalseUpdate -experimental
+orionldStart CB -noNotifyFalseUpdate -experimental
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--

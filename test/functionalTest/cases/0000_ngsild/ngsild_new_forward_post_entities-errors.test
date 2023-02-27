@@ -24,13 +24,12 @@
 Forwarding of POST Entities requests - errors handling for forwarded requests
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CP1
 dbInit CP4
-brokerStart CB  31-35 IPv4 -experimental -forwarding
-brokerStart CP1 0 IPv4 -experimental
-brokerStart CP4 0 IPv4 -experimental
+orionldStart CB  -experimental -forwarding
+orionldStart CP1 -experimental
+orionldStart CP4 -experimental
 
 --SHELL--
 #

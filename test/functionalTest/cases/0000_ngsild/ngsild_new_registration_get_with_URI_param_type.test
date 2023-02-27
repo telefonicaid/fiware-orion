@@ -25,9 +25,8 @@ Getting registrations with the type=T1, T3, T5, TX URI param
 
 --SHELL-INIT--
 # Copied from ngsild_registration_get_with_URI_param_type.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

@@ -24,9 +24,8 @@
 Create an entity with an already expanded type, containing a hash sign
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 #

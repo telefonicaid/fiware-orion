@@ -25,9 +25,8 @@ Batch Upsert with a single GeoProperty in two entities
 
 --SHELL-INIT--
 #Copied from ngsild_batch_upsert-many-geoproperties.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 #

@@ -24,9 +24,8 @@
 Multi-byte characters in attribute names and Q-filters
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 212-249
+orionldStart CB
 
 --SHELL--
 

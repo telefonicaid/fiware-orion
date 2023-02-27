@@ -24,9 +24,8 @@
 NGSILD Test Suite - Retrieve Entity - should retrieve the entity. JSON-LD MIME Type requested
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 242-243 --prettyPrint
+orionldStart CB
 
 --SHELL--
 

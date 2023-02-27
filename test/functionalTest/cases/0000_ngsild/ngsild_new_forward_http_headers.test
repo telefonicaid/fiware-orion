@@ -24,9 +24,8 @@
 HTTP header test for forwarded requests - the accumulator is used as it can easily be dumped
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -forwarding
+orionldStart CB -experimental -forwarding
 accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_PORT} 
 
 --SHELL--

@@ -24,9 +24,8 @@
 Patching attributes and single attribute using Content-Type "application/merge-patch+json"
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

@@ -25,9 +25,8 @@ Notifications after killing and restarting broker
 
 --SHELL-INIT--
 # Copied from ngsild_notifications_after_restarting_broker.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT} -v
 
 --SHELL--
@@ -120,8 +119,7 @@ echo
 echo "06. Kill and restart Broker"
 echo "==========================="
 brokerStop CB
-export BROKER=orionld
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 sleep 2  # give the poor broker some time to start (not really necessary)
 echo
 echo

@@ -24,9 +24,8 @@
 Subscription with new notifications sent as GeoJSON
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 PIv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--

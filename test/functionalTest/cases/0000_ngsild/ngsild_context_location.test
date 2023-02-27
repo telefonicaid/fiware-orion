@@ -24,10 +24,9 @@
 GET the location of an @context
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

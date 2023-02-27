@@ -24,9 +24,8 @@
 Error handling of PATCH of a subscription
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

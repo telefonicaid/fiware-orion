@@ -25,9 +25,8 @@ Getting registrations with the attrs=attrs1,attrs2,attrsX URI param
 
 --SHELL-INIT--
 # Copied from ngsild_registration_get_with_URI_param_attrs.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

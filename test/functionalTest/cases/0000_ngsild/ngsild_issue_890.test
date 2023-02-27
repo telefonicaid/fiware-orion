@@ -24,9 +24,8 @@
 Subscriptions MUST contain an endpoint
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

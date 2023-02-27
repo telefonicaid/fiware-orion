@@ -24,10 +24,9 @@
 Issue #1322: Problematic Notification causing a crash
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CB captn
-brokerStart CB 0 IPv4 -mongocOnly -multiservice
+orionldStart CB -mongocOnly -multiservice
 accumulatorStart --pretty-print 127.0.0.1 $LISTENER_PORT
 
 --SHELL--

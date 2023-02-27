@@ -24,9 +24,8 @@
 Getting error messages from URI param queries: id, type, idPattern and attrs.
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

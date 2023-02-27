@@ -24,9 +24,8 @@
 Geo-Query and problem with index in MongoDB - see issue #953
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

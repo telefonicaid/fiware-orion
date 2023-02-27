@@ -24,9 +24,8 @@
 Notifications after killing and restarting broker - sub on type only
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT} -v
 
 --SHELL--
@@ -119,8 +118,7 @@ echo
 echo "06. Kill and restart Broker"
 echo "==========================="
 brokerStop CB
-export BROKER=orionld
-brokerStart CB 0-255
+orionldStart CB
 sleep 2  # give the poor broker some time to start (not really necessary)
 echo
 echo

@@ -24,9 +24,8 @@
 Subscription Counters and timestamps for HTTP notifications
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -cSubCounters 5
+orionldStart CB -experimental -cSubCounters 5
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--
@@ -181,7 +180,7 @@ echo "13. Restart broker"
 echo "=================="
 brokerStop
 sleep .5
-brokerStart CB 0 IPv4 -experimental -cSubCounters 5
+orionldStart CB -experimental -cSubCounters 5
 echo
 echo
 

@@ -25,9 +25,8 @@ BATCH Entity Creation with Simplified Format
 
 --SHELL-INIT--
 # Copied from ngsild_simplified_BATCH_Create.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

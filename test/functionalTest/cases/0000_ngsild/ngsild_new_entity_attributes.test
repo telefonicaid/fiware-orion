@@ -25,9 +25,8 @@ Entity Attributes - simple test without collisions
 
 --SHELL-INIT--
 # Colpied from ngsild_entity_attributes.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

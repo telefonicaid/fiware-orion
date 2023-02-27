@@ -24,9 +24,8 @@
 Subscription Creation without optional fields - check for errors in log file
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0
+orionldStart CB
 
 --SHELL--
 

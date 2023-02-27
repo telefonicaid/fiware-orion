@@ -25,9 +25,8 @@ Notifications before killing and restarting broker - tmp?
 
 --SHELL-INIT--
 # Copied from ngsild_notifications_before_restarting_broker.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT} -v
 
 --SHELL--

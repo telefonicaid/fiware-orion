@@ -25,11 +25,10 @@ Batch Upsert with an array of three entities, with context arrays in payload
 
 --SHELL-INIT--
 # Copied from ngsild_batch_upsert_and_contexts.test
-export BROKER=orionld
 dbInit CB
 dbInit CB smartmaas001
 dbDrop orionld
-brokerStart CB 212-249 IPv4 -multiservice -experimental
+orionldStart CB -multiservice -experimental
 
 --SHELL--
 

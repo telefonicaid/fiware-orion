@@ -24,9 +24,8 @@
 Issue 1016 - wrong context in Link header of the response
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

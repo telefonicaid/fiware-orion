@@ -25,9 +25,8 @@ Entity with GeoProperty having sub-attributes - checking their compaction in GET
 
 --SHELL-INIT--
 # Copied from ngsild_entity_with_geoproperty_with_subattrs.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

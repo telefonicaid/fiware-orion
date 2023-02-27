@@ -25,7 +25,7 @@ Handle errors of Context Source Registrations GET
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

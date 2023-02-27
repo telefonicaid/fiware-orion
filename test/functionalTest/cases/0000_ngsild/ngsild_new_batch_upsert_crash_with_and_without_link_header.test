@@ -25,10 +25,9 @@ Batch Upsert Crash - for request with context in both payload and Link header
 
 --SHELL-INIT--
 # Copied from ngsild_batch_upsert_crash_with_and_without_link_header.test
-export BROKER=orionld
 dbInit CB
 dbInit CB smartmaas001
-brokerStart CB 0 IPv4 -multiservice -experimental
+orionldStart CB -multiservice -experimental
 
 --SHELL--
 

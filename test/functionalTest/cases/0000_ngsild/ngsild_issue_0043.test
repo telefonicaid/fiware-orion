@@ -24,9 +24,8 @@
 Issue #43 - createdAt/modifiedAt incorrectly reported as invalid
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 212-254
+orionldStart CB
 
 --SHELL--
 

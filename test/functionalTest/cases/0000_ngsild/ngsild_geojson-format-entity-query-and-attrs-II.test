@@ -24,9 +24,8 @@
 Entity query in the GeoJSON format WITH URI param attrs not including the geometryProperty, that is location
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0
+orionldStart CB
 
 --SHELL--
 

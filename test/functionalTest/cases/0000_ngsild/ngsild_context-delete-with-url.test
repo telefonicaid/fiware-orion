@@ -24,10 +24,9 @@
 Delete a @context from the context cache with the URL
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

@@ -25,9 +25,8 @@ Adding a Relationship with metadata, then changing+adding metadata
 
 --SHELL-INIT--
 # Copied from ngsild_updated_relationship_with_metadata.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

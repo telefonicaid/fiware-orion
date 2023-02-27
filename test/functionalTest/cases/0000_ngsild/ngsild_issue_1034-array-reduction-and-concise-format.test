@@ -24,9 +24,8 @@
 Concise Attribute Format and Array Reduction
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 #

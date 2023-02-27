@@ -24,9 +24,8 @@
 Issue 160 says GET without Accept gives application/ld+json back. This test proves it does not
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 --prettyPrint
+orionldStart CB
 
 --SHELL--
 

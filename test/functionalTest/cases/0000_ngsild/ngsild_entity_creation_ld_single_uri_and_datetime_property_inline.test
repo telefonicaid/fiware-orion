@@ -24,9 +24,8 @@
 Entity Creation - should create an entity with JSON-LD @context as single URI, DateTime Property inline
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 --prettyPrint
+orionldStart CB
 
 --SHELL--
 

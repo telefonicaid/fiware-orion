@@ -24,9 +24,8 @@
 Getting registrations with the attrs=attrs1,attrs2,attrsX URI param
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

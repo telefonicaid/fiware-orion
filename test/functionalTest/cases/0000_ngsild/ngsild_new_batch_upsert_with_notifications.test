@@ -24,9 +24,8 @@
 Entity Batch Upsert Create+Replace+Update with 3 instances of the same entity and two entities - AND Notifications
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 accumulatorStart --pretty-print 127.0.0.1 $LISTENER_PORT
 
 --SHELL--

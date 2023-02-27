@@ -25,9 +25,8 @@ Batch Upsert complains about correct entity type
 
 --SHELL-INIT--
 # Copied from ngsild_issue_0393.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

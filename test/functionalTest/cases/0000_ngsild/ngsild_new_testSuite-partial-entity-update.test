@@ -25,9 +25,8 @@ NGSi-LD Test Suite - Partial Entity Attribute Update
 
 --SHELL-INIT--
 # Copied from ngsild_testSuite-partial-entity-update.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

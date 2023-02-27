@@ -24,9 +24,8 @@
 Subscription Creations and Patch with receiverInfo
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 
@@ -128,7 +127,7 @@ echo
 echo "07. Restart broker"
 echo "=================="
 brokerStop CB
-brokerStart CB
+orionldStart CB
 echo
 echo
 

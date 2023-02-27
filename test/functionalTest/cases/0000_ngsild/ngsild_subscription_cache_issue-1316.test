@@ -24,10 +24,9 @@
 Subscription Creation Error - issue #1317
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CB t_02
-brokerStart CB 0 IPv4 -experimental -multiservice
+orionldStart CB -experimental -multiservice
 
 --SHELL--
 
@@ -78,7 +77,7 @@ echo
 echo "03. Restart the broker"
 echo "======================"
 brokerStop CB
-brokerStart CB 0 IPv4 -experimental -multiservice
+orionldStart CB -experimental -multiservice
 echo
 echo
 

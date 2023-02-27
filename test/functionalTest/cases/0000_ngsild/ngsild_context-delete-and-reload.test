@@ -24,10 +24,9 @@
 Delete AND RELOAD a @context from the context cache 
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

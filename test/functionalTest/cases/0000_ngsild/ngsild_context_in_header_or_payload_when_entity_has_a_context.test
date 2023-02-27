@@ -24,9 +24,8 @@
 context in Link HTTP Header if application/json, in payload if application/ld+json
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

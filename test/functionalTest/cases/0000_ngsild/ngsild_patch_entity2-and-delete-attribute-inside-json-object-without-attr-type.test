@@ -24,9 +24,8 @@
 Update an entity using Real PATCH - delete attribute with attr: { value: "urn:ngsi-ld:null" } and with attribute type present
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 #

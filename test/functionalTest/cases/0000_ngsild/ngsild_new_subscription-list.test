@@ -24,10 +24,9 @@
 Subscription Creation and DB Content
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbInit CB t1
-brokerStart CB 0 IPv4 -experimental -multiservice
+orionldStart CB -experimental -multiservice
 
 --SHELL--
 

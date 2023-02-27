@@ -25,9 +25,8 @@ Registration with an array of entity types, without entity ID
 
 --SHELL-INIT--
 # Copied from ngsild_reg_with_only_entity_types.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

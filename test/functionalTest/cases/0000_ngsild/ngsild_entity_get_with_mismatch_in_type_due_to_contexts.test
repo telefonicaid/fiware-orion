@@ -24,9 +24,8 @@
 Entity created with Type T_Query and context that defines it. Then a query with T_Query but without context - no match
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 243,246-247
+orionldStart CB
 
 --SHELL--
 

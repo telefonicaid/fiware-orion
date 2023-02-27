@@ -24,9 +24,8 @@
 Attribute Deletion and its context
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 --prettyPrint
+orionldStart CB
 
 --SHELL--
 

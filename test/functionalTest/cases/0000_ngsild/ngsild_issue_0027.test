@@ -24,9 +24,8 @@
 If a target entity does not exist an append entity attributes request must result in a 404 
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

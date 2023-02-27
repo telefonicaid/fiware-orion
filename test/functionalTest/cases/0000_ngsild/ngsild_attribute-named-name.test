@@ -24,9 +24,8 @@
 An attribute named 'name' should get a long-name in the database
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 

@@ -24,9 +24,8 @@
 GET registration by id with mandatory values
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

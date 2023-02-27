@@ -24,9 +24,8 @@
 Notifications via MQTT: Issue #1178
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic example_mosquitto_topic
 
 --SHELL--

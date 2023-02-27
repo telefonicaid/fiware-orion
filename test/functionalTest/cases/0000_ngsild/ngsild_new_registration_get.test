@@ -25,9 +25,8 @@ GET registration by id
 
 --SHELL-INIT--
 # Copied from ngsild_registration_get.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 
@@ -131,7 +130,7 @@ echo
 echo "04. Restart the broker (reg-cache re-read at startup)"
 echo "====================================================="
 brokerStop CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 sleep 1
 echo
 echo

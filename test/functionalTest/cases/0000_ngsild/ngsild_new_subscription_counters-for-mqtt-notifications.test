@@ -24,9 +24,8 @@
 Subscription Counters and timestamps for MQTT notifications
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental -cSubCounters 5
+orionldStart CB -experimental -cSubCounters 5
 mqttTestClientStart --mqttBrokerPort $MQTT_BROKER_PORT --mqttBrokerIp $MQTT_BROKER_HOST --pretty-print --mqttTopic entities
 
 --SHELL--
@@ -170,7 +169,7 @@ echo "13. Restart broker"
 echo "=================="
 brokerStop
 sleep .5
-brokerStart CB 0 IPv4 -experimental -cSubCounters 5
+orionldStart CB -experimental -cSubCounters 5
 echo
 echo
 

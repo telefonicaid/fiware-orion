@@ -24,9 +24,8 @@
 Entity with a DateTime Property as compound with @type and @value
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255 --prettyPrint
+orionldStart CB
 
 --SHELL--
 

@@ -24,9 +24,8 @@
 Entity Creation that crashes the broker
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

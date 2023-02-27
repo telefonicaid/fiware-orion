@@ -24,9 +24,8 @@
 Performance tests for GET /ngsi-ld/v1/entities/{entityId}
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0
+orionldStart CB
 
 typeset -i eNo
 eNo=1

@@ -24,9 +24,8 @@
 Issue #1050, part 4 - deletion with json literal
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 

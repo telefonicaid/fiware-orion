@@ -24,9 +24,8 @@
 All specified temporal representation requests should return 501
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB
+orionldStart CB
 
 --SHELL--
 

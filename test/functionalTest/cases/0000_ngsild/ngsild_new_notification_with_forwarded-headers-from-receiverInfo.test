@@ -24,9 +24,8 @@
 Notification with forwarded headers fron receiverInfo og the subscription
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -multiservice -experimental
+orionldStart CB -multiservice -experimental
 accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 --SHELL--

@@ -24,10 +24,9 @@
 Pagination and offset of 100
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB 0
+orionldStart CB
 
 --SHELL--
 

@@ -25,9 +25,8 @@ Attempt to change entity type during a Batch Update
 
 --SHELL-INIT--
 #Copied from ngsild_batch_update-attempt_to_change_entity_type.test
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0 IPv4 -experimental
+orionldStart CB -experimental
 
 --SHELL--
 #

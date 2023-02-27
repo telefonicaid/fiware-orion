@@ -24,9 +24,8 @@
 Notifications - value of sub-properties that are compound
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
-brokerStart CB 0-255
+orionldStart CB
 accumulatorStart --pretty-print
 
 --SHELL--

@@ -24,10 +24,9 @@
 Alternative Context implementation - inline context that is just a key-value object
 
 --SHELL-INIT--
-export BROKER=orionld
 dbInit CB
 dbDrop orionld
-brokerStart CB 0-255
+orionldStart CB
 
 --SHELL--
 
