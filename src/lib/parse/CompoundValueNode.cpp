@@ -253,7 +253,7 @@ std::string CompoundValueNode::finish(void)
 {
   error = "OK";
 
-  if (lmTraceIsSet(LmtCompoundValueShow))
+  if (lmTraceIsSet(LmtLegacy))
   {
     show("");
   }
@@ -406,31 +406,31 @@ void CompoundValueNode::shortShow(const std::string& indent)
 {
   if ((rootP == this) && (valueType == orion::ValueTypeVector))
   {
-    LM_T(LmtCompoundValue,      ("%s%s (toplevel vector)",
+    LM_T(LmtLegacy,      ("%s%s (toplevel vector)",
                                  indent.c_str(),
                                  name.c_str()));
   }
   else if (rootP == this)
   {
-    LM_T(LmtCompoundValue,      ("%s%s (toplevel object)",
+    LM_T(LmtLegacy,      ("%s%s (toplevel object)",
                                  indent.c_str(),
                                  name.c_str()));
   }
   else if (valueType == orion::ValueTypeVector)
   {
-    LM_T(LmtCompoundValue,      ("%s%s (vector)",
+    LM_T(LmtLegacy,      ("%s%s (vector)",
                                  indent.c_str(),
                                  name.c_str()));
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    LM_T(LmtCompoundValue,      ("%s%s (object)",
+    LM_T(LmtLegacy,      ("%s%s (object)",
                                  indent.c_str(),
                                  name.c_str()));
   }
   else if (valueType == orion::ValueTypeString)
   {
-    LM_T(LmtCompoundValue,      ("%s%s (%s)",
+    LM_T(LmtLegacy,      ("%s%s (%s)",
                                  indent.c_str(),
                                  name.c_str(),
                                  stringValue.c_str()));
@@ -438,7 +438,7 @@ void CompoundValueNode::shortShow(const std::string& indent)
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    LM_T(LmtCompoundValue,      ("%s%s (%s)",
+    LM_T(LmtLegacy,      ("%s%s (%s)",
                                  indent.c_str(),
                                  name.c_str(),
                                  (boolValue == true)? "true" : "false"));
@@ -446,21 +446,21 @@ void CompoundValueNode::shortShow(const std::string& indent)
   }
   else if (valueType == orion::ValueTypeNull)
   {
-    LM_T(LmtCompoundValue,      ("%s%s (null)",
+    LM_T(LmtLegacy,      ("%s%s (null)",
                                  indent.c_str(),
                                  name.c_str()));
     return;
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    LM_T(LmtCompoundValue,      ("%s%s (not given)",
+    LM_T(LmtLegacy,      ("%s%s (not given)",
                                  indent.c_str(),
                                  name.c_str()));
     return;
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    LM_T(LmtCompoundValue,      ("%s%s (%f)",
+    LM_T(LmtLegacy,      ("%s%s (%f)",
                                  indent.c_str(),
                                  name.c_str(),
                                  numberValue));
@@ -483,56 +483,56 @@ void CompoundValueNode::show(const std::string& indent)
 {
   if (name != "")
   {
-    LM_T(LmtCompoundValueShow, ("%sname:      %s",
+    LM_T(LmtLegacy, ("%sname:      %s",
                                 indent.c_str(),
                                 name.c_str()));
   }
 
-  LM_T(LmtCompoundValueShow, ("%scontainer: %s",
+  LM_T(LmtLegacy, ("%scontainer: %s",
                               indent.c_str(),
                               container->name.c_str()));
-  LM_T(LmtCompoundValueShow, ("%slevel:     %d",
+  LM_T(LmtLegacy, ("%slevel:     %d",
                               indent.c_str(),
                               level));
-  LM_T(LmtCompoundValueShow, ("%ssibling:   %d",
+  LM_T(LmtLegacy, ("%ssibling:   %d",
                               indent.c_str(),
                               siblingNo));
-  LM_T(LmtCompoundValueShow, ("%stype:      %s",
+  LM_T(LmtLegacy, ("%stype:      %s",
                               indent.c_str(),
                               orion::valueTypeName(valueType)));
-  LM_T(LmtCompoundValueShow, ("%spath:      %s",
+  LM_T(LmtLegacy, ("%spath:      %s",
                               indent.c_str(),
                               path.c_str()));
-  LM_T(LmtCompoundValueShow, ("%srootP:     %s",
+  LM_T(LmtLegacy, ("%srootP:     %s",
                               indent.c_str(),
                               rootP->name.c_str()));
 
   if (valueType == orion::ValueTypeString)
   {
-    LM_T(LmtCompoundValueShow, ("%sString Value:     %s",
+    LM_T(LmtLegacy, ("%sString Value:     %s",
                                 indent.c_str(),
                                 stringValue.c_str()));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    LM_T(LmtCompoundValueShow, ("%sBool Value:     %s",
+    LM_T(LmtLegacy, ("%sBool Value:     %s",
                                 indent.c_str(),
                                 (boolValue == false)? "false" : "true"));
   }
   else if (valueType == orion::ValueTypeNumber)
   {
-    LM_T(LmtCompoundValueShow, ("%sNumber Value:     %f",
+    LM_T(LmtLegacy, ("%sNumber Value:     %f",
                                 indent.c_str(),
                                 numberValue));
   }
   else if (valueType == orion::ValueTypeNull)
   {
-    LM_T(LmtCompoundValueShow, ("%sNull",
+    LM_T(LmtLegacy, ("%sNull",
                                 indent.c_str()));
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
-    LM_T(LmtCompoundValueShow, ("%sNotGiven",
+    LM_T(LmtLegacy, ("%sNotGiven",
                                 indent.c_str()));
   }
   else if (childV.size() != 0)
@@ -548,7 +548,7 @@ void CompoundValueNode::show(const std::string& indent)
       }
     }
 
-    LM_T(LmtCompoundValueShow, ("%s%lu children (%s)",
+    LM_T(LmtLegacy, ("%s%lu children (%s)",
                                 indent.c_str(),
                                 childV.size(),
                                 childrenString.c_str()));
@@ -559,7 +559,7 @@ void CompoundValueNode::show(const std::string& indent)
     }
   }
 
-  LM_T(LmtCompoundValueShow, (""));
+  LM_T(LmtLegacy, (""));
 }
 
 

@@ -324,7 +324,7 @@ HttpStatusCode mongoEntityTypesValues
   }
 
   // Processing result to build response
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
+  LM_T(LmtLegacy, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
 
@@ -348,7 +348,7 @@ HttpStatusCode mongoEntityTypesValues
     BSONObj     resultItem = resultsArray[ix].embeddedObject();
     std::string type;
 
-    LM_T(LmtMongo, ("result item[%d]: %s", ix, resultItem.toString().c_str()));
+    LM_T(LmtLegacy, ("result item[%d]: %s", ix, resultItem.toString().c_str()));
 
     if (getFieldF(&resultItem, "_id").isNull())
     {
@@ -618,8 +618,8 @@ HttpStatusCode mongoAttributesForEntityType
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
 
-  LM_T(LmtMongo, ("Query Types Attribute for <%s>", entityType.c_str()));
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", orionldState.uriParams.offset, orionldState.uriParams.limit, (count == true)? "true" : "false"));
+  LM_T(LmtLegacy, ("Query Types Attribute for <%s>", entityType.c_str()));
+  LM_T(LmtLegacy, ("Offset: %d, Limit: %d, Count: %s", orionldState.uriParams.offset, orionldState.uriParams.limit, (count == true)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types attributes request", SemReadOp, &reqSemTaken);
 
@@ -674,7 +674,7 @@ HttpStatusCode mongoAttributesForEntityType
   }
 
   /* Processing result to build response */
-  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
+  LM_T(LmtLegacy, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = std::vector<BSONElement>();
 

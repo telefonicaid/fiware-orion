@@ -48,7 +48,6 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse() : e
 */
 SubscribeContextAvailabilityResponse::~SubscribeContextAvailabilityResponse()
 {
-   LM_T(LmtDestructor,("destroyed"));
 }
 
 

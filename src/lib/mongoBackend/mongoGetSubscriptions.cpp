@@ -379,7 +379,7 @@ void mongoListSubscriptions
 
   reqSemTake(__FUNCTION__, "Mongo List Subscriptions", SemReadOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Mongo List Subscriptions"));
+  LM_T(LmtLegacy, ("Mongo List Subscriptions"));
 
   /* ONTIMEINTERVAL subscriptions are not part of NGSIv2, so they are excluded.
    * Note that expiration is not taken into account (in the future, a q= query
@@ -430,7 +430,7 @@ void mongoListSubscriptions
     }
 
     docs++;
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    LM_T(LmtLegacy, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     Subscription  sub;
 
@@ -477,7 +477,7 @@ void mongoGetSubscription
 
   reqSemTake(__FUNCTION__, "Mongo Get Subscription", SemReadOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Mongo Get Subscription"));
+  LM_T(LmtLegacy, ("Mongo Get Subscription"));
 
   std::auto_ptr<DBClientCursor>  cursor;
   BSONObj                        q = BSON("_id" << oid);
@@ -507,7 +507,7 @@ void mongoGetSubscription
       *oe = OrionError(SccReceiverInternalError, std::string("exception in nextSafe(): ") + err.c_str());
       return;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtLegacy, ("retrieved document: '%s'", r.toString().c_str()));
 
     extractSubscriptionId(subP, &r);
     extractDescription(subP, &r);
@@ -519,7 +519,7 @@ void mongoGetSubscription
     {
       releaseMongoConnection(connection);
       // Ooops, we expect only one
-      LM_T(LmtMongo, ("more than one subscription: '%s'", idSub.c_str()));
+      LM_T(LmtLegacy, ("more than one subscription: '%s'", idSub.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *oe = OrionError(SccConflict);
 
@@ -529,7 +529,7 @@ void mongoGetSubscription
   else
   {
     releaseMongoConnection(connection);
-    LM_T(LmtMongo, ("subscription not found: '%s'", idSub.c_str()));
+    LM_T(LmtLegacy, ("subscription not found: '%s'", idSub.c_str()));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *oe = OrionError(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
 
@@ -593,7 +593,7 @@ bool mongoGetLdSubscription
       *statusCodeP = 500;
       return false;
     }
-    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+    LM_T(LmtLegacy, ("retrieved document: '%s'", r.toString().c_str()));
 
     extractSubscriptionIdAsString(subP, &r);
     extractDescription(subP, &r);
@@ -615,7 +615,7 @@ bool mongoGetLdSubscription
       releaseMongoConnection(connection);
 
       // Ooops, we expected only one
-      LM_T(LmtMongo, ("more than one subscription: '%s'", subId));
+      LM_T(LmtLegacy, ("more than one subscription: '%s'", subId));
       reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
       *detailsP    = (char*) "more than one subscription matched";
       *statusCodeP = 409;
@@ -625,7 +625,7 @@ bool mongoGetLdSubscription
   else
   {
     releaseMongoConnection(connection);
-    LM_T(LmtMongo, ("subscription not found: '%s'", subId));
+    LM_T(LmtLegacy, ("subscription not found: '%s'", subId));
     reqSemGive(__FUNCTION__, "Mongo Get Subscription", reqSemTaken);
     *detailsP    = (char*) "subscription not found";
     *statusCodeP = 404;
@@ -658,7 +658,7 @@ bool mongoGetLdSubscriptions
 
   reqSemTake(__FUNCTION__, "Mongo GET Subscriptions", SemReadOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("Mongo GET Subscriptions"));
+  LM_T(LmtLegacy, ("Mongo GET Subscriptions"));
 
   /* ONTIMEINTERVAL subscriptions are not part of NGSIv2, so they are excluded.
    * Note that expiration is not taken into account (in the future, a q= query
@@ -711,7 +711,7 @@ bool mongoGetLdSubscriptions
     }
 
     docs++;
-    LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
+    LM_T(LmtLegacy, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     Subscription s;
 

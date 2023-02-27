@@ -48,7 +48,7 @@ namespace orion
 */
 void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
 {
-  LM_T(LmtCompoundValue, ("Compound END"));
+  LM_T(LmtLegacy, ("Compound END"));
 
   // Finish the compound value - error check included
   std::string status = orionldState.compoundValueRoot->finish();
@@ -75,9 +75,9 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   // owner of this compound value tree.
   //
 
-  LM_T(LmtCompoundValue, ("Set compoundValueP (%p) for attribute at %p",
-                          orionldState.compoundValueRoot,
-                          parseDataP->lastContextAttribute));
+  LM_T(LmtLegacy, ("Set compoundValueP (%p) for attribute at %p",
+                   orionldState.compoundValueRoot,
+                   parseDataP->lastContextAttribute));
 
   //
   // Special case for updateContextAttributeRequest. This payload has no

@@ -45,7 +45,6 @@ Timer::~Timer(void)
   // Compilation fails when a warning occurs, and it is enabled
   // compilation option -Werror "warnings being treated as errors"
   //
-  LM_T(LmtNotImplemented, ("Timer destructor not implemented"));
 }
 
 

@@ -487,7 +487,6 @@ void setNotifier(Notifier* n)
 void setDbPrefix(const std::string& _dbPrefix)
 {
   dbPrefix = _dbPrefix;
-  // LM_T(LmtBug, ("Set dbPrefix to '%s'", dbPrefix.c_str()));
 }
 
 
@@ -593,7 +592,6 @@ void ensureLocationIndex(OrionldTenant* tenantP)
     std::string err;
 
     collectionCreateIndex(tenantP->entities, BSON(index << "2dsphere"), false, &err);
-    // LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenantP->tenant));
   }
 }
 
@@ -612,7 +610,6 @@ void ensureDateExpirationIndex(OrionldTenant* tenantP)
     std::string err;
 
     collectionCreateIndex(tenantP->entities, BSON(index << 1), true, &err);
-    // LM_T(LmtMongo, ("ensuring TTL date expiration index on %s (tenant %s)", index.c_str(), tenantP->tenant));
   }
 }
 
@@ -1505,8 +1502,6 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
 
-    // LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-
     PERFORMANCE_BEGIN(8, "entitiesQuery, part 8");
     ContextElementResponse*  cer = new ContextElementResponse(&r, attrL, includeEmpty, apiVersion);
     PERFORMANCE_END(8, NULL);
@@ -1931,7 +1926,6 @@ bool registrationsQuery
       continue;
     }
     docs++;
-    // LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
     MimeType                  mimeType = JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(&r, REG_CONTEXT_REGISTRATION).Array();

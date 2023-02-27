@@ -250,7 +250,7 @@ double getCurrentTime(void)
 {
   if (getTimer() == NULL)
   {
-    LM_T(LmtSoftError, ("getTimer() == NULL - calling exit function for library user"));
+    LM_W(("getTimer() == NULL - calling exit function for library user"));
     orionExitFunction(1, "getTimer() == NULL");
     return -1;
   }

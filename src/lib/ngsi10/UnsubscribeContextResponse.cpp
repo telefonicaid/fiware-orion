@@ -36,7 +36,6 @@
 */
 UnsubscribeContextResponse::UnsubscribeContextResponse()
 {
-   LM_T(LmtDestructor,("created"));
 }
 
 
@@ -59,7 +58,6 @@ UnsubscribeContextResponse::UnsubscribeContextResponse(StatusCode& _statusCode)
 */
 UnsubscribeContextResponse::~UnsubscribeContextResponse()
 {
-  LM_T(LmtDestructor,("destroyed"));
 }
 
 /* ****************************************************************************

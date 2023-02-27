@@ -48,7 +48,7 @@
 */
 static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata"));
+  LM_T(LmtLegacy, ("Got a metadata"));
   reqData->rpr.metadataP = new Metadata();
   reqData->rpr.res.metadataVector.push_back(reqData->rpr.metadataP);
   return "OK";
@@ -63,7 +63,7 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 */
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata name '%s'", value.c_str()));
   reqData->rpr.metadataP->name = value;
   return "OK";
 }
@@ -76,7 +76,7 @@ static std::string contextMetadataName(const std::string& path, const std::strin
 */
 static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata type '%s'", value.c_str()));
   reqData->rpr.metadataP->type = value;
   return "OK";
 }
@@ -90,7 +90,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 */
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata value '%s'", value.c_str()));
   reqData->rpr.metadataP->stringValue = value;
   reqData->rpr.metadataP->valueType = orion::ValueTypeString;
   return "OK";
@@ -104,7 +104,7 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 */
 static std::string duration(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a duration '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a duration '%s'", value.c_str()));
   reqData->rpr.res.duration.set(value);
   return "OK";
 }
@@ -117,7 +117,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 */
 static std::string providingApplication(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a providingApplication '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a providingApplication '%s'", value.c_str()));
   reqData->rpr.res.providingApplication.set(value);
   return "OK";
 }
@@ -130,7 +130,7 @@ static std::string providingApplication(const std::string& path, const std::stri
 */
 static std::string registrationId(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a registrationId '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a registrationId '%s'", value.c_str()));
   reqData->rpr.res.registrationId.set(value);
   return "OK";
 }

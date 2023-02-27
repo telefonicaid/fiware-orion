@@ -62,7 +62,7 @@ static HttpStatusCode processDiscoverContextAvailability
   std::string  err;
   long long    count = -1;
 
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+  LM_T(LmtLegacy, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
   if (!registrationsQuery(requestP->entityIdVector,
                           requestP->attributeList,
@@ -138,7 +138,7 @@ HttpStatusCode mongoDiscoverContextAvailability
 
   reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request", SemReadOp, &reqSemTaken);
 
-  LM_T(LmtMongo, ("DiscoverContextAvailability Request"));
+  LM_T(LmtLegacy, ("DiscoverContextAvailability Request"));
 
   HttpStatusCode hsCode = processDiscoverContextAvailability(requestP,
                                                              responseP,

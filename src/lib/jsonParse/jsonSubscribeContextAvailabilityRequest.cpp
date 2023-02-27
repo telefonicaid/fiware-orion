@@ -44,17 +44,17 @@
 */
 static std::string entityId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
+  LM_T(LmtLegacy, ("%s: %s", path.c_str(), value.c_str()));
 
   reqDataP->scar.entityIdP = new EntityId();
 
-  LM_T(LmtNew, ("New entityId at %p", reqDataP->scar.entityIdP));
+  LM_T(LmtLegacy, ("New entityId at %p", reqDataP->scar.entityIdP));
   reqDataP->scar.entityIdP->id        = "";
   reqDataP->scar.entityIdP->type      = "";
   reqDataP->scar.entityIdP->isPattern = "false";
 
   reqDataP->scar.res.entityIdVector.push_back(reqDataP->scar.entityIdP);
-  LM_T(LmtNew, ("After push_back"));
+  LM_T(LmtLegacy, ("After push_back"));
 
   return "OK";
 }
@@ -68,7 +68,7 @@ static std::string entityId(const std::string& path, const std::string& value, P
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->scar.entityIdP->id = value;
-  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->scar.entityIdP->id.c_str()));
+  LM_T(LmtLegacy, ("Set 'id' to '%s' for an entity", reqDataP->scar.entityIdP->id.c_str()));
 
   return "OK";
 }
@@ -82,7 +82,7 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->scar.entityIdP->type = value;
-  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->scar.entityIdP->type.c_str()));
+  LM_T(LmtLegacy, ("Set 'type' to '%s' for an entity", reqDataP->scar.entityIdP->type.c_str()));
 
   return "OK";
 }
@@ -95,7 +95,7 @@ static std::string entityIdType(const std::string& path, const std::string& valu
 */
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
   {
@@ -115,7 +115,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an attribute: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attribute: '%s'", value.c_str()));
 
   reqDataP->scar.res.attributeList.push_back(value);
 
@@ -130,7 +130,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 */
 static std::string reference(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a reference: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a reference: '%s'", value.c_str()));
 
   reqDataP->scar.res.reference.set(value);
 
@@ -147,7 +147,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 {
   std::string s;
 
-  LM_T(LmtParse, ("Got a duration: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a duration: '%s'", value.c_str()));
 
   reqDataP->scar.res.duration.set(value);
 
@@ -170,7 +170,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 */
 static std::string restriction(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a restriction"));
+  LM_T(LmtLegacy, ("Got a restriction"));
 
   ++reqDataP->scar.res.restrictions;
 
@@ -185,7 +185,7 @@ static std::string restriction(const std::string& path, const std::string& value
 */
 static std::string attributeExpression(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got an attributeExpression: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got an attributeExpression: '%s'", value.c_str()));
 
   reqDataP->scar.res.restriction.attributeExpression.set(value);
 
@@ -200,7 +200,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 */
 static std::string scope(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a scope"));
+  LM_T(LmtLegacy, ("Got a scope"));
 
   reqDataP->scar.scopeP = new Scope();
   reqDataP->scar.res.restriction.scopeVector.push_back(reqDataP->scar.scopeP);
@@ -216,7 +216,7 @@ static std::string scope(const std::string& path, const std::string& value, Pars
 */
 static std::string scopeType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a scope type: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a scope type: '%s'", value.c_str()));
   reqDataP->scar.scopeP->type = value;
   return "OK";
 }
@@ -229,7 +229,7 @@ static std::string scopeType(const std::string& path, const std::string& value, 
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a scope value: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a scope value: '%s'", value.c_str()));
   reqDataP->scar.scopeP->value = value;
   return "OK";
 }

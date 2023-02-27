@@ -60,9 +60,7 @@ std::string getContextEntityTypeAttribute
   std::string  attributeName  = (compV.size() == 6)? compV[5] : compV[4];
   std::string  answer;
 
-  LM_T(LmtConvenience,
-       ("CONVENIENCE: got a  'GET' request for entity type '%s', attribute: '%s'",
-        entityType.c_str(), attributeName.c_str()));
+  LM_T(LmtSR, ("CONVENIENCE: got a  'GET' request for entity type '%s', attribute: '%s'", entityType.c_str(), attributeName.c_str()));
 
   //
   // 1. Fill in parseDataP->dcar.res to pass to postDiscoverContextAvailability

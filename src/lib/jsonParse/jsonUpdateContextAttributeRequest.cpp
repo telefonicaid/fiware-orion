@@ -74,7 +74,7 @@ static std::string attributeValue(const std::string& path, const std::string& va
 */
 static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Creating a metadata"));
+  LM_T(LmtLegacy, ("Creating a metadata"));
   reqData->upcar.metadataP = new Metadata();
   reqData->upcar.res.metadataVector.push_back(reqData->upcar.metadataP);
   return "OK";
@@ -88,7 +88,7 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 */
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata name: '%s'", value.c_str()));
   reqData->upcar.metadataP->name = value;
   return "OK";
 }
@@ -101,7 +101,7 @@ static std::string contextMetadataName(const std::string& path, const std::strin
 */
 static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata type: '%s'", value.c_str()));
   reqData->upcar.metadataP->type = value;
   reqData->upcar.metadataP->typeGiven = true;
   return "OK";
@@ -115,7 +115,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 */
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
+  LM_T(LmtLegacy, ("Got a metadata value: '%s'", value.c_str()));
   reqData->upcar.metadataP->stringValue = value;
   reqData->upcar.metadataP->valueType = orion::ValueTypeString;
   return "OK";

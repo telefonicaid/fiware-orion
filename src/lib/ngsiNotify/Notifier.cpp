@@ -75,7 +75,6 @@ Notifier::~Notifier (void)
   //     -Werror "warnings being treated as errors"
   //   is enabled
   //
-  LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
 }
 
 

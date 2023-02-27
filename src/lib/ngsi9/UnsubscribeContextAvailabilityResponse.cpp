@@ -67,7 +67,6 @@ UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse(S
 */
 UnsubscribeContextAvailabilityResponse::~UnsubscribeContextAvailabilityResponse()
 {
-   LM_T(LmtDestructor, ("destroyed"));
 }
 
 /* ****************************************************************************

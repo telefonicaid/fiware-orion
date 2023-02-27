@@ -81,7 +81,7 @@ static void setExpiration(const SubscriptionUpdate& subUp, const BSONObj& subOri
       double expires = getNumberFieldAsDoubleF(&subOrig, CSUB_EXPIRATION);
 
       b->append(CSUB_EXPIRATION, expires);
-      LM_T(LmtMongo, ("Subscription expiration: %f", expires));
+      LM_T(LmtLegacy, ("Subscription expiration: %f", expires));
     }
   }
 }
@@ -107,15 +107,15 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
     b->append(CSUB_REFERENCE, reference);
     b->append(CSUB_CUSTOM,    custom);
 
-    LM_T(LmtMongo, ("Subscription reference: %s", reference.c_str()));
-    LM_T(LmtMongo, ("Subscription custom:    %s", custom? "true" : "false"));
+    LM_T(LmtLegacy, ("Subscription reference: %s", reference.c_str()));
+    LM_T(LmtLegacy, ("Subscription custom:    %s", custom? "true" : "false"));
 
     if (subOrig.hasField(CSUB_METHOD))
     {
       std::string method = getStringFieldF(&subOrig, CSUB_METHOD);
 
       b->append(CSUB_METHOD, method);
-      LM_T(LmtMongo, ("Subscription method: %s", method.c_str()));
+      LM_T(LmtLegacy, ("Subscription method: %s", method.c_str()));
     }
 
     if (subOrig.hasField(CSUB_HEADERS))
@@ -124,7 +124,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
       getObjectFieldF(&headers, &subOrig, CSUB_HEADERS);
 
       b->append(CSUB_HEADERS, headers);
-      LM_T(LmtMongo, ("Subscription headers: %s", headers.toString().c_str()));
+      LM_T(LmtLegacy, ("Subscription headers: %s", headers.toString().c_str()));
     }
 
     if (subOrig.hasField(CSUB_QS))
@@ -133,7 +133,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
       getObjectFieldF(&qs, &subOrig, CSUB_QS);
 
       b->append(CSUB_QS, qs);
-      LM_T(LmtMongo, ("Subscription qs: %s", qs.toString().c_str()));
+      LM_T(LmtLegacy, ("Subscription qs: %s", qs.toString().c_str()));
     }
 
     if (subOrig.hasField(CSUB_PAYLOAD))
@@ -141,7 +141,7 @@ static void setHttpInfo(const SubscriptionUpdate& subUp, const BSONObj& subOrig,
       std::string payload = getStringFieldF(&subOrig, CSUB_PAYLOAD);
 
       b->append(CSUB_PAYLOAD, payload);
-      LM_T(LmtMongo, ("Subscription payload: %s", payload.c_str()));
+      LM_T(LmtLegacy, ("Subscription payload: %s", payload.c_str()));
     }
   }
 }
@@ -165,7 +165,7 @@ static void setThrottling(const SubscriptionUpdate& subUp, const BSONObj& subOri
       double throttling = getNumberFieldAsDoubleF(&subOrig, CSUB_THROTTLING);
 
       b->append(CSUB_THROTTLING, throttling);
-      LM_T(LmtMongo, ("Subscription throttling: %f", throttling));
+      LM_T(LmtLegacy, ("Subscription throttling: %f", throttling));
     }
   }
 }
@@ -189,7 +189,7 @@ static void setDescription(const SubscriptionUpdate& subUp, const BSONObj& subOr
       std::string description = getStringFieldF(&subOrig, CSUB_DESCRIPTION);
 
       b->append(CSUB_DESCRIPTION, description);
-      LM_T(LmtMongo, ("Subscription description: %s", description.c_str()));
+      LM_T(LmtLegacy, ("Subscription description: %s", description.c_str()));
     }
   }
 }
@@ -213,7 +213,7 @@ static void setStatus(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
       std::string status = getStringFieldF(&subOrig, CSUB_STATUS);
 
       b->append(CSUB_STATUS, status);
-      LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
+      LM_T(LmtLegacy, ("Subscription status: %s", status.c_str()));
     }
   }
 }
@@ -356,7 +356,7 @@ static void setCondsAndInitialNotifyNgsiv1
                                             sub.notification.blacklist);
 
   b->append(CSUB_CONDITIONS, conds);
-  LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
+  LM_T(LmtLegacy, ("Subscription conditions: %s", conds.toString().c_str()));
 }
 
 
@@ -622,7 +622,7 @@ static void setExpression(const SubscriptionUpdate& subUp, const BSONObj& subOri
                         CSUB_EXPR_GEOREL << "");
     }
     b->append(CSUB_EXPR, expression);
-    LM_T(LmtMongo, ("Subscription expression: %s", expression.toString().c_str()));
+    LM_T(LmtLegacy, ("Subscription expression: %s", expression.toString().c_str()));
   }
 }
 
@@ -643,7 +643,7 @@ static void setFormat(const SubscriptionUpdate& subUp, const BSONObj& subOrig, B
     std::string format = getStringFieldF(&subOrig, CSUB_FORMAT);
 
     b->append(CSUB_FORMAT, format);
-    LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
+    LM_T(LmtLegacy, ("Subscription format: %s", format.c_str()));
   }
 }
 
@@ -664,7 +664,7 @@ static void setBlacklist(const SubscriptionUpdate& subUp, const BSONObj& subOrig
     bool bList = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(&subOrig, CSUB_BLACKLIST) : false;
 
     b->append(CSUB_BLACKLIST, bList);
-    LM_T(LmtMongo, ("Subscription blacklist: %s", bList? "true" : "false"));
+    LM_T(LmtLegacy, ("Subscription blacklist: %s", bList? "true" : "false"));
   }
 }
 
@@ -769,7 +769,7 @@ void updateInCache
   // Second lookup for the same in the mongo update subscription process.
   // However, we have to do it, as the item in the cache could have been changed in the meanwhile.
   //
-  LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
+  LM_T(LmtLegacy, ("update: %s", doc.toString().c_str()));
 
   CachedSubscription* subCacheP        = subCacheItemLookup(tenantP->tenant, subUp.id.c_str());
   char*               servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
@@ -822,7 +822,7 @@ void updateInCache
 
     if (subCacheP != NULL)
     {
-      LM_T(LmtSubCache, ("Calling subCacheItemRemove"));
+      LM_T(LmtLegacy, ("Calling subCacheItemRemove"));
       subCacheItemRemove(subCacheP);
     }
   }

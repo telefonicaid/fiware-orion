@@ -90,8 +90,6 @@ bool collectionQuery
     return false;
   }
 
-  // LM_T(LmtMongo, ("query() in '%s' collection: '%s'", col, q.toString().c_str()));
-
   try
   {
     *cursor = connection->query(col, q, 0, 0, 0, QueryOption_SlaveOk);
@@ -164,8 +162,6 @@ bool collectionRangedQuery
 
     return false;
   }
-
-  // LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'", col, limit, offset, q.toString().c_str()));
 
   try
   {
@@ -380,8 +376,6 @@ bool collectionInsert
     return false;
   }
 
-  // LM_T(LmtMongo, ("insert in '%s': '%s'", col, doc.toString().c_str()));
-
   try
   {
     connection->insert(col, doc);
@@ -450,8 +444,6 @@ bool collectionUpdate
     return false;
   }
 
-  // LM_T(LmtMongo, ("update() in '%s' collection: query='%s' doc='%s', upsert=%s", col, q.toString().c_str(), doc.toString().c_str(), FT(upsert)));
-
   try
   {
     connection->update(col, q, doc, upsert);
@@ -519,8 +511,6 @@ bool collectionRemove
     return false;
   }
 
-  // LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", col, q.toString().c_str()));
-
   try
   {
     connection->remove(col, q);
@@ -585,8 +575,6 @@ bool collectionCreateIndex
 
     return false;
   }
-
-  // LM_T(LmtMongo, ("createIndex() in '%s' collection: '%s'", col, indexes.toString().c_str()));
 
   try
   {
@@ -700,8 +688,6 @@ bool runCollectionCommand
     }
   }
 
-  // LM_T(LmtMongo, ("runCommand() in '%s' collection: '%s'", col, command.toString().c_str()));
-
   try
   {
     connection->runCommand(col, command, *result);
@@ -764,8 +750,6 @@ bool setWriteConcern
   std::string*         err
 )
 {
-  // LM_T(LmtMongo, ("setWriteConcern(): '%d'", wc.nodes()));
-
   try
   {
     connection->setWriteConcern(wc);
@@ -810,8 +794,6 @@ bool getWriteConcern
   std::string*   err
 )
 {
-  // LM_T(LmtMongo, ("getWriteConcern()"));
-
   try
   {
     *wc = connection->getWriteConcern();

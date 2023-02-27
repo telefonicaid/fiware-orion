@@ -45,7 +45,7 @@ TEST(CompoundValueNode, tree)
 
   utInit();
 
-  lmTraceLevelSet(LmtCompoundValueAdd, true);
+  lmTraceLevelSet(LmtLegacy, true);
   vec = tree->add(orion::ValueTypeVector, "vec", "");
 
   for (int ix = 0; ix < 5; ++ix)
@@ -70,7 +70,7 @@ TEST(CompoundValueNode, tree)
   delete tree;
   delete copy;
 
-  lmTraceLevelSet(LmtCompoundValueAdd, false);
+  lmTraceLevelSet(LmtLegacy, false);
   utExit();
 }
 
@@ -105,7 +105,7 @@ TEST(CompoundValueNode, typeName)
 */
 TEST(CompoundValueNode, vectorInvalidAndOk)
 {
-  lmTraceLevelSet(LmtCompoundValueAdd, true);
+  lmTraceLevelSet(LmtLegacy, true);
 
   orion::CompoundValueNode*  tree     = new orion::CompoundValueNode(orion::ValueTypeObject);
   orion::CompoundValueNode*  vec      = new orion::CompoundValueNode(tree, "/vec", "vec", "", 0, orion::ValueTypeVector, 1);
@@ -134,7 +134,7 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   tree->shortShow("");
   tree->show("");
 
-  lmTraceLevelSet(LmtCompoundValueAdd, false);
+  lmTraceLevelSet(LmtLegacy, false);
 
   delete tree;
 
@@ -150,7 +150,7 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
 */
 TEST(CompoundValueNode, structInvalidAndOk)
 {
-  lmTraceLevelSet(LmtCompoundValueAdd, true);
+  lmTraceLevelSet(LmtLegacy, true);
 
   orion::CompoundValueNode*  tree     = new orion::CompoundValueNode(orion::ValueTypeObject);
   orion::CompoundValueNode*  str      = new orion::CompoundValueNode(tree, "/struct", "struct", "", 0, orion::ValueTypeObject, 1);
@@ -182,6 +182,6 @@ TEST(CompoundValueNode, structInvalidAndOk)
 
   delete tree;
 
-  lmTraceLevelSet(LmtCompoundValueAdd, false);
+  lmTraceLevelSet(LmtLegacy, false);
   utExit();
 }

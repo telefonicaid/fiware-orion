@@ -38,7 +38,7 @@ struct ParseData;
 */
 std::string jsonNullTreat(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  LM_T(LmtNullNode, ("Not treating JSON node '%s'", path.c_str()));
+  LM_T(LmtLegacy, ("Not treating JSON node '%s'", path.c_str()));
 
   return "OK";
 }

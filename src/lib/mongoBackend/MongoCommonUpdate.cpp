@@ -2172,8 +2172,8 @@ static bool processSubscriptions
 
       if (tSubP->throttling > sinceLastNotification)
       {
-        LM_T(LmtMongo, ("blocked due to throttling, current time is: %f", current));
-        LM_T(LmtSubCache, ("ignored '%s' due to throttling, current time is: %f", tSubP->cacheSubId.c_str(), current));
+        LM_T(LmtLegacy, ("blocked due to throttling, current time is: %f", current));
+        LM_T(LmtLegacy, ("ignored '%s' due to throttling, current time is: %f", tSubP->cacheSubId.c_str(), current));
         continue;
       }
     }

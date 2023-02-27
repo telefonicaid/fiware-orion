@@ -869,14 +869,6 @@ int main(int argC, char* argV[])
 
   paCleanup();
 
-#ifdef DEBUG_develenv
-  //
-  // FIXME P9: Temporary setting trace level 250 in jenkins only, until the ftest-ftest-ftest bug is solved
-  //           See issue #652
-  //
-  lmTraceLevelSet(LmtBug, true);
-#endif
-
   if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));

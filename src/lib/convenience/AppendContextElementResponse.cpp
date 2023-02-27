@@ -122,8 +122,6 @@ std::string AppendContextElementResponse::check
 */
 void AppendContextElementResponse::release(void)
 {
-  LM_T(LmtRelease, ("Releasing AppendContextElementResponse"));
-
   contextAttributeResponseVector.release();
   errorCode.release();
 }

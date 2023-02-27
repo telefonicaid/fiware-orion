@@ -148,15 +148,7 @@ static JsonRequest* jsonRequestGet(RequestType request, Verb verb)
   for (unsigned int ix = 0; ix < sizeof(jsonRequest) / sizeof(jsonRequest[0]); ++ix)
   {
     if ((request == jsonRequest[ix].type) && (jsonRequest[ix].method == method))
-    {
-      if (jsonRequest[ix].parseVector != NULL)
-      {
-        LM_T(LmtHttpRequest, ("Found jsonRequest of type %d, method '%s' - index %d (%s)",
-              request, method.c_str(), ix, jsonRequest[ix].parseVector[0].path.c_str()));
-      }
-
       return &jsonRequest[ix];
-    }
   }
 
   std::string details = std::string("no request found for RequestType '") + requestType(request) + "'', method '" + method + "'";
@@ -197,7 +189,7 @@ std::string jsonTreat
     return "OK";
   }
 
-  LM_T(LmtParse, ("Treating a JSON request: '%s'", content));
+  LM_T(LmtLegacy, ("Treating a JSON request: '%s'", content));
 
   if (reqP == NULL)
   {
@@ -218,7 +210,7 @@ std::string jsonTreat
     *reqPP = reqP;
   }
 
-  LM_T(LmtParse, ("Treating '%s' request", reqP->keyword.c_str()));
+  LM_T(LmtLegacy, ("Treating '%s' request", reqP->keyword.c_str()));
 
   reqP->init(parseDataP);
 
@@ -259,7 +251,7 @@ std::string jsonTreat
   {
     orion::compoundValueEnd(ciP, parseDataP);
   }
-  if ((lmTraceIsSet(LmtCompoundValueShow)) && (orionldState.compoundValueP != NULL))
+  if ((lmTraceIsSet(LmtLegacy)) && (orionldState.compoundValueP != NULL))
   {
     orionldState.compoundValueP->shortShow("after parse: ");
   }
