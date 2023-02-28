@@ -42,9 +42,9 @@
 
 /* ****************************************************************************
 *
-* changeLogLevel -
+* changeLogConfig -
 */
-std::string changeLogLevel
+std::string changeLogConfig
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -55,11 +55,38 @@ std::string changeLogLevel
   std::string  level   = ciP->uriParam[URI_PARAM_LEVEL];
   const char*  levelP  = level.c_str();
 
-  if (level.empty())
+  std::string logSize     = ciP->uriParam[URI_PARAM_LOG_SIZE];
+  int logSizeValue        = atoi(logSize.c_str());
+  std::string payloadSize = ciP->uriParam[URI_PARAM_PAYLOAD_SIZE];
+  int payloadSizeValue    = atoi(payloadSize.c_str());
+
+  if (level.empty() && logSize.empty() && payloadSize.empty())
   {
     ciP->httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "no log level in URI param");
-    return "{\"error\":\"log level missing\"}";
+    alarmMgr.badInput(clientIp, "no log configs in URI param");
+    return "{\"error\":\"log config missing\"}";
+  }
+
+  if ((!logSize.empty()) && logSizeValue > 0)
+  {
+    logLineMaxSize = logSizeValue;
+  }
+  else if (logSizeValue < 0)
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    alarmMgr.badInput(clientIp, "invalid logLineMaxSize in URI param", logSize);
+    return "{\"error\":\"invalid logLineMaxSize, logLine size should be > 0\"}";
+  }
+
+  if ((!payloadSize.empty()) && payloadSizeValue > 0)
+  {
+    logInfoPayloadMaxSize = payloadSizeValue;
+  }
+  else if (payloadSizeValue < 0)
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
+    return "{\"error\":\"invalid logInfoPayloadMaxSize,logPayload size should be > 0\"}";
   }
 
   //
@@ -68,26 +95,29 @@ std::string changeLogLevel
   //  - "fatal" is translated into the internal "None", meaning complete silence.
   //  - "warn" is translated into "Warning" which is accepted internally.
   //
-  if ((strcasecmp(levelP, "none")    == 0) ||
-      (strcasecmp(levelP, "fatal")   == 0) ||
-      (strcasecmp(levelP, "error")   == 0) ||
-      (strcasecmp(levelP, "warning") == 0) ||
-      (strcasecmp(levelP, "warn")    == 0) ||
-      (strcasecmp(levelP, "info")    == 0) ||
-      (strcasecmp(levelP, "debug")   == 0))
+  if (!level.empty())
   {
-    if (strcasecmp(levelP, "warning") == 0)
+    if ((strcasecmp(levelP, "none")    == 0) ||
+        (strcasecmp(levelP, "fatal")   == 0) ||
+        (strcasecmp(levelP, "error")   == 0) ||
+        (strcasecmp(levelP, "warning") == 0) ||
+        (strcasecmp(levelP, "warn")    == 0) ||
+        (strcasecmp(levelP, "info")    == 0) ||
+        (strcasecmp(levelP, "debug")   == 0))
     {
-      level = "WARN";
-    }
+      if (strcasecmp(levelP, "warning") == 0)
+      {
+        level = "WARN";
+      }
 
-    lmLevelMaskSetString((char*) level.c_str());
-  }
-  else
-  {
-    ciP->httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "invalid log level in URI param", level);
-    return "{\"error\":\"invalid log level\"}";
+      lmLevelMaskSetString((char*) level.c_str());
+    }
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, "invalid log level in URI param", level);
+      return "{\"error\":\"invalid log level\"}";
+    }
   }
 
   return "";
@@ -97,9 +127,9 @@ std::string changeLogLevel
 
 /* ****************************************************************************
 *
-* getLogLevel -
+* getLogConfig -
 */
-std::string getLogLevel
+std::string getLogConfig
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -108,6 +138,10 @@ std::string getLogLevel
 )
 {
   std::string  level = lmLevelMaskStringGet();
+  std::string  payloadMaxSize = std::to_string(logInfoPayloadMaxSize);
+  std::string  lineMaxSize    = std::to_string(logLineMaxSize);
 
-  return "{\"level\":\"" + level + "\"}";
+  return "{\"level\":\"" + level + "\" \
+           \"infoPayloadMaxSize\":\"" + payloadMaxSize + "\" \
+           \"lineMaxSize\":\"" + lineMaxSize + "\"}";
 }
