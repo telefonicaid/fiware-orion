@@ -287,7 +287,7 @@ PaArgument paArgs[] =
 {
   { "-fg",                          &fg,                    "FOREGROUND",               PaBool,   PaOpt, false,                           false, true,                  FG_DESC                      },
   { "-localIp",                     bindAddress,            "LOCALIP",                  PaString, PaOpt, IP_ALL,                          PaNL,  PaNL,                  LOCALIP_DESC                 },
-  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            PaNL,  PaNL,                  PORT_DESC                    },
+  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            1,    65535,                  PORT_DESC                    },
   { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,                  PIDPATH_DESC                 },
 
   { "-dbhost",                      dbHost,                 "MONGO_HOST",               PaString, PaOpt, LOCALHOST,                       PaNL,  PaNL,                  DBHOST_DESC                  },
