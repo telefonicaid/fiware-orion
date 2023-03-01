@@ -3,3 +3,4 @@
 - Fix: Ngsiv2-AttrsFormat header set to "normalized" in NGSI patching custom notification
 - Fix: subscription autodisable based on maxFailsLimit not working when fails does not happen within the same csubs cache refresh cycle
 - Fix: incorrectly sum stale failsCounter from database when subscription has started to work again (only when csubs cache is enabled)
+- Fix: Orion should return error and refuse to start when port is negative (#3875)
