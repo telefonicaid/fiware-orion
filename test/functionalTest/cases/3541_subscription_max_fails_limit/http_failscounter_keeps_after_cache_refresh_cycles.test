@@ -248,5 +248,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
 dbDrop CB

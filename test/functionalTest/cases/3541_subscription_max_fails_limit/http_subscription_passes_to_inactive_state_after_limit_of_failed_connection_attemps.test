@@ -33,19 +33,18 @@ brokerStart CB
 # 01. POST /v2/entities, to create Room1 with temperature and pressure
 # 02. POST /v2/subscriptions, to create subscription with maxFailsLimit=5
 # 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
-# 04. Stop accumulator
-# 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
-# 07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
-# 09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 10. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
-# 11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 12. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
-# 13. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 14. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
-# 15. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 16. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6
+# 04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
+# 06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
+# 08. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 09. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
+# 10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
+# 12. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 13. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
+# 14. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 15. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -107,15 +106,7 @@ echo
 echo
 
 
-
-echo "04. Stop accumulator"
-echo "===================="
-accumulatorStop
-echo
-echo
-
-
-echo '05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -132,14 +123,14 @@ echo
 echo
 
 
-echo '06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1'
+echo '05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -156,14 +147,14 @@ echo
 echo
 
 
-echo '08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2'
+echo '07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '08. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -180,14 +171,14 @@ echo
 echo
 
 
-echo '10. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3'
+echo '09. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -204,14 +195,14 @@ echo
 echo
 
 
-echo '12. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4'
+echo '11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '13. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '12. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -228,14 +219,14 @@ echo
 echo
 
 
-echo '14. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5'
+echo '13. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '15. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '14. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -252,7 +243,7 @@ echo
 echo
 
 
-echo '16. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.'
+echo '15. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.'
 echo '==========================================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -320,11 +311,7 @@ Date: REGEX(.*)
 }
 
 
-04. Stop accumulator
-====================
-
-
-05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -332,7 +319,7 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
+05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 ========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 535
@@ -377,7 +364,7 @@ Date: REGEX(.*)
 }
 
 
-07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -385,7 +372,7 @@ Date: REGEX(.*)
 
 
 
-08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
+07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 ========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 535
@@ -430,7 +417,7 @@ Date: REGEX(.*)
 }
 
 
-09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+08. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -438,7 +425,7 @@ Date: REGEX(.*)
 
 
 
-10. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
+09. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
 ========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 535
@@ -483,7 +470,7 @@ Date: REGEX(.*)
 }
 
 
-11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -491,7 +478,7 @@ Date: REGEX(.*)
 
 
 
-12. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
+11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
 ========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 535
@@ -536,7 +523,7 @@ Date: REGEX(.*)
 }
 
 
-13. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+12. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -544,7 +531,7 @@ Date: REGEX(.*)
 
 
 
-14. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
+13. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
 ========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 535
@@ -589,7 +576,7 @@ Date: REGEX(.*)
 }
 
 
-15. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+14. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -597,7 +584,7 @@ Date: REGEX(.*)
 
 
 
-16. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.
+15. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.
 ===========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 537
@@ -644,5 +631,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
 dbDrop CB
