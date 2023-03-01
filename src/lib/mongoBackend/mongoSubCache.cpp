@@ -123,9 +123,8 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->covered               = sub.hasField(CSUB_COVERED)?          getBoolFieldF(sub, CSUB_COVERED)                     : false;
   cSubP->next                  = NULL;
 
-  // failsCounter field may not be in DB (e.g. a just created subscription). In this getIntOrLongFieldAsLong() guard
-  // return -1, but we need 0
-  cSubP->failsCounterFromDb = sub.hasField(CSUB_FAILSCOUNTER)?     getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER)    : -1;
+  // getIntOrLongFieldAsLong() may return -1 if something goes wrong, so we add a guard to set 0 in this case
+  cSubP->failsCounterFromDb = sub.hasField(CSUB_FAILSCOUNTER)? getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER) : 0;
   if (cSubP->failsCounterFromDb < 0)
   {
     cSubP->failsCounterFromDb = 0;
