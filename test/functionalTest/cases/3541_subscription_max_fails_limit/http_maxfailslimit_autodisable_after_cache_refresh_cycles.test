@@ -1,4 +1,4 @@
-# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-failsCounter keeps after cache refresh cycles
+maxFailsLimit autodisable after cache refresh cycles (HTTP case)
 
 --SHELL-INIT--
 dbInit CB
@@ -30,16 +30,16 @@ brokerStart CB 0 IPv4 -subCacheIval 3
 --SHELL--
 
 #
-# 01. POST /v2/subscriptions, to create subscription
+# 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=3
 # 02. Upsert entity twice to trigger notification and reach failsCounter=2
 # 03. GET /v2/subscriptions/subId, and see failsCounter=2
-# 04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
-# 05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
+# 04. Wait a cache cycle, and upsert two more times so failsCounter=4 and subscription is disabled
+# 05. GET /v2/subscriptions/subId, and see failsCounter=4 and subscription inactive
 #
 
 
-echo "01. POST /v2/subscriptions, to create subscription"
-echo "=================================================="
+echo "01. POST /v2/subscriptions, to create subscription with maxFailsLimit=3"
+echo "======================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -52,7 +52,8 @@ payload='{
   "notification": {
     "http": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
-    }
+    },
+    "maxFailsLimit": 3
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -86,25 +87,35 @@ echo
 echo
 
 
-echo "04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2"
-echo "==============================================================================="
+echo "04. Wait a cache cycle, and upsert two more times so failsCounter=4 and subscription is disabled"
+echo "================================================================================================"
 sleep 3.5s
-orionCurl --url /v2/subscriptions/${subId}
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
 echo
 echo
 
 
-echo "05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2"
-echo "======================================================================================"
-sleep 3.5s
+echo "05. GET /v2/subscriptions/subId, and see failsCounter=4 and subscription inactive"
+echo "================================================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
 --REGEXPECT--
-01. POST /v2/subscriptions, to create subscription
-==================================================
+01. POST /v2/subscriptions, to create subscription with maxFailsLimit=3
+=======================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -132,7 +143,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subId, and see failsCounter=2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 450
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -150,6 +161,7 @@ Date: REGEX(.*)
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
+        "maxFailsLimit": 3,
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
@@ -168,10 +180,26 @@ Date: REGEX(.*)
 }
 
 
-04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
-===============================================================================
+04. Wait a cache cycle, and upsert two more times so failsCounter=4 and subscription is disabled
+================================================================================================
+HTTP/1.1 204 No Content
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+HTTP/1.1 204 No Content
+Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+05. GET /v2/subscriptions/subId, and see failsCounter=4 and subscription inactive
+=================================================================================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 452
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -182,56 +210,18 @@ Date: REGEX(.*)
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "failsCounter": 2,
+        "failsCounter": 4,
         "http": {
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Couldn't connect to server",
-        "lastNotification": "REGEX(.*)",
+        "lastNotification": "REGEX(.*)",        
+        "maxFailsLimit": 3,
         "onlyChangedAttrs": false,
-        "timesSent": 2
+        "timesSent": 4
     },
-    "status": "active",
-    "subject": {
-        "condition": {
-            "attrs": []
-        },
-        "entities": [
-            {
-                "id": "E",
-                "type": "T"
-            }
-        ]
-    }
-}
-
-
-05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
-======================================================================================
-HTTP/1.1 200 OK
-Content-Length: 432
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "id": "REGEX([0-9a-f]{24})",
-    "notification": {
-        "attrs": [],
-        "attrsFormat": "normalized",
-        "covered": false,
-        "failsCounter": 2,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
-        "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
-        "lastNotification": "REGEX(.*)",
-        "onlyChangedAttrs": false,
-        "timesSent": 2
-    },
-    "status": "active",
+    "status": "inactive",
     "subject": {
         "condition": {
             "attrs": []

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription maxFailsLimit error conditions
+Subscription maxFailsLimit error conditions (HTTP case)
 
 --SHELL-INIT--
 dbInit CB

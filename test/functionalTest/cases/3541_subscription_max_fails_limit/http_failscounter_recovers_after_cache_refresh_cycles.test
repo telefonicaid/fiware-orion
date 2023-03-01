@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-failsCounter recovers after cache refresh cycles
+failsCounter recovers after cache refresh cycles (HTTP case)
 
 --SHELL-INIT--
 dbInit CB
