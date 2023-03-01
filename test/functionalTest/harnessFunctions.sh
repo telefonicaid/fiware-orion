@@ -819,6 +819,63 @@ function accumulatorStart()
 
 # ------------------------------------------------------------------------------
 #
+# debugMqttBrokerStop -
+#
+function debugMqttBrokerStop()
+{
+  pid=$(cat /tmp/debugMqttBroker.cbtests.pid 2> /dev/null)
+  if [ "$pid" != "" ]
+  then
+    kill -15 $pid 2> /dev/null
+    sleep .1
+    kill -2 $pid 2> /dev/null
+    sleep .1
+    kill -9 $pid 2> /dev/null
+    rm -f /tmp/debugMqttBroker.cbtests.pid /tmp/debugMqttBroker.cbtests.*.conf
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# debugMmqttBrokerStart -
+#
+# Starts a Python-based MQTT broker used in some tests (eg. the mqtt* ones in cases/4085). Note that
+# in MQTT tests in general we use the system MQTT broker (usually mosquitto), but in that case we need
+# a "debug" MQTT broker that we can start/stop the broker at some points during the test script,
+# so we use this one
+#
+function debugMmqttBrokerStart()
+{
+  # Just in case a previous tests not finished cleanly and some broker instance is there
+  debugMqttBrokerStop
+
+  amqtt_tmp="$(mktemp -u /tmp/debugMqttBroker.cbtests.XXXX)"
+  amqtt_conf_file="$amqtt_tmp.conf"
+
+  echo "listeners:"                                >  $amqtt_conf_file
+  echo "  default:"                                >> $amqtt_conf_file
+  echo "      max-connections: 50000"              >> $amqtt_conf_file
+  echo "      type: tcp"                           >> $amqtt_conf_file
+  echo "  my-tcp-1:"                               >> $amqtt_conf_file
+  echo "      bind: 127.0.0.1:${MQTT_DEBUG_PORT}"  >> $amqtt_conf_file
+
+  amqtt -c $amqtt_conf_file >$amqtt_tmp.log 2>&1 &
+
+  # $$ env var gives a wrong PID (maybe due to some process double-fork or something similar, that
+  # causes the actual amqtt server to be spawned into a different process at OS level), so
+  # we use ps + grep. As we are using the conf file in the grep statement, this seems to be strong
+  # enough (i.e. we cannot get the PID of another amqtt process)
+  ps ax | grep $amqtt_conf_file | grep -v grep | awk -F ' ' '{print $1}' > /tmp/debugMqttBroker.cbtests.pid
+
+  echo "MQTT broker running as PID $(cat /tmp/debugMqttBroker.cbtests.pid)"
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # accumulatorDump
 #
 function accumulatorDump()
@@ -1346,6 +1403,8 @@ export -f localBrokerStart
 export -f brokerStop
 export -f accumulatorStart
 export -f accumulatorStop
+export -f debugMmqttBrokerStart
+export -f debugMqttBrokerStop
 export -f accumulatorDump
 export -f accumulator2Dump
 export -f accumulator3Dump

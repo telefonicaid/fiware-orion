@@ -21,11 +21,11 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-failsCounter recovers and fails within same cache refresh cycle (HTTP case)
+failsCounter recovers after cache refresh cycles (MQTT case)
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -subCacheIval 5
+brokerStart CB 0 IPv4 -subCacheIval 3
 
 --SHELL--
 
@@ -33,13 +33,10 @@ brokerStart CB 0 IPv4 -subCacheIval 5
 # 01. POST /v2/subscriptions, to create subscription
 # 02. Upsert entity twice to trigger notification and reach failsCounter=2
 # 03. GET /v2/subscriptions/subId, and see failsCounter=2
-# 04. Recover endpoint (starting now the accumulator)
-# 05. Wait a cache cycle, and upsert one time so failsCounter=0
-# 06. Stop the acumulator and do one more upsert, so failsCounter=1
-# 07. GET /v2/subscriptions/subId, and see failsCounter=1
-# 08. Recover endpoint and do one more upsert, so failsCounter=0
-# 09. GET /v2/subscriptions/subId, and see failsCounter=0
-# 10. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0
+# 04. Recover endpoint (starting now the MQTT broker)
+# 05. Wait a cache cycle, and upsert one times so failsCounter=0
+# 06. GET /v2/subscriptions/subId, and see failsCounter=0
+# 07. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0
 #
 
 
@@ -55,8 +52,9 @@ payload='{
     ]
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
     }
   }
 }'
@@ -91,15 +89,15 @@ echo
 echo
 
 
-echo "04. Recover endpoint (starting now the accumulator)"
+echo "04. Recover endpoint (starting now the MQTT broker)"
 echo "==================================================="
-accumulatorStart
+debugMmqttBrokerStart
 echo
 echo
 
 
-echo "05. Wait a cache cycle, and upsert one time so failsCounter=0"
-echo "============================================================="
+echo "05. Wait a cache cycle, and upsert one times so failsCounter=0"
+echo "=============================================================="
 sleep 3.5s
 payload='{
   "id": "E",
@@ -114,59 +112,16 @@ echo
 echo
 
 
-echo "06. Stop the acumulator and do one more upsert, so failsCounter=1"
-echo "================================================================="
-accumulatorStop
-sleep 0.5s
-payload='{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": 1,
-    "type": "Number"
-  }
-}'
-orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
-echo
-echo
-
-
-echo "07. GET /v2/subscriptions/subId, and see failsCounter=1"
+echo "06. GET /v2/subscriptions/subId, and see failsCounter=0"
 echo "======================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo "08. Recover endpoint and do one more upsert, so failsCounter=0"
-echo "=============================================================="
-accumulatorStart
-echo
-echo
-sleep 0.5s
-payload='{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": 1,
-    "type": "Number"
-  }
-}'
-orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
-echo
-echo
-
-
-echo "09. GET /v2/subscriptions/subId, and see failsCounter=0"
-echo "======================================================="
-orionCurl --url /v2/subscriptions/${subId}
-echo
-echo
-
-
-echo "10. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0"
+echo "07. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0"
 echo "==============================================================================="
-sleep 5.5s
+sleep 3.5s
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
@@ -202,7 +157,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subId, and see failsCounter=2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 400
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -214,12 +169,13 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 2,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
@@ -238,75 +194,13 @@ Date: REGEX(.*)
 }
 
 
-04. Recover endpoint (starting now the accumulator)
+04. Recover endpoint (starting now the MQTT broker)
 ===================================================
-accumulator running as PID REGEX(\d+)
+MQTT broker running as PID REGEX(\d+)
 
 
-05. Wait a cache cycle, and upsert one time so failsCounter=0
-=============================================================
-HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-06. Stop the acumulator and do one more upsert, so failsCounter=1
-=================================================================
-HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-07. GET /v2/subscriptions/subId, and see failsCounter=1
-=======================================================
-HTTP/1.1 200 OK
-Content-Length: 495
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "id": "REGEX([0-9a-f]{24})",
-    "notification": {
-        "attrs": [],
-        "attrsFormat": "normalized",
-        "covered": false,
-        "failsCounter": 1,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
-        "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
-        "lastNotification": "REGEX(.*)",
-        "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
-        "onlyChangedAttrs": false,
-        "timesSent": 4
-    },
-    "status": "active",
-    "subject": {
-        "condition": {
-            "attrs": []
-        },
-        "entities": [
-            {
-                "id": "E",
-                "type": "T"
-            }
-        ]
-    }
-}
-
-
-08. Recover endpoint and do one more upsert, so failsCounter=0
+05. Wait a cache cycle, and upsert one times so failsCounter=0
 ==============================================================
-accumulator running as PID REGEX(\d+)
-
-
 HTTP/1.1 204 No Content
 Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -314,10 +208,10 @@ Date: REGEX(.*)
 
 
 
-09. GET /v2/subscriptions/subId, and see failsCounter=0
+06. GET /v2/subscriptions/subId, and see failsCounter=0
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 478
+Content-Length: 424
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -328,16 +222,16 @@ Date: REGEX(.*)
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
-        "timesSent": 5
+        "timesSent": 3
     },
     "status": "active",
     "subject": {
@@ -354,10 +248,10 @@ Date: REGEX(.*)
 }
 
 
-10. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0
+07. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 478
+Content-Length: 424
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -368,16 +262,16 @@ Date: REGEX(.*)
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
-        "timesSent": 5
+        "timesSent": 3
     },
     "status": "active",
     "subject": {
@@ -396,5 +290,5 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
+debugMqttBrokerStop
 dbDrop CB
