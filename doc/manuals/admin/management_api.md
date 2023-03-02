@@ -13,7 +13,7 @@ curl -X PUT <host>:<port>/admin/log?infoPayloadMaxSize=<logPayloadSizeValue>
 curl -X PUT <host>:<port>/admin/log?lineMaxSize=<logLineSizeValue>
 ```
 
-To retrieve the log Config:
+To retrieve the log config:
 
 ```
 curl <host>:<port>:/admin/log
