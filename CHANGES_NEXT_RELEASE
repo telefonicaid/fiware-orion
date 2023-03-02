@@ -1,5 +1,5 @@
 - Add: -mqttTimeout (env var ORION_MQTT_TIMEOUT) for MQTT broker connection timeout
 - Fix: queue workers deadlock when MQTT broker was not responding to connection attemp
 - Fix: Ngsiv2-AttrsFormat header set to "normalized" in NGSI patching custom notification
-- Fix: Orion should return error and refuse to start when port is negative (3875)
-- Fix: logLineMaxSize and logLineMaxSize in the log admin REST API (3707)
+- Fix: Orion should return error and refuse to start when port is negative (#3875)
+- Fix: logLineMaxSize and logLineMaxSize in the log admin REST API (#3707)

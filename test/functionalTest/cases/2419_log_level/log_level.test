@@ -159,7 +159,7 @@ Date: REGEX(.*)
 02. GET log config, see level=NONE
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 90
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -183,7 +183,7 @@ Date: REGEX(.*)
 04. GET log config, see level=FATAL
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 84
+Content-Length: 91
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -207,7 +207,7 @@ Date: REGEX(.*)
 06. GET log config, see level=ERROR
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 84
+Content-Length: 91
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -231,7 +231,7 @@ Date: REGEX(.*)
 08. GET log config, see level=WARN
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 90
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -255,7 +255,7 @@ Date: REGEX(.*)
 10. GET log config, see level=INFO
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 90
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,7 +279,7 @@ Date: REGEX(.*)
 12. GET log config, see level=DEBUG
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 84
+Content-Length: 91
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -307,7 +307,7 @@ Date: REGEX(.*)
 14. GET log config, see level=DEBUG
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 84
+Content-Length: 91
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
