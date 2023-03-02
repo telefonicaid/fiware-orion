@@ -67,26 +67,32 @@ std::string changeLogConfig
     return "{\"error\":\"log config missing\"}";
   }
 
-  if ((!logSize.empty()) && logSizeValue > 0)
+  if (!logSize.empty())
   {
-    logLineMaxSize = logSizeValue;
-  }
-  else if (logSizeValue < 0)
-  {
-    ciP->httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "invalid logLineMaxSize in URI param", logSize);
-    return "{\"error\":\"invalid logLineMaxSize, logLine size should be > 0\"}";
+    if (logSizeValue > 0)
+    {
+      logLineMaxSize = logSizeValue;
+    }
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, "invalid logLineMaxSize in URI param", logSize);
+      return "{\"error\":\"invalid logLineMaxSize, logLine size should be > 0\"}";
+    }
   }
 
-  if ((!payloadSize.empty()) && payloadSizeValue > 0)
+  if (!payloadSize.empty())
   {
-    logInfoPayloadMaxSize = payloadSizeValue;
-  }
-  else if (payloadSizeValue < 0)
-  {
-    ciP->httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
-    return "{\"error\":\"invalid logInfoPayloadMaxSize,logPayload size should be > 0\"}";
+    if (payloadSizeValue > 0)
+    {
+      logInfoPayloadMaxSize = payloadSizeValue;
+    }
+    else if (payloadSizeValue < 0)
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
+      return "{\"error\":\"invalid logInfoPayloadMaxSize,logPayload size should be > 0\"}";
+    }
   }
 
   //
@@ -141,7 +147,7 @@ std::string getLogConfig
   std::string  payloadMaxSize = std::to_string(logInfoPayloadMaxSize);
   std::string  lineMaxSize    = std::to_string(logLineMaxSize);
 
-  return "{\"level\":\"" + level + "\" \
-           \"infoPayloadMaxSize\":\"" + payloadMaxSize + "\" \
+  return "{\"level\":\"" + level + "\", \
+           \"infoPayloadMaxSize\":\"" + payloadMaxSize + "\", \
            \"lineMaxSize\":\"" + lineMaxSize + "\"}";
 }
