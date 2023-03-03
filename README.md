@@ -18,8 +18,7 @@
 
 The Orion Context Broker is an implementation of the Publish/Subscribe Context
 Broker GE, providing an
-[NGSI](https://swagger.lab.fiware.org/?url=https://raw.githubusercontent.com/Fiware/specifications/master/OpenAPI/ngsiv2/ngsiv2-openapi.json)
-interface. Using this interface, clients can do several operations:
+[NGSI interface](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/orion-api.md). Using this interface, clients can do several operations:
 
 -   Query context information. The Orion Context Broker stores context
     information updated from applications, so queries are resolved based
