@@ -40,11 +40,14 @@ extern "C"
 //
 // mongocAuxAttributesFilter -
 //
-bool mongocAuxAttributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP, const char* geojsonGeometry)
+bool mongocAuxAttributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson_t* projectionP, const char* geojsonGeometry, bool onlyIds)
 {
   char    path[512];  // Assuming 512 is always enough ...
   bson_t  exists;
   bool    geojsonGeometryToProjection = (geojsonGeometry == NULL)? false : true;  // if GEOJSON, the "geometry" must be present
+
+  if (onlyIds == true)
+    geojsonGeometryToProjection = false;
 
   bson_init(&exists);
   bson_append_int32(&exists, "$exists", 7, 1);
@@ -73,7 +76,9 @@ bool mongocAuxAttributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson
     dotForEq(&path[6]);
 
     bson_append_document(&attrExists, path, len, &exists);
-    bson_append_bool(projectionP, path, len, true);
+
+    if (onlyIds == false)
+      bson_append_bool(projectionP, path, len, true);
 
     bson_append_document(&array, &num[2-numLen], numLen, &attrExists);
 
@@ -96,29 +101,32 @@ bool mongocAuxAttributesFilter(bson_t* mongoFilterP, StringArray* attrList, bson
   //
   // Then "@datasets.X" - geojsonGeometryToProjection is already taken care of by "attrs" loop
   //
-  int offset = attrList->items;
-  for (int ix = 0; ix < attrList->items; ix++)
+  if (onlyIds == false)
   {
-    int    len = snprintf(path, sizeof(path) - 1, "@datasets.%s", attrList->array[ix]);
-    bson_t attrExists;
-
-    bson_init(&attrExists);
-    dotForEq(&path[10]);
-
-    bson_append_document(&attrExists, path, len, &exists);
-    bson_append_bool(projectionP, path, len, true);
-
-    bson_append_document(&array, &num[2-numLen], numLen, &attrExists);
-
-    num[1] += 1;
-    if (((offset + ix + 1) % 10) == 0)
+    int offset = attrList->items;
+    for (int ix = 0; ix < attrList->items; ix++)
     {
-      num[1] = '0';
-      num[0] += 1;
-      numLen = 2;
-    }
+      int    len = snprintf(path, sizeof(path) - 1, "@datasets.%s", attrList->array[ix]);
+      bson_t attrExists;
 
-    bson_destroy(&attrExists);
+      bson_init(&attrExists);
+      dotForEq(&path[10]);
+
+      bson_append_document(&attrExists, path, len, &exists);
+      bson_append_bool(projectionP, path, len, true);
+
+      bson_append_document(&array, &num[2-numLen], numLen, &attrExists);
+
+      num[1] += 1;
+      if (((offset + ix + 1) % 10) == 0)
+      {
+        num[1] = '0';
+        num[0] += 1;
+        numLen = 2;
+      }
+
+      bson_destroy(&attrExists);
+    }
   }
 
   bson_append_array(mongoFilterP, "$or", 3, &array);

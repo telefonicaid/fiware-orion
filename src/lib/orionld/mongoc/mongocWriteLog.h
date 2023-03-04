@@ -46,6 +46,19 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// MONGOC_RLOG -
+//
+#define MONGOC_RLOG(msg, dbName, collectionName, filterP, optionsP, traceLevel)                                     \
+do                                                                                                                  \
+{                                                                                                                   \
+  if (LM_MASK(LogLevelDebug) && lmOk('T', traceLevel) == LmsOk)                                                     \
+    mongocReadLog(msg, dbName, collectionName, filterP, optionsP, __FILE__, __LINE__, __FUNCTION__, traceLevel);    \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // mongocWriteLog -
 //
 // NOTE
@@ -58,6 +71,28 @@ extern void mongocWriteLog
   const char*  collectionName,
   bson_t*      selectorP,
   bson_t*      requestP,
+  const char*  fileName,
+  int          lineNo,
+  const char*  functionName,
+  int          traceLevel
+);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// mongocReadLog -
+//
+// NOTE
+//   This function is not meant to be called directly. Always via the MONGOC_RLOG macro
+//
+extern void mongocReadLog
+(
+  const char*  msg,
+  const char*  dbName,
+  const char*  collectionName,
+  bson_t*      filterP,
+  bson_t*      optionsP,
   const char*  fileName,
   int          lineNo,
   const char*  functionName,

@@ -199,6 +199,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_TYPE;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DATASET_SUPPORT;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_ONLYIDS;
   }
   else if (serviceP->serviceRoutine == orionldPostNotify)
   {

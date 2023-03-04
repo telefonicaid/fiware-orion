@@ -164,6 +164,7 @@ typedef struct OrionldUriParams
   char*     observedAt;
   char*     lang;
   bool      local;
+  bool      onlyIds;
 
   double    observedAtAsDouble;
   uint64_t  mask;

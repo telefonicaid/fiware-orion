@@ -95,7 +95,7 @@ KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringA
   // Attribute List AND GeoJSON Geometry
   if ((attrsV != NULL) && (attrsV->items > 0))
   {
-    if (mongocAuxAttributesFilter(&mongoFilter, attrsV, &projection, geojsonGeometry) == false)
+    if (mongocAuxAttributesFilter(&mongoFilter, attrsV, &projection, geojsonGeometry, false) == false)
     {
       if (detailP != NULL)
         *detailP = (char*) "mongocAuxAttributesFilter failed";

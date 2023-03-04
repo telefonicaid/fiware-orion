@@ -26,10 +26,12 @@ extern "C"
 {
 #include "kjson/KjNode.h"                                           // KjNode
 #include "kjson/kjFree.h"                                           // kjFree
+#include "kjson/kjLookup.h"                                         // kjLookup
+#include "kjson/kjBuilder.h"                                        // kjChildRemove, kjChildAdd, kjArray
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
-#include "logMsg/traceLevels.h"                                     // Lmt*
+#include "logMsg/traceLevels.h"                                     // LmtMongoc
 
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
@@ -131,6 +133,38 @@ void orionldDistOpMatchIdsRelease(void)
 
 // ----------------------------------------------------------------------------
 //
+// dbModelToEntityIdArray -
+//
+// INPUT:  [ { "_id": { "id": "urn:E1" } }, { "_id": { "id": "urn:E2" } }, ... ]
+// OUTPUT: [ "urn:E1", "urn:E2", ... ]
+//
+KjNode* dbModelToEntityIdArray(KjNode* localDbMatches)
+{
+  KjNode* matchIds = kjArray(orionldState.kjsonP, NULL);
+
+  for (KjNode* dbEntityP = localDbMatches->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
+  {
+    KjNode* _idP = kjLookup(dbEntityP, "_id");
+
+    if (_idP == NULL)
+      continue;   // DB Error !!!
+
+    KjNode* idP = kjLookup(_idP, "id");
+
+    if (idP == NULL)
+      continue;   // DB Error !!!
+
+    kjChildRemove(_idP, idP);
+    kjChildAdd(matchIds, idP);
+  }
+
+  return matchIds;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
 // orionldGetEntitiesDistributed -
 //
 bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
@@ -144,16 +178,20 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request
   //
+// #if 0
+  // Temporarily removing this, for tests of mongocEntitiesQuery
   if (orionldDistOpMatchIds == NULL)
     return orionldGetEntitiesLocal(idPattern, qNode, geoInfoP);
+// #endif
 
   char* geojsonGeometryLongName = NULL;
   if (orionldState.out.contentType == GEOJSON)
     geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
 
   // Get the local matches
+  KjNode* localEntitiesV = NULL;
   int64_t count;
-  KjNode* localMatches = mongocEntitiesQuery(&orionldState.in.typeList,
+  KjNode* localDbMatches = mongocEntitiesQuery(&orionldState.in.typeList,
                                              &orionldState.in.idList,
                                              idPattern,
                                              &orionldState.in.attrList,
@@ -162,8 +200,13 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
                                              &count,
                                              geojsonGeometryLongName,
                                              true);
-  if (localMatches != NULL)
-    LM(("Found local matches"));
+
+  if (localDbMatches != NULL)
+  {
+    kjTreeLog(localDbMatches, "Response from mongocEntitiesQuery", LmtMongoc);
+    localEntitiesV = dbModelToEntityIdArray(localDbMatches);
+    kjTreeLog(localEntitiesV, "Local Entities", LmtMongoc);
+  }
   else
     LM(("Found no local matches"));
 
