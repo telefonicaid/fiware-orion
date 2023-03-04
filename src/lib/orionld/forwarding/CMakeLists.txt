@@ -24,10 +24,11 @@ SET (SOURCES
     DistOpType.cpp
     distOpInit.cpp
     distOpSend.cpp
+    distOpListsMerge.cpp
     distOpListRelease.cpp
+    distOpListDebug.cpp
     distOpSuccess.cpp
     distOpFailure.cpp
-    distOpListsMerge.cpp
     distOpLookupByCurlHandle.cpp
     distOpEntityMerge.cpp
     distOpRequests.cpp
@@ -43,6 +44,10 @@ SET (SOURCES
     regMatchForEntityCreation.cpp
     regMatchForEntityGet.cpp
     regMatchForBatchDelete.cpp
+    regMatchInformationArrayForQuery.cpp
+    regMatchInformationItemForQuery.cpp
+    regMatchAttributesForQuery.cpp
+    regMatchEntityInfoForQuery.cpp
     xForwardedForCompose.cpp
     xForwardedForMatch.cpp
 )

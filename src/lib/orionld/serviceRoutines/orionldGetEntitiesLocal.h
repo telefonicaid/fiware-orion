@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESLOCAL_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESLOCAL_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,28 +25,15 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
-#include "orionld/types/OrionldGeorel.h"                         // OrionldGeorel
+#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// OrionldGeoInfo -
+// orionldGetEntitiesLocal -
 //
-typedef struct OrionldGeoInfo
-{
-  OrionldGeometry  geometry;
-  OrionldGeorel    georel;
-  KjNode*          coordinates;
-  int              minDistance;
-  int              maxDistance;
-  char*            geoProperty;
-} OrionldGeoInfo;
+extern bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESLOCAL_H_

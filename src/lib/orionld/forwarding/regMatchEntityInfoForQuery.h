@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFOFORQUERY_H_
+#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFOFORQUERY_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,23 +30,15 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
-#include "orionld/types/OrionldGeorel.h"                         // OrionldGeorel
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/StringArray.h"                           // StringArray
 
 
 
 // -----------------------------------------------------------------------------
 //
-// OrionldGeoInfo -
+// regMatchEntityInfoForQuery -
 //
-typedef struct OrionldGeoInfo
-{
-  OrionldGeometry  geometry;
-  OrionldGeorel    georel;
-  KjNode*          coordinates;
-  int              minDistance;
-  int              maxDistance;
-  char*            geoProperty;
-} OrionldGeoInfo;
+extern bool regMatchEntityInfoForQuery(RegCacheItem* regP, KjNode* entityInfoP, StringArray* idListP, StringArray* typeListP);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFOFORQUERY_H_

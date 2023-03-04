@@ -656,7 +656,8 @@ KjNode* mongocEntitiesQuery
   QNode*           qNode,
   OrionldGeoInfo*  geoInfoP,
   int64_t*         countP,
-  const char*      geojsonGeometry
+  const char*      geojsonGeometry,
+  bool             onlyIds
 )
 {
   if ((attrList != NULL) && (attrList->items > 99))

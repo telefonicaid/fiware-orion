@@ -612,9 +612,9 @@ static int commaCount(char* s)
 
 // -----------------------------------------------------------------------------
 //
-// pCheckUriParamAttrs -
+// pCheckAttrsParam -
 //
-static bool pCheckUriParamAttrs(void)
+static bool pCheckAttrsParam(void)
 {
   if (orionldState.uriParams.attrs == NULL)
     return true;
@@ -654,13 +654,13 @@ static bool pCheckUriParamAttrs(void)
 
 // -----------------------------------------------------------------------------
 //
-// pCheckUriParamId -
+// pCheckEntityIdParam -
 //
 // NOTE
 //   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
 //   is only alloowed by those services that need expansion (GET /entities and GET /registrations)
 //
-static bool pCheckUriParamId(void)
+static bool pCheckEntityIdParam(void)
 {
   if (orionldState.uriParams.id == NULL)
     return true;
@@ -706,13 +706,13 @@ static bool pCheckUriParamId(void)
 
 // -----------------------------------------------------------------------------
 //
-// pCheckUriParamType -
+// pCheckEntityTypeParam -
 //
 // NOTE
 //   No need to check ORIONLD_SERVICE_OPTION_EXPAND_TYPE here as the URI-parameter 'type'
 //   is only allowed by those services that need expansion (GET /entities and GET /registrations)
 //
-static bool pCheckUriParamType(void)
+static bool pCheckEntityTypeParam(void)
 {
   if (orionldState.uriParams.type == NULL)
     return true;
@@ -845,9 +845,9 @@ static bool pCheckUrlPathAttributeName(void)
 //
 static bool uriParamExpansion(void)
 {
-  if (pCheckUriParamId()               == false) return false;
-  if (pCheckUriParamType()             == false) return false;
-  if (pCheckUriParamAttrs()            == false) return false;
+  if (pCheckEntityIdParam()            == false) return false;
+  if (pCheckEntityTypeParam()          == false) return false;
+  if (pCheckAttrsParam()               == false) return false;
   if (pCheckUriParamGeoProperty()      == false) return false;
   if (pCheckUriParamGeometryProperty() == false) return false;
   if (pCheckPayloadEntityType()        == false) return false;

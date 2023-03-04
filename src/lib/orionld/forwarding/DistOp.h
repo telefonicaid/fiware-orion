@@ -52,11 +52,14 @@ typedef struct DistOp
   uint64_t            httpResponseCode;  // Response HTTP Status Code  (64 bit due to libcurl curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE))
   KjNode*             responseBody;      // Parsed body of the response
 
-  char*               entityId;          // Used by GET /entities/{entityId} (and as intermediate result for BATCH Delete)
-  char*               entityType;        // Used by GET /entities/{entityId}
+  char*               entityId;          // Used by GET /entities/{entityId}, BATCH /delete, and GET /entities
+  char*               entityIdPattern;   // Used by GET /entities
+  char*               entityType;        // Used by GET /entities/{entityId} and GET /entities
   char*               attrName;          // Used by PATCH /entities/{entityId}/attrs/{attrName}
   StringArray*        attrList;          // URI Param "attrs" for GET Requests
   char*               geoProp;           // URI Param "geometryProperty" for GET Requests
+  StringArray*        idList;            // Used by GET /entities (unless entityId is used)
+  StringArray*        typeList;          // Used by GET /entities (unless entityType is used)
 
   bool                error;
   char*               title;

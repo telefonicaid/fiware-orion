@@ -111,37 +111,39 @@ StringArray* regMatchAttributesForGet
   RegCacheItem*  regP,
   KjNode*        propertyNamesP,
   KjNode*        relationshipNamesP,
-  StringArray*   attrV,
+  StringArray*   attrListP,
   const char*    geoProp
 )
 {
-  bool        allAttributes = (propertyNamesP == NULL) && (relationshipNamesP == NULL);
+  bool allAttributes = (propertyNamesP == NULL) && (relationshipNamesP == NULL);
 
   if (allAttributes == true)
   {
     //
-    // Note, attrV can be NULL (if no 'attrs' URL param has been used)
+    // Note, attrListP can be NULL (if no 'attrs' URL param has been used)
     // However, a return value of NULL means "Nothing matches" and that's exactly what we don't want here
     //
     // So, we'll need an empty StringArray - meaning EVERYTHING matches => don't include 'attrs' URI param in the forwarded request
     // That comes a few lines down (right after allocating the StringArray, see 'if (allAttributes == true)')
     //
-    if (attrV != NULL)
-      return stringArrayClone(attrV);
+    // Now, if the query is with an "attrs" parameter, we'll create a copy of it for this DistOp
+    //
+    if (attrListP != NULL)
+      return stringArrayClone(attrListP);
   }
 
   StringArray* sList = (StringArray*) kaAlloc(&orionldState.kalloc, sizeof(StringArray));
   int          items;
 
-  if (allAttributes == true)  // We know that attrV == NULL in such case (see a few lines up)
+  if (allAttributes == true)  // We know that attrListP == NULL (otherwise it would have returned already a few lines up)
   {
     // Everything matches - return an empty array
     sList->items = 0;
     sList->array = NULL;
     return sList;
   }
-  else if (attrV != NULL)
-    items = attrV->items;
+  else if (attrListP != NULL)
+    items = attrListP->items;
   else
   {
     // Count items in propertyNamesP + relationshipNamesP
@@ -154,7 +156,7 @@ StringArray* regMatchAttributesForGet
   sList->items = items;
   sList->array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
 
-  if (attrV == NULL)
+  if (attrListP == NULL)
   {
     // Just copy all propertyNames + relationshipNames to sList
     int ix = 0;
@@ -179,23 +181,23 @@ StringArray* regMatchAttributesForGet
   else
   {
     int matches = 0;
-    for (int ix = 0; ix < attrV->items; ix++)
+    for (int ix = 0; ix < attrListP->items; ix++)
     {
       bool match = false;
 
       if (propertyNamesP != NULL)
-        match = (kjStringValueLookupInArray(propertyNamesP, attrV->array[ix]) != NULL);
+        match = (kjStringValueLookupInArray(propertyNamesP, attrListP->array[ix]) != NULL);
 
       if ((match == false) && (relationshipNamesP != NULL))
-        match = (kjStringValueLookupInArray(relationshipNamesP, attrV->array[ix]) != NULL);
+        match = (kjStringValueLookupInArray(relationshipNamesP, attrListP->array[ix]) != NULL);
 
       if (match == false)
         continue;
 
-      sList->array[matches++]  = attrV->array[ix];
+      sList->array[matches++]  = attrListP->array[ix];
 
       if (regP->mode == RegModeExclusive)
-        stringArrayRemoveItem(attrV, ix);
+        stringArrayRemoveItem(attrListP, ix);
     }
 
     if (matches == 0)

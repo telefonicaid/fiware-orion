@@ -248,7 +248,7 @@ static bool attributesFilter(bson_t* mongoFilterP, KjNode* attrArray, bson_t* pr
 
 // -----------------------------------------------------------------------------
 //
-// mongocEntitiesQuery2 -
+// mongocEntitiesQuery2 - needed for POST Query
 //
 // Four parameters are passed via orionldState:
 // - orionldState.uriParams.offset  (URL parameter)

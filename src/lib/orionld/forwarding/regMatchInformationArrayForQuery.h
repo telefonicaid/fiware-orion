@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAYFORQUERY_H_
+#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAYFORQUERY_H_
 
 /*
 *
@@ -30,23 +30,16 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
-#include "orionld/types/OrionldGeorel.h"                         // OrionldGeorel
+#include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// OrionldGeoInfo -
+// regMatchInformationArrayForQuery -
 //
-typedef struct OrionldGeoInfo
-{
-  OrionldGeometry  geometry;
-  OrionldGeorel    georel;
-  KjNode*          coordinates;
-  int              minDistance;
-  int              maxDistance;
-  char*            geoProperty;
-} OrionldGeoInfo;
+extern DistOp* regMatchInformationArrayForQuery(RegCacheItem* regP, StringArray* idListP, StringArray* typeListP, StringArray* attrListP);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAYFORQUERY_H_

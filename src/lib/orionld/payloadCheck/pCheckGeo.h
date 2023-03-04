@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEO_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEO_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,28 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
-#include "orionld/types/OrionldGeorel.h"                         // OrionldGeorel
+#include "orionld/types/OrionldGeoInfo.h"                      // OrionldGeoInfo
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// OrionldGeoInfo -
+// pCheckGeo -
 //
-typedef struct OrionldGeoInfo
-{
-  OrionldGeometry  geometry;
-  OrionldGeorel    georel;
-  KjNode*          coordinates;
-  int              minDistance;
-  int              maxDistance;
-  char*            geoProperty;
-} OrionldGeoInfo;
+extern bool pCheckGeo(OrionldGeoInfo* geoInfoP, char* geometry, char* georel, char* coordinates, char* geoproperty);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEO_H_

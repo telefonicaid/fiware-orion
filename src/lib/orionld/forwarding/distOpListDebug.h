@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
-#define SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTDEBUG_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTDEBUG_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,28 +25,22 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
-#include "orionld/types/OrionldGeorel.h"                         // OrionldGeorel
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// OrionldGeoInfo -
+// distOpListDebug -
 //
-typedef struct OrionldGeoInfo
-{
-  OrionldGeometry  geometry;
-  OrionldGeorel    georel;
-  KjNode*          coordinates;
-  int              minDistance;
-  int              maxDistance;
-  char*            geoProperty;
-} OrionldGeoInfo;
+extern void distOpListDebug(DistOp* distOpList, const char* what);
 
-#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDGEOINFO_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// distOpListDebug2 -
+//
+extern void distOpListDebug2(DistOp* distOpP, const char* what);
+
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTDEBUG_H_
