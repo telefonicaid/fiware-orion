@@ -40,43 +40,6 @@ extern "C"
 #include "orionld/forwarding/regMatchInformationArrayForQuery.h"  // Own interface
 
 
-#if 0
-// -----------------------------------------------------------------------------
-//
-// distOpEnqueueOne -
-//
-DistOp* distOpEnqueueOne(DistOp* listP, DistOp* newItemP)
-{
-  if (listP != NULL)
-    newItemP->next = listP;  // Enqueue in the beginning of the list
-
-  return newItemP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpEnqueueMany -
-//
-DistOp* distOpEnqueueMany(DistOp* listP, DistOp* newItemP)
-{
-  if (listP == NULL)
-    return newItemP;
-
-  // Find last item in listP
-  DistOp* lastItemP = listP;
-  while (lastItemP->next != NULL)
-    lastItemP = lastItemP->next;
-
-  lastItemP->next = listP;
-
-  return listP;
-}
-#endif
-
-
-
 // -----------------------------------------------------------------------------
 //
 // regMatchInformationArrayForQuery -
@@ -85,59 +48,19 @@ DistOp* regMatchInformationArrayForQuery(RegCacheItem* regP, StringArray* idList
 {
   DistOp* distOpList   = NULL;
   KjNode* informationV = kjLookup(regP->regTree, "information");
-  int     infos        = 0;
 
   for (KjNode* infoP = informationV->value.firstChildP; infoP != NULL; infoP = infoP->next)
   {
-    KjNode*      entitiesItemP = NULL;
-    StringArray* attrList      = regMatchInformationItemForQuery(regP, infoP, idListP, typeListP, attrListP, &entitiesItemP);
-
-    if (attrList == NULL)  // No match
-      continue;
-
-    // If we get this far, then it's a match and we can create the DistOp item and return
-    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
-
-    distOpP->regP       = regP;
-    distOpP->operation  = DoQueryEntity;
-    distOpP->attrList   = attrList;
+    DistOp* distOps = regMatchInformationItemForQuery(regP, infoP, idListP, typeListP, attrListP);
 
     //
-    // To fill in 'idList' and 'typeList' of 'distOpP', we need the matching item in "entities"
+    // regMatchEntityInfoForQuery fills in the entity id/type fields for the DistOps,
+    // That is how we "respect" the registration
+    // The search criteria is narrowed down using info from the registration
     //
-    if (entitiesItemP != NULL)
-    {
-      //
-      // This is how we "respect" the registration
-      // The search criteria is narrowed down usinf info from the registration
-      //
-      distOpP->idList   = NULL;
-      distOpP->typeList = NULL;
-
-      KjNode* entityIdP        = kjLookup(entitiesItemP, "id");
-      KjNode* entityIdPatternP = kjLookup(entitiesItemP, "idPattern");
-      KjNode* entityTypeP      = kjLookup(entitiesItemP, "type");
-
-      if (entityIdP != NULL)
-        distOpP->entityId = entityIdP->value.s;
-      else if (entityIdPatternP != NULL)
-        distOpP->entityIdPattern = entityIdPatternP->value.s;
-
-      if (entityTypeP != NULL)  // "type" is mandatory. entityTypeP cannot be NULL
-        distOpP->entityType = entityTypeP->value.s;
-    }
-    else
-    {
-      distOpP->idList     = idListP;
-      distOpP->typeList   = typeListP;
-    }
-
-    distOpList = distOpListsMerge(distOpList, distOpP);
-    ++infos;
+    if (distOps != NULL)
+      distOpList = distOpListsMerge(distOpList, distOps);
   }
 
-  LM(("%s: %d matching infos", regP->regId, infos));
-
-  distOpListDebug(distOpList, "partial list, end of regMatchInformationArrayForQuery");
   return distOpList;
 }

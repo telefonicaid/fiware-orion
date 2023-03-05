@@ -91,7 +91,7 @@ typedef struct SList
 //
 typedef struct ForwardUrlParts
 {
-  DistOp*  distOpP;  // From here we need "op", "entityId", "attrName", ...
+  DistOp*  distOpP;      // From here we need "op", "entityId", "attrName", ...
   SList*   params;       // Linked list of strings (URI params)
   SList*   last;         // Last item in the 'params' list - used for linking in new items
 } ForwardUrlParts;
@@ -450,6 +450,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     // They MUST be sent with NORMALIZED and SYSATTRS, as without that, there's no way to pick attributes in case we have clashes
     //
     uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
+
+    if (distOpP->onlyIds == true)
+      uriParamAdd(&urlParts, "onlyIds=true", NULL, 12);
 
     //
     // If we know the Entity Type, we pass that piece of information as well

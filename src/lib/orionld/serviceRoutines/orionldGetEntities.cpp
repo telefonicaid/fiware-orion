@@ -174,12 +174,7 @@ DistOp* regMatchForEntitiesQuery
     //
     LM_T(LmtRegMatch, ("%s: Reg Match !", regP->regId));
 
-    distOpListDebug(distOpList, "Current List");
-    distOpListDebug(distOpP, "Output from regMatchInformationArrayForQuery");
-
     distOpList = distOpListsMerge(distOpList, distOpP);
-    distOpListDebug(distOpList, "New List");
-    distOpListDebug2(distOpList, "New List");
   }
 
   return distOpList;
@@ -204,6 +199,8 @@ DistOp* distOpRequestsForEntitiesQuery(char* idPattern, QNode* qNode)
   distOpList = distOpListsMerge(exclusiveList,  redirectList);
   distOpList = distOpListsMerge(distOpList, inclusiveList);
   distOpList = distOpListsMerge(distOpList, auxiliarList);
+
+  distOpListDebug2(distOpList, "Final distOpList", "RM");
 
   // What more? :)
 
@@ -249,7 +246,6 @@ bool orionldGetEntities(void)
   if (orionldState.distributed == false)
     return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
 
-  LM(("Distributed"));
   //
   // Matching regs
   //
@@ -264,6 +260,5 @@ bool orionldGetEntities(void)
     return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
   }
 
-  LM(("Calling orionldGetEntitiesDistributed"));
   return orionldGetEntitiesDistributed(distOpList, idPattern, qNode, &geoInfo);
 }

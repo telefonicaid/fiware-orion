@@ -28,6 +28,7 @@ extern "C"
 #include "kjson/kjFree.h"                                           // kjFree
 #include "kjson/kjLookup.h"                                         // kjLookup
 #include "kjson/kjBuilder.h"                                        // kjChildRemove, kjChildAdd, kjArray
+#include "kjson/kjParse.h"                                          // kjParse
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
@@ -39,6 +40,9 @@ extern "C"
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
 #include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
+#include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
+#include "orionld/forwarding/xForwardedForCompose.h"                // xForwardedForCompose
+#include "orionld/forwarding/distOpSend.h"                          // distOpSend
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesDistributed.h"  // Own interface
 
@@ -84,35 +88,190 @@ extern "C"
 
 
 
+// Global variable - Needs to go to orionld/common/orionldState.h/cpp
+KjNode* orionldDistOpMatchIds = NULL;
+
+
+
 // -----------------------------------------------------------------------------
 //
-// distOpMatchIdsGet -
+// distOpsSend -
 //
-static KjNode* distOpMatchIdsGet(DistOp* distOpList)
+int distOpsSend(DistOp* distOpList)
 {
-  KjNode* distOpMatchIds = NULL;
+  char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
 
-  distOpListDebug(distOpList, "Before distOpMatchIdsGet");
-  //
-  //  Foreach matching reg in distOpList
-  //    Query endpoint for an array of matching Entity IDs
-  //    Foreach eidMatch
-  //      KjNode* matchP = kjLookup(distOpMatchIds, eidMatch->value.s)
-  //      if (matchP)
-  //        kjChildAdd(matchP, distOpP->regP->regId)
-  //      else
-  //        matchP = kjArray(NULL, eidMatch->value.s);
-  //        kjChildInsert(distOpMatchIds, matchP);
-  //
-  //
+  char dateHeader[70];
+  snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);  // MOVE to orionldStateInit, for example
 
-  return distOpMatchIds;
+  int forwards = 0;  // Debugging purposees
+  for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
+  {
+    // Send the forwarded request and await all responses
+    if ((distOpP->regP != NULL) && (distOpP->error == false))
+    {
+      distOpP->onlyIds = true;
+
+      if (distOpSend(distOpP, dateHeader, xff) == 0)
+        distOpP->error = false;
+      else
+        distOpP->error = true;
+
+      ++forwards;  // Also when error?
+    }
+  }
+
+  int stillRunning = 1;
+  int loops        = 0;
+
+  if (forwards > 0)
+  {
+    while (stillRunning != 0)
+    {
+      CURLMcode cm = curl_multi_perform(orionldState.curlDoMultiP, &stillRunning);
+      if (cm != 0)
+      {
+        LM_E(("Internal Error (curl_multi_perform: error %d)", cm));
+        return -1;
+      }
+
+      if (stillRunning != 0)
+      {
+        cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 1000, NULL);
+        if (cm != CURLM_OK)
+        {
+          LM_E(("Internal Error (curl_multi_wait: error %d", cm));
+          return -2;
+        }
+      }
+
+      if ((++loops >= 50) && ((loops % 25) == 0))
+        LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
+    }
+
+    if (loops >= 100)
+      LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
+  }
+
+  return forwards;
 }
 
 
 
-// Global variable - Needs to go to orionld/common/orionldState.h/cpp
-KjNode* orionldDistOpMatchIds = NULL;
+// -----------------------------------------------------------------------------
+//
+// DistOpResponseTreatFunction -
+//
+typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// distOpsReceive -
+//
+void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam)
+{
+  //
+  // Read the responses to the forwarded requests
+  //
+  CURLMsg* msgP;
+  int      msgsLeft;
+
+  while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
+  {
+    if (msgP->msg != CURLMSG_DONE)
+      continue;
+
+    if (msgP->data.result == CURLE_OK)
+    {
+      DistOp* distOpP = distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
+
+      if (distOpP == NULL)
+      {
+        LM_E(("Unable to find the curl handle of a message, presumably a response to a forwarded request"));
+        continue;
+      }
+
+      curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &distOpP->httpResponseCode);
+
+      if ((distOpP->rawResponse != NULL) && (distOpP->rawResponse[0] != 0))
+        distOpP->responseBody = kjParse(orionldState.kjsonP, distOpP->rawResponse);
+
+      LM_T(LmtDistOpResponse, ("%s: received a response for a forwarded request", distOpP->regP->regId, distOpP->httpResponseCode));
+      LM_T(LmtDistOpResponse, ("%s: response for a forwarded request: %s", distOpP->regP->regId, distOpP->rawResponse));
+
+      treatFunction(distOpP, callbackParam);
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldDistOpMatchAdd -
+//
+void orionldDistOpMatchAdd(const char* entityId, const char* regId)
+{
+  KjNode* matchP = kjLookup(orionldDistOpMatchIds, entityId);
+  if (matchP == NULL)
+  {
+    //
+    // The entity ID is not present in the list - must be added
+    //
+    matchP = kjArray(NULL, entityId);
+    kjChildAdd(orionldDistOpMatchIds, matchP);
+  }
+
+  //
+  // Add regId to matchP's array - remember it's a global variable, can't use orionldState
+  //
+  KjNode* regIdNodeP = (regId != NULL)? kjString(NULL, NULL, regId) : kjNull(NULL, NULL);
+  kjChildAdd(matchP, regIdNodeP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// idListResponse - callback function for distOpMatchIdsGet
+//
+int idListResponse(DistOp* distOpP, void* callbackParam)
+{
+  if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
+  {
+    for (KjNode* eIdNodeP = distOpP->responseBody->value.firstChildP; eIdNodeP != NULL; eIdNodeP = eIdNodeP->next)
+    {
+      char* entityId = eIdNodeP->value.s;
+
+      LM_T(LmtSR, ("* Entity '%s', registration '%s'", entityId, distOpP->regP->regId));
+
+      orionldDistOpMatchAdd(entityId, distOpP->regP->regId);
+    }
+  }
+
+  return 0;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// distOpMatchIdsRequest -
+//
+static void distOpMatchIdsRequest(DistOp* distOpList)
+{
+  if (distOpList == NULL)
+    return;
+
+  // Send all distributed requests
+  int forwards = distOpsSend(distOpList);
+
+  // Await all responses, if any
+  if (forwards > 0)
+    distOpsReceive(distOpList, idListResponse, orionldDistOpMatchIds);
+}
 
 
 
@@ -172,25 +331,23 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
   if ((orionldDistOpMatchIds == NULL) || (orionldState.uriParams.reset == true))
   {
     orionldDistOpMatchIdsRelease();
-    orionldDistOpMatchIds = distOpMatchIdsGet(distOpList);  // Not including local hits
+    orionldDistOpMatchIds = kjObject(NULL, "orionldDistOpMatchIds");
+    distOpMatchIdsRequest(distOpList);  // Not including local hits
   }
 
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request
   //
-// #if 0
-  // Temporarily removing this, for tests of mongocEntitiesQuery
   if (orionldDistOpMatchIds == NULL)
     return orionldGetEntitiesLocal(idPattern, qNode, geoInfoP);
-// #endif
 
   char* geojsonGeometryLongName = NULL;
   if (orionldState.out.contentType == GEOJSON)
     geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
 
   // Get the local matches
-  KjNode* localEntitiesV = NULL;
   int64_t count;
+  KjNode* localEntityV   = NULL;
   KjNode* localDbMatches = mongocEntitiesQuery(&orionldState.in.typeList,
                                              &orionldState.in.idList,
                                              idPattern,
@@ -203,23 +360,42 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
 
   if (localDbMatches != NULL)
   {
-    kjTreeLog(localDbMatches, "Response from mongocEntitiesQuery", LmtMongoc);
-    localEntitiesV = dbModelToEntityIdArray(localDbMatches);
-    kjTreeLog(localEntitiesV, "Local Entities", LmtMongoc);
+    localEntityV = dbModelToEntityIdArray(localDbMatches);
+
+    for (KjNode* eidNodeP = localEntityV->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
+    {
+      const char* entityId = eidNodeP->value.s;
+      orionldDistOpMatchAdd(entityId, NULL);
+    }
+
+    kjTreeLog(orionldDistOpMatchIds, "Complete Entity-Reg Array", LmtSR);
   }
-  else
-    LM(("Found no local matches"));
 
-  //   Foreach DistOp in distOpList
-  //     query endpoint for matching entities (only array of entity ID in response)
-  //     Foreach id in matchingEidArray
-  //       if ((match = kjStringValueLookupInArray(queryIdArray, id)) == true)
-  //         kjChildRemove(queryIdArray, match)
-  //         idRegArray = kjObject(NULL, match->name)
-  //         kjChildAdd(idRegArray, "local");
-  //         kjChildAdd(idRegArray, distOpP->regP->regId);
-  //       else if ((match = kjLookup()) != NULL)
-  // }
+  // Now we have the list of entities and their registrations
+  // All of that will go into a separatre routine.
+  // What will be done here now is:
+  //
+  // - pick which entities to retrieve (according to pagination)
+  //   - Create a new list for that
+  //
+  // - Send all forwarded requests
+  //   - create an idList (?id=E1,E2,...) and add it to each DistOp to be used
+  //   - reuse the attrList from the distOp's
+  //
+  // - Await the responses and
+  //   - Merge all responses into an array of entities
+  //   - Merge entities into one in case there's more than one with the same Entity ID
+  //   - respond to the initial caller
+  //
+  //
+  // ALSO:   Forgot about Count.
+  //         Every forwarded request needs to be with "count == true", and the Count HTTP Headers in the responses
+  //         must be found and an accumulated count maintained
+  //
 
-  return false;
+  orionldState.responseTree   = kjArray(orionldState.kjsonP, NULL);
+  orionldState.httpStatusCode = 200;
+
+  LM(("Returning 200"));
+  return true;
 }

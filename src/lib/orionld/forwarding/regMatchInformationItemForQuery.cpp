@@ -31,6 +31,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
+#include "orionld/forwarding/distOpListDebug.h"                  // distOpListDebug
 #include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery
 #include "orionld/forwarding/regMatchAttributesForGet.h"         // regMatchAttributesForGet
 #include "orionld/forwarding/regMatchInformationItemForQuery.h"  // Own interface
@@ -41,45 +44,90 @@ extern "C"
 //
 // regMatchInformationItemForQuery -
 //
-StringArray* regMatchInformationItemForQuery
+DistOp* regMatchInformationItemForQuery
 (
   RegCacheItem* regP,
   KjNode*       infoP,
   StringArray*  idListP,
   StringArray*  typeListP,
-  StringArray*  attrListP,
-  KjNode**      entityInfoPP
+  StringArray*  attrListP
 )
 {
-  KjNode* entities = kjLookup(infoP, "entities");
-
-  kjTreeLog(infoP, "reg::info array item", LmtRegMatch);
-
-  *entityInfoPP = NULL;  // If no "entities", there can still be a match
+  KjNode* entities   = kjLookup(infoP, "entities");
+  DistOp* distOpList = NULL;
 
   if (entities != NULL)
   {
-    bool match = false;
+    DistOp* distOpP = NULL;
+
     for (KjNode* entityInfoP = entities->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
     {
-      if (regMatchEntityInfoForQuery(regP, entityInfoP, idListP, typeListP) == true)
+      //
+      // Creating a DistOp, in case entityInfoP matches (regMatchEntityInfoForQuery fills it in on hit).
+      // If used:
+      //   - distOpP is inserted in distOpList,
+      //   - it is NULLed, and
+      //   - it is allocated again in the next round of the loop
+      //
+      if (distOpP == NULL)
+        distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
+
+      if (regMatchEntityInfoForQuery(regP, entityInfoP, idListP, typeListP, distOpP) == true)
       {
-        match = true;
-        *entityInfoPP = entityInfoP;
-        // FIXME: Two different entityInfos might match.
-        //        To take care of this case, this function would need to create DistOp's and return a linked list of them
-        //        one DistOp per matching item in "entities"
-        break;
+        distOpP->regP       = regP;
+        distOpP->operation  = DoQueryEntity;
+        distOpP->attrList   = NULL;  // Might come later (regMatchAttributesForGet)
+        distOpP->next       = NULL;
+
+        if (distOpList == NULL)
+          distOpList = distOpP;
+        else
+        {
+          distOpP->next = distOpList;
+          distOpList    = distOpP;
+        }
+
+        distOpP = NULL;
       }
     }
 
-    if (match == false)
+    if (distOpList == NULL)
       return NULL;
   }
+  else
+  {
+    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
 
+    distOpP->regP       = regP;
+    distOpP->operation  = DoQueryEntity;
+    distOpP->idList     = idListP;
+    distOpP->typeList   = typeListP;
+    distOpP->attrList   = NULL;  // Comes later (regMatchAttributesForGet)
+    distOpP->next       = NULL;
+
+    if (distOpList == NULL)
+      distOpList = distOpP;
+    else
+    {
+      distOpP->next = distOpList;
+      distOpList    = distOpP;
+    }
+  }
+
+  //
+  // The attributes are the same for all matching entity array items
+  //
   KjNode*      propertyNamesP     = kjLookup(infoP, "propertyNames");
   KjNode*      relationshipNamesP = kjLookup(infoP, "relationshipNames");
   StringArray* attrUnionP         = regMatchAttributesForGet(regP, propertyNamesP, relationshipNamesP, attrListP, NULL);
 
-  return attrUnionP;
+  if (attrUnionP == NULL)
+    return NULL;
+
+  for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
+  {
+    distOpP->attrList = attrUnionP;
+  }
+
+  return distOpList;
 }

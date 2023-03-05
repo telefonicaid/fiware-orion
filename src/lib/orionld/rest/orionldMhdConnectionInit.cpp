@@ -527,6 +527,8 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     return MHD_YES;
   }
 
+  LM_T(LmtUriParams, ("URI Param: %s=%s", key, value));
+
   //
   // Forbidden characters in URI param value - not for NGSI-LD - for now at least ...
   //

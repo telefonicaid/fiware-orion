@@ -34,13 +34,17 @@
 //
 // distOpListDebug -
 //
-void distOpListDebug(DistOp* distOpList, const char* what)
+void distOpListDebug(DistOp* distOpList, const char* what, const char* prefix)
 {
-  LM(("Matching registrations (%s):", what));
+  LM(("%s: Matching registrations (%s):", prefix, what));
+
+  if (distOpList == NULL)
+    LM(("%s:   None", prefix));
+
   int ix = 0;
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
   {
-    LM(("  DistOp %d: Reg Id: %s", ix, distOpP->regP->regId));
+    LM(("%s:   DistOp %d: Reg Id: %s", prefix, ix, distOpP->regP->regId));
     ++ix;
   }
 }
@@ -51,31 +55,34 @@ void distOpListDebug(DistOp* distOpList, const char* what)
 //
 // distOpListDebug2 -
 //
-void distOpListDebug2(DistOp* distOpP, const char* what)
+void distOpListDebug2(DistOp* distOpP, const char* what, const char* prefix)
 {
-  LM(("----- DistOp List: %s", what));
+  LM(("%s: ----- DistOp List: %s", what, prefix));
+
+  if (distOpP == NULL)
+    LM(("%s:   None", prefix));
 
   while (distOpP != NULL)
   {
-    LM(("  Registration:      %s", distOpP->regP->regId));
-    LM(("  Operation:         %s", distOpTypes[distOpP->operation]));
+    LM(("%s:   Registration:      %s", prefix, distOpP->regP->regId));
+    LM(("%s:   Operation:         %s", prefix, distOpTypes[distOpP->operation]));
 
     if (distOpP->error == true)
     {
-      LM(("  Title:             %s", distOpP->title));
-      LM(("  Detail:            %s", distOpP->detail));
-      LM(("  Status:            %d", distOpP->httpResponseCode));
+      LM(("%s:   Title:             %s", prefix, distOpP->title));
+      LM(("%s:   Detail:            %s", prefix, distOpP->detail));
+      LM(("%s:   Status:            %d", prefix, distOpP->httpResponseCode));
     }
 
     if (distOpP->requestBody != NULL)
     {
-      LM(("  Attributes:"));
+      LM(("%s:   Attributes:", prefix));
       int ix = 0;
       for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
         if ((strcmp(attrP->name, "id") != 0) && (strcmp(attrP->name, "type") != 0))
         {
-          LM(("    Attribute %d:   '%s'", ix, attrP->name));
+          LM(("%s:     Attribute %d:   '%s'", prefix, ix, attrP->name));
           ++ix;
         }
       }
@@ -83,42 +90,42 @@ void distOpListDebug2(DistOp* distOpP, const char* what)
 
     if (distOpP->attrList != NULL)
     {
-      LM(("  URL Attributes:        %d", distOpP->attrList->items));
+      LM(("%s:   URL Attributes:        %d", prefix, distOpP->attrList->items));
       for (int ix = 0; ix < distOpP->attrList->items; ix++)
       {
-        LM(("    Attribute %d:   '%s'", ix, distOpP->attrList->array[ix]));
+        LM(("%s:     Attribute %d:   '%s'", prefix, ix, distOpP->attrList->array[ix]));
       }
     }
 
     if (distOpP->typeList != NULL)
     {
-      LM(("  URL Entity Types:        %d", distOpP->typeList->items));
+      LM(("%s:   URL Entity Types:        %d", prefix, distOpP->typeList->items));
       for (int ix = 0; ix < distOpP->typeList->items; ix++)
       {
-        LM(("    Entity Type %02d:   '%s'", ix, distOpP->typeList->array[ix]));
+        LM(("%s:     Entity Type %02d:   '%s'", prefix, ix, distOpP->typeList->array[ix]));
       }
     }
 
     if (distOpP->idList != NULL)
     {
-      LM(("  URL Entity IDs:        %d", distOpP->idList->items));
+      LM(("%s:   URL Entity IDs:        %d", prefix, distOpP->idList->items));
       for (int ix = 0; ix < distOpP->idList->items; ix++)
       {
-        LM(("    Entity ID %02d:   '%s'", ix, distOpP->idList->array[ix]));
+        LM(("%s:     Entity ID %02d:   '%s'", prefix, ix, distOpP->idList->array[ix]));
       }
     }
 
     if (distOpP->entityId != NULL)
-      LM(("  URL Entity ID:         %s", distOpP->entityId));
+      LM(("%s:   URL Entity ID:         %s", prefix, distOpP->entityId));
     if (distOpP->entityIdPattern != NULL)
-      LM(("  URL Entity ID Pattern: %s", distOpP->entityIdPattern));
+      LM(("%s:   URL Entity ID Pattern: %s", prefix, distOpP->entityIdPattern));
     if (distOpP->entityType != NULL)
-      LM(("  URL Entity TYPE:       %s", distOpP->entityType));
+      LM(("%s:   URL Entity TYPE:       %s", prefix, distOpP->entityType));
 
-    LM(("----------------------------------------"));
+    LM(("%s: ----------------------------------------", prefix));
 
     distOpP = distOpP->next;
   }
 
-  LM(("---------------------"));
+  LM(("%s: ---------------------", prefix));
 }

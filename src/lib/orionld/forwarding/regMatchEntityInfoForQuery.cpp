@@ -30,6 +30,7 @@ extern "C"
 
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem, RegIdPattern
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery
 
 
@@ -52,7 +53,7 @@ extern RegIdPattern* regIdPatternLookup(RegCacheItem* regP, KjNode* idPatternP);
 //   idListP:     StringArray of Entity Ids (can be empty)
 //   typeListP:   StringArray of Entity Types (can be empty)
 //
-bool regMatchEntityInfoForQuery(RegCacheItem* regP, KjNode* entityInfoP, StringArray* idListP, StringArray* typeListP)
+bool regMatchEntityInfoForQuery(RegCacheItem* regP, KjNode* entityInfoP, StringArray* idListP, StringArray* typeListP, DistOp* distOpP)
 {
   KjNode* regEntityTypeP       = kjLookup(entityInfoP, "type");
   KjNode* regEntityIdP         = kjLookup(entityInfoP, "id");
@@ -148,6 +149,28 @@ bool regMatchEntityInfoForQuery(RegCacheItem* regP, KjNode* entityInfoP, StringA
       }
     }
   }
+
+  if (regEntityIdP != NULL)
+  {
+    distOpP->entityId = regEntityIdP->value.s;
+    distOpP->idList   = NULL;
+  }
+  else
+    distOpP->idList = idListP;
+
+  if ((regEntityIdP == NULL) && (regEntityIdPatternP != NULL))
+  {
+    distOpP->entityIdPattern = regEntityIdPatternP->value.s;
+    distOpP->idList          = NULL;
+  }
+
+  if (regEntityTypeP != NULL)  // "type" is mandatory. regEntityTypeP cannot be NULL
+  {
+    distOpP->entityType = regEntityTypeP->value.s;
+    distOpP->typeList   = NULL;
+  }
+  else
+    distOpP->typeList = typeListP;
 
   return true;
 }

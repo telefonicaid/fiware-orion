@@ -33,7 +33,7 @@
 //
 // distOpListDebug -
 //
-extern void distOpListDebug(DistOp* distOpList, const char* what);
+extern void distOpListDebug(DistOp* distOpList, const char* what, const char* prefix);
 
 
 
@@ -41,6 +41,6 @@ extern void distOpListDebug(DistOp* distOpList, const char* what);
 //
 // distOpListDebug2 -
 //
-extern void distOpListDebug2(DistOp* distOpP, const char* what);
+extern void distOpListDebug2(DistOp* distOpP, const char* what, const char* prefix);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTDEBUG_H_

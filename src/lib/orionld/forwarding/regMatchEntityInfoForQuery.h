@@ -32,6 +32,7 @@ extern "C"
 
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
@@ -39,6 +40,13 @@ extern "C"
 //
 // regMatchEntityInfoForQuery -
 //
-extern bool regMatchEntityInfoForQuery(RegCacheItem* regP, KjNode* entityInfoP, StringArray* idListP, StringArray* typeListP);
+extern bool regMatchEntityInfoForQuery
+(
+  RegCacheItem*  regP,
+  KjNode*        entityInfoP,
+  StringArray*   idListP,
+  StringArray*   typeListP,
+  DistOp*        distOpP
+);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFOFORQUERY_H_

@@ -133,7 +133,7 @@ StringArray* regMatchAttributesForGet
   }
 
   StringArray* sList = (StringArray*) kaAlloc(&orionldState.kalloc, sizeof(StringArray));
-  int          items;
+  int          items = 0;
 
   if (allAttributes == true)  // We know that attrListP == NULL (otherwise it would have returned already a few lines up)
   {
@@ -142,7 +142,7 @@ StringArray* regMatchAttributesForGet
     sList->array = NULL;
     return sList;
   }
-  else if (attrListP != NULL)
+  else if ((attrListP != NULL) && (attrListP->items > 0))
     items = attrListP->items;
   else
   {
@@ -154,9 +154,10 @@ StringArray* regMatchAttributesForGet
   }
 
   sList->items = items;
-  sList->array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+  if (items > 0)
+    sList->array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
 
-  if (attrListP == NULL)
+  if ((attrListP == NULL) || (attrListP->items == 0))
   {
     // Just copy all propertyNames + relationshipNames to sList
     int ix = 0;
