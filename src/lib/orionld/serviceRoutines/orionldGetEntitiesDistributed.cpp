@@ -29,6 +29,7 @@ extern "C"
 #include "kjson/kjLookup.h"                                         // kjLookup
 #include "kjson/kjBuilder.h"                                        // kjChildRemove, kjChildAdd, kjArray
 #include "kjson/kjParse.h"                                          // kjParse
+#include "kjson/kjRender.h"                                         // kjRender (for debugging purposes - LM_T)
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
@@ -39,7 +40,6 @@ extern "C"
 #include "orionld/q/QNode.h"                                        // QNode
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
 #include "orionld/forwarding/DistOp.h"                              // DistOp
-#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
 #include "orionld/forwarding/xForwardedForCompose.h"                // xForwardedForCompose
 #include "orionld/forwarding/distOpSend.h"                          // distOpSend
@@ -54,7 +54,7 @@ extern "C"
 //
 // - To be able to do pagination, we need a list of all matching entities:
 //
-//     "orionldDistOpMatchIds": {
+//     "orionldEntityMap": {
 //       "urn:E1": [ null ],          # null indicates it was found locally
 //       "urn:E2": [ null ],
 //       "urn:E3": [ null ],
@@ -74,9 +74,9 @@ extern "C"
 // Mechanism:
 // 1. GET a list of all matching registrations.
 // 2. Query them all (locally as well) for their 'Entity Id Array'
-// 3. Merge all the reponses into one single array (orionldDistOpMatchIds)
+// 3. Merge all the reponses into one single array (orionldEntityMap)
 // 4. Now we have a list and we can do pagination.
-// 5. Just pick the start index and end index of orionldDistOpMatchIds and:
+// 5. Just pick the start index and end index of orionldEntityMap and:
 //    - Identify each registered endpoint to be queried (from start index to end index)
 //    - Gather all entity ids for each registered endpoint
 //    - query using (GET /entities?id=E1,E2,E3,...En)
@@ -89,7 +89,7 @@ extern "C"
 
 
 // Global variable - Needs to go to orionld/common/orionldState.h/cpp
-KjNode* orionldDistOpMatchIds = NULL;
+KjNode* orionldEntityMap = NULL;
 
 
 
@@ -214,14 +214,14 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 //
 void orionldDistOpMatchAdd(const char* entityId, const char* regId)
 {
-  KjNode* matchP = kjLookup(orionldDistOpMatchIds, entityId);
+  KjNode* matchP = kjLookup(orionldEntityMap, entityId);
   if (matchP == NULL)
   {
     //
     // The entity ID is not present in the list - must be added
     //
     matchP = kjArray(NULL, entityId);
-    kjChildAdd(orionldDistOpMatchIds, matchP);
+    kjChildAdd(orionldEntityMap, matchP);
   }
 
   //
@@ -241,11 +241,12 @@ int idListResponse(DistOp* distOpP, void* callbackParam)
 {
   if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
   {
+    LM_T(LmtEntityMapDetail, ("Entity map from registration '%s'", distOpP->regP->regId));
     for (KjNode* eIdNodeP = distOpP->responseBody->value.firstChildP; eIdNodeP != NULL; eIdNodeP = eIdNodeP->next)
     {
       char* entityId = eIdNodeP->value.s;
 
-      LM_T(LmtSR, ("* Entity '%s', registration '%s'", entityId, distOpP->regP->regId));
+      LM_T(LmtEntityMapDetail, ("o Entity '%s', registration '%s'", entityId, distOpP->regP->regId));
 
       orionldDistOpMatchAdd(entityId, distOpP->regP->regId);
     }
@@ -270,21 +271,21 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
 
   // Await all responses, if any
   if (forwards > 0)
-    distOpsReceive(distOpList, idListResponse, orionldDistOpMatchIds);
+    distOpsReceive(distOpList, idListResponse, orionldEntityMap);
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldDistOpMatchIdsRelease -
+// orionldEntityMapRelease -
 //
-void orionldDistOpMatchIdsRelease(void)
+void orionldEntityMapRelease(void)
 {
-  if (orionldDistOpMatchIds != NULL)
+  if (orionldEntityMap != NULL)
   {
-    kjFree(orionldDistOpMatchIds);
-    orionldDistOpMatchIds = NULL;
+    kjFree(orionldEntityMap);
+    orionldEntityMap = NULL;
   }
 }
 
@@ -328,17 +329,23 @@ KjNode* dbModelToEntityIdArray(KjNode* localDbMatches)
 //
 bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
 {
-  if ((orionldDistOpMatchIds == NULL) || (orionldState.uriParams.reset == true))
+  if (orionldState.uriParams.reset == true)
   {
-    orionldDistOpMatchIdsRelease();
-    orionldDistOpMatchIds = kjObject(NULL, "orionldDistOpMatchIds");
+    orionldEntityMapRelease();
+    orionldEntityMap = NULL;
+  }
+
+  if (orionldEntityMap == NULL)
+  {
+    orionldEntityMapRelease();
+    orionldEntityMap = kjObject(NULL, "orionldEntityMap");
     distOpMatchIdsRequest(distOpList);  // Not including local hits
   }
 
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request
   //
-  if (orionldDistOpMatchIds == NULL)
+  if ((orionldEntityMap == NULL) || (orionldEntityMap->value.firstChildP == NULL))
     return orionldGetEntitiesLocal(idPattern, qNode, geoInfoP);
 
   char* geojsonGeometryLongName = NULL;
@@ -367,8 +374,18 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
       const char* entityId = eidNodeP->value.s;
       orionldDistOpMatchAdd(entityId, NULL);
     }
+  }
 
-    kjTreeLog(orionldDistOpMatchIds, "Complete Entity-Reg Array", LmtSR);
+  if (lmTraceIsSet(LmtEntityMap) == true)
+  {
+    LM_T(LmtEntityMap, ("Entity Maps:"));
+    for (KjNode* entityP = orionldEntityMap->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    {
+      char rBuf[1024];
+
+      kjFastRender(entityP, rBuf);
+      LM_T(LmtEntityMap, ("o '%s': %s", entityP->name, rBuf));
+    }
   }
 
   // Now we have the list of entities and their registrations
@@ -396,6 +413,5 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
   orionldState.responseTree   = kjArray(orionldState.kjsonP, NULL);
   orionldState.httpStatusCode = 200;
 
-  LM(("Returning 200"));
   return true;
 }

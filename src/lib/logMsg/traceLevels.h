@@ -69,19 +69,26 @@ typedef enum TraceLevels
   //
   // Distributed Operations
   //
-  LmtDistOpMsgs = 70,                  // Distributed Operations: messages
-  LmtDistOpRequest,                    // ONLY the verb, path, and body of a distributed request
+  LmtDistOpRequest = 70,               // ONLY the verb, path, and body of a distributed request
   LmtDistOpResponse,                   // ONLY the body and status code of the response to a distributed request
-  LmtDistOp207,                        // Merging of the final 207 response
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
+  LmtDistOp207,                        // Merging of the final 207 response
+  LmtDistOpList,                       // Matching registrations subject to forwarded requests
+  LmtDistOpMsgs,                       // Deprecated, still in use though :(
   LmtMqtt,                             // MQTT notifications
+
+  //
+  // Pagination
+  //
+  LmtEntityMap = 80,                   // The arrays of registrations per entity - distributed GET /entities
+  LmtEntityMapDetail,                  // Details of the entity-registration maps
 
   //
   // Misc
   //
-  LmtMongoc = 80,                      // Entire mongoc library
+  LmtMongoc = 90,                      // Entire mongoc library
   LmtSR,                               // Service Routine (whatever it is doing)
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs

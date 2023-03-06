@@ -200,7 +200,7 @@ DistOp* distOpRequestsForEntitiesQuery(char* idPattern, QNode* qNode)
   distOpList = distOpListsMerge(distOpList, inclusiveList);
   distOpList = distOpListsMerge(distOpList, auxiliarList);
 
-  distOpListDebug2(distOpList, "Final distOpList", "RM");
+  distOpListDebug2(distOpList, "Final distOpList");
 
   // What more? :)
 

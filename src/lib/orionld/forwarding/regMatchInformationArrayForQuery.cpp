@@ -35,7 +35,6 @@ extern "C"
 #include "orionld/regCache/RegCache.h"                            // RegCacheItem
 #include "orionld/forwarding/DistOp.h"                            // DistOp
 #include "orionld/forwarding/distOpListsMerge.h"                  // distOpListsMerge
-#include "orionld/forwarding/distOpListDebug.h"                   // distOpListDebug
 #include "orionld/forwarding/regMatchInformationItemForQuery.h"   // regMatchInformationItemForQuery
 #include "orionld/forwarding/regMatchInformationArrayForQuery.h"  // Own interface
 
