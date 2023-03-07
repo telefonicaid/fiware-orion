@@ -91,7 +91,7 @@ std::string changeLogConfig
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
-      return "{\"error\":\"invalid logInfoPayloadMaxSize,logPayload size should be > 0\"}";
+      return "{\"error\":\"invalid logInfoPayloadMaxSize, logPayload size should be > 0\"}";
     }
   }
 
