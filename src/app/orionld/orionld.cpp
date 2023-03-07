@@ -144,9 +144,6 @@ extern "C"
 #include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
 #include "orionld/forwarding/distOpInit.h"                    // distOpInit
-#include "orionld/socketService/socketServiceInit.h"          // socketServiceInit
-#include "orionld/socketService/socketServiceRun.h"           // socketServiceRun
-
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -822,49 +819,6 @@ static void libLogFunction
 }
 
 
-#ifdef DEBUG
-// -----------------------------------------------------------------------------
-//
-// regCachePresent -
-//
-void regCachePresent(void)
-{
-  for (OrionldTenant* tenantP = &tenant0; tenantP != NULL; tenantP = tenantP->next)
-  {
-    if (tenantP->regCache == NULL)
-      LM(("Tenant '%s': No regCache", tenantP->mongoDbName));
-    else
-    {
-      LM(("Tenant '%s':", tenantP->mongoDbName));
-      RegCacheItem* rciP = tenantP->regCache->regList;
-
-      while (rciP != NULL)
-      {
-        KjNode* regIdP = kjLookup(rciP->regTree, "id");
-
-        LM(("  o Registration %s:", (regIdP != NULL)? regIdP->value.s : "unknown"));
-        LM(("    o mode:  %s", registrationModeToString(rciP->mode)));
-        LM(("    o ops:   0x%x", rciP->opMask));
-
-        if (rciP->idPatternRegexList != NULL)
-        {
-          LM(("    o patterns:"));
-          for (RegIdPattern* ripP = rciP->idPatternRegexList; ripP != NULL; ripP = ripP->next)
-          {
-            LM(("      o %s (idPattern at %p)", ripP->owner->value.s, ripP->owner));
-          }
-        }
-        else
-          LM(("    o patterns: NONE"));
-        LM(("  -----------------------------------"));
-        rciP = rciP->next;
-      }
-    }
-  }
-}
-#endif
-
-
 
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
@@ -986,13 +940,19 @@ int main(int argC, char* argV[])
   }
 
   //
-  // If trace levels are set, turn set logLevel to DEBUG, so that the trace messages will actually pass through
+  // If trace levels are set, set logLevel to DEBUG, so that the trace messages will actually pass through
   //
   if (paIsSet(argC, argV, paArgs, "-t"))
     strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel) - 1);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  if ((debugCurl == true) && ((lmTraceIsSet(LmtCurl) == false) || (strcmp(paLogLevel, "DEBUG") != 0)))
+  {
+    strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel) - 1);
+    lmTraceLevelSet(LmtCurl, true);
+  }
 
 #if 0
   //
@@ -1133,7 +1093,6 @@ int main(int argC, char* argV[])
 
   // localIpAndPort - IP:port for X-Forwarded-For
   snprintf(localIpAndPort, sizeof(localIpAndPort), "%s:%d", orionldHostName, port);
-  LM(("localIpAndPort: %s", localIpAndPort));
 
   orionldStateInit(NULL);
 

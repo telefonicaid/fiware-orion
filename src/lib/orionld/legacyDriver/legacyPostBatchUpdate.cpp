@@ -84,29 +84,29 @@ static bool entityTypeChange(KjNode* entityP, KjNode* dbEntityP, char** newTypeP
   KjNode*  oldTypeNodeP  = kjLookup(dbEntityP, "type");
   char*    oldType       = (oldTypeNodeP != NULL)? oldTypeNodeP->value.s : NULL;
 
-  LM(("TYPES: newTypeNodeP at %p", newTypeNodeP));
-  LM(("TYPES: oldTypeNodeP at %p", oldTypeNodeP));
+  LM_T(LmtLegacy, ("TYPES: newTypeNodeP at %p", newTypeNodeP));
+  LM_T(LmtLegacy, ("TYPES: oldTypeNodeP at %p", oldTypeNodeP));
 
   if (newTypeNodeP != NULL)
-    LM(("TYPES: newType: '%s'", newTypeNodeP->value.s));
+    LM_T(LmtLegacy, ("TYPES: newType: '%s'", newTypeNodeP->value.s));
   if (oldTypeNodeP != NULL)
-    LM(("TYPES: oldType: '%s'", oldTypeNodeP->value.s));
+    LM_T(LmtLegacy, ("TYPES: oldType: '%s'", oldTypeNodeP->value.s));
 
   if ((newType != NULL) && (oldType != NULL))
   {
     if (strcmp(newType, oldType) != 0)  // They differ
     {
       *newTypeP = newType;
-      LM(("TYPES: Bad - old and new type differ"));
+      LM_T(LmtLegacy, ("TYPES: Bad - old and new type differ"));
       return true;
     }
     else
-      LM(("TYPES: '%s' and '%s' are identical", newType, oldType));
+      LM_T(LmtLegacy, ("TYPES: '%s' and '%s' are identical", newType, oldType));
   }
   else
-    LM(("TYPES: Both new and old are NULL"));
+    LM_T(LmtLegacy, ("TYPES: Both new and old are NULL"));
 
-  LM(("TYPES: All Good - no diff ..."));
+  LM_T(LmtLegacy, ("TYPES: All Good - no diff ..."));
   return false;
 }
 

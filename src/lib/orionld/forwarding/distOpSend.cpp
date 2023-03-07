@@ -329,8 +329,6 @@ void subAttrsCompact(KjNode* requestBody, OrionldContext* fwdContextP)
 {
   for (KjNode* subAttrP = requestBody->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
   {
-    LM(("subAttr '%s'", subAttrP->name));
-
     if (strcmp(subAttrP->name, "type")        == 0)   continue;
     if (strcmp(subAttrP->name, "value")       == 0)   continue;
     if (strcmp(subAttrP->name, "object")      == 0)   continue;

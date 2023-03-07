@@ -255,10 +255,7 @@ bool orionldGetEntities(void)
   // if there are no matching registrations, the request is treated as a local request
   //
   if (distOpList == NULL)
-  {
-    LM(("No hits in Registrations, so, treating it as a local request"));
     return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
-  }
 
   return orionldGetEntitiesDistributed(distOpList, idPattern, qNode, &geoInfo);
 }

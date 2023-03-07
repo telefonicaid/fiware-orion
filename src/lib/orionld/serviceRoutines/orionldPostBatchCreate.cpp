@@ -72,7 +72,7 @@ bool orionldPostBatchCreate(void)
   KjNode*      outArrayErroredP = kjArray(orionldState.kjsonP, "errors");
   int          noOfEntities     = batchEntityCountAndFirstCheck(orionldState.requestTree, outArrayErroredP);
 
-  LM(("Number of valid Entities after 1st check-round: %d", noOfEntities));
+  LM_T(LmtSR, ("Number of valid Entities after 1st check-round: %d", noOfEntities));
 
   //
   // Now that we know the max number of entities (some may drop out after calling pCheckEntity - part of entitiesFinalCheck),
@@ -95,7 +95,7 @@ bool orionldPostBatchCreate(void)
   // (extract the entity ids) later to be used by mongocEntitiesQuery().
   //
   noOfEntities = batchEntityStringArrayPopulate(orionldState.requestTree, &eIdArray, outArrayErroredP, false);
-  LM(("Number of valid Entities after 2nd check-round: %d", noOfEntities));
+  LM_T(LmtSR, ("Number of valid Entities after 2nd check-round: %d", noOfEntities));
 
   //
   // The entity id array is ready - time to query mongo
@@ -113,7 +113,7 @@ bool orionldPostBatchCreate(void)
   // Finally we have everything we need to 100% CHECK the incoming entities
   //
   noOfEntities = batchEntitiesFinalCheck(orionldState.requestTree, outArrayErroredP, dbEntityArray, orionldState.uriParamOptions.update, false, true);
-  LM(("Number of valid Entities after 3rd check-round: %d", noOfEntities));
+  LM_T(LmtSR, ("Number of valid Entities after 3rd check-round: %d", noOfEntities));
 
 
   //

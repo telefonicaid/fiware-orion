@@ -143,18 +143,6 @@ static char* uriCompose
   char* compV[50];
   int   compNo = 0;
 
-#if 0
-  LM(("dbURI:           '%s'", dbURI));
-  LM(("dbHost:          '%s'", dbHost));
-  LM(("dbUser:          '%s'", dbUser));
-  LM(("dbPwd:           '%s'", dbPwd));
-  LM(("dbAuthDb:        '%s'", dbAuthDb));
-  LM(("dbReplicaSet:    '%s'", dbReplicaSet));
-  LM(("dbAuthMechanism: '%s'", dbAuthMechanism));
-  LM(("dbSSL:           '%s'", (dbSSL == true)? "true" : "false"));
-  LM(("tlsCertificate:  '%s'", tlsCertificateFilePath));
-#endif
-
   if (dbURI[0] != 0)
   {
     //
@@ -247,7 +235,6 @@ static char* uriCompose
     len += strlen(compV[ix]);
   }
 
-  // LM(("mongo uri: %s", uri));
   return uri;
 }
 

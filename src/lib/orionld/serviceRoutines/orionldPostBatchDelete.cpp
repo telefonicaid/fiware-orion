@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/forwarding/distOpListsMerge.h"               // distOpListsMerge
 #include "orionld/forwarding/distOpSend.h"                     // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"       // distOpLookupByCurlHandle
+#include "orionld/forwarding/distOpListDebug.h"                // distOpListDebug2
 #include "orionld/forwarding/xForwardedForCompose.h"           // xForwardedForCompose
 #include "orionld/forwarding/regMatchForBatchDelete.h"         // regMatchForBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
@@ -113,37 +114,6 @@ KjNode* dbModelToEntityIdAndTypeTable(KjNode* dbEntityIdArray)
 
 
 
-// ----------------------------------------------------------------------------
-//
-// distReqLog -
-//
-void distReqLog(DistOp* distReqList, const char* title)
-{
-  LM(("DR: %s", title));
-  for (DistOp* drP = distReqList; drP != NULL; drP = drP->next)
-  {
-    LM(("DR: Registration:               %s", drP->regP->regId));
-    LM(("DR: Verb:                       %s", "TBD"));
-    LM(("DR: URL:                        %s", "TBD"));  // IP+port should be in the URL
-    LM(("DR: Entity ID:                  %s", drP->entityId));
-    LM(("DR: Entity Type:                %s", drP->entityType));
-
-    if (drP->requestBody != NULL)
-    {
-      int   bodySize = kjFastRenderSize(drP->requestBody);
-      char* body     = kaAlloc(&orionldState.kalloc, bodySize + 256);
-      kjFastRender(drP->requestBody, body);
-      LM(("DR: payload body:               %s", body));
-    }
-    else
-      LM(("DR: payload body:               NULL"));
-
-    LM(("DR: -----------------------------------------------------------"));
-  }
-}
-
-
-
 // -----------------------------------------------------------------------------
 //
 // firstItemOfRegLookup -
@@ -186,16 +156,14 @@ void distReqsMergeForBatchDelete(DistOp* distReqList)
 
     if (drP == firstP)
     {
-      LM(("Keeping drP  { reg: %s, entityId: %s } - creating BODY", drP->regP->regId, drP->entityId));
       drP->requestBody = kjArray(orionldState.kjsonP, NULL);
 
       prev = drP;  // Only setting 'prev' here as in the "esle case", drP is skipped
     }
     else
     {
-      // Remove drP from list (just skip over it
+      // Remove drP from list (just skip over it)
       prev->next = next;
-      LM(("Removing drP { reg: %s, entityId: %s } from the list", drP->regP->regId, drP->entityId));
     }
 
     // Now add the entityId to the array of "firstP"
@@ -255,13 +223,8 @@ static KjNode* entityIdLookupInObjectArray(KjNode* objectArray, char* entityId)
 //
 static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* responseErrors)
 {
-  LM(("KZ: drP->httpResponseCode == %d", drP->httpResponseCode));
-
   if (drP->httpResponseCode == 204)
   {
-    LM(("KZ: 204 - move all drP->requestBody entity ids from drP to responseSuccess"));
-    LM(("KZ: 204 - remove all drP->requestBody entity ids from responseErrors"));
-
     for (KjNode* eidNodeP = drP->requestBody->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
     {
       KjNode* nodeP;
@@ -282,9 +245,6 @@ static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* response
   }
   else if (drP->httpResponseCode == 207)
   {
-    LM(("KZ: 207 - move all drP->responseBody::success entity ids from drP to responseSuccess"));
-    LM(("KZ: 207 - move all drP->responseBody::errors entity ids from drP to responseErrors"));
-
     KjNode* successV = kjLookup(drP->responseBody, "success");
     KjNode* errorsV  = kjLookup(drP->responseBody, "errors");
 
@@ -322,8 +282,6 @@ static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* response
 
           if (oldErrorItemP == NULL)
           {
-            LM(("KZ: Entity ID '%s' is added to responseErrors (unless it's already in the successArray)", eidNodeP->value.s));
-
             if (kjStringValueLookupInArray(responseSuccess, eidNodeP->value.s) == NULL)
             {
               kjChildRemove(errorsV, errorBodyP);
@@ -340,10 +298,6 @@ static void responseMerge(DistOp* drP, KjNode* responseSuccess, KjNode* response
         }
       }
     }
-  }
-  else
-  {
-    LM(("%d - like 204 but to responseErrors instead of responseSuccess ...", drP->httpResponseCode));
   }
 }
 
@@ -415,7 +369,6 @@ bool orionldPostBatchDelete(void)
     dbOperationOk = mongocEntitiesDelete(responseSuccess);
     if (dbOperationOk == false)
     {
-      LM(("KZ3: mongocEntitiesDelete returned FALSE !!!   -  Treat it as a 404 for all entities"));
       responseErrors  = responseSuccess;
       responseSuccess = kjArray(orionldState.kjsonP, "success");   // EMPTY ARRAY
       // FIXME: Remodel responseErrors to follow the API
@@ -430,7 +383,6 @@ bool orionldPostBatchDelete(void)
   {
     if (kjStringValueLookupInArray(responseSuccess, eidP->value.s) == NULL)
     {
-      LM(("KZ3: Adding entity '%s' to responseErrors", eidP->value.s));
       KjNode* objectP       = kjObject(orionldState.kjsonP,  NULL);
       KjNode* eidNodeP      = kjString(orionldState.kjsonP,  "entityId", eidP->value.s);
       KjNode* pdNodeP       = kjObject(orionldState.kjsonP,  "error");
@@ -449,8 +401,6 @@ bool orionldPostBatchDelete(void)
 
       kjChildAdd(responseErrors, objectP);
     }
-    else
-      LM(("KZ3: NOT Adding entity '%s' to responseErrors (cause found in responseSuccess)", eidP->value.s));
   }
 
   // Add any entity ids that were not found in the DB to entityIdAndTypeTable as "entityId": null, now that the entity type is unknown
@@ -466,9 +416,7 @@ bool orionldPostBatchDelete(void)
 
 
   // Get the list of Forwarded requests, for matching registrations
-  if (orionldState.distributed == false)
-    LM(("KZ3: Need to create the response, well, fix the arrays that define the response later"));
-  else
+  if (orionldState.distributed == true)
   {
     DistOp* exclusiveList = regMatchForBatchDelete(RegModeAuxiliary, DoDeleteBatch, entityIdAndTypeTable);
     DistOp* redirectList  = regMatchForBatchDelete(RegModeRedirect,  DoDeleteBatch, entityIdAndTypeTable);
@@ -478,13 +426,9 @@ bool orionldPostBatchDelete(void)
     distReqList = distOpListsMerge(exclusiveList,  redirectList);
     distReqList = distOpListsMerge(distReqList, inclusiveList);
 
-    distReqLog(distReqList, "Before distReqsMergeForBatchDelete");
+    distOpListDebug2(distReqList, "Before distReqsMergeForBatchDelete");
     distReqsMergeForBatchDelete(distReqList);
-    distReqLog(distReqList, "After distReqsMergeForBatchDelete");
-
-    LM(("KZ2: distReqList at %p", distReqList));
-    if (distReqList != NULL)
-      LM(("KZ2: distReqList->next%p", distReqList->next));
+    distOpListDebug2(distReqList, "After distReqsMergeForBatchDelete");
 
     if (distReqList != NULL)
     {
@@ -560,10 +504,10 @@ bool orionldPostBatchDelete(void)
             DistOp* drP = distOpLookupByCurlHandle(distReqList, msgP->easy_handle);
 
             curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &drP->httpResponseCode);
-            LM(("Got a response HTTP Status for Reg '%s': %d", drP->regP->regId, drP->httpResponseCode));
+            LM_T(LmtDistOpResponse, ("Got a response HTTP Status for Reg '%s': %d", drP->regP->regId, drP->httpResponseCode));
             if (drP->rawResponse != NULL)
             {
-              LM(("Got a response BODY for Reg '%s': '%s'", drP->regP->regId, drP->rawResponse));
+              LM_T(LmtDistOpResponse, ("Got a response BODY for Reg '%s': '%s'", drP->regP->regId, drP->rawResponse));
 
               drP->responseBody = kjParse(orionldState.kjsonP, drP->rawResponse);
 

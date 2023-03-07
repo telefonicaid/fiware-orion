@@ -583,7 +583,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
   }
 
-  // LM(("Treating service %s %s", verbName(orionldState.verb), orionldState.urlPath)); // Sacred - used in 'heavyTest'
   if (orionldState.in.payloadSize == 0)
   {
     orionldState.in.contentType = NOMIMETYPE;

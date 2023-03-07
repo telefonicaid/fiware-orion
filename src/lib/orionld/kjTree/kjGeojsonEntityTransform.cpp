@@ -55,7 +55,7 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
   KjNode* typeP = kjLookup(attributeP, "type");
   if (typeP == NULL)
   {
-    LM(("No type - might be OK if concise - BUT, in such case there MUST be a value and that value MUST have type + coordinates"));
+    LM_T(LmtGeoJSON, ("No type - might be OK if concise - BUT, in such case there MUST be a value and that value MUST have type + coordinates"));
 
     if (orionldState.uriParamOptions.concise == true)
     {
@@ -69,7 +69,7 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
 
         if (typeP == NULL)
         {
-          LM(("No type inside 'value' for Concise"));
+          LM_T(LmtGeoJSON, ("No type inside 'value' for Concise"));
           return NULL;
         }
       }
@@ -84,7 +84,7 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
 
     if (valueP == NULL)
     {
-      LM(("No value"));
+      LM_T(LmtGeoJSON, ("No value"));
       return NULL;
     }
 
@@ -93,7 +93,7 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
 
     if (typeP == NULL)
     {
-      LM(("No type inside 'value' for Normalized"));
+      LM_T(LmtGeoJSON, ("No type inside 'value' for Normalized"));
       return NULL;
     }
   }
@@ -109,7 +109,7 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
       (strcmp(typeP->value.s, "MultiLineString") != 0)  &&
       (strcmp(typeP->value.s, "MultiPolygon")    != 0))
   {
-    LM(("Not a GeoJSON type (%s)", typeP->value.s));
+    LM_T(LmtGeoJSON, ("Not a GeoJSON type (%s)", typeP->value.s));
     return NULL;  // Not a GeoProperty
   }
 
@@ -117,11 +117,11 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
 
   if ((coordsP == NULL) || (coordsP->type != KjArray))
   {
-    LM(("No coords"));
+    LM_T(LmtGeoJSON, ("No coords"));
     return NULL;
   }
 
-  LM(("Cloning and returning"));
+  LM_T(LmtGeoJSON, ("Cloning and returning"));
   KjNode* cloneP = kjClone(orionldState.kjsonP, attributeP);
   cloneP->name = (char*) "geometry";
   return cloneP;

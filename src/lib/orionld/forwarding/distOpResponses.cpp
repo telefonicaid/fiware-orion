@@ -330,10 +330,10 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     //
     // Not Implemented ...
     //
-    LM(("************************************** distOpP->operation: %s (THIS MUST BE IMPLEMENTED !!!)", distOpTypes[distOpP->operation]));
+    LM_W(("*** distributed operation: '%s' - THIS MUST BE IMPLEMENTED !!!", distOpTypes[distOpP->operation]));
     if (msgP->data.result == CURLE_OK)
     {
-      LM(("Got a response: httpResponseCode == %d", httpResponseCode));
+      LM_T(LmtDistOpResponseDetail, ("Got a response: httpResponseCode == %d", httpResponseCode));
       if ((httpResponseCode >= 200) && (httpResponseCode <= 299))
         distOpSuccess(responseBody, distOpP, NULL);
       else if (httpResponseCode == 404)
@@ -365,8 +365,6 @@ void distOpResponses(DistOp* distOpList, KjNode* responseBody)
   int      msgsLeft;
   KjNode*  successV = kjLookup(responseBody, "success");
   KjNode*  failureV = kjLookup(responseBody, "failure");
-
-  LM(("-------------------------------- In distOpResponses ------------------------"));
 
   if (successV == NULL)
   {

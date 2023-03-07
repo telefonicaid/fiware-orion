@@ -22,8 +22,8 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include "logMsg/logMsg.h"                                       // LM_T, lmTraceIsSet
+#include "logMsg/traceLevels.h"                                  // distOpListDebug2
 
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpListDebug.h"                  // Own interface
@@ -36,6 +36,9 @@
 //
 void distOpListDebug(DistOp* distOpList, const char* what)
 {
+  if (lmTraceIsSet(LmtDistOpList) == false)
+    return;
+
   LM_T(LmtDistOpList, ("Matching registrations (%s):", what));
 
   if (distOpList == NULL)
@@ -57,6 +60,9 @@ void distOpListDebug(DistOp* distOpList, const char* what)
 //
 void distOpListDebug2(DistOp* distOpP, const char* what)
 {
+  if (lmTraceIsSet(LmtDistOpList) == false)
+    return;
+
   LM_T(LmtDistOpList, ("----- DistOp List: %s", what));
 
   if (distOpP == NULL)
@@ -76,14 +82,26 @@ void distOpListDebug2(DistOp* distOpP, const char* what)
 
     if (distOpP->requestBody != NULL)
     {
-      LM_T(LmtDistOpList, ("  Attributes:"));
-      int ix = 0;
-      for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      if (distOpP->operation == DoDeleteBatch)
       {
-        if ((strcmp(attrP->name, "id") != 0) && (strcmp(attrP->name, "type") != 0))
+        LM_T(LmtDistOpList, ("  Entity IDs:"));
+        for (KjNode* eIdNodeP = distOpP->requestBody->value.firstChildP; eIdNodeP != NULL; eIdNodeP = eIdNodeP->next)
         {
-          LM_T(LmtDistOpList, ("    Attribute %d:   '%s'", ix, attrP->name));
-          ++ix;
+          LM_T(LmtDistOpList, ("  o %s", eIdNodeP->value.s));
+        }
+      }
+      else
+      {
+        LM_T(LmtDistOpList, ("  Attributes:"));
+
+        int ix = 0;
+        for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
+        {
+          if ((strcmp(attrP->name, "id") != 0) && (strcmp(attrP->name, "type") != 0))
+          {
+            LM_T(LmtDistOpList, ("    Attribute %d:   '%s'", ix, attrP->name));
+            ++ix;
+          }
         }
       }
     }

@@ -110,7 +110,7 @@ bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* ent
   {
     if (strcmp(idP->value.s, entityId) != 0)
     {
-      LM(("RM: No match due to entity id ('%s' in reg, '%s' in entity creation)", idP->value.s, entityId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to entity id ('%s' in reg, '%s' in entity creation)", regP->regId, idP->value.s, entityId));
       return false;
     }
   }
@@ -127,7 +127,7 @@ bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* ent
     {
       if (regexec(&ripP->regex, entityId, 0, NULL, 0) != 0)
       {
-        LM(("RM: No match due to entity idPattern"));
+        LM_T(LmtRegMatch, ("%s: No Reg Match due to entity id pattern", regP->regId));
         return false;
       }
     }

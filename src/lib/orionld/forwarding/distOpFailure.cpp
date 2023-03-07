@@ -58,8 +58,6 @@ void distOpFailure(KjNode* responseBody, DistOp* distOpP, const char* title, con
     KjNode* successV = kjLookup(responseBody, "success");
     if ((successV != NULL) && (successV->value.firstChildP != NULL) && (alias != NULL))
     {
-      LM(("Looking up '%s' in successV", alias));
-      kjTreeLog(successV, "successV", LmtDistOp207);
       if (kjStringValueLookupInArray(successV, alias) != NULL)
       {
         // The 404 attribute was updated elsewhere => not a 404
@@ -67,8 +65,6 @@ void distOpFailure(KjNode* responseBody, DistOp* distOpP, const char* title, con
         return;
       }
     }
-    else
-      LM(("No successV present"));
   }
 
   KjNode* failureV = kjLookup(responseBody, "failure");

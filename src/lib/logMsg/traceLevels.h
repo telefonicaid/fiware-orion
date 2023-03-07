@@ -89,10 +89,17 @@ typedef enum TraceLevels
   // Misc
   //
   LmtMongoc = 90,                      // Entire mongoc library
+  LmtPostgres,                         // Postgres (TRoE)
   LmtSR,                               // Service Routine (whatever it is doing)
+  LmtTenants,                          // Well, tenants :)
+  LmtQ,                                // Query Language
+  LmtGeoJSON,                          // GeoJSON transformations
+  LmtCurl,                             // Debugging for curl requests
+  LmtSocketService,                    // Socket Service
   LmtSemaphore,                        // Semaphores
-  LmtKjlParse,                         // Trace level start for K libs
-  LmtLegacy                            // Old code (mongoBackend, json parsers, etc)
+  LmtRegex,                            // Regular expressions - all of them
+  LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
+  LmtKjlParse                          // Trace level start for K libs
 } TraceLevels;
 
 

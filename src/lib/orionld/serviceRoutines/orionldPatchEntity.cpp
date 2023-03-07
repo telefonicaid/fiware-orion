@@ -178,23 +178,6 @@ static bool attributeLookup(KjNode* dbAttrsP, char* attrName)
 
 
 
-#if 0
-void rawResponse(DistOp* distOpList, const char* what)
-{
-  LM(("=============== rawResponse: %s", what));
-  for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
-  {
-    if (distOpP->rawResponse != NULL)
-      LM_T(LmtDistOpMsgs, ("%s: rawResponse: '%s'", distOpP->regP->regId, distOpP->rawResponse));
-    else
-      LM_T(LmtDistOpMsgs, ("%s: rawResponse: NULL", distOpP->regP->regId));
-  }
-  LM(("===================================================================="));
-}
-#endif
-
-
-
 // -----------------------------------------------------------------------------
 //
 // orionldPatchEntity -

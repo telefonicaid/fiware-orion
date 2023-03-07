@@ -35,10 +35,12 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // LmtRegCache
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
+#include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/types/RegistrationMode.h"                    // registrationMode
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pcheckRegistration.h"           // pcheckRegistration
@@ -592,6 +594,48 @@ static void regTimestamp(KjNode* dbRegP, const char* fieldName, double ts)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// regCachePresent -
+//
+void regCachePresent(void)
+{
+  for (OrionldTenant* tenantP = &tenant0; tenantP != NULL; tenantP = tenantP->next)
+  {
+    if (tenantP->regCache == NULL)
+      LM_T(LmtRegCache, ("Tenant '%s': No regCache", tenantP->mongoDbName));
+    else
+    {
+      LM_T(LmtRegCache, ("Tenant '%s':", tenantP->mongoDbName));
+      RegCacheItem* rciP = tenantP->regCache->regList;
+
+      while (rciP != NULL)
+      {
+        KjNode* regIdP = kjLookup(rciP->regTree, "id");
+
+        LM_T(LmtRegCache, ("  o Registration %s:", (regIdP != NULL)? regIdP->value.s : "unknown"));
+        LM_T(LmtRegCache, ("    o mode:  %s", registrationModeToString(rciP->mode)));
+        LM_T(LmtRegCache, ("    o ops:   0x%x", rciP->opMask));
+
+        if (rciP->idPatternRegexList != NULL)
+        {
+          LM_T(LmtRegCache, ("    o patterns:"));
+          for (RegIdPattern* ripP = rciP->idPatternRegexList; ripP != NULL; ripP = ripP->next)
+          {
+            LM_T(LmtRegCache, ("      o %s (idPattern at %p)", ripP->owner->value.s, ripP->owner));
+          }
+        }
+        else
+          LM_T(LmtRegCache, ("    o patterns: NONE"));
+        LM_T(LmtRegCache, ("  -----------------------------------"));
+        rciP = rciP->next;
+      }
+    }
+  }
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPatchRegistration -
@@ -754,8 +798,8 @@ bool orionldPatchRegistration(void)
       LM_X(1, ("Internal Error (if this happens it's a bug of Orion-LD - the idPattern was checked in pcheckEntityInfo and all OK"));
   }
 
-  // extern void regCachePresent(void);
-  // regCachePresent();
+  if (lmTraceIsSet(LmtRegCache))
+    regCachePresent();
 
   //
   // Return 204 if all OK

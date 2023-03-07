@@ -119,7 +119,6 @@ static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
 static unsigned int              mhdConnectionTimeout  = 0;
-static int                       reqNo                 = 1;
 
 
 
@@ -512,10 +511,8 @@ static void requestCompleted
 
   *con_cls = NULL;
 
-  ++reqNo;
-
 #ifdef REQUEST_PERFORMANCE
-  // if (reqNo % 100 == 0)
+  // if (requestNo % 100 == 0)
   {
     PERFORMANCE(reqEnd);
 
@@ -1318,15 +1315,15 @@ static MHD_Result connectionTreat
   //
   //  NOT NGSI-LD
   //
-  ++requestNo;
-  LM(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
     MHD_Result retVal;
 
-    LM(("Servicing request %d: %s %s -----------------", reqNo, method, url));
+    ++requestNo;
+    LM(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
+
     //
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
     //

@@ -97,7 +97,7 @@ void Notifier::sendNotifyContextRequest
 {
   pthread_t                         tid;
 
-  LM(("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
+  LM_T(LmtLegacy, ("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
                                                                           httpInfo,
                                                                           tenant,
@@ -433,7 +433,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     char*                             toFree  = NULL;
 #endif
 
-    LM(("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
+    LM_T(LmtLegacy, ("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {

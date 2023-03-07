@@ -86,7 +86,7 @@ bool regMatchEntityInfoForQuery(RegCacheItem* regP, KjNode* entityInfoP, StringA
 
     if (match == false)
     {
-      LM(("%s: No match due to entity type ('%s' in reg)", regP->regId, entityType));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to entity type ('%s' in reg)", regP->regId, entityType));
       return false;
     }
   }
@@ -113,7 +113,7 @@ bool regMatchEntityInfoForQuery(RegCacheItem* regP, KjNode* entityInfoP, StringA
 
       if (match == false)
       {
-        LM(("%s: No match due to entity id ('%s' in reg)", regP->regId, regEntityId));
+        LM_T(LmtRegMatch, ("%s: No Reg Match due to entity id ('%s' in reg)", regP->regId, regEntityId));
         return false;
       }
     }
@@ -143,7 +143,7 @@ bool regMatchEntityInfoForQuery(RegCacheItem* regP, KjNode* entityInfoP, StringA
 
         if (match == false)
         {
-          LM(("%s: No match due to entity id (idPattern in registration VS query entity-id-list)", regP->regId));
+          LM_T(LmtRegMatch, ("%s: No Reg Match due to entity id (idPattern in registration VS query entity-id-list)", regP->regId));
           return false;
         }
       }
