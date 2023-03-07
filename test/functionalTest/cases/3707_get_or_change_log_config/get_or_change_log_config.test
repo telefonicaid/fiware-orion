@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. GET initial log config 
-# 02. PUT /admin/log and error
+# 02. PUT /admin/log and see error
 # 03. GET log config, see initial log config
 # 04. PUT /admin/log?level=ERROR and see it work
 # 05. GET log config, see level=ERROR
@@ -41,16 +41,28 @@ brokerStart CB
 # 09. GET log config, see level=INFO
 # 10. PUT /admin/log?infoPayloadMaxSize=5000 and see it work
 # 11. GET log config, see infoPayloadMaxSize=5000
-# 12. PUT /admin/log?infoPayloadMaxSize=100000 and see it work
-# 13. GET log config, see infoPayloadMaxSize=100000
+# 12. PUT /admin/log?infoPayloadMaxSize= and see error
+# 13. GET log config, see previous data
 # 14. PUT /admin/log?infoPayloadMaxSize=-2000 and see error
 # 15. GET log config, see previous data
-# 16. PUT /admin/log?lineMaxSize=32000 and see it work
-# 17. GET log config, see lineMaxSize=32000
-# 18. PUT /admin/log?lineMaxSize=400000 and see it work
-# 19. GET log config, see lineMaxSize=400000
-# 20. PUT /admin/log?lineMaxSize=-30000 and see error
-# 21. GET log config, see previous data
+# 16. PUT /admin/log?infoPayloadMaxSize=3.1416 and see error
+# 17. GET log config, see previous data
+# 18. PUT /admin/log?infoPayloadMaxSize=nonumber and see error
+# 19. GET log config, see previous data
+# 20. PUT /admin/log?infoPayloadMaxSize=100000 and see it work
+# 21. GET log config, see infoPayloadMaxSize=100000
+# 22. PUT /admin/log?lineMaxSize=32000 and see it work
+# 23. GET log config, see lineMaxSize=32000
+# 24. PUT /admin/log?lineMaxSize= and see error
+# 25. GET log config, see previous data
+# 26. PUT /admin/log?lineMaxSize=-30000 and see error
+# 27. GET log config, see previous data
+# 28. PUT /admin/log?lineMaxSize=3.1416 and see error
+# 29. GET log config, see previous data
+# 30. PUT /admin/log?lineMaxSize=nonumber and see error
+# 31. GET log config, see previous data
+# 32. PUT /admin/log?lineMaxSize=400000 and see it work
+# 33. GET log config, see lineMaxSize=400000
 #
 
 
@@ -136,16 +148,16 @@ echo
 echo
 
 
-echo "12. PUT /admin/log?infoPayloadMaxSize=100000 and see it work"
-echo "============================================================"
-orionCurl --url /admin/log?infoPayloadMaxSize=100000 -X PUT
+echo "12. PUT /admin/log?infoPayloadMaxSize= and see error"
+echo "===================================================="
+orionCurl --url /admin/log?infoPayloadMaxSize= -X PUT
 echo
 echo
 
 
 
-echo "13. GET log config, see infoPayloadMaxSize=100000"
-echo "================================================="
+echo "13. GET log config, see previous data"
+echo "====================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -166,7 +178,52 @@ echo
 echo
 
 
-echo "16. PUT /admin/log?lineMaxSize=32000 and see it work"
+echo "16. PUT /admin/log?infoPayloadMaxSize=3.1416 and see error"
+echo "=========================================================="
+orionCurl --url /admin/log?infoPayloadMaxSize=3.1416 -X PUT
+echo
+echo
+
+
+
+echo "17. GET log config, see previous data"
+echo "====================================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "18. PUT /admin/log?infoPayloadMaxSize=nonumber and see error"
+echo "============================================================"
+orionCurl --url /admin/log?infoPayloadMaxSize=nonumber -X PUT
+echo
+echo
+
+
+
+echo "19. GET log config, see previous data"
+echo "====================================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "20. PUT /admin/log?infoPayloadMaxSize=100000 and see it work"
+echo "============================================================"
+orionCurl --url /admin/log?infoPayloadMaxSize=100000 -X PUT
+echo
+echo
+
+
+
+echo "21. GET log config, see infoPayloadMaxSize=100000"
+echo "================================================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "22. PUT /admin/log?lineMaxSize=32000 and see it work"
 echo "===================================================="
 orionCurl --url /admin/log?lineMaxSize=32000 -X PUT
 echo
@@ -174,29 +231,29 @@ echo
 
 
 
-echo "17. GET log config, see lineMaxSize=32000"
+echo "23. GET log config, see lineMaxSize=32000"
 echo "========================================="
 orionCurl --url /admin/log
 echo
 echo
 
 
-echo "18. PUT /admin/log?lineMaxSize=400000 and see it work"
-echo "====================================================="
-orionCurl --url /admin/log?lineMaxSize=400000 -X PUT
+echo "24. PUT /admin/log?lineMaxSize= and see error"
+echo "============================================="
+orionCurl --url /admin/log?lineMaxSize= -X PUT
 echo
 echo
 
 
 
-echo "19. GET log config, see lineMaxSize=400000"
-echo "=========================================="
+echo "25. GET log config, see previous data"
+echo "====================================="
 orionCurl --url /admin/log
 echo
 echo
 
 
-echo "20. PUT /admin/log?lineMaxSize=-30000 and see error"
+echo "26. PUT /admin/log?lineMaxSize=-30000 and see error"
 echo "==================================================="
 orionCurl --url /admin/log?lineMaxSize=-30000 -X PUT
 echo
@@ -204,8 +261,53 @@ echo
 
 
 
-echo "21. GET log config, see previous data"
+echo "27. GET log config, see previous data"
 echo "====================================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "28. PUT /admin/log?lineMaxSize=3.1416 and see error"
+echo "==================================================="
+orionCurl --url /admin/log?lineMaxSize=3.1416 -X PUT
+echo
+echo
+
+
+
+echo "29. GET log config, see previous data"
+echo "====================================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "30. PUT /admin/log?lineMaxSize=nonumber and see error"
+echo "====================================================="
+orionCurl --url /admin/log?lineMaxSize=nonumber -X PUT
+echo
+echo
+
+
+
+echo "31. GET log config, see previous data"
+echo "====================================="
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "32. PUT /admin/log?lineMaxSize=400000 and see it work"
+echo "====================================================="
+orionCurl --url /admin/log?lineMaxSize=400000 -X PUT
+echo
+echo
+
+
+
+echo "33. GET log config, see lineMaxSize=400000"
+echo "=========================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -355,7 +457,119 @@ Date: REGEX(.*)
 }
 
 
-12. PUT /admin/log?infoPayloadMaxSize=100000 and see it work
+12. PUT /admin/log?infoPayloadMaxSize= and see error
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 68
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "Empty right-hand-side for URI param /infoPayloadMaxSize/"
+}
+
+
+13. GET log config, see previous data
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "infoPayloadMaxSize": "5000",
+    "level": "INFO",
+    "lineMaxSize": "32768"
+}
+
+
+14. PUT /admin/log?infoPayloadMaxSize=-2000 and see error
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 90
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
+}
+
+
+15. GET log config, see previous data
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "infoPayloadMaxSize": "5000",
+    "level": "INFO",
+    "lineMaxSize": "32768"
+}
+
+
+16. PUT /admin/log?infoPayloadMaxSize=3.1416 and see error
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 90
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
+}
+
+
+17. GET log config, see previous data
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "infoPayloadMaxSize": "5000",
+    "level": "INFO",
+    "lineMaxSize": "32768"
+}
+
+
+18. PUT /admin/log?infoPayloadMaxSize=nonumber and see error
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 90
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
+}
+
+
+19. GET log config, see previous data
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "infoPayloadMaxSize": "5000",
+    "level": "INFO",
+    "lineMaxSize": "32768"
+}
+
+
+20. PUT /admin/log?infoPayloadMaxSize=100000 and see it work
 ============================================================
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -364,7 +578,7 @@ Date: REGEX(.*)
 
 
 
-13. GET log config, see infoPayloadMaxSize=100000
+21. GET log config, see infoPayloadMaxSize=100000
 =================================================
 HTTP/1.1 200 OK
 Content-Length: 92
@@ -379,35 +593,7 @@ Date: REGEX(.*)
 }
 
 
-14. PUT /admin/log?infoPayloadMaxSize=-2000 and see error
-=========================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "error": "invalid logInfoPayloadMaxSize, logPayload size should be > 0"
-}
-
-
-15. GET log config, see previous data
-=====================================
-HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "infoPayloadMaxSize": "100000",
-    "level": "INFO",
-    "lineMaxSize": "32768"
-}
-
-
-16. PUT /admin/log?lineMaxSize=32000 and see it work
+22. PUT /admin/log?lineMaxSize=32000 and see it work
 ====================================================
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -416,7 +602,7 @@ Date: REGEX(.*)
 
 
 
-17. GET log config, see lineMaxSize=32000
+23. GET log config, see lineMaxSize=32000
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 92
@@ -431,7 +617,119 @@ Date: REGEX(.*)
 }
 
 
-18. PUT /admin/log?lineMaxSize=400000 and see it work
+24. PUT /admin/log?lineMaxSize= and see error
+=============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "Empty right-hand-side for URI param /lineMaxSize/"
+}
+
+
+25. GET log config, see previous data
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "infoPayloadMaxSize": "100000",
+    "level": "INFO",
+    "lineMaxSize": "32000"
+}
+
+
+26. PUT /admin/log?lineMaxSize=-30000 and see error
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
+}
+
+
+27. GET log config, see previous data
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "infoPayloadMaxSize": "100000",
+    "level": "INFO",
+    "lineMaxSize": "32000"
+}
+
+
+28. PUT /admin/log?lineMaxSize=3.1416 and see error
+===================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
+}
+
+
+29. GET log config, see previous data
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "infoPayloadMaxSize": "100000",
+    "level": "INFO",
+    "lineMaxSize": "32000"
+}
+
+
+30. PUT /admin/log?lineMaxSize=nonumber and see error
+=====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 76
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
+}
+
+
+31. GET log config, see previous data
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 92
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "infoPayloadMaxSize": "100000",
+    "level": "INFO",
+    "lineMaxSize": "32000"
+}
+
+
+32. PUT /admin/log?lineMaxSize=400000 and see it work
 =====================================================
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -440,36 +738,8 @@ Date: REGEX(.*)
 
 
 
-19. GET log config, see lineMaxSize=400000
+33. GET log config, see lineMaxSize=400000
 ==========================================
-HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "infoPayloadMaxSize": "100000",
-    "level": "INFO",
-    "lineMaxSize": "400000"
-}
-
-
-20. PUT /admin/log?lineMaxSize=-30000 and see error
-===================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "error": "invalid logLineMaxSize, logLine size should be > 0"
-}
-
-
-21. GET log config, see previous data
-=====================================
 HTTP/1.1 200 OK
 Content-Length: 93
 Content-Type: application/json

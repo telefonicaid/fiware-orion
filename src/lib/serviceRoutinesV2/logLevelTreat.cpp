@@ -42,6 +42,25 @@
 
 /* ****************************************************************************
 *
+* checkInteger -
+* This function is written: to check whether 'logSize' or 'payloadSize' options only contain integers, if not, return error.
+*/
+bool checkInteger(std::string logConfigSize)
+{
+  for (unsigned int i = 0; i < logConfigSize.length(); i++)
+  {
+    if (!isdigit(logConfigSize[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * changeLogConfig -
 */
 std::string changeLogConfig
@@ -69,7 +88,7 @@ std::string changeLogConfig
 
   if (!logSize.empty())
   {
-    if (logSizeValue > 0)
+    if (logSizeValue > 0 && checkInteger(logSize.c_str()))
     {
       logLineMaxSize = logSizeValue;
     }
@@ -77,21 +96,21 @@ std::string changeLogConfig
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid logLineMaxSize in URI param", logSize);
-      return "{\"error\":\"invalid logLineMaxSize, logLine size should be > 0\"}";
+      return "{\"error\":\"invalid lineMaxSize, lineMaxSize should be an integer number > 0\"}";
     }
   }
 
   if (!payloadSize.empty())
   {
-    if (payloadSizeValue > 0)
+    if (payloadSizeValue > 0 && checkInteger(payloadSize.c_str()))
     {
       logInfoPayloadMaxSize = payloadSizeValue;
     }
-    else if (payloadSizeValue < 0)
+    else
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
-      return "{\"error\":\"invalid logInfoPayloadMaxSize, logPayload size should be > 0\"}";
+      return "{\"error\":\"invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0\"}";
     }
   }
 
