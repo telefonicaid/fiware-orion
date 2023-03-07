@@ -382,7 +382,7 @@ Date: REGEX(.*)
 14. PUT /admin/log?infoPayloadMaxSize=-2000 and see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
+Content-Length: 72
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
