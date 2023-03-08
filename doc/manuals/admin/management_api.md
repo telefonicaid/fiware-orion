@@ -23,9 +23,9 @@ which response follows the following pattern:
 
 ```
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 ```
 
