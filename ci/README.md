@@ -38,7 +38,7 @@ To run the image in the same way that GitHub Actions does, for instance:
 ```
 # Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
-docker run --network-host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion fiware/orion-ci:deb build -miqts functional
+docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion fiware/orion-ci:deb build -miqts functional
 ```
 
 To run the image using an interactive bash on it
