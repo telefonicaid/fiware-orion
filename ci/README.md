@@ -69,3 +69,6 @@ change after ending your debug session. Something like this:
 ```
 sudo chown -R fermin:fermin /path/to/fiware-orion
 ```
+
+**NOTE2:** the `build` script will make changes in your `makefile` file. Do a `git checkout makefile` after your debug session
+to recover it.
