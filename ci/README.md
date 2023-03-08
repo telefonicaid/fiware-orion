@@ -55,6 +55,14 @@ Once have a bash shell, you can do the same execution:
 root@debian11:/opt# CB_NO_CACHE=ON FT_FROM_IX=1201 build -miqts functional
 ```
 
+Alternatively, you can run the `testHarness.sh` script directly (for instance, to execute a single test):
+
+```
+root@debian11:/opt# . /opt/ft_env/bin/activate
+(ft_env) root@debian11:/opt# cd /opt/fiware-orion/test/functionalTest/
+(ft_env) root@debian11:/opt/fiware-orion/test/functionalTest# ./testHarness.sh cases/3541_subscription_max_fails_limit/mqtt_subscription_without_maxfailslimit_and_failscounter.test
+```
+
 **NOTE:** the above procedure makes that Orion is compiled using root user. It is advisable to do a recursive owner
 change after ending your debug session. Something like this:
 
