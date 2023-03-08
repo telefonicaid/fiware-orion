@@ -30,15 +30,15 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. GET initial log-level (DEBUG)
+# 01. GET initial log-config (level=DEBUG)
 # 02. Change log level to INFO
-# 03. GET log-level (INFO)
+# 03. GET log-config (level=INFO)
 # 04. Change log level to 'error'
-# 05. GET log-level (ERROR)
+# 05. GET log-config (level=ERROR)
 #
 
-echo "01. GET initial log-level (DEBUG)"
-echo "================================="
+echo "01. GET initial log-config (level=DEBUG)"
+echo "========================================"
 orionCurl --url /admin/log
 echo
 echo
@@ -51,8 +51,8 @@ echo
 echo
 
 
-echo "03. GET log-level (INFO)"
-echo "========================"
+echo "03. GET log-config (level=INFO)"
+echo "==============================="
 orionCurl --url /admin/log
 echo
 echo
@@ -65,24 +65,26 @@ echo
 echo
 
 
-echo "05. GET log-level (ERROR)"
-echo "========================"
+echo "05. GET log-config (level=ERROR)"
+echo "================================"
 orionCurl --url /admin/log
 echo
 echo
 
 
 --REGEXPECT--
-01. GET initial log-level (DEBUG)
-=================================
+01. GET initial log-config (level=DEBUG)
+========================================
 HTTP/1.1 200 OK
-Content-Length: 17
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "DEBUG"
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768
 }
 
 
@@ -95,16 +97,18 @@ Date: REGEX(.*)
 
 
 
-03. GET log-level (INFO)
-========================
+03. GET log-config (level=INFO)
+===============================
 HTTP/1.1 200 OK
-Content-Length: 16
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "INFO"
+    "infoPayloadMaxSize": 5120,
+    "level": "INFO",
+    "lineMaxSize": 32768
 }
 
 
@@ -117,16 +121,18 @@ Date: REGEX(.*)
 
 
 
-05. GET log-level (ERROR)
-========================
+05. GET log-config (level=ERROR)
+================================
 HTTP/1.1 200 OK
-Content-Length: 17
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "ERROR"
+    "infoPayloadMaxSize": 5120,
+    "level": "ERROR",
+    "lineMaxSize": 32768
 }
 
 
