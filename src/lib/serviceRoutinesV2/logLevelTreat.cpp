@@ -167,6 +167,6 @@ std::string getLogConfig
   std::string  lineMaxSize    = std::to_string(logLineMaxSize);
 
   return "{\"level\":\"" + level + "\", \
-           \"infoPayloadMaxSize\":\"" + payloadMaxSize + "\", \
-           \"lineMaxSize\":\"" + lineMaxSize + "\"}";
+           \"infoPayloadMaxSize\":" + payloadMaxSize + ", \
+           \"lineMaxSize\":" + lineMaxSize + "}";
 }

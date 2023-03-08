@@ -76,15 +76,15 @@ echo
 01. GET initial log-config (level=DEBUG)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 91
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
@@ -100,15 +100,15 @@ Date: REGEX(.*)
 03. GET log-config (level=INFO)
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 90
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "INFO",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
@@ -124,15 +124,15 @@ Date: REGEX(.*)
 05. GET log-config (level=ERROR)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 91
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "ERROR",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 

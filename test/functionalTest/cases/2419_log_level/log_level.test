@@ -159,15 +159,15 @@ Date: REGEX(.*)
 02. GET log config, see level=NONE
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 90
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "NONE",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
@@ -183,15 +183,15 @@ Date: REGEX(.*)
 04. GET log config, see level=FATAL
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 91
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "FATAL",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
@@ -207,15 +207,15 @@ Date: REGEX(.*)
 06. GET log config, see level=ERROR
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 91
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "ERROR",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
@@ -231,15 +231,15 @@ Date: REGEX(.*)
 08. GET log config, see level=WARN
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 90
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "WARN",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
@@ -255,15 +255,15 @@ Date: REGEX(.*)
 10. GET log config, see level=INFO
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 90
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "INFO",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
@@ -279,15 +279,15 @@ Date: REGEX(.*)
 12. GET log config, see level=DEBUG
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 91
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
@@ -307,15 +307,15 @@ Date: REGEX(.*)
 14. GET log config, see level=DEBUG
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 91
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "infoPayloadMaxSize": "5120",
+    "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
-    "lineMaxSize": "32768"
+    "lineMaxSize": 32768
 }
 
 
