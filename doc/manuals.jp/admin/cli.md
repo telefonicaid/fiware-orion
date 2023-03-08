@@ -104,8 +104,8 @@ broker はデフォルトでバックグラウンドで実行されるため、�
     * `${...}` マクロ置換は実行されません
 -   **-disableFileLog** : Orion がファイルにロギングするのを避けます (デフォルトの動作はログ・ファイルを使用します)。このオプションは、kubernetes で実行している場合に役に立ちます
 -   **-logForHumans** : 人のために標準化されたトレースを作成します。ログ・ファイルのトレースは影響を受けないことに注意してください
--   **-logLineMaxSize** : ログ行の最大長 (超過すると、Orion は `LINE TOO LONG` をログ・トレースとして出力します)。最小許容値:100バイト。デフォルト値:32キロバイト
--   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト
+-   **-logLineMaxSize** : ログ行の最大長 (超過すると、Orion は `LINE TOO LONG` をログ・トレースとして出力します)。最小許容値:100バイト。デフォルト値:32キロバイト。Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) の `lineMaxSize` フィールドで変更できます
+-   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト。Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) で `infoPayloadMaxSize` フィールドを使用して変更できます。
 -   **-disableMetrics** : 'metrics' 機能をオフにします。メトリックの収集は、システムコールやセマフォが関与するため、少しコストがかかります。メトリックオーバーヘッドなしで broker を起動するには、このパラメータを使用します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
 -   **-mqttMaxAge** : 未使用の MQTT 接続が保持される最大時間 (分単位)。デフォルト値: 60
