@@ -1520,7 +1520,7 @@ LmStatus lmTraceSub(const char* levelFormat)
 */
 char* lmTraceGet(char* levelString, int levelStringSize)
 {
-  int       i = 0;
+  int       i;
   int       j = 0;
   int       levels[256];
 
@@ -1596,7 +1596,7 @@ char* lmTraceGet(char* levelString, int levelStringSize)
 */
 char* lmTraceGet(char* levelString, int levelStringSize, char* traceV)
 {
-  int       i = 0;
+  int       i;
   int       j = 0;
   int       levels[256];
 
