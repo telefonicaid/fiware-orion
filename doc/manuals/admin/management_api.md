@@ -1,17 +1,19 @@
 # Management REST interface
 
-## Log and Trace levels
+## Log configs and Trace levels
 Apart from the NGSI interface, Orion Context Broker exposes a REST
-API for management that allows to change the log level and the trace levels
+API for management that allows to change the log config and the trace levels
 (whose initial value is set using `-t` and `-logLevel` command line options).
 
-To change the log level:
+To change the log config:
 
 ```
 curl -X PUT <host>:<port>/admin/log?level=<NONE|FATAL|ERROR|WARN|INFO|DEBUG>
+curl -X PUT <host>:<port>/admin/log?infoPayloadMaxSize=<logPayloadSizeValue>
+curl -X PUT <host>:<port>/admin/log?lineMaxSize=<logLineSizeValue>
 ```
 
-To retrieve the log level:
+To retrieve the log config:
 
 ```
 curl <host>:<port>:/admin/log
@@ -21,7 +23,9 @@ which response follows the following pattern:
 
 ```
 {
-   "level": "INFO"
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768
 }
 ```
 

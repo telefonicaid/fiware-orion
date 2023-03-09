@@ -9,7 +9,7 @@
     * [Diagnose memory exhaustion problem](#diagnose-memory-exhaustion-problem)
     * [Diagnose spontaneous binary corruption problem](#diagnose-spontaneous-binary-corruption-problem)
 * [I/O Flows](#io-flows)
-    * [Diagnose HTTP notification reception problems](#diagnose-notification-reception-problems)
+    * [Diagnose HTTP notification reception problems](#diagnose-http-notification-reception-problems)
     * [Diagnose database connection problems](#diagnose-database-connection-problems)
 
 The Diagnosis Procedures are the first steps that a System Administrator

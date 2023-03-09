@@ -31,19 +31,19 @@ brokerStart CB
 
 #
 # 01. Set log level to NONE
-# 02. GET log level, see NONE
+# 02. GET log config, see level=NONE
 # 03. Set log level to FATAL
-# 04. GET log level, see FATAL
+# 04. GET log config, see level=FATAL
 # 05. Set log level to ERROR
-# 06. GET log level, see ERROR
+# 06. GET log config, see level=ERROR
 # 07. Set log level to WARN
-# 08. GET log level, see WARN
+# 08. GET log config, see level=WARN
 # 09. Set log level to INFO
-# 10. GET log level, see INFO
+# 10. GET log config, see level=INFO
 # 11. Set log level to DEBUG
-# 12. GET log level, see DEBUG
+# 12. GET log config, see level=DEBUG
 # 13. Set log level to XYZ - see error
-# 14. GET log level, see DEBUG
+# 14. GET log config, see level=DEBUG
 #
 
 echo "01. Set log level to NONE"
@@ -53,8 +53,8 @@ echo
 echo
 
 
-echo "02. GET log level, see NONE"
-echo "==========================="
+echo "02. GET log config, see level=NONE"
+echo "=================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -67,8 +67,8 @@ echo
 echo
 
 
-echo "04. GET log level, see FATAL"
-echo "============================"
+echo "04. GET log config, see level=FATAL"
+echo "==================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -81,8 +81,8 @@ echo
 echo
 
 
-echo "06. GET log level, see ERROR"
-echo "============================"
+echo "06. GET log config, see level=ERROR"
+echo "==================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -95,8 +95,8 @@ echo
 echo
 
 
-echo "08. GET log level, see WARN"
-echo "==========================="
+echo "08. GET log config, see level=WARN"
+echo "=================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -109,8 +109,8 @@ echo
 echo
 
 
-echo "10. GET log level, see INFO"
-echo "==========================="
+echo "10. GET log config, see level=INFO"
+echo "=================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -123,8 +123,8 @@ echo
 echo
 
 
-echo "12. GET log level, see DEBUG"
-echo "============================"
+echo "12. GET log config, see level=DEBUG"
+echo "==================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -137,8 +137,8 @@ echo
 echo
 
 
-echo "14. GET log level, see DEBUG"
-echo "============================"
+echo "14. GET log config, see level=DEBUG"
+echo "==================================="
 orionCurl --url /admin/log
 echo
 echo
@@ -156,16 +156,18 @@ Date: REGEX(.*)
 
 
 
-02. GET log level, see NONE
-===========================
+02. GET log config, see level=NONE
+==================================
 HTTP/1.1 200 OK
-Content-Length: 16
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "NONE"
+    "infoPayloadMaxSize": 5120,
+    "level": "NONE",
+    "lineMaxSize": 32768
 }
 
 
@@ -178,16 +180,18 @@ Date: REGEX(.*)
 
 
 
-04. GET log level, see FATAL
-============================
+04. GET log config, see level=FATAL
+===================================
 HTTP/1.1 200 OK
-Content-Length: 17
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "FATAL"
+    "infoPayloadMaxSize": 5120,
+    "level": "FATAL",
+    "lineMaxSize": 32768
 }
 
 
@@ -200,16 +204,18 @@ Date: REGEX(.*)
 
 
 
-06. GET log level, see ERROR
-============================
+06. GET log config, see level=ERROR
+===================================
 HTTP/1.1 200 OK
-Content-Length: 17
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "ERROR"
+    "infoPayloadMaxSize": 5120,
+    "level": "ERROR",
+    "lineMaxSize": 32768
 }
 
 
@@ -222,16 +228,18 @@ Date: REGEX(.*)
 
 
 
-08. GET log level, see WARN
-===========================
+08. GET log config, see level=WARN
+==================================
 HTTP/1.1 200 OK
-Content-Length: 16
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "WARN"
+    "infoPayloadMaxSize": 5120,
+    "level": "WARN",
+    "lineMaxSize": 32768
 }
 
 
@@ -244,16 +252,18 @@ Date: REGEX(.*)
 
 
 
-10. GET log level, see INFO
-===========================
+10. GET log config, see level=INFO
+==================================
 HTTP/1.1 200 OK
-Content-Length: 16
+Content-Length: 86
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "INFO"
+    "infoPayloadMaxSize": 5120,
+    "level": "INFO",
+    "lineMaxSize": 32768
 }
 
 
@@ -266,16 +276,18 @@ Date: REGEX(.*)
 
 
 
-12. GET log level, see DEBUG
-============================
+12. GET log config, see level=DEBUG
+===================================
 HTTP/1.1 200 OK
-Content-Length: 17
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "DEBUG"
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768
 }
 
 
@@ -292,16 +304,18 @@ Date: REGEX(.*)
 }
 
 
-14. GET log level, see DEBUG
-============================
+14. GET log config, see level=DEBUG
+===================================
 HTTP/1.1 200 OK
-Content-Length: 17
+Content-Length: 87
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
 
 {
-    "level": "DEBUG"
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768
 }
 
 

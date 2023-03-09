@@ -35,9 +35,9 @@
 
 /* ****************************************************************************
 *
-* changeLogLevel -
+* changeLogConfig -
 */
-extern std::string changeLogLevel
+extern std::string changeLogConfig
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -48,9 +48,9 @@ extern std::string changeLogLevel
 
 /* ****************************************************************************
 *
-* getLogLevel -
+* getLogConfig -
 */
-extern std::string getLogLevel
+extern std::string getLogConfig
 (
   ConnectionInfo*            ciP,
   int                        components,
