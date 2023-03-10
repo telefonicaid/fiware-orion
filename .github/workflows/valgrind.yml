@@ -7,7 +7,7 @@ name: Valgrind Tests
 on:
   push:
     branches:
-      - 'checkvalgrind**'
+      - checkvalgrind**
 
 env:
    TEST_IMAGE_NAME: fiware/orion-ci:deb

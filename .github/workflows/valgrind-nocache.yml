@@ -10,7 +10,7 @@ name: Valgrind Tests Nocache
 on:
   push:
     branches:
-      - 'checkvalgrind**'
+      - checkvalgrind**
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
