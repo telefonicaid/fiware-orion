@@ -9,6 +9,10 @@ on:
     branches:
       - checkvalgrind**
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
    TEST_IMAGE_NAME: fiware/orion-ci:deb
 
@@ -34,7 +38,7 @@ jobs:
         image: eclipse-mosquitto:1.6.7
         ports:
         - 1884:1883
-        
+    
     name: valgrind - ${{ matrix.payload.name }}
     
     strategy:
