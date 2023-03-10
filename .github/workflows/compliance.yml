@@ -2,10 +2,12 @@ name: Compliance Tests
 
 on:
   push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
-      - !checkvalgrind**
+      - '!checkvalgrind**'
 
 jobs:
   compliance:
