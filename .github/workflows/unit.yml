@@ -5,6 +5,8 @@ on:
   pull_request:
     branches:
       - master
+    branches-ignore:
+      - 'checkvalgrind**'
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}

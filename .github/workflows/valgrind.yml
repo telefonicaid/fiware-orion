@@ -1,10 +1,13 @@
+# Valgrind action is a heavy process that can take arround 50 minutes to finish. Thus, we don't want
+# this to be executed in every pull request but only intentionally on specific branches. In particular,
+# the action is configured so it will run in branches starting with 'checkvalgrind'
+
 name: Valgrind Tests
 
 on:
   push:
-  pull_request:
     branches:
-      - master
+      - 'checkvalgrind**'
 
 env:
    TEST_IMAGE_NAME: fiware/orion-ci:deb
