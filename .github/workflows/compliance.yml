@@ -3,8 +3,9 @@ name: Compliance Tests
 on:
   push:
   pull_request:
-    branches-ignore:
-      - checkvalgrind**
+    branches:
+      - master
+      - !checkvalgrind**
 
 jobs:
   compliance:

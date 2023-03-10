@@ -3,8 +3,9 @@ name: Functional Tests
 on:
   push:
   pull_request:
-    branches-ignore:
-      - checkvalgrind**
+    branches:
+      - master
+      - !checkvalgrind**
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
