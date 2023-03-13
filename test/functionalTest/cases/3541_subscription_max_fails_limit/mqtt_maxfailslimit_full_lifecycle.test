@@ -935,5 +935,3 @@ automatically disabled due to failsCounter (6) overpasses maxFailsLimit (5)
 brokerStop CB
 debugMqttBrokerStop
 dbDrop CB
-#FIXME PR: just testing
-sleep 10s

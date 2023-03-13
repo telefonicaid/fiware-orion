@@ -419,5 +419,3 @@ Date: REGEX(.*)
 brokerStop CB
 debugMqttBrokerStop
 dbDrop CB
-#FIXME PR: just testing
-sleep 10s
