@@ -863,6 +863,9 @@ function debugMmqttBrokerStart()
 
   amqtt -c $amqtt_conf_file >$amqtt_tmp.log 2>&1 &
 
+  # FIXME PR: small delay before
+  sleep 0.5s
+
   # $$ env var gives a wrong PID (maybe due to some process double-fork or something similar, that
   # causes the actual amqtt server to be spawned into a different process at OS level), so
   # we use ps + grep. As we are using the conf file in the grep statement, this seems to be strong
