@@ -863,7 +863,8 @@ function debugMmqttBrokerStart()
 
   amqtt -c $amqtt_conf_file >$amqtt_tmp.log 2>&1 &
 
-  # FIXME PR: small delay before
+  # Small delay before attemping to grab the PID file. Empirically we have found that
+  # in some cases it is needed (eg. GitAction ftest pass within CI docker container)
   sleep 0.5s
 
   # $$ env var gives a wrong PID (maybe due to some process double-fork or something similar, that
