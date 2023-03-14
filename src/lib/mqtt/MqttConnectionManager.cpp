@@ -399,6 +399,11 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
   {
     retval = false;
     alarmMgr.mqttConnectionError(endpoint, mosquitto_strerror(resultCode));
+    // We destroy the connection in this case so a re-connection is forced next time
+    // a MQTT notification is sent
+    disconnect(cP->mosq, endpoint);
+    connections.erase(endpoint);
+    delete cP;
   }
   else
   {
