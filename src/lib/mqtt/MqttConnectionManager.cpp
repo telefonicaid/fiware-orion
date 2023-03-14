@@ -218,7 +218,10 @@ void MqttConnectionManager::disconnect(struct mosquitto*  mosq, const std::strin
 {
   LM_T(LmtMqttNotif, ("Disconnecting from MQTT Broker at %s", endpoint.c_str()));
   int resultCode = mosquitto_disconnect(mosq);
-  if (resultCode != MOSQ_ERR_SUCCESS)
+
+  // Sometimes this function is called when connection is not actually stablisehd, so we skip logging
+  // the MOSQ_ERR_NO_CONN case
+  if ((resultCode != MOSQ_ERR_SUCCESS) && (resultCode != MOSQ_ERR_NO_CONN))
   {
     LM_E(("Runtime Error (could not disconnect from MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
   }
