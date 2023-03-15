@@ -251,7 +251,8 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
     {
-      if (strlen(dbName.c_str()) <= 50) //Check for size of database name, db names size should be <= '50' bytes.
+      // Check for size of database name, db names size should be <= '50' bytes.
+      if (strlen(dbName.c_str()) <= 50)
       {
         LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
         dbsP->push_back(dbName);
@@ -260,7 +261,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
       else
       {
         LM_E(("Runtime Error (database name size should be smaller than 50 characters: %s)", dbName.c_str()));
-	return false;
+        return false;
       }
     }
   }
