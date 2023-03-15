@@ -150,7 +150,7 @@ Date: REGEX(.*)
 ============================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 343
+Content-Length: 290
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -158,60 +158,57 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "id": "E",
-            "name": {
-                "metadata": {},
-                "type": "Text",
-                "value": "SD3"
-            },
-            "perimeter": {
-                "metadata": {},
-                "type": "geo:json",
-                "value": {
-                    "coordinates": [
+[
+    {
+        "id": "E",
+        "name": {
+            "metadata": {},
+            "type": "Text",
+            "value": "SD3"
+        },
+        "perimeter": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
                         [
-                            [
-                                -13.806455,
-                                33.467278,
-                                0
-                            ],
-                            [
-                                -13.806708,
-                                33.467234,
-                                0
-                            ],
-                            [
-                                -13.806864,
-                                33.467206,
-                                0
-                            ],
-                            [
-                                -13.807017,
-                                33.467191,
-                                0
-                            ],
-                            [
-                                -13.806455,
-                                33.467278,
-                                0
-                            ]
+                            -13.806455,
+                            33.467278,
+                            0
+                        ],
+                        [
+                            -13.806708,
+                            33.467234,
+                            0
+                        ],
+                        [
+                            -13.806864,
+                            33.467206,
+                            0
+                        ],
+                        [
+                            -13.807017,
+                            33.467191,
+                            0
+                        ],
+                        [
+                            -13.806455,
+                            33.467278,
+                            0
                         ]
-                    ],
-                    "type": "Polygon"
-                }
-            },
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "type": "T"
+    }
+]
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 343
+Content-Length: 290
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -219,56 +216,53 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "id": "E",
-            "name": {
-                "metadata": {},
-                "type": "Text",
-                "value": "SD1"
-            },
-            "perimeter": {
-                "metadata": {},
-                "type": "geo:json",
-                "value": {
-                    "coordinates": [
+[
+    {
+        "id": "E",
+        "name": {
+            "metadata": {},
+            "type": "Text",
+            "value": "SD1"
+        },
+        "perimeter": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    [
                         [
-                            [
-                                -13.806455,
-                                33.467278,
-                                0
-                            ],
-                            [
-                                -13.806708,
-                                33.467234,
-                                0
-                            ],
-                            [
-                                -13.806864,
-                                33.467206,
-                                0
-                            ],
-                            [
-                                -13.807017,
-                                33.467191,
-                                0
-                            ],
-                            [
-                                -13.806455,
-                                33.467278,
-                                0
-                            ]
+                            -13.806455,
+                            33.467278,
+                            0
+                        ],
+                        [
+                            -13.806708,
+                            33.467234,
+                            0
+                        ],
+                        [
+                            -13.806864,
+                            33.467206,
+                            0
+                        ],
+                        [
+                            -13.807017,
+                            33.467191,
+                            0
+                        ],
+                        [
+                            -13.806455,
+                            33.467278,
+                            0
                         ]
-                    ],
-                    "type": "Polygon"
-                }
-            },
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "type": "T"
+    }
+]
 =======================================
 
 

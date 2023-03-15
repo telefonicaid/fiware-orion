@@ -156,7 +156,7 @@ Date: REGEX(.*)
 #SORT_START
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 101
+Content-Length: 48
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(\d+)
@@ -164,10 +164,10 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-{"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"none","A3":3,"A1":1,"A2":2}]}=======================================
+[{"id":"E1","type":"none","A3":3,"A1":1,"A2":2}]=======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 221
+Content-Length: 168
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -175,7 +175,7 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-{"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"none","A3":{"type":"Number","value":3,"metadata":{}},"A1":{"type":"Number","value":1,"metadata":{}},"A2":{"type":"Number","value":2,"metadata":{}}}]}=======================================
+[{"id":"E1","type":"none","A3":{"type":"Number","value":3,"metadata":{}},"A1":{"type":"Number","value":1,"metadata":{}},"A2":{"type":"Number","value":2,"metadata":{}}}]=======================================
 #SORT_END
 
 

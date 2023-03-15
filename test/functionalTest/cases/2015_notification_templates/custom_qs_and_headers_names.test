@@ -108,7 +108,7 @@ Date: REGEX(.*)
 ========================================
 POST http://127.0.0.1:REGEX(\d+)/notify?paramfoo=bar
 Fiware-Servicepath: /
-Content-Length: 281
+Content-Length: 228
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -117,35 +117,32 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 X-Myheader: 23
 
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {},
-                "type": "Text",
-                "value": "foo"
-            },
-            "A2": {
-                "metadata": {},
-                "type": "Text",
-                "value": "bar"
-            },
-            "A3": {
-                "metadata": {},
-                "type": "Text",
-                "value": "myHeader"
-            },
-            "A4": {
-                "metadata": {},
-                "type": "Number",
-                "value": 23
-            },
-            "id": "E1",
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Text",
+            "value": "foo"
+        },
+        "A2": {
+            "metadata": {},
+            "type": "Text",
+            "value": "bar"
+        },
+        "A3": {
+            "metadata": {},
+            "type": "Text",
+            "value": "myHeader"
+        },
+        "A4": {
+            "metadata": {},
+            "type": "Number",
+            "value": 23
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
 =======================================
 
 

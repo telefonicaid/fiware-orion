@@ -275,7 +275,7 @@ Date: REGEX(.*)
 =======================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 151
+Content-Length: 98
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -283,24 +283,21 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-{
-    "data": [
-        {
-            "id": "E1",
-            "ts": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "2020-05-10T01:02:03.123Z"
-            },
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
+[
+    {
+        "id": "E1",
+        "ts": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2020-05-10T01:02:03.123Z"
+        },
+        "type": "T"
+    }
+]
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 151
+Content-Length: 98
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -308,24 +305,21 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-{
-    "data": [
-        {
-            "id": "E1",
-            "ts": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "2020-05-10T01:02:03.123Z"
-            },
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
+[
+    {
+        "id": "E1",
+        "ts": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2020-05-10T01:02:03.123Z"
+        },
+        "type": "T"
+    }
+]
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 151
+Content-Length: 98
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -333,24 +327,21 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-{
-    "data": [
-        {
-            "id": "E2",
-            "ts": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "2020-05-10T01:02:03.456Z"
-            },
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
+[
+    {
+        "id": "E2",
+        "ts": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2020-05-10T01:02:03.456Z"
+        },
+        "type": "T"
+    }
+]
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 151
+Content-Length: 98
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -358,24 +349,21 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-{
-    "data": [
-        {
-            "id": "E2",
-            "ts": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "2020-05-10T01:02:03.456Z"
-            },
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
+[
+    {
+        "id": "E2",
+        "ts": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2020-05-10T01:02:03.456Z"
+        },
+        "type": "T"
+    }
+]
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 151
+Content-Length: 98
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -383,20 +371,17 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "id": "E3",
-            "ts": {
-                "metadata": {},
-                "type": "DateTime",
-                "value": "2020-05-10T01:02:03.789Z"
-            },
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
+[
+    {
+        "id": "E3",
+        "ts": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2020-05-10T01:02:03.789Z"
+        },
+        "type": "T"
+    }
+]
 =======================================
 
 

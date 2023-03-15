@@ -127,7 +127,7 @@ Date: REGEX(.*)
 ==============================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 124
+Content-Length: 71
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -135,20 +135,17 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {},
-                "type": "T1",
-                "value": 1
-            },
-            "id": "E1",
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "T1",
+            "value": 1
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
 =======================================
 
 
@@ -164,7 +161,7 @@ Date: REGEX(.*)
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 163
+Content-Length: 110
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -172,25 +169,22 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {
-                    "previousValue": {
-                        "type": "T1",
-                        "value": 1
-                    }
-                },
-                "type": "T2",
-                "value": 1
+[
+    {
+        "A1": {
+            "metadata": {
+                "previousValue": {
+                    "type": "T1",
+                    "value": 1
+                }
             },
-            "id": "E1",
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+            "type": "T2",
+            "value": 1
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
 =======================================
 
 

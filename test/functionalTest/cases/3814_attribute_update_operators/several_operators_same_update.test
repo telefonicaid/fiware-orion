@@ -290,7 +290,7 @@ Date: REGEX(.*)
 ====================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 665
+Content-Length: 612
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -298,83 +298,80 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "A01": {
-                "metadata": {},
-                "type": "Number",
-                "value": 3
-            },
-            "A02": {
-                "metadata": {},
-                "type": "Number",
-                "value": 0
-            },
-            "A03": {
-                "metadata": {},
-                "type": "Number",
-                "value": 8
-            },
-            "A04": {
-                "metadata": {},
-                "type": "Number",
-                "value": 15
-            },
-            "A05": {
-                "metadata": {},
-                "type": "StructuredValue",
-                "value": [
-                    "foo",
-                    "bar"
-                ]
-            },
-            "A06": {
-                "metadata": {},
-                "type": "StructuredValue",
-                "value": [
-                    "foo"
-                ]
-            },
-            "A07": {
-                "metadata": {},
-                "type": "StructuredValue",
-                "value": [
-                    1,
-                    3,
-                    4
-                ]
-            },
-            "A08": {
-                "metadata": {},
-                "type": "StructuredValue",
-                "value": [
-                    1,
-                    3
-                ]
-            },
-            "A09": {
-                "metadata": {},
-                "type": "StructuredValue",
-                "value": {
-                    "X": 1,
-                    "Y": 20,
-                    "Z": 30
-                }
-            },
-            "A10": {
-                "metadata": {},
-                "type": "StructuredValue",
-                "value": {
-                    "X": 1
-                }
-            },
-            "id": "E",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f\-]{24})"
-}
+[
+    {
+        "A01": {
+            "metadata": {},
+            "type": "Number",
+            "value": 3
+        },
+        "A02": {
+            "metadata": {},
+            "type": "Number",
+            "value": 0
+        },
+        "A03": {
+            "metadata": {},
+            "type": "Number",
+            "value": 8
+        },
+        "A04": {
+            "metadata": {},
+            "type": "Number",
+            "value": 15
+        },
+        "A05": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": [
+                "foo",
+                "bar"
+            ]
+        },
+        "A06": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": [
+                "foo"
+            ]
+        },
+        "A07": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": [
+                1,
+                3,
+                4
+            ]
+        },
+        "A08": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": [
+                1,
+                3
+            ]
+        },
+        "A09": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": {
+                "X": 1,
+                "Y": 20,
+                "Z": 30
+            }
+        },
+        "A10": {
+            "metadata": {},
+            "type": "StructuredValue",
+            "value": {
+                "X": 1
+            }
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
 =======================================
 
 

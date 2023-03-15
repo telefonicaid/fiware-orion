@@ -163,7 +163,7 @@ Date: REGEX(.*)
 ==============================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 122
+Content-Length: 69
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -171,20 +171,17 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "A": {
-                "metadata": {},
-                "type": "Number",
-                "value": 1
-            },
-            "id": "E",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
 =======================================
 
 

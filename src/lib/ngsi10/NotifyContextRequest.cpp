@@ -34,7 +34,6 @@
 #include "alarmMgr/alarmMgr.h"
 
 
-
 /* ****************************************************************************
 *
 * NotifyContextRequest::toJsonV1 -
@@ -88,12 +87,9 @@ std::string NotifyContextRequest::toJson
     return oe.toJson();
   }  
 
-  JsonObjectHelper jh;
-
-  jh.addString("subscriptionId", subscriptionId.get());
-  jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP));
-
-  return jh.str();
+  std::string out;
+  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+  return out;
 }
 
 

@@ -280,7 +280,7 @@ Date: REGEX(.*)
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 266
+Content-Length: 213
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -288,29 +288,26 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {
-                    "dateCreated": {
-                        "type": "DateTime",
-                        "value": "REGEX(2\d\d\d\-.*)"
-                    },
-                    "dateModified": {
-                        "type": "DateTime",
-                        "value": "REGEX(2\d\d\d\-.*)"
-                    }
+[
+    {
+        "A1": {
+            "metadata": {
+                "dateCreated": {
+                    "type": "DateTime",
+                    "value": "REGEX(2\d\d\d\-.*)"
                 },
-                "type": "Number",
-                "value": 3
+                "dateModified": {
+                    "type": "DateTime",
+                    "value": "REGEX(2\d\d\d\-.*)"
+                }
             },
-            "id": "E1",
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+            "type": "Number",
+            "value": 3
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
 =======================================
 
 
@@ -326,7 +323,7 @@ Date: REGEX(.*)
 ==================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 267
+Content-Length: 214
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -334,29 +331,26 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "A1": {
-                "metadata": {
-                    "dateCreated": {
-                        "type": "DateTime",
-                        "value": "REGEX(2\d\d\d\-.*)"
-                    },
-                    "dateModified": {
-                        "type": "DateTime",
-                        "value": "REGEX(2\d\d\d\-.*)"
-                    }
+[
+    {
+        "A1": {
+            "metadata": {
+                "dateCreated": {
+                    "type": "DateTime",
+                    "value": "REGEX(2\d\d\d\-.*)"
                 },
-                "type": "Number",
-                "value": 12
+                "dateModified": {
+                    "type": "DateTime",
+                    "value": "REGEX(2\d\d\d\-.*)"
+                }
             },
-            "id": "E1",
-            "type": "Thing"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+            "type": "Number",
+            "value": 12
+        },
+        "id": "E1",
+        "type": "Thing"
+    }
+]
 =======================================
 
 

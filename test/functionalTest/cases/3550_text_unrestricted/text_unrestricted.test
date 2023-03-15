@@ -135,7 +135,7 @@ Date: REGEX(.*)
 ======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 192
+Content-Length: 139
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -143,20 +143,17 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "description": {
-                "metadata": {},
-                "type": "TextUnrestricted",
-                "value": "I'm a description (and I'm using forbidden chars)"
-            },
-            "id": "E",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+[
+    {
+        "description": {
+            "metadata": {},
+            "type": "TextUnrestricted",
+            "value": "I'm a description (and I'm using forbidden chars)"
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
 =======================================
 
 

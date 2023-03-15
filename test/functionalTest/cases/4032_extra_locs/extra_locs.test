@@ -262,7 +262,7 @@ Date: REGEX(.*)
 =============================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 422
+Content-Length: 369
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -270,58 +270,55 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{
-    "data": [
-        {
-            "L1": {
-                "metadata": {},
-                "type": "geo:json",
-                "value": {
-                    "coordinates": [
-                        10,
-                        10
-                    ],
-                    "type": "Point"
+[
+    {
+        "L1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    10,
+                    10
+                ],
+                "type": "Point"
+            }
+        },
+        "L2": {
+            "metadata": {
+                "ignoreType": {
+                    "type": "Boolean",
+                    "value": true
                 }
             },
-            "L2": {
-                "metadata": {
-                    "ignoreType": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
-                "type": "geo:json",
-                "value": {
-                    "coordinates": [
-                        20,
-                        20
-                    ],
-                    "type": "Point"
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    20,
+                    20
+                ],
+                "type": "Point"
+            }
+        },
+        "L3": {
+            "metadata": {
+                "ignoreType": {
+                    "type": "Boolean",
+                    "value": true
                 }
             },
-            "L3": {
-                "metadata": {
-                    "ignoreType": {
-                        "type": "Boolean",
-                        "value": true
-                    }
-                },
-                "type": "geo:json",
-                "value": {
-                    "coordinates": [
-                        30,
-                        30
-                    ],
-                    "type": "Point"
-                }
-            },
-            "id": "E",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    30,
+                    30
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
 =======================================
 
 
