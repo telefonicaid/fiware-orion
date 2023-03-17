@@ -97,7 +97,7 @@ ELSEIF (${DISTRO} MATCHES "Debian_9.*")
 ELSEIF (${DISTRO} MATCHES "RedHat_8.*")
   set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -DREDHAT_UBI=8.4 -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
 ELSE()
-  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -fno-var-tracking-assignments")
+  set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror -Wno-deprecated-declarations -Wno-psabi -fno-var-tracking-assignments")
 ENDIF ()
 
 #
