@@ -65,7 +65,7 @@ bool mongocEntityDelete(const char* entityId, char** detailP)
   {
     LM_E(("Database Error (mongoc_collection_remove returned %d.%d:%s)", error.domain, error.code, error.message));
     orionldError(OrionldInternalError, "Database Error", error.message, 500);
-    *detailP = kaStrdup(&orionldState.kalloc,error.message);
+    *detailP = kaStrdup(&orionldState.kalloc, error.message);
     return false;
   }
 
