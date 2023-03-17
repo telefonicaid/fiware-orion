@@ -24,6 +24,11 @@
 */
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
+extern "C"
+{
+#include "kalloc/kaStrdup.h"                                     // ksStrdup
+}
+
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -60,7 +65,7 @@ bool mongocEntityDelete(const char* entityId, char** detailP)
   {
     LM_E(("Database Error (mongoc_collection_remove returned %d.%d:%s)", error.domain, error.code, error.message));
     orionldError(OrionldInternalError, "Database Error", error.message, 500);
-    *detailP = error.message;
+    *detailP = kaStrdup(&orionldState.kalloc,error.message);
     return false;
   }
 
