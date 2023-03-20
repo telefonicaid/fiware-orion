@@ -53,7 +53,7 @@ bool troePostBatchDelete(void)
     char* entityId = entityIdP->value.s;
     char  instanceId[80];
 
-    uuidGenerate(instanceId, sizeof(instanceId), true);
+    uuidGenerate(instanceId, sizeof(instanceId), "urn:ngsi-ld:attribute:instance:");
 
     pgEntityAppend(&entitiesBuffer, "Delete", entityId, "NULL", instanceId);
   }

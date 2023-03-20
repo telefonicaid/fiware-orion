@@ -36,6 +36,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                     // LmtMongoc
 
 #include "orionld/common/orionldState.h"                            // orionldState
+#include "orionld/common/uuidGenerate.h"                            // uuidGenerate
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                        // QNode
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
@@ -376,6 +377,7 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
     }
   }
 
+  // <DEBUG>
   if (lmTraceIsSet(LmtEntityMap) == true)
   {
     LM_T(LmtEntityMap, ("Entity Maps:"));
@@ -387,9 +389,11 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
       LM_T(LmtEntityMap, ("o '%s': %s", entityP->name, rBuf));
     }
   }
+  // </DEBUG>
 
+  //
   // Now we have the list of entities and their registrations
-  // All of that will go into a separatre routine.
+  // All of that will go into a separate routine.
   // What will be done here now is:
   //
   // - pick which entities to retrieve (according to pagination)
@@ -405,10 +409,27 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
   //   - respond to the initial caller
   //
   //
-  // ALSO:   Forgot about Count.
+  // ALSO:   Forgot about Count !!!
   //         Every forwarded request needs to be with "count == true", and the Count HTTP Headers in the responses
   //         must be found and an accumulated count maintained
+  //         However, as the same entity may be counted more than once, the result might now be very exact.
+  //         If I instead count the number of entities in the Entity Map - orionldEntityMap, all is good
   //
+  if (orionldState.uriParams.count == true)
+  {
+    int count = 0;
+    for (KjNode* entityP = orionldEntityMap->value.firstChildP; entityP != NULL; entityP = entityP->next)
+    {
+      ++count;
+    }
+
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
+  }
+
+  // Need to return the ID of the entity map
+  char entityMapId[61];
+  uuidGenerate(entityMapId, sizeof(entityMapId), "urn:ngsi-ld:entity-map:");
+  orionldHeaderAdd(&orionldState.out.headers, HttpEntityMap, entityMapId, 0);
 
   orionldState.responseTree   = kjArray(orionldState.kjsonP, NULL);
   orionldState.httpStatusCode = 200;

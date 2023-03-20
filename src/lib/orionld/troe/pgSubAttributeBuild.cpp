@@ -60,7 +60,7 @@ bool pgSubAttributeBuild
   if (subAttributeNodeP->type != KjObject)
     return true;
 
-  uuidGenerate(instanceId, sizeof(instanceId), true);
+  uuidGenerate(instanceId, sizeof(instanceId), "urn:ngsi-ld:attribute:instance:");
 
   // Extract sub-attribute info
   for (KjNode* nodeP = subAttributeNodeP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)

@@ -55,7 +55,7 @@ bool troeDeleteAttribute(void)
   char* attributeNameEq;
   char  instanceId[80];
 
-  uuidGenerate(instanceId, sizeof(instanceId), true);
+  uuidGenerate(instanceId, sizeof(instanceId), "urn:ngsi-ld:attribute:instance:");
 
   attributeNameEq = kaStrdup(&orionldState.kalloc, attributeName);
   dotForEq(attributeNameEq);

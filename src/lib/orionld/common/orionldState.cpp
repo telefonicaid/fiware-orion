@@ -104,7 +104,7 @@ char              pgPortString[16];
 char              mongoServerVersion[32];
 char              userAgentHeaderNoLF[64];     // "User-Agent: orionld/" + ORIONLD_VERSION - initialized in orionldServiceInit()
 char              hostHeader[256];             // Host: xxx
-
+char              entityMapId[256];            // Used by GET /entities in the distributed case, for pagination
 
 //
 // Variables for Mongo C Driver

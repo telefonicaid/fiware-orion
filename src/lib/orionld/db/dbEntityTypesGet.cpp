@@ -190,8 +190,7 @@ static KjNode* getEntityTypesResponse(KjNode* sortedArrayP)
 {
   char entityTypesId[64];
 
-  strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId) - 1);
-  uuidGenerate(&entityTypesId[27], sizeof(entityTypesId) - 27, false);
+  uuidGenerate(entityTypesId, sizeof(entityTypesId), "urn:ngsi-ld:EntityTypeList:");
 
   KjNode* typeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
   KjNode* idNodeP           = kjString(orionldState.kjsonP, "id", entityTypesId);
@@ -482,10 +481,8 @@ KjNode* dbEntityTypesGet(OrionldProblemDetails* pdP, bool details)
 
   if ((remote == NULL) && (local == NULL))
   {
-    char entityTypesId[64];
-
-    strncpy(entityTypesId, "urn:ngsi-ld:EntityTypeList:", sizeof(entityTypesId) - 1);
-    uuidGenerate(&entityTypesId[27], sizeof(entityTypesId) - 27, false);
+    char  entityTypesId[64];
+    uuidGenerate(entityTypesId, sizeof(entityTypesId), "urn:ngsi-ld:EntityTypeList:");
 
     KjNode* noTypesObject = kjObject(orionldState.kjsonP,  NULL);
     KjNode* idP           = kjString(orionldState.kjsonP, "id",   entityTypesId);

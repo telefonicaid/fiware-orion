@@ -132,8 +132,7 @@ bool orionldPostSubscriptions(void)
   else
   {
     char subscriptionId[80];
-    strncpy(subscriptionId, "urn:ngsi-ld:subscription:", sizeof(subscriptionId) - 1);
-    uuidGenerate(&subscriptionId[25], sizeof(subscriptionId) - 25, false);
+    uuidGenerate(subscriptionId, sizeof(subscriptionId), "urn:ngsi-ld:subscription:");
 
     subIdP = kjString(orionldState.kjsonP, "_id", subscriptionId);
   }

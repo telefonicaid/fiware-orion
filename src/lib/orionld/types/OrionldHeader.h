@@ -62,7 +62,8 @@ typedef enum OrionldHeaderType
   HttpMaxAge,          // CORS
   HttpExposeHeaders,   // CORS
   HttpAcceptPatch,
-  HttpPerformance
+  HttpPerformance,
+  HttpEntityMap        // For distributed GET /entities
 } OrionldHeaderType;
 
 
