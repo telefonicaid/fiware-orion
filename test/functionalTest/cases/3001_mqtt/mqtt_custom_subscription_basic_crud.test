@@ -279,7 +279,7 @@ Date: REGEX(.*)
 07. Get subs
 ============
 HTTP/1.1 200 OK
-Content-Length: 2158
+Content-Length: 2344
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -305,7 +305,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -335,7 +336,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -364,7 +366,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -393,7 +396,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -423,7 +427,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -453,7 +458,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {

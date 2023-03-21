@@ -156,7 +156,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 458
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -183,7 +183,8 @@ Date: REGEX(.*)
             "attrs": [
                 "temperature",
                 "timestamp"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -203,7 +204,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/REGEX([0-9a-f]{24})
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 359
+Content-Length: 390
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -228,7 +229,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "speed"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

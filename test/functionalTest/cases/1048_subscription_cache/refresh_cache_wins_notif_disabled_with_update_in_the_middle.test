@@ -178,7 +178,7 @@ echo
 01. GET /v2/subscriptions and see maxFailsLimit 1, status active
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 285
+Content-Length: 316
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -199,7 +199,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -240,7 +241,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions and see status inactive (as cache data is newer), timesSent 2, failsCounter 2
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 485
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -266,7 +267,8 @@ Date: REGEX(.*)
         "status": "inactive",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -361,7 +363,7 @@ Date: REGEX(.*)
 08. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
 =============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 491
+Content-Length: 522
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -388,7 +390,8 @@ Date: REGEX(.*)
         "status": "inactive",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {

@@ -138,7 +138,7 @@ Date: REGEX(.*)
 02. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 308
+Content-Length: 339
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -161,7 +161,8 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "A"
-                ]
+                ],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -194,7 +195,7 @@ Date: REGEX(.*)
 04. Get subscriptions by /sp1 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 309
+Content-Length: 340
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -217,7 +218,8 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "A"
-                ]
+                ],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -261,7 +263,7 @@ Date: REGEX(.*)
 07. Get subscriptions by /sp2 and get it
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 309
+Content-Length: 340
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -284,7 +286,8 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "A"
-                ]
+                ],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {

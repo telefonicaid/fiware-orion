@@ -190,7 +190,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see both subscriptions
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 778
+Content-Length: 840
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -220,7 +220,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -254,7 +255,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {

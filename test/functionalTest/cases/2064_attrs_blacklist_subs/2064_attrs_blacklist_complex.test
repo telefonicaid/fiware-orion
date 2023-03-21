@@ -203,7 +203,7 @@ Date: REGEX(.*)
 03. Check subscription timesSent value (1)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 480
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -232,7 +232,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "A"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -263,7 +264,7 @@ Date: REGEX(.*)
 06. Check subscription timesSent value (2)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 480
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -292,7 +293,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "A"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -323,7 +325,7 @@ Date: REGEX(.*)
 09. Check subscription timesSent value (3)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 480
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -352,7 +354,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "A"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

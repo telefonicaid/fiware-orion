@@ -49,7 +49,8 @@ TriggeredSubscription::TriggeredSubscription
   const StringList&        _attrL,
   const std::string&       _cacheSubId,
   const char*              _tenant,
-  bool                     _covered
+  bool                     _covered,
+  bool                     _notifyOnMetadataChange
 )
 :
   throttling(_throttling),
@@ -63,7 +64,8 @@ TriggeredSubscription::TriggeredSubscription
   stringFilterP(NULL),
   mdStringFilterP(NULL),
   blacklist(false),
-  covered(_covered)
+  covered(_covered),
+  notifyOnMetadataChange(_notifyOnMetadataChange)
 {
   httpInfo.fill(_httpInfo);
   mqttInfo.fill(_mqttInfo);

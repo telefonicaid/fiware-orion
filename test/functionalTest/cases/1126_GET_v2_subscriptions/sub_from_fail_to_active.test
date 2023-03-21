@@ -134,7 +134,7 @@ Date: REGEX(.*)
 02. Get subscription (no last* field)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 293
+Content-Length: 324
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -154,7 +154,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -179,7 +180,7 @@ Date: REGEX(.*)
 04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 460
+Content-Length: 491
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -204,7 +205,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -232,7 +234,7 @@ Date: REGEX(.*)
 07. Get subscription see lastSuccessCode: 200 but not failsCounter (and also old lastFailure fields*)
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 506
+Content-Length: 537
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -258,7 +260,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

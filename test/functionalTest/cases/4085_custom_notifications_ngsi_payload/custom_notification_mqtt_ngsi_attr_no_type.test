@@ -108,7 +108,7 @@ Date: REGEX(.*)
 02. Get sub1 to see how attributes are set using defaults
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 555
+Content-Length: 586
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -163,7 +163,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

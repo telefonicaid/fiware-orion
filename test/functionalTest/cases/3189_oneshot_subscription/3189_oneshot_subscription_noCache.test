@@ -255,7 +255,7 @@ Broker Restarted
 04. GET /v2/subscriptions/subscription_id, to check the status oneshot.
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 351
+Content-Length: 382
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -279,7 +279,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -339,7 +340,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. GET /v2/subscriptions/subscription_id, to check the status inactive.
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 475
+Content-Length: 506
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -367,7 +368,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -390,7 +392,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/subscription_id, to check the update status.
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 474
+Content-Length: 505
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -418,7 +420,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

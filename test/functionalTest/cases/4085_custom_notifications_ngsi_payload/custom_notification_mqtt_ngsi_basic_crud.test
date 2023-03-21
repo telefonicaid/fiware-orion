@@ -279,7 +279,7 @@ Date: REGEX(.*)
 02. Get sub1 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 353
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -308,7 +308,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -331,7 +332,7 @@ Date: REGEX(.*)
 04. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 337
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -353,7 +354,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -376,7 +378,7 @@ Date: REGEX(.*)
 06. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 353
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -405,7 +407,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -428,7 +431,7 @@ Date: REGEX(.*)
 08. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 353
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -457,7 +460,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -480,7 +484,7 @@ Date: REGEX(.*)
 10. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 337
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -502,7 +506,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -527,7 +532,7 @@ Date: REGEX(.*)
 12. Get sub2 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 337
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -549,7 +554,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -572,7 +578,7 @@ Date: REGEX(.*)
 14. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 353
+Content-Length: 384
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -601,7 +607,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -616,7 +623,7 @@ Date: REGEX(.*)
 15. Get all subs and see sub1 an sub2 in its final state
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 662
+Content-Length: 724
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -639,7 +646,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -673,7 +681,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {

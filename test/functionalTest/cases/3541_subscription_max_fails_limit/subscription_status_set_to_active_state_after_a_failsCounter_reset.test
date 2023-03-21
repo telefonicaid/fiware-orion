@@ -214,7 +214,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 399
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -239,7 +239,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -266,7 +267,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 566
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -296,7 +297,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -319,7 +321,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 566
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -349,7 +351,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -377,7 +380,7 @@ Date: REGEX(.*)
 11. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 581
+Content-Length: 612
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -408,7 +411,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

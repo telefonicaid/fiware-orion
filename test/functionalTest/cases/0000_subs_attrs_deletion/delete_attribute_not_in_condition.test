@@ -147,7 +147,7 @@ Date: REGEX(.*)
 05. Get subscription and check timesSent is 0
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 325
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -174,7 +174,8 @@ Date: REGEX(.*)
                 "attrs": [
                     "B",
                     "C"
-                ]
+                ],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {

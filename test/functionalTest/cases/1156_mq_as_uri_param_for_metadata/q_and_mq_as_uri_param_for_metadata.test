@@ -61,7 +61,8 @@ payload='
       "expression": {
         "q": "A1==1",
         "mq": "A1.M1==2"
-      }
+      },
+      "notifyOnMetadataChange":true
     }
   },
   "notification": {

@@ -403,7 +403,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. Gets sub1, 3 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 441
+Content-Length: 472
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -429,7 +429,8 @@ Date: REGEX(.*)
             "attrs": [],
             "expression": {
                 "q": "ts>2020-05-10T01:02:03Z"
-            }
+            },
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -444,7 +445,7 @@ Date: REGEX(.*)
 09. Gets sub2, 1 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 445
+Content-Length: 476
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -470,7 +471,8 @@ Date: REGEX(.*)
             "attrs": [],
             "expression": {
                 "q": "ts<2020-05-10T01:02:03.200Z"
-            }
+            },
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -485,7 +487,7 @@ Date: REGEX(.*)
 10. Gets sub3, 1 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 472
+Content-Length: 503
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -511,7 +513,8 @@ Date: REGEX(.*)
             "attrs": [],
             "expression": {
                 "q": "ts==2020-05-10T01:02:03.200Z..2020-05-10T01:02:03.600Z"
-            }
+            },
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

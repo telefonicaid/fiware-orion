@@ -151,7 +151,7 @@ echo
 01. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 and without timeSent
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 376
+Content-Length: 407
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -174,7 +174,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -200,7 +201,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 (as cache data is older), timesSent 1
 ====================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 390
+Content-Length: 421
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -224,7 +225,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -277,7 +279,7 @@ Date: REGEX(.*)
 05. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 390
+Content-Length: 421
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -301,7 +303,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {

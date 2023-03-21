@@ -516,7 +516,7 @@ Date: REGEX(.*)
 10. Get sub1 see lastSuccessCode: 200 but not failsCounter
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 457
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -540,7 +540,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -555,7 +556,7 @@ Date: REGEX(.*)
 11. Get sub2 see lastSuccessCode: 400 but not failsCounter
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 457
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -579,7 +580,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -594,7 +596,7 @@ Date: REGEX(.*)
 12. Get sub3 see lastSuccessCode: 404 but not failsCounter
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 457
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -618,7 +620,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -633,7 +636,7 @@ Date: REGEX(.*)
 13. Get sub4 see lastSuccessCode: 500 but not failsCounter
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 426
+Content-Length: 457
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -657,7 +660,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -672,7 +676,7 @@ Date: REGEX(.*)
 14. Get sub5 see failsCounter: 1, lastFailureReason: Timeout was reached
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 469
+Content-Length: 500
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -697,7 +701,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -712,7 +717,7 @@ Date: REGEX(.*)
 15. Get sub6 see failsCounter: 1, lastFailureReason: Couldn't connect to server
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 474
+Content-Length: 505
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -737,7 +742,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -752,7 +758,7 @@ Date: REGEX(.*)
 16. Get sub7 see failsCounter: 1, lastFailureReason: Couldn't resolve host name
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 484
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -777,7 +783,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -792,7 +799,7 @@ Date: REGEX(.*)
 17. Get sub8 see failsCounter: 1, lastFailureReason: Timeout was reached
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 501
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -817,7 +824,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

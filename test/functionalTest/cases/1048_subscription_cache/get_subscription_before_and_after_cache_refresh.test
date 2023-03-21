@@ -153,7 +153,7 @@ echo
 01. GET /v2/subscriptions and see dynamic fields set A
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 521
+Content-Length: 552
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -181,7 +181,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -202,7 +203,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 503
+Content-Length: 534
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -230,7 +231,8 @@ Date: REGEX(.*)
         "status": "inactive",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -246,7 +248,7 @@ Date: REGEX(.*)
 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 503
+Content-Length: 534
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -274,7 +276,8 @@ Date: REGEX(.*)
         "status": "inactive",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {

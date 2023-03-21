@@ -283,7 +283,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 399
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -308,7 +308,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -335,7 +336,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 566
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -365,7 +366,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -388,7 +390,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 566
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -418,7 +420,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -441,7 +444,7 @@ Date: REGEX(.*)
 10. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 566
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -471,7 +474,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -494,7 +498,7 @@ Date: REGEX(.*)
 12. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 566
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -524,7 +528,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -547,7 +552,7 @@ Date: REGEX(.*)
 14. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 535
+Content-Length: 566
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -577,7 +582,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {
@@ -600,7 +606,7 @@ Date: REGEX(.*)
 16. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 537
+Content-Length: 568
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -630,7 +636,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": false
         },
         "entities": [
             {

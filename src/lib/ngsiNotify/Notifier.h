@@ -71,6 +71,7 @@ public:
                                         const std::vector<std::string>&  attrsFilter,
                                         bool                             blacklist,
                                         bool                             covered,
+                                        bool                             notifyOnMetadataChange,
                                         const std::vector<std::string>&  metadataFilter);
 
 protected:
@@ -87,6 +88,7 @@ protected:
                                                const std::vector<std::string>&  attrsFilter,
                                                bool                             blacklist,
                                                bool                             covered,
+                                               bool                             notifyOnMetadataChange,
                                                const std::vector<std::string>&  metadataFilter);
 };
 
