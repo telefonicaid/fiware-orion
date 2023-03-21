@@ -190,7 +190,7 @@ Date: REGEX(.*)
 03. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 437
+Content-Length: 468
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -218,7 +218,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -243,7 +244,7 @@ Date: REGEX(.*)
 05. Get sub and see timesSent:1, failsCounter:2 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 437
+Content-Length: 468
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -271,7 +272,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -304,7 +306,7 @@ Date: REGEX(.*)
 08. Get sub and see timesSent:3, lastFailure (old) and lastSuccess but not failsCounter
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 521
+Content-Length: 552
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -332,7 +334,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": false
             },
             "entities": [
                 {
@@ -366,3 +369,4 @@ Request received: GET /v2/subscriptions, response code: 200
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+
