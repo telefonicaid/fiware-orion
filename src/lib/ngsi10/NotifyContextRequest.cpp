@@ -87,7 +87,7 @@ std::string NotifyContextRequest::toJson
 
     return oe.toJson();
   }
-  if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat != NGSI_V2_SIMPLIFIEDKEYVALUES))
+  else if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat != NGSI_V2_SIMPLIFIEDKEYVALUES))
   {
     std::string out;
     out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
