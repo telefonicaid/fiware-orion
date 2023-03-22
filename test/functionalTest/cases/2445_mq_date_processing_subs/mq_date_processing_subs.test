@@ -171,7 +171,7 @@ Date: REGEX(.*)
 ==========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 674
+Content-Length: 727
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -179,72 +179,75 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "humidity": {
-            "metadata": {
-                "meta_humidity": {
-                    "type": "Text",
-                    "value": "air,density"
-                }
+{
+    "data": [
+        {
+            "humidity": {
+                "metadata": {
+                    "meta_humidity": {
+                        "type": "Text",
+                        "value": "air,density"
+                    }
+                },
+                "type": "porcent",
+                "value": 36
             },
-            "type": "porcent",
-            "value": 36
-        },
-        "id": "room4",
-        "pressure": {
-            "metadata": {
-                "meta_pressure": {
-                    "type": "Text",
-                    "value": "high"
-                }
+            "id": "room4",
+            "pressure": {
+                "metadata": {
+                    "meta_pressure": {
+                        "type": "Text",
+                        "value": "high"
+                    }
+                },
+                "type": "Number",
+                "value": 35
             },
-            "type": "Number",
-            "value": 35
-        },
-        "temperature": {
-            "metadata": {
-                "meta_temperature": {
-                    "type": "alarm",
-                    "value": 34
-                }
+            "temperature": {
+                "metadata": {
+                    "meta_temperature": {
+                        "type": "alarm",
+                        "value": 34
+                    }
+                },
+                "type": "celsius",
+                "value": 34
             },
-            "type": "celsius",
-            "value": 34
-        },
-        "timestamp": {
-            "metadata": {
-                "meta_timestamp": {
-                    "type": "DateTime",
-                    "value": "2017-06-15T07:21:24.000Z"
-                }
+            "timestamp": {
+                "metadata": {
+                    "meta_timestamp": {
+                        "type": "DateTime",
+                        "value": "2017-06-15T07:21:24.000Z"
+                    }
+                },
+                "type": "nothing",
+                "value": 37
             },
-            "type": "nothing",
-            "value": 37
-        },
-        "type": "Ph9h",
-        "value_bool": {
-            "metadata": {
-                "meta_value_bool": {
-                    "type": "alarm",
-                    "value": true
-                }
+            "type": "Ph9h",
+            "value_bool": {
+                "metadata": {
+                    "meta_value_bool": {
+                        "type": "alarm",
+                        "value": true
+                    }
+                },
+                "type": "Number",
+                "value": 39
             },
-            "type": "Number",
-            "value": 39
-        },
-        "value_str": {
-            "metadata": {
-                "meta_value_str": {
-                    "type": "Text",
-                    "value": "true"
-                }
-            },
-            "type": "Number",
-            "value": 38
+            "value_str": {
+                "metadata": {
+                    "meta_value_str": {
+                        "type": "Text",
+                        "value": "true"
+                    }
+                },
+                "type": "Number",
+                "value": 38
+            }
         }
-    }
-]
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 

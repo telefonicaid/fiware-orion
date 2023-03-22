@@ -80,17 +80,27 @@ std::string NotifyContextRequest::toJson
   std::map<std::string, std::string>* replacementsP
 )
 {
-  if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
+  if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES) && (renderFormat != NGSI_V2_SIMPLIFIEDKEYVALUES))
   {
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
 
     return oe.toJson();
-  }  
+  }
+  if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat != NGSI_V2_SIMPLIFIEDKEYVALUES))
+  {
+    std::string out;
+    out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+    return out;
+  }
+  else
+  {
+    JsonObjectHelper jh;
 
-  std::string out;
-  out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
-  return out;
+    jh.addString("subscriptionId", subscriptionId.get());
+    jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP));
+    return jh.str();
+  }
 }
 
 

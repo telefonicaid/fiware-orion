@@ -272,7 +272,7 @@ Date: REGEX(.*)
 ============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -280,26 +280,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "A": {
-            "metadata": {
-                "dateModified": {
-                    "type": "DateTime",
-                    "value": "2051-01-01T00:00:00.478Z"
-                }
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "2051-01-01T00:00:00.478Z"
+                    }
+                },
+                "type": "Text",
+                "value": "foo"
             },
-            "type": "Text",
-            "value": "foo"
-        },
-        "id": "E1",
-        "type": "T"
-    }
-]
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -307,22 +310,25 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "A": {
-            "metadata": {
-                "dateModified": {
-                    "type": "DateTime",
-                    "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
-                }
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
+                    }
+                },
+                "type": "Text",
+                "value": "foo"
             },
-            "type": "Text",
-            "value": "foo"
-        },
-        "id": "E2",
-        "type": "T"
-    }
-]
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 
@@ -346,7 +352,7 @@ Date: REGEX(.*)
 ============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -354,26 +360,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "A": {
-            "metadata": {
-                "dateModified": {
-                    "type": "DateTime",
-                    "value": "2051-01-01T00:00:00.555Z"
-                }
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "2051-01-01T00:00:00.555Z"
+                    }
+                },
+                "type": "Text",
+                "value": "bar"
             },
-            "type": "Text",
-            "value": "bar"
-        },
-        "id": "E1",
-        "type": "T"
-    }
-]
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -381,22 +390,25 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "A": {
-            "metadata": {
-                "dateModified": {
-                    "type": "DateTime",
-                    "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
-                }
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
+                    }
+                },
+                "type": "Text",
+                "value": "bar"
             },
-            "type": "Text",
-            "value": "bar"
-        },
-        "id": "E2",
-        "type": "T"
-    }
-]
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 
@@ -438,7 +450,7 @@ Date: REGEX(.*)
 ===============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -446,26 +458,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "A": {
-            "metadata": {
-                "dateModified": {
-                    "type": "DateTime",
-                    "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
-                }
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
+                    }
+                },
+                "type": "Text",
+                "value": "zzz"
             },
-            "type": "Text",
-            "value": "zzz"
-        },
-        "id": "E1",
-        "type": "T"
-    }
-]
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -473,26 +488,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "A": {
-            "metadata": {
-                "dateModified": {
-                    "type": "DateTime",
-                    "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
-                }
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
+                    }
+                },
+                "type": "Text",
+                "value": "zzz"
             },
-            "type": "Text",
-            "value": "zzz"
-        },
-        "id": "E1",
-        "type": "T"
-    }
-]
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -500,26 +518,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "A": {
-            "metadata": {
-                "dateModified": {
-                    "type": "DateTime",
-                    "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
-                }
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
+                    }
+                },
+                "type": "Text",
+                "value": "zzz"
             },
-            "type": "Text",
-            "value": "zzz"
-        },
-        "id": "E2",
-        "type": "T"
-    }
-]
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 141
+Content-Length: 194
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -527,22 +548,25 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "A": {
-            "metadata": {
-                "dateModified": {
-                    "type": "DateTime",
-                    "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
-                }
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "dateModified": {
+                        "type": "DateTime",
+                        "value": "REGEX(20[1|2]\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ)"
+                    }
+                },
+                "type": "Text",
+                "value": "zzz"
             },
-            "type": "Text",
-            "value": "zzz"
-        },
-        "id": "E2",
-        "type": "T"
-    }
-]
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 

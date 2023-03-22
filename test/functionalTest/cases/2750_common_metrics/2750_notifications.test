@@ -146,7 +146,7 @@ Date: REGEX(.*)
                 "SP": {
                     "incomingTransactionRequestSize": 177,
                     "incomingTransactions": 2,
-                    "outgoingTransactionRequestSize": 71,
+                    "outgoingTransactionRequestSize": 124,
                     "outgoingTransactions": 1,
                     "serviceTime": REGEX(.*)
                 }
@@ -154,7 +154,7 @@ Date: REGEX(.*)
             "sum": {
                 "incomingTransactionRequestSize": 177,
                 "incomingTransactions": 2,
-                "outgoingTransactionRequestSize": 71,
+                "outgoingTransactionRequestSize": 124,
                 "outgoingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -165,7 +165,7 @@ Date: REGEX(.*)
             "SP": {
                 "incomingTransactionRequestSize": 177,
                 "incomingTransactions": 2,
-                "outgoingTransactionRequestSize": 71,
+                "outgoingTransactionRequestSize": 124,
                 "outgoingTransactions": 1,
                 "serviceTime": REGEX(.*)
             }
@@ -173,7 +173,7 @@ Date: REGEX(.*)
         "sum": {
             "incomingTransactionRequestSize": 177,
             "incomingTransactions": 2,
-            "outgoingTransactionRequestSize": 71,
+            "outgoingTransactionRequestSize": 124,
             "outgoingTransactions": 1,
             "serviceTime": REGEX(.*)
         }
@@ -211,7 +211,7 @@ Date: REGEX(.*)
                     "incomingTransactionRequestSize": 227,
                     "incomingTransactions": 3,
                     "outgoingTransactionErrors": 1,
-                    "outgoingTransactionRequestSize": 142,
+                    "outgoingTransactionRequestSize": 248,
                     "outgoingTransactions": 2,
                     "serviceTime": REGEX(.*)
                 },
@@ -226,7 +226,7 @@ Date: REGEX(.*)
                 "incomingTransactionResponseSize": REGEX(\d+),
                 "incomingTransactions": 4,
                 "outgoingTransactionErrors": 1,
-                "outgoingTransactionRequestSize": 142,
+                "outgoingTransactionRequestSize": 248,
                 "outgoingTransactions": 2,
                 "serviceTime": REGEX(.*)
             }
@@ -238,7 +238,7 @@ Date: REGEX(.*)
                 "incomingTransactionRequestSize": 227,
                 "incomingTransactions": 3,
                 "outgoingTransactionErrors": 1,
-                "outgoingTransactionRequestSize": 142,
+                "outgoingTransactionRequestSize": 248,
                 "outgoingTransactions": 2,
                 "serviceTime": REGEX(.*)
             },
@@ -253,7 +253,7 @@ Date: REGEX(.*)
             "incomingTransactionResponseSize": REGEX(\d+),
             "incomingTransactions": 4,
             "outgoingTransactionErrors": 1,
-            "outgoingTransactionRequestSize": 142,
+            "outgoingTransactionRequestSize": 248,
             "outgoingTransactions": 2,
             "serviceTime": REGEX(.*)
         }

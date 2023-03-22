@@ -145,7 +145,7 @@ Date: REGEX(.*)
 ========================================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 80
+Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -153,21 +153,24 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "id": "E1",
-        "temperature": {
-            "metadata": {},
-            "type": "Float",
-            "value": 23
-        },
-        "type": "T"
-    }
-]
+{
+    "data": [
+        {
+            "id": "E1",
+            "temperature": {
+                "metadata": {},
+                "type": "Float",
+                "value": 23
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 80
+Content-Length: 133
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -175,17 +178,20 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "id": "E1",
-        "temperature": {
-            "metadata": {},
-            "type": "Float",
-            "value": 24
-        },
-        "type": "T"
-    }
-]
+{
+    "data": [
+        {
+            "id": "E1",
+            "temperature": {
+                "metadata": {},
+                "type": "Float",
+                "value": 24
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 

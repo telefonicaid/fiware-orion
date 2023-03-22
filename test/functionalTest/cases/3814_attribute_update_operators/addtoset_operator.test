@@ -272,7 +272,7 @@ Date: REGEX(.*)
 =========================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 143
+Content-Length: 196
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -280,137 +280,35 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "A": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                1
-            ]
-        },
-        "B": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                {
-                    "x": 1
-                }
-            ]
-        },
-        "id": "E",
-        "type": "T"
-    }
-]
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 149
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-[
-    {
-        "A": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                1,
-                "foo"
-            ]
-        },
-        "B": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                {
-                    "x": 1
-                }
-            ]
-        },
-        "id": "E",
-        "type": "T"
-    }
-]
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 149
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-[
-    {
-        "A": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                1,
-                "foo"
-            ]
-        },
-        "B": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                {
-                    "x": 1
-                }
-            ]
-        },
-        "id": "E",
-        "type": "T"
-    }
-]
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 155
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: localhost:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-[
-    {
-        "A": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                1,
-                "foo"
-            ]
-        },
-        "B": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                {
-                    "x": 1
-                },
-                [
-                    "z"
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1
                 ]
-            ]
-        },
-        "id": "E",
-        "type": "T"
-    }
-]
+            },
+            "B": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    {
+                        "x": 1
+                    }
+                ]
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 207
+Content-Length: 202
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -418,38 +316,155 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "A": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                1,
-                "foo",
-                "bar"
-            ]
-        },
-        "B": {
-            "metadata": {},
-            "type": "StructuredValue",
-            "value": [
-                {
-                    "x": 1
-                },
-                [
-                    "z"
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    "foo"
                 ]
-            ]
-        },
-        "C": {
-            "metadata": {},
-            "type": "Number",
-            "value": 3
-        },
-        "id": "E",
-        "type": "T"
-    }
-]
+            },
+            "B": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    {
+                        "x": 1
+                    }
+                ]
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 202
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    "foo"
+                ]
+            },
+            "B": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    {
+                        "x": 1
+                    }
+                ]
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 208
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    "foo"
+                ]
+            },
+            "B": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    {
+                        "x": 1
+                    },
+                    [
+                        "z"
+                    ]
+                ]
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 260
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    "foo",
+                    "bar"
+                ]
+            },
+            "B": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    {
+                        "x": 1
+                    },
+                    [
+                        "z"
+                    ]
+                ]
+            },
+            "C": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
 =======================================
 
 

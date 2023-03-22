@@ -237,7 +237,7 @@ Date: REGEX(.*)
 ===================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 173
+Content-Length: 226
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -245,31 +245,34 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
-[
-    {
-        "A1": {
-            "metadata": {
-                "M1": {
-                    "type": "StructuredValue",
-                    "value": {
-                        "f": 3.14,
-                        "i": 10,
-                        "modified": true,
-                        "s": "test_string"
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "f": 3.14,
+                            "i": 10,
+                            "modified": true,
+                            "s": "test_string"
+                        }
                     }
-                }
+                },
+                "type": "Text",
+                "value": "modified"
             },
-            "type": "Text",
-            "value": "modified"
-        },
-        "id": "E1",
-        "type": "Thing"
-    }
-]
+            "id": "E1",
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 173
+Content-Length: 226
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -277,31 +280,34 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
-[
-    {
-        "A1": {
-            "metadata": {
-                "M1": {
-                    "type": "StructuredValue",
-                    "value": {
-                        "f": 3.14,
-                        "i": 10,
-                        "modified": true,
-                        "s": "test_string"
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "f": 3.14,
+                            "i": 10,
+                            "modified": true,
+                            "s": "test_string"
+                        }
                     }
-                }
+                },
+                "type": "Text",
+                "value": "modified"
             },
-            "type": "Text",
-            "value": "modified"
-        },
-        "id": "E1",
-        "type": "Thing"
-    }
-]
+            "id": "E1",
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 173
+Content-Length: 226
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -309,31 +315,34 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
-[
-    {
-        "A1": {
-            "metadata": {
-                "M1": {
-                    "type": "StructuredValue",
-                    "value": {
-                        "f": 3.14,
-                        "i": 10,
-                        "modified": true,
-                        "s": "test_string"
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "f": 3.14,
+                            "i": 10,
+                            "modified": true,
+                            "s": "test_string"
+                        }
                     }
-                }
+                },
+                "type": "Text",
+                "value": "modified"
             },
-            "type": "Text",
-            "value": "modified"
-        },
-        "id": "E1",
-        "type": "Thing"
-    }
-]
+            "id": "E1",
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 173
+Content-Length: 226
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -341,27 +350,30 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
-[
-    {
-        "A1": {
-            "metadata": {
-                "M1": {
-                    "type": "StructuredValue",
-                    "value": {
-                        "f": 3.14,
-                        "i": 10,
-                        "modified": true,
-                        "s": "test_string"
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {
+                    "M1": {
+                        "type": "StructuredValue",
+                        "value": {
+                            "f": 3.14,
+                            "i": 10,
+                            "modified": true,
+                            "s": "test_string"
+                        }
                     }
-                }
+                },
+                "type": "Text",
+                "value": "modified"
             },
-            "type": "Text",
-            "value": "modified"
-        },
-        "id": "E1",
-        "type": "Thing"
-    }
-]
+            "id": "E1",
+            "type": "Thing"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 

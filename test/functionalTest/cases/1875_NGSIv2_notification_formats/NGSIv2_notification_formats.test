@@ -367,7 +367,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 121
+Content-Length: 174
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -375,26 +375,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 
-[
-    {
-        "A1": {
-            "metadata": {},
-            "type": "Number",
-            "value": 1
-        },
-        "A3": {
-            "metadata": {},
-            "type": "Number",
-            "value": 3
-        },
-        "id": "E1",
-        "type": "none"
-    }
-]
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "A3": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 121
+Content-Length: 174
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -402,26 +405,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 
-[
-    {
-        "A1": {
-            "metadata": {},
-            "type": "Number",
-            "value": 1
-        },
-        "A4": {
-            "metadata": {},
-            "type": "Number",
-            "value": 4
-        },
-        "id": "E1",
-        "type": "none"
-    }
-]
+{
+    "data": [
+        {
+            "A1": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "A4": {
+                "metadata": {},
+                "type": "Number",
+                "value": 4
+            },
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 41
+Content-Length: 94
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(\d+)
@@ -429,18 +435,21 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 
-[
-    {
-        "A1": 1,
-        "A5": 5,
-        "id": "E1",
-        "type": "none"
-    }
-]
+{
+    "data": [
+        {
+            "A1": 1,
+            "A5": 5,
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 7
+Content-Length: 60
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: values
 Host: localhost:REGEX(\d+)
@@ -448,12 +457,15 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 
-[
-    [
-        1,
-        6
-    ]
-]
+{
+    "data": [
+        [
+            1,
+            6
+        ]
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 #SORT_END
 
@@ -482,7 +494,7 @@ Date: REGEX(.*)
 ===================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 42
+Content-Length: 95
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: keyValues
 Host: localhost:REGEX(\d+)
@@ -490,14 +502,17 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "A1": 1,
-        "A3": 31,
-        "id": "E1",
-        "type": "none"
-    }
-]
+{
+    "data": [
+        {
+            "A1": 1,
+            "A3": 31,
+            "id": "E1",
+            "type": "none"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 

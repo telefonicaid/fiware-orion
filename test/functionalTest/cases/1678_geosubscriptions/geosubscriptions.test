@@ -400,7 +400,7 @@ Date: REGEX(.*)
 ======================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 155
+Content-Length: 208
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -408,26 +408,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "city": {
-            "metadata": {},
-            "type": "Text",
-            "value": "Toledo"
-        },
-        "id": "E1",
-        "location": {
-            "metadata": {},
-            "type": "geo:point",
-            "value": "39.867459, -4.035825"
-        },
-        "type": "T"
-    }
-]
+{
+    "data": [
+        {
+            "city": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Toledo"
+            },
+            "id": "E1",
+            "location": {
+                "metadata": {},
+                "type": "geo:point",
+                "value": "39.867459, -4.035825"
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 154
+Content-Length: 207
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -435,26 +438,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "city": {
-            "metadata": {},
-            "type": "Text",
-            "value": "Avila"
-        },
-        "id": "E2",
-        "location": {
-            "metadata": {},
-            "type": "geo:point",
-            "value": "40.674238, -4.695622"
-        },
-        "type": "T"
-    }
-]
+{
+    "data": [
+        {
+            "city": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Avila"
+            },
+            "id": "E2",
+            "location": {
+                "metadata": {},
+                "type": "geo:point",
+                "value": "40.674238, -4.695622"
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 160
+Content-Length: 213
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -462,26 +468,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "city": {
-            "metadata": {},
-            "type": "Text",
-            "value": "Guadalajara"
-        },
-        "id": "E1",
-        "location": {
-            "metadata": {},
-            "type": "geo:point",
-            "value": "40.634273, -3.166392"
-        },
-        "type": "T"
-    }
-]
+{
+    "data": [
+        {
+            "city": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Guadalajara"
+            },
+            "id": "E1",
+            "location": {
+                "metadata": {},
+                "type": "geo:point",
+                "value": "40.634273, -3.166392"
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 156
+Content-Length: 209
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -489,26 +498,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "city": {
-            "metadata": {},
-            "type": "Text",
-            "value": "Segovia"
-        },
-        "id": "E1",
-        "location": {
-            "metadata": {},
-            "type": "geo:point",
-            "value": "40.941245, -4.110314"
-        },
-        "type": "T"
-    }
-]
+{
+    "data": [
+        {
+            "city": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Segovia"
+            },
+            "id": "E1",
+            "location": {
+                "metadata": {},
+                "type": "geo:point",
+                "value": "40.941245, -4.110314"
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 155
+Content-Length: 208
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -516,26 +528,29 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "city": {
-            "metadata": {},
-            "type": "Text",
-            "value": "Algete"
-        },
-        "id": "E3",
-        "location": {
-            "metadata": {},
-            "type": "geo:point",
-            "value": "40.597242, -3.499744"
-        },
-        "type": "T"
-    }
-]
+{
+    "data": [
+        {
+            "city": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Algete"
+            },
+            "id": "E3",
+            "location": {
+                "metadata": {},
+                "type": "geo:point",
+                "value": "40.597242, -3.499744"
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 154
+Content-Length: 207
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -543,22 +558,25 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-[
-    {
-        "city": {
-            "metadata": {},
-            "type": "Text",
-            "value": "Cadiz"
-        },
-        "id": "E4",
-        "location": {
-            "metadata": {},
-            "type": "geo:point",
-            "value": "36.532787, -6.297897"
-        },
-        "type": "T"
-    }
-]
+{
+    "data": [
+        {
+            "city": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Cadiz"
+            },
+            "id": "E4",
+            "location": {
+                "metadata": {},
+                "type": "geo:point",
+                "value": "36.532787, -6.297897"
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 

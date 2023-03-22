@@ -127,7 +127,7 @@ Date: REGEX(.*)
 ============================================
 POST http://127.0.0.1:9997/notify?EntityType=myType&data=myEntity
 Fiware-Servicepath: /
-Content-Length: 94
+Content-Length: 147
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
@@ -136,17 +136,20 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 Authorization: Basic ABC...ABC==
 
-[
-    {
-        "id": "myEntity",
-        "temperature": {
-            "metadata": {},
-            "type": "Number",
-            "value": 42.3
-        },
-        "type": "myType"
-    }
-]
+{
+    "data": [
+        {
+            "id": "myEntity",
+            "temperature": {
+                "metadata": {},
+                "type": "Number",
+                "value": 42.3
+            },
+            "type": "myType"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 
 

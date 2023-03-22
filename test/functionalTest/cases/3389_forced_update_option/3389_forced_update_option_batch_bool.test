@@ -283,7 +283,7 @@ Date: REGEX(.*)
 #SORT_START
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 91
+Content-Length: 144
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -291,21 +291,24 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "availability": {
-            "metadata": {},
-            "type": "Boolean",
-            "value": true
-        },
-        "id": "Slot1",
-        "type": "Slot"
-    }
-]
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "id": "Slot1",
+            "type": "Slot"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 91
+Content-Length: 144
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -313,17 +316,20 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "availability": {
-            "metadata": {},
-            "type": "Boolean",
-            "value": true
-        },
-        "id": "Slot2",
-        "type": "Slot"
-    }
-]
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "id": "Slot2",
+            "type": "Slot"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 #SORT_END
 
@@ -353,7 +359,7 @@ Date: REGEX(.*)
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 91
+Content-Length: 144
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -361,21 +367,24 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "availability": {
-            "metadata": {},
-            "type": "Boolean",
-            "value": true
-        },
-        "id": "Slot1",
-        "type": "Slot"
-    }
-]
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "id": "Slot1",
+            "type": "Slot"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 91
+Content-Length: 144
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -383,17 +392,20 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "availability": {
-            "metadata": {},
-            "type": "Boolean",
-            "value": true
-        },
-        "id": "Slot2",
-        "type": "Slot"
-    }
-]
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "id": "Slot2",
+            "type": "Slot"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 #SORT_END
 
@@ -411,7 +423,7 @@ Date: REGEX(.*)
 =================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 91
+Content-Length: 144
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -419,21 +431,24 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "availability": {
-            "metadata": {},
-            "type": "Boolean",
-            "value": true
-        },
-        "id": "Slot1",
-        "type": "Slot"
-    }
-]
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "id": "Slot1",
+            "type": "Slot"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 91
+Content-Length: 144
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -441,17 +456,20 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
 
-[
-    {
-        "availability": {
-            "metadata": {},
-            "type": "Boolean",
-            "value": true
-        },
-        "id": "Slot2",
-        "type": "Slot"
-    }
-]
+{
+    "data": [
+        {
+            "availability": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "id": "Slot2",
+            "type": "Slot"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
 =======================================
 #SORT_END
 
