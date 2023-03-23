@@ -35,7 +35,7 @@
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "orionld/common/orionldState.h"                             // orionldState, userAgentHeader
+#include "orionld/common/orionldState.h"                             // orionldState, userAgentHeader, hostHeader
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
@@ -496,12 +496,14 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   //
   // FIXME: This "block should move to orionld.cpp ?
   //
-  // * userAgentHeader(Len): Notifications with HTTP
+  // * userAgentHeader(Len): Notifications with HTTP(s)
   // * userAgentHeaderNoLF:  Forwarding
+  // * hostHeader(Len):      Notifications with HTTP(s)
   //
   userAgentHeaderLen = snprintf(userAgentHeader, sizeof(userAgentHeader) -1, "User-Agent: orionld/%s\r\n", ORIONLD_VERSION);  // Used in notifications as value of HTTP Header User-Agent
   snprintf(userAgentHeaderNoLF, sizeof(userAgentHeaderNoLF) -1, "User-Agent: orionld/%s", ORIONLD_VERSION);  // Used in forwarding as value of HTTP Header User-Agent
 
+  hostHeaderLen = snprintf(hostHeader, sizeof(hostHeader) - 1, "Host: %s\r\n", orionldHostName);
 
   int svIx;    // Service Vector Index
   for (svIx = 0; svIx < vecItems; svIx++)

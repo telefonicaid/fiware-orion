@@ -955,9 +955,9 @@ static bool tenantCheck(char* tenantName)
       return false;
     }
 
-    if ((!isalnum(tenantName[len])) && (tenantName[len] != '_'))
+    if ((!isalnum(tenantName[len])) && (tenantName[len] != '_') && (tenantName[len] != '-'))
     {
-      orionldError(OrionldBadRequestData, "Invalid Tenant", "bad character in tenant name - only underscore and alphanumeric characters are allowed", 400);
+      orionldError(OrionldBadRequestData, "Invalid Tenant", "invalid character in tenant name - only underscore, hyphen, and alphanumeric characters are allowed", 400);
       return false;
     }
 

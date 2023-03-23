@@ -206,6 +206,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withAttributes
 Content-Length: 411
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -246,6 +247,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withAttributes
 Content-Length: 411
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -286,6 +288,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withAttributes
 Content-Length: 360
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -315,6 +318,7 @@ Ngsild-Attribute-Format: Normalized
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withoutAttributes
 Content-Length: 493
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -348,6 +352,7 @@ Ngsild-Attribute-Format: Normalized
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withoutAttributes
 Content-Length: 493
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -381,6 +386,7 @@ Ngsild-Attribute-Format: Normalized
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:withoutAttributes
 Content-Length: 363
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized

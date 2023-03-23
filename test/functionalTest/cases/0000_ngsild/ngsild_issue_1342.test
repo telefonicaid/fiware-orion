@@ -1,0 +1,328 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of an entity with keyValues/simplified
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity urn:ngsi-ld:Building:barn002 according to issue #1342
+# 02. Retrieve the entity with 'keyValues'
+# 03. Retrieve the entity with 'simplified'
+# 04. Retrieve the entity with 'concise'
+# 05. Retrieve the entity with 'normalized'
+# 06. Retrieve the entity with default output format (that's normalized)
+#
+
+
+echo "01. Create an entity urn:ngsi-ld:Building:barn002 according to issue #1342"
+echo "=========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Building:barn002",
+  "type": "Building",
+  "category": {
+    "type": "Property",
+    "value": "barn"
+  },
+  "address": {
+    "type": "Property",
+    "value": {
+      "streetAddress": "Straße des 17. Juni",
+      "addressRegion": "Berlin",
+      "addressLocality": "Tiergarten",
+      "postalCode": "10557"
+    },
+    "verified": {
+      "type": "Property",
+      "value": true
+    }
+  },
+  "location": {
+    "type": "GeoProperty",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.3698,
+        52.5163
+      ]
+    }
+  },
+  "name": {
+    "type": "Property",
+    "value": "Big Red Barn"
+  },
+  "owner": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Person:person001"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Retrieve the entity with 'keyValues'"
+echo "========================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:barn002?options=keyValues
+echo
+echo
+
+
+echo "03. Retrieve the entity with 'simplified'"
+echo "========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:barn002?options=simplified
+echo
+echo
+
+
+echo "04. Retrieve the entity with 'concise'"
+echo "======================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:barn002?options=concise
+echo
+echo
+
+
+echo "05. Retrieve the entity with 'normalized'"
+echo "========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:barn002?options=normalized
+echo
+echo
+
+
+echo "06. Retrieve the entity with default output format (that's normalized)"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Building:barn002
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:ngsi-ld:Building:barn002 according to issue #1342
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:barn002
+
+
+
+02. Retrieve the entity with 'keyValues'
+========================================
+HTTP/1.1 200 OK
+Content-Length: 322
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "address": {
+        "addressLocality": "Tiergarten",
+        "addressRegion": "Berlin",
+        "postalCode": "10557",
+        "streetAddress": "Stra\u00dfe des 17. Juni"
+    },
+    "category": "barn",
+    "id": "urn:ngsi-ld:Building:barn002",
+    "location": {
+        "coordinates": [
+            13.3698,
+            52.5163
+        ],
+        "type": "Point"
+    },
+    "name": "Big Red Barn",
+    "owner": "urn:ngsi-ld:Person:person001",
+    "type": "Building"
+}
+
+
+03. Retrieve the entity with 'simplified'
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 322
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "address": {
+        "addressLocality": "Tiergarten",
+        "addressRegion": "Berlin",
+        "postalCode": "10557",
+        "streetAddress": "Stra\u00dfe des 17. Juni"
+    },
+    "category": "barn",
+    "id": "urn:ngsi-ld:Building:barn002",
+    "location": {
+        "coordinates": [
+            13.3698,
+            52.5163
+        ],
+        "type": "Point"
+    },
+    "name": "Big Red Barn",
+    "owner": "urn:ngsi-ld:Person:person001",
+    "type": "Building"
+}
+
+
+04. Retrieve the entity with 'concise'
+======================================
+HTTP/1.1 200 OK
+Content-Length: 359
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "address": {
+        "value": {
+            "addressLocality": "Tiergarten",
+            "addressRegion": "Berlin",
+            "postalCode": "10557",
+            "streetAddress": "Stra\u00dfe des 17. Juni"
+        },
+        "verified": true
+    },
+    "category": "barn",
+    "id": "urn:ngsi-ld:Building:barn002",
+    "location": {
+        "coordinates": [
+            13.3698,
+            52.5163
+        ],
+        "type": "Point"
+    },
+    "name": "Big Red Barn",
+    "owner": {
+        "object": "urn:ngsi-ld:Person:person001"
+    },
+    "type": "Building"
+}
+
+
+05. Retrieve the entity with 'normalized'
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 514
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "address": {
+        "type": "Property",
+        "value": {
+            "addressLocality": "Tiergarten",
+            "addressRegion": "Berlin",
+            "postalCode": "10557",
+            "streetAddress": "Stra\u00dfe des 17. Juni"
+        },
+        "verified": {
+            "type": "Property",
+            "value": true
+        }
+    },
+    "category": {
+        "type": "Property",
+        "value": "barn"
+    },
+    "id": "urn:ngsi-ld:Building:barn002",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.3698,
+                52.5163
+            ],
+            "type": "Point"
+        }
+    },
+    "name": {
+        "type": "Property",
+        "value": "Big Red Barn"
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:Person:person001",
+        "type": "Relationship"
+    },
+    "type": "Building"
+}
+
+
+06. Retrieve the entity with default output format (that's normalized)
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 514
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "address": {
+        "type": "Property",
+        "value": {
+            "addressLocality": "Tiergarten",
+            "addressRegion": "Berlin",
+            "postalCode": "10557",
+            "streetAddress": "Stra\u00dfe des 17. Juni"
+        },
+        "verified": {
+            "type": "Property",
+            "value": true
+        }
+    },
+    "category": {
+        "type": "Property",
+        "value": "barn"
+    },
+    "id": "urn:ngsi-ld:Building:barn002",
+    "location": {
+        "type": "GeoProperty",
+        "value": {
+            "coordinates": [
+                13.3698,
+                52.5163
+            ],
+            "type": "Point"
+        }
+    },
+    "name": {
+        "type": "Property",
+        "value": "Big Red Barn"
+    },
+    "owner": {
+        "object": "urn:ngsi-ld:Person:person001",
+        "type": "Relationship"
+    },
+    "type": "Building"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

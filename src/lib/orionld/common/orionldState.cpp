@@ -103,8 +103,9 @@ bool              orionldStartup           = true;
 char              pgPortString[16];
 char              mongoServerVersion[32];
 char              userAgentHeaderNoLF[64];     // "User-Agent: orionld/" + ORIONLD_VERSION - initialized in orionldServiceInit()
-char              hostHeader[256];             // Host: xxx
-
+char              hostHeaderNoLF[128];
+char              hostHeader[128];             // Host: xxx
+size_t            hostHeaderLen;
 
 //
 // Variables for Mongo C Driver

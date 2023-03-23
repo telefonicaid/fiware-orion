@@ -297,6 +297,7 @@ NGSILD-Tenant: captn
 POST http://REGEX(.*)
 Content-Length: 346
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: captn
 Content-Type: application/json

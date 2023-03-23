@@ -313,6 +313,7 @@ Date: REGEX(.*)
 POST REGEX(.*)/notify?subscriptionId=urn:S4
 Content-Length: 267
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -334,6 +335,7 @@ Ngsild-Attribute-Format: Normalized
 POST REGEX(.*)/notify?subscriptionId=urn:S2
 Content-Length: 267
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -355,6 +357,7 @@ Ngsild-Attribute-Format: Normalized
 POST REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 267
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -389,6 +392,7 @@ Date: REGEX(.*)
 POST REGEX(.*)/notify?subscriptionId=urn:S4
 Content-Length: 267
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -410,6 +414,7 @@ Ngsild-Attribute-Format: Normalized
 POST REGEX(.*)/notify?subscriptionId=urn:S2
 Content-Length: 267
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -444,6 +449,7 @@ Date: REGEX(.*)
 POST REGEX(.*)/notify?subscriptionId=urn:S5
 Content-Length: 303
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -469,6 +475,7 @@ Ngsild-Attribute-Format: Normalized
 POST REGEX(.*)/notify?subscriptionId=urn:S4
 Content-Length: 303
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
@@ -494,6 +501,7 @@ Ngsild-Attribute-Format: Normalized
 POST REGEX(.*)/notify?subscriptionId=urn:S2
 Content-Length: 303
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized

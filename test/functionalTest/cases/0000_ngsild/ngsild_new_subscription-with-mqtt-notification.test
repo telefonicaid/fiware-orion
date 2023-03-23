@@ -344,6 +344,7 @@ Notifications: 1
     "Content-Type": "application/json",
     "H1": "123",
     "H2": "456",
+    "Host": "REGEX(.*)",
     "Link": "REGEX(.*)",
     "Ngsild-Attribute-Format": "Normalized",
     "User-Agent": "orionld/REGEX(.*)"
@@ -489,6 +490,7 @@ Notifications: 1
     "Content-Type": "application/json",
     "H1": "123",
     "H2": "456",
+    "Host": "REGEX(.*)",
     "Link": "REGEX(.*)",
     "Ngsild-Attribute-Format": "Normalized",
     "User-Agent": "orionld/REGEX(.*)",

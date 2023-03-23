@@ -271,9 +271,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
 
 06. Dump/Reset accumulator - see one notification for S1, with L1 as a LanguageProperty
 =======================================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 377
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -325,9 +326,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
 
 08. Dump/Reset accumulator - see one notification for S2, with L2 as a normal Property
 ======================================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 293
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

@@ -494,6 +494,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 POST REGEX(.*)
 Content-Length: 233
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -558,6 +559,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E3
 POST REGEX(.*)
 Content-Length: 239
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -622,6 +624,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E5
 POST REGEX(.*)
 Content-Length: 237
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -700,6 +703,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E9
 POST REGEX(.*)
 Content-Length: 243
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -745,6 +749,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E11
 POST REGEX(.*)
 Content-Length: 247
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -768,6 +773,7 @@ Ngsild-Attribute-Format: Simplified
 POST REGEX(.*)
 Content-Length: 234
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -819,6 +825,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E12
 POST REGEX(.*)
 Content-Length: 241
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

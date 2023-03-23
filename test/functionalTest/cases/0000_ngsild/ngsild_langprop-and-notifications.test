@@ -453,7 +453,7 @@ Fiware-Servicepath: /
 Content-Length: 310
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:9997
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -497,7 +497,7 @@ Fiware-Servicepath: /
 Content-Length: 272
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:9997
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -547,7 +547,7 @@ Fiware-Servicepath: /
 Content-Length: 232
 User-Agent: REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
-Host: 127.0.0.1:9997
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -584,9 +584,10 @@ Date: REGEX(.*)
 
 23. Dump/Reset accumulator - see one notification for S1, with L1 as a Property
 ===============================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 271
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

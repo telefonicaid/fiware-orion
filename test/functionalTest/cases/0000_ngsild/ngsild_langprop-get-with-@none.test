@@ -91,6 +91,7 @@ echo
 echo "06. Create a subscription with lang=gr, matching E1"
 echo "==================================================="
 payload='{
+  "id": "urn:ngsi-ld:subscription:S1",
   "type": "Subscription",
   "entities": [
     {
@@ -222,7 +223,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:S1
 
 
 
@@ -235,9 +236,10 @@ Date: REGEX(.*)
 
 08. Dump accumulator, see one notification with the Default language for L
 ==========================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:REGEX(.*)
-Content-Length: 359
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscription:S1
+Content-Length: 325
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -261,7 +263,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "202REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subscription:S1",
     "type": "Notification"
 }
 =======================================

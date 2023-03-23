@@ -141,9 +141,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
 
 03. Dump accumulator to see one notification - in GeoJSON format
 ================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=http://a.b.c/subs/sub01
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Content-Length: 565
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -205,9 +206,10 @@ Date: REGEX(.*)
 
 05. Dump accumulator to see another GeoJSON format notification
 ===============================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=http://a.b.c/subs/sub01
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Content-Length: 600
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
