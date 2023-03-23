@@ -1688,7 +1688,7 @@ static bool addTriggeredSubscriptions_noCache
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
       bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? \
-						 getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : false;
+      getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
@@ -4469,3 +4469,4 @@ unsigned int processContextElement
   // Response in responseP
   return notifSent;
 }
+
