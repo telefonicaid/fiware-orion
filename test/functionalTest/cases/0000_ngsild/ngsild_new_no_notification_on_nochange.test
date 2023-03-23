@@ -147,9 +147,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
 
 03. Dump and reset accumulator - see one notification
 =====================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:copy-e1
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:copy-e1
 Content-Length: 338
 User-Agent: orionld/REGEX(.*)
+REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -198,9 +199,10 @@ Date: REGEX(.*)
 
 07. Dump and reset accumulator - see one notification
 =====================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:copy-e1
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:copy-e1
 Content-Length: 338
 User-Agent: orionld/REGEX(.*)
+REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

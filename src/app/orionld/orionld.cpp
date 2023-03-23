@@ -55,7 +55,7 @@
 * CLI option '--insecure'.
 */
 #include <stdio.h>
-#include <unistd.h>                                         // getppid, fork, setuid, sleep, etc.
+#include <unistd.h>                                         // getppid, fork, setuid, sleep, gethostname, etc.
 #include <string.h>
 #include <fcntl.h>                                          // open
 #include <sys/types.h>
@@ -1126,7 +1126,7 @@ int main(int argC, char* argV[])
 
 
   //
-  // Get the hostname - needed for contexts created by the broker
+  // Get the hostname - needed for contexts created by the broker + notifications
   //
   gethostname(orionldHostName, sizeof(orionldHostName));
   orionldHostNameLen = strlen(orionldHostName);

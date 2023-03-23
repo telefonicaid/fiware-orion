@@ -331,9 +331,10 @@ Location: /ngsi-ld/v1/entities/urn:E1
 04b. Dump/Reset Accumulator
 ===========================
 #SORT_START
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Content-Length: 209
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -353,9 +354,10 @@ Ngsild-Attribute-Format: Simplified
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 234
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -378,9 +380,10 @@ Ngsild-Attribute-Format: Concise
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 252
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -419,9 +422,10 @@ Location: /ngsi-ld/v1/entities/urn:E2
 05b. Dump/Reset Accumulator
 ===========================
 #SORT_START
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Content-Length: 209
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -441,9 +445,10 @@ Ngsild-Attribute-Format: Simplified
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 231
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -466,9 +471,10 @@ Ngsild-Attribute-Format: Concise
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 249
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -507,9 +513,10 @@ Location: /ngsi-ld/v1/entities/urn:E3
 06b. Dump/Reset Accumulator
 ===========================
 #SORT_START
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Content-Length: 209
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -529,9 +536,10 @@ Ngsild-Attribute-Format: Simplified
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 231
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -554,9 +562,10 @@ Ngsild-Attribute-Format: Concise
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 249
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -595,9 +604,10 @@ Location: /ngsi-ld/v1/entities/urn:E4
 07b. Dump/Reset Accumulator
 ===========================
 #SORT_START
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Content-Length: 209
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -617,9 +627,10 @@ Ngsild-Attribute-Format: Simplified
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 231
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -642,9 +653,10 @@ Ngsild-Attribute-Format: Concise
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 249
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -683,9 +695,10 @@ Location: /ngsi-ld/v1/entities/urn:E5
 08b. Dump/Reset Accumulator
 ===========================
 #SORT_START
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Content-Length: 219
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -708,9 +721,10 @@ Ngsild-Attribute-Format: Simplified
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 244
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -736,9 +750,10 @@ Ngsild-Attribute-Format: Concise
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 262
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -780,9 +795,10 @@ Location: /ngsi-ld/v1/entities/urn:E6
 09b. Dump/Reset Accumulator
 ===========================
 #SORT_START
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Content-Length: 224
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -805,9 +821,10 @@ Ngsild-Attribute-Format: Simplified
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 246
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -833,9 +850,10 @@ Ngsild-Attribute-Format: Concise
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 264
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -877,9 +895,10 @@ Location: /ngsi-ld/v1/entities/urn:E7
 10b. Dump/Reset Accumulator
 ===========================
 #SORT_START
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Content-Length: 211
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -901,9 +920,10 @@ Ngsild-Attribute-Format: Simplified
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 233
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -928,9 +948,10 @@ Ngsild-Attribute-Format: Concise
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 251
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -971,9 +992,10 @@ Location: /ngsi-ld/v1/entities/urn:E8
 11b. Dump/Reset Accumulator
 ===========================
 #SORT_START
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S3
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S3
 Content-Length: 211
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -995,9 +1017,10 @@ Ngsild-Attribute-Format: Simplified
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S2
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S2
 Content-Length: 233
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1022,9 +1045,10 @@ Ngsild-Attribute-Format: Concise
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:subs:S1
 Content-Length: 251
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

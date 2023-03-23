@@ -206,6 +206,7 @@ POST http://REGEX(.*)/yvonne?subscriptionId=urn:S1
 Content-Length: 403
 Authorization: Bearer {myToken}
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: captn
 Content-Type: application/json
@@ -240,7 +241,7 @@ POST https://REGEX(.*)/yvonne
 Content-Length: 403
 Authorization: Bearer {myToken}
 User-Agent: orionld/REGEX(.*)
-Host: localhost:9977
+Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: captn
 Content-Type: application/json

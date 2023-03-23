@@ -120,6 +120,7 @@ Content-Length: 282
 Authorization: Auth123
 X-Auth-Token: XHT
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: t1
 Content-Type: application/json

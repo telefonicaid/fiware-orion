@@ -137,6 +137,7 @@ POST http://REGEX(.*)/notify
 Content-Length: 239
 User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 
@@ -180,6 +181,7 @@ POST REGEX(.*)
 Content-Length: 288
 User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 

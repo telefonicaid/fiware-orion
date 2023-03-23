@@ -288,6 +288,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E3
 POST REGEX(.*)
 Content-Length: 223
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

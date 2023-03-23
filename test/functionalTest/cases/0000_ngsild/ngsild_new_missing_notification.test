@@ -70,6 +70,7 @@ echo
 echo "01. Creating subscription on tenant openiot"
 echo "==========================================="
 payload='{
+  "id": "urn:S1",
   "description": "Notify me of all changes",
   "type": "Subscription",
   "entities" : [{"type": "TemperatureSensor"}],
@@ -162,7 +163,7 @@ transfer-encoding: chunked
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
 NGSILD-Tenant: openiot
 
 
@@ -182,9 +183,10 @@ NGSILD-Tenant: openiot
 
 03. Dumping/Reseting accumulator to see one notification
 ========================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:REGEX(.*)
-Content-Length: 388
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 333
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: openiot
 Content-Type: application/json
@@ -208,7 +210,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "subscriptionId": "urn:S1",
     "type": "Notification"
 }
 =======================================
@@ -223,9 +225,10 @@ Date: REGEX(.*)
 
 05. Dumping accumulator to see one notification
 ===============================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:REGEX(.*)
-Content-Length: 394
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 339
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: openiot
 Content-Type: application/json
@@ -247,7 +250,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "REGEX(.*)",
-    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "subscriptionId": "urn:S1",
     "type": "Notification"
 }
 =======================================

@@ -138,9 +138,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
 
 03. Dump accumulator to see one notification, then reset the accumulator
 ========================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=http://a.b.c/subs/sub01
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Content-Length: 322
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Simplified
@@ -172,9 +173,10 @@ Date: REGEX(.*)
 
 05. Dump accumulator to see one notification
 ============================================
-POST http://127.0.0.1:9997/notify?subscriptionId=http://a.b.c/subs/sub01
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Content-Length: 329
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Simplified

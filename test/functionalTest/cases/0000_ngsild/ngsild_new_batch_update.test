@@ -300,9 +300,10 @@ Date: REGEX(.*)
 
 03. Dump and reset accumulator - see one notification with 3 entities
 =====================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
 Content-Length: 436
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -418,9 +419,10 @@ Date: REGEX(.*)
 
 06. Dump and reset accumulator - see one notification with two entities
 =======================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
 Content-Length: 402
 User-Agent: orionld/post-v1.1.0
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -548,9 +550,10 @@ Date: REGEX(.*)
 
 09. Dump and reset accumulator - see one notification with two entities
 =======================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
 Content-Length: 432
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

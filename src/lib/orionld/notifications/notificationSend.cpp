@@ -78,7 +78,7 @@ static const char* normalizedHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: norma
 static const char* keyValuesHeaderNgsiV2    = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
 
 char    userAgentHeader[64];     // "User-Agent: orionld/" + ORIONLD_VERSION + \r\n" - initialized in orionldServiceInit()
-size_t  userAgentHeaderLen = 0;  // Also set in orionldServiceInit()
+size_t  userAgentHeaderLen = 0;  // Set in orionldServiceInit()
 
 
 
@@ -650,7 +650,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   strcpy(contentLenHeader, "Content-Length: 0");  // Can't modify inside static strings, so need a char-vec on the stack for contentLenHeader
   snprintf(lenP, sizeLeftForLen, "%d\r\n", (int) contentLength);  // Adding Content-Length inside contentLenHeader
 
-  int headers  = 6;  // the minimum number of request headers
+  int headers  = 7;  // the minimum number of request headers
 
 
   //
@@ -672,14 +672,15 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
     LM_X(1, ("Too many HTTP headers (>50) for a Notification - to support that many, the broker needs a SW update and to be recompiled"));
 
   int           ioVecLen   = headers + 3;  // Request line + X headers + empty line + payload body
-  int           headerIx   = 6;
+  int           headerIx   = 7;
   struct iovec  ioVec[53]  = {
     { requestHeader,                 requestHeaderLen },
     { contentLenHeader,              strlen(contentLenHeader) },
     { (void*) contentTypeHeaderJson, 32 },  // Index 2
     { (void*) userAgentHeader,       userAgentHeaderLen },
+    { (void*) hostHeader,            hostHeaderLen },
     { (void*) acceptHeader,          26 },
-    { (void*) normalizedHeader,      37 }   // Index 5
+    { (void*) normalizedHeader,      37 }   // Index 6
   };
 
   //
@@ -715,23 +716,23 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   //
   if (mAltP->subP->renderFormat == RF_CONCISE)
   {
-    ioVec[5].iov_base = (void*) conciseHeader;
-    ioVec[5].iov_len  = 34;
+    ioVec[6].iov_base = (void*) conciseHeader;
+    ioVec[6].iov_len  = 34;
   }
   else if (mAltP->subP->renderFormat == RF_KEYVALUES)
   {
-    ioVec[5].iov_base = (void*) simplifiedHeader;
-    ioVec[5].iov_len  = 37;
+    ioVec[6].iov_base = (void*) simplifiedHeader;
+    ioVec[6].iov_len  = 37;
   }
   else if ((mAltP->subP->renderFormat == RF_CROSS_APIS_NORMALIZED) || (mAltP->subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT))
   {
-    ioVec[5].iov_base = (void*) normalizedHeaderNgsiV2;
-    ioVec[5].iov_len  = 32;
+    ioVec[6].iov_base = (void*) normalizedHeaderNgsiV2;
+    ioVec[6].iov_len  = 32;
   }
   else if ((mAltP->subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (mAltP->subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
   {
-    ioVec[5].iov_base = (void*) keyValuesHeaderNgsiV2;
-    ioVec[5].iov_len  = 31;
+    ioVec[6].iov_base = (void*) keyValuesHeaderNgsiV2;
+    ioVec[6].iov_len  = 31;
   }
 
 

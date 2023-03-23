@@ -143,6 +143,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
 POST http://REGEX(.*)/notify
 Content-Length: 565
 User-Agent: orionld/REGEX(.*)
+REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
 Link: REGEX(.*)
@@ -207,6 +208,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify
 Content-Length: 600
 User-Agent: orionld/REGEX(.*)
+REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
 Link: REGEX(.*)

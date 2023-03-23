@@ -394,10 +394,11 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
 
 03. Dump accumulator to see the notification
 ============================================
-POST http://127.0.0.1:9997/notify
+POST http://REGEX(.*)/notify
 Content-Length: 146
 User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 
@@ -445,10 +446,11 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
 
 07. Dump accumulator to see the notification (and reset the accumulator afterwards)
 ===================================================================================
-POST http://127.0.0.1:9997/notify
+POST http://REGEX(.*)/notify
 Content-Length: 147
 User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 
@@ -496,10 +498,11 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E3
 
 11. Dump accumulator to see the notification with P3 only (and reset the accumulator afterwards)
 ================================================================================================
-POST http://127.0.0.1:9997/notify
+POST http://REGEX(.*)/notify
 Content-Length: 148
 User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 
@@ -547,10 +550,11 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E4
 
 15. Dump accumulator to see location in the notification (and reset the accumulator afterwards)
 ===============================================================================================
-POST http://127.0.0.1:9997/notify
+POST http://REGEX(.*)/notify
 Content-Length: 193
 User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 
@@ -624,10 +628,11 @@ Date: REGEX(.*)
 
 18. Dump accumulator to see observationSpace in the notification (and reset the accumulator afterwards)
 =======================================================================================================
-POST http://127.0.0.1:9997/notify
+POST http://REGEX(.*)/notify
 Content-Length: 343
 User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 
@@ -681,10 +686,11 @@ Date: REGEX(.*)
 
 20. Dump accumulator to see operationSpace in the notification (and reset the accumulator afterwards)
 =====================================================================================================
-POST http://127.0.0.1:9997/notify
+POST http://REGEX(.*)/notify
 Content-Length: 491
 User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 
