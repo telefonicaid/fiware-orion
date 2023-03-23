@@ -1687,7 +1687,8 @@ static bool addTriggeredSubscriptions_noCache
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
-      bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : false;
+      bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? \
+						 getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : false;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
@@ -1893,7 +1894,7 @@ static bool processNotification
   nsf.fiwareCorrelator  = fiwareCorrelator;
   nsf.correlatorCounter = correlatorCounter;
 
-  if(!notifyOnMetadataChange && !onlyMetadataChange)
+  if (!notifyOnMetadataChange && !onlyMetadataChange)
   {
     getNotifier()->sendNotifyContextRequest(notifyCerP,
                                             notification,
@@ -1909,7 +1910,7 @@ static bool processNotification
 
     return true;
   }
-  else if(notifyOnMetadataChange)
+  else if (notifyOnMetadataChange)
   {
     getNotifier()->sendNotifyContextRequest(notifyCerP,
                                             notification,

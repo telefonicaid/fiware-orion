@@ -158,10 +158,11 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
     s->subject.condition.expression.georel   = georel;
   }
 
-  //notifyOnMetadataChange
+  // notifyOnMetadataChange
   if (r.hasField(CSUB_NOTIFYONMETADATACHANGE))
   {
-    s->subject.condition.notifyOnMetadataChange = r.hasField(CSUB_NOTIFYONMETADATACHANGE)?   getBoolFieldF(r, CSUB_NOTIFYONMETADATACHANGE)   : false;
+    s->subject.condition.notifyOnMetadataChange = r.hasField(CSUB_NOTIFYONMETADATACHANGE)?   \
+    getBoolFieldF(r, CSUB_NOTIFYONMETADATACHANGE)   : false;
   }
 }
 
@@ -445,3 +446,5 @@ void mongoGetSubscription
 
   *oe = OrionError(SccOk);
 }
+
+
