@@ -137,11 +137,7 @@ void MqttConnectionManager::teardown(void)
     std::string endpoint = iter->first;
     MqttConnection* cP   = iter->second;
 
-    LM_T(LmtMqttNotif, ("Teardown MQTT Broker connection %s", endpoint.c_str()));
-
-    mosquitto_disconnect(cP->mosq);
-    mosquitto_loop_stop(cP->mosq, false);
-    mosquitto_destroy(cP->mosq);
+    disconnect(cP->mosq, endpoint);
     cP->mosq = NULL;
 
     delete cP;
@@ -210,6 +206,31 @@ void MqttConnectionManager::semTake(void)
 void MqttConnectionManager::semGive(void)
 {
   sem_post(&sem);
+}
+
+
+
+/* ****************************************************************************
+*
+* MqttConnectionManager::disconnect -
+*/
+void MqttConnectionManager::disconnect(struct mosquitto*  mosq, const std::string& endpoint)
+{
+  LM_T(LmtMqttNotif, ("Disconnecting from MQTT Broker at %s", endpoint.c_str()));
+  int resultCode = mosquitto_disconnect(mosq);
+
+  // Sometimes this function is called when connection is not actually stablisehd, so we skip logging
+  // the MOSQ_ERR_NO_CONN case
+  if ((resultCode != MOSQ_ERR_SUCCESS) && (resultCode != MOSQ_ERR_NO_CONN))
+  {
+    LM_E(("Runtime Error (could not disconnect from MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
+  }
+  else
+  {
+    LM_T(LmtMqttNotif, ("Successfully disconnected from MQTT Broker at %s", endpoint.c_str()));
+  }
+  mosquitto_loop_stop(mosq, false);
+  mosquitto_destroy(mosq);
 }
 
 
@@ -300,24 +321,23 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
 
        // Not sure if this is actually needed (as the connection was never done in this case)
        // but let's use them just in case
-       mosquitto_disconnect(cP->mosq);
-       mosquitto_loop_stop(cP->mosq, false);
-       mosquitto_destroy(cP->mosq);
-
+       disconnect(cP->mosq, endpoint);
        cP->mosq = NULL;
+
        return cP;
      }
 
      // Check if the connection went ok (if not, e.g wrong user/pass, alarm is raised)
+     // Note a value of 0 means success, check:
+     // - For MQTT v5.0, look at section 3.2.2.2 Connect Reason code: https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html
+     // - For MQTT v3.1.1, look at section 3.2.2.3 Connect Return code: http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html
      if (cP->conectionResult)
      {
        alarmMgr.mqttConnectionError(endpoint, mosquitto_connack_string(cP->conectionResult));
 
-       mosquitto_disconnect(cP->mosq);
-       mosquitto_loop_stop(cP->mosq, false);
-       mosquitto_destroy(cP->mosq);
-
+       disconnect(cP->mosq, endpoint);
        cP->mosq = NULL;
+
        return cP;
      }
 
@@ -361,7 +381,9 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
 
   if (mosq == NULL)
   {
-    // No need of log traces here: the getConnection() method would already print them
+    // No need of log traces here: the getConnection() method would already print them.
+    // In addition, note in this case (check getConnection()) cP was not added to the
+    // connections std::map, so just freeing the memory allocated to cP pointer is enough
     delete cP;
     semGive();
     return false;
@@ -377,6 +399,11 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
   {
     retval = false;
     alarmMgr.mqttConnectionError(endpoint, mosquitto_strerror(resultCode));
+    // We destroy the connection in this case so a re-connection is forced next time
+    // a MQTT notification is sent
+    disconnect(cP->mosq, endpoint);
+    connections.erase(endpoint);
+    delete cP;
   }
   else
   {
@@ -415,19 +442,7 @@ void MqttConnectionManager::cleanup(double maxAge)
       LM_T(LmtMqttNotif, ("MQTT connection %s too old (age: %f, maxAge: %f), removing it", endpoint.c_str(), age, maxAge));
 
       toErase.push_back(endpoint);
-
-      LM_T(LmtMqttNotif, ("Disconnecting from MQTT Broker at %s", endpoint.c_str()));
-      int resultCode = mosquitto_disconnect(cP->mosq);
-      if (resultCode != MOSQ_ERR_SUCCESS)
-      {
-        LM_E(("Runtime Error (could not disconnect from MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
-      }
-      else
-      {
-        LM_T(LmtMqttNotif, ("Successfully disconnected from MQTT Broker at %s", endpoint.c_str()));
-      }
-      mosquitto_loop_stop(cP->mosq, false);
-      mosquitto_destroy(cP->mosq);
+      disconnect(cP->mosq, endpoint);
       cP->mosq = NULL;
 
       delete cP;
