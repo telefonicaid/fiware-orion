@@ -68,7 +68,10 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-fg** : broker をフォアグラウンドで実行します (デバッグに便利です)。ログ出力は、標準出力 (ログ・ファイルに加えて、単純化された形式を使用) で出力されます
 -   **-localIp <ip>** : broker がリッスンする IP インタフェースを指定します。デフォルトでは、すべてのインタフェースをリッスンします
 -   **-pidpath <pid_file>** : broker プロセスの PID を格納するファイルを指定します
--   **-httpTimeout <interval>** : メッセージの転送と通知のタイムアウトをミリ秒単位で指定します。デフォルトのタイムアウト (このパラメータが指定されていない場合) は5000 (5秒) です。最大値は 1800000 (30分) です。 このパラメータは、サブスクリプションに対して個別に定義できます。サブスクリプションの JSON で定義されている場合、デフォルトのパラメータは無視されます。[`subscription.notification.http`](../orion-api.md#subscriptionnotificationhttp)のセクションを参照してください
+-   **-httpTimeout <interval>** : メッセージの転送と通知のタイムアウトをミリ秒単位で指定します。HTTP 転送メッセージおよび通知のデフォルトのタイムアウト (このパラメータが指定されていない場合)。デフォルトのタイムアウト (このパラメータが指定されていない場合) は 5000 (5 秒) です。最大値は 1800000 (30分) です。 このパラメータは、サブスクリプションに対して個別に定義できます。サブスクリプションの JSON で定義されている場合、デフォルトのパラメータは無視されます。[`subscription.notification.http`](../orion-api.md#subscriptionnotificationhttp)のセクションを参照してください
+-   **-mqttTimeout <interval>**. MQTT 通知での MQTT ブローカーへの接続のタイムアウトをミリ秒単位で指定します。
+    デフォルトのタイムアウト (このパラメータが指定されていない場合) は 5000 (5秒) です。
+    最大値は、1800000 (30分) です。
 -   **-reqTimeout <interval>** : REST 接続のタイムアウトを秒単位で指定します。デフォルト値はゼロ、つまりタイムアウトなし (永遠に待機) であることに注意してください
 -   **-cprForwardLimit** : 単一のクライアント要求に対するコンテキスト・プロバイダへの転送リクエストの最大数 (デフォルトは制限なし)。コンテキスト・プロバイダの転送を完全に無効にするには、0を使用します。
 -   **-corsOrigin <domain>** : 許可された発信元を指定して、クロス・ソース・リソースの共有を有効にします (`*` に `__ALL` を使用)。Orion での CORS サポートの詳細については、[ユーザ・マニュアル](../user/cors.md)を参照してください。
@@ -101,8 +104,8 @@ broker はデフォルトでバックグラウンドで実行されるため、�
     * `${...}` マクロ置換は実行されません
 -   **-disableFileLog** : Orion がファイルにロギングするのを避けます (デフォルトの動作はログ・ファイルを使用します)。このオプションは、kubernetes で実行している場合に役に立ちます
 -   **-logForHumans** : 人のために標準化されたトレースを作成します。ログ・ファイルのトレースは影響を受けないことに注意してください
--   **-logLineMaxSize** : ログ行の最大長 (超過すると、Orion は `LINE TOO LONG` をログ・トレースとして出力します)。最小許容値:100バイト。デフォルト値:32キロバイト
--   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト
+-   **-logLineMaxSize** : ログ行の最大長 (超過すると、Orion は `LINE TOO LONG` をログ・トレースとして出力します)。最小許容値:100バイト。デフォルト値:32キロバイト。Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) の `lineMaxSize` フィールドで変更できます
+-   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト。Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) で `infoPayloadMaxSize` フィールドを使用して変更できます。
 -   **-disableMetrics** : 'metrics' 機能をオフにします。メトリックの収集は、システムコールやセマフォが関与するため、少しコストがかかります。メトリックオーバーヘッドなしで broker を起動するには、このパラメータを使用します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
 -   **-mqttMaxAge** : 未使用の MQTT 接続が保持される最大時間 (分単位)。デフォルト値: 60
@@ -149,6 +152,7 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_HTTPS_CERTFILE    |   cert    |
 |   ORION_MULTI_SERVICE |   multiservice    |
 |   ORION_HTTP_TIMEOUT  |   httpTimeout |
+|   ORION_MQTT_TIMEOUT	|   mqttTimeout |
 |   ORION_REQ_TIMEOUT   |   reqTimeout  |
 |   ORION_MUTEX_POLICY  |   reqMutexPolicy  |
 |   ORION_MONGO_WRITE_CONCERN   |   writeConcern    |

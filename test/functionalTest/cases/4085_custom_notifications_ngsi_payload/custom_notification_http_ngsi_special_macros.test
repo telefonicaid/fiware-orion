@@ -150,7 +150,7 @@ Fiware-Servicepath: /ss2
 Content-Length: 323
 X-Auth-Token: token2
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
+Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Fiware-Service: s2
@@ -192,7 +192,7 @@ Fiware-Servicepath: /ss3
 Content-Length: 323
 X-Auth-Token: token2
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
+Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Fiware-Service: s2

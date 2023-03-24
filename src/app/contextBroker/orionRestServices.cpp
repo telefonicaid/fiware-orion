@@ -201,7 +201,7 @@ static RestService getServiceV[] =
   { StatisticsRequest,                             2, { "cache", "statistics"                                                          },  statisticsCacheTreat                             },
   //{ StatisticsRequest,                             4, { "v1", "admin", "cache", "statistics"                                           },  statisticsCacheTreat                             },
   { VersionRequest,                                1, { "version"                                                                      },  versionTreat                                     },
-  { LogLevelRequest,                               2, { "admin", "log"                                                                 },  getLogLevel                                      },
+  { LogLevelRequest,                               2, { "admin", "log"                                                                 },  getLogConfig                                     },
   { SemStateRequest,                               2, { "admin", "sem"                                                                 },  semStateTreat                                    },
   { MetricsRequest,                                2, { "admin", "metrics"                                                             },  getMetrics                                       },
 
@@ -307,7 +307,7 @@ static RestService putServiceV[] =
   //{ LogTraceRequest,                               3, { "log", "traceLevel", "*"                                                     }, logTraceTreat                                    },
   //{ LogTraceRequest,                               5, { "v1", "admin", "log", "trace",      "*"                                      }, logTraceTreat                                    },
   //{ LogTraceRequest,                               5, { "v1", "admin", "log", "traceLevel", "*"                                      }, logTraceTreat                                    },
-  { LogLevelRequest,                               2, { "admin", "log"                                                               }, changeLogLevel                                   },
+  { LogLevelRequest,                               2, { "admin", "log"                                                               }, changeLogConfig                                  },
 
   ORION_REST_SERVICE_END
 };

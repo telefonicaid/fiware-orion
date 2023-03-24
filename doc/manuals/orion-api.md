@@ -100,7 +100,7 @@
             - [Get Attribute Value `GET /v2/entities/{entityId}/attrs/{attrName}/value`](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
             - [Update Attribute Value `PUT /v2/entities/{entityId}/attrs/{attrName}/value`](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [Types](#types)
-            - [List Entity Types `GET /v2/type`](#list-entity-types-get-v2type)
+            - [List Entity Types `GET /v2/types`](#list-entity-types-get-v2types)
             - [Retrieve entity information for a given type `GET /v2/types/{type}`](#retrieve-entity-information-for-a-given-type-get-v2typestype)
     - [Subscriptions Operations](#subscriptions-operations)
         - [Subscription payload datamodel](#subscription-payload-datamodel)
@@ -2334,10 +2334,10 @@ Some considerations to take into account when using custom notifications:
   [CLI parameter](admin/cli.md). In this case:
   * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
   * No `${...}` macro substitution is performed.
-
-Note that if a custom payload is used for the notification (the field `payload`, `json` or `ngsi`
-is given in the corresponding subscription), then a value of `custom`
-is used for the `Ngsiv2-AttrsFormat` header in the notification.
+* If text based or JSON payloads are used (i.e. field `payload` or `json` is used) then
+  `Ngsiv2-AttrsFormat` header is set to `custom`. However, note that if NGSI patching is used
+  (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
+  notification (given that the notification format is actually the same).
 
 ## Oneshot Subscriptions
 
@@ -3469,7 +3469,7 @@ _**Response code**_
 
 ### Types
 
-#### List Entity Types `GET /v2/type`
+#### List Entity Types `GET /v2/types`
 
 Retrieves a list of entity types, as described in the response payload section below.
 

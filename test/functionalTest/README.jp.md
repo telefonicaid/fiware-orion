@@ -28,6 +28,7 @@ virtualenv --python=/usr/bin/python3 /path/to/ft_env
 ```
 pip install Flask==2.0.2
 pip install paho-mqtt==1.6.1
+pip install amqtt==0.10.1  # Not actually an accumulator-server.py dependency, but needed by some tests
 ```
 
 次に、accumulator-server.py のスクリプト自体をインストールします:

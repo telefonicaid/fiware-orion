@@ -83,7 +83,7 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-logAppend' (append to log-file)]                                          ORION_LOG_APPEND                   FALSE /FALSE/
                                [option '-fg' (don't start as daemon)]                                              ORION_FOREGROUND                   FALSE /FALSE/
                                [option '-localIp' <IP to receive new connections>]                                 ORION_LOCALIP                      '0.0.0.0' /'0.0.0.0'/
-                               [option '-port' <port to receive new connections>]                                  ORION_PORT                         1026 /1026/
+                               [option '-port' <port to receive new connections>]                                  ORION_PORT                         1 <= 1026 /1026/ <= 65535
                                [option '-pidpath' <pid file path>]                                                 ORION_PID_PATH                     '/tmp/contextBroker.pid' /'/tmp/contextBroker/
                                [option '-dbhost' <database host>]                                                  ORION_MONGO_HOST                   'localhost' /'localhost'/
                                [option '-rplSet' <replica set>]                                                    ORION_MONGO_REPLICA_SET            '' /''/
@@ -102,7 +102,8 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-key' <private server key file (for https)>]                               ORION_HTTPS_KEYFILE                '' /''/
                                [option '-cert' <certificate key file (for https)>]                                 ORION_HTTPS_CERTFILE               '' /''/
                                [option '-multiservice' (service multi tenancy mode)]                               ORION_MULTI_SERVICE                FALSE /FALSE/
-                               [option '-httpTimeout' <timeout in milliseconds for forwards and notifications>]    ORION_HTTP_TIMEOUT                 -1 <= -1 /-1/ <= 1800000
+                               [option '-httpTimeout' <timeout in milliseconds for HTTP forwards and notificati]   ORION_HTTP_TIMEOUT                 -1 <= -1 /-1/ <= 1800000
+                               [option '-mqttTimeout' <timeout in milliseconds for MQTT broker connection in no]   ORION_MQTT_TIMEOUT                 -1 <= -1 /-1/ <= 1800000
                                [option '-reqTimeout' <connection timeout for REST requests (in seconds)>]          ORION_REQ_TIMEOUT                  0 /0/ >= 0
                                [option '-reqMutexPolicy' <mutex policy (none/read/write/all)>]                     ORION_MUTEX_POLICY                 'all' /'all'/
                                [option '-writeConcern' <db write concern (0:unacknowledged, 1:acknowledged)>]      ORION_MONGO_WRITE_CONCERN          0 <= 1 /1/ <= 1
