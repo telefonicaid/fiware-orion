@@ -123,6 +123,15 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->covered               = sub.hasField(CSUB_COVERED)?          getBoolFieldF(sub, CSUB_COVERED)                     : false;
   cSubP->next                  = NULL;
 
+  // getIntOrLongFieldAsLong() may return -1 if something goes wrong, so we add a guard to set 0 in this case
+  cSubP->failsCounterFromDb = sub.hasField(CSUB_FAILSCOUNTER)? getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER) : 0;
+  if (cSubP->failsCounterFromDb < 0)
+  {
+    cSubP->failsCounterFromDb = 0;
+  }
+
+  // set to valid at refresh time (to be invalidated if some sucess occurs before the next cache refresh cycle)
+  cSubP->failsCounterFromDbValid = true;
 
   //
   // 04.2 httpInfo & mqttInfo

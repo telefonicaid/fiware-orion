@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Inactive status changed due to maxFailsLimit keeps after csubs cache refresh
+Inactive status changed due to maxFailsLimit keeps after csubs cache refresh (HTTP case)
 
 --SHELL-INIT--
 dbInit CB
