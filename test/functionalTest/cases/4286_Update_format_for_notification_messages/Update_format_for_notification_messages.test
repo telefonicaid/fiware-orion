@@ -31,9 +31,9 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create NGSIv2 subscription for E1/A1 (A1, A4), with attrsFormat set to simplifiedNormalized
-# 02. Create NGSIv2 subscription for E1/A1 (A1, A5), with attrsFormat set to simplifiedkeyValues
-# 03. Create E1/A1
+# 01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized
+# 02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedkeyValues
+# 03. Create entity E1/T1
 # 04. Dump accumulator to see notifications
 #
 
@@ -56,13 +56,12 @@ payload='
     "httpCustom": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
-    "attrs": [ "A1", "sub1_with_simplifiedNormalized" ],
+    "attrs": [ "A1" ],
     "attrsFormat": "simplifiedNormalized"
   },
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
-sub3=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 
@@ -85,13 +84,12 @@ payload='
     "httpCustom": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
-    "attrs": [ "A1", "sub2_with_simplifiedKeyValues" ],
+    "attrs": [ "A1" ],
     "attrsFormat": "simplifiedKeyValues"
   },
   "expires": "2050-04-05T14:00:00.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
-sub3=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 echo
 echo
 
@@ -175,7 +173,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 72
+Content-Length: 32
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: simplifiedKeyValues
 Host: localhost:REGEX(\d+)
@@ -185,17 +183,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 
 [
     {
-        "A1": {
-            "metadata": {},
-            "type": "Number",
-            "value": 1
-        },
+        "A1": 1,
         "id": "E1",
         "type": "T1"
     }
 ]
 =======================================
-
 
 
 --TEARDOWN--
