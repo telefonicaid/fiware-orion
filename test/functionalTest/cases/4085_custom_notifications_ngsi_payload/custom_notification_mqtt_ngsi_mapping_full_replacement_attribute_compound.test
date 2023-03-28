@@ -102,6 +102,10 @@ echo
 echo
 
 
+# FIXME PR
+sleep 0.5s
+
+
 echo "03. Update entity E1"
 echo "===================="
 payload='{

@@ -83,6 +83,10 @@ echo
 echo
 
 
+# FIXME PR
+sleep 0.5s
+
+
 echo "02. Create entity E1"
 echo "===================="
 payload='{
