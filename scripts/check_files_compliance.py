@@ -51,12 +51,12 @@ verbose = True
 
 # check_file returns an error string in the case of error or empty string if everything goes ok
 def check_file(file):
-    # The license header doesn't necessarily starts in the first line, e.g. due to a #define in a .h file
+    # The license header doesn't necessarily start in the first line, e.g. due to a #define in a .h file
     # or a hashbang (#!/usr/bin/python...). Thus, we locate the starting line and start the comparison from
     # that line
 
     searching_first_line = True
-    with open(file) as f:
+    with open(file, encoding='utf-8') as f:
         for line in f:
             line = line.rstrip()
             if searching_first_line:
