@@ -32,13 +32,13 @@ jobs:
 
       mosquitto:
         # Needed by MQTT notification tests
-        image: eclipse-mosquitto:1.6.7
+        image: eclipse-mosquitto:2.0.15
         ports:
         - 1883:1883
 
       mosquitto-extra:
         # Needed by MQTT notification tests (multi broker)
-        image: eclipse-mosquitto:1.6.7
+        image: eclipse-mosquitto:2.0.15
         ports:
         - 1884:1883
     
