@@ -175,13 +175,13 @@ def supported_extension(root, file):
         return True
 
     filename = os.path.join(root, file)
-    print 'not supported extension: {filename}'.format(filename=filename)
+    print('not supported extension: {filename}'.format(filename=filename))
     return False
 
 if len(argv) > 1:
     dir = argv[1]
 else:
-    print 'Usage:   ./check_files_compliance.py <directory>'
+    print('Usage:   ./check_files_compliance.py <directory>')
     exit(1)
 
 good = 0
@@ -204,18 +204,18 @@ for root, dirs, files in os.walk(dir):
         filename = os.path.join(root, file)
         error = check_file(filename)
         if len(error) > 0:
-            print filename + ': ' + error
+            print(filename + ': ' + error)
             bad += 1
         else:
             # DEBUG
             # print filename + ': OK'
             good += 1
 
-print '--------------'
-print 'Summary:'
-print '   good:    {good}'.format(good=str(good))
-print '   bad:     {bad}'.format(bad=str(bad))
-print 'Total: {total}'.format(total=str(good + bad))
+print('--------------')
+print('Summary:')
+print('   good:    {good}'.format(good=str(good)))
+print('   bad:     {bad}'.format(bad=str(bad)))
+print('Total: {total}'.format(total=str(good + bad)))
 
 if bad > 0:
     exit(1)
