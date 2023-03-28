@@ -56,6 +56,7 @@ def check_file(file):
     # that line
 
     searching_first_line = True
+    print("DEBUG: file is" + file)
     with open(file, encoding='utf-8') as f:
         for line in f:
             line = line.rstrip()
