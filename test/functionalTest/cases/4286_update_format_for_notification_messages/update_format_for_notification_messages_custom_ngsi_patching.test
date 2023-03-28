@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update format for notification messages
+update format for notification messages custom ngsi patching
 
 --SHELL-INIT--
 dbInit CB
@@ -31,15 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized
-# 02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedkeyValues
+# 01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized with httpCustom and ngsi field adding a new attribute
+# 02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedkeyValues with httpCustom and ngsi field adding a new attribute
 # 03. Create entity E1/T1
 # 04. Dump accumulator to see notifications
 #
 
 
-echo "01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized"
-echo "====================================================================================="
+echo "01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized with httpCustom and ngsi field adding a new attribute"
+echo "==========================================================================================================================================="
 payload='
 {
   "subject": {
@@ -54,7 +54,15 @@ payload='
   },
   "notification": {
     "httpCustom": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "ngsi": {
+        "id": "E1",
+        "type": "T1",
+        "A2": {
+          "value": 1,
+          "type": "Number"
+        }
+      }
     },
     "attrs": [ "A1" ],
     "attrsFormat": "simplifiedNormalized"
@@ -66,8 +74,8 @@ echo
 echo
 
 
-echo "02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedKeyValues"
-echo "===================================================================================="
+echo "02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedKeyValues with httpCustom and ngsi field adding a new attribute"
+echo "=========================================================================================================================================="
 payload='
 {
   "subject": {
@@ -82,7 +90,15 @@ payload='
   },
   "notification": {
     "httpCustom": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "ngsi": {
+        "id": "E1",
+        "type": "T1",
+        "A3": {
+          "value": 1,
+          "type": "Number"
+        }
+      }
     },
     "attrs": [ "A1" ],
     "attrsFormat": "simplifiedKeyValues"
@@ -117,8 +133,8 @@ echo
 
 
 --REGEXPECT--
-01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized
-=====================================================================================
+01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized with httpCustom and ngsi field adding a new attribute
+===========================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -127,8 +143,8 @@ Date: REGEX(.*)
 
 
 
-02 Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedKeyValues
-===================================================================================
+02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedKeyValues with httpCustom and ngsi field adding a new attribute
+==========================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
