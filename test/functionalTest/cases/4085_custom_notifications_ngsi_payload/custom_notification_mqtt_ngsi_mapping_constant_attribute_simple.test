@@ -91,7 +91,8 @@ echo
 # in ubuntu-22.04 fails if we don't add this. It doesn't make sense to me (both
 # Orion and mosquitto runs in containers on top of ubuntu OS) but it happens
 # (maybe some kind of networking effect in the docker host?)
-sleep 0.5s
+# Note the sleep time is <<60s (cache refresh time)
+sleep 0.75s
 
 
 echo "03. Update entity E1"
