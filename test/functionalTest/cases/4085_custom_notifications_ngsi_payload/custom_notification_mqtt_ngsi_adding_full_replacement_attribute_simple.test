@@ -122,15 +122,6 @@ echo
 echo
 
 
-# This was introduced when we changed from ubuntu-18.04 to ubuntu-22.04 in GitActions
-# in PR https://github.com/telefonicaid/fiware-orion/pull/4302. For some unknown reason
-# in ubuntu-22.04 fails if we don't add this. It doesn't make sense to me (both
-# Orion and mosquitto runs in containers on top of ubuntu OS) but it happens
-# (maybe some kind of networking effect in the docker host?)
-# Note the sleep time is <<60s (cache refresh time)
-sleep 0.75s
-
-
 echo "03. Update entity E1"
 echo "===================="
 payload='{
@@ -162,6 +153,15 @@ payload='{
 orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
 echo
 echo
+
+
+# This delay before asking for accumulator dump was introduced when we
+# changed from ubuntu-18.04 to ubuntu-22.04 in GitActions
+# in PR https://github.com/telefonicaid/fiware-orion/pull/4302. For some
+# unknown reason in ubuntu-22.04 fails if we don't add this. It doesn't make
+# sense to me (both Orion and mosquitto runs in containers on top of ubuntu OS)
+# but it happens... (maybe some kind of networking effect in the docker host?)
+sleep 0.75s
 
 
 echo "04. Dump accumulator and see two notifications with replaced values"
