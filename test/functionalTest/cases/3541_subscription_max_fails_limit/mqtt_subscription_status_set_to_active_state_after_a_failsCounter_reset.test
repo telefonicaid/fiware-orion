@@ -1,4 +1,4 @@
-# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription status keeps active after a failsCounter reset
+Subscription status keeps active after a failsCounter reset (MQTT case)
 
 --SHELL-INIT--
 dbInit CB
@@ -33,14 +33,13 @@ brokerStart CB
 # 01. POST /v2/entities, to create Room1 with temperature and pressure
 # 02. POST /v2/subscriptions, to create subscription with maxFailsLimit=5
 # 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
-# 04. Stop accumulator
-# 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
-# 07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
-# 09. Start accumulator
-# 10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=0
+# 04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
+# 06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
+# 08. Start MQTT Broker
+# 09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 10. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=0
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -80,8 +79,9 @@ payload='{
     }
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
     },
     "attrs": [
       "temperature"
@@ -102,15 +102,7 @@ echo
 echo
 
 
-
-echo "04. Stop accumulator"
-echo "===================="
-accumulatorStop
-echo
-echo
-
-
-echo '05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -127,14 +119,14 @@ echo
 echo
 
 
-echo '06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1'
+echo '05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -151,21 +143,24 @@ echo
 echo
 
 
-echo '08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2'
+echo '07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo "09. Start accumulator"
+echo "08. Start MQTT broker"
 echo "====================="
-accumulatorStart
+# It seems that amqtt broker takes its time to start so we wait a while
+# Note 5s < 60s = default cache refresh interval
+debugMmqttBrokerStart
+sleep 5s
 echo
 echo
 
 
-echo '10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -182,7 +177,7 @@ echo
 echo
 
 
-echo '11. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active'
+echo '10. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active'
 echo '====================================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -214,7 +209,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 399
+Content-Length: 385
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -228,10 +223,12 @@ Date: REGEX(.*)
         ],
         "attrsFormat": "normalized",
         "covered": false,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false
     },
     "status": "active",
@@ -239,8 +236,7 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ],
-            "notifyOnMetadataChange": false
+            ]
         },
         "entities": [
             {
@@ -252,11 +248,7 @@ Date: REGEX(.*)
 }
 
 
-04. Stop accumulator
-====================
-
-
-05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -264,10 +256,10 @@ Date: REGEX(.*)
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
+05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 566
+Content-Length: 503
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -282,13 +274,14 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 1,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -297,8 +290,7 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ],
-            "notifyOnMetadataChange": false
+            ]
         },
         "entities": [
             {
@@ -310,7 +302,7 @@ Date: REGEX(.*)
 }
 
 
-07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -318,10 +310,10 @@ Date: REGEX(.*)
 
 
 
-08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
+07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 566
+Content-Length: 503
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -336,13 +328,14 @@ Date: REGEX(.*)
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 2,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
@@ -351,8 +344,7 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ],
-            "notifyOnMetadataChange": false
+            ]
         },
         "entities": [
             {
@@ -364,12 +356,12 @@ Date: REGEX(.*)
 }
 
 
-09. Start accumulator
+08. Start MQTT broker
 =====================
-accumulator running as PID REGEX(.*)
+MQTT broker running as PID REGEX(.*)
 
 
-10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -377,10 +369,10 @@ Date: REGEX(.*)
 
 
 
-11. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
+10. GET /v2/subscriptions/subscription_id, to check no failsCounter and status=active
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 612
+Content-Length: 527
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -394,15 +386,15 @@ Date: REGEX(.*)
         ],
         "attrsFormat": "normalized",
         "covered": false,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 3
     },
@@ -411,8 +403,7 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ],
-            "notifyOnMetadataChange": false
+            ]
         },
         "entities": [
             {
@@ -426,5 +417,5 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
+debugMqttBrokerStop
 dbDrop CB

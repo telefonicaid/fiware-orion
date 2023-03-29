@@ -124,7 +124,7 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
         . scripts/testEnv.sh
         virtualenv /opt/ft_env --python=/usr/bin/python3
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.10.1
 
 * Run test harness in this environment (it takes some time, please be patient).
 
@@ -273,7 +273,7 @@ In the case of the aarch64 architecture, run `./configure` with `--build=arm-lin
         . scripts/testEnv.sh
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.10.1
 
 * Run test harness (it takes some time, please be patient). Before starting test by make command, apply the following patch to avoid test failing.
 

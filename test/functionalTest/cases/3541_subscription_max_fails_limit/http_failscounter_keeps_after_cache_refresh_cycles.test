@@ -21,26 +21,25 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Inactive status changed due to maxFailsLimit keeps after csubs cache refresh
+failsCounter keeps after cache refresh cycles (HTTP case)
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPv4 -multiservice -subCacheIval 2 --cache
+brokerStart CB 0 IPv4 -subCacheIval 3
 
 --SHELL--
 
 #
-# 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=1
-# 02. Upsert entity to trigger notification (fail)
-# 03. Upsert entity to trigger notification (fail that causes change to status=inactive)
-# 04. GET /v2/subscriptions/subId before cache refresh to check the status=inactive
-# 05. Sleep 2.5s so cache refresh takes place
-# 06. GET /v2/subscriptions/subId after cache refresh to check the status=inactive
+# 01. POST /v2/subscriptions, to create subscription
+# 02. Upsert entity twice to trigger notification and reach failsCounter=2
+# 03. GET /v2/subscriptions/subId, and see failsCounter=2
+# 04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
+# 05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
 #
 
 
-echo "01. POST /v2/subscriptions, to create subscription with maxFailsLimit=1"
-echo "======================================================================="
+echo "01. POST /v2/subscriptions, to create subscription"
+echo "=================================================="
 payload='{
   "subject": {
     "entities": [
@@ -53,8 +52,7 @@ payload='{
   "notification": {
     "http": {
       "url": "http://localhost:'$LISTENER_PORT'/notify"
-    },
-    "maxFailsLimit" : 1
+    }
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -63,8 +61,8 @@ echo
 echo
 
 
-echo "02. Upsert entity to trigger notification (fails)"
-echo "================================================="
+echo "02. Upsert entity twice to trigger notification and reach failsCounter=2"
+echo "========================================================================"
 payload='{
   "id": "E",
   "type": "T",
@@ -76,47 +74,37 @@ payload='{
 orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
 echo
 echo
-
-
-echo "03. Upsert entity to trigger notification (fail that causes change to status=inactive)"
-echo "======================================================================================"
-payload='{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": 1,
-    "type": "Number"
-  }
-}'
 orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
 echo
 echo
 
 
-echo "04. GET /v2/subscriptions/subId before cache refresh to check the status=inactive"
-echo "================================================================================="
+echo "03. GET /v2/subscriptions/subId, and see failsCounter=2"
+echo "======================================================="
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo "05. Sleep 2.5s so cache refresh takes place"
-echo "==========================================="
-sleep 2.5s
+echo "04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2"
+echo "==============================================================================="
+sleep 3.5s
+orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo "06. GET /v2/subscriptions/subId after cache refresh to check the status=inactive"
-echo "================================================================================"
+echo "05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2"
+echo "======================================================================================"
+sleep 3.5s
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
 --REGEXPECT--
-01. POST /v2/subscriptions, to create subscription with maxFailsLimit=1
-=======================================================================
+01. POST /v2/subscriptions, to create subscription
+==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
@@ -125,8 +113,8 @@ Date: REGEX(.*)
 
 
 
-02. Upsert entity to trigger notification (fails)
-=================================================
+02. Upsert entity twice to trigger notification and reach failsCounter=2
+========================================================================
 HTTP/1.1 204 No Content
 Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -134,8 +122,6 @@ Date: REGEX(.*)
 
 
 
-03. Upsert entity to trigger notification (fail that causes change to status=inactive)
-======================================================================================
 HTTP/1.1 204 No Content
 Location: /v2/entities/E?type=T
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -143,10 +129,10 @@ Date: REGEX(.*)
 
 
 
-04. GET /v2/subscriptions/subId before cache refresh to check the status=inactive
-=================================================================================
+03. GET /v2/subscriptions/subId, and see failsCounter=2
+=======================================================
 HTTP/1.1 200 OK
-Content-Length: 483
+Content-Length: 463
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -164,11 +150,10 @@ Date: REGEX(.*)
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
-        "maxFailsLimit": 1,
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
-    "status": "inactive",
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": [],
@@ -184,14 +169,10 @@ Date: REGEX(.*)
 }
 
 
-05. Sleep 2.5s so cache refresh takes place
-===========================================
-
-
-06. GET /v2/subscriptions/subId after cache refresh to check the status=inactive
-================================================================================
+04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
+===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 483
+Content-Length: 463
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -209,11 +190,50 @@ Date: REGEX(.*)
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
-        "maxFailsLimit": 1,
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
-    "status": "inactive",
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": false
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 463
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 2,
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
     "subject": {
         "condition": {
             "attrs": [],
