@@ -32,6 +32,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/orionldError.h"                            // orionldError
+#include "orionld/common/orionldEntityMapRelease.h"                 // orionldEntityMapRelease
 #include "orionld/types/OrionldHeader.h"                            // orionldHeaderAdd, HttpResultsCount
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/legacyDriver/legacyGetEntities.h"                 // legacyGetEntities
@@ -246,16 +247,47 @@ bool orionldGetEntities(void)
   if (orionldState.distributed == false)
     return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
 
-  //
-  // Matching regs
-  //
-  DistOp* distOpList = distOpRequestsForEntitiesQuery(idPattern, qNode);
+  // Is an entity map requested?
+  if (orionldState.uriParams.entityMap != NULL)
+  {
+    if (strcmp(orionldState.uriParams.entityMap, orionldEntityMapId) != 0)
+    {
+      orionldError(OrionldResourceNotFound, "Invalid Entity Map Identifier", orionldState.uriParams.entityMap, 404);
+      return false;
+    }
 
-  //
-  // if there are no matching registrations, the request is treated as a local request
-  //
-  if (distOpList == NULL)
-    return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
+    if (orionldState.uriParams.reset == true)
+    {
+      orionldEntityMapRelease();
+      orionldEntityMap      = NULL;
+      orionldEntityMapCount = 0;
+    }
+    else
+    {
+      // No query params can be used when asking for pages in an entity map
+      if ((id       != NULL) || (type  != NULL) || (idPattern != NULL) || (q != NULL)      ||
+          (geometry != NULL) || (attrs != NULL) || (orionldState.uriParams.local == true))
+      {
+        orionldError(OrionldBadRequestData, "Query parameters present", "not allowed when paginating using an entity map", 400);
+        return false;
+      }
+    }
+  }
+
+  DistOp* distOpList = NULL;
+  if (orionldState.uriParams.entityMap == NULL)
+  {
+    //
+    // Find matching registrations
+    //
+    distOpList = distOpRequestsForEntitiesQuery(idPattern, qNode);
+
+    //
+    // if there are no matching registrations, the request is treated as a local request
+    //
+    if (distOpList == NULL)
+      return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
+  }
 
   return orionldGetEntitiesDistributed(distOpList, idPattern, qNode, &geoInfo);
 }

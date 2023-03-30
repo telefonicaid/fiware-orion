@@ -712,8 +712,10 @@ KjNode* mongocEntitiesQuery
     bson_append_bool(&projection, "lastCorrelator", 14, true);
   }
   else
+  {
     bson_append_bool(&projection, "_id.id",          6, true);
-
+    bson_append_bool(&projection, "_id.type",        8, true);
+  }
 
   //
   // Create the filter for the query
@@ -781,7 +783,7 @@ KjNode* mongocEntitiesQuery
   // semTake(&mongoEntitiesSem);
 
   // count?
-  if (orionldState.uriParams.count == true)
+  if (countP != NULL)
   {
     bson_error_t error;
 

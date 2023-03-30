@@ -48,6 +48,7 @@ SET (SOURCES
     dbModelAttributeCreatedAtLookup.cpp
     dbModelAttributeCreatedAtSet.cpp
     dbModelAttributeLookup.cpp
+    dbModelToEntityIdAndTypeObject.cpp
 )
 
 # Include directories

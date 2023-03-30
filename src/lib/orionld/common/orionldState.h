@@ -165,6 +165,7 @@ typedef struct OrionldUriParams
   char*     lang;
   bool      local;
   bool      onlyIds;
+  char*     entityMap;
 
   double    observedAtAsDouble;
   uint64_t  mask;
@@ -589,7 +590,9 @@ extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
 extern int               cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 extern char              localIpAndPort[135];      // Local address for X-Forwarded-For (from orionld.cpp)
-extern char              entityMapId[256];         // Used by GET /entities in the distributed case, for pagination
+extern char              orionldEntityMapId[64];   // Used by GET /entities in the distributed case, for pagination
+extern KjNode*           orionldEntityMap;
+extern int               orionldEntityMapCount;
 
 
 

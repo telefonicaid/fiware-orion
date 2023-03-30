@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
 #include "orionld/kjTree/kjChildPrepend.h"                          // kjChildPrepend
 #include "orionld/dbModel/dbModelToApiEntity.h"                     // dbModelToApiEntity2
+#include "orionld/dbModel/dbModelToEntityIdAndTypeObject.h"         // dbModelToEntityIdAndTypeObject
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // Own interface
 
 
@@ -172,9 +173,7 @@ bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoI
 
   if (orionldState.uriParams.onlyIds == true)
   {
-    extern KjNode* dbModelToEntityIdArray(KjNode* localDbMatches);
-
-    orionldState.responseTree = dbModelToEntityIdArray(dbEntityArray);
+    orionldState.responseTree = dbModelToEntityIdAndTypeObject(dbEntityArray);
     orionldState.noLinkHeader = true;
   }
   else

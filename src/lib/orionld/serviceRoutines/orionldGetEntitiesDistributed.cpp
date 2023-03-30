@@ -40,11 +40,14 @@ extern "C"
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                        // QNode
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
+#include "orionld/dbModel/dbModelToEntityIdAndTypeObject.h"         // dbModelToEntityIdAndTypeObject
 #include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
 #include "orionld/forwarding/xForwardedForCompose.h"                // xForwardedForCompose
 #include "orionld/forwarding/distOpSend.h"                          // distOpSend
+#include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
+#include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // orionldGetEntitiesPage
 #include "orionld/serviceRoutines/orionldGetEntitiesDistributed.h"  // Own interface
 
 
@@ -89,14 +92,9 @@ extern "C"
 
 
 
-// Global variable - Needs to go to orionld/common/orionldState.h/cpp
-KjNode* orionldEntityMap = NULL;
-
-
-
 // -----------------------------------------------------------------------------
 //
-// distOpsSend -
+// distOpsSend - FIXME: move to orionld/forwarding/distOpsSend.cpp/h
 //
 int distOpsSend(DistOp* distOpList)
 {
@@ -169,7 +167,7 @@ typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam)
 
 // -----------------------------------------------------------------------------
 //
-// distOpsReceive -
+// distOpsReceive - FIXME: move to orionld/forwarding/distOpsReceive.cpp/h
 //
 void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam)
 {
@@ -213,23 +211,40 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 //
 // orionldDistOpMatchAdd -
 //
-void orionldDistOpMatchAdd(const char* entityId, const char* regId)
+void orionldDistOpMatchAdd(const char* entityId, const char* entityType, const char* regId)
 {
-  KjNode* matchP = kjLookup(orionldEntityMap, entityId);
+  KjNode* matchP    = kjLookup(orionldEntityMap, entityId);
+  KjNode* regArrayP = NULL;
+
   if (matchP == NULL)
   {
     //
     // The entity ID is not present in the list - must be added
     //
-    matchP = kjArray(NULL, entityId);
+    matchP = kjObject(NULL, entityId);
     kjChildAdd(orionldEntityMap, matchP);
+
+    // Add the entity type
+    KjNode* typeNodeP = kjString(NULL, "type", entityType);
+    kjChildAdd(matchP, typeNodeP);
+
+    // And the reg match array
+    regArrayP = kjArray(NULL, "regs");
+    kjChildAdd(matchP, regArrayP);
+  }
+
+  if (regArrayP == NULL)
+  {
+    regArrayP = kjLookup(matchP, "regs");
+    if (regArrayP == NULL)
+      LM_RVE(("No 'regs' item found in the entity map '%s' - THIS IS A SW BUG in Orion-LD"));
   }
 
   //
-  // Add regId to matchP's array - remember it's a global variable, can't use orionldState
+  // Add regId to matchP's 'regs' array - remember it's a global variable, can't use orionldState
   //
   KjNode* regIdNodeP = (regId != NULL)? kjString(NULL, NULL, regId) : kjNull(NULL, NULL);
-  kjChildAdd(matchP, regIdNodeP);
+  kjChildAdd(regArrayP, regIdNodeP);
 }
 
 
@@ -245,11 +260,12 @@ int idListResponse(DistOp* distOpP, void* callbackParam)
     LM_T(LmtEntityMapDetail, ("Entity map from registration '%s'", distOpP->regP->regId));
     for (KjNode* eIdNodeP = distOpP->responseBody->value.firstChildP; eIdNodeP != NULL; eIdNodeP = eIdNodeP->next)
     {
-      char* entityId = eIdNodeP->value.s;
+      char* entityId   = eIdNodeP->name;
+      char* entityType = eIdNodeP->value.s;
 
       LM_T(LmtEntityMapDetail, ("o Entity '%s', registration '%s'", entityId, distOpP->regP->regId));
 
-      orionldDistOpMatchAdd(entityId, distOpP->regP->regId);
+      orionldDistOpMatchAdd(entityId, entityType, distOpP->regP->regId);
     }
   }
 
@@ -277,76 +293,26 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
 
 
 
-// -----------------------------------------------------------------------------
-//
-// orionldEntityMapRelease -
-//
-void orionldEntityMapRelease(void)
-{
-  if (orionldEntityMap != NULL)
-  {
-    kjFree(orionldEntityMap);
-    orionldEntityMap = NULL;
-  }
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// dbModelToEntityIdArray -
-//
-// INPUT:  [ { "_id": { "id": "urn:E1" } }, { "_id": { "id": "urn:E2" } }, ... ]
-// OUTPUT: [ "urn:E1", "urn:E2", ... ]
-//
-KjNode* dbModelToEntityIdArray(KjNode* localDbMatches)
-{
-  KjNode* matchIds = kjArray(orionldState.kjsonP, NULL);
-
-  for (KjNode* dbEntityP = localDbMatches->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
-  {
-    KjNode* _idP = kjLookup(dbEntityP, "_id");
-
-    if (_idP == NULL)
-      continue;   // DB Error !!!
-
-    KjNode* idP = kjLookup(_idP, "id");
-
-    if (idP == NULL)
-      continue;   // DB Error !!!
-
-    kjChildRemove(_idP, idP);
-    kjChildAdd(matchIds, idP);
-  }
-
-  return matchIds;
-}
-
-
-
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntitiesDistributed -
 //
 bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
 {
-  if (orionldState.uriParams.reset == true)
-  {
-    orionldEntityMapRelease();
-    orionldEntityMap = NULL;
-  }
+  if (orionldEntityMap != NULL)
+    return orionldGetEntitiesPage(NULL);
 
-  if (orionldEntityMap == NULL)
-  {
-    orionldEntityMapRelease();
-    orionldEntityMap = kjObject(NULL, "orionldEntityMap");
-    distOpMatchIdsRequest(distOpList);  // Not including local hits
-  }
+  orionldEntityMap = kjObject(NULL, "orionldEntityMap");
+
+  distOpMatchIdsRequest(distOpList);  // Not including local hits
+
+  orionldEntityMapCount = kjChildCount(orionldEntityMap);
+
 
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request
   //
-  if ((orionldEntityMap == NULL) || (orionldEntityMap->value.firstChildP == NULL))
+  if (orionldEntityMap->value.firstChildP == NULL)
     return orionldGetEntitiesLocal(idPattern, qNode, geoInfoP);
 
   char* geojsonGeometryLongName = NULL;
@@ -354,7 +320,6 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
     geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
 
   // Get the local matches
-  int64_t count;
   KjNode* localEntityV   = NULL;
   KjNode* localDbMatches = mongocEntitiesQuery(&orionldState.in.typeList,
                                              &orionldState.in.idList,
@@ -362,18 +327,20 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
                                              &orionldState.in.attrList,
                                              qNode,
                                              geoInfoP,
-                                             &count,
+                                             NULL,
                                              geojsonGeometryLongName,
                                              true);
 
   if (localDbMatches != NULL)
   {
-    localEntityV = dbModelToEntityIdArray(localDbMatches);
+    localEntityV = dbModelToEntityIdAndTypeObject(localDbMatches);
 
     for (KjNode* eidNodeP = localEntityV->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
     {
-      const char* entityId = eidNodeP->value.s;
-      orionldDistOpMatchAdd(entityId, NULL);
+      const char* entityId   = eidNodeP->name;
+      const char* entityType = eidNodeP->value.s;
+
+      orionldDistOpMatchAdd(entityId, entityType, NULL);
     }
   }
 
@@ -409,30 +376,20 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
   //   - respond to the initial caller
   //
   //
-  // ALSO:   Forgot about Count !!!
-  //         Every forwarded request needs to be with "count == true", and the Count HTTP Headers in the responses
-  //         must be found and an accumulated count maintained
-  //         However, as the same entity may be counted more than once, the result might now be very exact.
-  //         If I instead count the number of entities in the Entity Map - orionldEntityMap, all is good
+  // Count:
+  //   Every forwarded request needs to be with "count == true", and the Count HTTP Headers in the responses
+  //   must be found and an accumulated count maintained.
   //
-  if (orionldState.uriParams.count == true)
-  {
-    int count = 0;
-    for (KjNode* entityP = orionldEntityMap->value.firstChildP; entityP != NULL; entityP = entityP->next)
-    {
-      ++count;
-    }
-
-    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
-  }
+  //   However, as the same entity may be counted more than once, the result might be just useless.
+  //   Scrap that!
+  //   This is what I will do:
+  //     I instead count the number of entities in the Entity Map - orionldEntityMap, all is good
+  //   The count header stuff is moved to orionldGetEntitiesPage
+  //
 
   // Need to return the ID of the entity map
-  char entityMapId[61];
-  uuidGenerate(entityMapId, sizeof(entityMapId), "urn:ngsi-ld:entity-map:");
-  orionldHeaderAdd(&orionldState.out.headers, HttpEntityMap, entityMapId, 0);
+  uuidGenerate(orionldEntityMapId, sizeof(orionldEntityMapId), "urn:ngsi-ld:entity-map:");
+  orionldHeaderAdd(&orionldState.out.headers, HttpEntityMap, orionldEntityMapId, 0);
 
-  orionldState.responseTree   = kjArray(orionldState.kjsonP, NULL);
-  orionldState.httpStatusCode = 200;
-
-  return true;
+  return orionldGetEntitiesPage(localDbMatches);
 }
