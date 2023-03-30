@@ -90,14 +90,14 @@ std::string NotifyContextRequest::toJson
   else if (renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED)
   {
     std::string out;
-    out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+    out += contextElementResponseVector[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
     return out;
   }
   else if (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES)
   {
     renderFormat = NGSI_V2_KEYVALUES;
     std::string out;
-    out += contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+    out += contextElementResponseVector[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
     return out;
   }
   else

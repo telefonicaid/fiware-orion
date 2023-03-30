@@ -151,7 +151,7 @@ Date: REGEX(.*)
 =========================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 72
+Content-Length: 70
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: simplifiedNormalized
 Host: localhost:REGEX(\d+)
@@ -159,21 +159,19 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 
-[
-    {
-        "A1": {
-            "metadata": {},
-            "type": "Number",
-            "value": 1
-        },
-        "id": "E1",
-        "type": "T1"
-    }
-]
+{
+    "A1": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "id": "E1",
+    "type": "T1"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 32
+Content-Length: 30
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: simplifiedKeyValues
 Host: localhost:REGEX(\d+)
@@ -181,13 +179,11 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
 
-[
-    {
-        "A1": 1,
-        "id": "E1",
-        "type": "T1"
-    }
-]
+{
+    "A1": 1,
+    "id": "E1",
+    "type": "T1"
+}
 =======================================
 
 
