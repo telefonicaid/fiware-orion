@@ -723,6 +723,38 @@ static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 
 /* ****************************************************************************
 *
+* parseTimeout -
+*/
+static std::string parseTimeoutMqtt(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<int64_t> timeoutOpt = getInt64Opt(mqtt, "timeout");
+  if (!timeoutOpt.ok())
+  {
+    return badInput(ciP, timeoutOpt.error);
+  }
+  if (timeoutOpt.given)
+  {
+    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_HTTP_TIMEOUT))
+    {
+      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_HTTP_TIMEOUT));
+    }
+    else
+    {
+      subsP->notification.mqttInfo.timeout = timeoutOpt.value;
+    }
+  }
+  else
+  {
+    subsP->notification.mqttInfo.timeout = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseMqttAuth -
 */
 static std::string parseMqttAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
@@ -833,6 +865,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
       // timeout
       r = parseTimeout(ciP, subsP, http);
+      //r = parseTimeoutMqtt(ciP, subsP, mqtt);
       if (!r.empty())
       {
         return r;
@@ -1042,6 +1075,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // timeout
+    r = parseTimeoutMqtt(ciP, subsP, mqtt);
+
     subsP->notification.mqttInfo.custom = false;
   }
   else if (notification.HasMember("mqttCustom"))
@@ -1082,6 +1118,9 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return r;
     }
+
+    // timeout
+    r = parseTimeoutMqtt(ciP, subsP, mqttCustom);
 
     // payload
     r = parseCustomPayload(ciP,

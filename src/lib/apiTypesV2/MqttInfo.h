@@ -51,6 +51,7 @@ struct MqttInfo
   Entity                     ngsi;     // either payload, json or ngsi is used (depending on payloadType)
   CustomPayloadType          payloadType;
   bool                       includePayload;
+  long long                  timeout;
 
   bool          providedAuth;
   std::string   user;

@@ -41,7 +41,7 @@ namespace ngsiv2
 *
 * MqttInfo::MqttInfo - 
 */
-MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
+MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), payloadType(Text), includePayload(true), timeout(0), providedAuth(false)
 {
 }
 
@@ -68,6 +68,11 @@ std::string MqttInfo::toJson()
   jh.addString("url", this->url);
   jh.addString("topic", this->topic);
   jh.addNumber("qos", (long long) this->qos);
+
+  if (this->timeout > 0)
+  {
+    jh.addNumber("timeout", this->timeout);
+  }
 
   if (providedAuth)
   {
@@ -118,6 +123,7 @@ void MqttInfo::fill(const orion::BSONObj& bo)
   this->topic  = bo.hasField(CSUB_MQTTTOPIC)? getStringFieldF(bo, CSUB_MQTTTOPIC) : "";
   this->qos    = bo.hasField(CSUB_MQTTQOS)?   getIntFieldF(bo, CSUB_MQTTQOS)      : 0;
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo, CSUB_CUSTOM)      : false;
+  this->timeout  = bo.hasField(CSUB_TIMEOUT)?    getLongFieldF(bo, CSUB_TIMEOUT)     : 0;
 
   // both user and passwd have to be used at the same time
   if ((bo.hasField(CSUB_USER)) && (bo.hasField(CSUB_PASSWD)))
@@ -214,6 +220,11 @@ void MqttInfo::fill(const orion::BSONObj& bo)
         this->ngsi.attributeVector.fill(getObjectFieldF(ngsiObj, ENT_ATTRS));
       }
     }
+    if (bo.hasField(CSUB_TIMEOUT))
+    {
+      this->timeout = getLongFieldF(bo, CSUB_TIMEOUT);
+    }
+
   }
 }
 
@@ -235,6 +246,7 @@ void MqttInfo::fill(const MqttInfo& _mqttInfo)
   this->providedAuth   = _mqttInfo.providedAuth;
   this->user           = _mqttInfo.user;
   this->passwd         = _mqttInfo.passwd;
+  this->timeout        = _mqttInfo.timeout;
 
   this->json = _mqttInfo.json == NULL ? NULL : _mqttInfo.json->clone();
 
