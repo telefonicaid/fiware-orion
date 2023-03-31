@@ -401,21 +401,7 @@ static SenderThreadParams* buildSenderParamsCustom
       // Warning already logged in macroSubstitute()
       return NULL;
     }
-    if (renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED)
-    {
-      renderFormat = NGSI_V2_SIMPLIFIEDNORMALIZED;
-      mimeType = "application/json";
-    }
-    else if (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES)
-    {
-      renderFormat = NGSI_V2_SIMPLIFIEDKEYVALUES;
-      mimeType = "application/json";
-    }
-    else
-    {
-      renderFormat = NGSI_V2_NORMALIZED;
-      mimeType = "application/json";
-    }
+    mimeType = "application/json";
   }
 
 

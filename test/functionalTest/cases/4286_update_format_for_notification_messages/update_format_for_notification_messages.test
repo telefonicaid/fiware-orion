@@ -169,8 +169,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
     "id": "E1",
     "type": "T1"
 }
-#SORT_END
-#SORT_START
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
