@@ -98,6 +98,8 @@ echo "03. PATCH /v2/entities/E1/attrs, to update the value of metadata"
 echo "================================================================"
 payload='{
   "A1": {
+    "value": 26.5,
+    "type": "Float",
     "metadata": {
       "M1": {
         "value": 1.55,

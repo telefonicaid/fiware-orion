@@ -562,6 +562,10 @@ static bool mergeAttrInfo
   {
     onlyMetadataChange = true;
   }
+  else if (!attrValueChanges(attr, caP, forcedUpdate, apiVersion) && !equalMetadata(md, mdNew))
+  {
+    onlyMetadataChange = true;
+  }
   else
   {
     onlyMetadataChange = false;

@@ -97,6 +97,8 @@ echo "03. PATCH /v2/entities/E2/attrs, to update the value of metadata"
 echo "================================================================"
 payload='{
   "A1": {
+    "value": 26.5,
+    "type": "Float",
     "metadata": {
       "M1": {
         "value": 1.55,
@@ -179,7 +181,7 @@ Date: REGEX(.*)
 ====================================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 163
+Content-Length: 164
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -197,8 +199,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                         "value": 1.55
                     }
                 },
-                "type": "None",
-                "value": null
+                "type": "Float",
+                "value": 26.5
             },
             "id": "E2",
             "type": "Thing"
