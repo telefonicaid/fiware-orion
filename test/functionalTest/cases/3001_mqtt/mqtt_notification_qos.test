@@ -267,7 +267,7 @@ MQTT notification sent to localhost:1883 on topic sub2 with qos 2 with id 3
 07. GET subscriptions: 3 subs with timesSent 1 and lastSuccess
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 1360
+Content-Length: 1357
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -294,7 +294,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -325,7 +325,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -356,7 +356,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

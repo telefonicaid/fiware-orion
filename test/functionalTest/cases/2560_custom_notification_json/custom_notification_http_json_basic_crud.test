@@ -251,7 +251,7 @@ Date: REGEX(.*)
 02. Get sub1 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 326
+Content-Length: 325
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -275,7 +275,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -298,7 +298,7 @@ Date: REGEX(.*)
 04. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 318
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -319,7 +319,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -342,7 +342,7 @@ Date: REGEX(.*)
 06. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 322
+Content-Length: 321
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -366,7 +366,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -389,7 +389,7 @@ Date: REGEX(.*)
 08. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 318
+Content-Length: 317
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -414,7 +414,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -437,7 +437,7 @@ Date: REGEX(.*)
 10. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 318
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -458,7 +458,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -483,7 +483,7 @@ Date: REGEX(.*)
 12. Get sub2 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 318
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -504,7 +504,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -527,7 +527,7 @@ Date: REGEX(.*)
 14. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 335
+Content-Length: 334
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -554,7 +554,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -569,7 +569,7 @@ Date: REGEX(.*)
 15. Get all subs and see sub1 an sub2 in its final state
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 657
+Content-Length: 655
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -591,7 +591,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -623,7 +623,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

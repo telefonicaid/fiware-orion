@@ -137,7 +137,7 @@ Date: REGEX(.*)
 05. GET /v2/subscriptions to see the sub from step 02
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 290
+Content-Length: 289
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -158,7 +158,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

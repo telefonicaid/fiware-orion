@@ -161,7 +161,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions for 1 servicepath
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 394
+Content-Length: 393
 Content-Type: application/json
 Fiware-Total-Count: 1
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -189,7 +189,7 @@ Date: REGEX(.*)
                 "attrs": [
                     "speed"
                 ],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -209,7 +209,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions for /#
 ================================
 HTTP/1.1 200 OK
-Content-Length: 853
+Content-Length: 851
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -239,7 +239,7 @@ Date: REGEX(.*)
                     "temperature",
                     "timestamp"
                 ],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -275,7 +275,7 @@ Date: REGEX(.*)
                 "attrs": [
                     "speed"
                 ],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

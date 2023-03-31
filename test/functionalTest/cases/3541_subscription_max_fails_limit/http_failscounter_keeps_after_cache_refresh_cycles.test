@@ -132,7 +132,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subId, and see failsCounter=2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 463
+Content-Length: 462
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -157,7 +157,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -172,7 +172,7 @@ Date: REGEX(.*)
 04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 463
+Content-Length: 462
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +197,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -212,7 +212,7 @@ Date: REGEX(.*)
 05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 463
+Content-Length: 462
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -237,7 +237,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

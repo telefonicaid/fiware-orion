@@ -154,7 +154,7 @@ Entity-Type: Thing
 05. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 696
+Content-Length: 695
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -195,7 +195,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

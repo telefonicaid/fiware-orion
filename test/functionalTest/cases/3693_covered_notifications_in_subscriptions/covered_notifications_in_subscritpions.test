@@ -346,7 +346,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check the covered=true
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 404
+Content-Length: 403
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -373,7 +373,7 @@ Date: REGEX(.*)
             "attrs": [
                 "pressure"
             ],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -455,7 +455,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/subscription_id, to check the covered=true
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 404
+Content-Length: 403
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -482,7 +482,7 @@ Date: REGEX(.*)
             "attrs": [
                 "pressure"
             ],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -564,7 +564,7 @@ Date: REGEX(.*)
 13. GET /v2/subscriptions/subscription_id, to check the covered=false
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 405
+Content-Length: 404
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -591,7 +591,7 @@ Date: REGEX(.*)
             "attrs": [
                 "pressure"
             ],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

@@ -175,7 +175,7 @@ echo
 01. GET /v2/subscriptions and see maxFailsLimit 1, status active
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 315
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -197,7 +197,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -238,7 +238,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions and see status active (as cache data is older), timesSent 2, failsCounter 2
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 483
+Content-Length: 482
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -265,7 +265,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -360,7 +360,7 @@ Date: REGEX(.*)
 08. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
 =============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 520
+Content-Length: 519
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -388,7 +388,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

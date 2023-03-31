@@ -253,7 +253,7 @@ Date: REGEX(.*)
 03. Wait for a cache cycle and check sub shows count 73 and failsCounter 3
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 528
+Content-Length: 527
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -280,7 +280,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -321,7 +321,7 @@ Date: REGEX(.*)
 07. Wait for a cache cycle and check sub shows same count 73 and failsCounter 3
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 530
+Content-Length: 529
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -348,7 +348,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -389,7 +389,7 @@ Date: REGEX(.*)
 11. Wait for a cache cycle and check sub shows count 75 and failsCounter 5
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 528
+Content-Length: 527
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -416,7 +416,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

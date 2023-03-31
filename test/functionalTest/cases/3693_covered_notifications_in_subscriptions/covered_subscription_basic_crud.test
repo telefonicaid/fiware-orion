@@ -309,7 +309,7 @@ Date: REGEX(.*)
 02. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 333
+Content-Length: 332
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -333,7 +333,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -354,6 +354,53 @@ Date: REGEX(.*)
 
 
 04. GET subscription and see covered=true
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 331
+Content-Type: application/json
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humudity",
+            "brightness"
+        ],
+        "attrsFormat": "normalized",
+        "covered": true,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Update subscrption without touching covered
+===============================================
+HTTP/1.1 204 No Content
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
+
+
+
+06. GET subscription and see covered=true
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 332
@@ -380,54 +427,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
-        },
-        "entities": [
-            {
-                "id": "E",
-                "type": "T"
-            }
-        ]
-    }
-}
-
-
-05. Update subscrption without touching covered
-===============================================
-HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-
-
-06. GET subscription and see covered=true
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 333
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "id": "REGEX([0-9a-f]{24})",
-    "notification": {
-        "attrs": [
-            "temperature",
-            "humudity",
-            "brightness"
-        ],
-        "attrsFormat": "normalized",
-        "covered": true,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
-        "onlyChangedAttrs": false
-    },
-    "status": "active",
-    "subject": {
-        "condition": {
-            "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -450,7 +450,7 @@ Date: REGEX(.*)
 08. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 334
+Content-Length: 333
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -474,7 +474,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -497,7 +497,7 @@ Date: REGEX(.*)
 10. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 334
+Content-Length: 333
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -521,7 +521,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

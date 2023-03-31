@@ -146,7 +146,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/subId before cache refresh to check the status=inactive
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 483
+Content-Length: 482
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -172,7 +172,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -191,7 +191,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/subId after cache refresh to check the status=inactive
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 483
+Content-Length: 482
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -217,7 +217,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

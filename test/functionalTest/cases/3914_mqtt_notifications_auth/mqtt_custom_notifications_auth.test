@@ -314,7 +314,7 @@ Date: REGEX(.*)
 05. GET subs checking user1 but password offuscated
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 352
+Content-Length: 351
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -338,7 +338,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -367,7 +367,7 @@ Date: REGEX(.*)
 08. GET subs checking user10 but password offuscated
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 353
+Content-Length: 352
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -391,7 +391,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -420,7 +420,7 @@ Date: REGEX(.*)
 11. GET subs checking user and password are not shown
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 320
+Content-Length: 319
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -442,7 +442,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -471,7 +471,7 @@ Date: REGEX(.*)
 14. GET subs checking user1 but password offuscated
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 352
+Content-Length: 351
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -495,7 +495,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

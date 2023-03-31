@@ -227,7 +227,7 @@ Date: REGEX(.*)
 02. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 499
+Content-Length: 498
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -259,7 +259,7 @@ Date: REGEX(.*)
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             },
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -283,7 +283,7 @@ Date: REGEX(.*)
 04. Get subscription (see desc = one)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 518
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -316,7 +316,7 @@ Date: REGEX(.*)
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             },
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -340,7 +340,7 @@ Date: REGEX(.*)
 06. Get subscription (see desc = two)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 518
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -373,7 +373,7 @@ Date: REGEX(.*)
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             },
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -397,7 +397,7 @@ Date: REGEX(.*)
 08. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 499
+Content-Length: 498
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -429,7 +429,7 @@ Date: REGEX(.*)
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             },
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -455,7 +455,7 @@ Date: REGEX(.*)
 10. Get subscription (see desc = three)
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 521
+Content-Length: 520
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -488,7 +488,7 @@ Date: REGEX(.*)
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
             },
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -504,7 +504,7 @@ Date: REGEX(.*)
 11. Get subscriptions list (first csub without desc, second with desc = three)
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 1023
+Content-Length: 1021
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -537,7 +537,7 @@ Date: REGEX(.*)
                     "georel": "near;minDistance:5000",
                     "q": "temperature>40"
                 },
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -576,7 +576,7 @@ Date: REGEX(.*)
                     "georel": "near;minDistance:5000",
                     "q": "temperature>40"
                 },
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

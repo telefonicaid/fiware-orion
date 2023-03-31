@@ -316,7 +316,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID see timeout field
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 329
+Content-Length: 328
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -338,7 +338,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -361,7 +361,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID and see timeout changed
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 329
+Content-Length: 328
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -383,7 +383,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -406,7 +406,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID and see no timeout is field is foud
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 313
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -427,7 +427,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -450,7 +450,7 @@ Date: REGEX(.*)
 08. GET /v2/subscriptions/ID and see the added timeout
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 329
+Content-Length: 328
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -472,7 +472,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -505,7 +505,7 @@ Date: REGEX(.*)
 11. GET /v2/subscriptions/ID and check no timeout field
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 313
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -526,7 +526,7 @@ Date: REGEX(.*)
     "subject": {
         "condition": {
             "attrs": [],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

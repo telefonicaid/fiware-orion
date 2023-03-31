@@ -644,10 +644,7 @@ void setCovered(const Subscription& sub, orion::BSONObjBuilder* b)
 void setNotifyOnMetadataChange(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   bool bl = sub.subject.condition.notifyOnMetadataChange;
-  if (bl)
-  {
-    b->append(CSUB_NOTIFYONMETADATACHANGE, bl);
-  }
+  b->append(CSUB_NOTIFYONMETADATACHANGE, bl);
   LM_T(LmtMongo, ("Subscription notifyOnMetadataChange: %s", bl ? "true" : "false"));
 }
 

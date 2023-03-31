@@ -168,7 +168,7 @@ echo
 01. GET /v2/subscriptions and see lastNotification/Failure in a far future and reason 'some reason' and without timeSent
 ========================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 419
+Content-Length: 418
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -192,7 +192,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -218,7 +218,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see lastNotification/Failure in a far future and reason 'some reason' (as cache data is older), timesSent 1, failsCounter 1
 =========================================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 450
+Content-Length: 449
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -244,7 +244,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -343,7 +343,7 @@ Date: REGEX(.*)
 07. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
 =============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 487
+Content-Length: 486
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -370,7 +370,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

@@ -173,7 +173,7 @@ echo
 01. GET /v2/subscriptions and see dynamic fields set A
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 552
+Content-Length: 551
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -202,7 +202,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -223,7 +223,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 534
+Content-Length: 533
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -252,7 +252,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -268,7 +268,7 @@ Date: REGEX(.*)
 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same, except failsCounter (see NOTE)
 ===============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 486
+Content-Length: 516
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -296,7 +296,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

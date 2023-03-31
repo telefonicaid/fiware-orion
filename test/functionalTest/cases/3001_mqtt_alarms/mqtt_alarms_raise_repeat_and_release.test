@@ -190,7 +190,7 @@ Date: REGEX(.*)
 03. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 468
+Content-Length: 467
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -219,7 +219,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -244,7 +244,7 @@ Date: REGEX(.*)
 05. Get sub and see timesSent:1, failsCounter:2 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 468
+Content-Length: 467
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -273,7 +273,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -306,7 +306,7 @@ Date: REGEX(.*)
 08. Get sub and see timesSent:3, lastFailure (old) and lastSuccess but not failsCounter
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 552
+Content-Length: 551
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -335,7 +335,7 @@ Date: REGEX(.*)
         "subject": {
             "condition": {
                 "attrs": [],
-                "notifyOnMetadataChange": false
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

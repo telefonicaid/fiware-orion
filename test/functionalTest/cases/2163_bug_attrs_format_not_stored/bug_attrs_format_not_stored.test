@@ -159,7 +159,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions/ID (and get keyValues)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 355
+Content-Length: 354
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -184,7 +184,7 @@ Date: REGEX(.*)
             "attrs": [
                 "temperature"
             ],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -206,7 +206,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/ID (and get normalized)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 356
+Content-Length: 355
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -231,7 +231,7 @@ Date: REGEX(.*)
             "attrs": [
                 "temperature"
             ],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -253,7 +253,7 @@ Date: REGEX(.*)
 06. GET /v2/subscriptions/ID (and get values)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 352
+Content-Length: 351
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -278,7 +278,7 @@ Date: REGEX(.*)
             "attrs": [
                 "temperature"
             ],
-            "notifyOnMetadataChange": false
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
