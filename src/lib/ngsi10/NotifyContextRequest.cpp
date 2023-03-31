@@ -24,6 +24,9 @@
 */
 #include <string>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/RenderFormat.h"
@@ -89,16 +92,32 @@ std::string NotifyContextRequest::toJson
   }
   else if (renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED)
   {
-    std::string out;
-    out += contextElementResponseVector[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
-    return out;
+    if (contextElementResponseVector.size() == 0)
+    {
+      LM_E(("Runtime Error (contextElementResponser MUST NOT be zero length)"));
+      return "{}";
+    }
+    else
+    {
+      std::string out;
+      out += contextElementResponseVector[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+      return out;
+    }
   }
   else if (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES)
   {
     renderFormat = NGSI_V2_KEYVALUES;
-    std::string out;
-    out += contextElementResponseVector[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
-    return out;
+    if (contextElementResponseVector.size() == 0)
+    {
+      LM_E(("Runtime Error (contextElementResponser MUST NOT be zero length)"));
+      return "{}";
+    }
+    else
+    {
+      std::string out;
+      out += contextElementResponseVector[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+      return out;
+    }
   }
   else
   {
