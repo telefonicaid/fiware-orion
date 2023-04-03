@@ -87,19 +87,20 @@ static QNode* qCheck(char* qString)
 //
 // pCheckQueryParams -
 //
-bool pCheckQueryParams(char* id, char* type, char* idPattern, char* q, char* geometry, char* attrs, bool local, QNode** qNodeP, OrionldGeoInfo* geoInfoP)
+bool pCheckQueryParams(char* id, char* type, char* idPattern, char* q, char* geometry, char* attrs, bool local, char* entityMap, QNode** qNodeP, OrionldGeoInfo* geoInfoP)
 {
   //
   // URI param validity check
   //
 
-  if ((id        == NULL) &&
-      (idPattern == NULL) &&
-      (type      == NULL) &&
-      (geometry  == NULL) &&
-      (attrs     == NULL) &&
-      (q         == NULL) &&
-      (local     == false))
+  if ((id        == NULL)  &&
+      (idPattern == NULL)  &&
+      (type      == NULL)  &&
+      (geometry  == NULL)  &&
+      (attrs     == NULL)  &&
+      (q         == NULL)  &&
+      (local     == false) &&
+      (entityMap == NULL))
   {
     orionldError(OrionldBadRequestData,
                  "Too broad query",
@@ -234,6 +235,7 @@ bool orionldGetEntities(void)
   char*   geometry  = orionldState.uriParams.geometry;
   char*   attrs     = orionldState.uriParams.attrs;      // Validity checked in orionldMhdConnectionTreat.cpp (pCheckAttrsParam)
   bool    local     = orionldState.uriParams.local;
+  char*   entityMap = orionldState.uriParams.entityMap;
   QNode*  qNode     = NULL;
 
   // According to the spec, id takes precedence over idPattern, so, if both are present, idPattern is NULLed out
@@ -241,18 +243,15 @@ bool orionldGetEntities(void)
     idPattern = NULL;
 
   OrionldGeoInfo geoInfo;
-  if (pCheckQueryParams(id, type, idPattern, q, geometry, attrs, local, &qNode, &geoInfo) == false)
+  if (pCheckQueryParams(id, type, idPattern, q, geometry, attrs, local, entityMap, &qNode, &geoInfo) == false)
     return false;
-
-  if (orionldState.distributed == false)
-    return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
 
   // Is an entity map requested?
   if (orionldState.uriParams.entityMap != NULL)
   {
     if (strcmp(orionldState.uriParams.entityMap, orionldEntityMapId) != 0)
     {
-      orionldError(OrionldResourceNotFound, "Invalid Entity Map Identifier", orionldState.uriParams.entityMap, 404);
+      orionldError(OrionldResourceNotFound, "Entity Map Not Found", orionldState.uriParams.entityMap, 404);
       return false;
     }
 
@@ -273,6 +272,9 @@ bool orionldGetEntities(void)
       }
     }
   }
+
+  if (orionldState.distributed == false)
+    return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
 
   DistOp* distOpList = NULL;
   if (orionldState.uriParams.entityMap == NULL)

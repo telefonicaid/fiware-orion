@@ -27,12 +27,14 @@ extern "C"
 #include "kjson/KjNode.h"                                           // KjNode
 #include "kjson/kjRender.h"                                         // kjFastRender (for debugging purposes - LM_T)
 #include "kjson/kjBuilder.h"                                        // kjArray, ...
+#include "kjson/kjLookup.h"                                         // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // LmtMongoc
 
 #include "orionld/common/orionldState.h"                            // orionldState, orionldEntityMapCount
+#include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // Own interface
 
 
@@ -80,14 +82,25 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
   // Must extract all parts of the entities, according to their array inside orionldEntityMap,
   // and merge them together (in case of distributed entities
   //
+
   for (int ix = 0; ix < limit; ix++)
   {
     if (entityMap == NULL)
       break;
 
-    char buf[1024];
-    kjFastRender(entityMap, buf);
-    LM_T(LmtSR, ("Entity '%s': %s", entityMap->name, buf));
+    KjNode* regsP = kjLookup(entityMap, "regs");
+    if (regsP == NULL)
+    {
+      orionldError(OrionldInternalError, "Internal Error (entityMap has no 'regs' field)", entityMap->name, 500);
+      LM_RE(false, ("entityMap for entity '%s' has no 'regs' field", entityMap->name));
+    }
+
+    LM_T(LmtSR, ("Getting Entity '%s from:", entityMap->name));
+    for (KjNode* regP = regsP->value.firstChildP; regP != NULL; regP = regP->next)
+    {
+      LM_T(LmtSR, ("  o %s", (regP->type == KjNull)? "Local DB" : regP->value.s));
+    }
+
     entityMap = entityMap->next;
   }
 

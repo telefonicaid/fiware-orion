@@ -360,7 +360,7 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
 
   //
   // Now we have the list of entities and their registrations
-  // All of that will go into a separate routine.
+  // All of that will go into a separate routine, namely orionldGetEntitiesPage.
   // What will be done here now is:
   //
   // - pick which entities to retrieve (according to pagination)

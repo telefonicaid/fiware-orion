@@ -901,6 +901,12 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_LOCAL;
   }
+  else if (strcmp(key, "entityMap") == 0)
+  {
+    orionldState.uriParams.entityMap = (char*) value;
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_ENTITYMAP;
+  }
   else if (strcmp(key, "onlyIds") == 0)
   {
     if (strcmp(value, "true") == 0)
