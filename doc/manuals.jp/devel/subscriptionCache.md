@@ -73,6 +73,7 @@ Broker が起動すると、サブスクリプション・キャッシュには�
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;
+  bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure

@@ -2019,7 +2019,6 @@ If `attrsFormat` is `keyValues` then keyValues partial entity representation mod
 If `attrsFormat` is `simplifiedKeyValues` then a simplified variant of `keyValues` (ommiting `subscriptionId`
 and the `data` holder) is used:
 
-
 ```json
 {
   "id": "Room1",
