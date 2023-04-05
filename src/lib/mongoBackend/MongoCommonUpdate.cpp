@@ -554,15 +554,7 @@ static bool mergeAttrInfo
     }
   }
 
-  if (caP->type == "None" && !equalMetadata(md, mdNew))
-  {
-    onlyMetadataChange = true;
-  }
-  else if ((attrValueChanges(attr, caP, forcedUpdate, apiVersion) && caP->getValue() == "null") && !equalMetadata(md, mdNew))
-  {
-    onlyMetadataChange = true;
-  }
-  else if (!attrValueChanges(attr, caP, forcedUpdate, apiVersion) && !equalMetadata(md, mdNew))
+  if (!attrValueChanges(attr, caP, forcedUpdate, apiVersion) && !equalMetadata(md, mdNew))
   {
     onlyMetadataChange = true;
   }
