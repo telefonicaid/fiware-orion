@@ -2,8 +2,7 @@
 
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
 [![License badge](https://img.shields.io/github/license/FIWARE/context.Orion-LD.svg)](https://opensource.org/licenses/AGPL-3.0)
-[![Docker badge](https://img.shields.io/docker/pulls/fiware/orion-ld.svg)](https://hub.docker.com/r/fiware/orion-ld/)
-[![Docker Repository on Quay](https://img.shields.io/badge/quay.io-orionld-green "Docker Repository on Quay")](https://quay.io/repository/fiware/orion-ld?tab=tags)
+[![Docker badge](https://img.shields.io/badge/quay.io-fiware%2Forion--ld-grey?logo=red%20hat&labelColor=EE0000)](https://quay.io/repository/fiware/orion-ld)
 [![Support badge](https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
 [![NGSI-LD badge](https://img.shields.io/badge/NGSI-LD-red.svg)](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_CIM009v010601p.pdf)
 <br>
@@ -11,7 +10,6 @@
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/incubating.svg)
 [![Coverage Status](https://coveralls.io/repos/github/FIWARE/context.Orion-LD/badge.svg?branch=develop)](https://coveralls.io/github/FIWARE/context.Orion-LD?branch=develop)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4800/badge)](https://bestpractices.coreinfrastructure.org/projects/4800)
-![Static analysis](https://softacheck.com/app/repository/FIWARE/context.Orion-LD/badge)
 
 Orion-LD is a Context Broker and [CEF](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/CEF+Digital+Home)
 [building block](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/What+is+a+building+Block) for context data
@@ -27,8 +25,7 @@ specification.
 The NGSI-LD Specification is regularly updated and published by ETSI. The latest specification is version 1.6.1 which was published in **September 2022**.
 Version 1.7.1 is about to be released (some time in February 2023).
 -  An Excel file detailing the current compatibility of the development version of the Orion-LD Context Broker against
-the features of v1.6.1 of the API specification can be downloaded (here)[https://docs.google.com/spreadsheets/d/18tq0_PZFl5WCfYUElcdI6M3Vlin4hP-M].
-
+the features of v1.6.1 of the API specification can be downloaded [here](https://docs.google.com/spreadsheets/d/18tq0_PZFl5WCfYUElcdI6M3Vlin4hP-M).
 
 > The latest release of Orion-LD is [1.1.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.1.1) from September 2022
 
@@ -44,7 +41,7 @@ The NGSI-LD Specification is regularly updated published by ETSI. The latest spe
 
 -  An Excel file detailing the current compatibility of the  development version of the Orion-LD Context Broker against the features of the 1.6.1 specification can be downloaded [here](https://docs.google.com/spreadsheets/d/e/2PACX-1vRxOjsDf3lqhwuypJ---pZN2OlqFRl0jyoTV0ewQ1WFnpe7xQary3uxRjunbgJkwQ/pub?output=xlsx)
 
-| :books: [Documentation](https://github.com/FIWARE/context.Orion-LD/tree/develop/doc/manuals-ld) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion-ld) | :whale: [Docker Hub](https://hub.docker.com/r/fiware/orion-ld/) |
+| :books: [Documentation](https://github.com/FIWARE/context.Orion-LD/tree/develop/doc/manuals-ld) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion-ld) | <img style="height:1em" src="https://quay.io/static/img/quay_favicon.png"/> [quay.io](https://quay.io/repository/fiware/orion-ld) |
 | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 
 If you want to start testing **NGSI-LD**, one option is to use Docker.
@@ -60,10 +57,10 @@ If you instead want to use a more stable image, the latest release (as of Septem
 [1.1.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.1.1)
 
 ```console
-docker run fiware/orion-ld:1.1.1
+docker run quay.io/fiware/orion-ld:1.1.1
 ```
 
-Please check [dockerhub](https://hub.docker.com/r/fiware/orion-ld/tags) for newer releases.
+Please check [quay.io](https://quay.io/repository/fiware/orion-ld?tab=tags) for newer releases.
 
 **NGSI-LD** is an an extended subset of [JSON-LD](https://en.wikipedia.org/wiki/JSON-LD) for use with context management systems.
 Its payloads are encoded as [linked data](https://en.wikipedia.org/wiki/Linked_data) using JSON.
@@ -72,7 +69,7 @@ https://www.slideshare.net/FI-WARE/fiware-global-summit-ngsild-ngsi-with-linked-
 
 If you are not sharing your data across systems and have no need for linked data concepts, then the current stable
 version of **NGSI** (**NGSI-v2**) is more than sufficient.
-If so, please use the original unforked [Orion](https://github.com/telefonicaid/fiware-orion) instead of Orion-LD (that is not up-to-date in terms of NGSIv2).
+If so, please use the original unforked [Orion](https://github.com/telefonicaid/fiware-orion) instead of Orion-LD (that is not up-to-date in terms of NGSI v2).
 
 Examples of **NGSI-LD** can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples).
 See also the [OpenAPI Specification of NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/NGSI-LD/NGSI-LD/-/raw/master/spec/updated/generated/full_api.json)
