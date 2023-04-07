@@ -288,9 +288,6 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
 
   distOpMatchIdsRequest(distOpList);  // Not including local hits
 
-  orionldEntityMapCount = kjChildCount(orionldEntityMap);
-
-
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request
   //
@@ -314,29 +311,32 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
                                              true);
 
   kjTreeLog(localDbMatches, "localDbMatches", LmtSR);
-
   if (localDbMatches != NULL)
   {
     localEntityV = dbModelToEntityIdAndTypeObject(localDbMatches);
     kjTreeLog(localEntityV, "localEntityV", LmtSR);
     for (KjNode* eidNodeP = localEntityV->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
     {
-      const char* entityId   = eidNodeP->value.s;
+      const char* entityId = eidNodeP->value.s;
 
       orionldDistOpMatchAdd(entityId, NULL);
     }
   }
 
+  orionldEntityMapCount = kjChildCount(orionldEntityMap);
+
   // <DEBUG>
   if (lmTraceIsSet(LmtEntityMap) == true)
   {
-    LM_T(LmtEntityMap, ("Entity Maps:"));
+    int ix = 0;
+    LM_T(LmtEntityMap, ("Entity Maps (%d):", orionldEntityMapCount));
     for (KjNode* entityP = orionldEntityMap->value.firstChildP; entityP != NULL; entityP = entityP->next)
     {
       char rBuf[1024];
 
       kjFastRender(entityP, rBuf);
-      LM_T(LmtEntityMap, ("o '%s': %s", entityP->name, rBuf));
+      LM_T(LmtEntityMap, ("  %03d '%s': %s", ix, entityP->name, rBuf));
+      ++ix;
     }
   }
   // </DEBUG>

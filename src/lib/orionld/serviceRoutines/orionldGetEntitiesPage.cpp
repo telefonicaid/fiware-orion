@@ -66,7 +66,10 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
   }
 
   if (offset >= orionldEntityMapCount)
+  {
+    LM_T(LmtEntityMap, ("offset (%d) >= orionldEntityMapCount (%d)", offset, orionldEntityMapCount));
     return true;
+  }
 
   //
   // Fast forward to offset indes in the KJNode array
@@ -83,18 +86,59 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
   // and merge them together (in case of distributed entities
   //
 
+  //
+  // What we have here is a number of "slots" in the entity map, each slot with the layout:
+  //
+  // "urn:cp3:entities:E30" [ "urn:Reg1", "urn:Reg2", null ]
+  //
+  // To avoid making a DB query, of forwarded request, for each and every entity in the slots,
+  // we must here group them into:
+  //
+  //   {
+  //     "urn:reg1": [ "urn:E1", ... "urn:En" ],
+  //     "urn:reg2": [ "urn:E1", ... "urn:En" ],
+  //     "localDB":  [ "urn:E1", ... "urn:En" ]
+  //   }
+  // ]
+  //
+  // Once that array is ready, we can send forwarded requests or query the local DB
+  //
+  KjNode* sources = kjObject(orionldState.kjsonP, NULL);
+
   for (int ix = 0; ix < limit; ix++)
   {
     if (entityMap == NULL)
       break;
 
-    LM_T(LmtSR, ("Getting Entity '%s from:", entityMap->name));
+    char* entityId = entityMap->name;
+
     for (KjNode* regP = entityMap->value.firstChildP; regP != NULL; regP = regP->next)
     {
-      LM_T(LmtSR, ("  o %s", (regP->type == KjNull)? "Local DB" : regP->value.s));
+      const char* regId    = (regP->type == KjString)? regP->value.s : "localDB";
+      KjNode*     regArray = kjLookup(sources, regId);
+
+      if (regArray == NULL)
+      {
+        regArray = kjArray(orionldState.kjsonP, regId);
+        kjChildAdd(sources, regArray);
+      }
+
+      KjNode* entityIdNodeP = kjString(orionldState.kjsonP, NULL, entityId);
+      kjChildAdd(regArray, entityIdNodeP);
     }
 
     entityMap = entityMap->next;
+  }
+
+  kjTreeLog(sources, "sources", LmtSR);
+
+  for (KjNode* sourceP = sources->value.firstChildP; sourceP != NULL; sourceP = sourceP->next)
+  {
+    LM_T(LmtSR, ("Query '%s' for:", sourceP->name));
+    for (KjNode* entityNodeP = sourceP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
+    {
+      LM_T(LmtSR, ("  o %s", entityNodeP->value.s));
+    }
   }
 
   return true;

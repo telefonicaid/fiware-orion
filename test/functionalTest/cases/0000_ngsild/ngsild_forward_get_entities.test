@@ -259,7 +259,7 @@ echo
 
 echo "11. Query CB for all entities (they're all type 'T')"
 echo "===================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&offset=12&limit=3' # | grep 'urn:' | grep ':entities:'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&offset=35&limit=3' # | grep 'urn:' | grep ':entities:'
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
