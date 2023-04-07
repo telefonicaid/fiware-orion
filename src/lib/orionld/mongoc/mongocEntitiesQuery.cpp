@@ -712,10 +712,7 @@ KjNode* mongocEntitiesQuery
     bson_append_bool(&projection, "lastCorrelator", 14, true);
   }
   else
-  {
-    bson_append_bool(&projection, "_id.id",          6, true);
-    bson_append_bool(&projection, "_id.type",        8, true);
-  }
+    bson_append_bool(&projection, "_id.id", 6, true);
 
   //
   // Create the filter for the query

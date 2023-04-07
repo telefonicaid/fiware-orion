@@ -211,40 +211,24 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 //
 // orionldDistOpMatchAdd -
 //
-void orionldDistOpMatchAdd(const char* entityId, const char* entityType, const char* regId)
+void orionldDistOpMatchAdd(const char* entityId, const char* regId)
 {
-  KjNode* matchP    = kjLookup(orionldEntityMap, entityId);
-  KjNode* regArrayP = NULL;
+  KjNode* matchP = kjLookup(orionldEntityMap, entityId);
 
   if (matchP == NULL)
   {
     //
     // The entity ID is not present in the list - must be added
     //
-    matchP = kjObject(NULL, entityId);
+    matchP = kjArray(NULL, entityId);
     kjChildAdd(orionldEntityMap, matchP);
-
-    // Add the entity type
-    KjNode* typeNodeP = kjString(NULL, "type", entityType);
-    kjChildAdd(matchP, typeNodeP);
-
-    // And the reg match array
-    regArrayP = kjArray(NULL, "regs");
-    kjChildAdd(matchP, regArrayP);
-  }
-
-  if (regArrayP == NULL)
-  {
-    regArrayP = kjLookup(matchP, "regs");
-    if (regArrayP == NULL)
-      LM_RVE(("No 'regs' item found in the entity map '%s' - THIS IS A SW BUG in Orion-LD"));
   }
 
   //
   // Add regId to matchP's 'regs' array - remember it's a global variable, can't use orionldState
   //
   KjNode* regIdNodeP = (regId != NULL)? kjString(NULL, NULL, regId) : kjNull(NULL, NULL);
-  kjChildAdd(regArrayP, regIdNodeP);
+  kjChildAdd(matchP, regIdNodeP);
 }
 
 
@@ -260,12 +244,10 @@ int idListResponse(DistOp* distOpP, void* callbackParam)
     LM_T(LmtEntityMapDetail, ("Entity map from registration '%s'", distOpP->regP->regId));
     for (KjNode* eIdNodeP = distOpP->responseBody->value.firstChildP; eIdNodeP != NULL; eIdNodeP = eIdNodeP->next)
     {
-      char* entityId   = eIdNodeP->name;
-      char* entityType = eIdNodeP->value.s;
+      char* entityId = eIdNodeP->value.s;
 
       LM_T(LmtEntityMapDetail, ("o Entity '%s', registration '%s'", entityId, distOpP->regP->regId));
-
-      orionldDistOpMatchAdd(entityId, entityType, distOpP->regP->regId);
+      orionldDistOpMatchAdd(entityId, distOpP->regP->regId);
     }
   }
 
@@ -331,16 +313,17 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
                                              geojsonGeometryLongName,
                                              true);
 
+  kjTreeLog(localDbMatches, "localDbMatches", LmtSR);
+
   if (localDbMatches != NULL)
   {
     localEntityV = dbModelToEntityIdAndTypeObject(localDbMatches);
-
+    kjTreeLog(localEntityV, "localEntityV", LmtSR);
     for (KjNode* eidNodeP = localEntityV->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
     {
-      const char* entityId   = eidNodeP->name;
-      const char* entityType = eidNodeP->value.s;
+      const char* entityId   = eidNodeP->value.s;
 
-      orionldDistOpMatchAdd(entityId, entityType, NULL);
+      orionldDistOpMatchAdd(entityId, NULL);
     }
   }
 

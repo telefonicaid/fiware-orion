@@ -228,9 +228,104 @@ echo
 
 
 --REGEXPECT--
-1
-2
-3
+01. In CB,  create an entity urn:E1 with attribute P0
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. In CP1, create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. In CP2, Create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. In CP3, Create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+05. In CP4, Create an entity urn:E1 with attributes P1-P4+R1+R4 (only P4 and R4 will be used)
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. Create an exclusive registration R1 on urn:E1/P1 for CP1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg1
+
+
+
+07. Create a  redirect  registration R2 on urn:E1/P2 for CP2
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg2
+
+
+
+08. Create an inclusive registration R3 on T/P3 for CP3
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg3
+
+
+
+09. Create an auxiliar  registration R3 on T/P4 for CP4
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg4
+
+
+
+10. GET /entities - see all properties P1-P4, each from a different broker, and relationships R1+R4 from CP4
+============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-Results-Count: 1
+
+[
+  {
+    ...   (to be implemented)
+  }
+]
+
+
 --TEARDOWN---
 brokerStop CB
 brokerStop CP1

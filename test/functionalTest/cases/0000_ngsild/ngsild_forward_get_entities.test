@@ -260,6 +260,15 @@ echo
 echo "11. Query CB for all entities (they're all type 'T')"
 echo "===================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&offset=12&limit=3' # | grep 'urn:' | grep ':entities:'
+entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "12. Query using the entity map I got from step 11"
+echo "================================================="
+orionCurl --url '/ngsi-ld/v1/entities?entityMap='$entityMap'&offset=20&limit=5' # | grep 'urn:' | grep ':entities:'
+entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
@@ -374,22 +383,22 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg4
 10. Local query on CB for all entities of type T, with onlyIds=true set
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 261
+Content-Length: 221
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "urn:cb:entities:E00": "T",
-    "urn:cb:entities:E01": "T",
-    "urn:cb:entities:E02": "T",
-    "urn:cb:entities:E03": "T",
-    "urn:cb:entities:E04": "T",
-    "urn:cb:entities:E05": "T",
-    "urn:cb:entities:E06": "T",
-    "urn:cb:entities:E07": "T",
-    "urn:cb:entities:E08": "T",
-    "urn:cb:entities:E09": "T"
-}
+[
+    "urn:cb:entities:E00",
+    "urn:cb:entities:E01",
+    "urn:cb:entities:E02",
+    "urn:cb:entities:E03",
+    "urn:cb:entities:E04",
+    "urn:cb:entities:E05",
+    "urn:cb:entities:E06",
+    "urn:cb:entities:E07",
+    "urn:cb:entities:E08",
+    "urn:cb:entities:E09"
+]
 
 
 11. Query CB for all entities (they're all type 'T')
@@ -403,6 +412,21 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 NGSILD-Results-Count: 30
 
 []
+
+
+12. Query using the entity map I got from step 11
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+  {
+    ...   (to be implemented)
+  }
+]
 
 
 --TEARDOWN---

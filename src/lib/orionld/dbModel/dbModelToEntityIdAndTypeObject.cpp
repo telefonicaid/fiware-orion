@@ -37,14 +37,14 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 //
-// dbModelToEntityIdAndTypeObject -
+// dbModelToEntityIdAndTypeObject - FIXME: rename to dbModelToEntityMap
 //
 // INPUT:  [ { "_id": { "id": "urn:E1", "type": "urn:...:T1" } }, { "_id": { "id": "urn:E2", "type": "urn:...:T2" } }, ... ]
-// OUTPUT: { "urn:E1": "urn:...:T1", "urn:E2", "urn:...:T2" }
+// OUTPUT: ["urn:E1", "urn:E2", ...]
 //
 KjNode* dbModelToEntityIdAndTypeObject(KjNode* localDbMatches)
 {
-  KjNode* matchIds = kjObject(orionldState.kjsonP, NULL);
+  KjNode* matchIds = kjArray(orionldState.kjsonP, NULL);
 
   for (KjNode* dbEntityP = localDbMatches->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
   {
@@ -54,17 +54,13 @@ KjNode* dbModelToEntityIdAndTypeObject(KjNode* localDbMatches)
       continue;   // DB Error !!!
 
     KjNode* idP   = kjLookup(_idP, "id");
-    KjNode* typeP = kjLookup(_idP, "type");
 
     if (idP == NULL)
       continue;   // DB Error !!!
-    if (typeP == NULL)
-      continue;   // DB Error !!!
 
-    char*   shortType          = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
-    KjNode* idWithTypeAsValueP = kjString(orionldState.kjsonP, idP->value.s, shortType);
+    KjNode* idNodeP = kjString(orionldState.kjsonP, NULL, idP->value.s);
 
-    kjChildAdd(matchIds, idWithTypeAsValueP);
+    kjChildAdd(matchIds, idNodeP);
   }
 
   return matchIds;

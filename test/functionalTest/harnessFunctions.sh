@@ -1837,11 +1837,11 @@ function cServerCurl
   r=0
   if [ "$hasPayload" == "yes" ]
   then
-    curlCommand='curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders -d "$_payload" -H "Content-Type: application/ld+json"'
+    curlCommand="curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders "'-d "$_payload" -H "Content-Type: application/ld+json"'
     curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders -d "$_payload" -H "Content-Type: application/ld+json"  > /tmp/cServerOut
     r=$?
   else
-    curlCommand='curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders'
+    curlCommand="curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders"
     curl -s http://localhost:7080$url -X $verb --dump-header /tmp/cServerHeaders                                                        > /tmp/cServerOut
     r=$?
   fi

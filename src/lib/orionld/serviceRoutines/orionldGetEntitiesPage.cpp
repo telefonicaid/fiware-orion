@@ -88,15 +88,8 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
     if (entityMap == NULL)
       break;
 
-    KjNode* regsP = kjLookup(entityMap, "regs");
-    if (regsP == NULL)
-    {
-      orionldError(OrionldInternalError, "Internal Error (entityMap has no 'regs' field)", entityMap->name, 500);
-      LM_RE(false, ("entityMap for entity '%s' has no 'regs' field", entityMap->name));
-    }
-
     LM_T(LmtSR, ("Getting Entity '%s from:", entityMap->name));
-    for (KjNode* regP = regsP->value.firstChildP; regP != NULL; regP = regP->next)
+    for (KjNode* regP = entityMap->value.firstChildP; regP != NULL; regP = regP->next)
     {
       LM_T(LmtSR, ("  o %s", (regP->type == KjNull)? "Local DB" : regP->value.s));
     }
