@@ -60,3 +60,4 @@
 * Issue #1340  Fixed a dangling pointer bug
 * Issue #1343  Added the HTTP header (well, for mqtt notfications also) 'Host' for notifications
 * Issue #1344  Accepting hyphen as a valid character for a tenant
+* Issue #1348  Unsupported value added mongodb url
