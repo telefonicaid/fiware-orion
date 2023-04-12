@@ -17,7 +17,7 @@ env:
 jobs:
   deploy-quay:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
 
   deploy-dockerhub:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
