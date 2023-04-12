@@ -16,7 +16,7 @@ jobs:
   # push to dockerhub
   deploy-release-dockerhub:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
@@ -74,7 +74,7 @@ jobs:
 
   deploy-debug-dockerhub:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
@@ -105,7 +105,7 @@ jobs:
 
   deploy-release-quay:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
@@ -156,7 +156,7 @@ jobs:
 
   deploy-debug-quay:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
