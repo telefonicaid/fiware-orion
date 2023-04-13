@@ -125,7 +125,7 @@ Date: REGEX(.*)
 02. Get subscription, see notification.attrs
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 634
+Content-Length: 664
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -164,7 +164,8 @@ Date: REGEX(.*)
                 "georel": "near;maxDistance:1000",
                 "mq": "temperature.accur<0.9",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -192,7 +193,7 @@ Date: REGEX(.*)
 04. Get subscription again, see notification.exceptAttrs
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 587
+Content-Length: 617
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -226,7 +227,8 @@ Date: REGEX(.*)
                 "georel": "near;maxDistance:1000",
                 "mq": "temperature.accur<0.9",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

@@ -57,6 +57,7 @@ bool                   notifQueueStatistics = false;
 bool                   checkIdv1            = false;
 unsigned long long     inReqPayloadMaxSize  = DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE;
 unsigned long long     outReqMsgMaxSize     = DEFAULT_OUT_REQ_MSG_MAX_SIZE;
+bool                   onlyMetadataChange   = false;
 
 
 

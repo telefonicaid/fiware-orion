@@ -121,7 +121,7 @@ Date: REGEX(.*)
 03. Get subs
 ============
 HTTP/1.1 200 OK
-Content-Length: 668
+Content-Length: 728
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -146,7 +146,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -175,7 +176,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

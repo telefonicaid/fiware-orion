@@ -330,6 +330,8 @@ std::string Condition::toJson()
 
   if (operationsString != "[]")         jh.addRaw("alterationTypes", operationsString);
 
+  jh.addBool("notifyOnMetadataChange", this->notifyOnMetadataChange);
+
   return jh.str();
 }
 

@@ -297,7 +297,7 @@ Date: REGEX(.*)
 02. Get sub1 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 402
+Content-Length: 432
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -335,7 +335,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -358,7 +359,7 @@ Date: REGEX(.*)
 04. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 336
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -380,7 +381,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -403,7 +405,7 @@ Date: REGEX(.*)
 06. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 403
+Content-Length: 433
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -445,7 +447,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -468,7 +471,7 @@ Date: REGEX(.*)
 08. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 399
+Content-Length: 429
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -506,7 +509,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -529,7 +533,7 @@ Date: REGEX(.*)
 10. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 336
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -551,7 +555,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -576,7 +581,7 @@ Date: REGEX(.*)
 12. Get sub2 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 306
+Content-Length: 336
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -598,7 +603,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -621,7 +627,7 @@ Date: REGEX(.*)
 14. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 405
+Content-Length: 435
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -663,7 +669,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

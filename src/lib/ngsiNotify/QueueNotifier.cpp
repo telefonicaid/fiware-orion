@@ -133,6 +133,7 @@ void QueueNotifier::sendNotifyContextRequest
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   bool                             covered,
+  bool                             notifyOnMetadataChange,
   const std::vector<std::string>&  metadataFilter
 )
 {
@@ -149,6 +150,7 @@ void QueueNotifier::sendNotifyContextRequest
                                                             attrsFilter,
                                                             blacklist,
                                                             covered,
+                                                            notifyOnMetadataChange,
                                                             metadataFilter);
 
   // Early return if some problem occurred with params building

@@ -357,6 +357,7 @@ std::string mongoUpdateSubscription
   if (subUp.blacklistProvided)     setBlacklist(subUp, &setB);
   if (subUp.onlyChangedProvided)   setOnlyChanged(subUp, &setB);
   if (subUp.coveredProvided)       setCovered(subUp, &setB);
+  if (subUp.notifyOnMetadataChangeProvided) setNotifyOnMetadataChange(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
 
 

@@ -113,7 +113,7 @@ Date: REGEX(.*)
 02. Get subscription and do not see typePattern
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 412
+Content-Length: 442
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -140,7 +140,8 @@ Date: REGEX(.*)
             "attrs": [],
             "expression": {
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -163,7 +164,7 @@ Date: REGEX(.*)
 04. Get subscription and see typePattern
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: 426
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -187,7 +188,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

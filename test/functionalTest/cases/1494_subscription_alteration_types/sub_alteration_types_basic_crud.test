@@ -281,7 +281,7 @@ Date: REGEX(.*)
 03a. Get subscription and see alterationTypes entityDelete and entityCreate
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 323
+Content-Length: 353
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -304,7 +304,8 @@ Date: REGEX(.*)
                 "entityDelete",
                 "entityCreate"
             ],
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -319,7 +320,7 @@ Date: REGEX(.*)
 03b. Get subscription (as a list) and see alterationTypes entityDelete and entityCreate
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 325
+Content-Length: 355
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -343,7 +344,8 @@ Date: REGEX(.*)
                     "entityDelete",
                     "entityCreate"
                 ],
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -367,7 +369,7 @@ Date: REGEX(.*)
 05a. Get subscription and see alterationTypes entityChange
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 308
+Content-Length: 338
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -389,7 +391,8 @@ Date: REGEX(.*)
             "alterationTypes": [
                 "entityChange"
             ],
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -404,7 +407,7 @@ Date: REGEX(.*)
 05b. Get subscription (as a list) and see alterationTypes entityChange
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 310
+Content-Length: 340
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -427,7 +430,8 @@ Date: REGEX(.*)
                 "alterationTypes": [
                     "entityChange"
                 ],
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -451,7 +455,7 @@ Date: REGEX(.*)
 07a. Get subscription and not see alterationTypes
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 303
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -470,7 +474,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -485,7 +490,7 @@ Date: REGEX(.*)
 07b. Get subscription (as a list) and not see alterationTypes
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 275
+Content-Length: 305
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -505,7 +510,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -529,7 +535,7 @@ Date: REGEX(.*)
 09a. Get subscription and see alterationTypes entityDelete and entityUpdate
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 323
+Content-Length: 353
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -552,7 +558,8 @@ Date: REGEX(.*)
                 "entityDelete",
                 "entityUpdate"
             ],
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -567,7 +574,7 @@ Date: REGEX(.*)
 09b. Get subscription (as a list) and see alterationTypes entityDelete and entityUpdate
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 325
+Content-Length: 355
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -591,7 +598,8 @@ Date: REGEX(.*)
                     "entityDelete",
                     "entityUpdate"
                 ],
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

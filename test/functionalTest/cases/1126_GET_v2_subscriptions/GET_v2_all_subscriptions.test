@@ -166,7 +166,7 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?options=count
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 791
+Content-Length: 851
 Content-Type: application/json
 Fiware-Total-Count: 2
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -195,7 +195,8 @@ Date: REGEX(.*)
                 "attrs": [
                     "temperature",
                     "timestamp"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -230,7 +231,8 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "speed"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -260,7 +262,7 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions (now seeing the timesSent, failsCounter and lastNotification in one sub)
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 958
+Content-Length: 1018
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -288,7 +290,8 @@ Date: REGEX(.*)
                 "attrs": [
                     "temperature",
                     "timestamp"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -328,7 +331,8 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "speed"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

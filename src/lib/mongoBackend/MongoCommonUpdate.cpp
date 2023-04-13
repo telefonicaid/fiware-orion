@@ -554,6 +554,15 @@ static bool mergeAttrInfo
     }
   }
 
+  if (!attrValueChanges(attr, caP, forcedUpdate, apiVersion) && !equalMetadata(md, mdNew))
+  {
+    onlyMetadataChange = true;
+  }
+  else
+  {
+    onlyMetadataChange = false;
+  }
+
   return actualUpdate;
 }
 
@@ -937,7 +946,8 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant,
-                                                           cSubP->covered);
+                                                           cSubP->covered,
+                                                           cSubP->notifyOnMetadataChange);
     if (cSubP->onlyChanged)
     {
       subP->blacklist = false;
@@ -1677,6 +1687,7 @@ static bool addTriggeredSubscriptions_noCache
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
+      bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
@@ -1706,7 +1717,7 @@ static bool addTriggeredSubscriptions_noCache
           renderFormat,
           httpInfo,
           mqttInfo,
-          aList, "", "", covered);
+          aList, "", "", covered, notifyOnMetadataChange);
 
       // Release after using them to fill the TriggeredSubscription
       httpInfo.release();
@@ -1870,7 +1881,8 @@ static bool processNotification
   unsigned int                     correlatorCounter,
   const ngsiv2::Notification&      notification,
   bool                             blacklist = false,
-  bool                             covered = false
+  bool                             covered = false,
+  bool                             notifyOnMetadataChange = false
 )
 {
   notifStaticFields nsf;
@@ -1881,18 +1893,42 @@ static bool processNotification
   nsf.fiwareCorrelator  = fiwareCorrelator;
   nsf.correlatorCounter = correlatorCounter;
 
-  getNotifier()->sendNotifyContextRequest(notifyCerP,
-                                          notification,
-                                          nsf,
-                                          maxFailsLimit,
-                                          failsCounter,
-                                          renderFormat,
-                                          attrL.stringV,
-                                          blacklist,
-                                          covered,
-                                          metadataV);
+  if (!notifyOnMetadataChange && !onlyMetadataChange)
+  {
+    getNotifier()->sendNotifyContextRequest(notifyCerP,
+                                            notification,
+                                            nsf,
+                                            maxFailsLimit,
+                                            failsCounter,
+                                            renderFormat,
+                                            attrL.stringV,
+                                            blacklist,
+                                            covered,
+                                            notifyOnMetadataChange,
+                                            metadataV);
 
-  return true;
+    return true;
+  }
+  else if (notifyOnMetadataChange)
+  {
+    getNotifier()->sendNotifyContextRequest(notifyCerP,
+                                            notification,
+                                            nsf,
+                                            maxFailsLimit,
+                                            failsCounter,
+                                            renderFormat,
+                                            attrL.stringV,
+                                            blacklist,
+                                            covered,
+                                            notifyOnMetadataChange,
+                                            metadataV);
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 
@@ -2037,7 +2073,8 @@ static unsigned int processSubscriptions
                                            notifStartCounter + notifSent + 1,
                                            notification,
                                            tSubP->blacklist,
-                                           tSubP->covered);
+                                           tSubP->covered,
+                                           tSubP->notifyOnMetadataChange);
 
     // notification already consumed, it can be freed
     // Only one of the release operations will do something, but it is simpler (and safer)
@@ -4431,3 +4468,4 @@ unsigned int processContextElement
   // Response in responseP
   return notifSent;
 }
+

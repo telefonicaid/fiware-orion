@@ -115,6 +115,7 @@ struct CachedSubscription
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;
+  bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
@@ -221,7 +222,8 @@ extern void subCacheItemInsert
   const std::string&                 georel,
   bool                               blacklist,
   bool                               onlyChanged,
-  bool                               covered
+  bool                               covered,
+  bool                               notifyOnMetadataChange
 );
 
 
