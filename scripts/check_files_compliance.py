@@ -79,7 +79,7 @@ def check_file(file):
     # that line
 
     searching_first_line = True
-    with open(file) as f:
+    with open(file,'r',encoding='latin-1') as f:
         for line in f:
             line = line.rstrip()
             if searching_first_line:

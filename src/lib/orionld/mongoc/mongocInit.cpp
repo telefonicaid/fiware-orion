@@ -192,21 +192,25 @@ static char* uriCompose
     }
 
     compV[compNo++] = dbHost;
-    compV[compNo++] = (char*) "/";
 
-    if ((dbAuthDb != NULL) && (dbAuthDb[0] != 0))
+    bool dbAuthDbPresent        = (dbAuthDb        != NULL) && (dbAuthDb[0]        != 0);
+    bool dbReplicaSetPresent    = (dbReplicaSet    != NULL) && (dbReplicaSet[0]    != 0);
+    bool dbAuthMechanismPresent = (dbAuthMechanism != NULL) && (dbAuthMechanism[0] != 0);
+
+    if ((dbAuthDbPresent == true) || (dbReplicaSetPresent == true) || (dbAuthMechanismPresent == true)  || (dbSSL == true))
+      compV[compNo++] = (char*) "?";
+
+    if (dbAuthDbPresent == true)
       compV[compNo++] = dbAuthDb;
 
-    compV[compNo++] = (char*) "?";
-
-    if ((dbReplicaSet != NULL) && (dbReplicaSet[0] != 0))
+    if (dbReplicaSetPresent == true)
     {
       compV[compNo++] = (char*) "replicaSet=";
       compV[compNo++] = dbReplicaSet;
       compV[compNo++] = (char*) "&";
     }
 
-    if ((dbAuthMechanism != NULL) && (dbAuthMechanism[0] != 0))
+    if (dbAuthMechanismPresent == true)
     {
       compV[compNo++] = (char*) "authMechanism=";
       compV[compNo++] = dbAuthMechanism;
