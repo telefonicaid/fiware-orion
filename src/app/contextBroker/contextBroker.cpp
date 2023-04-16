@@ -668,6 +668,9 @@ static void contextBrokerInit(void)
   /* Set HTTP timeout */
   setHttpTimeout(httpTimeout);
 
+  /* Set MQTT timeout */
+  setMqttTimeout(mqttTimeout);
+
   //WARN about insecureNotifications mode
   if (insecureNotif == true)
    {

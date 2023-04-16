@@ -723,7 +723,7 @@ static std::string parseTimeout(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 
 /* ****************************************************************************
 *
-* parseTimeout -
+* parseTimeoutMqtt -
 */
 static std::string parseTimeoutMqtt(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
 {
@@ -734,9 +734,9 @@ static std::string parseTimeoutMqtt(ConnectionInfo* ciP, SubscriptionUpdate* sub
   }
   if (timeoutOpt.given)
   {
-    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_HTTP_TIMEOUT))
+    if ((timeoutOpt.value < 0) || (timeoutOpt.value > MAX_MQTT_TIMEOUT))
     {
-      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_HTTP_TIMEOUT));
+      return badInput(ciP, "timeout field must be an integer between 0 and " + std::to_string(MAX_MQTT_TIMEOUT));
     }
     else
     {
@@ -865,7 +865,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
       // timeout
       r = parseTimeout(ciP, subsP, http);
-      //r = parseTimeoutMqtt(ciP, subsP, mqtt);
+
       if (!r.empty())
       {
         return r;
@@ -1077,6 +1077,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // timeout
     r = parseTimeoutMqtt(ciP, subsP, mqtt);
+    if (!r.empty())
+    {
+      return r;
+    }
+
 
     subsP->notification.mqttInfo.custom = false;
   }
@@ -1121,6 +1126,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // timeout
     r = parseTimeoutMqtt(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
 
     // payload
     r = parseCustomPayload(ciP,

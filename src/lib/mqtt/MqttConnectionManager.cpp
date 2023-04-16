@@ -46,6 +46,28 @@
 
 /* ****************************************************************************
 *
+* defaultTimeout -
+*/
+static long defaultTimeout = DEFAULT_TIMEOUT;
+
+
+
+/* ****************************************************************************
+*
+* setMqttTimeout -
+*/
+void setMqttTimeout(long defaultTimeoutInMilliseconds)
+{
+  if (defaultTimeoutInMilliseconds != -1)
+  {
+    defaultTimeout = defaultTimeoutInMilliseconds;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * getEndpoint -
 */
 inline std::string getEndpoint(const std::string& host, int port)
@@ -366,9 +388,16 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
 *
 * MqttConnectionManager::sendMqttNotification -
 */
-bool MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos)
+bool MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, long timeoutInMilliseconds)
 {
   std::string endpoint = getEndpoint(host, port);
+
+  CURL*                curl;
+
+  if (timeoutInMilliseconds <= 0)
+  {
+    timeoutInMilliseconds = defaultTimeout;
+  }
 
   // A previous version of the implementation took the sem in getConnection(), but we
   // need to do it in sendMqttNotification to avoid the connection get removed by
@@ -387,6 +416,11 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
     delete cP;
     semGive();
     return false;
+  }
+
+  if (timeoutInMilliseconds > 0)
+  {
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutInMilliseconds);
   }
 
   const char* msg = content.c_str();

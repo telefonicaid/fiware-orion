@@ -34,6 +34,14 @@
 
 
 
+/***************************************************************************
+*
+* setMqttTimeout -
+*/
+extern void setMqttTimeout(long defaultTimeoutInMilliseconds);
+
+
+
 /* ****************************************************************************
 *
 * MqttConnection -
@@ -69,7 +77,7 @@ class MqttConnectionManager
 
   const char*  semGet(void);
 
-  bool sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos);
+  bool sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, long timeoutInMilliseconds = -1);
   void cleanup(double maxAge);
 
  private:
