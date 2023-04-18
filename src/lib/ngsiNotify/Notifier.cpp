@@ -226,8 +226,7 @@ static bool setNgsiPayload
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
-  std::string*                     payloadP,
-  RenderFormat                     renderFormat
+  std::string*                     payloadP
 )
 {
   // Prepare a map for macro replacements. We firstly tried to pass Entity object to
@@ -385,7 +384,7 @@ static SenderThreadParams* buildSenderParamsCustom
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
     const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
-    if (!setNgsiPayload(ngsi, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
+    if (!setNgsiPayload(ngsi, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload))
     {
       // Warning already logged in macroSubstitute()
       return NULL;
