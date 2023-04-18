@@ -123,7 +123,7 @@ void MqttInfo::fill(const orion::BSONObj& bo)
   this->topic  = bo.hasField(CSUB_MQTTTOPIC)? getStringFieldF(bo, CSUB_MQTTTOPIC) : "";
   this->qos    = bo.hasField(CSUB_MQTTQOS)?   getIntFieldF(bo, CSUB_MQTTQOS)      : 0;
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo, CSUB_CUSTOM)      : false;
-  this->timeout  = bo.hasField(CSUB_TIMEOUT)?    getLongFieldF(bo, CSUB_TIMEOUT)     : 0;
+  this->timeout= bo.hasField(CSUB_TIMEOUT)?   getLongFieldF(bo, CSUB_TIMEOUT)     : 0;
 
   // both user and passwd have to be used at the same time
   if ((bo.hasField(CSUB_USER)) && (bo.hasField(CSUB_PASSWD)))

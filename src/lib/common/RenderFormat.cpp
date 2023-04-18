@@ -47,8 +47,6 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
   case NGSI_V2_VALUES:              return "values";
   case NGSI_V2_UNIQUE_VALUES:       return "uniqueValues";
   case NGSI_V2_CUSTOM:              return "custom";
-  case NGSI_V2_SIMPLIFIEDNORMALIZED:return "simplifiedNormalized";
-  case NGSI_V2_SIMPLIFIEDKEYVALUES: return "simplifiedKeyValues";
   case NO_FORMAT:
     if (noDefault == true)
     {
@@ -78,8 +76,6 @@ RenderFormat stringToRenderFormat(const std::string& s, bool noDefault)
   if (s == "values")       { return NGSI_V2_VALUES;        }
   if (s == "uniqueValues") { return NGSI_V2_UNIQUE_VALUES; }
   if (s == "custom")       { return NGSI_V2_CUSTOM;        }
-  if (s == "simplifiedNormalized") { return NGSI_V2_SIMPLIFIEDNORMALIZED;    }
-  if (s == "simplifiedKeyValues")  { return NGSI_V2_SIMPLIFIEDKEYVALUES;     }
   
   return (noDefault == false)? DEFAULT_RENDER_FORMAT : NO_FORMAT;
 }

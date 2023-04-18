@@ -288,18 +288,7 @@ static bool setNgsiPayload
   ncr.subscriptionId  = subscriptionId;
   ncr.contextElementResponseVector.push_back(&cer);
 
-  if (renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED)
-  {
-    *payloadP = ncr.toJson(NGSI_V2_SIMPLIFIEDNORMALIZED, attrsFilter, blacklist, metadataFilter, &replacements);
-  }
-  else if (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES)
-  {
-    *payloadP = ncr.toJson(NGSI_V2_SIMPLIFIEDKEYVALUES, attrsFilter, blacklist, metadataFilter, &replacements);
-  }
-  else
-  {
-    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, &replacements);
-  }
+ *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, &replacements);
 
   return true;
 }
@@ -359,6 +348,7 @@ static SenderThreadParams* buildSenderParamsCustom
     method = verbName(NOVERB);
   }
 
+
   //
   // 2. URL
   //
@@ -400,21 +390,8 @@ static SenderThreadParams* buildSenderParamsCustom
       // Warning already logged in macroSubstitute()
       return NULL;
     }
-    if (renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED)
-    {
-      renderFormat = NGSI_V2_SIMPLIFIEDNORMALIZED;
-      mimeType = "application/json";
-    }
-    else if (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES)
-    {
-      renderFormat = NGSI_V2_SIMPLIFIEDKEYVALUES;
-      mimeType = "application/json";
-    }
-    else
-    {
-      renderFormat = NGSI_V2_NORMALIZED;
-      mimeType = "application/json";
-    }
+    renderFormat = NGSI_V2_NORMALIZED;
+    mimeType = "application/json";
   }
 
 
