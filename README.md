@@ -61,7 +61,7 @@ Administration Manual on [readthedocs.io](https://fiware-orion.readthedocs.io)
 
 Any feedback on this documentation is highly welcome, including bugs, typos or
 things you think should be included but aren't. You can use
-[github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to
+[github issues](https://github.com/telefonicaid/fiware-orion/issues/new/choose) to
 provide feedback.
 
 [Top](#top)
