@@ -150,7 +150,6 @@ void QueueNotifier::sendNotifyContextRequest
                                                             attrsFilter,
                                                             blacklist,
                                                             covered,
-                                                            notifyOnMetadataChange,
                                                             metadataFilter);
 
   // Early return if some problem occurred with params building

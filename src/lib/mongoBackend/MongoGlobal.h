@@ -337,7 +337,9 @@ extern StringList subToAttributeList
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
+#if 1
 extern StringList subToAttributeList(const orion::BSONObj& attrL);
+#endif
 
 
 

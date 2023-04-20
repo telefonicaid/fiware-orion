@@ -74,7 +74,6 @@ void Notifier::sendNotifyContextRequest
     const std::vector<std::string>&  attrsFilter,
     bool                             blacklist,
     bool                             covered,
-    bool                             notifyOnMetadataChange,
     const std::vector<std::string>&  metadataFilter
 )
 {
@@ -92,7 +91,6 @@ void Notifier::sendNotifyContextRequest
                                                             attrsFilter,
                                                             blacklist,
                                                             covered,
-                                                            notifyOnMetadataChange,
                                                             metadataFilter);
 
   if (paramsP != NULL)
@@ -558,7 +556,6 @@ SenderThreadParams* Notifier::buildSenderParams
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   bool                             covered,
-  bool                             notifyOnMetadataChange,
   const std::vector<std::string>&  metadataFilter
 )
 {

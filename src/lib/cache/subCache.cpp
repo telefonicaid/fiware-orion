@@ -441,7 +441,8 @@ static bool subMatch
   const char*                      entityId,
   const char*                      entityType,
   const std::vector<std::string>&  attributes,
-  const std::vector<std::string>&  modifiedAttrs,
+  const std::vector<std::string>&  attrsWithModifiedValue,
+  const std::vector<std::string>&  attrsWithModifiedMd,
   ngsiv2::SubAltType               targetAltType
 )
 {
@@ -502,7 +503,8 @@ static bool subMatch
   }
   else
   {
-    if (!attributeMatch(cSubP, modifiedAttrs))
+    if (!attributeMatch(cSubP, attrsWithModifiedValue) &&
+        !(cSubP->notifyOnMetadataChange && attributeMatch(cSubP, attrsWithModifiedMd)))
     {
       LM_T(LmtSubCacheMatch, ("No match due to attributes"));
       return false;
@@ -548,7 +550,7 @@ void subCacheMatch
 
     attrV.push_back(attr);
 
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, attrV, targetAltType))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, attrV, attrV, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -572,7 +574,8 @@ void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const std::vector<std::string>&    attributes,
-  const std::vector<std::string>&    modifiedAttrs,
+  const std::vector<std::string>&    attrsWithModifiedValue,
+  const std::vector<std::string>&    attrsWithModifiedMd,
   ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 )
@@ -581,7 +584,7 @@ void subCacheMatch
 
   while (cSubP != NULL)
   {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attributes, modifiedAttrs, targetAltType))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attributes, attrsWithModifiedValue, attrsWithModifiedMd, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",

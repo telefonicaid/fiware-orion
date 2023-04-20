@@ -67,7 +67,6 @@ class TriggeredSubscription
   StringFilter*             mdStringFilterP;
   bool                      blacklist;
   bool                      covered;
-  bool                      notifyOnMetadataChange;
   std::vector<std::string>  metadata;
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
@@ -87,8 +86,7 @@ class TriggeredSubscription
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
                         const char*              _tenant,
-                        bool                     _covered,
-                        bool                     _notifyOnMetadataChange);
+                        bool                     _covered);
 
   ~TriggeredSubscription();
 

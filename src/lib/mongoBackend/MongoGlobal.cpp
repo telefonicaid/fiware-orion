@@ -2252,13 +2252,14 @@ EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
 */
 static void getCommonAttributes
 (
-  const bool                        type,
+  // FIXME PR
+  //const bool                        type,
   const std::vector<std::string>&   fVector,
   const std::vector<std::string>&   sVector,
   std::vector<std::string>&         resultVector
 )
 {
-  if (type)
+  //if (type)
   {
     for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
     {
@@ -2271,7 +2272,7 @@ static void getCommonAttributes
       }
     }
   }
-  else
+  /*else
   {
     for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
     {
@@ -2283,9 +2284,38 @@ static void getCommonAttributes
         }
       }
     }
-  }
+  }*/
 }
 
+
+/* ****************************************************************************
+*
+* getDifferenceAttributes -
+*/
+static void getDifferenceAttributes
+(
+  const std::vector<std::string>&   fVector,
+  const std::vector<std::string>&   sVector,
+  std::vector<std::string>&         resultVector
+)
+{
+  for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+  {
+    bool found = false;
+    for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+    {
+      if (fVector[cavOc] == sVector[avOc])
+      {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      resultVector.push_back(fVector[cavOc]);
+    }
+  }
+}
 
 
 /* ****************************************************************************
@@ -2306,9 +2336,33 @@ void subToNotifyList
     std::vector<std::string>  condAttrs;
     std::vector<std::string>  notifyAttrs;
 
-    if (!blacklist)
+    if (blacklist)
     {
-      if (conditionVector.size() == 0 && notificationVector.size() == 0)
+      /*
+      if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      {
+        getCommonAttributes(false, modifiedAttrs, notificationVector, notifyAttrs);
+      }
+      else
+      {
+        getCommonAttributes(false, modifiedAttrs, notificationVector, condAttrs);
+        getCommonAttributes(true, condAttrs, entityAttrsVector, notifyAttrs);
+      }
+
+      if (notifyAttrs.size() == 0)
+      {
+        op = true;
+      }
+      attrL.fill(notifyAttrs);*/
+
+      // By definition, notificationVector cannot be empty in blacklist case
+      // FIXME PR: we should have .test to ensure this is detected at parsing stage
+      getDifferenceAttributes(entityAttrsVector, notificationVector, notifyAttrs);
+      attrL.fill(notifyAttrs);
+    }
+    else
+    {
+      /*if (conditionVector.size() == 0 && notificationVector.size() == 0)
       {
         attrL.fill(modifiedAttrs);
       }
@@ -2328,26 +2382,20 @@ void subToNotifyList
       {
         op = true;
       }
-      attrL.fill(notifyAttrs);
-    }
-    else if (blacklist)
-    {
-      if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      attrL.fill(notifyAttrs);*/
+      if (notificationVector.size() == 0)
       {
-        getCommonAttributes(false, modifiedAttrs, notificationVector, notifyAttrs);
+        // This means "all attributes"
+        attrL.fill(entityAttrsVector);
       }
       else
       {
-        getCommonAttributes(false, modifiedAttrs, notificationVector, condAttrs);
-        getCommonAttributes(true, condAttrs, entityAttrsVector, notifyAttrs);
+        getCommonAttributes(entityAttrsVector, notificationVector, notifyAttrs);
+        attrL.fill(notifyAttrs);
       }
-
-      if (notifyAttrs.size() == 0)
-      {
-        op = true;
-      }
-      attrL.fill(notifyAttrs);
     }
+    // FIXME PR: better as return value
+    op = (attrL.size() == 0);
 }
 
 
@@ -2371,7 +2419,11 @@ StringList subToAttributeList
 {
   if (!onlyChanged)
   {
+    // FIXME PR: this is weird... In this case op is always the same a in the caller, i.e. false
+    // thus it ends in a continue in the caller...
     return subToAttributeList(sub);
+    //StringList attrL;
+    //return attrL;
   }
   StringList                       attrL;
   std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
@@ -2394,6 +2446,7 @@ StringList subToAttributeList
 
 
 
+#if 1
 /* ****************************************************************************
 *
 * subToAttributeList -
@@ -2415,6 +2468,7 @@ StringList subToAttributeList(const orion::BSONObj& sub)
 
   return attrL;
 }
+#endif
 
 
 

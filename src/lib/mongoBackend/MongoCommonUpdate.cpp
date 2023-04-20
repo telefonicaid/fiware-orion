@@ -363,16 +363,29 @@ static bool isSomeCalculatedOperatorUsed(ContextAttribute* caP)
 
 /* ****************************************************************************
 *
+* ChangeType -
+*/
+typedef enum ChangeType
+{
+  NO_CHANGE           = 0,
+  CHANGE_ONLY_VALUE   = 1,
+  CHANGE_ONLY_MD      = 2,
+  CHANGE_VALUE_AND_MD = 3
+} ChangeType;
+
+/* ****************************************************************************
+*
 * mergeAttrInfo -
 *
 * Takes as input the information of a given attribute, both in database (attr) and
 * request (caP), and merged them in the toSet builder. The function returns
-* true if it was an actual update, false otherwise.
+* NO_CHANGE, CHANGE_ONLY_VALUE, CHANGE_ONLY_MD and CHANGE_VALUE_AND_MD depending
+* of the change type.
 *
 * You may wonder why we need toUnset if this function is not related with delete attribute
 * logic. However, it's need to "clean" metadata in some cases.
 */
-static bool mergeAttrInfo
+static ChangeType mergeAttrInfo
 (
   const orion::BSONObj&   attr,
   ContextAttribute*       caP,
@@ -513,34 +526,53 @@ static bool mergeAttrInfo
   }
 
   /* Was it an actual update? */
-  bool actualUpdate;
+  ChangeType changeType = NO_CHANGE;
 
   if (caP->compoundValueP == NULL)
   {
-    /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
+    /* In the case of simple value, we consider there is a change in the value if one or more of the following are true:
      *
      * 1) the value of the attribute changed (see attrValueChanges for details)
      * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
      *    type is optional according to NGSI and the attribute may not have that field in the BSON)
+     *
+     * In addition, we consider there is change in the metadata if:
+     *
      * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
-    actualUpdate = (attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
-                    ((!caP->type.empty()) &&
-                     (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
-                    mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
+    bool valueChanged = attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
+                      ((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) );
+    bool mdChanged = (mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
+
+    if (valueChanged && !mdChanged)
+    {
+      changeType = CHANGE_ONLY_VALUE;
+    }
+    else if (!valueChanged && mdChanged)
+    {
+      changeType = CHANGE_ONLY_MD;
+    }
+    else if (valueChanged && mdChanged)
+    {
+      changeType = CHANGE_VALUE_AND_MD;
+    }
+    else  // !valueChanged && !mdChanged
+    {
+      changeType = NO_CHANGE;
+    }
   }
   else
   {
     // FIXME #643 P6: in the case of compound value, it's more difficult to know if an attribute
     // has really changed its value (many levels have to be traversed). Until we can develop the
-    // matching logic, we consider actualUpdate always true.
+    // matching logic, we consider CHANGE_VALUE_AND_MD always.
     //
-    actualUpdate = true;
+    changeType = CHANGE_VALUE_AND_MD;
   }
 
   /* 5. Add modification date (actual change only if actual update) */
-  if (actualUpdate)
+  if (changeType)
   {
     toSet->append(composedName + "." + ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
   }
@@ -554,16 +586,7 @@ static bool mergeAttrInfo
     }
   }
 
-  if (!attrValueChanges(attr, caP, forcedUpdate, apiVersion) && !equalMetadata(md, mdNew))
-  {
-    onlyMetadataChange = true;
-  }
-  else
-  {
-    onlyMetadataChange = false;
-  }
-
-  return actualUpdate;
+  return changeType;
 }
 
 
@@ -600,14 +623,14 @@ static bool updateAttribute
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   ContextAttribute*         caP,
-  bool*                     actualUpdate,
+  ChangeType*               changeType,
   bool                      isReplace,
   const bool&               forcedUpdate,
   const bool&               overrideMetadata,
   ApiVersion                apiVersion
 )
 {
-  *actualUpdate = false;
+  *changeType = NO_CHANGE;
 
   std::string effectiveName = dbEncode(caP->name);
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
@@ -617,7 +640,7 @@ static bool updateAttribute
     orion::BSONObjBuilder newAttr;
     double         now = getCurrentTime();
 
-    *actualUpdate = true;
+    *changeType = CHANGE_VALUE_AND_MD;
 
     std::string attrType;
     if (!caP->typeGiven && (apiVersion == V2))
@@ -666,7 +689,7 @@ static bool updateAttribute
     orion::BSONObj newAttr;
     orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
 
-    *actualUpdate = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, overrideMetadata, apiVersion);
+    *changeType = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, overrideMetadata, apiVersion);
   }
 
   return true;
@@ -698,7 +721,7 @@ static bool appendAttribute
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
   ContextAttribute*         caP,
-  bool*                     actualUpdate,
+  ChangeType*               changeType,
   const bool&               forcedUpdate,
   const bool&               overrideMetadata,
   ApiVersion                apiVersion
@@ -710,7 +733,7 @@ static bool appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrsP->hasField(effectiveName))
   {
-    updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, caP, actualUpdate, false, forcedUpdate, overrideMetadata, apiVersion);
+    updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, caP, changeType, false, forcedUpdate, overrideMetadata, apiVersion);
     return false;
   }
 
@@ -761,7 +784,7 @@ static bool appendAttribute
 
   attrNamesAdd->append(caP->name);
 
-  *actualUpdate = true;
+  *changeType = CHANGE_VALUE_AND_MD;
   return true;
 }
 
@@ -872,7 +895,8 @@ static bool addTriggeredSubscriptions_withCache
   std::string                                    entityId,
   std::string                                    entityType,
   const std::vector<std::string>&                attributes,
-  const std::vector<std::string>&                modifiedAttrs,
+  const std::vector<std::string>&                attrsWithModifiedValue,
+  const std::vector<std::string>&                attrsWithModifiedMd,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
   std::string                                    tenant,
@@ -884,7 +908,7 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<CachedSubscription*>  subVec;
 
   cacheSemTake(__FUNCTION__, "match subs for notifications");
-  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attributes, modifiedAttrs, targetAltType, &subVec);
+  subCacheMatch(tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attributes, attrsWithModifiedValue, attrsWithModifiedMd, targetAltType, &subVec);
   LM_T(LmtSubCache, ("%d subscriptions in cache match the update", subVec.size()));
 
   double now = getCurrentTime();
@@ -921,7 +945,7 @@ static bool addTriggeredSubscriptions_withCache
     bool op = false;
     if (cSubP->onlyChanged)
     {
-      subToNotifyList(modifiedAttrs, cSubP->notifyConditionV, cSubP->attributes, attributes, aList, cSubP->blacklist, op);
+      subToNotifyList(attrsWithModifiedValue, cSubP->notifyConditionV, cSubP->attributes, attributes, aList, cSubP->blacklist, op);
       if (op)
       {
         continue;
@@ -946,8 +970,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant,
-                                                           cSubP->covered,
-                                                           cSubP->notifyOnMetadataChange);
+                                                           cSubP->covered);
     if (cSubP->onlyChanged)
     {
       subP->blacklist = false;
@@ -1552,7 +1575,8 @@ static bool addTriggeredSubscriptions_noCache
   const std::string&                             entityId,
   const std::string&                             entityType,
   const std::vector<std::string>&                attributes,
-  const std::vector<std::string>&                modifiedAttrs,
+  const std::vector<std::string>&                attrsWithModifiedValue,
+  const std::vector<std::string>&                attrsWithModifiedMd,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
   const std::string&                             tenant,
@@ -1657,6 +1681,9 @@ static bool addTriggeredSubscriptions_noCache
         continue;
       }
 
+      // Early extraction of fiedl from DB document. The rest of fields are got later
+      bool  notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
+
       // Depending of the alteration type, we use the list of attributes in the request or the list
       // with effective modifications
       if (targetAltType == ngsiv2::EntityUpdate)
@@ -1668,7 +1695,7 @@ static bool addTriggeredSubscriptions_noCache
       }
       else
       {
-        if (!condValueAttrMatch(sub, modifiedAttrs))
+        if (!condValueAttrMatch(sub, attrsWithModifiedValue) && !(notifyOnMetadataChange && condValueAttrMatch(sub, attrsWithModifiedMd)))
         {
           continue;
         }
@@ -1687,7 +1714,6 @@ static bool addTriggeredSubscriptions_noCache
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
-      bool              notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
@@ -1702,7 +1728,7 @@ static bool addTriggeredSubscriptions_noCache
       }
 
       bool op = false;
-      StringList aList = subToAttributeList(sub, onlyChanged, blacklist, modifiedAttrs, attributes, op);
+      StringList aList = subToAttributeList(sub, onlyChanged, blacklist, attrsWithModifiedValue, attributes, op);
       if (op)
       {
          continue;
@@ -1717,7 +1743,7 @@ static bool addTriggeredSubscriptions_noCache
           renderFormat,
           httpInfo,
           mqttInfo,
-          aList, "", "", covered, notifyOnMetadataChange);
+          aList, "", "", covered);
 
       // Release after using them to fill the TriggeredSubscription
       httpInfo.release();
@@ -1836,7 +1862,8 @@ static bool addTriggeredSubscriptions
   const std::string&                             entityId,
   const std::string&                             entityType,
   const std::vector<std::string>&                attributes,
-  const std::vector<std::string>&                modifiedAttrs,
+  const std::vector<std::string>&                attrsWithModifiedValues,
+  const std::vector<std::string>&                attrsWithModifiedMd,
   std::map<std::string, TriggeredSubscription*>& subs,
   std::string&                                   err,
   std::string                                    tenant,
@@ -1848,11 +1875,11 @@ static bool addTriggeredSubscriptions
 
   if (noCache)
   {
-    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV, targetAltType);
+    return addTriggeredSubscriptions_noCache(entityId, entityType, attributes, attrsWithModifiedValues, attrsWithModifiedMd, subs, err, tenant, servicePathV, targetAltType);
   }
   else
   {
-    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, modifiedAttrs, subs, err, tenant, servicePathV, targetAltType);
+    return addTriggeredSubscriptions_withCache(entityId, entityType, attributes, attrsWithModifiedValues, attrsWithModifiedMd, subs, err, tenant, servicePathV, targetAltType);
   }
 }
 
@@ -1881,9 +1908,7 @@ static bool processNotification
   unsigned int                     correlatorCounter,
   const ngsiv2::Notification&      notification,
   bool                             blacklist = false,
-  bool                             covered = false,
-  bool                             notifyOnMetadataChange = false
-)
+  bool                             covered = false)
 {
   notifStaticFields nsf;
 
@@ -1893,42 +1918,19 @@ static bool processNotification
   nsf.fiwareCorrelator  = fiwareCorrelator;
   nsf.correlatorCounter = correlatorCounter;
 
-  if (!notifyOnMetadataChange && !onlyMetadataChange)
-  {
-    getNotifier()->sendNotifyContextRequest(notifyCerP,
-                                            notification,
-                                            nsf,
-                                            maxFailsLimit,
-                                            failsCounter,
-                                            renderFormat,
-                                            attrL.stringV,
-                                            blacklist,
-                                            covered,
-                                            notifyOnMetadataChange,
-                                            metadataV);
+  getNotifier()->sendNotifyContextRequest(notifyCerP,
+                                          notification,
+                                          nsf,
+                                          maxFailsLimit,
+                                          failsCounter,
+                                          renderFormat,
+                                          attrL.stringV,
+                                          blacklist,
+                                          covered,
+                                          metadataV);
 
-    return true;
-  }
-  else if (notifyOnMetadataChange)
-  {
-    getNotifier()->sendNotifyContextRequest(notifyCerP,
-                                            notification,
-                                            nsf,
-                                            maxFailsLimit,
-                                            failsCounter,
-                                            renderFormat,
-                                            attrL.stringV,
-                                            blacklist,
-                                            covered,
-                                            notifyOnMetadataChange,
-                                            metadataV);
 
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return true;
 }
 
 
@@ -2073,8 +2075,7 @@ static unsigned int processSubscriptions
                                            notifStartCounter + notifSent + 1,
                                            notification,
                                            tSubP->blacklist,
-                                           tSubP->covered,
-                                           tSubP->notifyOnMetadataChange);
+                                           tSubP->covered);
 
     // notification already consumed, it can be freed
     // Only one of the release operations will do something, but it is simpler (and safer)
@@ -2433,7 +2434,7 @@ static bool updateContextAttributeItem
   orion::BSONObjBuilder*    toSet,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
-  bool*                     actualUpdate,
+  ChangeType*               changeType,
   bool*                     entityModified,
   std::string*              currentLocAttrName,
   orion::BSONObjBuilder*    geoJson,
@@ -2448,10 +2449,10 @@ static bool updateContextAttributeItem
 {
   std::string err;
 
-  if (updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, isReplace, forcedUpdate, overrideMetadata, apiVersion))
+  if (updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, changeType, isReplace, forcedUpdate, overrideMetadata, apiVersion))
   {
     // Attribute was found
-    *entityModified = (*actualUpdate) || (*entityModified);
+    *entityModified = *entityModified || (*changeType != NO_CHANGE);
   }
   else
   {
@@ -2520,7 +2521,7 @@ static bool appendContextAttributeItem
   orion::BSONObjBuilder*    toSet,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
-  bool*                     actualUpdate,
+  ChangeType*               changeType,
   bool*                     entityModified,
   std::string*              currentLocAttrName,
   orion::BSONObjBuilder*    geoJson,
@@ -2533,9 +2534,9 @@ static bool appendContextAttributeItem
 {
   std::string err;
 
-  bool actualAppend = appendAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, actualUpdate, forcedUpdate, overrideMetadata, apiVersion);
+  bool actualAppend = appendAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, changeType, forcedUpdate, overrideMetadata, apiVersion);
 
-  *entityModified = (*actualUpdate) || (*entityModified);
+  *entityModified = *entityModified || (*changeType != NO_CHANGE);
 
   /* Check aspects related with location */
   /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
@@ -2685,7 +2686,8 @@ static bool processContextAttributeVector
   std::string               entityType      = cerP->entity.type;
   std::string               entityDetail    = cerP->entity.toString();
   bool                      entityModified  = false;
-  std::vector<std::string>  modifiedAttrs;
+  std::vector<std::string>  attrsWithModifiedValue;
+  std::vector<std::string>  attrsWithModifiedMd;
   std::vector<std::string>  attributes;
   ngsiv2::SubAltType        targetAltType = ngsiv2::SubAltType::EntityUpdate;
 
@@ -2706,7 +2708,7 @@ static bool processContextAttributeVector
 
     /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and
      * "append" it would keep the true value untouched */
-    bool actualUpdate = true;
+    ChangeType changeType = CHANGE_VALUE_AND_MD;
     if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
       if (!updateContextAttributeItem(cerP,
@@ -2718,7 +2720,7 @@ static bool processContextAttributeVector
                                       toSet,
                                       toUnset,
                                       attrNamesAdd,
-                                      &actualUpdate,
+                                      &changeType,
                                       &entityModified,
                                       currentLocAttrName,
                                       geoJson,
@@ -2743,7 +2745,7 @@ static bool processContextAttributeVector
                                       toSet,
                                       toUnset,
                                       attrNamesAdd,
-                                      &actualUpdate,
+                                      &changeType,
                                       &entityModified,
                                       currentLocAttrName,
                                       geoJson,
@@ -2787,18 +2789,29 @@ static bool processContextAttributeVector
       return false;
     }
 
-    /* Add the attribute to the list of modifiedAttrs, in order to check at the end if it triggers some
-     * subscription. Note that actualUpdate is always true in the case of  "delete" or "append",
-     * so the if statement is "bypassed" */
-    if (actualUpdate)
+    /* Add the attribute to the list of attrsWithModifiedValue and attrsWithModifiedMd, in order to
+     * check at the end if it triggers some subscription. Note that changeType is always CHANGE_VALUE_AND_MD
+     * in the case of  "delete" or "append" */
+    if (changeType == CHANGE_VALUE_AND_MD)
     {
-      modifiedAttrs.push_back(ca->name);
+      attrsWithModifiedValue.push_back(ca->name);
+      attrsWithModifiedMd.push_back(ca->name);
     }
+    else if (changeType == CHANGE_ONLY_VALUE)
+    {
+      attrsWithModifiedValue.push_back(ca->name);
+    }
+    else if (changeType == CHANGE_ONLY_MD)
+    {
+      attrsWithModifiedMd.push_back(ca->name);
+    }
+
     attributes.push_back(ca->name);
 
     /* If actual update then targetAltType changes from EntityUpdate (the value used to initialize
      * the variable) to EntityChange */
-    if (actualUpdate)
+    // FIXME PR: not sure about this condition...
+    if (changeType != NO_CHANGE)
     {
       targetAltType = ngsiv2::SubAltType::EntityChange;
     }
@@ -2811,7 +2824,7 @@ static bool processContextAttributeVector
   {
     LM_W(("Notification loop detected for entity id <%s> type <%s>, skipping subscription triggering", entityId.c_str(), entityType.c_str()));
   }
-  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, modifiedAttrs, subsToNotify, err, tenant, servicePathV, targetAltType))
+  else if (!addTriggeredSubscriptions(entityId, entityType, attributes, attrsWithModifiedValue, attrsWithModifiedMd, subsToNotify, err, tenant, servicePathV, targetAltType))
   {
     cerP->statusCode.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
@@ -3545,6 +3558,7 @@ static unsigned int updateEntity
     // (that would break the cases/1494_subscription_alteration_types/sub_alteration_type_entity_delete2.test case)
     if (!addTriggeredSubscriptions(notifyCerP->entity.id,
                                    notifyCerP->entity.type,
+                                   attrNames,
                                    attrNames,
                                    attrNames,
                                    subsToNotify,
@@ -4393,6 +4407,7 @@ unsigned int processContextElement
 
         if (!addTriggeredSubscriptions(eP->id,
                                        eP->type,
+                                       attrNames,
                                        attrNames,
                                        attrNames,
                                        subsToNotify,
