@@ -224,7 +224,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **conditions** : 通知をトリガーする属性のリストです。
 -   **expression** : 更新が来たときに通知を送信するかどうかを評価するために使用される式です。 次のフィールドで構成されています : q, mq, georel, geometry and/or coords (オプション)
 -   **count** : サブスクリプションに関連付けられて送信された通知の数です
--   **format** : 通知を送信するために使用する形式。可能な値はは **JSON**  (NGSIv1 レガシー形式の JSON 通知を意味する)、**normalized**, **keyValues**, **values** (最後の3つは NGSIv2 形式で使用されます) です
+-   **format** : 通知を送信するために使用する形式。可能な値はは **JSON**  (NGSIv1 レガシー形式の JSON 通知を意味する)、**normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues**, **values** (最後の5つは NGSIv2 形式で使用されます) です
 -   **status** : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)、
     または `oneshot` ([oneshot サブスクリプション](../orion-api.md#oneshot-subscriptions) の場合) のいずれか。Orion API
     は追加の状態 (`expired`など) を考慮しますが、DB にヒットすることはありません (Orion によって管理されます)
@@ -251,11 +251,11 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **maxFailsLimit**: 接続試行の最大制限を指定するために使用されるオプションのフィールド。これにより、失敗した通知の数に達すると、サブスクリプションは自動的に非アクティブ状態に移行します
 -   **failsCounter**: サブスクリプションに関連付けられた連続して失敗した通知の数。これは、通知の試行が失敗するたびに1つずつ増加します。通知の試行が成功すると、0にリセットされます
 -   **altTypes**: サブスクリプションに関連付けられた変更タイプ (alteration types) のリストを含む配列。フィールドが含まれていない場合は、デフォルトが想定されます ([このドキュメント](../orion-api.md#subscriptions-based-in-alteration-type)を確認してください)
-
 -   **covered**: すべての `attrs` を通知に含める必要があるか (値がtrueの場合)、トリガー・エンティティに存在するものだけを含める必要があるか
     (値がfalseの場合、またはフィールドが省略されている場合) を指定するブール・フィールド
     詳細については、Orion API 仕様の[対象サブスクリプション・セクション](../orion-api.md#covered-subscriptions)
     を参照してください。
+-   **notifyOnMetadataChange**: `true` の場合、メタデータはサブスクリプションのトリガーに関する属性の値の一部と見なされます。`false` の場合、メタデータはサブスクリプションのトリガーに関する属性の値の一部と見なされません。 デフォルトの動作 (省略された場合) は `true` の動作です。
 
 サンプルドキュメント :
 
