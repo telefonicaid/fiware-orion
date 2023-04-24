@@ -6,7 +6,7 @@ This guide is a brief guide to the most common characteristics of Orion-LD, with
 It is imperative to have a running instance of Orion-LD and MongoDB to play with for this exercise.
 
 Orion-LD is an enhanced [Orion](https://github.com/telefonicaid/fiware-orion) and implements (apart from what Orion offers) the NGSI-LD API.
-The NGSI-LD API is specified [here](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.01.01_60/gs_CIM009v010101p.pdf) and while it's a pretty extensive
+The NGSI-LD API is specified [here](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_CIM009v010601p.pdf) and while it's a pretty extensive
 document, anybody that is really going to work with NGSI-LD should definitely read this document. And use it as a reference, of course.
 
 The first thing to do is to thoroughly read [this quick guide to the @context](doc/manuals-ld/the-context.md).
