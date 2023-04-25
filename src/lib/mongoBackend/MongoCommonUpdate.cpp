@@ -944,7 +944,8 @@ static bool addTriggeredSubscriptions_withCache
     StringList aList;
     if (cSubP->onlyChanged)
     {
-      if (!subToNotifyList(cSubP->attributes, attributes, aList, cSubP->blacklist))
+      subToNotifyList(cSubP->attributes, attributes, aList, cSubP->blacklist);
+      if (aList.size() == 0)
       {
         continue;
       }
@@ -1725,11 +1726,18 @@ static bool addTriggeredSubscriptions_noCache
         httpInfo.fill(sub);
       }
 
-      bool op = false;
-      StringList aList = subToAttributeList(sub, onlyChanged, blacklist, attributes, op);
-      if (op)
+      StringList aList;
+      if (onlyChanged)
       {
-         continue;
+        aList = subToAttributeList(sub, blacklist, attributes);
+        if (aList.size() == 0)
+        {
+           continue;
+        }
+      }
+      else
+      {
+        aList = subToAttributeList(sub);
       }
 
       TriggeredSubscription* trigs = new TriggeredSubscription

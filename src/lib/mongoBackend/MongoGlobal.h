@@ -300,7 +300,7 @@ extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
 *
 * subToNotifyList -
 */
-bool  subToNotifyList
+void  subToNotifyList
 (
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
@@ -318,10 +318,8 @@ bool  subToNotifyList
 extern StringList subToAttributeList
 (
   const orion::BSONObj&           attrL,
-  const bool&                     onlyChanged,
   const bool&                     blacklist,
-  const std::vector<std::string>  attributes,
-  bool&                           op
+  const std::vector<std::string>  attributes
 );
 
 
@@ -332,10 +330,7 @@ extern StringList subToAttributeList
 *
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
-// FIXME PR
-#if 1
 extern StringList subToAttributeList(const orion::BSONObj& attrL);
-#endif
 
 
 

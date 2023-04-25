@@ -2304,9 +2304,8 @@ static void getDifferenceAttributes
 *
 * subToNotifyList -
 *
-* Return true if some attribute was added to the list
 */
-bool subToNotifyList
+void subToNotifyList
 (
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
@@ -2319,7 +2318,7 @@ bool subToNotifyList
     if (blacklist)
     {
       // By definition, notificationVector cannot be empty in blacklist case
-      // FIXME PR: we should have .test to ensure this is detected at parsing stage
+      // (checked at parsing time)
       getDifferenceAttributes(entityAttrsVector, notificationVector, notifyAttrs);
       attrL.fill(notifyAttrs);
     }
@@ -2336,8 +2335,6 @@ bool subToNotifyList
         attrL.fill(notifyAttrs);
       }
     }
-
-    return (attrL.size() != 0);
 }
 
 
@@ -2352,20 +2349,10 @@ bool subToNotifyList
 StringList subToAttributeList
 (
   const orion::BSONObj&           sub,
-  const bool&                     onlyChanged,
   const bool&                     blacklist,
-  const std::vector<std::string>  attributes,
-  bool&                           op
+  const std::vector<std::string>  attributes
 )
 {
-  if (!onlyChanged)
-  {
-    // FIXME PR: this is weird... In this case op is always the same a in the caller, i.e. false
-    // thus it ends in a continue in the caller...
-    return subToAttributeList(sub);
-    //StringList attrL;
-    //return attrL;
-  }
   StringList                       attrL;
   std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
   std::vector<std::string>         notificationAttrs;
@@ -2374,13 +2361,12 @@ StringList subToAttributeList
     std::string subAttr = subAttrs[ix].String();
     notificationAttrs.push_back(subAttr);
   }
-  op = !subToNotifyList(notificationAttrs, attributes, attrL, blacklist);
+  subToNotifyList(notificationAttrs, attributes, attrL, blacklist);
   return attrL;
 }
 
 
 
-#if 1
 /* ****************************************************************************
 *
 * subToAttributeList -
@@ -2402,7 +2388,6 @@ StringList subToAttributeList(const orion::BSONObj& sub)
 
   return attrL;
 }
-#endif
 
 
 
