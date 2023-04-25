@@ -942,11 +942,9 @@ static bool addTriggeredSubscriptions_withCache
     //           instead of its std::vector<std::string> ... ?
     //
     StringList aList;
-    bool op = false;
     if (cSubP->onlyChanged)
     {
-      subToNotifyList(cSubP->attributes, attributes, aList, cSubP->blacklist, op);
-      if (op)
+      if (!subToNotifyList(cSubP->attributes, attributes, aList, cSubP->blacklist))
       {
         continue;
       }

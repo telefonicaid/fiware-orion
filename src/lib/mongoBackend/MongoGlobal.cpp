@@ -2303,14 +2303,15 @@ static void getDifferenceAttributes
 /* ****************************************************************************
 *
 * subToNotifyList -
+*
+* Return true if some attribute was added to the list
 */
-void subToNotifyList
+bool subToNotifyList
 (
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
   StringList&                      attrL,
-  const bool&                      blacklist,
-  bool&                            op
+  const bool&                      blacklist
 )
 {
     std::vector<std::string>  notifyAttrs;
@@ -2335,8 +2336,8 @@ void subToNotifyList
         attrL.fill(notifyAttrs);
       }
     }
-    // FIXME PR: better as return value
-    op = (attrL.size() == 0);
+
+    return (attrL.size() != 0);
 }
 
 
@@ -2373,7 +2374,7 @@ StringList subToAttributeList
     std::string subAttr = subAttrs[ix].String();
     notificationAttrs.push_back(subAttr);
   }
-  subToNotifyList(notificationAttrs, attributes, attrL, blacklist, op);
+  op = subToNotifyList(notificationAttrs, attributes, attrL, blacklist);
   return attrL;
 }
 
