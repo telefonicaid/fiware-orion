@@ -178,7 +178,7 @@ static void optionsParse(const char* options)
 
       *cP = 0;  // Zero-terminate
 
-      LM_T(LmtUriParamOptions, ("Got a value for options: %s", optionStart));
+      LM_T(LmtUriParamOptions, ("Got a value for the 'options' URI param: %s", optionStart));
 
       if      (strcmp(optionStart, "update")        == 0)  orionldState.uriParamOptions.update        = true;
       else if (strcmp(optionStart, "replace")       == 0)  orionldState.uriParamOptions.replace       = true;
@@ -225,19 +225,9 @@ static void optionsParse(const char* options)
   else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.sysAttrs)
     orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when /simplified/ output format is selected", 400);
   else if (orionldState.uriParamOptions.keyValues == true)
-  {
     orionldState.out.format = RF_KEYVALUES;
-    LM_T(LmtUriParamOptions, ("Set orionldState.out.format to RF_KEYVALUES"));
-  }
   else if (orionldState.uriParamOptions.concise == true)
-  {
     orionldState.out.format = RF_CONCISE;
-    LM_T(LmtUriParamOptions, ("Set orionldState.out.format to RF_CONCISE"));
-  }
-
-  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.keyValues:  %s", (orionldState.uriParamOptions.keyValues == true)? "ON" : "OFF"));
-  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.concise:    %s", (orionldState.uriParamOptions.concise   == true)? "ON" : "OFF"));
-  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.normalized: %s", (orionldState.uriParamOptions.concise   == true)? "ON" : "OFF"));
 }
 
 
@@ -413,6 +403,8 @@ bool pCheckTenantName(const char* dbName)
 //
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
+  LM_T(LmtHeaders, ("Got an HTTP Header: '%s': '%s'", key, value));
+
   //
   // Need to keep track of ALL incoming headers, in case they're asked for in forwarded requests
   // This is copying information, but as it is not a default behaviour, that's OK.
@@ -520,6 +512,8 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
 //
 MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
+  LM_T(LmtUriParams, ("Got a URI param '%s': '%s'", key, value));
+
   // NULL/empty URI param value
   if ((value == NULL) || (*value == 0))
   {

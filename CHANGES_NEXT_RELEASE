@@ -63,3 +63,6 @@
 * Issue #1348  Unsupported value added mongodb url
 * Issue #1353  properties/relationships in regs now also supported as propertyNames/relationshipNames in requests for non experimental
 * Issue #1353  properties/relationships in regs is now propertyNames/relationshipNames in all responses for GET Regs
+* Issue #280   Implemented trace messages for incoming URL parameters (trace level LmtUriParams (-t 33))
+* Issue #280   Implemented trace messages for incoming HTTP headers (trace level LmtHeaders (-t 32))
+ 
