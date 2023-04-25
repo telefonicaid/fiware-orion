@@ -66,7 +66,6 @@ public:
                                 const std::vector<std::string>&  attrsFilter,
                                 bool                             blacklist,
                                 bool                             covered,
-                                bool                             notifyOnMetadataChange,
                                 const std::vector<std::string>&  metadataFilter);
   int start();
   size_t queueSize(const std::string& service);
