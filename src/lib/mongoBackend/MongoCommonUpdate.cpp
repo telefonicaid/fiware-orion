@@ -945,7 +945,7 @@ static bool addTriggeredSubscriptions_withCache
     bool op = false;
     if (cSubP->onlyChanged)
     {
-      subToNotifyList(attrsWithModifiedValue, cSubP->notifyConditionV, cSubP->attributes, attributes, aList, cSubP->blacklist, op);
+      subToNotifyList(cSubP->attributes, attributes, aList, cSubP->blacklist, op);
       if (op)
       {
         continue;
@@ -1728,7 +1728,7 @@ static bool addTriggeredSubscriptions_noCache
       }
 
       bool op = false;
-      StringList aList = subToAttributeList(sub, onlyChanged, blacklist, attrsWithModifiedValue, attributes, op);
+      StringList aList = subToAttributeList(sub, onlyChanged, blacklist, attributes, op);
       if (op)
       {
          continue;
@@ -2810,7 +2810,6 @@ static bool processContextAttributeVector
 
     /* If actual update then targetAltType changes from EntityUpdate (the value used to initialize
      * the variable) to EntityChange */
-    // FIXME PR: not sure about this condition...
     if (changeType != NO_CHANGE)
     {
       targetAltType = ngsiv2::SubAltType::EntityChange;
