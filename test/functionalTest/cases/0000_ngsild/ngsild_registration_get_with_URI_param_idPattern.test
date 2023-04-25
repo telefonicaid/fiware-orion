@@ -220,7 +220,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg05
 02. Get registration 02 and 03 using URI param idPattern=urn:ngsi-ld:pattern.*
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 1025
+Content-Length: 1039
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -240,11 +240,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }
@@ -264,11 +264,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }
@@ -281,7 +281,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 03. Get registration 01, 04 and 05 using URI param idPattern=urn:ngsi-ld:r.*
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 1512
+Content-Length: 1533
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -301,11 +301,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }
@@ -325,11 +325,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }
@@ -349,11 +349,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }
@@ -366,7 +366,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. Get registration 01 using URI param idPattern=urn:ngsi-ld:reg01
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 506
+Content-Length: 513
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -386,11 +386,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }

@@ -103,12 +103,12 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
         if (kjTreeToEntIdVector(infoNodeP, &regP->dataProvided.entities) == false)
           return false;  // orionldError is invoked by kjTreeToEntIdVector
       }
-      else if (strcmp(infoNodeP->name, "properties") == 0)
+      else if ((strcmp(infoNodeP->name, "properties") == 0) || (strcmp(infoNodeP->name, "propertyNames") == 0))
       {
-        DUPLICATE_CHECK(propertiesP, "Registration::information::properties", infoNodeP);
+        DUPLICATE_CHECK(propertiesP, "Registration::information::propertyNames", infoNodeP);
         if (infoNodeP->value.firstChildP == NULL)
         {
-          orionldError(OrionldBadRequestData, "Empty Array", "information::properties", 400);
+          orionldError(OrionldBadRequestData, "Empty Array", "information::propertyNames", 400);
           return false;
         }
 
@@ -120,13 +120,13 @@ static bool kjTreeToRegistrationInformation(KjNode* regInfoNodeP, ngsiv2::Regist
           regP->dataProvided.propertyV.push_back(propP->value.s);
         }
       }
-      else if (strcmp(infoNodeP->name, "relationships") == 0)
+      else if ((strcmp(infoNodeP->name, "relationships") == 0) || (strcmp(infoNodeP->name, "relationshipNames") == 0))
       {
-        DUPLICATE_CHECK(relationshipsP, "Registration::information::relationships", infoNodeP);
+        DUPLICATE_CHECK(relationshipsP, "Registration::information::relationshipNames", infoNodeP);
 
         if (infoNodeP->value.firstChildP == NULL)
         {
-          orionldError(OrionldBadRequestData, "Empty Array", "information::relationships", 400);
+          orionldError(OrionldBadRequestData, "Empty Array", "information::relationshipNames", 400);
           return false;
         }
 

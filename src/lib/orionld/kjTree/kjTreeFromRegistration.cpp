@@ -186,7 +186,7 @@ KjNode* kjTreeFromRegistration(ngsiv2::Registration* registrationP)
     size = registrationP->dataProvided.propertyV.size();
     if (size != 0)
     {
-      arrayP2 = kjArray(orionldState.kjsonP, "properties");
+      arrayP2 = kjArray(orionldState.kjsonP, "propertyNames");
 
       for (unsigned int pIx = 0; pIx < size; pIx++)
       {
@@ -201,7 +201,7 @@ KjNode* kjTreeFromRegistration(ngsiv2::Registration* registrationP)
     size = registrationP->dataProvided.relationshipV.size();
     if (size != 0)
     {
-      arrayP2 = kjArray(orionldState.kjsonP, "relationships");
+      arrayP2 = kjArray(orionldState.kjsonP, "relationshipNames");
 
       for (unsigned int rIx = 0; rIx < size; rIx++)
       {
