@@ -211,7 +211,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg05
 02. Get registration 02 using URI param type=T1
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 501
+Content-Length: 508
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -231,11 +231,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "T1"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }
@@ -248,7 +248,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 03. Get registration 01, 03, and 05, using URI param type=T1, T3, T5
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 1497
+Content-Length: 1518
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -268,11 +268,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "T1"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }
@@ -292,11 +292,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "T3"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }
@@ -316,11 +316,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "T5"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "brandName",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "isParked"
         ]
       }

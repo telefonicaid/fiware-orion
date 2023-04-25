@@ -636,7 +636,7 @@ bye
 03. GET the registration, with sysAttrs included
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 2011
+Content-Length: 2018
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -658,11 +658,11 @@ Date: REGEX(.*)
           "type": "Vehicle"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "brandName",
         "speed"
       ],
-      "relationships": [
+      "relationshipNames": [
         "isParked"
       ]
     }
@@ -923,12 +923,12 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 07. Attempt to create a registration with an empty array for 'properties' inside 'information' - see error
 ==========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 118
+Content-Length: 121
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "information::properties",
+    "detail": "information::propertyNames",
     "title": "Empty Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -937,12 +937,12 @@ Date: REGEX(.*)
 08. Attempt to create a registration with an empty array for 'relationaships' inside 'information' - see error
 ==============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 121
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "information::relationships",
+    "detail": "information::relationshipNames",
     "title": "Empty Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

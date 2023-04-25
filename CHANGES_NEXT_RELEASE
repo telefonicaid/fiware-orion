@@ -61,3 +61,5 @@
 * Issue #1343  Added the HTTP header (well, for mqtt notfications also) 'Host' for notifications
 * Issue #1344  Accepting hyphen as a valid character for a tenant
 * Issue #1348  Unsupported value added mongodb url
+* Issue #1353  properties/relationships in regs now also supported as propertyNames/relationshipNames in requests for non experimental
+* Issue #1353  properties/relationships in regs is now propertyNames/relationshipNames in all responses for GET Regs

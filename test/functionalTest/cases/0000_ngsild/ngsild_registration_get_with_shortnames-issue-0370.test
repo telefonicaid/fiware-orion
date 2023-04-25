@@ -81,7 +81,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/REGEX(.*)
 02. GET all registrations, accepting application/ld+json
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 587
+Content-Length: 594
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -99,10 +99,10 @@ Date: REGEX(.*)
             "type": "Building"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "tweets"
         ],
-        "relationships": [
+        "relationshipNames": [
           "tweets"
         ]
       }

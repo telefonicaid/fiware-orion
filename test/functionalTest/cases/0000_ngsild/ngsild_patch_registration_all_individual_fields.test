@@ -523,7 +523,7 @@ bye
 03. GET the registration to see the ORIGINAL
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 1031
+Content-Length: 1038
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -543,11 +543,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "Vehicle"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "brandName",
         "speed"
       ],
-      "relationships": [
+      "relationshipNames": [
         "isParked"
       ]
     }
@@ -596,7 +596,7 @@ Date: REGEX(.*)
 05. GET the registration and see the new name
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 1037
+Content-Length: 1044
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -616,11 +616,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "Vehicle"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "brandName",
         "speed"
       ],
-      "relationships": [
+      "relationshipNames": [
         "isParked"
       ]
     }
@@ -669,7 +669,7 @@ Date: REGEX(.*)
 07. GET the registration and see the new description
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 1031
+Content-Length: 1038
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -689,11 +689,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "Vehicle"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "brandName",
         "speed"
       ],
-      "relationships": [
+      "relationshipNames": [
         "isParked"
       ]
     }
@@ -742,7 +742,7 @@ Date: REGEX(.*)
 09. GET the registration and see the new information array
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 977
+Content-Length: 984
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -762,10 +762,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -885,7 +885,7 @@ Date: REGEX(.*)
 12. GET the registration and see the new observationInterval
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 977
+Content-Length: 984
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -905,10 +905,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -957,7 +957,7 @@ Date: REGEX(.*)
 14. GET the registration and see the new managementInterval
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 977
+Content-Length: 984
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -977,10 +977,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -1029,7 +1029,7 @@ Date: REGEX(.*)
 16. GET the registration and see the new location
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 976
+Content-Length: 983
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1049,10 +1049,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -1101,7 +1101,7 @@ Date: REGEX(.*)
 18. GET the registration and see the new observationSpace
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 975
+Content-Length: 982
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1121,10 +1121,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -1173,7 +1173,7 @@ Date: REGEX(.*)
 20. GET the registration and see the new operationSpace
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 974
+Content-Length: 981
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1193,10 +1193,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -1245,7 +1245,7 @@ Date: REGEX(.*)
 22. GET the registration and see the new expires
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 974
+Content-Length: 981
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1265,10 +1265,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -1317,7 +1317,7 @@ Date: REGEX(.*)
 24. GET the registration and see the new endpoint
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 972
+Content-Length: 979
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1337,10 +1337,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -1389,7 +1389,7 @@ Date: REGEX(.*)
 26. GET the registration and see the new P1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 979
+Content-Length: 986
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1409,10 +1409,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -1468,7 +1468,7 @@ Date: REGEX(.*)
 28. GET the registration and see no P7 (patch only replaces, it doesn't add)
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 979
+Content-Length: 986
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1488,10 +1488,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1"
       ],
-      "relationships": [
+      "relationshipNames": [
         "R1"
       ]
     }
@@ -1612,7 +1612,7 @@ Date: REGEX(.*)
 31. GET the registration and see all the fields updated
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 1104
+Content-Length: 1107
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1636,7 +1636,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
           "type": "T3"
         }
       ],
-      "properties": [
+      "propertyNames": [
         "P1",
         "P2",
         "P3"
