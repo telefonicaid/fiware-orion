@@ -2374,7 +2374,7 @@ StringList subToAttributeList
     std::string subAttr = subAttrs[ix].String();
     notificationAttrs.push_back(subAttr);
   }
-  op = subToNotifyList(notificationAttrs, attributes, attrL, blacklist);
+  op = !subToNotifyList(notificationAttrs, attributes, attrL, blacklist);
   return attrL;
 }
 
