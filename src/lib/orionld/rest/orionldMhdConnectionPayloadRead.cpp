@@ -48,7 +48,7 @@ MHD_Result orionldMhdConnectionPayloadRead
   size_t  dataLen = *upload_data_size;
 
   //
-  // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
+  // If the HTTP header says the request is bigger than inReqPayloadMaxSize,
   // just silently "eat" the entire message.
   //
   // The problem occurs when the broker is lied to and there aren't orionldState.in.contentLength
@@ -60,7 +60,7 @@ MHD_Result orionldMhdConnectionPayloadRead
   // See github issue:
   //   https://github.com/telefonicaid/fiware-orion/issues/2761
   //
-  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
+  if ((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize)
   {
     //
     // Errors can't be returned yet, postpone ...
