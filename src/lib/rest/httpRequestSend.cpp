@@ -478,7 +478,7 @@ int httpRequestSendWithCurl
 
 
   // Check if total outgoing message size is too big
-  if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
+  if ((unsigned long long) outgoingMsgSize > outReqMsgMaxSize)
   {
     if (metricsMgr.isOn())
       metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);

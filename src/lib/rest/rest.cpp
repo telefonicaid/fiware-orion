@@ -1055,10 +1055,10 @@ ConnectionInfo* connectionTreatInit
 
   orionldHeaderAdd(&orionldState.out.headers, HttpCorrelator, orionldState.correlator, 0);
 
-  if ((orionldState.in.contentLength > PAYLOAD_MAX_SIZE) && (orionldState.apiVersion == V2))
+  if (((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize) && (orionldState.apiVersion == V2))
   {
     char details[256];
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", orionldState.in.contentLength, PAYLOAD_MAX_SIZE);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", orionldState.in.contentLength, inReqPayloadMaxSize);
 
     alarmMgr.badInput(clientIp, details);
     OrionError oe(SccRequestEntityTooLarge, details);
@@ -1198,7 +1198,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   size_t  dataLen = *upload_data_size;
 
   //
-  // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
+  // If the HTTP header says the request is bigger than inReqPayloadMaxSize,
   // just silently "eat" the entire message.
   //
   // The problem occurs when the broker is lied to and there aren't orionldState.in.contentLength
@@ -1210,7 +1210,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   // See github issue:
   //   https://github.com/telefonicaid/fiware-orion/issues/2761
   //
-  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
+  if ((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize)
   {
     //
     // Errors can't be returned yet, postpone ...
@@ -1431,11 +1431,11 @@ static MHD_Result connectionTreat
   //
   // If the incoming request was too big, return error about it
   //
-  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
+  if ((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize)
   {
     char details[256];
 
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", orionldState.in.contentLength, PAYLOAD_MAX_SIZE);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", orionldState.in.contentLength, inReqPayloadMaxSize);
     alarmMgr.badInput(clientIp, details);
     restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
 
