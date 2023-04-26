@@ -60,7 +60,7 @@ class SubscriptionUpdate : public Subscription
     blacklistProvided(false),
     onlyChangedProvided(false),
     coveredProvided(false),
-    notifyOnMetadataChangeProvided(false),
+    notifyOnMetadataChangeProvided(true),
     fromNgsiv1(false)
   {
     descriptionProvided = false;

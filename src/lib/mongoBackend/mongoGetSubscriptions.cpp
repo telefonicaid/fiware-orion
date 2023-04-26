@@ -457,5 +457,3 @@ void mongoGetSubscription
 
   *oe = OrionError(SccOk);
 }
-
-

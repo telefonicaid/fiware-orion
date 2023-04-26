@@ -1914,7 +1914,8 @@ static bool processNotification
   unsigned int                     correlatorCounter,
   const ngsiv2::Notification&      notification,
   bool                             blacklist = false,
-  bool                             covered = false)
+  bool                             covered = false
+)
 {
   notifStaticFields nsf;
 
@@ -1934,7 +1935,6 @@ static bool processNotification
                                           blacklist,
                                           covered,
                                           metadataV);
-
 
   return true;
 }

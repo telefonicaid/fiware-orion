@@ -122,8 +122,12 @@ struct Condition
   std::vector<std::string>  attributes;
   SubscriptionExpression    expression;
   std::vector<SubAltType>   altTypes;
-  bool                      notifyOnMetadataChange = true;
+  bool                      notifyOnMetadataChange;
   std::string               toJson();
+
+  Condition():
+    notifyOnMetadataChange(true)
+  {}
 };
 
 
