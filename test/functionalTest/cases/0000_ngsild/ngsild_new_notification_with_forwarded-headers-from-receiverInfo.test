@@ -32,8 +32,10 @@ accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
 
 #
 # 01. Create a subscription S1 with 3 headers in receiverInfo
-# 02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization
-# 03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization
+# 02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization AND FIWARE-Correlator
+# 03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization AND FIWARE-Correlator from step 02
+# 04. Update Entity E1, matching S1, but NO FIWARE-Correlator header
+# 05. Dump accumulator and make sure the FIWARE-Correlator header is not present
 #
 
 echo "01. Create a subscription S1 with 3 headers in receiverInfo"
@@ -64,6 +66,10 @@ payload='{
         {
           "key": "H3",
           "value": "789"
+        },
+        {
+          "key": "FIWARE-Correlator",
+          "value": "urn:ngsi-ld:request"
         }
       ]
     }
@@ -74,8 +80,8 @@ echo
 echo
 
 
-echo "02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization"
-echo "=========================================================================================="
+echo "02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization AND FIWARE-Correlator"
+echo "================================================================================================================"
 payload='{
   "id": "urn:ngsi-ld:entities:T:E1",
   "type": "T",
@@ -92,13 +98,31 @@ payload='{
     "value": "ok"
   }
 }'
-orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "X-Auth-Token: XHT" -H "Authorization: Auth123"
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "X-Auth-Token: XHT" -H "Authorization: Auth123" -H "FIWARE-Correlator: abc"
 echo
 echo
 
 
-echo "03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization"
-echo "================================================================================================================="
+echo "03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization AND FIWARE-Correlator from step 02"
+echo "===================================================================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Update Entity E1, matching S1, but NO FIWARE-Correlator header"
+echo "=================================================================="
+payload='{
+  "P1": "Step 04"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator and make sure the FIWARE-Correlator header is not present"
+echo "=============================================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -115,8 +139,8 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 
 
 
-02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization
-==========================================================================================
+02. Create an Entity E1, matching S1, and with HTTP headers X-Auth-Token and Authorization AND FIWARE-Correlator
+================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -124,13 +148,57 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 
 
 
-03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization
-=================================================================================================================
+03. Dump accumulator to see one notification with the three receiverInfo headers + X-Auth-Token and Authorization AND FIWARE-Correlator from step 02
+====================================================================================================================================================
 POST REGEX(.*)
 Content-Length: 282
 Authorization: Auth123
 X-Auth-Token: XHT
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Fiware-Correlator: abc
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+H1: 123
+H2: 456
+H3: 789
+
+{
+    "data": [
+        {
+            "P1": {
+                "Sub-R1": {
+                    "object": "urn:E1"
+                },
+                "value": 1
+            },
+            "P2": "ok",
+            "id": "urn:ngsi-ld:entities:T:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
+    "notifiedAt": "202REGEX(.*)",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+04. Update Entity E1, matching S1, but NO FIWARE-Correlator header
+==================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Dump accumulator and make sure the FIWARE-Correlator header is not present
+==============================================================================
+POST REGEX(.*)
+Content-Length: 290
+User-Agent: orionld/post-v1.1.0
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -147,7 +215,7 @@ H3: 789
                 "Sub-R1": {
                     "object": "urn:E1"
                 },
-                "value": 1
+                "value": "Step 04"
             },
             "P2": "ok",
             "id": "urn:ngsi-ld:entities:T:E1",

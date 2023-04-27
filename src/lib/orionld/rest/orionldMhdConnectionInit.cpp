@@ -409,16 +409,16 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   // Need to keep track of ALL incoming headers, in case they're asked for in forwarded requests
   // This is copying information, but as it is not a default behaviour, that's OK.
   // Distributed operations slow down everything SO MUCH, so, ... I'm perfectly fine with this copy
+  // Actually, I will need these for notifications as well ...
   //
-  if (distributed == true)
-  {
-    KjNode* kvP = kjString(orionldState.kjsonP, key, value);
+  // if (distributed == true)
+  //
+  KjNode* kvP = kjString(orionldState.kjsonP, key, value);
 
-    if (orionldState.in.httpHeaders == NULL)
-      orionldState.in.httpHeaders = kjObject(orionldState.kjsonP, NULL);
+  if (orionldState.in.httpHeaders == NULL)
+    orionldState.in.httpHeaders = kjObject(orionldState.kjsonP, NULL);
 
-    kjChildAdd(orionldState.in.httpHeaders, kvP);
-  }
+  kjChildAdd(orionldState.in.httpHeaders, kvP);
 
   if (strcasecmp(key, "Orionld-Legacy") == 0)
   {

@@ -529,7 +529,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
           kjTreeLog(orionldState.in.httpHeaders, "orionldState.in.httpHeaders", LmtDistOpMsgs);
           KjNode* kvP = kjLookup(orionldState.in.httpHeaders, keyP->value.s);
 
-          if (kvP != NULL)
+          if ((kvP != NULL) && (kvP->type == KjString))
           {
             char header[512];
             snprintf(header, sizeof(header), "%s: %s", kvP->name, kvP->value.s);
