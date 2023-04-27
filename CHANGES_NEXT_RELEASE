@@ -67,3 +67,4 @@
 * Issue #280   Implemented trace messages for incoming HTTP headers (trace level LmtHeaders (-t 32))
 * Issue #1356  Made Orion-LD accept a configureable max size for incoming/outgoing payload bodies
 * Issue #280   Fixed a bug about keyValues returned as normalized when distributed operations but no hits on regs
+* Issue #280   Added the feature of "urn:ngsi-ld:request" to notifications (forwarding a header with its value from the initial request)

@@ -784,9 +784,23 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   for (std::map<std::string, std::string>::const_iterator it = mAltP->subP->httpInfo.headers.begin(); it != mAltP->subP->httpInfo.headers.end(); ++it)
   {
     const char* key    = it->first.c_str();
-    const char* value  = it->second.c_str();
+    char*       value  = (char*) it->second.c_str();
     int         len    = strlen(key) + strlen(value) + 10;
     char*       buf    = kaAlloc(&orionldState.kalloc, len);
+
+    if (strcmp(value, "urn:ngsi-ld:request") == 0)
+    {
+      if (orionldState.in.httpHeaders != NULL)
+      {
+        KjNode* kvP = kjLookup(orionldState.in.httpHeaders, key);
+        if ((kvP != NULL) && (kvP->type == KjString))
+          value = kvP->value.s;
+        else
+          continue;  // Not found in initial request - ignoring the header
+      }
+      else
+        continue;  // No incoming headers?  Must ignore the urn:ngsi-ld:request header, no other choice
+    }
 
     ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
     ioVec[headerIx].iov_base = buf;
