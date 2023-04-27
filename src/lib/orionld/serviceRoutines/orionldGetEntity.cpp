@@ -133,6 +133,10 @@ bool orionldGetEntity(void)
     if (orionldState.distributed == true)
     {
       forcedSysAttrs = true;
+      //
+      // For forwarded requests, I NEED sysAttrs (to pick attribute in case there's more than one)
+      // And, Normalized is the format for Distributed operations
+      //
       apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, lang, true, &orionldState.pd);
     }
     else
@@ -334,7 +338,7 @@ bool orionldGetEntity(void)
     }
   }
 
-  if (forwards > 0)
+  if ((forwards > 0) || (forcedSysAttrs == true))  // Nothing to do with SysAttrs really, just a bieffekt
   {
     // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
 
