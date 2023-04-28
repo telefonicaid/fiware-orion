@@ -224,7 +224,7 @@ Date: REGEX(.*)
 03. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 421
+Content-Length: 451
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -249,7 +249,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -280,7 +281,7 @@ Date: REGEX(.*)
 06. GET subscription, see NO error stats in notification field
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 470
+Content-Length: 500
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -306,7 +307,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -366,7 +368,7 @@ Date: REGEX(.*)
 10. GET subscription, see error stats in notification field
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 484
+Content-Length: 514
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -393,7 +395,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

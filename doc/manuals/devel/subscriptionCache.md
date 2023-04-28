@@ -71,6 +71,7 @@ When the broker starts, the subscription cache is populated with the subscriptio
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;
+  bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure

@@ -309,7 +309,7 @@ Date: REGEX(.*)
 02. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 302
+Content-Length: 332
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -332,7 +332,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -355,7 +356,7 @@ Date: REGEX(.*)
 04. GET subscription and see covered=true
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 301
+Content-Length: 331
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -378,7 +379,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -401,7 +403,7 @@ Date: REGEX(.*)
 06. GET subscription and see covered=true
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 302
+Content-Length: 332
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -424,7 +426,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -447,7 +450,7 @@ Date: REGEX(.*)
 08. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 303
+Content-Length: 333
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -470,7 +473,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -493,7 +497,7 @@ Date: REGEX(.*)
 10. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 303
+Content-Length: 333
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -516,7 +520,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

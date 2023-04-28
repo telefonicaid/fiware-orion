@@ -174,7 +174,7 @@ Date: REGEX(.*)
 02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 344
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -196,7 +196,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -219,7 +220,7 @@ Date: REGEX(.*)
 04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 344
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -241,7 +242,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -264,7 +266,7 @@ Date: REGEX(.*)
 06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 311
+Content-Length: 341
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -286,7 +288,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -309,7 +312,7 @@ Date: REGEX(.*)
 08. Get sub, see http element
 =============================
 HTTP/1.1 200 OK
-Content-Length: 289
+Content-Length: 319
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -329,7 +332,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -352,7 +356,7 @@ Date: REGEX(.*)
 10. Get sub, see url=mqtt://localhost:1885, topic=/orionbk, qos=1
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 346
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -374,7 +378,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

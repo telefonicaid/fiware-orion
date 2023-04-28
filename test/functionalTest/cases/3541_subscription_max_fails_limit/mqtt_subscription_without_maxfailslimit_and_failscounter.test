@@ -144,7 +144,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit or failsCounter
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 367
+Content-Length: 397
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -170,7 +170,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -193,7 +194,7 @@ Date: REGEX(.*)
 05. GET /v2/subscriptions/subscription_id, to check failsCounter:1
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 485
+Content-Length: 515
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -223,7 +224,8 @@ Date: REGEX(.*)
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
