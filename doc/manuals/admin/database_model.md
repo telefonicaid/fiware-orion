@@ -343,7 +343,7 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
 -   **covered**: a boolean field that specifies if all `attrs` have to be included in notifications (if value is true)
     or only the ones existing in the triggering entity (if value is false or field is omitted).
     More information in [covered subscription section in Orion API specification](../orion-api.md#covered-subscriptions).
--   **notifyOnMetadataChange**: a boolean variable that defines to trigger notifications only for metadata changes (if the value is true) or If only the metadata changes, avoid trigger notifications (if the value is false).
+-   **notifyOnMetadataChange**: if `true` metadata is considered part of the value of the attribute regarding subscription triggering. If `false` metadata is not considered part of the value of the attribute regarding subscription triggering. Default behaviour (if omitted) is the one for `true`.
 
 Example document:
 

@@ -300,12 +300,13 @@ extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
 *
 * subToNotifyList -
 */
-void  subToNotifyList
+void subToNotifyList
 (
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
   StringList&                      attrL,
-  const bool&                      blacklist);
+  const bool&                      blacklist
+);
 
 
 

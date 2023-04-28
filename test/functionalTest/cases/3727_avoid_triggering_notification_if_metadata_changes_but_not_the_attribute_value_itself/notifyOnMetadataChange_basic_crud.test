@@ -133,7 +133,7 @@ echo
 
 
 echo "06. GET subscription and see notifyOnMetadataChange true"
-echo "=============================================================="
+echo "========================================================"
 orionCurl --url /v2/subscriptions/$subId
 echo
 echo
@@ -196,10 +196,6 @@ echo "========================================================"
 orionCurl --url /v2/subscriptions/$subId
 echo
 echo
-
-
-
-
 
 
 --REGEXPECT--
@@ -304,7 +300,7 @@ Date: REGEX(.*)
 
 
 06. GET subscription and see notifyOnMetadataChange true
-==============================================================
+========================================================
 HTTP/1.1 200 OK
 Content-Length: 304
 Content-Type: application/json

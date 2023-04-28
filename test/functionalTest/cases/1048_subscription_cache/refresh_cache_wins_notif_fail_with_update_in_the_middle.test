@@ -286,7 +286,7 @@ Date: REGEX(.*)
     "lastFailure": 1546337410,
     "lastFailureReason": "some reason",
     "lastNotification": 1546337410,
-    "metadata": [],    
+    "metadata": [],
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/",
