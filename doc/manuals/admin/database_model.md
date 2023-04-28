@@ -304,7 +304,7 @@ Fields:
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
-    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
+    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues** and **values** (the last five used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions), `inactive` (for inactive subscriptions) or
     `oneshot` (for [oneshot subscriptions](../orion-api.md#oneshot-subscriptions)). Note that Orion API consider additional states (e.g. `expired`)
     but they never hit the DB (they are managed by Orion).

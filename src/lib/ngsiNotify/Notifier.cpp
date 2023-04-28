@@ -226,7 +226,8 @@ static bool setNgsiPayload
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
-  std::string*                     payloadP
+  std::string*                     payloadP,
+  RenderFormat                     renderFormat
 )
 {
   // Prepare a map for macro replacements. We firstly tried to pass Entity object to
@@ -287,7 +288,18 @@ static bool setNgsiPayload
   ncr.subscriptionId  = subscriptionId;
   ncr.contextElementResponseVector.push_back(&cer);
 
- *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, &replacements);
+  if (renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED)
+  {
+    *payloadP = ncr.toJson(NGSI_V2_SIMPLIFIEDNORMALIZED, attrsFilter, blacklist, metadataFilter, &replacements);
+  }
+  else if (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES)
+  {
+    *payloadP = ncr.toJson(NGSI_V2_SIMPLIFIEDKEYVALUES, attrsFilter, blacklist, metadataFilter, &replacements);
+  }
+  else
+  {
+    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, &replacements);
+  }
 
   return true;
 }
@@ -384,12 +396,11 @@ static SenderThreadParams* buildSenderParamsCustom
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
     const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
-    if (!setNgsiPayload(ngsi, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload))
+    if (!setNgsiPayload(ngsi, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
     {
       // Warning already logged in macroSubstitute()
       return NULL;
     }
-    renderFormat = NGSI_V2_NORMALIZED;
     mimeType = "application/json";
   }
 

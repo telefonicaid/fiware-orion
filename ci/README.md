@@ -25,7 +25,7 @@ File compliance, payload and style checks are combined in one 'compliance' test.
 # How to use the image locally
 
 Sometime you need to run the CI image locally (for instance, to debug problems found in GitHub Action jobs). In that case,
-the followin cheatsheet can be useful:
+the following cheatsheet can be useful:
 
 To download the image:
 
