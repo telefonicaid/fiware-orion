@@ -185,80 +185,80 @@ echo
 01. Make CP1 subscribe to ALL in CB (federation creation)
 =========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity 'E1' in CB with a geo:json Point
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 03. Create entity 'E2' in CB with a geo:json MultiPoint
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 04. Create entity 'E3' in CB with a geo:json LineString
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 05. Create entity 'E4' in CB with a geo:json MultiLineString
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T
+Content-Length: 0
 
 
 
 06. Create entity 'E5' in CB with a geo:json Polygon
 ====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E5?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=T
+Content-Length: 0
 
 
 
 07. Create entity 'E6' in CB with a geo:json MultiPolygon
 =========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E6?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E6?type=T
+Content-Length: 0
 
 
 
 08. Query CP1, see all entites
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 867
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 867
 
 [
     {

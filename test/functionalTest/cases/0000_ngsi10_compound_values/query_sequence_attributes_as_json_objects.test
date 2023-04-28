@@ -86,10 +86,10 @@ echo
 ===========================================================
 1: Append entity E1 with two different attributes A1 and A2
 HTTP/1.1 200 OK
-Content-Length: 228
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 228
 
 {
     "contextResponses": [
@@ -123,10 +123,10 @@ Date: REGEX(.*)
 ======================================================================
 2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2
 HTTP/1.1 200 OK
-Content-Length: 216
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 216
 
 {
     "contextResponses": [

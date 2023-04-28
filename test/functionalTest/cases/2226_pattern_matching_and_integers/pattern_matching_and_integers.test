@@ -102,40 +102,40 @@ echo
 01. Create entity E1 with A1:101 (Number)
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Create entity E2 with A1:"101" (String)
 ===========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 03. Create entity E3 with A1:103 (Number)
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 04. GET entities, q=A1~=100, see nothing
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -143,10 +143,10 @@ Date: REGEX(.*)
 05. GET entities, q=A1~=101, see E2
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 [
     {
@@ -164,10 +164,10 @@ Date: REGEX(.*)
 06. GET entities, q=A1~='101', see error (forbidden chars)
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "forbidden characters in String Filter",

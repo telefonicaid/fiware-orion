@@ -257,10 +257,10 @@ echo
 01. Create subscription with invalid alterationTypes, see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "description": "unknown subscription alterationType: entityFoo",
@@ -271,20 +271,20 @@ Date: REGEX(.*)
 02. Create subscription with alterationTypes entityDelete and entityCreate
 ==========================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03a. Get subscription and see alterationTypes entityDelete and entityCreate
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 323
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 323
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -319,10 +319,10 @@ Date: REGEX(.*)
 03b. Get subscription (as a list) and see alterationTypes entityDelete and entityCreate
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 325
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 325
 
 [
     {
@@ -359,18 +359,18 @@ Date: REGEX(.*)
 04. Update subscription with alterationTypes entityChange
 =========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05a. Get subscription and see alterationTypes entityChange
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 308
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 308
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -404,10 +404,10 @@ Date: REGEX(.*)
 05b. Get subscription (as a list) and see alterationTypes entityChange
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 310
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 310
 
 [
     {
@@ -443,18 +443,18 @@ Date: REGEX(.*)
 06. Update subscription without alterationTypes
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07a. Get subscription and not see alterationTypes
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 273
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 273
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -485,10 +485,10 @@ Date: REGEX(.*)
 07b. Get subscription (as a list) and not see alterationTypes
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 275
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 275
 
 [
     {
@@ -521,18 +521,18 @@ Date: REGEX(.*)
 08. Update subscription with with entityDelete and entityUpdate
 ===============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09a. Get subscription and see alterationTypes entityDelete and entityUpdate
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 323
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 323
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -567,10 +567,10 @@ Date: REGEX(.*)
 09b. Get subscription (as a list) and see alterationTypes entityDelete and entityUpdate
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 325
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 325
 
 [
     {
@@ -607,10 +607,10 @@ Date: REGEX(.*)
 10. Update subscription without 1 invalid alterationTypes (see error)
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "description": "unknown subscription alterationType: entityFoo",
@@ -621,10 +621,10 @@ Date: REGEX(.*)
 11. Update subscription with 1 valid element and 1 invalid element the alterationTypes (see error)
 ==================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "description": "unknown subscription alterationType: entityFoo",

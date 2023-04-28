@@ -342,110 +342,110 @@ echo
 01. Create E1/T1/A1 in CP1
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. Create E1/T1/A2 in CP2
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. Create E1/T1/A3 in CP3
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 04. Create E1/T1/A4 in CP4
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 05. Create E1/T1/A5 in CP5
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 06. Register E1/T1/A1 in CB, provApp: CP1
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 07. Register E1/T1/A2 in CB, provApp: CP2
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 08. Register E1/T1/A3 in CB, provApp: CP3
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 09. Register E1/T1/A4 in CB, provApp: CP4
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 10. Register E1/T1/A5 in CB, provApp: CP5
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 11. Query E1/T1 in CB
 =====================
 HTTP/1.1 200 OK
-Content-Length: 298
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 298
 
 {
     "A1": {
@@ -489,10 +489,10 @@ Date: REGEX(.*)
 13. Query E1/T1 in CB
 =====================
 HTTP/1.1 200 OK
-Content-Length: 298
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 298
 
 {
     "A1": {

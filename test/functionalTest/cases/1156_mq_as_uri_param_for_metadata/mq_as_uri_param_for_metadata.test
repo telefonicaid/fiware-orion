@@ -337,20 +337,20 @@ echo
 01. Create a subscription for all entities/A1 AND mq=A1.M1==13 (accum1)
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. GET subscription to see 'mq' correctly rendered
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 335
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 335
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -386,70 +386,70 @@ Date: REGEX(.*)
 03. Create subscription with mq: !A1.M2 (accum2)
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 04. Create subscription with mq: A2.M2 (accum3)
 ===============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Create subscription with mq: !A2.M2 (accum3)
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 06. Create an entity E1 with attr A1 with metadata M1=12 (+1 accum2)
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 07. Create an entity E2 with attr A1 with metadata M1=13 (+1 accum1, +1 accum2)
 ===============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 08. Create an entity E3 with attr A1 with metadata M1=14 (+1 accum2)
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 09. Lookup all entities having A1.M1==12, see E1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 109
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 109
 
 [
     {
@@ -506,8 +506,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 11. Modify E1/A1, setting A1/M1=13 (+1 accum1, +1 accum2)
 =========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -548,10 +548,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 13. Check unary operator for mq: !A1.M1 - nothing found
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -559,10 +559,10 @@ Date: REGEX(.*)
 14. Check unary operator for mq: A1.M1 - all three entities
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 325
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 325
 
 [
     {
@@ -613,10 +613,10 @@ Date: REGEX(.*)
 15. Check unary operator for mq: !A1.M2 - all three entities
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 325
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 325
 
 [
     {
@@ -667,10 +667,10 @@ Date: REGEX(.*)
 16. Check unary operator for mq: A1.M2 - nothing found
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -678,10 +678,10 @@ Date: REGEX(.*)
 17. Check unary operator for mq: A2.M9 - nothing found
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

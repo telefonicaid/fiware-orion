@@ -158,20 +158,20 @@ echo
 01. Create subscription with previousValue as metadata
 ======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create E1 with attributes A: 1
 ==================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
@@ -207,8 +207,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 04. Update A: [1, {b: foo} ]
 ============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -254,8 +254,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 06. Update A: {x: 1, y: [true, foo] }
 =====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -307,8 +307,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. Update A: x
 ===============
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

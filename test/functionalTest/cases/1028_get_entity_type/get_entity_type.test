@@ -125,10 +125,10 @@ echo
 01. GET /v2/types/T1 and get Not Found
 ======================================
 HTTP/1.1 404 Not Found
-Content-Length: 58
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 58
 
 {
     "description": "Entity type not found",
@@ -139,20 +139,20 @@ Date: REGEX(.*)
 02. Create E1/T1/A1+A2
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. GET /v2/types/T1 and get a non-empty list
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "attrs": {
@@ -174,30 +174,30 @@ Date: REGEX(.*)
 04. Create E2/T1/A1+A3
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T1
+Content-Length: 0
 
 
 
 05. Create E3/T1/A2+A4
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T1
+Content-Length: 0
 
 
 
 06. GET /v2/types/T1 and get a list of four attrs and three entities
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 129
 
 {
     "attrs": {
@@ -230,20 +230,20 @@ Date: REGEX(.*)
 07. Create E4/T1/A4+A3
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T1
+Content-Length: 0
 
 
 
 08. GET /v2/types/T1 and get a list of four attrs and four entities
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 140
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 140
 
 {
     "attrs": {

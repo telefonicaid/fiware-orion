@@ -97,20 +97,20 @@ echo
 01. Create a subscription with encoded chars in custom payload
 ==============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create an entity to provoke a notification
 ==============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
@@ -134,10 +134,10 @@ A string with double-quotes: "a1"=======================================
 04. GET the subscription to see the encoded chars in custom payload
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 520
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 520
 
 {
     "id": "REGEX([0-9a-f]{24})",

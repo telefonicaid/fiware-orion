@@ -164,20 +164,20 @@ echo
 01. Create mqtt sub url=mqtt://localhost:1883, topic=/orion, qos=2
 ==================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 314
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 314
 
 {
     "description": "Original sub",
@@ -211,18 +211,18 @@ Date: REGEX(.*)
 03. Update sub element different to notification
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 314
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 314
 
 {
     "description": "Modified sub",
@@ -256,18 +256,18 @@ Date: REGEX(.*)
 05. Update sub with url=mqtt://localhost:1884, topic=/cb, no-qos
 ================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 311
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 311
 
 {
     "description": "Modified sub",
@@ -301,18 +301,18 @@ Date: REGEX(.*)
 07. Update sub to http sub
 ==========================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get sub, see http element
 =============================
 HTTP/1.1 200 OK
-Content-Length: 289
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 289
 
 {
     "description": "Modified sub",
@@ -344,18 +344,18 @@ Date: REGEX(.*)
 09. Update sub to mqtt url=mqtt://localhost:1885, topic=/orionbk, qos=1
 =======================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Get sub, see url=mqtt://localhost:1885, topic=/orionbk, qos=1
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 316
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 316
 
 {
     "description": "Modified sub",

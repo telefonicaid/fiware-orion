@@ -262,10 +262,10 @@ echo
 01. Create mqttCustom sub only user, see error
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
 
 {
     "description": "you must use user and passwd fields simultaneously",
@@ -276,10 +276,10 @@ Date: REGEX(.*)
 02. Create mqttCustom sub only pass, see error
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
 
 {
     "description": "you must use user and passwd fields simultaneously",
@@ -290,10 +290,10 @@ Date: REGEX(.*)
 03. Create mqttCustom sub user and pass, but forbidden chars in user, see error
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
 
 {
     "description": "forbidden characters in mqtt /user/",
@@ -304,20 +304,20 @@ Date: REGEX(.*)
 04. Create mqttCustom sub with user user1 and passwd pass1
 ==========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 05. GET subs checking user1 but password offuscated
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 321
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 321
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -358,18 +358,18 @@ pass1
 07. PATCH sub changing password to user10 and pass10
 ====================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. GET subs checking user10 but password offuscated
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 322
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 322
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -410,18 +410,18 @@ pass10
 10. PATCH sub removing auth parameters
 ======================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 11. GET subs checking user and password are not shown
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 289
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 289
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -460,18 +460,18 @@ false
 13. PATCH sub adding back again user1 and pass1
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 14. GET subs checking user1 but password offuscated
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 321
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 321
 
 {
     "id": "REGEX([0-9a-f\-]{24})",

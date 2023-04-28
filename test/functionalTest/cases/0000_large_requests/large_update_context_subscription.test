@@ -41,10 +41,10 @@ orionCurl --url "/v1/updateContextSubscription" --payload "$BIGFILE"
 rm $BIGFILE
 --REGEXPECT--
 HTTP/1.1 413 Payload Too Large
-Content-Length: 196
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 196
 
 {
     "subscribeError": {

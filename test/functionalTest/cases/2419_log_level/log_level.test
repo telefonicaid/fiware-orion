@@ -150,19 +150,19 @@ echo
 01. Set log level to NONE
 =========================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 02. GET log config, see level=NONE
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 {
     "infoPayloadMaxSize": 5120,
@@ -174,19 +174,19 @@ Date: REGEX(.*)
 03. Set log level to FATAL
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 04. GET log config, see level=FATAL
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "infoPayloadMaxSize": 5120,
@@ -198,19 +198,19 @@ Date: REGEX(.*)
 05. Set log level to ERROR
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 06. GET log config, see level=ERROR
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "infoPayloadMaxSize": 5120,
@@ -222,19 +222,19 @@ Date: REGEX(.*)
 07. Set log level to WARN
 =========================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 08. GET log config, see level=WARN
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 {
     "infoPayloadMaxSize": 5120,
@@ -246,19 +246,19 @@ Date: REGEX(.*)
 09. Set log level to INFO
 =========================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 10. GET log config, see level=INFO
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 {
     "infoPayloadMaxSize": 5120,
@@ -270,19 +270,19 @@ Date: REGEX(.*)
 11. Set log level to DEBUG
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 12. GET log config, see level=DEBUG
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "infoPayloadMaxSize": 5120,
@@ -294,10 +294,10 @@ Date: REGEX(.*)
 13. Set log level to XYZ - see error
 ====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 29
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 29
 
 {
     "error": "invalid log level"
@@ -307,10 +307,10 @@ Date: REGEX(.*)
 14. GET log config, see level=DEBUG
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "infoPayloadMaxSize": 5120,

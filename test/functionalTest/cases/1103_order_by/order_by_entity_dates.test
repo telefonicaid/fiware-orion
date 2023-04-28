@@ -139,66 +139,66 @@ echo
 01. Create entity E1
 ====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create entity E2
 ====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Create entity E3
 ====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 04. Create entity E4
 ====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T
+Content-Length: 0
 
 
 
 04. Modify entity E3
 ====================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Modify entity E2
 ====================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Get sorted by dateCreated: E1, E2, E3, E4
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 [
     {
@@ -225,10 +225,10 @@ Date: REGEX(.*)
 06. Get sorted by !dateCreated: E4, E3, E2, E1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 [
     {
@@ -255,10 +255,10 @@ Date: REGEX(.*)
 07. Get sorted by dateModified: E1, E4, E3, E2
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 [
     {
@@ -285,10 +285,10 @@ Date: REGEX(.*)
 08. Get sorted by !dateModified: E2, E3, E4, E1
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 [
     {

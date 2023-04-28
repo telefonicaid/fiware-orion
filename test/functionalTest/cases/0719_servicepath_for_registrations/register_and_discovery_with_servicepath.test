@@ -192,10 +192,10 @@ echo
 01. Register E1/A1 with service path /a1/e1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -206,10 +206,10 @@ Date: REGEX(.*)
 02. Register E2/A1 with service path /a1/e2
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -220,10 +220,10 @@ Date: REGEX(.*)
 03. Discovery of E.*/A1 with service path /a1/e1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 211
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 211
 
 {
     "contextRegistrationResponses": [
@@ -252,10 +252,10 @@ Date: REGEX(.*)
 04. Discovery of E.*/A1 with service path /a1/e2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 211
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 211
 
 {
     "contextRegistrationResponses": [
@@ -284,10 +284,10 @@ Date: REGEX(.*)
 05. Discovery of E.*/A1 with service path /a1
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -300,10 +300,10 @@ Date: REGEX(.*)
 06. Discovery of E.*/A1 with service path /a1/#
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 388
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 388
 
 {
     "contextRegistrationResponses": [
@@ -350,10 +350,10 @@ Date: REGEX(.*)
 07. Discovery of E.*/A1 with service path /a2/#
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {

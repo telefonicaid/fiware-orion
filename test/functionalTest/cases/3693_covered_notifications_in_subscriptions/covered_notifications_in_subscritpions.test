@@ -326,30 +326,30 @@ echo
 01. POST /v2/entities, to create Room1 with temperature and pressure
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Room
+Content-Length: 0
 
 
 
 02. POST /v2/subscriptions, to create subscription with covered=true and some attributes in attrs which is not present in entities
 ==================================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions/subscription_id, to check the covered=true
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 373
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 373
 
 {
     "description": "A subscription to get info about Room1",
@@ -387,8 +387,8 @@ Date: REGEX(.*)
 04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute
 =============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -434,30 +434,30 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 06. POST /v2/entities, to create Room2 with temperature and pressure
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room2?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room2?type=Room
+Content-Length: 0
 
 
 
 07. POST /v2/subscriptions, to create subscription with covered=true and some attributes in attrs which is not present in entities
 ==================================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 08. GET /v2/subscriptions/subscription_id, to check the covered=true
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 373
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 373
 
 {
     "description": "A subscription to get info about Room2",
@@ -495,8 +495,8 @@ Date: REGEX(.*)
 09. PATCH /v2/entities/Room2/attrs, to update the value of pressure attribute
 =============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -542,30 +542,30 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 11. POST /v2/entities, to create Room3 with temperature and pressure
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room3?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room3?type=Room
+Content-Length: 0
 
 
 
 12. POST /v2/subscriptions, to create subscription with covered=false and some attributes in attrs which is not present in entities
 ===================================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 13. GET /v2/subscriptions/subscription_id, to check the covered=false
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 374
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 374
 
 {
     "description": "A subscription to get info about Room3",
@@ -603,8 +603,8 @@ Date: REGEX(.*)
 14. PATCH /v2/entities/Room3/attrs, to update the value of pressure attribute
 =============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

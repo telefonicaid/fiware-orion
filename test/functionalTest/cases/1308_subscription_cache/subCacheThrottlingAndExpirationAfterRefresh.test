@@ -170,10 +170,10 @@ echo
 01. Create subscription for s0.* entities, attribute A, w/o tenant, expiration time 21 secs
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 106
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 106
 
 {
     "subscribeResponse": {
@@ -187,10 +187,10 @@ Date: REGEX(.*)
 02. Sleep 11 secs to let the cache refresh from DB - one cache insert comes from the refresh
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "ids": "REGEX([0-9a-f]{24})",
@@ -205,26 +205,26 @@ Date: REGEX(.*)
 03. Create entity s01 w/ attr A w/o tenant
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/s01?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/s01?type=Thing
+Content-Length: 0
 
 
 
 04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 ============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling
 ============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -235,16 +235,16 @@ Date: REGEX(.*)
 07. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling
 ================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Modify entity s01 w/ attr A=5 w/o tenant - notification lost by throttling
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -255,8 +255,8 @@ Date: REGEX(.*)
 10. Modify entity s01 w/ attr A w/o tenant - no notification as expired
 =======================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

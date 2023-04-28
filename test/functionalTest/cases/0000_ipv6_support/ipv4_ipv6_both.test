@@ -130,10 +130,10 @@ accumulatorDump
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
 "orion" : {
@@ -161,10 +161,10 @@ Date: REGEX(.*)
 
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
 "orion" : {
@@ -192,10 +192,10 @@ Date: REGEX(.*)
 
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "subscribeResponse": {
@@ -205,10 +205,10 @@ Date: REGEX(.*)
 }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "subscribeResponse": {
@@ -218,10 +218,10 @@ Date: REGEX(.*)
 }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 253
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 253
 
 {
     "contextResponses": [

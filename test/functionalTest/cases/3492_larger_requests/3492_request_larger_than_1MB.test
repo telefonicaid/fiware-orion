@@ -61,10 +61,10 @@ echo
 01. Sending a request of ~40 MB, to a broker that excepts request upto ~50MB - see parse error as a result
 ==========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -75,10 +75,10 @@ Date: REGEX(.*)
 02. Sending a request of ~60 MB, to a broker that excepts request upto ~50MB - see 413 error
 ============================================================================================
 HTTP/1.1 413 Payload Too Large
-Content-Length: 102
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 102
 
 {
     "description": "payload size: 60000000, max size supported: 50000000",

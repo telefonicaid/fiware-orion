@@ -292,20 +292,20 @@ echo
 01. POST /v2/entities creating E1 A1=1
 ======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. PUT /v2/entities/E1/attrs/A1/value with erroneous JSON payload
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -316,18 +316,18 @@ Date: REGEX(.*)
 03. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
 ==================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Check that A1 == "that JSON object"
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 55
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 55
 
 {
     "metadata": {},
@@ -342,18 +342,18 @@ Date: REGEX(.*)
 05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Check that A1 == "that JSON array"
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 53
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 53
 
 {
     "metadata": {},
@@ -369,18 +369,18 @@ Date: REGEX(.*)
 07. PUT /v2/entities/E1/attrs/A1/value with TEXT payload "STRING"
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Check that A1 == "STRING"
 =============================
 HTTP/1.1 200 OK
-Content-Length: 48
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 48
 
 {
     "metadata": {},
@@ -392,18 +392,18 @@ Date: REGEX(.*)
 09. PUT /v2/entities/E1/attrs/A1/value with TEXT payload true
 =============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 44
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 44
 
 {
     "metadata": {},
@@ -415,18 +415,18 @@ Date: REGEX(.*)
 11. PUT /v2/entities/E1/attrs/A1/value with TEXT payload TRUE
 =============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 12. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 44
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 44
 
 {
     "metadata": {},
@@ -438,18 +438,18 @@ Date: REGEX(.*)
 13. PUT /v2/entities/E1/attrs/A1/value with TEXT payload True
 =============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 14. Check that A1 == true
 =========================
 HTTP/1.1 200 OK
-Content-Length: 44
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 44
 
 {
     "metadata": {},
@@ -461,18 +461,18 @@ Date: REGEX(.*)
 15. PUT /v2/entities/E1/attrs/A1/value with TEXT payload false
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 16. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 45
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 45
 
 {
     "metadata": {},
@@ -484,18 +484,18 @@ Date: REGEX(.*)
 17. PUT /v2/entities/E1/attrs/A1/value with TEXT payload FALSE
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 18. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 45
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 45
 
 {
     "metadata": {},
@@ -507,18 +507,18 @@ Date: REGEX(.*)
 19. PUT /v2/entities/E1/attrs/A1/value with TEXT payload False
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 20. Check that A1 == false
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 45
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 45
 
 {
     "metadata": {},
@@ -530,18 +530,18 @@ Date: REGEX(.*)
 21. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 123
 ============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 22. Check that A1 == 123
 ========================
 HTTP/1.1 200 OK
-Content-Length: 43
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 43
 
 {
     "metadata": {},
@@ -553,18 +553,18 @@ Date: REGEX(.*)
 23. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.14
 =============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 24. Check that A1 == 3.14
 =========================
 HTTP/1.1 200 OK
-Content-Length: 44
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 44
 
 {
     "metadata": {},
@@ -576,10 +576,10 @@ Date: REGEX(.*)
 25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 - see error
 =========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
 
 {
     "description": "attribute value type not recognized",
@@ -590,10 +590,10 @@ Date: REGEX(.*)
 26. Check that A1 == 3.14 still
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 44
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 44
 
 {
     "metadata": {},
@@ -605,18 +605,18 @@ Date: REGEX(.*)
 27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 28. Check that A1 == -12.1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 45
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 45
 
 {
     "metadata": {},
@@ -628,18 +628,18 @@ Date: REGEX(.*)
 29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 30. Check that A1 == 3.2e2
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 43
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 43
 
 {
     "metadata": {},

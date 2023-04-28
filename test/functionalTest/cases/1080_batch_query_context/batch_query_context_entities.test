@@ -175,40 +175,40 @@ echo
 01. Create an entity E of type T, with attributes A1=11,A4=14,A5=15
 ===================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Create an entity E of type T2, with attributes A2=22,A5=25
 ==============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T2
+Content-Length: 0
 
 
 
 03. Create an entity E3 of type T, with attributes A3=33,A4=34,A5=35
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 04. POST /v2/op/query, with only E in payload, see 2 entities
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 286
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 286
 
 [
     {
@@ -250,10 +250,10 @@ Date: REGEX(.*)
 05. POST /v2/op/query, with only E3 in payload, see 1 entity
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 168
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 168
 
 [
     {
@@ -281,10 +281,10 @@ Date: REGEX(.*)
 06. POST /v2/op/query, with E and E3 in payload, see 3 entities
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 453
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 453
 
 [
     {
@@ -345,10 +345,10 @@ Date: REGEX(.*)
 07. POST /v2/op/query, with E.* in payload, see 3 entities
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 453
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 453
 
 [
     {
@@ -409,10 +409,10 @@ Date: REGEX(.*)
 08. POST /v2/op/query, with E3.* in payload, see 1 entity
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 168
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 168
 
 [
     {
@@ -440,10 +440,10 @@ Date: REGEX(.*)
 09. POST /v2/op/query, with F.* in payload, see no entities
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

@@ -137,44 +137,44 @@ echo
 01. Create entity E with A=[1,2,foo], B=[{x:1},{y:2},[z]], C=3
 ==============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Create sub for entity E
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Update A with $pull: [1,foo]
 ================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Update B with $pullAll: [{y:2},{x:1}]
 =========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Delete attribute C
 ======================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

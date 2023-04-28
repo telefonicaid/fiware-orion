@@ -115,10 +115,10 @@ orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 128
 
 {
     "errorCode": {
@@ -129,10 +129,10 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 269
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 269
 
 {
     "contextResponses": [
@@ -165,10 +165,10 @@ Date: REGEX(.*)
 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 272
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 272
 
 {
     "contextResponses": [
@@ -201,10 +201,10 @@ Date: REGEX(.*)
 }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 264
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 264
 
 {
     "contextResponses": [
@@ -237,10 +237,10 @@ Date: REGEX(.*)
 }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 272
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 272
 
 {
     "contextResponses": [
@@ -273,10 +273,10 @@ Date: REGEX(.*)
 }
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 268
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 268
 
 {
     "contextResponses": [
@@ -309,10 +309,10 @@ Date: REGEX(.*)
 }
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 128
 
 {
     "errorCode": {
@@ -323,10 +323,10 @@ Date: REGEX(.*)
 }
 8: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: GET
+Content-Length: 0
 
 --TEARDOWN--
 brokerStop CB

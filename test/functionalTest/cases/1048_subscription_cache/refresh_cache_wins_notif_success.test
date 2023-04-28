@@ -154,10 +154,10 @@ echo
 01. GET /v2/subscriptions and see lastNotification/Success in a the past and status code 211 and without timeSent
 =================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 376
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 376
 
 [
     {
@@ -193,20 +193,20 @@ Date: REGEX(.*)
 02. Create entity E to trigger notification
 ===========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions and see lastNotification/Success in the present and status code 200 (as cache data is newer), timesSent 1
 ===================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 390
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 390
 
 [
     {
@@ -280,10 +280,10 @@ Date: REGEX(.*)
 05. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 390
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 390
 
 [
     {

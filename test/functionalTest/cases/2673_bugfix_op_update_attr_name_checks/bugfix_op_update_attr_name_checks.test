@@ -133,10 +133,10 @@ echo
 01. Update using attr name with not plain ASCII and see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid characters in attribute name",
@@ -147,10 +147,10 @@ Date: REGEX(.*)
 02. Update using empty attr and see error
 =========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
 
 {
     "description": "attribute name length: 0, min length supported: 1",
@@ -161,10 +161,10 @@ Date: REGEX(.*)
 03. Update using attr name exceding length and see error
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "attribute name length: 257, max length supported: 256",
@@ -175,10 +175,10 @@ Date: REGEX(.*)
 04. Update using attr name with forbidden chars and see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid characters in attribute name",
@@ -189,10 +189,10 @@ Date: REGEX(.*)
 05. Check no entity has been created
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

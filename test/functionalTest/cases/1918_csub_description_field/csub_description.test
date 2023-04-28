@@ -217,20 +217,20 @@ echo
 01. Create subscription without description
 ===========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 468
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 468
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -274,18 +274,18 @@ Date: REGEX(.*)
 03. Update subscription to add description (desc = one)
 =======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get subscription (see desc = one)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 488
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 488
 
 {
     "description": "one",
@@ -330,18 +330,18 @@ Date: REGEX(.*)
 05. Update subscription to modify description (desc = two)
 ==========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Get subscription (see desc = two)
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 488
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 488
 
 {
     "description": "two",
@@ -386,18 +386,18 @@ Date: REGEX(.*)
 07. Update subscription to delete description
 =============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get subscription (without desc)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 468
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 468
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -441,20 +441,20 @@ Date: REGEX(.*)
 09. Create a second subscription with description (desc = three)
 ================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 10. Get subscription (see desc = three)
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 490
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 490
 
 {
     "description": "three",
@@ -499,10 +499,10 @@ Date: REGEX(.*)
 11. Get subscriptions list (first csub without desc, second with desc = three)
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 961
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 961
 
 [
     {
@@ -586,10 +586,10 @@ Date: REGEX(.*)
 12. Update second subscription with no string description (fail)
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 66
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 66
 
 {
     "description": "description is not a string",

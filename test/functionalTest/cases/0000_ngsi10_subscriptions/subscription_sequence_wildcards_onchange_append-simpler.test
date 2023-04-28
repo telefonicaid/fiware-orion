@@ -101,10 +101,10 @@ echo
 01. Subscribe to OfficeRoom.* / Room
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "subscribeResponse": {
@@ -117,10 +117,10 @@ Date: REGEX(.*)
 02. Create OfficeRoom/Room/pressure
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 {
     "contextResponses": [

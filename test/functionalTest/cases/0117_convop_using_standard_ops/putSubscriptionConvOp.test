@@ -421,10 +421,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 07. PUT /v1/contextSubscriptions/SUB_ID, removing A2 from notifyConditions
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
 
 {
     "subscribeResponse": {
@@ -481,10 +481,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 09. Update E1/T1/A2
 ===================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -556,10 +556,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 11. Update E1/T1/A1
 ===================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [

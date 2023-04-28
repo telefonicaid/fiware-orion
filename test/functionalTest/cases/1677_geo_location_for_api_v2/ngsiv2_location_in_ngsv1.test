@@ -580,60 +580,60 @@ echo
 01. Create point A (5, 5)
 =========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A?type=T
+Content-Length: 0
 
 
 
 02. Create point B (9, 5)
 =========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B?type=T
+Content-Length: 0
 
 
 
 03. Create point C (15, 5)
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C?type=T
+Content-Length: 0
 
 
 
 04. Create point D (15, 15)
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/D?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/D?type=T
+Content-Length: 0
 
 
 
 05. Create point E (-4, 10)
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 06. Query coveredBy point (5, 5) -> not supported
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 142
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 142
 
 {
     "errorCode": {
@@ -647,10 +647,10 @@ Date: REGEX(.*)
 07. Query coveredBy line (5, 5) (9, 5) -> not supported
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 141
 
 {
     "errorCode": {
@@ -664,10 +664,10 @@ Date: REGEX(.*)
 08. Query coveredBy box (-5, 0) (6, 11) -> A, E
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 380
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 380
 
 {
     "contextResponses": [
@@ -714,10 +714,10 @@ Date: REGEX(.*)
 09. Query coveredBy polygon (0, 0) (24, 0) (0, 20) -> A, B, C
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 557
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 557
 
 {
     "contextResponses": [
@@ -782,10 +782,10 @@ Date: REGEX(.*)
 10. Query intersects point (5, 5) -> A
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 200
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 200
 
 {
     "contextResponses": [
@@ -814,10 +814,10 @@ Date: REGEX(.*)
 11. Query intersects line (5, 5) (9, 5) -> A, B
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 378
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 378
 
 {
     "contextResponses": [
@@ -864,10 +864,10 @@ Date: REGEX(.*)
 12. Query intersects box (-5, 0) (6, 11) -> A, E
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 380
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 380
 
 {
     "contextResponses": [
@@ -914,10 +914,10 @@ Date: REGEX(.*)
 13. Query intersects polygon (0, 0) (24, 0) (0, 20) -> A, B, C
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 557
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 557
 
 {
     "contextResponses": [
@@ -982,10 +982,10 @@ Date: REGEX(.*)
 14. Query disjoint point (5, 5) -> B, C, D, E
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 739
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 739
 
 {
     "contextResponses": [
@@ -1068,10 +1068,10 @@ Date: REGEX(.*)
 15. Query disjoint line (5, 5) (9, 5) -> C, D, E
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 561
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 561
 
 {
     "contextResponses": [
@@ -1136,10 +1136,10 @@ Date: REGEX(.*)
 16. Query disjoint box (-5, 0) (6, 11) -> B, C, D
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 559
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 559
 
 {
     "contextResponses": [
@@ -1204,10 +1204,10 @@ Date: REGEX(.*)
 17. Query disjoint polygon (0, 0) (24, 0) (0, 20) -> D, E
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 382
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 382
 
 {
     "contextResponses": [
@@ -1254,10 +1254,10 @@ Date: REGEX(.*)
 18. Query equals point (15, 15) -> D
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 202
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 202
 
 {
     "contextResponses": [
@@ -1286,10 +1286,10 @@ Date: REGEX(.*)
 19. Query equals line (5, 5) (9, 5) -> none
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -1302,10 +1302,10 @@ Date: REGEX(.*)
 20. Query equals box (-5, 0) (6, 11) -> none
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -1318,10 +1318,10 @@ Date: REGEX(.*)
 21. Query equals polygon (0, 0) (24, 0) (0, 20) -> none
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {

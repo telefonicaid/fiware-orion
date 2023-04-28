@@ -92,10 +92,10 @@ orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 208
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 208
 
 {
     "contextResponses": [
@@ -121,10 +121,10 @@ Date: REGEX(.*)
 }
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 210
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 210
 
 {
     "contextResponses": [
@@ -150,10 +150,10 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 143
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 143
 
 {
     "contextResponses": [
@@ -172,10 +172,10 @@ Date: REGEX(.*)
 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {

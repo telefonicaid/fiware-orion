@@ -209,28 +209,28 @@ echo
 01. Create entity E with A=1
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Update/append E with B={$inc:3}
 ===================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. Get entity, see A=1, B=3
 ============================
 HTTP/1.1 200 OK
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 {
     "A": {
@@ -251,18 +251,18 @@ Date: REGEX(.*)
 04. Update/append E with A=4, B={$inc:3}
 ========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Get entity, see A=4, B=6
 ============================
 HTTP/1.1 200 OK
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 {
     "A": {
@@ -283,18 +283,18 @@ Date: REGEX(.*)
 06. Update/append E with A={$inc:2}, B={$inc:3}, C={$inc:2}
 ===========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. Get entity, see A=6, B=9, C=2
 =================================
 HTTP/1.1 200 OK
-Content-Length: 159
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 159
 
 {
     "A": {
@@ -320,18 +320,18 @@ Date: REGEX(.*)
 08. Update/append E with A=0, C={$inc:2}, D={$inc:5}, E=10 with batch operation
 ===============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. Get entity, see A=0, B=9, C=4, D=5, E=10
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 252
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 252
 
 {
     "A": {
@@ -367,9 +367,9 @@ Date: REGEX(.*)
 10. Update/append E with B=0, D={$inc:5}, F={$inc:-1}, G=8 with upsert operation
 ================================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
@@ -377,10 +377,10 @@ Date: REGEX(.*)
 11. Get entity, see A=0, B=0, C=4, D=10, E=10, F=-1, G=8
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 346
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 346
 
 {
     "A": {

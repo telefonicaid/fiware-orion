@@ -223,20 +223,20 @@ echo
 01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [A, B, C] notify exceptAttrs: [B], onlyChangedAttrs: true.
 ========================================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. POST /v2/entities, create Room1 entity with A, B, C, and D attributes.
 ==========================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Room
+Content-Length: 0
 
 
 
@@ -282,8 +282,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 04. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -319,8 +319,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -356,8 +356,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -398,8 +398,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
 ================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

@@ -194,40 +194,40 @@ echo
 01. Create entity E1 with attributes A, B, C
 ============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create entity E2 with attributes B, C
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Create entity E3 with attribute C
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 04. Query attrs: A, without q: E1-A, E2-none, E3-none
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 [
     {
@@ -253,10 +253,10 @@ Date: REGEX(.*)
 05. Query attrs: A, with q=A: E1-A
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 [
     {
@@ -274,10 +274,10 @@ Date: REGEX(.*)
 06. Query attrs: C, with q=A: E1-C
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 [
     {
@@ -295,10 +295,10 @@ Date: REGEX(.*)
 07. Query attrs: A, with q=!A: E2-none, E3-none
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 47
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 47
 
 [
     {
@@ -315,10 +315,10 @@ Date: REGEX(.*)
 08. Query attrs: C, with q=!A: E2-C, E3-C
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 141
 
 [
     {

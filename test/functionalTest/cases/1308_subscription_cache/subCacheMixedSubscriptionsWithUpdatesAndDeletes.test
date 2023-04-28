@@ -251,10 +251,10 @@ echo
 01. Create subscription S1 - without pattern
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
 
 {
     "subscribeResponse": {
@@ -268,10 +268,10 @@ Date: REGEX(.*)
 02. Check statistics, see ONE entry in subCache
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "ids": "REGEX([0-9a-f]{24})",
@@ -286,10 +286,10 @@ Date: REGEX(.*)
 03. Update S1
 =============
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "subscribeResponse": {
@@ -303,10 +303,10 @@ Date: REGEX(.*)
 04. Check statistics, see ONE entry in subCache
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "ids": "REGEX([0-9a-f]{24})",
@@ -321,10 +321,10 @@ Date: REGEX(.*)
 05. Create subscription S2 - with pattern 's0.*'
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "subscribeResponse": {
@@ -338,10 +338,10 @@ Date: REGEX(.*)
 06. Check statistics, see TWO entries in subCache
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 118
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
     "ids": "REGEX([0-9a-f, ]{50})",
@@ -356,10 +356,10 @@ Date: REGEX(.*)
 07. Create subscription S3 - without pattern
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
 
 {
     "subscribeResponse": {
@@ -373,10 +373,10 @@ Date: REGEX(.*)
 08. Check statistics, see THREE subCacheItems in subCache
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 144
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 144
 
 {
     "ids": "REGEX([0-9a-f, ]{76})",
@@ -391,10 +391,10 @@ Date: REGEX(.*)
 09. Update S3
 =============
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "subscribeResponse": {
@@ -408,10 +408,10 @@ Date: REGEX(.*)
 10. Check statistics, see THREE subCacheItems in subCache
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 144
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 144
 
 {
     "ids": "REGEX([0-9a-f, ]{76})",
@@ -426,10 +426,10 @@ Date: REGEX(.*)
 11. Remove S1
 =============
 HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 {
     "statusCode": {
@@ -443,10 +443,10 @@ Date: REGEX(.*)
 12. Check statistics, see TWO subCacheItems in subCache
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 118
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
     "ids": "REGEX([0-9a-f, ]{50})",
@@ -461,10 +461,10 @@ Date: REGEX(.*)
 13. Update S2
 =============
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "subscribeResponse": {
@@ -478,10 +478,10 @@ Date: REGEX(.*)
 14. Check statistics, see TWO subCacheItems in subCache
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 118
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
     "ids": "REGEX([0-9a-f, ]{50})",
@@ -496,10 +496,10 @@ Date: REGEX(.*)
 15. Remove S2
 =============
 HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 {
     "statusCode": {
@@ -513,10 +513,10 @@ Date: REGEX(.*)
 16. Check statistics, see ONE entry in subCache
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "ids": "REGEX([0-9a-f]{24})",

@@ -44,10 +44,10 @@ echo
 01. Query with invalid modifier in georel parameter, and see error
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 90
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 90
 
 {
     "description": "Invalid query: Invalid modifier in georel parameter",

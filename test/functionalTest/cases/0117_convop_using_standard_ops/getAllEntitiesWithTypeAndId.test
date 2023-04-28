@@ -189,10 +189,10 @@ echo
 01. GET /v1/contextEntities/type/T1/id/E1 and see it fail
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "contextElement": {
@@ -211,10 +211,10 @@ Date: REGEX(.*)
 02. Update/APPEND E1-T1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -243,10 +243,10 @@ Date: REGEX(.*)
 03. Update/APPEND E1-T2
 =======================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -275,10 +275,10 @@ Date: REGEX(.*)
 04. GET /v1/contextEntities/type/T1/id/E1 and see it work
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 167
 
 {
     "contextElement": {
@@ -303,10 +303,10 @@ Date: REGEX(.*)
 05. GET /v1/contextEntities/type/T1/id/E1?entity::type=T1 and see it work
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 167
 
 {
     "contextElement": {
@@ -331,10 +331,10 @@ Date: REGEX(.*)
 06. GET /v1/contextEntities/type/T1/id/E1?entity::type=T2 and see it fail
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 165
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 165
 
 {
     "contextElement": {
@@ -353,10 +353,10 @@ Date: REGEX(.*)
 07. GET /v1/contextEntities/type/T2/id/E1?entity::type=T2 and see it work
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 167
 
 {
     "contextElement": {
@@ -381,10 +381,10 @@ Date: REGEX(.*)
 08. GET /v1/contextEntities/type/T1/id/E1?!exist=entity::type and see it fail
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 177
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 177
 
 {
     "contextElement": {
@@ -403,10 +403,10 @@ Date: REGEX(.*)
 09. GET /v1/contextEntities/type/T1/id/E1?entity::type=T1&exist=entity::type and see it work
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 167
 
 {
     "contextElement": {
@@ -431,10 +431,10 @@ Date: REGEX(.*)
 10. Update/APPEND E1-T1, service-path /test
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -463,10 +463,10 @@ Date: REGEX(.*)
 11. GET /v1/contextEntities/type/T1/id/E1, service-path /test and see it work
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 177
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 177
 
 {
     "contextElement": {
@@ -491,10 +491,10 @@ Date: REGEX(.*)
 12. GET /v1/contextEntities/type/T1/id/E1, service-path /test2 and see it fail
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "contextElement": {
@@ -513,10 +513,10 @@ Date: REGEX(.*)
 13. GET /v1/contextEntities/type/T1/id/E1?attributesFormat=object
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "contextElement": {

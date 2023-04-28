@@ -184,30 +184,30 @@ echo
 01. Create subscription for entity E
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity E with actual loc (L1) and 2 extra locs (L2, L3)
 ==================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 03. GET entity E: see actual L1 (actual), L2 (extra), L3 (extra)
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 367
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 367
 
 {
     "L1": {
@@ -328,10 +328,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. GET geoquery near 1m around L1, to check this is the actual location of the entity
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 369
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 369
 
 [
     {
@@ -387,10 +387,10 @@ Date: REGEX(.*)
 06. Update E (with overrideMetadata) to remove ignoreType metadata in L2: see fail
 ==================================================================================
 HTTP/1.1 413 Payload Too Large
-Content-Length: 202
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 202
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
@@ -401,18 +401,18 @@ Date: REGEX(.*)
 07. Update E to add ignoreType metadata in L1: success
 ======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. GET geoquery near 1m around L1, to check there is no result
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -420,18 +420,18 @@ Date: REGEX(.*)
 09. Update E (with overrideMetadata) to remove ignoreType metadata in L2: success
 =================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. GET geoquery near 1m around L2, to check this is the actual location of the entity
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 369
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 369
 
 [
     {

@@ -154,10 +154,10 @@ echo
 01. Batch Update without payload
 ================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -168,10 +168,10 @@ Date: REGEX(.*)
 02. Batch Update with empty payload
 ===================================
 HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 52
 
 {
     "description": "empty payload",
@@ -182,10 +182,10 @@ Date: REGEX(.*)
 03. Batch Update with invalid JSON payload
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -196,10 +196,10 @@ Date: REGEX(.*)
 04. Batch Update without 'actionType' (which is mandatory)
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 99
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 99
 
 {
     "description": "Invalid JSON payload, mandatory field /actionType/ not found",
@@ -210,10 +210,10 @@ Date: REGEX(.*)
 05. Batch Update without 'entities' (which is mandatory)
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 {
     "description": "Invalid JSON payload, mandatory field /entities/ not found",
@@ -224,10 +224,10 @@ Date: REGEX(.*)
 06. Batch Update with unrecognized item 'foo'
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 {
     "description": "Unrecognized field in JSON payload: /foo/",
@@ -238,10 +238,10 @@ Date: REGEX(.*)
 07. Batch Update with empty entity vector
 =========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -252,10 +252,10 @@ Date: REGEX(.*)
 08. Batch Update with entity without 'id'
 =========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "description": "nor /id/ nor /idPattern/ present",
@@ -266,10 +266,10 @@ Date: REGEX(.*)
 09. Batch Update with entity with unknown field (and no options=keyValues)
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 103
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 103
 
 {
     "description": "attribute must be a JSON object, unless keyValues option is used",

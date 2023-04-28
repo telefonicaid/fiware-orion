@@ -87,20 +87,20 @@ echo
 01. Create E1
 =============
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Make sure E1 exists
 =======================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "attr1": {
@@ -116,10 +116,10 @@ Date: REGEX(.*)
 03. Try to create E1/T1 again, using POST /v2/entities/E1/attrs?options=append
 ==============================================================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 111
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 111
 
 {
     "description": "one or more of the attributes in the request already exist: [ attr1 ]",
@@ -130,10 +130,10 @@ Date: REGEX(.*)
 04. Make sure it didn't work
 ============================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "attr1": {
@@ -149,18 +149,18 @@ Date: REGEX(.*)
 05. Now update E1, using POST /v2/entities/E1/attrs
 ===================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Make sure it worked
 =======================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "attr1": {

@@ -241,20 +241,20 @@ echo
 01. Create custom sub1 with json field
 ======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Get sub1 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 295
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 295
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -289,18 +289,18 @@ Date: REGEX(.*)
 03. Update sub1 to remove json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 288
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 288
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -332,18 +332,18 @@ Date: REGEX(.*)
 05. Update sub1 to add json field back again
 ============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 291
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 291
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -378,18 +378,18 @@ Date: REGEX(.*)
 07. Update sub1 to modify json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 287
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 287
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -425,18 +425,18 @@ Date: REGEX(.*)
 09. Update sub1 to remove json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 288
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 288
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -468,20 +468,20 @@ Date: REGEX(.*)
 11. Create custom sub2 without json field
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 12. Get sub2 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 288
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 288
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -521,10 +521,10 @@ Date: REGEX(.*)
 14. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 304
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 304
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -562,10 +562,10 @@ Date: REGEX(.*)
 15. Get all subs and see sub1 an sub2 in its final state
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 595
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 595
 
 [
     {

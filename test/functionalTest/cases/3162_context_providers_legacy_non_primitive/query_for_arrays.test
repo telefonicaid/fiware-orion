@@ -162,20 +162,20 @@ echo
 01. Register an entity/attribute E1/A1 in broker, with CP as providing application
 ==================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Update/APPEND E1/A1(=CP) in CP
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 187
 
 {
     "contextResponses": [
@@ -204,10 +204,10 @@ Date: REGEX(.*)
 03. Query CP for E1/A1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 203
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 203
 
 {
     "contextResponses": [
@@ -239,10 +239,10 @@ Date: REGEX(.*)
 04. Query broker for E1/A1 (will go to CP and it should work, A1=CP array is returned)
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 18
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 18
 
 [
     "Data",
@@ -253,10 +253,10 @@ Date: REGEX(.*)
 05. Update/APPEND E1/A2(=broker) in broker
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 187
 
 {
     "contextResponses": [
@@ -285,10 +285,10 @@ Date: REGEX(.*)
 06. Query broker for E1/A2 (will go to CB and should work, A2 array is returned)
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 18
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 18
 
 ["Data","from CB"]
 
@@ -296,10 +296,10 @@ Date: REGEX(.*)
 07. Query E1 in CB - expect two arrays returned
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 148
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 148
 
 {
     "A1": {

@@ -118,10 +118,10 @@ orionCurl --url "/v1/contextEntities/EObject"
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 196
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 196
 
 {
     "contextResponses": [
@@ -147,10 +147,10 @@ Date: REGEX(.*)
 }
 2: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 196
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 196
 
 {
     "contextResponses": [
@@ -176,10 +176,10 @@ Date: REGEX(.*)
 }
 3: ++++++++++ query for vector compound in JSON ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 238
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 238
 
 {
     "contextResponses": [
@@ -218,10 +218,10 @@ Date: REGEX(.*)
 }
 4: ++++++++++ query for object compound in JSON ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 235
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 235
 
 {
     "contextResponses": [
@@ -256,10 +256,10 @@ Date: REGEX(.*)
 }
 5: ++++++++++ query for vector compound in JSON convop ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 215
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 215
 
 {
     "contextElement": {
@@ -294,10 +294,10 @@ Date: REGEX(.*)
 }
 6: ++++++++++ query for object compound in JSON convop ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 212
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 212
 
 {
     "contextElement": {

@@ -535,10 +535,10 @@ Date: REGEX(.*)
 03.06. Query with mq='A1.B1'.'M1.x'.'C1.x'==Step03_02, no hits
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -546,20 +546,20 @@ Date: REGEX(.*)
 04.01. Create E4 with attribute 'A.B' with metadata 'C' == { "D.E": { "F": { "G.H": "Step04_01" } } }
 =====================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=Thing
+Content-Length: 0
 
 
 
 04.02. Query with mq=A.B.C.D.E.F.G.H, no hits
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -567,10 +567,10 @@ Date: REGEX(.*)
 04.03. Query with mq='A.B'.C.'D.E'.F.'G.H', see E4
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 149
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 149
 
 [
     {
@@ -599,10 +599,10 @@ Date: REGEX(.*)
 04.04. Query with q='A.B'.C.'D.E'.F.'G.H', no hits (as C is metadata, not part of compound)
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -610,10 +610,10 @@ Date: REGEX(.*)
 04.05. Query with mq='A.B'.C.'D.E'.F.'G.H'==Step04_01, see E4
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 149
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 149
 
 [
     {
@@ -642,10 +642,10 @@ Date: REGEX(.*)
 04.06. Query with mq='A.B'.C.'D.E'.F.'G.H'==Step04_02, no hits
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

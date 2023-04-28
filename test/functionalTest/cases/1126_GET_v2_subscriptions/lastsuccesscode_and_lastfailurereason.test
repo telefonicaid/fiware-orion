@@ -386,120 +386,120 @@ echo
 01. Create sub1 for 200 endpoint
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create sub2 for 400 endpoint
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. Create sub3 for 404 endpoint
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 04. Create sub4 for 500 endpoint
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Create sub5 for timeout endpoint
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 06. Create sub6 for wrong port endpoint
 =======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 07. Create sub7 for host not found
 ==================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 08. Create sub1 for wrong IP endpoint
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 09. Create entities (triggering all notifications)
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E5?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E6?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E6?type=T
+Content-Length: 0
 
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -516,10 +516,10 @@ Date: REGEX(.*)
 10. Get sub1 see lastSuccessCode: 200 but not failsCounter
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 426
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 426
 
 {
     "description": "Test 200 reponses",
@@ -555,10 +555,10 @@ Date: REGEX(.*)
 11. Get sub2 see lastSuccessCode: 400 but not failsCounter
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 426
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 426
 
 {
     "description": "Test 400 reponses",
@@ -594,10 +594,10 @@ Date: REGEX(.*)
 12. Get sub3 see lastSuccessCode: 404 but not failsCounter
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 426
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 426
 
 {
     "description": "Test 404 reponses",
@@ -633,10 +633,10 @@ Date: REGEX(.*)
 13. Get sub4 see lastSuccessCode: 500 but not failsCounter
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 426
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 426
 
 {
     "description": "Test 500 reponses",
@@ -672,10 +672,10 @@ Date: REGEX(.*)
 14. Get sub5 see failsCounter: 1, lastFailureReason: Timeout was reached
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 469
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 469
 
 {
     "description": "Test timeout reponses",
@@ -712,10 +712,10 @@ Date: REGEX(.*)
 15. Get sub6 see failsCounter: 1, lastFailureReason: Couldn't connect to server
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 474
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 474
 
 {
     "description": "Test wrong port reponses",
@@ -752,10 +752,10 @@ Date: REGEX(.*)
 16. Get sub7 see failsCounter: 1, lastFailureReason: Couldn't resolve host name
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 484
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 484
 
 {
     "description": "Test host not found reponses",
@@ -792,10 +792,10 @@ Date: REGEX(.*)
 17. Get sub8 see failsCounter: 1, lastFailureReason: Timeout was reached
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 470
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 470
 
 {
     "description": "Test wrong IP reponses",

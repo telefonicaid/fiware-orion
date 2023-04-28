@@ -85,10 +85,10 @@ orionCurl --url "$url" --payload "${payload}"
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 137
 
 {
     "subscribeError": {
@@ -101,10 +101,10 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 137
 
 {
     "subscribeError": {
