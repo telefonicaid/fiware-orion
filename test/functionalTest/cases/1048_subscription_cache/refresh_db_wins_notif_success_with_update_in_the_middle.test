@@ -170,7 +170,7 @@ echo
 01. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 and without timeSent
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 376
+Content-Length: 406
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -193,7 +193,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -219,7 +220,7 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 (as cache data is older), timesSent 1
 ====================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 390
+Content-Length: 420
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -243,7 +244,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -329,6 +331,7 @@ Date: REGEX(.*)
     "lastSuccess": 2524644000,
     "lastSuccessCode": 211,
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",
@@ -342,7 +345,7 @@ Date: REGEX(.*)
 07. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
 =============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 427
+Content-Length: 457
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -367,7 +370,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -410,6 +414,7 @@ Date: REGEX(.*)
     "lastSuccess": 2524644000,
     "lastSuccessCode": 211,
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",

@@ -172,7 +172,7 @@ Date: REGEX(.*)
 05. Check if 1st sub notification succeed
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 466
+Content-Length: 496
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -198,7 +198,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -213,7 +214,7 @@ Date: REGEX(.*)
 06. Check if 2nd sub notification has failsCounter: 1
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 502
+Content-Length: 532
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
@@ -240,7 +241,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
