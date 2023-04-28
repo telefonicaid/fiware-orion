@@ -32,12 +32,12 @@ accumulatorStart --pretty-print
 
 #
 # 01.  Create Entity urn:E1, type T
-# 02a. Create a subscription S1 for the accumulator, on entity type T, for deletions
+# 02a. Create a subscription S1 for the accumulator, on entity type T, for deletions, with a receiverInfo header 'FIWARE-Correlator' header set to 'urn:ngsi-ld:request'
 # 02b. Create a subscription S2 for the accumulator, on entity type T + entity id urn:E1, for deletions
 # 02c. Create a subscription S3 for the accumulator, on entity type T + entity id urn:E2, for deletions
 # 02d. Create a subscription S4 for the accumulator, on entity type T2 + entity id urn:E1, for deletions
-# 03.  Delete urn:E1
-# 04.  Dump the accumulator, see two notifications (S1+S2) on Entity deletion for urn:E1
+# 03.  Delete urn:E1, with a FIWARE-Correlator header set
+# 04.  Dump the accumulator, see two notifications (S1+S2) on Entity deletion for urn:E1, see the 'FIWARE-Correlator' header for the S1 notification
 #
 
 echo "01. Create Entity urn:E1, type T"
@@ -55,8 +55,8 @@ echo
 echo
 
 
-echo "02a. Create a subscription S1 for the accumulator, on entity type T, for deletions"
-echo "=================================================================================="
+echo "02a. Create a subscription S1 for the accumulator, on entity type T, for deletions, with a receiverInfo header 'FIWARE-Correlator' header set to 'urn:ngsi-ld:request'"
+echo "======================================================================================================================================================================"
 payload='{
   "id": "urn:S1",
   "type": "Subscription",
@@ -67,7 +67,13 @@ payload='{
   ],
   "notification": {
     "endpoint": {
-      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "receiverInfo": [
+        {
+          "key": "FIWARE-Correlator",
+          "value": "urn:ngsi-ld:request"
+        }
+      ]
     }
   }
 }'
@@ -142,15 +148,15 @@ echo
 echo
 
 
-echo "03. Delete urn:E1"
-echo "================="
-orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE
+echo "03.  Delete urn:E1, with a FIWARE-Correlator header set"
+echo "======================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE -H "FIWARE-Correlator: c846fdbb-b8ad-41f7-ba21-84"
 echo
 echo
 
 
-echo "04. Dump the accumulator, see the notification on Entity deletion for urn:E1"
-echo "============================================================================"
+echo "04.  Dump the accumulator, see two notifications (S1+S2) on Entity deletion for urn:E1, see the 'FIWARE-Correlator' header for the S1 notification"
+echo "=================================================================================================================================================="
 accumulatorDump
 echo
 echo
@@ -166,8 +172,8 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 
 
-02a. Create a subscription S1 for the accumulator, on entity type T, for deletions
-==================================================================================
+02a. Create a subscription S1 for the accumulator, on entity type T, for deletions, with a receiverInfo header 'FIWARE-Correlator' header set to 'urn:ngsi-ld:request'
+======================================================================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -202,15 +208,15 @@ Location: /ngsi-ld/v1/subscriptions/urn:S4
 
 
 
-03. Delete urn:E1
-=================
+03.  Delete urn:E1, with a FIWARE-Correlator header set
+=======================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-04. Dump the accumulator, see the notification on Entity deletion for urn:E1
-============================================================================
+04.  Dump the accumulator, see two notifications (S1+S2) on Entity deletion for urn:E1, see the 'FIWARE-Correlator' header for the S1 notification
+==================================================================================================================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:S2
 Content-Length: 233
 User-Agent: orionld/REGEX(.*)
@@ -240,6 +246,7 @@ User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
+Fiware-Correlator: c846fdbb-b8ad-41f7-ba21-84
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Ngsild-Attribute-Format: Normalized
 
