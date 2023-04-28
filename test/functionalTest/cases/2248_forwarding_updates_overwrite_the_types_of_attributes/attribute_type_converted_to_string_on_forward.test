@@ -82,10 +82,10 @@ echo
 01. Register E1/A1 in CB, provApp: accumulator
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -97,10 +97,10 @@ Date: REGEX(.*)
 Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1
 ==========================================================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",

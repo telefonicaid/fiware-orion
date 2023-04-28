@@ -43,10 +43,10 @@ echo
 01. GET /v2/entities/NONE/attrs/ANY/value
 =========================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {"error":"NotFound","description":"The requested entity has not been found. Check type and id"}
 

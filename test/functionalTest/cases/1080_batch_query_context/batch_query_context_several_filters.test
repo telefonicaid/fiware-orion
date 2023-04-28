@@ -183,70 +183,70 @@ echo
 01. Create an entity R1 of type R, with attributes A=10, location P
 ===================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/R1?type=R
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/R1?type=R
+Content-Length: 0
 
 
 
 02. Create an entity R2 of type R, with attributes A=20, location ~13km to P
 ============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/R2?type=R
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/R2?type=R
+Content-Length: 0
 
 
 
 03. Create an entity R3 of type R, with attributes A=30, location ~13km to P
 ============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/R3?type=R
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/R3?type=R
+Content-Length: 0
 
 
 
 04. Create an entity C1 of type C, with attributes A=100, location ~15 km to P
 ==============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C1?type=C
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C1?type=C
+Content-Length: 0
 
 
 
 05. Create an entity C2 of type C, with attributes A=200, location ~13 km to P
 ==============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C2?type=C
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C1?type=C
+Content-Length: 0
 
 
 
 06. Create an entity C3 of type C, with attributes A=300, location ~15 km to P
 ==============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C3?type=C
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C3?type=C
+Content-Length: 0
 
 
 
 07. Query R and C entities ending with 2 or 3, A>25 and max distance 13.5 km to P: R3/R and C2/C
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 288
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 288
 
 [
     {

@@ -57,10 +57,10 @@ echo
 01. Create E1 without type at servicePath /mine
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 167
 
 {
     "contextResponses": [
@@ -87,10 +87,10 @@ Date: REGEX(.*)
 02. Query on servicePath /mine and get E1
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 164
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 164
 
 {
     "contextElement": {

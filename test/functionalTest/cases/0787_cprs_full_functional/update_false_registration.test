@@ -91,10 +91,10 @@ echo
 01. Register E1/T1/A1-CP1 in CB
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -105,10 +105,10 @@ Date: REGEX(.*)
 02. Update/UPDATE E1/T1/A1 in CB
 ================================
 HTTP/1.1 200 OK
-Content-Length: 226
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 226
 
 {
     "contextResponses": [

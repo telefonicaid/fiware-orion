@@ -200,10 +200,10 @@ echo
 1. APPEND entity E1, type T1 with attribute A1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -232,10 +232,10 @@ Date: REGEX(.*)
 2. APPEND entity E2, WITHOUT TYPE and with attribute A2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 184
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 184
 
 {
     "contextResponses": [
@@ -264,10 +264,10 @@ Date: REGEX(.*)
 3. APPEND entity E3, type T3 with attribute A3
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -296,10 +296,10 @@ Date: REGEX(.*)
 4. APPEND entity E4, WITHOUT TYPE and with attribute A4
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 184
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 184
 
 {
     "contextResponses": [
@@ -328,10 +328,10 @@ Date: REGEX(.*)
 5. Query for Entities with type EMPTY
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 350
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 350
 
 {
     "contextResponses": [
@@ -378,10 +378,10 @@ Date: REGEX(.*)
 6. Query for Entities with type NOT EMPTY
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 354
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 354
 
 {
     "contextResponses": [
@@ -428,10 +428,10 @@ Date: REGEX(.*)
 7. Query for Entities with type EMPTY using std operation
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 350
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 350
 
 {
     "contextResponses": [
@@ -478,10 +478,10 @@ Date: REGEX(.*)
 8. Query for Entities with type NOT EMPTY using std operation
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 354
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 354
 
 {
     "contextResponses": [

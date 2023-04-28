@@ -175,40 +175,40 @@ echo
 01. Create entity corresponding to Madrid
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Madrid?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Madrid?type=City
+Content-Length: 0
 
 
 
 02. Create entity corresponding to Alcobendas
 =============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Alcobendas?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Alcobendas?type=City
+Content-Length: 0
 
 
 
 03. Create entity corresponding to Leganes
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Leganes?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Leganes?type=City
+Content-Length: 0
 
 
 
 04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 423
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 423
 
 {
     "contextResponses": [
@@ -255,10 +255,10 @@ Date: REGEX(.*)
 05. Query inside 15 kms radius from Madrid center -> Madrid, Alcobendas, Leganes
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 629
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 629
 
 {
     "contextResponses": [
@@ -323,10 +323,10 @@ Date: REGEX(.*)
 06. Query in 13.5 kms radius outside Madrid center -> Alcobendas
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 228
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 228
 
 {
     "contextResponses": [

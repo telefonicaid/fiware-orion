@@ -82,10 +82,10 @@ echo
 01. Set up entities
 ===================
 HTTP/1.1 200 OK
-Content-Length: 168
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 168
 
 {
     "contextResponses": [
@@ -110,10 +110,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 168
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 168
 
 {
     "contextResponses": [
@@ -138,10 +138,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 168
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 168
 
 {
     "contextResponses": [
@@ -168,10 +168,10 @@ Date: REGEX(.*)
 02. Query on / (returns: E1, E2)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 354
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 354
 
 {
     "contextResponses": [
@@ -218,10 +218,10 @@ Date: REGEX(.*)
 03. Query on /# (returns: E1, E2, E3)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 520
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 520
 
 {
     "contextResponses": [
@@ -286,10 +286,10 @@ Date: REGEX(.*)
 04. Query without servicePath (returns: E1, E2, E3)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 520
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 520
 
 {
     "contextResponses": [
