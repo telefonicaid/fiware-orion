@@ -100,13 +100,12 @@ std::string NotifyContextRequest::toJson
     else
     {
       std::string out;
-      out += contextElementResponseVector[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+      out += contextElementResponseVector[0]->toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, replacementsP);
       return out;
     }
   }
   else if (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES)
   {
-    renderFormat = NGSI_V2_KEYVALUES;
     if (contextElementResponseVector.size() == 0)
     {
       LM_E(("Runtime Error (contextElementResponser MUST NOT be zero length)"));
@@ -115,7 +114,7 @@ std::string NotifyContextRequest::toJson
     else
     {
       std::string out;
-      out += contextElementResponseVector[0]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+      out += contextElementResponseVector[0]->toJson(NGSI_V2_KEYVALUES, attrsFilter, blacklist, metadataFilter, replacementsP);
       return out;
     }
   }
