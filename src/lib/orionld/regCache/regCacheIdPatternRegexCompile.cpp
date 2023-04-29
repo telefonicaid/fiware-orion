@@ -68,8 +68,6 @@ bool regCacheIdPatternRegexCompile(RegCacheItem* rciP, KjNode* informationArrayP
         LM_X(1, ("Out of memory"));
 
       ripP->owner = idPatternP;
-      LM(("ripP->owner (idPattern from reg-cache tree): %p", ripP->owner));
-      LM(("Calling regcomp for '%s'", idPatternP->value.s));
       if (regcomp(&ripP->regex, idPatternP->value.s, REG_EXTENDED) != 0)
       {
         LM_E(("Error compiling a regular expression for '%s'", idPatternP->value.s));

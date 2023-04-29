@@ -44,78 +44,78 @@ static void qTreePresent(QNode* qP, int indent, const char* prefix)
 
   if (qP->type == QNodeEQ)
   {
-    LM(("%s:%sEQ:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sEQ:", prefix, indentV));
     qTreePresent(qP->value.children, indent+2, prefix);
     qTreePresent(qP->value.children->next, indent+2, prefix);
   }
   else if (qP->type == QNodeNE)
   {
-    LM(("%s:%sNE:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sNE:", prefix, indentV));
     qTreePresent(qP->value.children, indent+2, prefix);
     qTreePresent(qP->value.children->next, indent+2, prefix);
   }
   else if (qP->type == QNodeLT)
   {
-    LM(("%s:%sLT:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sLT:", prefix, indentV));
     qTreePresent(qP->value.children, indent+2, prefix);
     qTreePresent(qP->value.children->next, indent+2, prefix);
   }
   else if (qP->type == QNodeLE)
   {
-    LM(("%s:%sLE:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sLE:", prefix, indentV));
     qTreePresent(qP->value.children, indent+2, prefix);
     qTreePresent(qP->value.children->next, indent+2, prefix);
   }
   else if (qP->type == QNodeGT)
   {
-    LM(("%s:%sGT:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sGT:", prefix, indentV));
     qTreePresent(qP->value.children, indent+2, prefix);
     qTreePresent(qP->value.children->next, indent+2, prefix);
   }
   else if (qP->type == QNodeGE)
   {
-    LM(("%s:%sGE:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sGE:", prefix, indentV));
     qTreePresent(qP->value.children, indent+2, prefix);
     qTreePresent(qP->value.children->next, indent+2, prefix);
   }
   else if (qP->type == QNodeVariable)
-    LM(("%s:%s%s (Variable) (v at %p, qP at %p)", prefix, indentV, qP->value.v, qP->value.v, qP));
+    LM_T(LmtQ, ("%s:%s%s (Variable) (v at %p, qP at %p)", prefix, indentV, qP->value.v, qP->value.v, qP));
   else if (qP->type == QNodeIntegerValue)
-    LM(("%s:%s%d (Int)", prefix, indentV, qP->value.i));
+    LM_T(LmtQ, ("%s:%s%d (Int)", prefix, indentV, qP->value.i));
   else if (qP->type == QNodeFloatValue)
-    LM(("%s:%s%f (Float)", prefix, indentV, qP->value.f));
+    LM_T(LmtQ, ("%s:%s%f (Float)", prefix, indentV, qP->value.f));
   else if (qP->type == QNodeStringValue)
-    LM(("%s:%s%s (String) at %p (String at %p)", prefix, indentV, qP->value.s, qP, qP->value.s));
+    LM_T(LmtQ, ("%s:%s%s (String) at %p (String at %p)", prefix, indentV, qP->value.s, qP, qP->value.s));
   else if (qP->type == QNodeTrueValue)
-    LM(("%s:%sTRUE (Bool)", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sTRUE (Bool)", prefix, indentV));
   else if (qP->type == QNodeFalseValue)
-    LM(("%s:%sFALSE (Bool)", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sFALSE (Bool)", prefix, indentV));
   else if (qP->type == QNodeExists)
   {
-    LM(("%s:%s Exists (at %p):", prefix, indentV, qP));
+    LM_T(LmtQ, ("%s:%s Exists (at %p):", prefix, indentV, qP));
     qTreePresent(qP->value.children, indent+2, prefix);
   }
   else if (qP->type == QNodeNotExists)
   {
-    LM(("%s:%s Not Exists:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%s Not Exists:", prefix, indentV));
     qTreePresent(qP->value.children, indent+2, prefix);
   }
   else if (qP->type == QNodeOr)
   {
-    LM(("%s:%sOR:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sOR:", prefix, indentV));
     indent+=2;
     for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
       qTreePresent(childP, indent, prefix);
   }
   else if (qP->type == QNodeAnd)
   {
-    LM(("%s:%sAND:", prefix, indentV));
+    LM_T(LmtQ, ("%s:%sAND:", prefix, indentV));
     indent+=2;
     for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
       qTreePresent(childP, indent, prefix);
   }
   else
-    LM(("%s:%s%s (presentation TBI)", prefix, indentV, qNodeType(qP->type)));
+    LM_T(LmtQ, ("%s:%s%s (presentation TBI)", prefix, indentV, qNodeType(qP->type)));
 }
 
 
@@ -126,9 +126,9 @@ static void qTreePresent(QNode* qP, int indent, const char* prefix)
 //
 void qPresent(QNode* qP, const char* prefix, const char* what)
 {
-  LM(("%s: --------------------- %s -----------------------------------", prefix, what));
+  LM_T(LmtQ, ("%s: --------------------- %s -----------------------------------", prefix, what));
   qTreePresent(qP, 0, prefix);
-  LM(("%s: --------------------------------------------------------", prefix));
+  LM_T(LmtQ, ("%s: --------------------------------------------------------", prefix));
 }
 
 
@@ -139,21 +139,21 @@ void qPresent(QNode* qP, const char* prefix, const char* what)
 //
 void qListPresent(QNode* qP, QNode* endP, const char* prefix, const char* what)
 {
-  LM(("%s: %s:", prefix, what));
-  LM(("%s: --------------------------------------------------------", prefix));
+  LM_T(LmtQ, ("%s: %s:", prefix, what));
+  LM_T(LmtQ, ("%s: --------------------------------------------------------", prefix));
 
   int ix = 0;
   while (qP != endP)
   {
     if (qP->type == QNodeVariable)
-      LM(("%s:  %02d: Variable (at %p) (var-name '%s' at %p)", prefix, ix, qP, qP->value.v, qP->value.v));
+      LM_T(LmtQ, ("%s:  %02d: Variable (at %p) (var-name '%s' at %p)", prefix, ix, qP, qP->value.v, qP->value.v));
     else if (qP->type == QNodeStringValue)
-      LM(("%s:  %02d: StringValue (at %p) (string-value '%s' at %p)", prefix, ix, qP, qP->value.s, qP->value.s));
+      LM_T(LmtQ, ("%s:  %02d: StringValue (at %p) (string-value '%s' at %p)", prefix, ix, qP, qP->value.s, qP->value.s));
     else
-      LM(("%s:  %02d: %s (at %p)", prefix, ix, qNodeType(qP->type), qP));
+      LM_T(LmtQ, ("%s:  %02d: %s (at %p)", prefix, ix, qNodeType(qP->type), qP));
     qP = qP->next;
     ++ix;
   }
 
-  LM(("%s: --------------------------------------------------------", prefix));
+  LM_T(LmtQ, ("%s: --------------------------------------------------------", prefix));
 }

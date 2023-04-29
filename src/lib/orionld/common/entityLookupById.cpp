@@ -70,16 +70,16 @@ KjNode* entityLookupBy_id_Id(KjNode* entityArray, char* entityId, KjNode** entit
 
     if (_idNodeP == NULL)
     {
-      LM(("Database Error (Entity without _id )"));
+      LM_W(("Database Error? (Entity without _id )"));
       continue;
     }
 
     KjNode* idNodeP = kjLookup(_idNodeP, "id");
 
     if (idNodeP == NULL)
-      LM(("Database Error (Entity _id without id)"));
+      LM_W(("Database Error? (Entity _id without id)"));
     else if (idNodeP->type != KjString)
-      LM(("Database Error (Entity _id::id that is not a string)"));
+      LM_W(("Database Error? (Entity _id::id that is not a string)"));
     else if (strcmp(idNodeP->value.s, entityId) == 0)  // Match
     {
       if (entityTypeNodeP != NULL)

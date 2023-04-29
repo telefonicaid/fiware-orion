@@ -92,7 +92,7 @@ extern "C"
   float           diffF;                                 \
                                                          \
   kTimeDiff(&start, &end, &diff, &diffF);                \
-  LM(("TPUT: %s %f", text, diffF));                      \
+  LM_T(LmtPerformance, ("TPUT: %s %f", text, diffF));    \
 }
 
 
@@ -566,8 +566,8 @@ static void requestCompleted
     else
       kTimeDiff(&performanceTimestamps.mongoBackendStart, &performanceTimestamps.mongoBackendEnd, &mongo, &mongoF);
 
-    LM(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
-    LM(("TPUT: mongoConnect Accumulated:   %f (%d calls)", performanceTimestamps.mongoConnectAccumulated, performanceTimestamps.getMongoConnectionCalls));
+    LM_T(LmtPerformance, ("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
+    LM_T(LmtPerformance, ("TPUT: mongoConnect Accumulated:   %f (%d calls)", performanceTimestamps.mongoConnectAccumulated, performanceTimestamps.getMongoConnectionCalls));
   }
 #endif
 }
@@ -772,10 +772,10 @@ int servicePathSplit(ConnectionInfo* ciP)
     ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
     //
-    // This was previously an LM_T trace, but we have "promoted" it to INFO due to
+    // This was previously an LM_T trace, but we have "promoted" it to INFO as
     // it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
     //
-    LM_K(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+    LM_K(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));  // Sacred - used by functest service_path_http_header.test
   }
 
 
@@ -1333,14 +1333,13 @@ static MHD_Result connectionTreat
   //  NOT NGSI-LD
   //
   ++requestNo;
-  LM(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
+  LM_K(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
     MHD_Result retVal;
 
-    LM(("Servicing request %d: %s %s -----------------", reqNo, method, url));
     //
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
     //

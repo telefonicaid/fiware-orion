@@ -120,26 +120,26 @@ KjNode* dbModelToEntityIdAndTypeTable(KjNode* dbEntityIdArray)
 //
 void distReqLog(DistOp* distOpList, const char* title)
 {
-  LM(("DR: %s", title));
+  LM_T(LmtSR, ("DR: %s", title));
   for (DistOp* drP = distOpList; drP != NULL; drP = drP->next)
   {
-    LM(("DR: Registration:               %s", drP->regP->regId));
-    LM(("DR: Verb:                       %s", "TBD"));
-    LM(("DR: URL:                        %s", "TBD"));  // IP+port should be in the URL
-    LM(("DR: Entity ID:                  %s", drP->entityId));
-    LM(("DR: Entity Type:                %s", drP->entityType));
+    LM_T(LmtSR, ("DR: Registration:               %s", drP->regP->regId));
+    LM_T(LmtSR, ("DR: Verb:                       %s", "TBD"));
+    LM_T(LmtSR, ("DR: URL:                        %s", "TBD"));  // IP+port should be in the URL
+    LM_T(LmtSR, ("DR: Entity ID:                  %s", drP->entityId));
+    LM_T(LmtSR, ("DR: Entity Type:                %s", drP->entityType));
 
     if (drP->requestBody != NULL)
     {
       int   bodySize = kjFastRenderSize(drP->requestBody);
       char* body     = kaAlloc(&orionldState.kalloc, bodySize + 256);
       kjFastRender(drP->requestBody, body);
-      LM(("DR: payload body:               %s", body));
+      LM_T(LmtSR, ("DR: payload body:               %s", body));
     }
     else
-      LM(("DR: payload body:               NULL"));
+      LM_T(LmtSR, ("DR: payload body:               NULL"));
 
-    LM(("DR: -----------------------------------------------------------"));
+    LM_T(LmtSR, ("DR: -----------------------------------------------------------"));
   }
 }
 

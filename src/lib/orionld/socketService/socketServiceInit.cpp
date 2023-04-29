@@ -61,6 +61,6 @@ int socketServiceInit(unsigned short port)
   if (listen(listenFd, 10) == -1)
     LM_RP(-1, ("error listening to socket for socket service"));
 
-  LM(("SS: socket service listens on fd %d", listenFd));
+  LM_T(LmtSocketService, ("SS: socket service listens on fd %d", listenFd));
   return listenFd;
 }

@@ -137,7 +137,7 @@ static void* workerFunc(void* pSyncQ)
       {
         char* topic = (char*) params->resource.c_str();
 
-        LM(("Sending MQTT Notification for subscription '%s'", params->subscriptionId.c_str()));
+        LM_T(LmtNotificationMsg, ("Sending MQTT Notification for subscription '%s'", params->subscriptionId.c_str()));
         r = mqttNotification(params->ip.c_str(),
                              params->port,
                              topic,
@@ -158,7 +158,7 @@ static void* workerFunc(void* pSyncQ)
         if (ngsildSubscription == false)
           subscriptionId = NULL;
 
-        LM(("Sending HTTP Notification for subscription '%s'", params->subscriptionId.c_str()));
+        LM_T(LmtNotificationMsg, ("Sending HTTP Notification for subscription '%s'", params->subscriptionId.c_str()));
         r = httpRequestSendWithCurl(curl,
                                     params->ip,
                                     params->port,

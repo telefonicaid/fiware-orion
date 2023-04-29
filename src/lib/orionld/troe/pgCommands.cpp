@@ -56,7 +56,7 @@ void pgCommands(char* sql[], int commands)
 
   for (int ix = 0; ix < commands; ix++)
   {
-    // LM(("SQL: %s;", sql[ix]));
+    LM_T(LmtSql, ("SQL: %s;", sql[ix]));
     PGresult* res = PQexec(connectionP->connectionP, sql[ix]);
     if (res == NULL)
     {

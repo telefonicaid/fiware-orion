@@ -50,8 +50,6 @@ void notificationSuccess(CachedSubscription* subP, const double timestamp)
 
   promCounterIncrease(promNotifications);
 
-  // LM(("SUBC: dirty: %d, cSubCounters: %d", subP->dirty, cSubCounters));
-
   //
   // Flush to DB?
   // - If subP->dirty (number of counter updates since last flush) >= cSubCounters

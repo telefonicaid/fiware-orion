@@ -59,19 +59,19 @@ DistOp* regMatchForBatchDelete
     // Loop detection
     if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
     {
-      LM(("No Reg Match due to loop detection"));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to loop detection", regP->regId));
       continue;
     }
 
     if ((regP->mode & regMode) == 0)
     {
-      LM(("%s: No Reg Match due to regMode", regP->regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode", regP->regId));
       continue;
     }
 
     if (regMatchOperation(regP, operation) == false)
     {
-      LM(("%s: No Reg Match due to Operation", regP->regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation", regP->regId));
       continue;
     }
 
@@ -97,7 +97,7 @@ DistOp* regMatchForBatchDelete
         distOpTail       = distOpP;
         distOpTail->next = NULL;
 
-        LM(("%s: Reg Match !", regP->regId));
+        LM_T(LmtRegMatch, ("%s: Reg Match !", regP->regId));
       }
     }
   }
