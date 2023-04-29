@@ -849,31 +849,31 @@ void regCachePresent(void)
   for (OrionldTenant* tenantP = &tenant0; tenantP != NULL; tenantP = tenantP->next)
   {
     if (tenantP->regCache == NULL)
-      LM(("Tenant '%s': No regCache", tenantP->mongoDbName));
+      LM_T(LmtRegCache, ("Tenant '%s': No regCache", tenantP->mongoDbName));
     else
     {
-      LM(("Tenant '%s':", tenantP->mongoDbName));
+      LM_T(LmtRegCache, ("Tenant '%s':", tenantP->mongoDbName));
       RegCacheItem* rciP = tenantP->regCache->regList;
 
       while (rciP != NULL)
       {
         KjNode* regIdP = kjLookup(rciP->regTree, "id");
 
-        LM(("  o Registration %s:", (regIdP != NULL)? regIdP->value.s : "unknown"));
-        LM(("    o mode:  %s", registrationModeToString(rciP->mode)));
-        LM(("    o ops:   0x%x", rciP->opMask));
+        LM_T(LmtRegCache, ("  o Registration %s:", (regIdP != NULL)? regIdP->value.s : "unknown"));
+        LM_T(LmtRegCache, ("    o mode:  %s", registrationModeToString(rciP->mode)));
+        LM_T(LmtRegCache, ("    o ops:   0x%x", rciP->opMask));
 
         if (rciP->idPatternRegexList != NULL)
         {
-          LM(("    o patterns:"));
+          LM_T(LmtRegCache, ("    o patterns:"));
           for (RegIdPattern* ripP = rciP->idPatternRegexList; ripP != NULL; ripP = ripP->next)
           {
-            LM(("      o %s (idPattern at %p)", ripP->owner->value.s, ripP->owner));
+            LM_T(LmtRegCache, ("      o %s (idPattern at %p)", ripP->owner->value.s, ripP->owner));
           }
         }
         else
-          LM(("    o patterns: NONE"));
-        LM(("  -----------------------------------"));
+          LM_T(LmtRegCache, ("    o patterns: NONE"));
+        LM_T(LmtRegCache, ("  -----------------------------------"));
         rciP = rciP->next;
       }
     }
@@ -1150,7 +1150,6 @@ int main(int argC, char* argV[])
 
   // localIpAndPort - IP:port for X-Forwarded-For
   snprintf(localIpAndPort, sizeof(localIpAndPort), "%s:%d", orionldHostName, port);
-  LM(("localIpAndPort: %s", localIpAndPort));
 
   orionldStateInit(NULL);
 

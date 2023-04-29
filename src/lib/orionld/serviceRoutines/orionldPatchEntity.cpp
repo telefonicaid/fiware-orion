@@ -181,7 +181,7 @@ static bool attributeLookup(KjNode* dbAttrsP, char* attrName)
 #if 0
 void rawResponse(DistOp* distOpList, const char* what)
 {
-  LM(("=============== rawResponse: %s", what));
+  LM_T(LmtDistOpMsgs, ("=============== rawResponse: %s", what));
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
   {
     if (distOpP->rawResponse != NULL)
@@ -189,7 +189,7 @@ void rawResponse(DistOp* distOpList, const char* what)
     else
       LM_T(LmtDistOpMsgs, ("%s: rawResponse: NULL", distOpP->regP->regId));
   }
-  LM(("===================================================================="));
+  LM_T(LmtDistOpMsgs, ("===================================================================="));
 }
 #endif
 

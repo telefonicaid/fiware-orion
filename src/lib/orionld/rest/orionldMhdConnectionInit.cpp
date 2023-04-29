@@ -979,7 +979,7 @@ MHD_Result orionldMhdConnectionInit
   ++requestNo;
 
   // if ((requestNo % 100 == 0) || (requestNo == 1))
-  LM(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
+  LM_K(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
   // 2. Prepare orionldState

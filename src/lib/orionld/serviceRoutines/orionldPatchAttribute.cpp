@@ -136,8 +136,6 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
       continue;
     }
 
-    LM_T(LmtSR, ("Treating sub-attr '%s'", subAttrP->name));
-
     bool isValue = false;
 
     if      (strcmp(subAttrP->name, "languageMap") == 0)  { isValue = true; }
@@ -153,7 +151,6 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
       KjNode* dbValueP = kjLookup(dbAttrP, "value");
       if (dbValueP != NULL)
       {
-        LM_T(LmtSR, ("Setting the value of the attribute"));
         dbValueP->type  = subAttrP->type;
         dbValueP->value = subAttrP->value;
       }
@@ -171,14 +168,7 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
     KjNode* dbSubAttrP = kjLookup(mdP, eqName);
 
     if (dbSubAttrP != NULL)
-    {
-      LM_T(LmtSR, ("Found it"));
-      LM_T(LmtSR, ("Removing already existing sub-attr '%s'", dbSubAttrP->name));
       kjChildRemove(mdP, dbSubAttrP);
-      LM_T(LmtSR, ("Removed sub-attr '%s'", dbSubAttrP->name));
-    }
-    else
-      LM_T(LmtSR, ("Did not find it"));
 
 
     //

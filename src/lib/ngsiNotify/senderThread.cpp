@@ -73,7 +73,7 @@ void* startSenderThread(void* p)
       {
         std::string  out;
 
-        LM(("Sending HTTP Notification for subscription '%s'", params->subscriptionId.c_str()));
+        LM_T(LmtNotificationMsg, ("Sending HTTP Notification for subscription '%s'", params->subscriptionId.c_str()));
         r = httpRequestSend(params->ip,
                             params->port,
                             params->protocol,
@@ -97,7 +97,7 @@ void* startSenderThread(void* p)
       {
         char* topic = (char*) params->resource.c_str();
 
-        LM(("Sending MQTT Notification for subscription '%s'", params->subscriptionId.c_str()));
+        LM_T(LmtNotificationMsg, ("Sending MQTT Notification for subscription '%s'", params->subscriptionId.c_str()));
         r = mqttNotification(params->ip.c_str(),
                              params->port,
                              topic,

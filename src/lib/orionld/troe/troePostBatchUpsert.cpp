@@ -52,7 +52,6 @@ extern "C"
 //
 static KjNode* entityIdLookup(KjNode* tree, const char* entityId)
 {
-  LM(("orionldState.batchEntities->value.firstChildP == %p", tree->value.firstChildP));
   for (KjNode* itemP = tree->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
     KjNode* idP = kjLookup(itemP, "id");
@@ -150,7 +149,6 @@ bool troePostBatchUpsert(void)
   if (attributes.values    > 0) sqlV[sqlIx++] = attributes.buf;
   if (subAttributes.values > 0) sqlV[sqlIx++] = subAttributes.buf;
 
-  LM(("XX: sqlIx == %d", sqlIx));
   if (sqlIx > 0)
     pgCommands(sqlV, sqlIx);
 

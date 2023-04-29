@@ -60,6 +60,7 @@ typedef enum TraceLevels
   //
   LmtSubCache = 50,                    // Subscription Cache
   LmtSubCacheMatch,                    // Subscription Cache Matches
+  LmtSubCacheDebug,                    // Subscription Cache Debug
 
   //
   // Registration Cache
@@ -76,16 +77,31 @@ typedef enum TraceLevels
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
-  LmtMqtt,                             // MQTT notifications
+  LmtDistOpList,                       // Linked list of DistOps
+
+  //
+  // Context
+  //
+  LmtContexts = 80,                    // Contexts
+  LmtContextTree,                      // Context Tree
+  LmtContextCache,                     // Context Cache
 
   //
   // Misc
   //
-  LmtMongoc = 80,                      // Entire mongoc library
+  LmtMongoc = 240,                     // Entire mongoc library
   LmtSR,                               // Service Routine (whatever it is doing)
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
-  LmtLegacy                            // Old code (mongoBackend, json parsers, etc)
+  LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
+  LmtMqtt,                             // MQTT notifications
+  LmtQ,                                // Query language
+  LmtSql,                              // SQL command for TRoE
+  LmtPgPool,                           // Postgres Connection Pool
+  LmtSocketService,                    // Socket Service
+  LmtCurl,                             // CURL library
+  LmtToDo,                             // To Do list
+  LmtLeak                              // Used when debugging leaks and valgrind errors
 } TraceLevels;
 
 

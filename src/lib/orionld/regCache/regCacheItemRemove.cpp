@@ -84,11 +84,17 @@ bool regCacheItemRemove(RegCache* rcP, const char* regId)
         prev->next = rciP->next;  // Just step over it
 
       // Free the reg-cache item to be deleted (call regCacheItemRelease(rciP)?)
+      if (rciP->regId != NULL)
+        free(rciP->regId);
+
       kjFree(rciP->regTree);
-      free(rciP->regId);
 
       // In case we have any regex's, free them
-      regCacheItemRegexRelease(rciP);
+      if (rciP->idPatternRegexList != NULL)
+        regCacheItemRegexRelease(rciP);
+
+      if (rciP->ipAndPort != NULL)
+        free(rciP->ipAndPort);
 
       // And finally, free the entire struct
       free(rciP);

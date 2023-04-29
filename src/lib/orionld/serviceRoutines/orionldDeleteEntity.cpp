@@ -53,6 +53,7 @@ extern "C"
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
 
 
@@ -242,7 +243,10 @@ bool orionldDeleteEntity(void)
     alterations(entityId, entityTypeExpanded, entityTypeCompacted);
 
   if (distOpList != NULL)
+  {
     distOpResponses(distOpList, responseBody);
+    distOpListRelease(distOpList);
+  }
 
   responseFix(responseBody, DoDeleteEntity, 204, entityId);
 

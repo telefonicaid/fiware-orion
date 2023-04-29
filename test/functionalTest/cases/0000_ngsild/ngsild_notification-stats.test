@@ -158,6 +158,7 @@ echo
 echo "06. Dump accumulator - see one notification"
 echo "==========================================="
 sleep .1
+valgrindSleep 1
 accumulatorDump IPv4 HTTPS
 accumulatorReset HTTPS
 echo

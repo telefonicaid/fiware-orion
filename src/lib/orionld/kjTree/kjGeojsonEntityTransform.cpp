@@ -55,8 +55,6 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
   KjNode* typeP = kjLookup(attributeP, "type");
   if (typeP == NULL)
   {
-    LM(("No type - might be OK if concise - BUT, in such case there MUST be a value and that value MUST have type + coordinates"));
-
     if (orionldState.uriParamOptions.concise == true)
     {
       // In 'Concise' attribute format, there may be no type field
@@ -68,10 +66,7 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
         typeP      = kjLookup(attributeP, "type");
 
         if (typeP == NULL)
-        {
-          LM(("No type inside 'value' for Concise"));
           return NULL;
-        }
       }
     }
     else
@@ -83,19 +78,13 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
     KjNode* valueP = kjLookup(attributeP, "value");
 
     if (valueP == NULL)
-    {
-      LM(("No value"));
       return NULL;
-    }
 
     attributeP = valueP;  // to be cloned and named 'geometry
     typeP      = kjLookup(attributeP, "type");
 
     if (typeP == NULL)
-    {
-      LM(("No type inside 'value' for Normalized"));
       return NULL;
-    }
   }
 
   //
@@ -109,19 +98,14 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
       (strcmp(typeP->value.s, "MultiLineString") != 0)  &&
       (strcmp(typeP->value.s, "MultiPolygon")    != 0))
   {
-    LM(("Not a GeoJSON type (%s)", typeP->value.s));
     return NULL;  // Not a GeoProperty
   }
 
   KjNode* coordsP = kjLookup(attributeP, "coordinates");
 
   if ((coordsP == NULL) || (coordsP->type != KjArray))
-  {
-    LM(("No coords"));
     return NULL;
-  }
 
-  LM(("Cloning and returning"));
   KjNode* cloneP = kjClone(orionldState.kjsonP, attributeP);
   cloneP->name = (char*) "geometry";
   return cloneP;

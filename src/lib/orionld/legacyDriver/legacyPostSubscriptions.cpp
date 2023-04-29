@@ -98,13 +98,11 @@ bool legacyPostSubscriptions(void)
   {
     KjNode* uriP = kjLookup(endpointP, "uri");
 
-    LM(("1178: uri: '%s'", uriP->value.s));
     if ((strncmp(uriP->value.s, "mqtt://", 7) == 0) || (strncmp(uriP->value.s, "mqtts://", 8) == 0))
     {
       char*           detail        = NULL;
       char*           uri           = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
 
-      LM(("1178: parsing MQTT url: '%s'", uriP->value.s));
       if (mqttParse(uri, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
       {
         orionldError(OrionldBadRequestData, "Invalid MQTT endpoint", detail, 400);
@@ -175,7 +173,6 @@ bool legacyPostSubscriptions(void)
     //
     // Establish connection with MQTT broker
     //
-    LM(("1178: Establishing connection with the MQTT broker"));
     if (mqttConnectionEstablish(mqtts, mqttUser, mqttPassword, mqttHost, mqttPort, mqttVersion) == false)
     {
       orionldError(OrionldInternalError, "Unable to connect to MQTT server", "xxx", 500);

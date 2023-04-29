@@ -63,7 +63,7 @@ bool orionldPostQuery(void)
   if (treeNodeV == NULL)
     return false;
 
-  LM(("QNode tree at %p", treeNodeV[3].output));
+  LM_T(LmtSR, ("QNode tree at %p", treeNodeV[3].output));
 
   //
   // pCheckQuery has left us everything checked and expanded.

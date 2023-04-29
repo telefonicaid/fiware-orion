@@ -29,6 +29,8 @@ extern "C"
 #include "kjson/kjFree.h"                                      // kjFree
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+
 #include "orionld/regCache/RegCache.h"                         // RegCache
 #include "orionld/regCache/regCacheItemRegexRelease.h"         // regCacheItemRegexRelease
 #include "orionld/regCache/regCacheRelease.h"                  // Own interface
@@ -47,6 +49,9 @@ void regCacheRelease(RegCache* regCacheP)
   while (rciP != NULL)
   {
     next = rciP->next;
+
+    if (rciP->regId != NULL)
+      free(rciP->regId);
 
     kjFree(rciP->regTree);
     if (rciP->idPatternRegexList != NULL)

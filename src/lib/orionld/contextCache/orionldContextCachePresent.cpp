@@ -37,12 +37,12 @@
 //
 void orionldContextCachePresent(const char* prefix, const char* info)
 {
-  LM_K(("%s: *************** %s: %d Contexts *************************", prefix, info, orionldContextCacheSlotIx));
-  LM_K(("%s: ========================================================================", prefix));
+  LM_T(LmtContextCache, ("%s: *************** %s: %d Contexts *************************", prefix, info, orionldContextCacheSlotIx));
+  LM_T(LmtContextCache, ("%s: ========================================================================", prefix));
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
     orionldContextPresent(prefix, orionldContextCache[ix]);
-    LM_K(("%s:", prefix));
+    LM_T(LmtContextCache, ("%s:", prefix));
   }
-  LM_K(("%s: ========================================================================", prefix));
+  LM_T(LmtContextCache, ("%s: ========================================================================", prefix));
 }

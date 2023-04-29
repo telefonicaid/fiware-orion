@@ -110,35 +110,35 @@ int curlDebug(CURL* handle, curl_infotype type, char* data, size_t size, void* u
   switch (type)
   {
   case CURLINFO_TEXT:
-    LM(("CURL: %s", data));
+    LM_T(LmtCurl, ("CURL: %s", data));
     break;
 
   case CURLINFO_HEADER_OUT:
-    LM(("CURL: Send header"));
+    LM_T(LmtCurl, ("CURL: Send header"));
     break;
 
   case CURLINFO_DATA_OUT:
-    LM(("CURL: Send data"));
+    LM_T(LmtCurl, ("CURL: Send data"));
     break;
 
   case CURLINFO_SSL_DATA_OUT:
-    LM(("CURL: Send SSL data"));
+    LM_T(LmtCurl, ("CURL: Send SSL data"));
     break;
 
   case CURLINFO_HEADER_IN:
-    LM(("CURL: Recv header"));
+    LM_T(LmtCurl, ("CURL: Recv header"));
     break;
 
   case CURLINFO_DATA_IN:
-    LM(("CURL: Recv data"));
+    LM_T(LmtCurl, ("CURL: Recv data"));
     break;
 
   case CURLINFO_SSL_DATA_IN:
-    LM(("CURL: Recv SSL data"));
+    LM_T(LmtCurl, ("CURL: Recv SSL data"));
     break;
 
   default:
-    LM(("CURL: type &d", type));
+    LM_T(LmtCurl, ("CURL: type &d", type));
     break;
   }
 

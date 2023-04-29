@@ -27,7 +27,7 @@
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include "logMsg/traceLevels.h"                                  // LmtMongoc
 
 #include "orionld/common/orionldState.h"                         // orionldState, mongocPool, ...
 #include "orionld/common/tenantList.h"                           // tenant0 - the default tenant
@@ -143,17 +143,16 @@ static char* uriCompose
   char* compV[50];
   int   compNo = 0;
 
-#if 0
-  LM(("dbURI:           '%s'", dbURI));
-  LM(("dbHost:          '%s'", dbHost));
-  LM(("dbUser:          '%s'", dbUser));
-  LM(("dbPwd:           '%s'", dbPwd));
-  LM(("dbAuthDb:        '%s'", dbAuthDb));
-  LM(("dbReplicaSet:    '%s'", dbReplicaSet));
-  LM(("dbAuthMechanism: '%s'", dbAuthMechanism));
-  LM(("dbSSL:           '%s'", (dbSSL == true)? "true" : "false"));
-  LM(("tlsCertificate:  '%s'", tlsCertificateFilePath));
-#endif
+  LM_T(LmtMongoc, ("dbURI:           '%s'", dbURI));
+  LM_T(LmtMongoc, ("dbHost:          '%s'", dbHost));
+  LM_T(LmtMongoc, ("dbUser:          '%s'", dbUser));
+  if (dbPwd != NULL)
+    LM_T(LmtMongoc, ("dbPwd:           '****'"));
+  LM_T(LmtMongoc, ("dbAuthDb:        '%s'", dbAuthDb));
+  LM_T(LmtMongoc, ("dbReplicaSet:    '%s'", dbReplicaSet));
+  LM_T(LmtMongoc, ("dbAuthMechanism: '%s'", dbAuthMechanism));
+  LM_T(LmtMongoc, ("dbSSL:           '%s'", (dbSSL == true)? "true" : "false"));
+  LM_T(LmtMongoc, ("tlsCertificate:  '%s'", tlsCertificateFilePath));
 
   if (dbURI[0] != 0)
   {
@@ -251,7 +250,6 @@ static char* uriCompose
     len += strlen(compV[ix]);
   }
 
-  // LM(("mongo uri: %s", uri));
   return uri;
 }
 

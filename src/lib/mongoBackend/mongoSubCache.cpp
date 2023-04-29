@@ -204,13 +204,8 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         {
           char* q = (char*) cSubP->expression.q.c_str();
 
-          // LM(("QOR: q == '%s'", q));
-
           if (strchr(q, '|') != NULL)
-          {
-            // LM(("QOR: Subscription::q contains an OR - NGSIv2 doesn't support that - only NGSI-LD"));
             q = (char*) "P;!P";
-          }
 
           if (!cSubP->expression.stringFilter.parse(q, &errorString))
           {
@@ -219,8 +214,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
             delete cSubP;
             return -5;
           }
-
-          // LM(("QOR: q == '%s'", cSubP->expression.q.c_str()));
         }
       }
 
@@ -231,7 +224,6 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
         cSubP->expression.mq = getStringFieldF(&expression, CSUB_EXPR_MQ);
         if (cSubP->expression.mq != "")
         {
-          // LM(("cSubP->expression.mq == '%s'", cSubP->expression.mq.c_str()));
           if (!cSubP->expression.mdStringFilter.parse(cSubP->expression.mq.c_str(), &errorString))
           {
             LM_E(("Runtime Error (error parsing md string filter: %s)", errorString.c_str()));

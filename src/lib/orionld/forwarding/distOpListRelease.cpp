@@ -50,4 +50,5 @@ void distOpListRelease(DistOp* distOpList)
   }
 
   curl_multi_cleanup(orionldState.curlDoMultiP);
+  orionldState.curlDoMultiP = NULL;
 }

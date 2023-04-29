@@ -126,7 +126,7 @@ bool pCheckOverlappingRegistrations(RegistrationMode regMode, KjNode* entitiesP,
 {
   if (entitiesP == NULL)
   {
-    LM(("ToDo: check conflict for reg with only attributes"));
+    LM_T(LmtToDo, ("ToDo: check conflict for reg with only attributes"));
     return false;
   }
 

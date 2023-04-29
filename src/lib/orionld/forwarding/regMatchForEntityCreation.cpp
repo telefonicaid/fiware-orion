@@ -42,29 +42,29 @@ extern "C"
 #if 0
 void distOpListDebug(DistOp* distOpP, const char* what)
 {
-  LM(("----- DistOp List: %s", what));
+  LM_T(LmtDistOpList, ("----- DistOp List: %s", what));
 
   while (distOpP != NULL)
   {
-    LM(("  Registration:      %s", distOpP->regP->regId));
-    LM(("  Operation:         %s", distOpTypes[distOpP->operation]));
+    LM_T(LmtDistOpList, ("  Registration:      %s", distOpP->regP->regId));
+    LM_T(LmtDistOpList, ("  Operation:         %s", distOpTypes[distOpP->operation]));
 
     if (distOpP->error == true)
     {
-      LM(("  Title:             %s", distOpP->title));
-      LM(("  Detail:            %s", distOpP->detail));
-      LM(("  Status:            %d", distOpP->httpResponseCode));
+      LM_T(LmtDistOpList, ("  Title:             %s", distOpP->title));
+      LM_T(LmtDistOpList, ("  Detail:            %s", distOpP->detail));
+      LM_T(LmtDistOpList, ("  Status:            %d", distOpP->httpResponseCode));
     }
 
     if (distOpP->requestBody != NULL)
     {
-      LM(("  Attributes:"));
+      LM_T(LmtDistOpList, ("  Attributes:"));
       int ix = 0;
       for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
         if ((strcmp(attrP->name, "id") != 0) && (strcmp(attrP->name, "type") != 0))
         {
-          LM(("    Attribute %d:   '%s'", ix, attrP->name));
+          LM_T(LmtDistOpList, ("    Attribute %d:   '%s'", ix, attrP->name));
           ++ix;
         }
       }
@@ -72,17 +72,17 @@ void distOpListDebug(DistOp* distOpP, const char* what)
 
     if (distOpP->attrList != NULL)
     {
-      LM(("  URL Attributes:        %d", distOpP->attrList->items));
+      LM_T(LmtDistOpList, ("  URL Attributes:        %d", distOpP->attrList->items));
       for (int ix = 0; ix < distOpP->attrList->items; ix++)
       {
-        LM(("    Attribute %d:   '%s'", ix, distOpP->attrList->array[ix]));
+        LM_T(LmtDistOpList, ("    Attribute %d:   '%s'", ix, distOpP->attrList->array[ix]));
       }
     }
 
     distOpP = distOpP->next;
   }
 
-  LM(("---------------------"));
+  LM_T(LmtDistOpList, ("---------------------"));
 }
 #endif
 
