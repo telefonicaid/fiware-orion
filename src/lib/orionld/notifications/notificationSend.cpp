@@ -781,8 +781,6 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   {
     const char* key    = it->first.c_str();
     char*       value  = (char*) it->second.c_str();
-    int         len    = strlen(key) + strlen(value) + 10;
-    char*       buf    = kaAlloc(&orionldState.kalloc, len);
 
     if (strcmp(value, "urn:ngsi-ld:request") == 0)
     {
@@ -797,6 +795,9 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
       else
         continue;  // No incoming headers?  Must ignore the urn:ngsi-ld:request header, no other choice
     }
+
+    int   len = strlen(key) + strlen(value) + 10;
+    char* buf = kaAlloc(&orionldState.kalloc, len);
 
     ioVec[headerIx].iov_len  = snprintf(buf, len, "%s: %s\r\n", key, value);
     ioVec[headerIx].iov_base = buf;

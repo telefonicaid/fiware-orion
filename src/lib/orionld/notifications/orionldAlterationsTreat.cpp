@@ -578,7 +578,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
     CURL* curlHandleP = NULL;
     int   fd          = notificationSend(matchHead, notificationTime, &curlHandleP);  // curl handle as output param?
-    LM_T(LmtNotificationSend, ("%s: notificationSend returned fd %d (-2 is OK if HTTPS)", matchHead->subP->subscriptionId, fd));
 
     //
     // -1 is ERROR, -2 is OK for HTTPS, anything else is a file descriptor to read from, except if MQTT.
