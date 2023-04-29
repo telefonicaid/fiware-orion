@@ -85,7 +85,8 @@ typedef enum TraceLevels
   LmtSR,                               // Service Routine (whatever it is doing)
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
-  LmtLegacy                            // Old code (mongoBackend, json parsers, etc)
+  LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
+  LmtLeak                              // Used when debugging leaks and valgrind errors
 } TraceLevels;
 
 

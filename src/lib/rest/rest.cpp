@@ -428,6 +428,20 @@ static void requestCompleted
     free(orionldState.curlHeadersV);
   }
 
+  //
+  // FIXME:
+  //   Would be nice to do this here instead of in every service routine
+  //   Just, I don't have the pointer (distOpList) in orionldState.
+  //   At least I can do the call to curl_multi_cleanup
+  //
+  if (orionldState.curlDoMultiP != NULL)
+  {
+    // distOpListRelease(orionldState.distOpList);
+    curl_multi_cleanup(orionldState.curlDoMultiP);
+    orionldState.curlDoMultiP = NULL;
+  }
+
+
   lmTransactionEnd();  // Incoming REST request ends
 
   if (timingStatistics)

@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/distOpEntityMerge.h"                // distOpEntityMerge
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own interface
 
@@ -336,6 +337,8 @@ bool orionldGetEntity(void)
       else
         distOpEntityMerge(apiEntityP, fwdP->responseBody, sysAttrs, fwdP->regP->mode == RegModeAuxiliary);
     }
+
+    distOpListRelease(distOpList);
   }
 
   if ((forwards > 0) || (forcedSysAttrs == true))  // Nothing to do with SysAttrs really, just a bieffekt

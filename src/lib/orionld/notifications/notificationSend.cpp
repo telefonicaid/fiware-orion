@@ -220,10 +220,6 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
         kjChildAdd(attrP, langP);
       }
     }
-    else if (strcmp(attrTypeP->value.s, "Relationship") == 0)
-    {
-      LM(("it's a relationship ... change name from 'value' to 'object'?    OR, is that done already?"));
-    }
   }
 }
 

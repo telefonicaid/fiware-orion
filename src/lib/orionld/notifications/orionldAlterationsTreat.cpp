@@ -260,8 +260,11 @@ bool notificationResponseRead
       notificationFailure(npP->subP, "Content-Length not found but the status code is not a 204", notificationTime);
       return false;
     }
+    contentLen = 0;
   }
-  contentLen = atoi(&contentLenP[16]);
+  else
+    contentLen = atoi(&contentLenP[16]);
+
   LM_T(LmtNotificationMsg, ("%s: Content-Length: %d", npP->subP->subscriptionId, contentLen));
 
 
