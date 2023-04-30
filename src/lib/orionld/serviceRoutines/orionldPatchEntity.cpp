@@ -267,7 +267,6 @@ bool orionldPatchEntity(void)
   if (orionldState.distributed == true)
   {
     distOpList = distOpRequests(entityId, entityType, DoUpdateEntity, orionldState.requestTree);
-    kjTreeLog(orionldState.requestTree, "Left for local", LmtDistOpMsgs);
 
     //
     // Read the responses from Distributed Requests
@@ -276,7 +275,6 @@ bool orionldPatchEntity(void)
     {
       distOpResponses(distOpList, responseBody);
       distOpListRelease(distOpList);
-      kjTreeLog(responseBody, "responseBody after distOpResponses", LmtDistOpMsgs);
     }
   }
 
@@ -347,11 +345,10 @@ bool orionldPatchEntity(void)
     // All that is needed is the body, sop, we can create a "fake" DistOp:
     //
     DistOp local;
+
     bzero(&local, sizeof(local));
     local.requestBody = orionldState.requestTree;
-    kjTreeLog(responseBody, "responseBody BEFORE", LmtDistOpMsgs);
     distOpSuccess(responseBody, &local, NULL);
-    kjTreeLog(responseBody, "responseBody AFTER", LmtDistOpMsgs);
   }
 
 
@@ -385,8 +382,6 @@ bool orionldPatchEntity(void)
   orionldState.requestTree = incomingP;
 
  done:
-  kjTreeLog(responseBody, "Final responseBody", LmtDistOpMsgs);
-
   responseFix(responseBody, DoUpdateEntity, 204, entityId);
 
   return true;

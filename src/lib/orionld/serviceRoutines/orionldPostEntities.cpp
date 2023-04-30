@@ -106,8 +106,6 @@ bool orionldPostEntities(void)
   //
   // If the entity already exists, a "409 Conflict" is returned, either complete or as part of a 207
   //
-  kjTreeLog(orionldState.requestTree, "Left after DistOps", LmtDistOpMsgs);
-
   dbEntityP = mongocEntityLookup(entityId, NULL, NULL, NULL, NULL);
   if (dbEntityP != NULL)
   {

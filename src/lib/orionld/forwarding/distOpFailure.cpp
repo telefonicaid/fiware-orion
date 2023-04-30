@@ -58,7 +58,6 @@ void distOpFailure(KjNode* responseBody, DistOp* distOpP, const char* title, con
     KjNode* successV = kjLookup(responseBody, "success");
     if ((successV != NULL) && (successV->value.firstChildP != NULL) && (alias != NULL))
     {
-      kjTreeLog(successV, "successV", LmtDistOp207);
       if (kjStringValueLookupInArray(successV, alias) != NULL)
       {
         // The 404 attribute was updated elsewhere => not a 404

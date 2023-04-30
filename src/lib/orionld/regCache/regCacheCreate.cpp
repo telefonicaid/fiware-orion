@@ -72,7 +72,7 @@ int regIterFunc(RegCache* rcP, KjNode* dbRegP)
   // Convert API Reg to Cache Reg
   apiModelToCacheRegistration(apiRegP);
 
-  kjTreeLog(apiRegP, "Cache Reg", LmtRegCache);
+  // kjTreeLog(apiRegP, "Cache Reg", LmtRegCache);
 
   // Insert cacheRegP in tenantP->regCache (rcP)
   regCacheItemAdd(rcP, regId, apiRegP, true, fwdContextP);

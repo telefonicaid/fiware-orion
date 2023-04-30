@@ -368,7 +368,7 @@ static OrionldAlterationMatch* attributeMatch(OrionldAlterationMatch* matchList,
     if ((match == true) && (watchAttrs == 0) && (dbAttrsP != NULL) && (noNotifyFalseUpdate == true) && (altP->inEntityP != NULL))
     {
       int changed = 0;
-      kjTreeLog(altP->inEntityP, "inEntityP - or ... is it just an attribute???", LmtSubCache);
+
       for (KjNode* attrP = altP->inEntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
       {
         if (strcmp(attrP->name, "id")   == 0) continue;
