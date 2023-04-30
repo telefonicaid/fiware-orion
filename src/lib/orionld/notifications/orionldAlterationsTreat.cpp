@@ -480,7 +480,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM_T(LmtAlt, ("   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
     }
 
-    kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);
+    kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);  // outdeffed
     ++alterations;
   }
   LM_T(LmtAlt, (" %d Alterations present", alterations));

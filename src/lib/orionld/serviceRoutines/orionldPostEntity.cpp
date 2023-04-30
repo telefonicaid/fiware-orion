@@ -183,9 +183,9 @@ bool orionldPostEntity(void)
 
   KjNode*  treeForTroe = NULL;
   DistOp*  distOpList  = NULL;
+
   if (orionldState.distributed == true)
     distOpList = distOpRequests(entityId, entityType, DoAppendAttrs, orionldState.requestTree);
-  kjTreeLog(orionldState.requestTree, "Left after distOpRequests", 20);
 
   KjNode* responseBody = kjObject(orionldState.kjsonP, NULL);
   KjNode* attrExists   = kjObject(orionldState.kjsonP, NULL);

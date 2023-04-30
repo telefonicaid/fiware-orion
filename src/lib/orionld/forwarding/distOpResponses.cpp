@@ -55,7 +55,6 @@ void updatedAttr404Purge(KjNode* failureV, char* attrName)
     return;
 
   LM_T(LmtDistOp207, ("********** attribute '%s' is updated - remove 404 failure if present", attrName));
-  kjTreeLog(failureV, "failureV", LmtDistOp207);
 
   int     purgedItems = 0;
   KjNode* failureItemP = failureV->value.firstChildP;
@@ -172,8 +171,6 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
 
       if ((notUpdatedV != NULL) && (notUpdatedV->value.firstChildP != NULL))
       {
-        kjTreeLog(notUpdatedV, "Found a 'notUpdated' in a DistOp response", LmtDistOpMsgs);
-
         //
         // The response doesn't include the registrationId, which is needed inside the "failure" objects
         // Of course it isn't !
@@ -306,8 +303,6 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
 void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* successV, KjNode* failureV, CURLMsg* msgP)
 {
   uint64_t  httpResponseCode = 500;
-
-  kjTreeLog(responseBody, "responseBody", LmtDistOpResponse);
 
   curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &httpResponseCode);
 

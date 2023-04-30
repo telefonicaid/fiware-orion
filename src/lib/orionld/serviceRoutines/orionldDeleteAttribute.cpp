@@ -270,7 +270,6 @@ bool orionldDeleteAttribute(void)
   if (distOpList != NULL)
     distOpListRelease(distOpList);
 
-  kjTreeLog(responseBody, "Fixing responses", 20);
   responseFix(responseBody, DoDeleteAttrs, 204, entityId);
 
   return true;

@@ -129,11 +129,12 @@ void distReqLog(DistOp* distOpList, const char* title)
     LM_T(LmtSR, ("DR: Entity ID:                  %s", drP->entityId));
     LM_T(LmtSR, ("DR: Entity Type:                %s", drP->entityType));
 
-    if (drP->requestBody != NULL)
+    if ((drP->requestBody != NULL) && (lmTraceIsSet(LmtSR)))
     {
       int   bodySize = kjFastRenderSize(drP->requestBody);
       char* body     = kaAlloc(&orionldState.kalloc, bodySize + 256);
-      kjFastRender(drP->requestBody, body);
+
+      kjFastRender(drP->requestBody, body);  // Depends on the trace level LmtSR
       LM_T(LmtSR, ("DR: payload body:               %s", body));
     }
     else
