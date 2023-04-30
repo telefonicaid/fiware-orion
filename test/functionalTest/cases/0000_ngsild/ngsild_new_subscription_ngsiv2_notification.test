@@ -396,7 +396,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
 ============================================
 POST http://REGEX(.*)/notify
 Content-Length: 236
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
@@ -448,7 +448,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
 ===================================================================================
 POST http://REGEX(.*)/notify
 Content-Length: 237
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
