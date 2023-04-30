@@ -9,7 +9,7 @@ env:
   IMAGE_NAME: orion-ld
   IMAGE_TAG_LATEST:  latest
   IMAGE_TAG_DEBUG: debug
-  IMAGE_TAG_PRE: 1.2.0-PRE-${{ github.run_number }}
+  IMAGE_TAG_PRE: 1.3.0-PRE-${{ github.run_number }}
 
 jobs:
 
