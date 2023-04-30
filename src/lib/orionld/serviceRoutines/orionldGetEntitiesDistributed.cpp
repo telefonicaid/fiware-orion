@@ -292,7 +292,7 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
   // if there are no entity hits to the matching registrations, the request is treated as a local request
   //
   if (orionldEntityMap->value.firstChildP == NULL)
-    return orionldGetEntitiesLocal(idPattern, qNode, geoInfoP);
+    return orionldGetEntitiesLocal(idPattern, qNode, geoInfoP, false);
 
   char* geojsonGeometryLongName = NULL;
   if (orionldState.out.contentType == GEOJSON)

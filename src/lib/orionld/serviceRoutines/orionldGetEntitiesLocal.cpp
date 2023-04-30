@@ -33,7 +33,10 @@ extern "C"
 #include "kjson/kjClone.h"                                          // kjClone
 }
 
+#include "logMsg/logMsg.h"                                          // LM_*
+
 #include "orionld/common/orionldState.h"                            // orionldState
+#include "orionld/types/OrionldHeader.h"                            // orionldHeaderAdd, HttpResultsCount
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                        // QNode
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
@@ -151,7 +154,7 @@ KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, bool geoPr
 //
 // orionldGetEntitiesLocal -
 //
-bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
+bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP, bool countAlreadyAdded)
 {
   char* geojsonGeometryLongName = NULL;
   if (orionldState.out.contentType == GEOJSON)
@@ -227,8 +230,11 @@ bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoI
     }
   }
 
-  if (orionldState.uriParams.count == true)
+  if ((orionldState.uriParams.count == true) && (countAlreadyAdded == false))
+  {
+    LM_T(LmtSR, ("COUNT: Adding HttpResultsCount header: %d", count));
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
+  }
 
   // If empty result array, no Link header is needed
   if (orionldState.responseTree->value.firstChildP == NULL)

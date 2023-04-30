@@ -33,7 +33,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/common/orionldEntityMapRelease.h"                 // orionldEntityMapRelease
-#include "orionld/types/OrionldHeader.h"                            // orionldHeaderAdd, HttpResultsCount
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/legacyDriver/legacyGetEntities.h"                 // legacyGetEntities
 #include "orionld/kjTree/kjTreeLog.h"                               // kjTreeLog
@@ -274,7 +273,7 @@ bool orionldGetEntities(void)
   }
 
   if (orionldState.distributed == false)
-    return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
+    return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo, false);
 
   DistOp* distOpList = NULL;
   if (orionldState.uriParams.entityMap == NULL)
@@ -288,7 +287,7 @@ bool orionldGetEntities(void)
     // if there are no matching registrations, the request is treated as a local request
     //
     if (distOpList == NULL)
-      return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo);
+      return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo, false);
   }
 
   return orionldGetEntitiesDistributed(distOpList, idPattern, qNode, &geoInfo);

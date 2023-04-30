@@ -34,6 +34,6 @@
 //
 // orionldGetEntitiesLocal -
 //
-extern bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP);
+extern bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP, bool countAlreadyAdded);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESLOCAL_H_

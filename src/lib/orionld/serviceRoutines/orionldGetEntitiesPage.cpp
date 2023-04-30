@@ -35,7 +35,30 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                            // orionldState, orionldEntityMapCount
 #include "orionld/common/orionldError.h"                            // orionldError
+#include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
+#include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// idListFix -
+//
+static void idListFix(KjNode* entityIdArray)
+{
+  int entityIds = kjChildCount(entityIdArray);
+
+  orionldState.in.idList.items = entityIds;
+  orionldState.in.idList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * entityIds);
+
+  KjNode* entityIdP = entityIdArray->value.firstChildP;
+  for (int ix = 0; ix < entityIds; ix++)
+  {
+    orionldState.in.idList.array[ix] = entityIdP->value.s;
+    entityIdP = entityIdP->next;
+  }
+}
 
 
 
@@ -62,6 +85,7 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
   if (orionldState.uriParams.count == true)
   {
     LM_T(LmtEntityMap, ("%d entities match, in the entire federation", orionldEntityMapCount));
+    LM_T(LmtSR, ("COUNT: Adding HttpResultsCount header: %d", orionldEntityMapCount));
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, orionldEntityMapCount);
   }
 
@@ -134,10 +158,42 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
 
   for (KjNode* sourceP = sources->value.firstChildP; sourceP != NULL; sourceP = sourceP->next)
   {
-    LM_T(LmtSR, ("Query '%s' for:", sourceP->name));
-    for (KjNode* entityNodeP = sourceP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
+    if (strcmp(sourceP->name, "localDB") == 0)
     {
-      LM_T(LmtSR, ("  o %s", entityNodeP->value.s));
+      // Local query - set input params for orionldGetEntitiesLocal
+      orionldState.uriParams.onlyIds = false;
+      orionldState.in.typeList.items = 0;
+      // Set orionldState.in.attrList according to the entityMap creation request (that's filtering away attributes)
+      orionldState.in.attrList.items = 0;
+
+      // Set orionldState.in.geometryPropertyExpanded according to the entityMap creation request (that's modifying the response)
+      orionldState.in.geometryPropertyExpanded = NULL;
+
+      // Set orionldState.in.idList according to the entities in the entityMap
+      idListFix(sourceP);
+
+      // No paging here
+      orionldState.uriParams.offset = 0;
+      orionldState.uriParams.limit  = orionldState.in.idList.items;
+
+      LM_T(LmtSR, ("Query local database for %d entities", orionldState.in.idList.items));
+      orionldGetEntitiesLocal(NULL, NULL, NULL, true);
+
+      // Response comes in orionldState.responseTree - move those to entityArray
+      kjTreeLog(orionldState.responseTree, "orionldState.responseTree", LmtSR);
+      if ((orionldState.responseTree != NULL) && (orionldState.responseTree->value.firstChildP != NULL))
+      {
+        orionldState.responseTree->lastChild->next = entityArray->value.firstChildP;
+        entityArray->value.firstChildP = orionldState.responseTree->value.firstChildP;
+      }
+    }
+    else
+    {
+      LM_T(LmtSR, ("Query '%s' for:", sourceP->name));
+      for (KjNode* entityNodeP = sourceP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
+      {
+        LM_T(LmtSR, ("  o %s", entityNodeP->value.s));
+      }
     }
   }
 
