@@ -421,7 +421,7 @@ Date: REGEX(.*)
 =======================================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:Subscription:testsubscription
 Content-Length: 402
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json

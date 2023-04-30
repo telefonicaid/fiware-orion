@@ -515,7 +515,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 ==========================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Content-Length: 278
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -542,7 +542,7 @@ Ngsild-Attribute-Format: Normalized
 =======================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Content-Length: 261
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -568,7 +568,7 @@ Ngsild-Attribute-Format: Normalized
 =======================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Content-Length: 402
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -612,7 +612,7 @@ Ngsild-Attribute-Format: Normalized
 ===========================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
 Content-Length: 278
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -639,7 +639,7 @@ Ngsild-Attribute-Format: Normalized
 =======================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
 Content-Length: 261
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -665,7 +665,7 @@ Ngsild-Attribute-Format: Normalized
 =======================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S2
 Content-Length: 402
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -709,7 +709,7 @@ Ngsild-Attribute-Format: Normalized
 ======================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S3
 Content-Length: 278
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
@@ -740,7 +740,7 @@ Ngsild-Attribute-Format: Normalized
 ======================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S4
 Content-Length: 402
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
