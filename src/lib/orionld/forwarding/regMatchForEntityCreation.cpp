@@ -39,6 +39,58 @@ extern "C"
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // Own interface
 
 
+#if 0
+// -----------------------------------------------------------------------------
+//
+// distOpListDebug -
+//
+void distOpListDebug(DistOp* distOpP, const char* what)
+{
+  LM_T(LmtDistOpList, ("----- DistOp List: %s", what));
+
+  while (distOpP != NULL)
+  {
+    LM_T(LmtDistOpList, ("  Registration:      %s", distOpP->regP->regId));
+    LM_T(LmtDistOpList, ("  Operation:         %s", distOpTypes[distOpP->operation]));
+
+    if (distOpP->error == true)
+    {
+      LM_T(LmtDistOpList, ("  Title:             %s", distOpP->title));
+      LM_T(LmtDistOpList, ("  Detail:            %s", distOpP->detail));
+      LM_T(LmtDistOpList, ("  Status:            %d", distOpP->httpResponseCode));
+    }
+
+    if (distOpP->requestBody != NULL)
+    {
+      LM_T(LmtDistOpList, ("  Attributes:"));
+      int ix = 0;
+      for (KjNode* attrP = distOpP->requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
+      {
+        if ((strcmp(attrP->name, "id") != 0) && (strcmp(attrP->name, "type") != 0))
+        {
+          LM_T(LmtDistOpList, ("    Attribute %d:   '%s'", ix, attrP->name));
+          ++ix;
+        }
+      }
+    }
+
+    if (distOpP->attrList != NULL)
+    {
+      LM_T(LmtDistOpList, ("  URL Attributes:        %d", distOpP->attrList->items));
+      for (int ix = 0; ix < distOpP->attrList->items; ix++)
+      {
+        LM_T(LmtDistOpList, ("    Attribute %d:   '%s'", ix, distOpP->attrList->array[ix]));
+      }
+    }
+
+    distOpP = distOpP->next;
+  }
+
+  LM_T(LmtDistOpList, ("---------------------"));
+}
+#endif
+
+
 
 // -----------------------------------------------------------------------------
 //

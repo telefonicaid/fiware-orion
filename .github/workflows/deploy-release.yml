@@ -46,7 +46,7 @@ jobs:
 
 
   deploy-release-quay:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
     steps:
@@ -84,7 +84,7 @@ jobs:
 
   deploy-release-dockerhub:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
     steps:

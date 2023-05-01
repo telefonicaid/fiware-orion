@@ -500,9 +500,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 06. Dump accumulator, see 2 notifications, with 6 entities each
 ===============================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Content-Length: 2835
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -745,9 +746,10 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscriptions:S1
 Content-Length: 5028
-User-Agent: orionld/post-v1.1.0
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

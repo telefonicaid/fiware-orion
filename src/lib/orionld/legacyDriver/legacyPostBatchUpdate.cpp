@@ -84,29 +84,15 @@ static bool entityTypeChange(KjNode* entityP, KjNode* dbEntityP, char** newTypeP
   KjNode*  oldTypeNodeP  = kjLookup(dbEntityP, "type");
   char*    oldType       = (oldTypeNodeP != NULL)? oldTypeNodeP->value.s : NULL;
 
-  LM_T(LmtLegacy, ("TYPES: newTypeNodeP at %p", newTypeNodeP));
-  LM_T(LmtLegacy, ("TYPES: oldTypeNodeP at %p", oldTypeNodeP));
-
-  if (newTypeNodeP != NULL)
-    LM_T(LmtLegacy, ("TYPES: newType: '%s'", newTypeNodeP->value.s));
-  if (oldTypeNodeP != NULL)
-    LM_T(LmtLegacy, ("TYPES: oldType: '%s'", oldTypeNodeP->value.s));
-
   if ((newType != NULL) && (oldType != NULL))
   {
     if (strcmp(newType, oldType) != 0)  // They differ
     {
       *newTypeP = newType;
-      LM_T(LmtLegacy, ("TYPES: Bad - old and new type differ"));
       return true;
     }
-    else
-      LM_T(LmtLegacy, ("TYPES: '%s' and '%s' are identical", newType, oldType));
   }
-  else
-    LM_T(LmtLegacy, ("TYPES: Both new and old are NULL"));
 
-  LM_T(LmtLegacy, ("TYPES: All Good - no diff ..."));
   return false;
 }
 

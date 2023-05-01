@@ -92,7 +92,7 @@ extern "C"
   float           diffF;                                 \
                                                          \
   kTimeDiff(&start, &end, &diff, &diffF);                \
-  LM(("TPUT: %s %f", text, diffF));                      \
+  LM_T(LmtPerformance, ("TPUT: %s %f", text, diffF));    \
 }
 
 
@@ -427,6 +427,20 @@ static void requestCompleted
     free(orionldState.curlHeadersV);
   }
 
+  //
+  // FIXME:
+  //   Would be nice to do this here instead of in every service routine
+  //   Just, I don't have the pointer (distOpList) in orionldState.
+  //   At least I can do the call to curl_multi_cleanup
+  //
+  if (orionldState.curlDoMultiP != NULL)
+  {
+    // distOpListRelease(orionldState.distOpList);
+    curl_multi_cleanup(orionldState.curlDoMultiP);
+    orionldState.curlDoMultiP = NULL;
+  }
+
+
   lmTransactionEnd();  // Incoming REST request ends
 
   if (timingStatistics)
@@ -549,8 +563,8 @@ static void requestCompleted
     else
       kTimeDiff(&performanceTimestamps.mongoBackendStart, &performanceTimestamps.mongoBackendEnd, &mongo, &mongoF);
 
-    LM(("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
-    LM(("TPUT: mongoConnect Accumulated:   %f (%d calls)", performanceTimestamps.mongoConnectAccumulated, performanceTimestamps.getMongoConnectionCalls));
+    LM_T(LmtPerformance, ("TPUT: Entire request - DB:        %f", allF - mongoF));  // Only for REQUEST_PERFORMANCE
+    LM_T(LmtPerformance, ("TPUT: mongoConnect Accumulated:   %f (%d calls)", performanceTimestamps.mongoConnectAccumulated, performanceTimestamps.getMongoConnectionCalls));
   }
 #endif
 }
@@ -755,10 +769,10 @@ int servicePathSplit(ConnectionInfo* ciP)
     ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
     //
-    // This was previously an LM_T trace, but we have "promoted" it to INFO due to
+    // This was previously an LM_T trace, but we have "promoted" it to INFO as
     // it is needed to check logs in a .test case (case 0392 service_path_http_header.test)
     //
-    LM_K(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+    LM_K(("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));  // Sacred - used by functest service_path_http_header.test
   }
 
 
@@ -1052,10 +1066,10 @@ ConnectionInfo* connectionTreatInit
 
   orionldHeaderAdd(&orionldState.out.headers, HttpCorrelator, orionldState.correlator, 0);
 
-  if ((orionldState.in.contentLength > PAYLOAD_MAX_SIZE) && (orionldState.apiVersion == V2))
+  if (((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize) && (orionldState.apiVersion == V2))
   {
     char details[256];
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", orionldState.in.contentLength, PAYLOAD_MAX_SIZE);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", orionldState.in.contentLength, inReqPayloadMaxSize);
 
     alarmMgr.badInput(clientIp, details);
     OrionError oe(SccRequestEntityTooLarge, details);
@@ -1195,7 +1209,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   size_t  dataLen = *upload_data_size;
 
   //
-  // If the HTTP header says the request is bigger than our PAYLOAD_MAX_SIZE,
+  // If the HTTP header says the request is bigger than inReqPayloadMaxSize,
   // just silently "eat" the entire message.
   //
   // The problem occurs when the broker is lied to and there aren't orionldState.in.contentLength
@@ -1207,7 +1221,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   // See github issue:
   //   https://github.com/telefonicaid/fiware-orion/issues/2761
   //
-  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
+  if ((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize)
   {
     //
     // Errors can't be returned yet, postpone ...
@@ -1322,7 +1336,7 @@ static MHD_Result connectionTreat
     MHD_Result retVal;
 
     ++requestNo;
-    LM(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
+    LM_K(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
 
     //
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
@@ -1428,11 +1442,11 @@ static MHD_Result connectionTreat
   //
   // If the incoming request was too big, return error about it
   //
-  if (orionldState.in.contentLength > PAYLOAD_MAX_SIZE)
+  if ((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize)
   {
     char details[256];
 
-    snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", orionldState.in.contentLength, PAYLOAD_MAX_SIZE);
+    snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", orionldState.in.contentLength, inReqPayloadMaxSize);
     alarmMgr.badInput(clientIp, details);
     restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
 

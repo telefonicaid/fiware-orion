@@ -57,8 +57,8 @@ payload='{
           "type": "Building"
         }
       ],
-      "properties": [ "size", "high" ],
-      "relationships": [ "isAvailable" ]
+      "propertyNames": [ "size", "high" ],
+      "relationshipNames": [ "isAvailable" ]
     }
   ],
   "observationInterval": {

@@ -91,6 +91,7 @@ echo
 
 echo "03. GET subscription - see failure"
 echo "=================================="
+valgrindSleep 1
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:8f6f80a4-a7a4-11ed-9cbf-16804aa0063b  --tenant captn
 echo
 echo

@@ -148,7 +148,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 03. GET all registrations, see R1 and R2
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 1045
+Content-Length: 1059
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -166,11 +166,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
                         "type": "Vehicle"
                     }
                 ],
-                "properties": [
+                "propertyNames": [
                     "brandName",
                     "speed"
                 ],
-                "relationships": [
+                "relationshipNames": [
                     "isParked"
                 ]
             }
@@ -190,11 +190,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
                         "type": "Vehicle"
                     }
                 ],
-                "properties": [
+                "propertyNames": [
                     "brandName",
                     "speed"
                 ],
-                "relationships": [
+                "relationshipNames": [
                     "isParked"
                 ]
             }
@@ -215,7 +215,7 @@ Date: REGEX(.*)
 05. GET all registrations, see only R2
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 524
+Content-Length: 531
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -233,11 +233,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
                         "type": "Vehicle"
                     }
                 ],
-                "properties": [
+                "propertyNames": [
                     "brandName",
                     "speed"
                 ],
-                "relationships": [
+                "relationshipNames": [
                     "isParked"
                 ]
             }

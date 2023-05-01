@@ -681,7 +681,7 @@ std::string Scope::check(void)
       {
         char noOfV[STRING_SIZE_FOR_INT];
 
-        snprintf(noOfV, sizeof(noOfV), "%lu", polygon.vertexList.size());
+        snprintf(noOfV, sizeof(noOfV), "%zu", polygon.vertexList.size());
         std::string details = std::string("too few vertices for a polygon (") + noOfV + " is less than three)";
         alarmMgr.badInput(clientIp, details);
 

@@ -60,6 +60,7 @@ typedef enum TraceLevels
   //
   LmtSubCache = 50,                    // Subscription Cache
   LmtSubCacheMatch,                    // Subscription Cache Matches
+  LmtSubCacheDebug,                    // Subscription Cache Debug
 
   //
   // Registration Cache
@@ -69,15 +70,21 @@ typedef enum TraceLevels
   //
   // Distributed Operations
   //
-  LmtDistOpRequest = 70,               // ONLY the verb, path, and body of a distributed request
+  LmtDistOpMsgs = 70,                  // Deprecated, still in use though ...
+  LmtDistOpRequest,                    // ONLY the verb, path, and body of a distributed request
   LmtDistOpResponse,                   // ONLY the body and status code of the response to a distributed request
+  LmtDistOp207,                        // Merging of the final 207 response
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
-  LmtDistOp207,                        // Merging of the final 207 response
-  LmtDistOpList,                       // Matching registrations subject to forwarded requests
-  LmtDistOpMsgs,                       // Deprecated, still in use though :(
-  LmtMqtt,                             // MQTT notifications
+  LmtDistOpList,                       // Linked list of DistOps
+
+  //
+  // Context
+  //
+  LmtContexts = 80,                    // Contexts
+  LmtContextTree,                      // Context Tree
+  LmtContextCache,                     // Context Cache
 
   //
   // Pagination
@@ -88,18 +95,23 @@ typedef enum TraceLevels
   //
   // Misc
   //
-  LmtMongoc = 90,                      // Entire mongoc library
-  LmtPostgres,                         // Postgres (TRoE)
+  LmtMongoc = 240,                     // Entire mongoc library
   LmtSR,                               // Service Routine (whatever it is doing)
-  LmtTenants,                          // Well, tenants :)
-  LmtQ,                                // Query Language
-  LmtGeoJSON,                          // GeoJSON transformations
-  LmtCurl,                             // Debugging for curl requests
-  LmtSocketService,                    // Socket Service
   LmtSemaphore,                        // Semaphores
-  LmtRegex,                            // Regular expressions - all of them
+  LmtKjlParse,                         // Trace level start for K libs
   LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
-  LmtKjlParse                          // Trace level start for K libs
+  LmtMqtt,                             // MQTT notifications
+  LmtQ,                                // Query Language
+  LmtPostgres,                         // Postgres (TRoE)
+  LmtSql,                              // SQL command for TRoE
+  LmtPgPool,                           // Postgres Connection Pool
+  LmtTenants,                          // Well, tenants :)
+  LmtGeoJSON,                          // GeoJSON transformations
+  LmtSocketService,                    // Socket Service
+  LmtRegex,                            // Regular expressions - all of them
+  LmtCurl,                             // CURL library
+  LmtToDo,                             // To Do list
+  LmtLeak                              // Used when debugging leaks and valgrind errors
 } TraceLevels;
 
 

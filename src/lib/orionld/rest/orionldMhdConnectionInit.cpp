@@ -178,7 +178,7 @@ static void optionsParse(const char* options)
 
       *cP = 0;  // Zero-terminate
 
-      LM_T(LmtUriParamOptions, ("Got a value for options: %s", optionStart));
+      LM_T(LmtUriParamOptions, ("Got a value for the 'options' URI param: %s", optionStart));
 
       if      (strcmp(optionStart, "update")        == 0)  orionldState.uriParamOptions.update        = true;
       else if (strcmp(optionStart, "replace")       == 0)  orionldState.uriParamOptions.replace       = true;
@@ -225,19 +225,9 @@ static void optionsParse(const char* options)
   else if (orionldState.uriParamOptions.keyValues && orionldState.uriParamOptions.sysAttrs)
     orionldError(OrionldBadRequestData, "Incoherent value for /options/ URI param", "Can't have system attributes when /simplified/ output format is selected", 400);
   else if (orionldState.uriParamOptions.keyValues == true)
-  {
     orionldState.out.format = RF_KEYVALUES;
-    LM_T(LmtUriParamOptions, ("Set orionldState.out.format to RF_KEYVALUES"));
-  }
   else if (orionldState.uriParamOptions.concise == true)
-  {
     orionldState.out.format = RF_CONCISE;
-    LM_T(LmtUriParamOptions, ("Set orionldState.out.format to RF_CONCISE"));
-  }
-
-  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.keyValues:  %s", (orionldState.uriParamOptions.keyValues == true)? "ON" : "OFF"));
-  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.concise:    %s", (orionldState.uriParamOptions.concise   == true)? "ON" : "OFF"));
-  LM_T(LmtUriParamOptions, ("orionldState.uriParamOptions.normalized: %s", (orionldState.uriParamOptions.concise   == true)? "ON" : "OFF"));
 }
 
 
@@ -413,20 +403,22 @@ bool pCheckTenantName(const char* dbName)
 //
 static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
+  LM_T(LmtHeaders, ("Got an HTTP Header: '%s': '%s'", key, value));
+
   //
   // Need to keep track of ALL incoming headers, in case they're asked for in forwarded requests
   // This is copying information, but as it is not a default behaviour, that's OK.
   // Distributed operations slow down everything SO MUCH, so, ... I'm perfectly fine with this copy
+  // Actually, I will need these for notifications as well ...
   //
-  if (distributed == true)
-  {
-    KjNode* kvP = kjString(orionldState.kjsonP, key, value);
+  // if (distributed == true)
+  //
+  KjNode* kvP = kjString(orionldState.kjsonP, key, value);
 
-    if (orionldState.in.httpHeaders == NULL)
-      orionldState.in.httpHeaders = kjObject(orionldState.kjsonP, NULL);
+  if (orionldState.in.httpHeaders == NULL)
+    orionldState.in.httpHeaders = kjObject(orionldState.kjsonP, NULL);
 
-    kjChildAdd(orionldState.in.httpHeaders, kvP);
-  }
+  kjChildAdd(orionldState.in.httpHeaders, kvP);
 
   if (strcasecmp(key, "Orionld-Legacy") == 0)
   {
@@ -520,6 +512,8 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
 //
 MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* key, const char* value)
 {
+  LM_T(LmtUriParams, ("Got a URI param '%s': '%s'", key, value));
+
   // NULL/empty URI param value
   if ((value == NULL) || (*value == 0))
   {
@@ -975,9 +969,9 @@ static bool tenantCheck(char* tenantName)
       return false;
     }
 
-    if ((!isalnum(tenantName[len])) && (tenantName[len] != '_'))
+    if ((!isalnum(tenantName[len])) && (tenantName[len] != '_') && (tenantName[len] != '-'))
     {
-      orionldError(OrionldBadRequestData, "Invalid Tenant", "bad character in tenant name - only underscore and alphanumeric characters are allowed", 400);
+      orionldError(OrionldBadRequestData, "Invalid Tenant", "invalid character in tenant name - only underscore, hyphen, and alphanumeric characters are allowed", 400);
       return false;
     }
 
@@ -1005,7 +999,7 @@ MHD_Result orionldMhdConnectionInit
   ++requestNo;
 
   // if ((requestNo % 100 == 0) || (requestNo == 1))
-  LM(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
+  LM_K(("------------------------- Servicing NGSI-LD request %03d: %s %s --------------------------", requestNo, method, url));  // if not REQUEST_PERFORMANCE
 
   //
   // 2. Prepare orionldState
@@ -1092,15 +1086,6 @@ MHD_Result orionldMhdConnectionInit
     orionldState.kjsonP->stringAfterColon  = (char*) " ";
   }
 
-
-  //
-  // Is only mongoc supporting operations allowed?
-  //
-  if ((mongocOnly) && ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT) == 0) && (orionldState.verb != OPTIONS))
-  {
-    orionldError(OrionldOperationNotSupported, "Not Implemented", "this request does not support the new mongoc driver", 501);
-    return MHD_YES;
-  }
 
   //
   // NGSI-LD only accepts the verbs POST, GET, DELETE, PATCH, PUT, and OPTIONS (if CORS is enabled)

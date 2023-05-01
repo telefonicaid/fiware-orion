@@ -92,7 +92,7 @@ void httpHeaderLinkAdd(const char* _url)
   }
 
   urlLen = strlen(url);
-  if (urlLen > sizeof(link) + LINK_REL_AND_TYPE_SIZE + 5)
+  if (urlLen + LINK_REL_AND_TYPE_SIZE + 5 > sizeof(link))
   {
     linkP = (char*) malloc(urlLen + LINK_REL_AND_TYPE_SIZE + 5);
     if (linkP == NULL)

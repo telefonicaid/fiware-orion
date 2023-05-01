@@ -177,15 +177,9 @@ bool orionldPutAttribute(void)
   }
 
   if (entityNotFoundLocally == true)
-  {
-    kjTreeLog(orionldState.requestTree, "entityNotFoundLocally", 20);
     distOpFailure(responseBody, NULL, "Entity Not Found", entityId, 404, attrName);
-  }
   else if (attrNotFoundLocally == true)
-  {
-    kjTreeLog(orionldState.requestTree, "attrNotFoundLocally", 20);
     distOpFailure(responseBody, NULL, "Attribute Not Found", entityId, 404, attrName);
-  }
 
   // Save requestTree before it is destroyed by dbModelFromApiAttribute (needed for notifications and TRoE
   apiAttributeP = kjClone(orionldState.kjsonP, orionldState.requestTree);

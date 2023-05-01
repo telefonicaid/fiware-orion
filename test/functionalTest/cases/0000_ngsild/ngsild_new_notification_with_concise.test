@@ -144,6 +144,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
 POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Content-Length: 361
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Concise
@@ -183,6 +184,7 @@ Date: REGEX(.*)
 POST REGEX(.*)
 Content-Length: 368
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/ld+json
 Ngsild-Attribute-Format: Concise

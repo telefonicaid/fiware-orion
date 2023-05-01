@@ -25,38 +25,38 @@ Tenant test
 
 --SHELL-INIT--
 dbInit CB
-dbInit CB tn1
+dbInit CB tn-1
 orionldStart CB -multiservice
 
 --SHELL--
 
 #
-# 01. Create an entity urn:ngsi-ld:entity:E1 in tenant tn1
-# 02. Dump mongo::entities collection of tenant tn1 - see E1
-# 03. GET the entity from tenant tn1
+# 01. Create an entity urn:ngsi-ld:entity:E1 in tenant tn-1
+# 02. Dump mongo::entities collection of tenant tn-1 - see E1
+# 03. GET the entity from tenant tn-1
 #
 
-echo "01. Create an entity urn:ngsi-ld:entity:E1 in tenant tn1"
-echo "========================================================"
+echo "01. Create an entity urn:ngsi-ld:entity:E1 in tenant tn-1"
+echo "========================================================="
 payload='{
   "id": "urn:ngsi-ld:entity:E1",
   "type": "T1"
 }'
-orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --tenant tn1
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --tenant tn-1
 echo
 echo
 
 
-echo "02. Dump mongo::entities collection of tenant tn1 - see E1"
-echo "=========================================================="
-mongoCmd2 ftest-tn1 "db.entities.findOne()"
+echo "02. Dump mongo::entities collection of tenant tn-1 - see E1"
+echo "==========================================================="
+mongoCmd2 ftest-tn-1 "db.entities.findOne()"
 echo
 echo
 
 
-echo "03. GET the entity from tenant tn1"
-echo "=================================="
-orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1 --tenant tn1
+echo "03. GET the entity from tenant tn-1"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1 --tenant tn-1
 echo
 echo
 
@@ -69,18 +69,18 @@ echo
 
 
 --REGEXPECT--
-01. Create an entity urn:ngsi-ld:entity:E1 in tenant tn1
-========================================================
+01. Create an entity urn:ngsi-ld:entity:E1 in tenant tn-1
+=========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
-NGSILD-Tenant: tn1
+NGSILD-Tenant: tn-1
 
 
 
-02. Dump mongo::entities collection of tenant tn1 - see E1
-==========================================================
+02. Dump mongo::entities collection of tenant tn-1 - see E1
+===========================================================
 MongoDB shell version REGEX(.*)
 connecting to: mongodb:REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -101,8 +101,8 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. GET the entity from tenant tn1
-==================================
+03. GET the entity from tenant tn-1
+===================================
 HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/json
@@ -133,4 +133,4 @@ Date: REGEX(.*)
 brokerStop CB
 accumulatorStop
 dbDrop CB
-dbDrop CB tn1
+dbDrop CB tn-1

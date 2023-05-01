@@ -95,9 +95,8 @@ void Notifier::sendNotifyContextRequest
     bool                             blackList
 )
 {
-  pthread_t                         tid;
+  pthread_t tid;
 
-  LM_T(LmtLegacy, ("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
                                                                           httpInfo,
                                                                           tenant,
@@ -428,12 +427,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 {
     Verb                              verb    = httpInfo.verb;
     std::vector<SenderThreadParams*>* paramsV = NULL;
-#ifdef ORIONLD
     CachedSubscription*               subP    = NULL;
     char*                             toFree  = NULL;
-#endif
-
-    LM_T(LmtLegacy, ("1178: httpInfo.url: '%s'", httpInfo.url.c_str()));
 
     if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
     {

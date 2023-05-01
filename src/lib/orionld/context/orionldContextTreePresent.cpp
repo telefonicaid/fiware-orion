@@ -39,10 +39,10 @@ extern "C"
 void orionldContextTreePresent(const char* prefix, KjNode* contextNodeP)
 {
   if (contextNodeP->type == KjString)
-    LM_K(("%s: the context is a String: %s", prefix, contextNodeP->value.s));
+    LM_T(LmtContextTree, ("%s: the context is a String: %s", prefix, contextNodeP->value.s));
   else if (contextNodeP->type == KjArray)
   {
-    LM_K(("%s: the context is an Array:", prefix));
+    LM_T(LmtContextTree, ("%s: the context is an Array:", prefix));
     for (KjNode* aItemP = contextNodeP->value.firstChildP; aItemP != NULL; aItemP = aItemP->next)
       orionldContextTreePresent(prefix, aItemP);
   }
@@ -50,20 +50,21 @@ void orionldContextTreePresent(const char* prefix, KjNode* contextNodeP)
   {
     int items = 0;
 
-    LM_K(("%s: the context is an Object:", prefix));
+    LM_T(LmtContextTree, ("%s: the context is an Object:", prefix));
     for (KjNode* itemP = contextNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
     {
       if (itemP->type == KjString)
-        LM_K(("%s: %s -> %s", prefix, itemP->name, itemP->value));
+        LM_T(LmtContextTree, ("%s: %s -> %s", prefix, itemP->name, itemP->value));
       else
-        LM_K(("%s: %s (%s)", prefix, itemP->name, kjValueType(itemP->type)));
+        LM_T(LmtContextTree, ("%s: %s (%s)", prefix, itemP->name, kjValueType(itemP->type)));
       ++items;
       if (items > 3)
         break;
     }
   }
   else
-    LM_K(("%s: Invalid type for context: %s", prefix, kjValueType(contextNodeP->type)));
-  LM_K(("%s", prefix));
+    LM_T(LmtContextTree, ("%s: Invalid type for context: %s", prefix, kjValueType(contextNodeP->type)));
+
+  LM_T(LmtContextTree, ("%s", prefix));
 }
 

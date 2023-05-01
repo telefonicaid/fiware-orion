@@ -589,7 +589,18 @@ bool orionldPatchEntity2(void)
 
   DistOp*  distOpList = NULL;
   if (orionldState.distributed)
+  {
     distOpList = distOpRequests(entityId, entityType, DoMergeEntity, orionldState.requestTree);
+
+#if 0
+    for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
+    {
+      char body[1024];
+      kjFastRender(distOpP->requestBody, body);
+      LM_T(LmtDistOpMsgs, ("Registration '%s': %s", distOpP->regP->regId, body));
+    }
+#endif
+  }
 
   KjNode* patchTree       = NULL;
   bool    dbUpdateResult  = false;

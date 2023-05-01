@@ -478,7 +478,7 @@ int httpRequestSendWithCurl
 
 
   // Check if total outgoing message size is too big
-  if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
+  if ((unsigned long long) outgoingMsgSize > outReqMsgMaxSize)
   {
     if (metricsMgr.isOn())
       metricsMgr.add(tenant, servicePath0, METRIC_TRANS_OUT_ERRORS, 1);
@@ -558,10 +558,10 @@ int httpRequestSendWithCurl
   //
   // Synchronous HTTP request
   //
-  // This was previously an LM_T trace, but we have "promoted" it to INFO due to it is needed
+  // This was previously an LM_T trace, but we have "promoted" it as it is needed
   // to check logs in a .test case (case 000 notification_different_sizes.test)
   //
-  LM_K(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", sendReqNo, outgoingMsgSize));
+  LM_K(("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", sendReqNo, outgoingMsgSize));  // Sacred: used in functest notification_different_sizes.test
 
   res = curl_easy_perform(curl);
   if (res != CURLE_OK)

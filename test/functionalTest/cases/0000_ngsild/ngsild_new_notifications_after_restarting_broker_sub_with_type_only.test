@@ -216,9 +216,10 @@ Date: REGEX(.*)
 
 05. Dump accumulator to see one notification - NGSI-LD has no initial notifications
 ===================================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=http://a.b.c/subs/sub01
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Content-Length: 328
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -264,9 +265,10 @@ Date: REGEX(.*)
 
 08. Dump accumulator to see one notification
 ============================================
-POST http://127.0.0.1:9997/notify?subscriptionId=http://a.b.c/subs/sub01
+POST http://REGEX(.*)/notify?subscriptionId=http://a.b.c/subs/sub01
 Content-Length: 363
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

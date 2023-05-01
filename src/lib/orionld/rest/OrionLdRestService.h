@@ -108,7 +108,6 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_SERVICE_OPTION_EXPAND_ATTR                           (1 << 9)
 #define ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL                    (1 << 10)
 #define ORIONLD_SERVICE_OPTION_DATASET_SUPPORT                       (1 << 11)
-#define ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT                        (1 << 12)
 
 
 
@@ -147,14 +146,14 @@ typedef struct OrionLdRestServiceSimplifiedVector
 #define ORIONLD_URIPARAM_NOTEXISTS            (1 << 29)
 #define ORIONLD_URIPARAM_RELATIONSHIPS        (1 << 30)
 #define ORIONLD_URIPARAM_GEOPROPERTIES        (1 << 31)
-#define ORIONLD_URIPARAM_LANGUAGEPROPERTIES   (1UL << 32)
-#define ORIONLD_URIPARAM_OBSERVEDAT           (1UL << 33)
-#define ORIONLD_URIPARAM_LANG                 (1UL << 34)
-#define ORIONLD_URIPARAM_LOCAL                (1UL << 35)
-#define ORIONLD_URIPARAM_RESET                (1UL << 36)
-#define ORIONLD_URIPARAM_LEVEL                (1UL << 37)
-#define ORIONLD_URIPARAM_ONLYIDS              (1UL << 38)
-#define ORIONLD_URIPARAM_ENTITYMAP            (1UL << 39)
+#define ORIONLD_URIPARAM_LANGUAGEPROPERTIES   (UINT64_C(1) << 32)
+#define ORIONLD_URIPARAM_OBSERVEDAT           (UINT64_C(1) << 33)
+#define ORIONLD_URIPARAM_LANG                 (UINT64_C(1) << 34)
+#define ORIONLD_URIPARAM_LOCAL                (UINT64_C(1) << 35)
+#define ORIONLD_URIPARAM_RESET                (UINT64_C(1) << 36)
+#define ORIONLD_URIPARAM_LEVEL                (UINT64_C(1) << 37)
+#define ORIONLD_URIPARAM_ONLYIDS              (UINT64_C(1) << 38)
+#define ORIONLD_URIPARAM_ENTITYMAP            (UINT64_C(1) << 39)
 
 
 

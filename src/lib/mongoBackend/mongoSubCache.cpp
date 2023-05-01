@@ -205,9 +205,7 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
           char* q = (char*) cSubP->expression.q.c_str();
 
           if (strchr(q, '|') != NULL)
-          {
             q = (char*) "P;!P";
-          }
 
           if (!cSubP->expression.stringFilter.parse(q, &errorString))
           {

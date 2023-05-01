@@ -260,8 +260,11 @@ bool notificationResponseRead
       notificationFailure(npP->subP, "Content-Length not found but the status code is not a 204", notificationTime);
       return false;
     }
+    contentLen = 0;
   }
-  contentLen = atoi(&contentLenP[16]);
+  else
+    contentLen = atoi(&contentLenP[16]);
+
   LM_T(LmtNotificationMsg, ("%s: Content-Length: %d", npP->subP->subscriptionId, contentLen));
 
 
@@ -477,7 +480,7 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM_T(LmtAlt, ("   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
     }
 
-    kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);
+    kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);  // outdeffed
     ++alterations;
   }
   LM_T(LmtAlt, (" %d Alterations present", alterations));
@@ -575,7 +578,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
 
     CURL* curlHandleP = NULL;
     int   fd          = notificationSend(matchHead, notificationTime, &curlHandleP);  // curl handle as output param?
-    LM_T(LmtNotificationSend, ("%s: notificationSend returned fd %d (-2 is OK if HTTPS)", matchHead->subP->subscriptionId, fd));
 
     //
     // -1 is ERROR, -2 is OK for HTTPS, anything else is a file descriptor to read from, except if MQTT.

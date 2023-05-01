@@ -227,7 +227,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg05
 02. Get registration 02 using URI param attrs=attrs2
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 508
+Content-Length: 515
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -247,11 +247,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "attrs2",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "relationship2"
         ]
       }
@@ -264,7 +264,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 03. Get registration 01, 03, and 05, using URI param attrs=attrs1,attrs3,attrs5
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 1518
+Content-Length: 1539
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -284,11 +284,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "attrs1",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "relationship1"
         ]
       }
@@ -308,11 +308,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "attrs3",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "relationship3"
         ]
       }
@@ -332,11 +332,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "attrs5",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "relationship5"
         ]
       }
@@ -349,7 +349,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. Get registration 02 using URI param attrs=relationship3
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 508
+Content-Length: 515
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -369,11 +369,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "attrs3",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "relationship3"
         ]
       }
@@ -386,7 +386,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 05. Get registration 02, 04, and 05, using URI param attrs=relationship2,relationship4,relationship5
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1518
+Content-Length: 1539
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -406,11 +406,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "attrs2",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "relationship2"
         ]
       }
@@ -430,11 +430,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "attrs4",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "relationship4"
         ]
       }
@@ -454,11 +454,11 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "type": "Vehicle"
           }
         ],
-        "properties": [
+        "propertyNames": [
           "attrs5",
           "speed"
         ],
-        "relationships": [
+        "relationshipNames": [
           "relationship5"
         ]
       }

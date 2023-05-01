@@ -35,7 +35,7 @@
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "orionld/common/orionldState.h"                             // orionldState, userAgentHeader
+#include "orionld/common/orionldState.h"                             // orionldState, userAgentHeader, hostHeader
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
@@ -198,13 +198,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options    = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_TYPE;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DATASET_SUPPORT;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostNotify)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_SUBSCRIPTION_ID;
-
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetEntities)
   {
@@ -227,8 +224,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_LOCAL;
     serviceP->uriParams |= ORIONLD_URIPARAM_ONLYIDS;
     serviceP->uriParams |= ORIONLD_URIPARAM_ENTITYMAP;
-
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetEntity)
   {
@@ -238,49 +233,39 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_LANG;
     serviceP->uriParams |= ORIONLD_URIPARAM_LOCAL;
     serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
-
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldDeleteEntity)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostEntity)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
-
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPatchAttribute)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPutAttribute)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPatchEntity)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPatchEntity2)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_OBSERVEDAT;
   }
   else if (serviceP->serviceRoutine == orionldPutEntity)
   {
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {
@@ -288,7 +273,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_DELETEALL;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostRegistrations)
   {
@@ -324,7 +308,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPatchRegistration)
   {
-    serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
   }
   else if (serviceP->serviceRoutine == orionldDeleteRegistration)
   {
@@ -336,12 +320,10 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_CREATE_CONTEXT;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetSubscriptions)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
@@ -351,37 +333,31 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldGetSubscription)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
   else if (serviceP->serviceRoutine == orionldPatchSubscription)
   {
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldDeleteSubscription)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchCreate)
   {
     serviceP->options    = 0;  // Tenant will be created if necessary
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
   {
     serviceP->options    = 0;  // Tenant will be created if necessary
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
   }
@@ -389,7 +365,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostQuery)
   {
@@ -397,28 +372,20 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
     serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;
     serviceP->uriParams |= ORIONLD_URIPARAM_OFFSET;
-
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetEntityTypes)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
-
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetEntityType)
   {
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetEntityAttributes)
   {
     serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
-
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetEntityAttribute)
   {
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostTemporalEntities)
   {
@@ -426,7 +393,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_EXPAND_TYPE;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetVersion)
   {
@@ -434,7 +400,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options  = ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetTenants)
   {
@@ -442,7 +407,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetDbIndexes)
   {
@@ -450,7 +414,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->options |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
-    serviceP->options |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetContexts)
   {
@@ -461,14 +424,12 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_URL;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldGetContext)
   {
     serviceP->options  = 0;  // Tenant is Ignored
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldPostContexts)
   {
@@ -477,7 +438,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
   }
   else if (serviceP->serviceRoutine == orionldDeleteContext)
   {
@@ -486,7 +446,6 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_TYPE_CHECK;
-    serviceP->options   |= ORIONLD_SERVICE_OPTION_MONGOC_SUPPORT;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_RELOAD;
   }
@@ -539,12 +498,14 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   //
   // FIXME: This "block should move to orionld.cpp ?
   //
-  // * userAgentHeader(Len): Notifications with HTTP
+  // * userAgentHeader(Len): Notifications with HTTP(s)
   // * userAgentHeaderNoLF:  Forwarding
+  // * hostHeader(Len):      Notifications with HTTP(s)
   //
   userAgentHeaderLen = snprintf(userAgentHeader, sizeof(userAgentHeader) -1, "User-Agent: orionld/%s\r\n", ORIONLD_VERSION);  // Used in notifications as value of HTTP Header User-Agent
   snprintf(userAgentHeaderNoLF, sizeof(userAgentHeaderNoLF) -1, "User-Agent: orionld/%s", ORIONLD_VERSION);  // Used in forwarding as value of HTTP Header User-Agent
 
+  hostHeaderLen = snprintf(hostHeader, sizeof(hostHeader) - 1, "Host: %s\r\n", orionldHostName);
 
   int svIx;    // Service Vector Index
   for (svIx = 0; svIx < vecItems; svIx++)

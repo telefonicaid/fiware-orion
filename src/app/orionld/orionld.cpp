@@ -55,7 +55,7 @@
 * CLI option '--insecure'.
 */
 #include <stdio.h>
-#include <unistd.h>                                         // getppid, fork, setuid, sleep, etc.
+#include <unistd.h>                                         // getppid, fork, setuid, sleep, gethostname, etc.
 #include <string.h>
 #include <fcntl.h>                                          // open
 #include <sys/types.h>
@@ -211,6 +211,10 @@ bool            noCache;
 unsigned int    connectionMemory;
 unsigned int    maxConnections;
 unsigned int    reqPoolSize;
+
+unsigned long long  inReqPayloadMaxSize;
+unsigned long long  outReqMsgMaxSize;
+
 bool            simulatedNotification;
 bool            statCounters;
 bool            statSemWait;
@@ -290,6 +294,8 @@ int             cSubCounters;
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
 #define MAX_CONN_DESC          "maximum number of simultaneous connections"
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
+#define IN_REQ_PAYLOAD_MAX_SIZE_DESC   "maximum size (in bytes) of the payload of incoming requests"
+#define OUT_REQ_MSG_MAX_SIZE_DESC      "maximum size (in bytes) of outgoing forward and notification request messages"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
@@ -329,6 +335,14 @@ int             cSubCounters;
 #define DBURI_DESC             "complete URI for database connection"
 #define DEBUG_CURL_DESC        "turn on debugging of libcurl - to the broker's logfile"
 #define CSUBCOUNTERS_DESC      "number of subscription counter updates before flush from sub-cache to DB (0: never, 1: always)"
+
+
+
+// -----------------------------------------------------------------------------
+//
+// MB - megabytes
+//
+#define MB(mbs) (1024 * 1024 * mbs)
 
 
 
@@ -380,6 +394,9 @@ PaArgument paArgs[] =
   { "-connectionMemory",      &connectionMemory,        "CONN_MEMORY",               PaUInt,    PaOpt,  64,              0,      1024,             CONN_MEMORY_DESC         },
   { "-maxConnections",        &maxConnections,          "MAX_CONN",                  PaUInt,    PaOpt,  1020,            1,      PaNL,             MAX_CONN_DESC            },
   { "-reqPoolSize",           &reqPoolSize,             "TRQ_POOL_SIZE",             PaUInt,    PaOpt,  0,               0,      1024,             REQ_POOL_SIZE            },
+
+  { "-inReqPayloadMaxSize",   &inReqPayloadMaxSize,     "IN_REQ_PAYLOAD_MAX_SIZE",   PaULong,   PaOpt,  MB(1),           0,      PaNL,             IN_REQ_PAYLOAD_MAX_SIZE_DESC },
+  { "-outReqMsgMaxSize",      &outReqMsgMaxSize,        "OUT_REQ_MSG_MAX_SIZE",      PaULong,   PaOpt,  MB(8),           0,      PaNL,             OUT_REQ_MSG_MAX_SIZE_DESC    },
   { "-notificationMode",      &notificationMode,        "NOTIF_MODE",                PaString,  PaOpt,  _i "transient",  PaNL,   PaNL,             NOTIFICATION_MODE_DESC   },
   { "-simulatedNotification", &simulatedNotification,   "DROP_NOTIF",                PaBool,    PaOpt,  false,           false,  true,             SIMULATED_NOTIF_DESC     },
   { "-statCounters",          &statCounters,            "STAT_COUNTERS",             PaBool,    PaOpt,  false,           false,  true,             STAT_COUNTERS            },
@@ -819,7 +836,6 @@ static void libLogFunction
 }
 
 
-
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
@@ -1086,7 +1102,7 @@ int main(int argC, char* argV[])
 
 
   //
-  // Get the hostname - needed for contexts created by the broker
+  // Get the hostname - needed for contexts created by the broker + notifications
   //
   gethostname(orionldHostName, sizeof(orionldHostName));
   orionldHostNameLen = strlen(orionldHostName);

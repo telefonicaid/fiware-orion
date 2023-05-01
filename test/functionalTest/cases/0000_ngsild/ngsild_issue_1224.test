@@ -62,7 +62,8 @@ echo
 echo "02. Create a subscription according to (2) of issue #1224"
 echo "========================================================="
 payload='{
- "description": "A subscription to get air quality",
+  "id": "urn:S1",
+  "description": "A subscription to get air quality",
   "type": "Subscription",
   "entities": [
     {
@@ -140,7 +141,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:AirQualityObserved:Guadalajara:ES1537
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
 
 
 
@@ -164,9 +165,10 @@ Date: REGEX(.*)
 
 06. Dump the accumulator, see one notification
 ==============================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subscription:REGEX(.*)
-Content-Length: 384
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 329
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://smartdatamodels.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -189,7 +191,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "202REGEX(.*)Z",
-    "subscriptionId": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "subscriptionId": "urn:S1",
     "type": "Notification"
 }
 =======================================

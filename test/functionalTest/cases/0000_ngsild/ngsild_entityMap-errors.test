@@ -31,11 +31,11 @@ orionldStart CP1 -experimental
 
 --SHELL--
 #
-# 01. Query the CB with an entity map that doesn't exist
+# 01. Query the CB with an entity map that doesn't exist - see error
 # 02. In CB,  create an entity urn:E1 with attribute  P0
 # 03. In CP1, create an entity urn:E1 with attributes P1-P3+R1
 # 04. Create an exclusive registration R1 on urn:E1/P1 for CP1
-# 05. Query the CB with type=T, to get the entity map back (FIXME: shouldn't get one as all entities are returned in the very first query)
+# 05. Query the CB with type=T, just to get the entity map (FIXME: shouldn't get one as all entities are returned in the very first query)
 # 06. Query the CB using the correct entity map but with offset=10 (we don't have that many entities in the map)
 # 07. Query the CB with an entity map that doesn't exist (yes, again, but this time the broker has a valid entity map)
 # 08. Query the CB using the correct entity map AND with URL parameter 'id' - see error as the entities are already selected
@@ -47,8 +47,8 @@ orionldStart CP1 -experimental
 # 14. Query the CB using the correct entity map AND with URL parameter 'local=true' - see error as the entities are already selected
 #
 
-echo "01. Query the CB with an entity map that doesn't exist"
-echo "======================================================"
+echo "01. Query the CB with an entity map that doesn't exist - see error"
+echo "=================================================================="
 orionCurl --url /ngsi-ld/v1/entities?entityMap=abc
 echo
 echo
@@ -122,8 +122,8 @@ echo
 
 
 --REGEXPECT--
-01. Query the CB with an entity map that doesn't exist
-======================================================
+01. Query the CB with an entity map that doesn't exist - see error
+==================================================================
 HTTP/1.1 404 Not Found
 Content-Length: 109
 Content-Type: application/json

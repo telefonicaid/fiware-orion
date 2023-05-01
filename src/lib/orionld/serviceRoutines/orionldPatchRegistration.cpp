@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/regCache/regCacheItemLookup.h"               // regCacheItemLookup
 #include "orionld/regCache/regCacheIdPatternRegexCompile.h"    // regCacheIdPatternRegexCompile
 #include "orionld/regCache/regCacheItemRegexRelease.h"         // regCacheItemRegexRelease
+#include "orionld/regCache/regCachePresent.h"                  // regCachePresent
 #include "orionld/dbModel/dbModelFromApiRegistration.h"        // dbModelFromApiRegistration
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
@@ -589,48 +590,6 @@ static void regTimestamp(KjNode* dbRegP, const char* fieldName, double ts)
   {
     tsNodeP = kjFloat(orionldState.kjsonP, fieldName, ts);
     kjChildAdd(dbRegP, tsNodeP);
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// regCachePresent -
-//
-void regCachePresent(void)
-{
-  for (OrionldTenant* tenantP = &tenant0; tenantP != NULL; tenantP = tenantP->next)
-  {
-    if (tenantP->regCache == NULL)
-      LM_T(LmtRegCache, ("Tenant '%s': No regCache", tenantP->mongoDbName));
-    else
-    {
-      LM_T(LmtRegCache, ("Tenant '%s':", tenantP->mongoDbName));
-      RegCacheItem* rciP = tenantP->regCache->regList;
-
-      while (rciP != NULL)
-      {
-        KjNode* regIdP = kjLookup(rciP->regTree, "id");
-
-        LM_T(LmtRegCache, ("  o Registration %s:", (regIdP != NULL)? regIdP->value.s : "unknown"));
-        LM_T(LmtRegCache, ("    o mode:  %s", registrationModeToString(rciP->mode)));
-        LM_T(LmtRegCache, ("    o ops:   0x%x", rciP->opMask));
-
-        if (rciP->idPatternRegexList != NULL)
-        {
-          LM_T(LmtRegCache, ("    o patterns:"));
-          for (RegIdPattern* ripP = rciP->idPatternRegexList; ripP != NULL; ripP = ripP->next)
-          {
-            LM_T(LmtRegCache, ("      o %s (idPattern at %p)", ripP->owner->value.s, ripP->owner));
-          }
-        }
-        else
-          LM_T(LmtRegCache, ("    o patterns: NONE"));
-        LM_T(LmtRegCache, ("  -----------------------------------"));
-        rciP = rciP->next;
-      }
-    }
   }
 }
 

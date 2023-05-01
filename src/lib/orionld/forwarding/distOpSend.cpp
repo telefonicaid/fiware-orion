@@ -419,6 +419,8 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   distOpP->curlHandle = curl_easy_init();
   if (distOpP->curlHandle == NULL)
   {
+    curl_multi_cleanup(orionldState.curlDoMultiP);
+    orionldState.curlDoMultiP = NULL;
     LM_E(("Internal Error: curl_easy_init failed"));
     return false;
   }
@@ -496,7 +498,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   headers = curl_slist_append(headers, dateHeader);
 
   // Host
-  headers = curl_slist_append(headers, hostHeader);
+  headers = curl_slist_append(headers, hostHeaderNoLF);
 
   // X-Forwarded-For
   headers = curl_slist_append(headers, xForwardedForHeader);
@@ -527,10 +529,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
         //
         if (orionldState.in.httpHeaders != NULL)
         {
-          kjTreeLog(orionldState.in.httpHeaders, "orionldState.in.httpHeaders", LmtDistOpMsgs);
           KjNode* kvP = kjLookup(orionldState.in.httpHeaders, keyP->value.s);
 
-          if (kvP != NULL)
+          if ((kvP != NULL) && (kvP->type == KjString))
           {
             char header[512];
             snprintf(header, sizeof(header), "%s: %s", kvP->name, kvP->value.s);

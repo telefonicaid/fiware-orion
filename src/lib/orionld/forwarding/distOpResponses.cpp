@@ -55,7 +55,6 @@ void updatedAttr404Purge(KjNode* failureV, char* attrName)
     return;
 
   LM_T(LmtDistOp207, ("********** attribute '%s' is updated - remove 404 failure if present", attrName));
-  kjTreeLog(failureV, "failureV", LmtDistOp207);
 
   int     purgedItems = 0;
   KjNode* failureItemP = failureV->value.firstChildP;
@@ -172,8 +171,6 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
 
       if ((notUpdatedV != NULL) && (notUpdatedV->value.firstChildP != NULL))
       {
-        kjTreeLog(notUpdatedV, "Found a 'notUpdated' in a DistOp response", LmtDistOpMsgs);
-
         //
         // The response doesn't include the registrationId, which is needed inside the "failure" objects
         // Of course it isn't !
@@ -291,10 +288,10 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     // Mark all attributes of this DistOp as erroneous (those attrs that were sent)
     distOpFailure(responseBody, distOpP, title, detail, statusCode, NULL);
   }
+  else if (httpResponseCode == 200)
+    LM_T(LmtDistOpMsgs, ("Reg %s: unexpected status code %d (using the accumulator?)", distOpP->regP->regId, httpResponseCode));
   else
-  {
     LM_W(("Reg %s: unexpected status code %d", distOpP->regP->regId, httpResponseCode));
-  }
 }
 
 
@@ -307,10 +304,9 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
 {
   uint64_t  httpResponseCode = 500;
 
-  kjTreeLog(responseBody, "responseBody", 0);
-
   curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &httpResponseCode);
 
+  LM_T(LmtDistOpResponse, ("Reg %s: Operation Type:            %s",   distOpP->regP->regId, distOpTypes[distOpP->operation]));
   LM_T(LmtDistOpResponse, ("Reg %s: Distributed Response Code: %d",   distOpP->regP->regId, httpResponseCode));
   LM_T(LmtDistOpResponse, ("Reg %s: Distributed Response Body: '%s'", distOpP->regP->regId, distOpP->rawResponse));
 
@@ -330,10 +326,9 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     //
     // Not Implemented ...
     //
-    LM_W(("*** distributed operation: '%s' - THIS MUST BE IMPLEMENTED !!!", distOpTypes[distOpP->operation]));
+    LM_W(("operation: %s (real implementation pending - running in \"fall-back\")", distOpTypes[distOpP->operation]));
     if (msgP->data.result == CURLE_OK)
     {
-      LM_T(LmtDistOpResponseDetail, ("Got a response: httpResponseCode == %d", httpResponseCode));
       if ((httpResponseCode >= 200) && (httpResponseCode <= 299))
         distOpSuccess(responseBody, distOpP, NULL);
       else if (httpResponseCode == 404)

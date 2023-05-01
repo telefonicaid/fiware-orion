@@ -54,6 +54,7 @@ extern "C"
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/distOpEntityMerge.h"                // distOpEntityMerge
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // Own interface
 
@@ -133,6 +134,10 @@ bool orionldGetEntity(void)
     if (orionldState.distributed == true)
     {
       forcedSysAttrs = true;
+      //
+      // For forwarded requests, I NEED sysAttrs (to pick attribute in case there's more than one)
+      // And, Normalized is the format for Distributed operations
+      //
       apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, lang, true, &orionldState.pd);
     }
     else
@@ -332,9 +337,11 @@ bool orionldGetEntity(void)
       else
         distOpEntityMerge(apiEntityP, fwdP->responseBody, sysAttrs, fwdP->regP->mode == RegModeAuxiliary);
     }
+
+    distOpListRelease(distOpList);
   }
 
-  if (forwards > 0)
+  if ((forwards > 0) || (forcedSysAttrs == true))  // Nothing to do with SysAttrs really, just a bieffekt
   {
     // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
 

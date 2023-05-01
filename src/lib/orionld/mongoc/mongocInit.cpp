@@ -27,7 +27,7 @@
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include "logMsg/traceLevels.h"                                  // LmtMongoc
 
 #include "orionld/common/orionldState.h"                         // orionldState, mongocPool, ...
 #include "orionld/common/tenantList.h"                           // tenant0 - the default tenant
@@ -143,6 +143,17 @@ static char* uriCompose
   char* compV[50];
   int   compNo = 0;
 
+  LM_T(LmtMongoc, ("dbURI:           '%s'", dbURI));
+  LM_T(LmtMongoc, ("dbHost:          '%s'", dbHost));
+  LM_T(LmtMongoc, ("dbUser:          '%s'", dbUser));
+  if (dbPwd != NULL)
+    LM_T(LmtMongoc, ("dbPwd:           '****'"));
+  LM_T(LmtMongoc, ("dbAuthDb:        '%s'", dbAuthDb));
+  LM_T(LmtMongoc, ("dbReplicaSet:    '%s'", dbReplicaSet));
+  LM_T(LmtMongoc, ("dbAuthMechanism: '%s'", dbAuthMechanism));
+  LM_T(LmtMongoc, ("dbSSL:           '%s'", (dbSSL == true)? "true" : "false"));
+  LM_T(LmtMongoc, ("tlsCertificate:  '%s'", tlsCertificateFilePath));
+
   if (dbURI[0] != 0)
   {
     //
@@ -180,21 +191,25 @@ static char* uriCompose
     }
 
     compV[compNo++] = dbHost;
-    compV[compNo++] = (char*) "/";
 
-    if ((dbAuthDb != NULL) && (dbAuthDb[0] != 0))
+    bool dbAuthDbPresent        = (dbAuthDb        != NULL) && (dbAuthDb[0]        != 0);
+    bool dbReplicaSetPresent    = (dbReplicaSet    != NULL) && (dbReplicaSet[0]    != 0);
+    bool dbAuthMechanismPresent = (dbAuthMechanism != NULL) && (dbAuthMechanism[0] != 0);
+
+    if ((dbAuthDbPresent == true) || (dbReplicaSetPresent == true) || (dbAuthMechanismPresent == true)  || (dbSSL == true))
+      compV[compNo++] = (char*) "?";
+
+    if (dbAuthDbPresent == true)
       compV[compNo++] = dbAuthDb;
 
-    compV[compNo++] = (char*) "?";
-
-    if ((dbReplicaSet != NULL) && (dbReplicaSet[0] != 0))
+    if (dbReplicaSetPresent == true)
     {
       compV[compNo++] = (char*) "replicaSet=";
       compV[compNo++] = dbReplicaSet;
       compV[compNo++] = (char*) "&";
     }
 
-    if ((dbAuthMechanism != NULL) && (dbAuthMechanism[0] != 0))
+    if (dbAuthMechanismPresent == true)
     {
       compV[compNo++] = (char*) "authMechanism=";
       compV[compNo++] = dbAuthMechanism;

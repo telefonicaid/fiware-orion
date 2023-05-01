@@ -582,17 +582,21 @@ extern bool              experimental;             // From orionld.cpp
 extern bool              mongocOnly;               // From orionld.cpp
 extern char              allowedOrigin[64];        // From orionld.cpp (CORS)
 extern int               maxAge;                   // From orionld.cpp (CORS)
-extern char              userAgentHeader[64];      // From notificationSend.cpp - move to orionld.cpp
-extern size_t            userAgentHeaderLen;       // From notificationSend.cpp - move to orionld.cpp
-extern char              userAgentHeaderNoLF[64];  // move to orionld.cpp (from orionldPostEntities.cpp)
-extern char              hostHeader[256];          // move to orionld.cpp (from orionldPostEntities.cpp)
+extern char              userAgentHeader[64];      // From notificationSend.cpp - move to orionld.cpp?
+extern size_t            userAgentHeaderLen;       // From notificationSend.cpp - move to orionld.cpp?
+extern char              userAgentHeaderNoLF[64];  // move to orionld.cpp?
+extern char              hostHeader[256];          // move to orionld.cpp?
+extern char              hostHeaderNoLF[128];      // move to orionld.cpp?
+extern size_t            hostHeaderLen;            // move to orionld.cpp?
 extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
 extern int               cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 extern char              localIpAndPort[135];      // Local address for X-Forwarded-For (from orionld.cpp)
-extern char              orionldEntityMapId[64];   // Used by GET /entities in the distributed case, for pagination
-extern KjNode*           orionldEntityMap;
-extern int               orionldEntityMapCount;
+extern unsigned long long  inReqPayloadMaxSize;
+extern unsigned long long  outReqMsgMaxSize;
+extern char                orionldEntityMapId[64];   // Used by GET /entities in the distributed case, for pagination
+extern KjNode*             orionldEntityMap;
+extern int                 orionldEntityMapCount;
 
 
 

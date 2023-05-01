@@ -48,6 +48,7 @@ extern "C"
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own interface
 
@@ -266,7 +267,9 @@ bool orionldDeleteAttribute(void)
       distOpSuccess(responseBody, NULL, attrName);
   }
 
-  kjTreeLog(responseBody, "Fixing responses", 20);
+  if (distOpList != NULL)
+    distOpListRelease(distOpList);
+
   responseFix(responseBody, DoDeleteAttrs, 204, entityId);
 
   return true;

@@ -343,6 +343,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E1
 POST REGEX(.*)
 Content-Length: 233
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -400,6 +401,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E3
 POST REGEX(.*)
 Content-Length: 236
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -457,6 +459,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E5
 POST REGEX(.*)
 Content-Length: 237
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -511,9 +514,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E7
 
 18. Dump accumulator to see one notification
 ============================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:ngsi-ld:subs:S4
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S4
 Content-Length: 301
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

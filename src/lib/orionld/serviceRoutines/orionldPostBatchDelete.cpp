@@ -48,6 +48,7 @@ extern "C"
 #include "orionld/forwarding/distOpSend.h"                     // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"       // distOpLookupByCurlHandle
 #include "orionld/forwarding/distOpListDebug.h"                // distOpListDebug2
+#include "orionld/forwarding/distOpListRelease.h"              // distOpListRelease
 #include "orionld/forwarding/xForwardedForCompose.h"           // xForwardedForCompose
 #include "orionld/forwarding/regMatchForBatchDelete.h"         // regMatchForBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
@@ -114,13 +115,45 @@ KjNode* dbModelToEntityIdAndTypeTable(KjNode* dbEntityIdArray)
 
 
 
+// ----------------------------------------------------------------------------
+//
+// distReqLog -
+//
+void distReqLog(DistOp* distOpList, const char* title)
+{
+  LM_T(LmtSR, ("DR: %s", title));
+  for (DistOp* drP = distOpList; drP != NULL; drP = drP->next)
+  {
+    LM_T(LmtSR, ("DR: Registration:               %s", drP->regP->regId));
+    LM_T(LmtSR, ("DR: Verb:                       %s", "TBD"));
+    LM_T(LmtSR, ("DR: URL:                        %s", "TBD"));  // IP+port should be in the URL
+    LM_T(LmtSR, ("DR: Entity ID:                  %s", drP->entityId));
+    LM_T(LmtSR, ("DR: Entity Type:                %s", drP->entityType));
+
+    if ((drP->requestBody != NULL) && (lmTraceIsSet(LmtSR)))
+    {
+      int   bodySize = kjFastRenderSize(drP->requestBody);
+      char* body     = kaAlloc(&orionldState.kalloc, bodySize + 256);
+
+      kjFastRender(drP->requestBody, body);  // Depends on the trace level LmtSR
+      LM_T(LmtSR, ("DR: payload body:               %s", body));
+    }
+    else
+      LM_T(LmtSR, ("DR: payload body:               NULL"));
+
+    LM_T(LmtSR, ("DR: -----------------------------------------------------------"));
+  }
+}
+
+
+
 // -----------------------------------------------------------------------------
 //
 // firstItemOfRegLookup -
 //
-DistOp* firstItemOfRegLookup(DistOp* distReqList, RegCacheItem* regP)
+DistOp* firstItemOfRegLookup(DistOp* distOpList, RegCacheItem* regP)
 {
-  for (DistOp* drP = distReqList; drP != NULL; drP = drP->next)
+  for (DistOp* drP = distOpList; drP != NULL; drP = drP->next)
   {
     if (drP->regP == regP)
       return drP;
@@ -135,12 +168,12 @@ DistOp* firstItemOfRegLookup(DistOp* distReqList, RegCacheItem* regP)
 //
 // distReqsMergeForBatchDelete -
 //
-void distReqsMergeForBatchDelete(DistOp* distReqList)
+void distReqsMergeForBatchDelete(DistOp* distOpList)
 {
   //
   // Payload body needed for the entity id(s)
   //
-  DistOp* drP  = distReqList;
+  DistOp* drP  = distOpList;
   DistOp* next;
   DistOp* prev = NULL;
 
@@ -152,7 +185,7 @@ void distReqsMergeForBatchDelete(DistOp* distReqList)
     // Either it's the first, in which case the drP->requestBody needs to be created (as an array and entityId added to it)
     // Or, the first must be found, and the entityId added to its array (and the drP item to be removed)
     //
-    DistOp* firstP = firstItemOfRegLookup(distReqList, drP->regP);
+    DistOp* firstP = firstItemOfRegLookup(distOpList, drP->regP);
 
     if (drP == firstP)
     {
@@ -421,23 +454,23 @@ bool orionldPostBatchDelete(void)
     DistOp* exclusiveList = regMatchForBatchDelete(RegModeAuxiliary, DoDeleteBatch, entityIdAndTypeTable);
     DistOp* redirectList  = regMatchForBatchDelete(RegModeRedirect,  DoDeleteBatch, entityIdAndTypeTable);
     DistOp* inclusiveList = regMatchForBatchDelete(RegModeInclusive, DoDeleteBatch, entityIdAndTypeTable);
-    DistOp* distReqList;
+    DistOp* distOpList;
 
-    distReqList = distOpListsMerge(exclusiveList,  redirectList);
-    distReqList = distOpListsMerge(distReqList, inclusiveList);
+    distOpList = distOpListsMerge(exclusiveList,  redirectList);
+    distOpList = distOpListsMerge(distOpList, inclusiveList);
 
-    distOpListDebug2(distReqList, "Before distReqsMergeForBatchDelete");
-    distReqsMergeForBatchDelete(distReqList);
-    distOpListDebug2(distReqList, "After distReqsMergeForBatchDelete");
+    distReqLog(distOpList, "Before distReqsMergeForBatchDelete");
+    distReqsMergeForBatchDelete(distOpList);
+    distReqLog(distOpList, "After distReqsMergeForBatchDelete");
 
-    if (distReqList != NULL)
+    if (distOpList != NULL)
     {
       // Enqueue all forwarded requests
       // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
       char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
 
       int forwards = 0;
-      for (DistOp* distReqP = distReqList; distReqP != NULL; distReqP = distReqP->next)
+      for (DistOp* distReqP = distOpList; distReqP != NULL; distReqP = distReqP->next)
       {
         // Send the forwarded request and await all responses
         if (distReqP->regP != NULL)
@@ -501,14 +534,11 @@ bool orionldPostBatchDelete(void)
 
           if (msgP->data.result == CURLE_OK)
           {
-            DistOp* drP = distOpLookupByCurlHandle(distReqList, msgP->easy_handle);
+            DistOp* drP = distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
 
             curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &drP->httpResponseCode);
-            LM_T(LmtDistOpResponse, ("Got a response HTTP Status for Reg '%s': %d", drP->regP->regId, drP->httpResponseCode));
             if (drP->rawResponse != NULL)
             {
-              LM_T(LmtDistOpResponse, ("Got a response BODY for Reg '%s': '%s'", drP->regP->regId, drP->rawResponse));
-
               drP->responseBody = kjParse(orionldState.kjsonP, drP->rawResponse);
 
               //
@@ -522,6 +552,8 @@ bool orionldPostBatchDelete(void)
             --forwards;
           }
         }
+
+        distOpListRelease(distOpList);
       }
     }
   }

@@ -163,6 +163,10 @@ char* pCheckEntityType2(KjNode* payloadTypeNode, KjNode* dbEntityP, char* entity
 
 
 
+// -----------------------------------------------------------------------------
+//
+// attributeLookup -
+//
 static bool attributeLookup(KjNode* dbAttrsP, char* attrName)
 {
   dotForEq(attrName);
@@ -175,6 +179,27 @@ static bool attributeLookup(KjNode* dbAttrsP, char* attrName)
 
   return (dbAttrP != NULL);
 }
+
+
+
+#if 0
+// -----------------------------------------------------------------------------
+//
+// rawResponse -
+//
+void rawResponse(DistOp* distOpList, const char* what)
+{
+  LM_T(LmtDistOpMsgs, ("=============== rawResponse: %s", what));
+  for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
+  {
+    if (distOpP->rawResponse != NULL)
+      LM_T(LmtDistOpMsgs, ("%s: rawResponse: '%s'", distOpP->regP->regId, distOpP->rawResponse));
+    else
+      LM_T(LmtDistOpMsgs, ("%s: rawResponse: NULL", distOpP->regP->regId));
+  }
+  LM_T(LmtDistOpMsgs, ("===================================================================="));
+}
+#endif
 
 
 
@@ -250,7 +275,6 @@ bool orionldPatchEntity(void)
   if (orionldState.distributed == true)
   {
     distOpList = distOpRequests(entityId, entityType, DoUpdateEntity, orionldState.requestTree);
-    kjTreeLog(orionldState.requestTree, "Left for local", LmtDistOpMsgs);
 
     //
     // Read the responses from Distributed Requests
@@ -259,7 +283,6 @@ bool orionldPatchEntity(void)
     {
       distOpResponses(distOpList, responseBody);
       distOpListRelease(distOpList);
-      kjTreeLog(responseBody, "responseBody after distOpResponses", LmtDistOpMsgs);
     }
   }
 
@@ -330,11 +353,10 @@ bool orionldPatchEntity(void)
     // All that is needed is the body, sop, we can create a "fake" DistOp:
     //
     DistOp local;
+
     bzero(&local, sizeof(local));
     local.requestBody = orionldState.requestTree;
-    kjTreeLog(responseBody, "responseBody BEFORE", LmtDistOpMsgs);
     distOpSuccess(responseBody, &local, NULL);
-    kjTreeLog(responseBody, "responseBody AFTER", LmtDistOpMsgs);
   }
 
 
@@ -368,8 +390,6 @@ bool orionldPatchEntity(void)
   orionldState.requestTree = incomingP;
 
  done:
-  kjTreeLog(responseBody, "Final responseBody", LmtDistOpMsgs);
-
   responseFix(responseBody, DoUpdateEntity, 204, entityId);
 
   return true;

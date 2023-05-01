@@ -247,9 +247,10 @@ bye
 
 06. Dump accumulator - see two notification (from step 01 and 03)
 =================================================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 331
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -280,9 +281,10 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
-POST http://127.0.0.1:9997/notify?subscriptionId=urn:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 331
 User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"

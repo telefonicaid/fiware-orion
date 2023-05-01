@@ -125,7 +125,10 @@ static bool attrsMatch(KjNode* propertiesP, KjNode* relationshipsP, KjNode* rciP
 bool pCheckOverlappingRegistrations(RegistrationMode regMode, KjNode* entitiesP, KjNode* propertiesP, KjNode* relationshipsP)
 {
   if (entitiesP == NULL)
+  {
+    LM_T(LmtToDo, ("ToDo: check conflict for reg with only attributes"));
     return false;
+  }
 
   for (KjNode* entityInfoP = entitiesP->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
   {
