@@ -132,30 +132,30 @@ echo
 01. POST /v2/entities, to create Room1 with temperature and pressure.
 =====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Room
+Content-Length: 0
 
 
 
 02. POST /v2/subscriptions, to create subscription without maxFailsLimit
 ========================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit or failsCounter
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 350
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 350
 
 {
     "description": "A subscription to get info about Room1",
@@ -195,18 +195,18 @@ Date: REGEX(.*)
 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. GET /v2/subscriptions/subscription_id, to check failsCounter:1
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 517
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 517
 
 {
     "description": "A subscription to get info about Room1",

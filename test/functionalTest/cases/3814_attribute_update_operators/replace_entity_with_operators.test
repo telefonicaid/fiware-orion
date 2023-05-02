@@ -102,20 +102,20 @@ echo
 01. Create entity E with A=1, B=2
 =================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Get entity E, see A=1, B=2
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 {
     "A": {
@@ -136,18 +136,18 @@ Date: REGEX(.*)
 03. Replace entity E with B={$inc:3}, C=3
 =========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get entity E, see B={$inc:3}, C=3
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 122
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 122
 
 {
     "B": {

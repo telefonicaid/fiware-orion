@@ -79,7 +79,7 @@ Content-Length: 0
 
 02. Attempt to replace E1/A2, see error about attribute not found
 =================================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

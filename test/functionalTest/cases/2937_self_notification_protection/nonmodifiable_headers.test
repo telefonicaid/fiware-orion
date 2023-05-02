@@ -106,7 +106,7 @@ Content-Length: 0
 =========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: MyCorrelator
 Location: /v2/entities/E1?type=T1
 Content-Length: 0
 

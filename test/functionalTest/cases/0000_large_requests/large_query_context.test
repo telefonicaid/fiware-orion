@@ -40,7 +40,7 @@ orionCurl --url "/v1/queryContext" --payload "$BIGFILE"
 
 rm $BIGFILE
 --REGEXPECT--
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

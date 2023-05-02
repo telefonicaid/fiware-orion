@@ -142,7 +142,7 @@ Content-Length: 0
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/E?type=T1
+Location: /v2/entities/E?type=T2
 Content-Length: 0
 
 

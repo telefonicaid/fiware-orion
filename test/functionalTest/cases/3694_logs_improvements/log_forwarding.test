@@ -481,8 +481,8 @@ Content-Length: 298
 12. Update E1/T1/A1+A2+A3+A4+A5 in CB
 =====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

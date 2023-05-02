@@ -93,7 +93,7 @@ Content-Length: 0
 
 03. Attempt to update attribute dfgdfgdf of entity room_2 (the attribute does not exist)
 ========================================================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

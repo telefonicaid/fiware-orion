@@ -171,7 +171,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 03. Update E1-loc2 to actual location: forbidden as it overpass the limit of one
 ================================================================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
@@ -233,7 +233,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 07. Update E1-loc1 to actual location: forbidden as it overpass the limit of one
 ================================================================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

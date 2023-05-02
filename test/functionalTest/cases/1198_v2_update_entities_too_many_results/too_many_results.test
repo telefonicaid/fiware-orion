@@ -85,7 +85,7 @@ Content-Length: 0
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/Room1?type=Room
+Location: /v2/entities/Room1?type=Space
 Content-Length: 0
 
 

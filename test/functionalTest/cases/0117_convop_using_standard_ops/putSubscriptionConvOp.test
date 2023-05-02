@@ -265,10 +265,10 @@ echo
 01. PUT /v1/contextSubscriptions/1234567890 and see it fail
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 149
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 149
 
 {
     "subscribeError": {
@@ -285,10 +285,10 @@ Date: REGEX(.*)
 02. PUT /v1/contextSubscriptions/123456789012345678901234 with 000000000000000000000000 in payload and see it fail
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 228
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 228
 
 {
     "subscribeError": {
@@ -305,10 +305,10 @@ Date: REGEX(.*)
 03. PUT /v1/contextSubscriptions/123456789012345678901234 and see it fail
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 133
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 133
 
 {
     "subscribeError": {
@@ -324,10 +324,10 @@ Date: REGEX(.*)
 04. Subscribe to E1/T1/A1+A2
 ============================
 HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
 
 {
     "subscribeResponse": {
@@ -341,10 +341,10 @@ Date: REGEX(.*)
 05. Create E1/T1/A1+A2
 ======================
 HTTP/1.1 200 OK
-Content-Length: 230
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 230
 
 {
     "contextResponses": [

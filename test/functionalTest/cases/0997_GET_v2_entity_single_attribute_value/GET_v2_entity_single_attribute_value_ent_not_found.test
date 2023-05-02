@@ -45,7 +45,7 @@ echo
 HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
+Content-Type: text/plain
 Content-Length: 95
 
 {"error":"NotFound","description":"The requested entity has not been found. Check type and id"}

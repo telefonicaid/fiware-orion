@@ -181,10 +181,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 06. Get entity, see E-A=[2] and E-B=[[z]]
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 139
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 139
 
 {
     "A": {

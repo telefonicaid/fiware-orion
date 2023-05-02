@@ -270,20 +270,20 @@ echo
 01.01. Create E1 with an attribute called A1, with value { "C1.x": "Step01_01" }
 ================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 01.02. Query with q=A1.C1.x, no hits
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -291,10 +291,10 @@ Date: REGEX(.*)
 01.03. Query with q=A1.'C1.x', see E1
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 103
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 103
 
 [
     {
@@ -314,10 +314,10 @@ Date: REGEX(.*)
 01.04. Query with q=A1.'C1.x'==Step01_01, see E1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 103
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 103
 
 [
     {

@@ -185,7 +185,7 @@ Content-Length: 117
 
 05. Try to UPDATE non-existing attribute A3, see error
 ======================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

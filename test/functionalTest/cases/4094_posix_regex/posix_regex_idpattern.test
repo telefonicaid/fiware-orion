@@ -165,7 +165,7 @@ echo
 =====================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})dd
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Content-Length: 0
 

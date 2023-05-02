@@ -327,7 +327,7 @@ Content-Length: 95
 
 03. Create entity with two geo:line -> fail
 ============================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
@@ -417,7 +417,7 @@ Content-Length: 96
 
 06. Append a new geo:line attribute (attr2) -> fail
 ===================================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
@@ -567,7 +567,7 @@ Content-Length: 153
 
 11. Change attr2 type to geo:line again -> fail
 ===============================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

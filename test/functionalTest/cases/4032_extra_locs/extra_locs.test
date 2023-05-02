@@ -386,7 +386,7 @@ Content-Length: 369
 
 06. Update E (with overrideMetadata) to remove ignoreType metadata in L2: see fail
 ==================================================================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

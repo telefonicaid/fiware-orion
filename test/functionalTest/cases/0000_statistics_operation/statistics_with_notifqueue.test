@@ -36,11 +36,10 @@ echo
 --REGEXPECT--
 +++++ 1. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Date: REGEX(.*)
+Content-Length: REGEX(\d+)
 
 {
     "measuring_interval_in_secs": REGEX(\d+),

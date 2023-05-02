@@ -113,7 +113,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 02. PATCH /v2/entities/Room1/attrs, to update existing attribute (temperature) and non existing attribute (pressur), resulting in 422 Unprocessable error
 =========================================================================================================================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
@@ -127,7 +127,7 @@ Content-Length: 112
 
 03. PATCH /v2/entities/Room1/attrs, to update existing attribute (temperature) and non existing attribute (temper and pressur), resulting in 422 Unprocessable error
 ====================================================================================================================================================================
-HTTP/1.1 422 Unprocessable Entity
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

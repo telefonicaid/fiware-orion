@@ -502,16 +502,16 @@ Location: /v2/entities/E6?type=T
 Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E7?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E7?type=T
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E8?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E8?type=T
+Content-Length: 0
 
 10. Get sub1 see lastSuccessCode: 200 but not failsCounter
 ==========================================================

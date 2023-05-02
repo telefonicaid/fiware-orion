@@ -74,7 +74,7 @@ Content-Length: 75
 
 02. Sending a request of ~60 MB, to a broker that excepts request upto ~50MB - see 413 error
 ============================================================================================
-HTTP/1.1 413 Payload Too Large
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json

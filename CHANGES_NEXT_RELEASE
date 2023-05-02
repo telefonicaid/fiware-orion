@@ -1,6 +1,13 @@
+- Fix: Modify .test to upgrade to libmicrohttpd 0.9.75 (#4267)
+- Add: subject.condition.notifyOnMetadataChange field to subscriptions, so only-metadata changes doesn't trigger notifications (#3727)
+- Add: new simplifiedNormalized and simplifiedKeyvalues for attrsFormat (#4286)
 - Add: -mqttTimeout (env var ORION_MQTT_TIMEOUT) for MQTT broker connection timeout
 - Fix: queue workers deadlock when MQTT broker was not responding to connection attemp
 - Fix: Ngsiv2-AttrsFormat header set to "normalized" in NGSI patching custom notification
 - Fix: memory access potential problem in GET /log/trace request when tracelevel 255 is enabled
 - Fix: Orion should return error and refuse to start when port is negative (#3875)
+- Fix: subscription autodisable based on maxFailsLimit not working when fails does not happen within the same csubs cache refresh cycle
+- Fix: incorrectly sum stale failsCounter from database when subscription has started to work again (only when csubs cache is enabled)
+- Fix: MQTT disconnection when MQTT publish fail (so re-connection is forced at next MQTT notification)
 - Fix: lineMaxSize and infoPayloadMaxSize in the log admin REST API (#3707)
+- Fix: check for service database name too long at cache sync logic (#2848)

@@ -179,6 +179,9 @@ Content-Length: 0
 03. Get entities (E1-loc: with actual location, E2-loc: null)
 =============================================================
 HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
 Content-Length: 164
 
 [

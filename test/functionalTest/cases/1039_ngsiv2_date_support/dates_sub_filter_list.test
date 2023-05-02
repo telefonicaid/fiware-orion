@@ -186,7 +186,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
 
 
 

@@ -87,7 +87,7 @@ Content-Length: REGEX(\d+)
 ====================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Correlator: OLD_CORRELATOR
 Content-Type: application/json
 Content-Length: REGEX(\d+)
 
