@@ -513,8 +513,8 @@ Content-Length: 288
 13. Update custom sub2 to add json field
 ========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

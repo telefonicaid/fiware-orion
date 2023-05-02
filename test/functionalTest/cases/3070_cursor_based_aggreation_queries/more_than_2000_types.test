@@ -68,11 +68,11 @@ creation completed
 02. GET /v2/types?offset=2000 and get types from T2001 to T2005
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 331
-Content-Type: application/json
-Fiware-Total-Count: 2005
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 2005
+Content-Type: application/json
+Content-Length: 331
 
 [
     {
