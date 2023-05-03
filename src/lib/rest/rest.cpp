@@ -1332,13 +1332,14 @@ static MHD_Result connectionTreat
   //
   //  NOT NGSI-LD
   //
-  ++requestNo;
-  LM_K(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (*con_cls == NULL)
   {
     MHD_Result retVal;
+
+    ++requestNo;
+    LM_K(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
 
     //
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests
