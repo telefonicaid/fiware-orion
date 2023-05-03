@@ -174,7 +174,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 388
+Content-Length: 418
 
 [
     {
@@ -194,7 +194,8 @@ Content-Length: 388
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -223,7 +224,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 434
+Content-Length: 464
 
 [
     {
@@ -245,7 +246,8 @@ Content-Length: 434
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -331,6 +333,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "lastFailureReason": "some reason",
     "lastNotification": 1546337410,
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",
@@ -347,7 +350,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 471
+Content-Length: 501
 
 [
     {
@@ -370,7 +373,8 @@ Content-Length: 471
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -413,6 +417,7 @@ Content-Length: 471
     "lastFailureReason": "Couldn't connect to server",
     "lastNotification": REGEX(1[6-9]\d+),
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",

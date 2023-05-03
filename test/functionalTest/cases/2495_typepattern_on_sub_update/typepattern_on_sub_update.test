@@ -116,7 +116,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 412
+Content-Length: 442
 
 {
     "description": "One subscription to rule them all",
@@ -140,7 +140,8 @@ Content-Length: 412
             "attrs": [],
             "expression": {
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -166,7 +167,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 396
+Content-Length: 426
 
 {
     "description": "One subscription to rule them all",
@@ -187,7 +188,8 @@ Content-Length: 396
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

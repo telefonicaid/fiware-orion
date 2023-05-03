@@ -251,9 +251,17 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
     {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
-      dbsP->push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      // Check for size of database name
+      if (strlen(dbName.c_str()) <= DB_AND_SERVICE_NAME_MAX_LEN)
+      {
+        LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+        dbsP->push_back(dbName);
+        LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      }
+      else
+      {
+        LM_E(("Runtime Error (database name size should be smaller than %d characters: %s)", DB_AND_SERVICE_NAME_MAX_LEN, dbName.c_str()));
+      }
     }
   }
 
@@ -2244,101 +2252,88 @@ EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
 */
 static void getCommonAttributes
 (
-  const bool                        type,
   const std::vector<std::string>&   fVector,
   const std::vector<std::string>&   sVector,
   std::vector<std::string>&         resultVector
 )
 {
-  if (type)
+  for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
   {
-    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
     {
-      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+      if (fVector[cavOc] == sVector[avOc])
       {
-        if (fVector[cavOc] == sVector[avOc])
-        {
-          resultVector.push_back(fVector[cavOc]);
-        }
-      }
-    }
-  }
-  else
-  {
-    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
-    {
-      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
-      {
-        if (fVector[cavOc] != sVector[avOc])
-        {
-          resultVector.push_back(fVector[cavOc]);
-        }
+        resultVector.push_back(fVector[cavOc]);
       }
     }
   }
 }
 
 
+/* ****************************************************************************
+*
+* getDifferenceAttributes -
+*/
+static void getDifferenceAttributes
+(
+  const std::vector<std::string>&   fVector,
+  const std::vector<std::string>&   sVector,
+  std::vector<std::string>&         resultVector
+)
+{
+  for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+  {
+    bool found = false;
+    for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+    {
+      if (fVector[cavOc] == sVector[avOc])
+      {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      resultVector.push_back(fVector[cavOc]);
+    }
+  }
+}
+
 
 /* ****************************************************************************
 *
 * subToNotifyList -
+*
 */
 void subToNotifyList
 (
-  const std::vector<std::string>&  modifiedAttrs,
-  const std::vector<std::string>&  conditionVector,
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
   StringList&                      attrL,
-  const bool&                      blacklist,
-  bool&                            op
+  const bool&                      blacklist
 )
 {
-    std::vector<std::string>  condAttrs;
     std::vector<std::string>  notifyAttrs;
 
-    if (!blacklist)
+    if (blacklist)
     {
-      if (conditionVector.size() == 0 && notificationVector.size() == 0)
-      {
-        attrL.fill(modifiedAttrs);
-      }
-      else if (conditionVector.size() == 0 && notificationVector.size() != 0)
-      {
-        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
-      }
-      else if (conditionVector.size() != 0 && notificationVector.size() == 0)
-      {
-        getCommonAttributes(true, modifiedAttrs, entityAttrsVector, notifyAttrs);
-      }
-      else
-      {
-        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
-      }
-      if (notifyAttrs.size() == 0 && (conditionVector.size() != 0 || notificationVector.size() != 0))
-      {
-        op = true;
-      }
+      // By definition, notificationVector cannot be empty in blacklist case
+      // (checked at parsing time)
+      getDifferenceAttributes(entityAttrsVector, notificationVector, notifyAttrs);
       attrL.fill(notifyAttrs);
     }
-    else if (blacklist)
+    else
     {
-      if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      if (notificationVector.size() == 0)
       {
-        getCommonAttributes(false, modifiedAttrs, notificationVector, notifyAttrs);
+        // This means "all attributes"
+        attrL.fill(entityAttrsVector);
       }
       else
       {
-        getCommonAttributes(false, modifiedAttrs, notificationVector, condAttrs);
-        getCommonAttributes(true, condAttrs, entityAttrsVector, notifyAttrs);
+        getCommonAttributes(entityAttrsVector, notificationVector, notifyAttrs);
+        attrL.fill(notifyAttrs);
       }
-
-      if (notifyAttrs.size() == 0)
-      {
-        op = true;
-      }
-      attrL.fill(notifyAttrs);
     }
 }
 
@@ -2354,33 +2349,19 @@ void subToNotifyList
 StringList subToAttributeList
 (
   const orion::BSONObj&           sub,
-  const bool&                     onlyChanged,
   const bool&                     blacklist,
-  const std::vector<std::string>  modifiedAttrs,
-  const std::vector<std::string>  attributes,
-  bool&                           op
+  const std::vector<std::string>  attributes
 )
 {
-  if (!onlyChanged)
-  {
-    return subToAttributeList(sub);
-  }
   StringList                       attrL;
   std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<orion::BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
-  std::vector<std::string>         conditionAttrs;
   std::vector<std::string>         notificationAttrs;
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {
     std::string subAttr = subAttrs[ix].String();
     notificationAttrs.push_back(subAttr);
   }
-  for (unsigned int ix = 0; ix < condAttrs.size() ; ++ix)
-  {
-    std::string subAttr = condAttrs[ix].String();
-    conditionAttrs.push_back(subAttr);
-  }
-  subToNotifyList(modifiedAttrs, conditionAttrs, notificationAttrs, attributes, attrL, blacklist, op);
+  subToNotifyList(notificationAttrs, attributes, attrL, blacklist);
   return attrL;
 }
 

@@ -157,6 +157,12 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
     s->subject.condition.expression.coords   = coords;
     s->subject.condition.expression.georel   = georel;
   }
+
+  // notifyOnMetadataChange
+  if (r.hasField(CSUB_NOTIFYONMETADATACHANGE))
+  {
+    s->subject.condition.notifyOnMetadataChange = r.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(r, CSUB_NOTIFYONMETADATACHANGE) : true;
+  }
 }
 
 
@@ -215,7 +221,19 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   if (cSubP)
   {
     subP->notification.timesSent    += cSubP->count;
-    subP->notification.failsCounter += cSubP->failsCounter;
+
+    if (cSubP->lastSuccess > subP->notification.lastFailure)
+    {
+      // this means that the lastFailure in the DB is stale, so the failsCounter at DB
+      // cannot be use and we enterely rely on the one in local cache
+      subP->notification.failsCounter = cSubP->failsCounter;
+    }
+    else
+    {
+      // in this case, the failsCounter at DB is valid and we can rely on it. We
+      // sum any local failsCounter to that
+      subP->notification.failsCounter += cSubP->failsCounter;
+    }
 
     if (cSubP->lastNotificationTime > subP->notification.lastNotification)
     {

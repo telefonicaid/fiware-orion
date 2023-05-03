@@ -22,3 +22,54 @@ CI の現在のバージョンは以下をサポートします:
 * 機能テスト
 
 ファイル・コンプライアンス、ペイロード、およびスタイル・チェックは、1つの 'compliance' テストにまとめられています。
+
+# イメージをローカルで使用する方法
+
+場合によっては、CI イメージをローカルで実行する必要があります (たとえば、GitHub アクション・ジョブで見つかった問題を
+デバッグするためです)。その場合、次のチート・シートが役立ちます:
+
+イメージをダウンロードするには:
+
+```
+docker pull fiware/orion-ci:deb
+```
+
+たとえば、GitHub Actions と同じ方法でイメージを実行するには、次のようにします:
+
+```
+# Check that MongoDB server is running in your localhost:27017
+cd /path/to/fiware-orion
+docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion fiware/orion-ci:deb build -miqts functional
+```
+
+インタラクティブな bash を使用してイメージを実行するには:
+
+```
+# Check that MongoDB server is running in your localhost:27017
+cd /path/to/fiware-orion
+docker run --network host -ti -v $(pwd):/opt/fiware-orion fiware/orion-ci:deb bash
+```
+
+bash シェルを起動したら、同様の実行を行うことができます:
+
+```
+root@debian11:/opt# CB_NO_CACHE=ON FT_FROM_IX=1201 build -miqts functional
+```
+
+または、`testHarness.sh` スクリプトを直接実行することもできます (たとえば、単一のテストを実行するため):
+
+```
+root@debian11:/opt# . /opt/ft_env/bin/activate
+(ft_env) root@debian11:/opt# cd /opt/fiware-orion/test/functionalTest/
+(ft_env) root@debian11:/opt/fiware-orion/test/functionalTest# ./testHarness.sh cases/3541_subscription_max_fails_limit/mqtt_subscription_without_maxfailslimit_and_failscounter.test
+```
+
+**注:** 上記の手順により、Orion は root ユーザを使用してコンパイルされます。デバッグ・セッションの終了後に
+再帰的な所有者の変更を行うことをお勧めします。このようなものです：
+
+```
+sudo chown -R fermin:fermin /path/to/fiware-orion
+```
+
+**注2:** `build` スクリプトは `makefile` ファイルに変更を加えます。デバッグ・セッションの後に `git checkout makefile`
+を実行して変更を取り消します。

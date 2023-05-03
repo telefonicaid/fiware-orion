@@ -159,7 +159,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 427
+Content-Length: 457
 
 {
     "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
@@ -183,7 +183,8 @@ Content-Length: 427
             "attrs": [
                 "temperature",
                 "timestamp"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -206,7 +207,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 359
+Content-Length: 389
 
 {
     "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
@@ -228,7 +229,8 @@ Content-Length: 359
         "condition": {
             "attrs": [
                 "speed"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

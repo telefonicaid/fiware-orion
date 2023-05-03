@@ -157,7 +157,7 @@ Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Fiware-Total-Count: 2
 Content-Type: application/json
-Content-Length: 429
+Content-Length: 459
 
 [
     {
@@ -182,7 +182,8 @@ Content-Length: 429
                 "attrs": [
                     "temperature",
                     "timestamp"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -207,7 +208,7 @@ Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Fiware-Total-Count: 2
 Content-Type: application/json
-Content-Length: 363
+Content-Length: 393
 
 [
     {
@@ -230,7 +231,8 @@ Content-Length: 363
             "condition": {
                 "attrs": [
                     "speed"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

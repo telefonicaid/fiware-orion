@@ -1,4 +1,4 @@
-# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription maxFailsLimit error conditions
+Subscription maxFailsLimit error conditions (MQTT case)
 
 --SHELL-INIT--
 dbInit CB
@@ -53,8 +53,9 @@ payload='{
     }
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
     },
     "attrs": [
       "temperature"
@@ -85,8 +86,9 @@ payload='{
     }
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
     },
     "attrs": [
       "temperature"
@@ -117,8 +119,9 @@ payload='{
     }
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
     },
     "attrs": [
       "temperature"
@@ -176,5 +179,4 @@ Content-Length: 78
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
 dbDrop CB

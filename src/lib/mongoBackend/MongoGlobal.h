@@ -302,13 +302,10 @@ extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
 */
 void subToNotifyList
 (
-  const std::vector<std::string>&  modifiedAttrs,
-  const std::vector<std::string>&  conditionVector,
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
   StringList&                      attrL,
-  const bool&                      blacklist,
-  bool&                            op
+  const bool&                      blacklist
 );
 
 
@@ -322,11 +319,8 @@ void subToNotifyList
 extern StringList subToAttributeList
 (
   const orion::BSONObj&           attrL,
-  const bool&                     onlyChanged,
   const bool&                     blacklist,
-  const std::vector<std::string>  modifiedAttrs,
-  const std::vector<std::string>  attributes,
-  bool&                           op
+  const std::vector<std::string>  attributes
 );
 
 

@@ -193,7 +193,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 437
+Content-Length: 467
 
 [
     {
@@ -218,7 +218,8 @@ Content-Length: 437
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -246,7 +247,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 437
+Content-Length: 467
 
 [
     {
@@ -271,7 +272,8 @@ Content-Length: 437
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -307,7 +309,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 521
+Content-Length: 551
 
 [
     {
@@ -332,7 +334,8 @@ Content-Length: 521
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -365,3 +368,4 @@ Request received: GET /v2/subscriptions, response code: 200
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+

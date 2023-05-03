@@ -157,7 +157,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 376
+Content-Length: 406
 
 [
     {
@@ -169,15 +169,16 @@ Content-Length: 376
             "http": {
                 "url": "http://localhost:9997/notify"
             },
-            "lastNotification": "2019-01-01T10:10:10.000Z",
-            "lastSuccess": "2019-01-01T10:10:10.000Z",
+            "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastSuccess": "2050-01-01T10:00:00.000Z",
             "lastSuccessCode": 211,
             "onlyChangedAttrs": false
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -206,7 +207,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 390
+Content-Length: 420
 
 [
     {
@@ -218,16 +219,17 @@ Content-Length: 390
             "http": {
                 "url": "http://localhost:9997/notify"
             },
-            "lastNotification": "202REGEX(.*)",
-            "lastSuccess": "202REGEX(.*)",
-            "lastSuccessCode": 200,
+            "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastSuccess": "2050-01-01T10:00:00.000Z",
+            "lastSuccessCode": 211,
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -283,7 +285,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 390
+Content-Length: 420
 
 [
     {
@@ -295,16 +297,17 @@ Content-Length: 390
             "http": {
                 "url": "http://localhost:9997/notify"
             },
-            "lastNotification": "202REGEX(.*)",
-            "lastSuccess": "202REGEX(.*)",
-            "lastSuccessCode": 200,
+            "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastSuccess": "2050-01-01T10:00:00.000Z",
+            "lastSuccessCode": 211,
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

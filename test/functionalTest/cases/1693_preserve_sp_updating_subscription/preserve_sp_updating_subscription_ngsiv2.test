@@ -149,7 +149,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 334
+Content-Length: 364
 
 [
     {
@@ -171,7 +171,8 @@ Content-Length: 334
             "condition": {
                 "attrs": [
                     "temperature"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -198,7 +199,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 331
+Content-Length: 361
 
 [
     {
@@ -220,7 +221,8 @@ Content-Length: 331
             "condition": {
                 "attrs": [
                     "temperature"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -258,7 +260,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 331
+Content-Length: 361
 
 [
     {
@@ -280,7 +282,8 @@ Content-Length: 331
             "condition": {
                 "attrs": [
                     "temperature"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

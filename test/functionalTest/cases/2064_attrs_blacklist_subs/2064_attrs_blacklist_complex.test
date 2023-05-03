@@ -206,7 +206,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 449
+Content-Length: 479
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -232,7 +232,8 @@ Content-Length: 449
         "condition": {
             "attrs": [
                 "A"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -266,7 +267,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 449
+Content-Length: 479
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -292,7 +293,8 @@ Content-Length: 449
         "condition": {
             "attrs": [
                 "A"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -326,7 +328,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 449
+Content-Length: 479
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -352,7 +354,8 @@ Content-Length: 449
         "condition": {
             "attrs": [
                 "A"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

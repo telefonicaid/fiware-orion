@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription without maxFailsLimit and failsCounter
+Subscription without maxFailsLimit and failsCounter (HTTP case)
 
 --SHELL-INIT--
 dbInit CB
@@ -33,9 +33,8 @@ brokerStart CB
 # 01. POST /v2/entities, to create Room1 with temperature and pressure
 # 02. POST /v2/subscriptions, to create subscription without maxFailsLimit
 # 03. GET /v2/subscriptions/subscription_id, to check no maxFailsLimit or failsCounter
-# 04. Stop accumulator
-# 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check failsCounter:1
+# 04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 05. GET /v2/subscriptions/subscription_id, to check failsCounter:1
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -96,15 +95,7 @@ echo
 echo
 
 
-
-echo "04. Stop accumulator"
-echo "===================="
-accumulatorStop
-echo
-echo
-
-
-echo '05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -121,7 +112,7 @@ echo
 echo
 
 
-echo '06. GET /v2/subscriptions/subscription_id, to check failsCounter:1'
+echo '05. GET /v2/subscriptions/subscription_id, to check failsCounter:1'
 echo '=================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -155,7 +146,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 350
+Content-Length: 380
 
 {
     "description": "A subscription to get info about Room1",
@@ -176,7 +167,8 @@ Content-Length: 350
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -188,11 +180,7 @@ Content-Length: 350
 }
 
 
-04. Stop accumulator
-====================
-
-
-05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -200,13 +188,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check failsCounter:1
+05. GET /v2/subscriptions/subscription_id, to check failsCounter:1
 ==================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 517
+Content-Length: 547
 
 {
     "description": "A subscription to get info about Room1",
@@ -232,7 +220,8 @@ Content-Length: 517
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -246,6 +235,4 @@ Content-Length: 517
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
 dbDrop CB
-

@@ -406,7 +406,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 441
+Content-Length: 471
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -429,7 +429,8 @@ Content-Length: 441
             "attrs": [],
             "expression": {
                 "q": "ts>2020-05-10T01:02:03Z"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -447,7 +448,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 445
+Content-Length: 475
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -470,7 +471,8 @@ Content-Length: 445
             "attrs": [],
             "expression": {
                 "q": "ts<2020-05-10T01:02:03.200Z"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -488,7 +490,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 472
+Content-Length: 502
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -511,7 +513,8 @@ Content-Length: 472
             "attrs": [],
             "expression": {
                 "q": "ts==2020-05-10T01:02:03.200Z..2020-05-10T01:02:03.600Z"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

@@ -57,6 +57,8 @@ When the broker starts, the subscription cache is populated with the subscriptio
   char*                            servicePath;
   char*                            subscriptionId;
   int64_t                          failsCounter;
+  int64_t                          failsCounterFromDb;
+  bool                             failsCounterFromDbValid;
   int64_t                          maxFailsLimit;
   int64_t                          throttling;
   int64_t                          expirationTime;
@@ -69,6 +71,7 @@ When the broker starts, the subscription cache is populated with the subscriptio
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;
+  bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
@@ -93,6 +96,7 @@ These fields have a special treatment inside the subscription cache:
 * `lastNotificationTime`, is updated in the database only if it is a **later time** than the *`lastNotificationTime` stored in the database* (some other broker may have updated it with a more recent value)
 * `count` and `failsCounter` in the subscription cache are set to zero at each sub-cache-refresh, so the `count` and `failsCounter` that are in the cache simply are accumulators and its accumulated values are added
   to the counters in the database and then the *counters in cache* are reset back to zero
+* `failsCounterFromDb` (and side `failsCounterFromDbValid`) are used to kept track of the fails counter as seen at DB, to be combined with `failsCounter` at cache (which counts only the fails within the same cache refresh cycle)
 * `lastFailure` (along with `lastFailureReason`), like `lastNotificationTime`, set if greater than *`lastFailure` in the database*
 * `lastSuccess` (along with `lastSuccessCode`), like `lastNotificationTime`, set if greater than *`lastSuccess` in the database*
 * `status`, is updated in the database only if it is a **later time** than the one stored in the database. To check which one is newer the side field `statusLastChange` is used.
@@ -182,7 +186,7 @@ typedef struct CachedSubSaved
 
 After having saved that important information in a vector, the entire subscription cache is wiped out and populated from the database, by calling `subCacheRefresh()`.
 
-After repopulation of the subscription cache, the saved information in the `CachedSubSaved` vector is merged into the subscription cache and finally, the `CachedSubSaved` vector is merged into the database, using the function `mongoSubCountersUpdate`, see [special subscription fields](#special-subscription-fields).  
+After repopulation of the subscription cache, the saved information in the `CachedSubSaved` vector is merged into the subscription cache and finally, the `CachedSubSaved` vector is merged into the database, using the function `mongoSubUpdateOnCacheSync`, see [special subscription fields](#special-subscription-fields).
 
 This is a costly operation and the semaphore that protects the subscription cache must be taken during the entire process to guarantee a successful outcome. As `subCacheSync()` calls a few subscription cache functions, these functions **must not** take the semaphore - the semaphore needs to be taken in a higher level. So, in case the functions are used separately, the caller must ensure the semaphore is taken before usage. Underlying functions may also **not** take/give the semaphore.
 

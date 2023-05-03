@@ -223,7 +223,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 418
+Content-Length: 448
 
 [
     {
@@ -248,7 +248,8 @@ Content-Length: 418
             "condition": {
                 "attrs": [
                     "$temperature"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

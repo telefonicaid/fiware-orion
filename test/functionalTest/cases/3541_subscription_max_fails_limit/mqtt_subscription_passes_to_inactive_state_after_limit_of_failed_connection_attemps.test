@@ -1,4 +1,4 @@
-# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Subscription that pass to inactive state after a limit of failed connection attemps
+Subscription that pass to inactive state after a limit of failed connection attemps (MQTT case)
 
 --SHELL-INIT--
 dbInit CB
@@ -33,19 +33,18 @@ brokerStart CB
 # 01. POST /v2/entities, to create Room1 with temperature and pressure
 # 02. POST /v2/subscriptions, to create subscription with maxFailsLimit=5
 # 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
-# 04. Stop accumulator
-# 05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
-# 07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
-# 09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 10. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
-# 11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 12. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
-# 13. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 14. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
-# 15. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
-# 16. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6
+# 04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
+# 06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
+# 08. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 09. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
+# 10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
+# 12. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 13. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
+# 14. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+# 15. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6
 #
 
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
@@ -85,8 +84,9 @@ payload='{
     }
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
     },
     "attrs": [
       "temperature"
@@ -107,15 +107,7 @@ echo
 echo
 
 
-
-echo "04. Stop accumulator"
-echo "===================="
-accumulatorStop
-echo
-echo
-
-
-echo '05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -132,14 +124,14 @@ echo
 echo
 
 
-echo '06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1'
+echo '05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -156,14 +148,14 @@ echo
 echo
 
 
-echo '08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2'
+echo '07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '08. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -180,14 +172,14 @@ echo
 echo
 
 
-echo '10. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3'
+echo '09. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -204,14 +196,14 @@ echo
 echo
 
 
-echo '12. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4'
+echo '11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '13. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '12. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -228,14 +220,14 @@ echo
 echo
 
 
-echo '14. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5'
+echo '13. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5'
 echo '========================================================================================'
 orionCurl --url /v2/subscriptions/${subId}
 echo
 echo
 
 
-echo '15. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
+echo '14. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.'
 echo '=============================================================================='
 payload='{
   "temperature": {
@@ -252,7 +244,7 @@ echo
 echo
 
 
-echo '16. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.'
+echo '15. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.'
 echo '==========================================================================================='
 orionCurl --url /v2/subscriptions/${subId}
 echo
@@ -263,30 +255,30 @@ echo
 01. POST /v2/entities, to create Room1 with temperature and pressure.
 ====================================================================
 HTTP/1.1 201 Created
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/Room1?type=Room
 Content-Length: 0
+Location: /v2/entities/Room1?type=Room
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 02. POST /v2/subscriptions, to create subscription with maxFailsLimit=5
 =======================================================================
 HTTP/1.1 201 Created
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
 Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 =========================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 415
 Content-Type: application/json
-Content-Length: 368
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1",
@@ -297,10 +289,12 @@ Content-Length: 368
         ],
         "attrsFormat": "normalized",
         "covered": false,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false
     },
     "status": "active",
@@ -308,7 +302,8 @@ Content-Length: 368
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -320,25 +315,21 @@ Content-Length: 368
 }
 
 
-04. Stop accumulator
-====================
-
-
-05. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
-06. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
+05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 ========================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 533
 Content-Type: application/json
-Content-Length: 535
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1",
@@ -350,13 +341,14 @@ Content-Length: 535
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 1,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -365,7 +357,8 @@ Content-Length: 535
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -377,21 +370,21 @@ Content-Length: 535
 }
 
 
-07. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
-08. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
+07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 ========================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 533
 Content-Type: application/json
-Content-Length: 535
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1",
@@ -403,13 +396,14 @@ Content-Length: 535
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 2,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 2
     },
@@ -418,7 +412,8 @@ Content-Length: 535
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -430,21 +425,21 @@ Content-Length: 535
 }
 
 
-09. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+08. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
-10. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
+09. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
 ========================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 533
 Content-Type: application/json
-Content-Length: 535
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1",
@@ -456,13 +451,14 @@ Content-Length: 535
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 3,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 3
     },
@@ -471,7 +467,8 @@ Content-Length: 535
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -483,21 +480,21 @@ Content-Length: 535
 }
 
 
-11. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
-12. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
+11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
 ========================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 533
 Content-Type: application/json
-Content-Length: 535
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1",
@@ -509,13 +506,14 @@ Content-Length: 535
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 4,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 4
     },
@@ -524,7 +522,8 @@ Content-Length: 535
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -536,21 +535,21 @@ Content-Length: 535
 }
 
 
-13. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+12. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
-14. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
+13. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
 ========================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 533
 Content-Type: application/json
-Content-Length: 535
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1",
@@ -562,13 +561,14 @@ Content-Length: 535
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 5,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 5
     },
@@ -577,7 +577,8 @@ Content-Length: 535
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -589,21 +590,21 @@ Content-Length: 535
 }
 
 
-15. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
+14. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
-16. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.
+15. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.
 ===========================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 535
 Content-Type: application/json
-Content-Length: 537
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "description": "A subscription to get info about Room1",
@@ -615,13 +616,14 @@ Content-Length: 537
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 6,
-        "http": {
-            "url": "http://localhost:REGEX(\d+)/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 6
     },
@@ -630,7 +632,8 @@ Content-Length: 537
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -644,5 +647,4 @@ Content-Length: 537
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
 dbDrop CB

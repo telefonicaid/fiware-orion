@@ -130,7 +130,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 477
+Content-Length: 507
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -158,7 +158,8 @@ Content-Length: 477
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -185,7 +186,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 496
+Content-Length: 526
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -215,7 +216,8 @@ Content-Length: 496
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

@@ -178,7 +178,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 285
+Content-Length: 315
 
 [
     {
@@ -196,7 +196,8 @@ Content-Length: 285
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -240,7 +241,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 452
+Content-Length: 482
 
 [
     {
@@ -263,7 +264,8 @@ Content-Length: 452
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -345,6 +347,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "format": "normalized",
     "maxFailsLimit": 1,
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",
@@ -361,7 +364,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 489
+Content-Length: 519
 
 [
     {
@@ -385,7 +388,8 @@ Content-Length: 489
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -429,6 +433,7 @@ Content-Length: 489
     "lastNotification": REGEX(\d+),
     "maxFailsLimit": 1,
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",

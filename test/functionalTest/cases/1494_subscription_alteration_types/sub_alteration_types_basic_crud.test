@@ -284,7 +284,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 323
+Content-Length: 353
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -304,7 +304,8 @@ Content-Length: 323
                 "entityDelete",
                 "entityCreate"
             ],
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -322,7 +323,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 325
+Content-Length: 355
 
 [
     {
@@ -343,7 +344,8 @@ Content-Length: 325
                     "entityDelete",
                     "entityCreate"
                 ],
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -370,7 +372,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 308
+Content-Length: 338
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -389,7 +391,8 @@ Content-Length: 308
             "alterationTypes": [
                 "entityChange"
             ],
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -407,7 +410,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 310
+Content-Length: 340
 
 [
     {
@@ -427,7 +430,8 @@ Content-Length: 310
                 "alterationTypes": [
                     "entityChange"
                 ],
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -454,7 +458,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 273
+Content-Length: 303
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -470,7 +474,8 @@ Content-Length: 273
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -488,7 +493,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 275
+Content-Length: 305
 
 [
     {
@@ -505,7 +510,8 @@ Content-Length: 275
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -532,7 +538,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 323
+Content-Length: 353
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -552,7 +558,8 @@ Content-Length: 323
                 "entityDelete",
                 "entityUpdate"
             ],
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -570,7 +577,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 325
+Content-Length: 355
 
 [
     {
@@ -591,7 +598,8 @@ Content-Length: 325
                     "entityDelete",
                     "entityUpdate"
                 ],
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

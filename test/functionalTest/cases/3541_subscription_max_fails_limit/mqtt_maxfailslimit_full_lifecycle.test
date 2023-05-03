@@ -1,4 +1,4 @@
-# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,12 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-maxFailsLimit full lifecycle
+maxFailsLimit full lifecycle (MQTT case)
 
 --SHELL-INIT--
 dbInit CB
+debugMmqttBrokerStart
+sleep 5s
 brokerStart CB
-accumulatorStart
 
 --SHELL--
 
@@ -34,7 +35,7 @@ accumulatorStart
 # 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=2
 # 02. Upsert entity to trigger notification (ok)
 # 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (omitted), maxFailsLimit=2
-# 04. Stop accumulator
+# 04. Stop MQTT broker
 # 05. Upsert entity to trigger notification (fail)
 # 06. Upsert entity to trigger notification (fail)
 # 07. GET /v2/subscriptions/subId, to check the status=active, timesSent=3, failsCounter=2, maxFailsLimit=2
@@ -54,7 +55,7 @@ accumulatorStart
 # 21. Upsert entity to trigger notification (not triggered due to status=inactive)
 # 22. Upsert entity to trigger notification (not triggered due to status=inactive)
 # 23. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=7, failsCounter=6, maxFailsLimit=5 (same as last GET)
-# 24. Start accumulator
+# 24. Start MQTT broker
 # 25. PATCH /v2/subscriptions/subId to set status=active again
 # 26. Upsert entity to trigger notification (ok)
 # 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (omitted), maxFailsLimit=5
@@ -74,8 +75,9 @@ payload='{
     ]
   },
   "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
     },
     "maxFailsLimit" : 2
   }
@@ -108,9 +110,10 @@ echo
 echo
 
 
-echo "04. Stop accumulator"
+echo "04. Stop MQTT broker"
 echo "===================="
-accumulatorStop
+debugMqttBrokerStop
+sleep 0.5s
 echo
 echo
 
@@ -247,8 +250,9 @@ echo "16. PATCH /v2/subscriptions/subId to enlarge maxFailLimit to 5 and set sta
 echo "=========================================================================================="
 payload='{
   "notification": {
-    "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
     },
     "maxFailsLimit" : 5
   },
@@ -340,9 +344,12 @@ echo
 echo
 
 
-echo "24. Start accumulator"
+echo "24. Start MQTT broker"
 echo "====================="
-accumulatorStart
+# It seems that amqtt broker takes its time to start so we wait a while
+# Note 5s < 60s = default cache refresh interval
+debugMmqttBrokerStart
+sleep 5s
 echo
 echo
 
@@ -394,29 +401,29 @@ echo
 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=2
 =======================================================================
 HTTP/1.1 201 Created
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/subscriptions/REGEX([0-9a-f]{24)
 Content-Length: 0
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 02. Upsert entity to trigger notification (ok)
 ==============================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (omitted), maxFailsLimit=2
 ===================================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 431
 Content-Type: application/json
-Content-Length: 406
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -424,20 +431,22 @@ Content-Length: 406
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 2,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -449,35 +458,35 @@ Content-Length: 406
 }
 
 
-04. Stop accumulator
+04. Stop MQTT broker
 ====================
 
 
 05. Upsert entity to trigger notification (fail)
 ================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 06. Upsert entity to trigger notification (fail)
 ================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 07. GET /v2/subscriptions/subId, to check the status=active, timesSent=3, failsCounter=2, maxFailsLimit=2
 =========================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 489
 Content-Type: application/json
-Content-Length: 513
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -486,22 +495,23 @@ Content-Length: 513
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 2,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 2,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 3
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -516,19 +526,19 @@ Content-Length: 513
 08. Upsert entity to trigger notification (fail that causes change to status=inactive)
 ======================================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 09. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=4, failsCounter=3, maxFailsLimit=2
 ===========================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 491
 Content-Type: application/json
-Content-Length: 515
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -537,22 +547,23 @@ Content-Length: 515
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 3,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 2,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 4
     },
     "status": "inactive",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -567,28 +578,28 @@ Content-Length: 515
 10. Upsert entity to trigger notification (not triggered due to status=inactive)
 ================================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 11. Upsert entity to trigger notification (not triggered due to status=inactive)
 ================================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 12. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=4, failsCounter=3, maxFailsLimit=2 (same as last GET)
 ==============================================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 491
 Content-Type: application/json
-Content-Length: 515
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -597,22 +608,23 @@ Content-Length: 515
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 3,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 2,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 4
     },
     "status": "inactive",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -627,27 +639,27 @@ Content-Length: 515
 13. PATCH /v2/subscriptions/subId to set status=active again
 ============================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 14. Upsert entity to trigger notification (fail that causes change to status=inactive)
 ======================================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36}
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 15. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=5, failsCounter=4, maxFailsLimit=2
 ===========================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 491
 Content-Type: application/json
-Content-Length: 515
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -656,22 +668,23 @@ Content-Length: 515
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 4,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 2,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 5
     },
     "status": "inactive",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -686,27 +699,27 @@ Content-Length: 515
 16. PATCH /v2/subscriptions/subId to enlarge maxFailLimit to 5 and set status=active again
 ==========================================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 17. Upsert entity to trigger notification (fail)
 ================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 18. GET /v2/subscriptions/subId, to check the status=active, timesSent=6, failsCounter=5, maxFailsLimit=5
 =========================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 489
 Content-Type: application/json
-Content-Length: 513
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -715,22 +728,23 @@ Content-Length: 513
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 5,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 6
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -745,19 +759,19 @@ Content-Length: 513
 19. Upsert entity to trigger notification (fail that causes change to status=inactive)
 ======================================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 20. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=7, failsCounter=6, maxFailsLimit=5
 ===========================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 491
 Content-Type: application/json
-Content-Length: 515
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -766,22 +780,23 @@ Content-Length: 515
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 6,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 7
     },
     "status": "inactive",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -796,28 +811,28 @@ Content-Length: 515
 21. Upsert entity to trigger notification (not triggered due to status=inactive)
 ================================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 22. Upsert entity to trigger notification (not triggered due to status=inactive)
 ================================================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 23. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=7, failsCounter=6, maxFailsLimit=5 (same as last GET)
 ==============================================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 491
 Content-Type: application/json
-Content-Length: 515
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -826,22 +841,23 @@ Content-Length: 515
         "attrsFormat": "normalized",
         "covered": false,
         "failsCounter": 6,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 7
     },
     "status": "inactive",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -853,35 +869,35 @@ Content-Length: 515
 }
 
 
-24. Start accumulator
+24. Start MQTT broker
 =====================
-accumulator running as PID REGEX(.*)
+MQTT broker running as PID REGEX(.*)
 
 
 25. PATCH /v2/subscriptions/subId to set status=active again
 ============================================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 26. Upsert entity to trigger notification (ok)
 ==============================================
 HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 
 
 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (omitted), maxFailsLimit=5
 ===================================================================================================================
 HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 472
 Content-Type: application/json
-Content-Length: 496
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Date: REGEX(.*)
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -889,22 +905,23 @@ Content-Length: 496
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "http": {
-            "url": "http://localhost:9997/notify"
-        },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
-        "lastSuccessCode": 200,
         "maxFailsLimit": 5,
+        "mqtt": {
+            "qos": 0,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
         "onlyChangedAttrs": false,
         "timesSent": 8
     },
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -925,5 +942,5 @@ automatically disabled due to failsCounter (6) overpasses maxFailsLimit (5)
 
 --TEARDOWN--
 brokerStop CB
-accumulatorStop
+debugMqttBrokerStop
 dbDrop CB

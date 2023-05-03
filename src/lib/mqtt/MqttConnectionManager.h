@@ -73,6 +73,7 @@ class MqttConnectionManager
   void cleanup(double maxAge);
 
  private:
+  void disconnect(struct mosquitto*  mosq, const std::string& endpoint);
   int  semInit(void);
   void semTake(void);
   void semGive(void);

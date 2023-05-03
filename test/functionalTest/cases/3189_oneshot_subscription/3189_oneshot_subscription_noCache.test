@@ -258,7 +258,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 351
+Content-Length: 381
 
 {
     "description": "A subscription to get info about Room1",
@@ -279,7 +279,8 @@ Content-Length: 351
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -342,7 +343,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 475
+Content-Length: 505
 
 {
     "description": "A subscription to get info about Room1",
@@ -367,7 +368,8 @@ Content-Length: 475
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -393,7 +395,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 474
+Content-Length: 504
 
 {
     "description": "A subscription to get info about Room1",
@@ -418,7 +420,8 @@ Content-Length: 474
         "condition": {
             "attrs": [
                 "pressure"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

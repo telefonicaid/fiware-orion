@@ -1314,6 +1314,22 @@ static std::string parseNotifyConditionVector
     }
   }
 
+  // notifyOnMetadataChange
+  if (condition.HasMember("notifyOnMetadataChange"))
+  {
+    Opt<bool> notifyOnMetadataChangeOpt = getBoolOpt(condition, "notifyOnMetadataChange");
+    if (!notifyOnMetadataChangeOpt.ok())
+    {
+      return badInput(ciP, notifyOnMetadataChangeOpt.error);
+    }
+    else if (notifyOnMetadataChangeOpt.given)
+    {
+      bool notifyOnMetadataChangeBool = notifyOnMetadataChangeOpt.value;
+      subsP->notifyOnMetadataChangeProvided = true;
+      subsP->subject.condition.notifyOnMetadataChange = notifyOnMetadataChangeBool;
+    }
+  }
+
   return "";
 }
 

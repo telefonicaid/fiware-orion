@@ -245,7 +245,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 444
+Content-Length: 474
 
 {
     "expires": "REGEX(.*)",
@@ -270,7 +270,8 @@ Content-Length: 444
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -297,7 +298,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 446
+Content-Length: 476
 
 {
     "expires": "REGEX(.*)",
@@ -322,7 +323,8 @@ Content-Length: 446
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -351,7 +353,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 469
+Content-Length: 499
 
 {
     "expires": "REGEX(.*)",
@@ -379,7 +381,8 @@ Content-Length: 469
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -406,7 +409,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 467
+Content-Length: 497
 
 {
     "expires": "REGEX(.*)",
@@ -434,7 +437,8 @@ Content-Length: 467
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -461,7 +465,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 468
+Content-Length: 498
 
 {
     "expires": "REGEX(.*)",
@@ -489,7 +493,8 @@ Content-Length: 468
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -516,7 +521,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 468
+Content-Length: 498
 
 {
     "expires": "REGEX(.*)",
@@ -544,7 +549,8 @@ Content-Length: 468
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -571,7 +577,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 469
+Content-Length: 499
 
 {
     "expires": "REGEX(.*)",
@@ -599,7 +605,8 @@ Content-Length: 469
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

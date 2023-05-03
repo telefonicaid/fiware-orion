@@ -256,7 +256,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 497
+Content-Length: 527
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -279,7 +279,8 @@ Content-Length: 497
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -323,7 +324,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 499
+Content-Length: 529
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -346,7 +347,8 @@ Content-Length: 499
     "status": "inactive",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -390,7 +392,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 497
+Content-Length: 527
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -413,7 +415,8 @@ Content-Length: 497
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

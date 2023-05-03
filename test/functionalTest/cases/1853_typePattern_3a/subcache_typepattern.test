@@ -161,7 +161,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 445
+Content-Length: 475
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -184,7 +184,8 @@ Content-Length: 445
         "condition": {
             "attrs": [
                 "A"
-            ]
+            ],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

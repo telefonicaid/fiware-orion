@@ -133,7 +133,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 431
+Content-Length: 461
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -160,7 +160,8 @@ Content-Length: 431
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -187,7 +188,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 469
+Content-Length: 499
 
 {
     "expires": "1982-06-14T17:15:00.000Z",
@@ -215,7 +216,8 @@ Content-Length: 469
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -242,7 +244,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 431
+Content-Length: 461
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -269,7 +271,8 @@ Content-Length: 431
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

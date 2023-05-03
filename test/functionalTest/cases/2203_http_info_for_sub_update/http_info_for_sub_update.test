@@ -173,7 +173,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 465
+Content-Length: 495
 
 [
     {
@@ -204,7 +204,8 @@ Content-Length: 465
                 ],
                 "expression": {
                     "q": "temp==10"
-                }
+                },
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -230,7 +231,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 467
+Content-Length: 497
 
 [
     {
@@ -261,7 +262,8 @@ Content-Length: 467
                 ],
                 "expression": {
                     "q": "temp==11"
-                }
+                },
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

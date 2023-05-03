@@ -63,6 +63,7 @@ echo "INSTALL: python special dependencies" \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==2.0.2 \
 && pip install paho-mqtt==1.6.1 \
+&& pip install amqtt==0.10.1 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
