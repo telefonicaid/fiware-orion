@@ -17,7 +17,7 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information 
 Issues on this projects can be reported as [github issues](https://github.com/FIWARE/context.Orion-LD/issues),
 while questions are preferred on Stackoverflow, using the tag `fiware-orion`.
 
-> The latest release of Orion-LD is [1.2.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.1.2) from December 2022
+> The latest release of Orion-LD is [1.2.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.2.0) from May 2023
 
 Orion-LD is a Context Broker and [CEF](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/CEF+Digital+Home)
 [building block](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/What+is+a+building+Block) for context data
@@ -60,7 +60,7 @@ Its payloads are encoded as [linked data](https://en.wikipedia.org/wiki/Linked_d
 The NGSI-LD Specification is regularly updated and published by ETSI.
 The latest specification is [version 1.6.1](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_CIM009v010601p.pdf)
 and it was published in December 2022.
-Version 1.7.1 is about to be released (hopefully end of April 2023).
+Version 1.7.1 is about to be released (May 2023).
 
 This presentation from FIWARE Summit Malaga 2018 might be of interest:
 https://www.slideshare.net/FI-WARE/fiware-global-summit-ngsild-ngsi-with-linked-data
@@ -94,8 +94,8 @@ Every merged pull request results in a new non-changing tag in dockerhub.
 
 Please note that for production and/or performance implementations, there is a thorough guide for that right [here](https://github.com/FIWARE/load-tests)
 
-If you instead want to use a more stable image, the latest release (as of December 2022) is
-[1.1.2](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.1.2)
+If you instead want to use a more stable image, the latest release (as of May 2023) is
+[1.2.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.2.0)
 
 ```console
 docker run quay.io/fiware/orion-ld:1.1.1

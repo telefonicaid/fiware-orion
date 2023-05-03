@@ -11,40 +11,6 @@ env:
 
 jobs:
 
-  deploy-release-redhat:
-    runs-on: ubuntu-20.04
-    if: github.event_name == 'push'
-
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
-      - uses: jungwinter/split@v1
-        id: split
-        with:
-          msg: ${{ steps.extract_branch.outputs.branch }}
-          seperator: /
-
-      - name: Build image
-        uses: redhat-actions/buildah-build@v2
-        id: build-image
-        with:
-          image: ${{ env.IMAGE_NAME }}
-          tags: ${{ steps.split.outputs._1 }}
-          containerfiles: |
-            ./docker/Dockerfile-ubi
-
-      - name: Push To certification registry
-        id: push-to-cert
-        run: |
-          podman tag ${{ env.IMAGE_NAME }}:${{ steps.split.outputs._1 }} scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ steps.split.outputs._1 }}
-          podman push scan.connect.redhat.com/ospid-61aa0f57e87c1ebf3e3a4d15/${{ env.IMAGE_NAME }}:${{ steps.split.outputs._1 }}
-
-
   deploy-release-quay:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
