@@ -124,3 +124,19 @@
    fun:curl_multi_perform
    fun:_Z23orionldAlterationsTreatP17OrionldAlteration
 }
+{
+   <curl_easy_perform, curl and libgnutls>
+   Memcheck:Cond
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   obj:/usr/lib/x86_64-linux-gnu/libgnutls.so.30.27.0
+   fun:gnutls_x509_crt_get_dn_by_oid
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.6.0
+   fun:curl_multi_perform
+   fun:curl_easy_perform
+}
