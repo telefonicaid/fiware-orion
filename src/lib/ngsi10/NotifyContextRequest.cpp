@@ -90,12 +90,6 @@ std::string NotifyContextRequest::toJson
 
     return oe.toJson();
   }
-  
-  JsonObjectHelper jh;
-
-  jh.addString("subscriptionId", subscriptionId.get());
-  jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP));
-
   else if (renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED)
   {
     if (contextElementResponseVector.size() == 0)
