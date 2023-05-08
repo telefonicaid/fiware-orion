@@ -3335,7 +3335,9 @@ static bool calculateSetOperator(ContextElementResponse* cerP, orion::BSONObjBui
       {
         CompoundValueNode* child = theChild->childV[jx];
 
-        std::string valueKey = baseKey + "." + child->name;
+        // dbEncode is needed, in order to avoid problems as the one
+        // described in issue #4315
+        std::string valueKey = baseKey + "." + dbEncode(child->name);
 
         if (child->valueType == orion::ValueTypeString)
         {
@@ -3469,7 +3471,9 @@ static bool calculateUnsetOperator(ContextElementResponse* cerP, orion::BSONObjB
     {
       CompoundValueNode* child = theChild->childV[jx];
 
-      std::string valueKey = baseKey + "." + child->name;
+      // dbEncode is needed, in order to avoid problems as the one
+      // described in issue #4315
+      std::string valueKey = baseKey + "." + dbEncode(child->name);
       b->append(valueKey, 1);
     }
   }
