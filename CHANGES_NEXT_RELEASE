@@ -2,6 +2,7 @@
 - Add: subject.condition.notifyOnMetadataChange field to subscriptions, so only-metadata changes doesn't trigger notifications (#3727)
 - Add: new simplifiedNormalized and simplifiedKeyvalues for attrsFormat (#4286)
 - Add: -mqttTimeout (env var ORION_MQTT_TIMEOUT) for MQTT broker connection timeout
+- Fix: $set/$unset update operator not working properly when the key has dots (#4315)
 - Fix: queue workers deadlock when MQTT broker was not responding to connection attemp
 - Fix: Ngsiv2-AttrsFormat header set to "normalized" in NGSI patching custom notification
 - Fix: memory access potential problem in GET /log/trace request when tracelevel 255 is enabled
