@@ -255,30 +255,30 @@ echo
 01. POST /v2/entities, to create Room1 with temperature and pressure.
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Room
+Content-Length: 0
 
 
 
 02. POST /v2/subscriptions, to create subscription with maxFailsLimit=5
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions/subscription_id, to check the maxFailsLimit=5 and status=active
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 415
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 415
 
 {
     "description": "A subscription to get info about Room1",
@@ -318,18 +318,18 @@ Date: REGEX(.*)
 04. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=1
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 533
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 533
 
 {
     "description": "A subscription to get info about Room1",
@@ -373,18 +373,18 @@ Date: REGEX(.*)
 06. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=2
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 533
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 533
 
 {
     "description": "A subscription to get info about Room1",
@@ -428,18 +428,18 @@ Date: REGEX(.*)
 08. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=3
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 533
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 533
 
 {
     "description": "A subscription to get info about Room1",
@@ -483,18 +483,18 @@ Date: REGEX(.*)
 10. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 11. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=4
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 533
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 533
 
 {
     "description": "A subscription to get info about Room1",
@@ -538,18 +538,18 @@ Date: REGEX(.*)
 12. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 13. GET /v2/subscriptions/subscription_id, to check the status=active and failsCounter=5
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 533
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 533
 
 {
     "description": "A subscription to get info about Room1",
@@ -593,18 +593,18 @@ Date: REGEX(.*)
 14. PATCH /v2/entities/Room1/attrs, to update the value of pressure attribute.
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 15. GET /v2/subscriptions/subscription_id, to check the status=inactive and failsCounter=6.
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 535
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 535
 
 {
     "description": "A subscription to get info about Room1",

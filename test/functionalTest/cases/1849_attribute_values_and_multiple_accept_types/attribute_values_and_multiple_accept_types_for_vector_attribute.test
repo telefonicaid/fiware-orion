@@ -140,7 +140,7 @@ Content-Length: 7
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: text/plain
+Content-Type: application/json
 Content-Length: 7
 
 [1,2,3]
