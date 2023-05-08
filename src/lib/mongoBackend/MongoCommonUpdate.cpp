@@ -3335,7 +3335,7 @@ static bool calculateSetOperator(ContextElementResponse* cerP, orion::BSONObjBui
       {
         CompoundValueNode* child = theChild->childV[jx];
 
-        // dbEncode is needed, in ordre to avoid problems as the one
+        // dbEncode is needed, in order to avoid problems as the one
         // described in issue #4315
         std::string valueKey = baseKey + "." + dbEncode(child->name);
 
