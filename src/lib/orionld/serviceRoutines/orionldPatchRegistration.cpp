@@ -722,8 +722,15 @@ bool orionldPatchRegistration(void)
 
   //
   // Write to mongo (overwriting the entire registration)
-  //
-  bool b = mongocRegistrationReplace(registrationId, dbRegP);
+  // NOTE: To replace an item in mongo, the "_id" can't be present
+  //       So, we clone the DB Reg and remove the _id from it.
+  //       Must clone as dbRegP is used later for dbModelToApiRegistration
+  KjNode* dbRegCopy = kjClone(orionldState.kjsonP, dbRegP);
+  KjNode* _idP      = kjLookup(dbRegCopy, "_id");
+  if (_idP != NULL)
+    kjChildRemove(dbRegCopy, _idP);
+
+  bool b = mongocRegistrationReplace(registrationId, dbRegCopy);
   if (b == false)
     return false;
 
