@@ -58,7 +58,8 @@ bool mongocRegistrationReplace(const char* registrationId, KjNode* dbRegistratio
   bson_init(&replacement);
   bson_init(&reply);
 
-  bson_append_utf8(&selector, "_id", 6, registrationId, -1);
+  bson_append_utf8(&selector, "_id", 3, registrationId, -1);
+
   mongocKjTreeToBson(dbRegistrationP, &replacement);
 
   bool b = mongoc_collection_replace_one(orionldState.mongoc.registrationsP, &selector, &replacement, NULL, &reply, &orionldState.mongoc.error);

@@ -28,6 +28,8 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
+#include "kjson/kjBuilder.h"                                     // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -35,6 +37,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_WLOG
 #include "orionld/mongoc/mongocSubscriptionReplace.h"            // Own interface
 
 
@@ -58,9 +61,17 @@ bool mongocSubscriptionReplace(const char* subscriptionId, KjNode* dbSubscriptio
   bson_init(&replacement);
   bson_init(&reply);
 
-  bson_append_utf8(&selector, "_id", 6, subscriptionId, -1);
+  LM_T(LmtMongoc, ("Creating the _id selector for subscription id '%s'", subscriptionId));
+  bson_append_utf8(&selector, "_id", 3, subscriptionId, -1);
+
+  // The "_id" field cannot be present in the payload - mongodb complains if it is
+  KjNode* _idP = kjLookup(dbSubscriptionP, "_id");
+  if (_idP != NULL)
+    kjChildRemove(dbSubscriptionP, _idP);
+
   mongocKjTreeToBson(dbSubscriptionP, &replacement);
 
+  MONGOC_WLOG("Updating Subscription", orionldState.tenantP->mongoDbName, "subscriptions", &selector, &replacement, LmtMongoc);
   bool b = mongoc_collection_replace_one(orionldState.mongoc.subscriptionsP, &selector, &replacement, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
   {

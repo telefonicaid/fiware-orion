@@ -1,0 +1,510 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Patch of second of two subs - issue #1368
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription S1
+# 02. Create subscription S2
+# 03. See the two subs in DB
+# 04. PATCH S2, changing watchedAttributes
+# 05. See the two subs in DB
+# 06. PATCH S1, changing watchedAttributes
+# 07. See the two subs in DB
+# 08. GET all subscriptions, see updates
+#
+
+echo "01. Create subscription S1"
+echo "=========================="
+payload='{
+  "description": "subscription S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "Humidity"
+    }
+  ],
+  "watchedAttributes": [
+    "humidity"
+  ],
+  "notification": {
+    "attributes": [
+      "humidity"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://quantumleap:3629/v2/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+S1=$(grep Location /tmp/httpHeaders.out | awk -FLocation: '{print $2}')
+S1ID=$(echo $S1 | awk -Fsubscriptions/ '{ print $2}')
+echo
+echo
+
+
+echo "02. Create subscription S2"
+echo "=========================="
+payload='{
+  "description": "subscription S2",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "Temperature"
+    }
+  ],
+  "watchedAttributes": [
+    "temperature"
+  ],
+  "notification": {
+    "attributes": [
+      "temperature"
+    ],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://quantumleap:3629/v2/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+S2=$(grep Location /tmp/httpHeaders.out | awk -FLocation: '{print $2}')
+S2ID=$(echo $S2 | awk -Fsubscriptions/ '{ print $2}')
+echo
+echo
+
+
+echo "03. See the two subs in DB"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.find().pretty()'
+echo
+echo
+
+
+echo "04. PATCH S2, changing watchedAttributes"
+echo "========================================"
+payload='{
+  "watchedAttributes": [ "temperature2" ]
+}'
+orionCurl --url $S2 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. See the two subs in DB"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.find().pretty()'
+echo
+echo
+
+
+echo "06. PATCH S1, changing watchedAttributes"
+echo "========================================"
+payload='{
+  "watchedAttributes": [ "humidity2" ]
+}'
+orionCurl --url $S1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. See the two subs in DB"
+echo "=========================="
+mongoCmd2 ftest 'db.csubs.find().pretty()'
+echo
+echo
+
+
+echo "08. GET all subscriptions, see updates"
+echo "======================================"
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription S1
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
+
+
+
+02. Create subscription S2
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
+
+
+
+03. See the two subs in DB
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:REGEX(.*)",
+	"expiration" : 0,
+	"reference" : "http://quantumleap:3629/v2/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "subscription S1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Humidity",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/humidity"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/humidity"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+{
+	"_id" : "urn:ngsi-ld:Subscription:REGEX(.*)",
+	"expiration" : 0,
+	"reference" : "http://quantumleap:3629/v2/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "subscription S2",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Temperature",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+04. PATCH S2, changing watchedAttributes
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. See the two subs in DB
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:REGEX(.*)",
+	"expiration" : 0,
+	"reference" : "http://quantumleap:3629/v2/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "subscription S1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Humidity",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/humidity"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/humidity"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+{
+	"_id" : "urn:ngsi-ld:Subscription:REGEX(.*)",
+	"expiration" : 0,
+	"reference" : "http://quantumleap:3629/v2/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "subscription S2",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Temperature",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature2"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+06. PATCH S1, changing watchedAttributes
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. See the two subs in DB
+==========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:REGEX(.*)",
+	"expiration" : 0,
+	"reference" : "http://quantumleap:3629/v2/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "subscription S1",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Humidity",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/humidity"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/humidity2"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+{
+	"_id" : "urn:ngsi-ld:Subscription:REGEX(.*)",
+	"expiration" : 0,
+	"reference" : "http://quantumleap:3629/v2/notify",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"description" : "subscription S2",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Temperature",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature"
+	],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/temperature2"
+	],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+08. GET all subscriptions, see updates
+======================================
+HTTP/1.1 200 OK
+Content-Length: 786
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "description": "subscription S1",
+        "entities": [
+            {
+                "type": "Humidity"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "humidity"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://quantumleap:3629/v2/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "status": "active",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "humidity2"
+        ]
+    },
+    {
+        "description": "subscription S2",
+        "entities": [
+            {
+                "type": "Temperature"
+            }
+        ],
+        "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
+        "isActive": true,
+        "notification": {
+            "attributes": [
+                "temperature"
+            ],
+            "endpoint": {
+                "accept": "application/json",
+                "uri": "http://quantumleap:3629/v2/notify"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "status": "active",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "temperature2"
+        ]
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
