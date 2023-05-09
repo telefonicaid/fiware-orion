@@ -164,7 +164,7 @@ bool pCheckSubscription
       PCHECK_ARRAY_EMPTY(subItemP, 0, NULL, SubscriptionEntitiesPath, 400);
       PCHECK_DUPLICATE(entitiesP,  subItemP, 0, NULL, SubscriptionEntitiesPath, 400);
 
-      if (pcheckEntityInfoArray(entitiesP, true, SubscriptionEntitiesPathV) == false)
+      if (pcheckEntityInfoArray(entitiesP, true, false, SubscriptionEntitiesPathV) == false)
         return false;
     }
     else if (strcmp(subItemP->name, "watchedAttributes") == 0)

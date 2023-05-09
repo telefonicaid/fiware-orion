@@ -42,13 +42,13 @@ extern "C"
 // This function is used by the "POST Query" request, where the entity type is NOT mandatory.
 // It is also used for Subscriptions and Registrations, where entity type IS mandatory.
 //
-bool pcheckEntityInfoArray(KjNode* entityInfoArrayP, bool typeMandatory, const char** fieldPathV)
+bool pcheckEntityInfoArray(KjNode* entityInfoArrayP, bool typeMandatory, bool idMandatory, const char** fieldPathV)
 {
   for (KjNode* entityInfoP = entityInfoArrayP->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
   {
     PCHECK_OBJECT(entityInfoP, 0, NULL, fieldPathV[1], 400);
 
-    if (pcheckEntityInfo(entityInfoP, typeMandatory, fieldPathV) == false)
+    if (pcheckEntityInfo(entityInfoP, typeMandatory, idMandatory, fieldPathV) == false)
       return false;
   }
 

@@ -70,7 +70,7 @@ static bool regexCheck(const char* pattern)
 //
 // pcheckEntityInfo -
 //
-bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, const char** fieldPathV)
+bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, bool idMandatory, const char** fieldPathV)
 {
   KjNode* idP         = NULL;
   KjNode* idPatternP  = NULL;
@@ -133,6 +133,19 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, const char** fiel
   if ((typeMandatory == true) && (typeP == NULL))
   {
     orionldError(OrionldBadRequestData, "Missing mandatory field", fieldPathV[4], 400);
+    return false;
+  }
+
+  //
+  // Only exclusive registrations use idMandatory=true, so, as we need a good error message,
+  // it is set right here.
+  //
+  // I know, it's a bit weird, as this function is also used for subscriptions.
+  // Not really a problem though.
+  //
+  if ((idMandatory == true) && (idP == NULL))
+  {
+    orionldError(OrionldBadRequestData, "Invalid exclusive registration", "information item without specifying entity id", 400);
     return false;
   }
 

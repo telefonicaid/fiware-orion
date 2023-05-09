@@ -350,7 +350,7 @@ bool pcheckInformationItem(RegistrationMode regMode, KjNode* informationP)
       ARRAY_CHECK(entitiesP, RegistrationInformationEntitiesPath);
       EMPTY_ARRAY_CHECK(entitiesP, RegistrationInformationEntitiesPath);
 
-      if (pcheckEntityInfoArray(entitiesP, true, RegistrationInformationEntitiesPathV) == false)
+      if (pcheckEntityInfoArray(entitiesP, true, regMode == RegModeExclusive, RegistrationInformationEntitiesPathV) == false)
         return false;
     }
     else if ((strcmp(infoItemP->name, "propertyNames") == 0) || (strcmp(infoItemP->name, "properties") == 0))
@@ -386,6 +386,18 @@ bool pcheckInformationItem(RegistrationMode regMode, KjNode* informationP)
     else
     {
       orionldError(OrionldBadRequestData, "Invalid field for Registration::information[X]", infoItemP->name, 400);
+      return false;
+    }
+  }
+
+  //
+  // Exclusive registrations must have either properties or relationships
+  //
+  if (regMode == RegModeExclusive)
+  {
+    if ((propertiesP == NULL) && (relationshipsP == NULL))
+    {
+      orionldError(OrionldBadRequestData, "Invalid exclusive registration", "information item without specifying attributes", 400);
       return false;
     }
   }
