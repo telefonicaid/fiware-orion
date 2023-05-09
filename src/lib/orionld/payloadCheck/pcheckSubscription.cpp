@@ -126,7 +126,7 @@ bool pcheckSubscription
       DUPLICATE_CHECK(entitiesP, "entities", nodeP);
       ARRAY_CHECK(entitiesP, "entities");
       EMPTY_ARRAY_CHECK(entitiesP, "entities");
-      if (pcheckEntityInfoArray(entitiesP, true, SubscriptionEntitiesPathV) == false)
+      if (pcheckEntityInfoArray(entitiesP, true, false, SubscriptionEntitiesPathV) == false)
         return false;
     }
     else if (strcmp(nodeP->name, "watchedAttributes") == 0)
