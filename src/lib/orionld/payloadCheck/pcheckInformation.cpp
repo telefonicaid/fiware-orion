@@ -43,7 +43,7 @@ extern "C"
 //
 // pcheckInformation -
 //
-bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP)
+bool pcheckInformation(const char* currentRegId, RegistrationMode regMode, KjNode* informationArrayP)
 {
   if (informationArrayP->value.firstChildP == NULL)  // Empty Array
   {
@@ -56,7 +56,7 @@ bool pcheckInformation(RegistrationMode regMode, KjNode* informationArrayP)
     OBJECT_CHECK(informationP, "information[X]");
     EMPTY_OBJECT_CHECK(informationP, "information[X]");
 
-    if (pcheckInformationItem(regMode, informationP) == false)
+    if (pcheckInformationItem(currentRegId, regMode, informationP) == false)
       return false;
   }
 
