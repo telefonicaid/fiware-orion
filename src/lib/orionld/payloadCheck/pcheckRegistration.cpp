@@ -78,7 +78,7 @@ extern "C"
 // - output param for "mode"
 // - ...
 //
-bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creation, KjNode**  propertyTreeP, OrionldContext** contextPP)
+bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const char* currentRegId, bool idCanBePresent, bool creation, KjNode**  propertyTreeP, OrionldContext** contextPP)
 {
   KjNode*  idP                   = NULL;  // Optional but already extracted by orionldMhdConnectionInit
   KjNode*  typeP                 = NULL;  // Mandatory but already extracted by orionldMhdConnectionInit
@@ -119,16 +119,24 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
   //
   // But, before the loop is started, we need the registrationMode, to check for invalid registrations
   //
-  KjNode* regModeNodeP = kjLookup(registrationP, "mode");
-  if (regModeNodeP != NULL)
+  RegistrationMode regMode;
+  if (regModeString == NULL)
   {
-    PCHECK_STRING(regModeNodeP, 0, NULL, "mode", 400);
-    PCHECK_STRING_EMPTY(regModeNodeP, 0, NULL, "mode", 400);
-    if (pCheckRegistrationMode(regModeNodeP->value.s) == false)
-      return false;
-  }
+    KjNode* regModeNodeP = kjLookup(registrationP, "mode");
+    if (regModeNodeP != NULL)
+    {
+      PCHECK_STRING(regModeNodeP, 0, NULL, "mode", 400);
+      PCHECK_STRING_EMPTY(regModeNodeP, 0, NULL, "mode", 400);
+      if (pCheckRegistrationMode(regModeNodeP->value.s) == false)
+        return false;
+    }
 
-  RegistrationMode regMode = (regModeNodeP == NULL)? RegModeInclusive : registrationMode(regModeNodeP->value.s);
+    regMode = (regModeNodeP == NULL)? RegModeInclusive : registrationMode(regModeNodeP->value.s);
+  }
+  else
+    regMode = registrationMode(regModeString);
+
+
   KjNode*          nodeP   = registrationP->value.firstChildP;
   KjNode*          next;
 
@@ -178,7 +186,7 @@ bool pcheckRegistration(KjNode* registrationP, bool idCanBePresent, bool creatio
       ARRAY_CHECK(nodeP, "information");
       EMPTY_ARRAY_CHECK(nodeP, "information");
 
-      if (pcheckInformation(regMode, nodeP) == false)
+      if (pcheckInformation(currentRegId, regMode, nodeP) == false)
         return false;
     }
     else if (strcmp(nodeP->name, "tenant") == 0)

@@ -30,7 +30,7 @@ accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_
 
 --SHELL--
 #
-# 01. Create a registration (exclusive) for the accumulator, with all types of headers inside Regostration::contextSourceInfo
+# 01. Create a registration (inclusive) for the accumulator, with all types of headers inside Registration::contextSourceInfo
 # 02. Send a request to create an Entity in the CB - will be forwarded to the accumulator (and fail, but that's OK)
 # 03. Dump the accumulator to see all the HTTP headers of the forwarded request
 # 04. PATCH the registration setting the contextSourceInfo, see what happens in the forwarded request later
@@ -38,7 +38,7 @@ accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_
 # 06. Dump the accumulator to see all the HTTP headers of the forwarded request
 #
 
-echo "01. Create a registration (exclusive) for the accumulator, with all types of headers inside Regostration::contextSourceInfo"
+echo "01. Create a registration (inclusive) for the accumulator, with all types of headers inside Registration::contextSourceInfo"
 echo "==========================================================================================================================="
 payload='{
   "id": "urn:R1",
@@ -47,7 +47,6 @@ payload='{
     {
       "entities": [
         {
-          "id": "urn:E1",
           "type": "T"
         }
       ]
@@ -69,7 +68,7 @@ payload='{
   ],
   "endpoint": "http://localhost:'$LISTENER_PORT'",
   "operations": [ "createEntity" ],
-  "mode": "exclusive"
+  "mode": "inclusive"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
@@ -134,7 +133,7 @@ echo
 
 
 --REGEXPECT--
-01. Create a registration (exclusive) for the accumulator, with all types of headers inside Regostration::contextSourceInfo
+01. Create a registration (inclusive) for the accumulator, with all types of headers inside Registration::contextSourceInfo
 ===========================================================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0

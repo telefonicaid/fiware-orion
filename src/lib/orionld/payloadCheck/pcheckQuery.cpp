@@ -194,7 +194,7 @@ bool pcheckQuery(KjNode* tree, KjNode** entitiesPP, KjNode** attrsPP, QNode** qT
     return false;
   }
 
-  if ((entitiesP != NULL) && (pcheckEntityInfoArray(entitiesP, false, PostQueryEntitiesPathV) == false))
+  if ((entitiesP != NULL) && (pcheckEntityInfoArray(entitiesP, false, false, PostQueryEntitiesPathV) == false))
     return false;
   if ((attrsP != NULL) && (pcheckAttrs(attrsP) == false))
     return false;

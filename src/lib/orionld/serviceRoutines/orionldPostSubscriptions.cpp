@@ -261,9 +261,9 @@ bool orionldPostSubscriptions(void)
   }
 
   //
-  // MQTT details to the cached subscription
+  // MQTT details of the cached subscription
   //
-  bzero(&cSubP->httpInfo.mqtt.mqtts, sizeof(cSubP->httpInfo.mqtt.mqtts));
+  bzero(&cSubP->httpInfo.mqtt, sizeof(cSubP->httpInfo.mqtt));
   if (mqttSubscription == true)
   {
     cSubP->httpInfo.mqtt.mqtts = mqtts;

@@ -1,0 +1,4 @@
+Fixed issues:
+#1368 - bug in subscription patch
+#280  - error handling in registration creation - making sure exclusive registrations specify entity id and attributes
+#280  - error handling in registration updated  - making sure exclusive registrations specify entity id and attributes

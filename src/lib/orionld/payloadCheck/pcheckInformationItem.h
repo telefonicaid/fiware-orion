@@ -38,6 +38,6 @@ extern "C"
 //
 // pcheckInformationItem -
 //
-extern bool pcheckInformationItem(RegistrationMode regMode, KjNode* informationP);
+extern bool pcheckInformationItem(const char* currentRegId, RegistrationMode regMode, KjNode* informationP);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKINFORMATIONITEM_H_

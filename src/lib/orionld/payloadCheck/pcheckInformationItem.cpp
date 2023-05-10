@@ -122,7 +122,14 @@ static bool attrsMatch(KjNode* propertiesP, KjNode* relationshipsP, KjNode* rciP
 //
 // pCheckOverlappingRegistrations -
 //
-bool pCheckOverlappingRegistrations(RegistrationMode regMode, KjNode* entitiesP, KjNode* propertiesP, KjNode* relationshipsP)
+static bool pCheckOverlappingRegistrations
+(
+  const char*       currentRegId,
+  RegistrationMode  regMode,
+  KjNode*           entitiesP,
+  KjNode*           propertiesP,
+  KjNode*           relationshipsP
+)
 {
   if (entitiesP == NULL)
   {
@@ -142,6 +149,10 @@ bool pCheckOverlappingRegistrations(RegistrationMode regMode, KjNode* entitiesP,
 
     for (RegCacheItem* rciP = orionldState.tenantP->regCache->regList; rciP != NULL; rciP = rciP->next)
     {
+      // In case it's an update, don't compare the registration with itself
+      if ((currentRegId != NULL) && (strcmp(currentRegId, rciP->regId) == 0))
+        continue;
+
       //
       // Conflict must be checked if any of the two regs are Exclusive, BUT not if the other is Auxiliary
       //
@@ -336,7 +347,7 @@ bool pCheckOverlappingEntities(KjNode* entitiesP, KjNode* propertiesP, KjNode* r
 // NOTE
 //   This function also expands ATTRIBUTE NAMES and ENTITY TYPES
 //
-bool pcheckInformationItem(RegistrationMode regMode, KjNode* informationP)
+bool pcheckInformationItem(const char* currentRegId, RegistrationMode regMode, KjNode* informationP)
 {
   KjNode* entitiesP      = NULL;
   KjNode* propertiesP    = NULL;
@@ -350,7 +361,7 @@ bool pcheckInformationItem(RegistrationMode regMode, KjNode* informationP)
       ARRAY_CHECK(entitiesP, RegistrationInformationEntitiesPath);
       EMPTY_ARRAY_CHECK(entitiesP, RegistrationInformationEntitiesPath);
 
-      if (pcheckEntityInfoArray(entitiesP, true, RegistrationInformationEntitiesPathV) == false)
+      if (pcheckEntityInfoArray(entitiesP, true, regMode == RegModeExclusive, RegistrationInformationEntitiesPathV) == false)
         return false;
     }
     else if ((strcmp(infoItemP->name, "propertyNames") == 0) || (strcmp(infoItemP->name, "properties") == 0))
@@ -390,6 +401,18 @@ bool pcheckInformationItem(RegistrationMode regMode, KjNode* informationP)
     }
   }
 
+  //
+  // Exclusive registrations must have either properties or relationships
+  //
+  if (regMode == RegModeExclusive)
+  {
+    if ((propertiesP == NULL) && (relationshipsP == NULL))
+    {
+      orionldError(OrionldBadRequestData, "Invalid exclusive registration", "information item without specifying attributes", 400);
+      return false;
+    }
+  }
+
   if (propertiesP != NULL)
   {
     // Check for duplicates
@@ -421,7 +444,7 @@ bool pcheckInformationItem(RegistrationMode regMode, KjNode* informationP)
   //
   // Check for local overlapping Registrations/Entities
   //
-  if (pCheckOverlappingRegistrations(regMode, entitiesP, propertiesP, relationshipsP) == true)
+  if (pCheckOverlappingRegistrations(currentRegId, regMode, entitiesP, propertiesP, relationshipsP) == true)
     return false;
 
   if (regMode == RegModeExclusive)

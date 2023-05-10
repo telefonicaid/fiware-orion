@@ -72,6 +72,7 @@ orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
 echo
 echo
 
+
 echo "02. Get Subscription from mongo"
 echo "==============================="
 mongoCmd2 ftest "db.csubs.findOne()"

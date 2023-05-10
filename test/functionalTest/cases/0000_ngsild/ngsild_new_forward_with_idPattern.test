@@ -79,7 +79,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP1_PORT'",
-  "mode": "exclusive",
+  "mode": "redirect",
   "operations": [ "createEntity" ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -104,7 +104,7 @@ payload='{
     }
   ],
   "endpoint": "http://localhost:'$CP2_PORT'",
-  "mode": "exclusive",
+  "mode": "redirect",
   "operations": [ "createEntity" ]
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
@@ -568,7 +568,7 @@ MongoDB server version: REGEX(.*)
 			"providingApplication" : "http://localhost:9801"
 		}
 	],
-	"mode" : "exclusive",
+	"mode" : "redirect",
 	"operations" : [
 		"createEntity"
 	],
@@ -583,7 +583,7 @@ bye
 17. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB)
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 264
+Content-Length: 263
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -605,7 +605,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             ]
         }
     ],
-    "mode": "exclusive",
+    "mode": "redirect",
     "operations": [
         "createEntity"
     ],
@@ -653,7 +653,7 @@ MongoDB server version: REGEX(.*)
 			"providingApplication" : "http://localhost:9801"
 		}
 	],
-	"mode" : "exclusive",
+	"mode" : "redirect",
 	"operations" : [
 		"createEntity"
 	],
@@ -668,7 +668,7 @@ bye
 20. GET R1 (from cache) - pay attention to the 'information' stuff ('contextRegistration in DB) - should have been overwritten
 ==============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 264
+Content-Length: 263
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -690,7 +690,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             ]
         }
     ],
-    "mode": "exclusive",
+    "mode": "redirect",
     "operations": [
         "createEntity"
     ],

@@ -284,7 +284,7 @@ static bool subCacheItemUpdateEntities(CachedSubscription* cSubP, KjNode* entity
 //
 static bool subCacheItemUpdateWatchedAttributes(CachedSubscription* cSubP, KjNode* itemP)
 {
-  cSubP->notifyConditionV.empty();
+  cSubP->notifyConditionV.clear();
 
   int  attrs = 0;
   for (KjNode* attrNodeP = itemP->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
@@ -709,7 +709,6 @@ bool orionldPatchSubscription(void)
     orionldError(OrionldResourceNotFound, "Subscription not found", subscriptionId, 404);
     return false;
   }
-
 
   //
   // Make sure we don't get both watchedAttributed AND timeInterval

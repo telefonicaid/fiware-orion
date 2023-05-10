@@ -141,9 +141,11 @@ payload='{
     {
       "entities": [
         {
-          "type": "T"
+          "type": "T",
+          "id": "urn:E1"
         }
-      ]
+      ],
+      "propertyNames": [ "P1" ]
     }
   ],
   "endpoint": "http://localhost:'$CP1_PORT'",

@@ -1,0 +1,575 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error handling in creation of an exclusive registration
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+
+--SHELL--
+
+#
+# Creation:
+# 01. Attempt to create an exclusive registration without "information"
+# 02. Attempt to create an exclusive registration with an empty "information"
+# 03. Attempt to create an exclusive registration with an empty "information::entities"
+# 04. Attempt to create an exclusive registration with an empty "information::entities::id"
+# 05. Attempt to create an exclusive registration with an "information::entities::id" that is not a string
+# 06. Attempt to create an exclusive registration without an "information::entities::type"
+# 07. Attempt to create an exclusive registration without an "information::entities::id"
+# 08. Attempt to create an exclusive registration without "information::propertyNames||relationshipNames"
+#
+# Modification
+# 10. Finally create the exclusive registration
+# 11. Attempt to patch the exclusive registration with an empty "information"
+# 12. Attempt to patch the exclusive registration with an empty "information::entities"
+# 13. Attempt to patch the exclusive registration with an empty "information::entities::id"
+# 14. Attempt to patch the exclusive registration with an "information::entities::id" that is not a string
+# 15. Attempt to patch the exclusive registration without an "information::entities::type"
+# 16. Attempt to patch the exclusive registration without an "information::entities::id"
+# 17. Attempt to patch the exclusive registration without "information::propertyNames||relationshipNames"
+# 
+#
+
+echo '01. Attempt to create an exclusive registration without "information"'
+echo '====================================================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "tenant": "T1",
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '02. Attempt to create an exclusive registration with an empty "information"'
+echo '==========================================================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "tenant": "T1",
+  "information": [],
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '03. Attempt to create an exclusive registration with an empty "information::entities"'
+echo '====================================================================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "tenant": "T1",
+  "information": [
+    {
+      "entities": []
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '04. Attempt to create an exclusive registration with an empty "information::entities::id"'
+echo '========================================================================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "tenant": "T1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": ""
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '05. Attempt to create an exclusive registration with an "information::entities::id" that is not a string'
+echo '========================================================================================================'
+payload='{
+  "type": "ContextSourceRegistration",
+  "tenant": "T1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": 14
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '06. Attempt to create an exclusive registration without an "information::entities::type"'
+echo '========================================================================================'
+payload='{
+  "type": "ContextSourceRegistration",
+  "tenant": "T1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '07. Attempt to create an exclusive registration without an "information::entities::id"'
+echo '======================================================================================'
+payload='{
+  "type": "ContextSourceRegistration",
+  "tenant": "T1",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '08. Attempt to create an exclusive registration without "information::propertyNames||relationshipNames"'
+echo '======================================================================================================='
+payload='{
+  "type": "ContextSourceRegistration",
+  "tenant": "T1",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo '10. Finally create the exclusive registration'
+echo '============================================='
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "mode": "exclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/ --payload "$payload"
+echo
+echo
+
+
+echo '11. Attempt to patch the exclusive registration with an empty "information"'
+echo '==========================================================================='
+payload='{
+  "information": []
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '12. Attempt to patch the exclusive registration with an empty "information::entities"'
+echo '====================================================================================='
+payload='{
+  "information": [
+    {
+      "entities": []
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+
+echo '13. Attempt to patch the exclusive registration with an empty "information::entities::id"'
+echo '========================================================================================='
+payload='{
+  "information": [
+    {
+      "entities": [
+        {
+          "id": ""
+        }
+      ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '14. Attempt to patch the exclusive registration with an "information::entities::id" that is not a string'
+echo '========================================================================================================'
+payload='{
+  "information": [
+    {
+      "entities": [
+        {
+          "id": 14
+        }
+      ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '15. Attempt to patch the exclusive registration without an "information::entities::type"'
+echo '========================================================================================'
+payload='{
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1"
+        }
+      ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '16. Attempt to patch the exclusive registration without an "information::entities::id"'
+echo '======================================================================================'
+payload='{
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '17. Attempt to patch the exclusive registration without "information::propertyNames||relationshipNames"'
+echo '======================================================================================================='
+payload='{
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ]
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create an exclusive registration without "information"
+=====================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information",
+    "title": "Missing mandatory field for Registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create an exclusive registration with an empty "information"
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 106
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Attempt to create an exclusive registration with an empty "information::entities"
+=====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+04. Attempt to create an exclusive registration with an empty "information::entities::id"
+=========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+05. Attempt to create an exclusive registration with an "information::entities::id" that is not a string
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. Attempt to create an exclusive registration without an "information::entities::type"
+========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+07. Attempt to create an exclusive registration without an "information::entities::id"
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 159
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information item without specifying entity id",
+    "title": "Invalid exclusive registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+08. Attempt to create an exclusive registration without "information::propertyNames||relationshipNames"
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 160
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information item without specifying attributes",
+    "title": "Invalid exclusive registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+10. Finally create the exclusive registration
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+11. Attempt to patch the exclusive registration with an empty "information"
+===========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 106
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+12. Attempt to patch the exclusive registration with an empty "information::entities"
+=====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities",
+    "title": "Empty Array",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+13. Attempt to patch the exclusive registration with an empty "information::entities::id"
+=========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 141
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Empty String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+14. Attempt to patch the exclusive registration with an "information::entities::id" that is not a string
+========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::id",
+    "title": "Not a JSON String",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+15. Attempt to patch the exclusive registration without an "information::entities::type"
+========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Registration::information[X]::entities[X]::type",
+    "title": "Missing mandatory field",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+16. Attempt to patch the exclusive registration without an "information::entities::id"
+======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 159
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information item without specifying entity id",
+    "title": "Invalid exclusive registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+17. Attempt to patch the exclusive registration without "information::propertyNames||relationshipNames"
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 160
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "information item without specifying attributes",
+    "title": "Invalid exclusive registration",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
