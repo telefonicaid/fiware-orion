@@ -492,7 +492,7 @@ static bool subMatch
   // case of ONANYCHANGE subscriptions).
   //
   // Depending of the alteration type, we use the list of attributes in the request or the list
-  // with effective modifications
+  // with effective modifications. Note that EntityDelete doesn't check the list
   if (targetAltType == ngsiv2::EntityUpdate)
   {
     if (!attributeMatch(cSubP, attributes))
@@ -501,7 +501,7 @@ static bool subMatch
       return false;
     }
   }
-  else
+  else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
   {
     if (!attributeMatch(cSubP, attrsWithModifiedValue) &&
         !(cSubP->notifyOnMetadataChange && attributeMatch(cSubP, attrsWithModifiedMd)))
