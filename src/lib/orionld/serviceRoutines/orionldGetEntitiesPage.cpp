@@ -189,11 +189,29 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
     }
     else
     {
+      int idStringSize = 0;
       LM_T(LmtSR, ("Query '%s' for:", sourceP->name));
       for (KjNode* entityNodeP = sourceP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
       {
         LM_T(LmtSR, ("  o %s", entityNodeP->value.s));
+        idStringSize += strlen(entityNodeP->value.s) + 1;  // +1 for the comma
       }
+
+      char* idString = kaAlloc(&orionldState.kalloc, idStringSize);
+      int   idStringIx = 0;
+
+      for (KjNode* entityNodeP = sourceP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
+      {
+        strcpy(&idString[idStringIx], entityNodeP->value.s);
+        idStringIx += strlen(entityNodeP->value.s);
+
+        if (entityNodeP->next != NULL)  // No comma if last item
+        {
+          idString[idStringIx] = ',';
+          idStringIx += 1;
+        }
+      }
+      LM_T(LmtSR, ("Query '%s' with id=%s", sourceP->name, idString));
     }
   }
 
