@@ -26,7 +26,7 @@
 apt-get -y update
 apt-get -y upgrade
 # FIXME: python2 required by an installation script in GMock. Sad but true :(
-# Install dependencies
+# Install dependencies 
 apt-get -y install \
   curl \
   gnupg \
