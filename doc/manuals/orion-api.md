@@ -2525,7 +2525,7 @@ subscription is triggered. At the present moment, the following alteration types
   in the update request)
 * `entityCreate`: notification is sent whenever a entity covered by the subscription is created
 * `entityDelete`: notification is sent whenever a entity covered by the subscription is deleted.
-  In this case, the `attrs` field within [`conditions`](#subscriptionsubjectcondition) is
+  In this case, the `attrs` field within [`condition`](#subscriptionsubjectcondition) is
   ignored (note that usual way of deleting entities, e.g. `DELETE /v2/entities/E` doesn't include
   any attribute).
 
