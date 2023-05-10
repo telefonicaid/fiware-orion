@@ -569,8 +569,25 @@ bool legacyPatchRegistration(void)
     }
   }
 
+  KjNode* dbRegistrationP = mongoCppLegacyRegistrationGet(registrationId);
+
+  if (dbRegistrationP == NULL)
+  {
+    orionldError(OrionldResourceNotFound, "Registration not found", registrationId, 404);
+    return false;
+  }
+
+  //
+  // Get the registration mode
+  //
+  KjNode*      regModeNodeP = kjLookup(dbRegistrationP, "mode");
+  const char*  regMode      = (regModeNodeP != NULL)? regModeNodeP->value.s : "inclusive";
+
+  //
+  // Check the incoming payload body
+  //
   OrionldContext* contextP = NULL;  // Needed but not used in legacy implementation
-  if (pcheckRegistration(orionldState.requestTree, false, false, &propertyTree, &contextP) == false)
+  if (pcheckRegistration(regMode, orionldState.requestTree, registrationId, false, false, &propertyTree, &contextP) == false)
   {
     LM_E(("pcheckRegistration FAILED"));
     return false;
@@ -579,13 +596,6 @@ bool legacyPatchRegistration(void)
   if (contextP != NULL)
     LM_W(("Registration @context in place but this is not supported by the legacy implementation of PATCH Registration"));
 
-  KjNode* dbRegistrationP = mongoCppLegacyRegistrationGet(registrationId);
-
-  if (dbRegistrationP == NULL)
-  {
-    orionldError(OrionldResourceNotFound, "Registration not found", registrationId, 404);
-    return false;
-  }
 
   //
   // Now that we have the "original" registration, we can check that all registration properties

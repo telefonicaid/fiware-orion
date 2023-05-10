@@ -174,7 +174,8 @@ bool orionldPostRegistrations(void)
   }
 
   OrionldContext* fwdContextP = NULL;
-  bool            b           = pcheckRegistration(regP, false, true, &propertyTree, &fwdContextP);
+  bool            b           = pcheckRegistration(NULL, regP, NULL, false, true, &propertyTree, &fwdContextP);
+
   if (b == false)
     LM_RE(false, ("pCheckRegistration FAILED"));
 

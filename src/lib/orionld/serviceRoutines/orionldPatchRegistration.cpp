@@ -620,6 +620,23 @@ bool orionldPatchRegistration(void)
     return false;
   }
 
+  RegCacheItem* rciP        = regCacheItemLookup(orionldState.tenantP->regCache, registrationId);
+  KjNode*       regPatch    = orionldState.requestTree;
+  KjNode*       dbRegP      = mongocRegistrationGet(registrationId);
+
+  if (dbRegP == NULL)
+  {
+    orionldError(OrionldResourceNotFound, "Registration Not Found", registrationId, 404);
+    return false;
+  }
+
+  //
+  // Get the registration mode
+  //
+  KjNode*      regModeNodeP = kjLookup(dbRegP, "mode");
+  const char*  regMode      = (regModeNodeP != NULL)? regModeNodeP->value.s : "inclusive";
+
+
   //
   // Check the validity of the incoming payload body - is it valid for a PATCH of a registration
   //
@@ -631,7 +648,7 @@ bool orionldPatchRegistration(void)
   //
   KjNode*         propertyTree = NULL;
   OrionldContext* fwdContextP  = NULL;
-  if (pcheckRegistration(orionldState.requestTree, false, false, &propertyTree, &fwdContextP) == false)
+  if (pcheckRegistration(regMode, orionldState.requestTree, registrationId, false, false, &propertyTree, &fwdContextP) == false)
     return false;
 
   //
@@ -660,15 +677,6 @@ bool orionldPatchRegistration(void)
   //   7. Replace the old cached registration
   //   8. Return 204 if all OK
   //
-  RegCacheItem* rciP        = regCacheItemLookup(orionldState.tenantP->regCache, registrationId);
-  KjNode*       regPatch    = orionldState.requestTree;
-  KjNode*       dbRegP      = mongocRegistrationGet(registrationId);
-
-  if (dbRegP == NULL)
-  {
-    orionldError(OrionldResourceNotFound, "Registration Not Found", registrationId, 404);
-    return false;
-  }
 
   //
   // modifiedAt
