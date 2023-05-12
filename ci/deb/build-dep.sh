@@ -26,7 +26,7 @@
 apt-get -y update
 apt-get -y upgrade
 # FIXME: python2 required by an installation script in GMock. Sad but true :(
-# Install dependencies 
+# Install dependencies
 apt-get -y install \
   curl \
   gnupg \
@@ -82,8 +82,8 @@ echo "INSTALL: rapidjson" \
 && mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include
 
 echo "INSTALL: libmicrohttpd" \
-&& curl -L https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.73.tar.gz | tar xzC /opt/ \
-&& cd /opt/libmicrohttpd-0.9.73  \
+&& curl -L https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz | tar xzC /opt/ \
+&& cd /opt/libmicrohttpd-0.9.76  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
 && make install
@@ -111,6 +111,6 @@ ldconfig
 apt-get -y clean \
 && rm -Rf /opt/mongo-c-driver-1.23.1 \
 && rm -Rf /opt/rapidjson-1.1.0 \
-&& rm -Rf /opt/libmicrohttpd-0.9.73 \
+&& rm -Rf /opt/libmicrohttpd-0.9.76 \
 && rm -Rf /opt/mosquitto-2.0.15 \
 && rm -Rf /opt/gmock-1.5.0
