@@ -96,6 +96,7 @@
 #define DATE_EXPIRES    "dateExpires"
 #define ALTERATION_TYPE "alterationType"
 #define ALL_ATTRS       "*"
+#define SERVICE_PATH    "servicePath"
 
 
 

@@ -1305,6 +1305,11 @@ void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType
     addIfNotPresentAttr(&cerP->entity, ALTERATION_TYPE, DEFAULT_ATTR_STRING_TYPE, alterationType);
   }
 
+  // servicePath
+  if (!cerP->entity.servicePath.empty())
+  {
+    addIfNotPresentAttr(&cerP->entity, SERVICE_PATH, DEFAULT_ATTR_STRING_TYPE, cerP->entity.servicePath);
+  }
 
   for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ix++)
   {
