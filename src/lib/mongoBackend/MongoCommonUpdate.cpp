@@ -1684,7 +1684,7 @@ static bool addTriggeredSubscriptions_noCache
       bool  notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
 
       // Depending of the alteration type, we use the list of attributes in the request or the list
-      // with effective modifications
+      // with effective modifications. Note that EntityDelete doesn't check the list
       if (targetAltType == ngsiv2::EntityUpdate)
       {
         if (!condValueAttrMatch(sub, attributes))
@@ -1692,7 +1692,7 @@ static bool addTriggeredSubscriptions_noCache
           continue;
         }
       }
-      else
+      else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
       {
         if (!condValueAttrMatch(sub, attrsWithModifiedValue) && !(notifyOnMetadataChange && condValueAttrMatch(sub, attrsWithModifiedMd)))
         {
