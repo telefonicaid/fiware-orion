@@ -141,7 +141,7 @@ bool pCheckSubscription
         return false;
       }
     }
-   }
+  }
 
   if (typeP != NULL)
   {

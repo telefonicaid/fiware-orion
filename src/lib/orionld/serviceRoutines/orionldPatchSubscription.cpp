@@ -182,7 +182,6 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription*
   //
   if (expressionP != NULL)  // expressionP points to the geoQ of the PATCH payload body
   {
-
     // For each field in expressionP, replace in dbExpressionP
     KjNode* dbExpressionP = kjLookup(dbSubscriptionP, "expression");
     KjNode* geoqNodeP     = expressionP->value.firstChildP;
@@ -572,7 +571,12 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
   }
 
   if (qNodeP != NULL)
+  {
+    if (cSubP->qText != NULL)
+      free(cSubP->qText);
+
     cSubP->qText = strdup(qText);
+  }
 
   if (qNodeP != NULL)
     cSubP->qP = qNodeP;
@@ -584,7 +588,11 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
     if ((strcmp(itemP->name, "subscriptionName") == 0) || (strcmp(itemP->name, "name") == 0))
       cSubP->name = itemP->value.s;
     else if (strcmp(itemP->name, "description") == 0)
+    {
+      if (cSubP->description != NULL)
+        free(cSubP->description);
       cSubP->description = strdup(itemP->value.s);
+    }
     else if (strcmp(itemP->name, "entities") == 0)
       subCacheItemUpdateEntities(cSubP, itemP);
     else if (strcmp(itemP->name, "watchedAttributes") == 0)

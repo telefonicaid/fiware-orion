@@ -120,7 +120,11 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     cSubP->lastFailure = lastFailureP->value.f;
 
   if (descriptionP != NULL)
+  {
+    if (cSubP->description != NULL)
+      free(cSubP->description);
     cSubP->description = strdup(descriptionP->value.s);
+  }
 
   if (qP != NULL)
     cSubP->expression.q = qP->value.s;
@@ -129,7 +133,11 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
     cSubP->expression.mq = mqP->value.s;
 
   if (ldqP != NULL)
+  {
+    if (cSubP->qText != NULL)
+      free(cSubP->qText);
     cSubP->qText = strdup(ldqP->value.s);
+  }
 
   if (isActiveP != NULL)
   {
