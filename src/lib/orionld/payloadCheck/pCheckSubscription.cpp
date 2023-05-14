@@ -97,12 +97,14 @@ extern "C"
 bool pCheckSubscription
 (
   KjNode*   subP,
+  bool      isCreate,          // true if POST, false if PATCH
+  char*     subscriptionId,    // non-NULL if PATCH
   KjNode*   idP,
   KjNode*   typeP,
   KjNode**  endpointP,
   KjNode**  qNodeP,
   QNode**   qTreeP,
-  char**    qTextP,
+  char**    qRenderedForDbP,
   bool*     qValidForV2P,
   bool*     qIsMqP,
   KjNode**  uriPP,
@@ -130,13 +132,23 @@ bool pCheckSubscription
   {
     PCHECK_STRING(idP, 0, NULL, SubscriptionIdPath, 400);
     PCHECK_URI(idP->value.s, true, 0, NULL, SubscriptionIdPath, 400);
-  }
-  else if (typeP != NULL)
+
+    if (subscriptionId != NULL)
+    {
+      if (strcmp(idP->value.s, subscriptionId) != 0)
+      {
+        orionldError(OrionldBadRequestData, "The Subscription ID cannot be modified", "id", 400);
+        return false;
+      }
+    }
+   }
+
+  if (typeP != NULL)
   {
     PCHECK_STRING(typeP, 0, NULL, SubscriptionTypePath, 400);
     if (strcmp(typeP->value.s, "Subscription") != 0)
     {
-      orionldError(OrionldBadRequestData, "Invalid value for Subscription TYPE", typeP->value.s, 400);
+      orionldError(OrionldBadRequestData, "Invalid value for Subscription Type", typeP->value.s, 400);
       return false;
     }
   }
@@ -155,8 +167,8 @@ bool pCheckSubscription
     }
     else if (strcmp(subItemP->name, "description") == 0)
     {
-      PCHECK_STRING(subItemP, 0, NULL, SubscriptionNamePath, 400);
-      PCHECK_DUPLICATE(descriptionP,  subItemP, 0, NULL, SubscriptionNamePath, 400);
+      PCHECK_STRING(subItemP, 0, NULL, SubscriptionDescriptionPath, 400);
+      PCHECK_DUPLICATE(descriptionP,  subItemP, 0, NULL, SubscriptionDescriptionPath, 400);
     }
     else if (strcmp(subItemP->name, "entities") == 0)
     {
@@ -187,7 +199,7 @@ bool pCheckSubscription
       PCHECK_DUPLICATE(qP, subItemP, 0, NULL, SubscriptionQPath, 400);
       PCHECK_STRING(qP, 0, NULL, SubscriptionQPath, 400);
 
-      *qTreeP = qBuild(qP->value.s, qTextP, qValidForV2P, qIsMqP, true);  // 5th parameter: qToDbModel == true
+      *qTreeP = qBuild(qP->value.s, qRenderedForDbP, qValidForV2P, qIsMqP, true);  // 5th parameter: qToDbModel == true
       *qNodeP = qP;
 
       if (*qTreeP == NULL)
@@ -218,7 +230,7 @@ bool pCheckSubscription
     {
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionNotificationPath, 400);
       PCHECK_DUPLICATE(notificationP,  subItemP, 0, NULL, SubscriptionNotificationPath, 400);
-      if (pCheckNotification(notificationP, false, uriPP, notifierInfoPP, mqttChangeP) == false)
+      if (pCheckNotification(notificationP, isCreate == false, uriPP, notifierInfoPP, mqttChangeP) == false)
         return false;
     }
     else if ((strcmp(subItemP->name, "expiresAt") == 0) || (strcmp(subItemP->name, "expires") == 0))
@@ -231,6 +243,20 @@ bool pCheckSubscription
     {
       PCHECK_DUPLICATE(throttlingP, subItemP, 0, NULL, SubscriptionThrottlingPath, 400);
       PCHECK_NUMBER(throttlingP, 0, NULL, SubscriptionThrottlingPath, 400);
+
+      //
+      // Can't be negative
+      //
+      if ((throttlingP->type == KjInt) && (throttlingP->value.i < 0))
+      {
+        orionldError(OrionldBadRequestData, "Negative Number not allowed in this position", SubscriptionThrottlingPath, 400);
+        return false;
+      }
+      else if ((throttlingP->type == KjFloat) && (throttlingP->value.f < 0))
+      {
+        orionldError(OrionldBadRequestData, "Negative Number not allowed in this position", SubscriptionThrottlingPath, 400);
+        return false;
+      }
     }
     else if (strcmp(subItemP->name, "lang") == 0)
     {
@@ -260,21 +286,24 @@ bool pCheckSubscription
   }
 
   // Make sure all mandatory fields are present
-  if (typeP == NULL)
+  if (isCreate == true)
   {
-    orionldError(OrionldBadRequestData, "Mandatory field missing", SubscriptionTypePath, 400);
-    return false;
-  }
-  else if (notificationP == NULL)
-  {
-    orionldError(OrionldBadRequestData, "Mandatory field missing", SubscriptionNotificationPath, 400);
-    return false;
-  }
+    if (typeP == NULL)
+    {
+      orionldError(OrionldBadRequestData, "Mandatory field missing", SubscriptionTypePath, 400);
+      return false;
+    }
+    else if (notificationP == NULL)
+    {
+      orionldError(OrionldBadRequestData, "Mandatory field missing", SubscriptionNotificationPath, 400);
+      return false;
+    }
 
-  if ((entitiesP == NULL) && (watchedAttributesP == NULL))
-  {
-    orionldError(OrionldBadRequestData, "Mandatory field missing", "At least one of 'entities' and 'watchedAttributes' must be present" , 400);
-    return false;
+    if ((entitiesP == NULL) && (watchedAttributesP == NULL))
+    {
+      orionldError(OrionldBadRequestData, "Mandatory field missing", "At least one of 'entities' and 'watchedAttributes' must be present" , 400);
+      return false;
+    }
   }
 
   return true;

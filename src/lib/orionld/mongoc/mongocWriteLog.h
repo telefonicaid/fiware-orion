@@ -46,6 +46,19 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// MONGOC_RLOG -
+//
+#define MONGOC_RLOG(msg, dbName, collectionName, selectorP, traceLevel)                                             \
+do                                                                                                                  \
+{                                                                                                                   \
+  if (LM_MASK(LogLevelDebug) && lmOk('T', traceLevel) == LmsOk)                                                     \
+    mongocWriteLog(msg, dbName, collectionName, selectorP, NULL, __FILE__, __LINE__, __FUNCTION__, traceLevel);     \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // mongocWriteLog -
 //
 // NOTE

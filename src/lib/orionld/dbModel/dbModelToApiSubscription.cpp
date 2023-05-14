@@ -350,8 +350,10 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
     KjNode* v2qP  = kjLookup(dbExpressionP, "q");
     KjNode* v2mqP = kjLookup(dbExpressionP, "mq");
 
-    kjChildRemove(dbExpressionP, v2qP);
-    kjChildRemove(dbExpressionP, v2mqP);
+    if (v2qP)
+      kjChildRemove(dbExpressionP, v2qP);
+    if (v2mqP)
+      kjChildRemove(dbExpressionP, v2mqP);
 
     if (orionldState.apiVersion != NGSI_LD_V1)  // FIXME: When taking from DB at startup, this won't work ...
     {

@@ -591,6 +591,24 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     cSubP->url = NULL;
   }
 
+  if (cSubP->protocolString != NULL)
+  {
+    free(cSubP->protocolString);
+    cSubP->protocolString = NULL;
+  }
+
+  if (cSubP->ip != NULL)
+  {
+    free(cSubP->ip);
+    cSubP->ip = NULL;
+  }
+
+  if (cSubP->rest != NULL)
+  {
+    free(cSubP->rest);
+    cSubP->rest = NULL;
+  }
+
   if (cSubP->tenant != NULL)
   {
     free(cSubP->tenant);
@@ -863,6 +881,10 @@ bool subCacheItemInsert
   cSubP->next                  = NULL;
   cSubP->count                 = 0;
   cSubP->status                = status;
+  cSubP->url                   = NULL;
+  cSubP->ip                    = NULL;
+  cSubP->protocolString        = NULL;
+  cSubP->rest                  = NULL;
 
   if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < orionldState.requestTime))
   {
@@ -968,7 +990,10 @@ bool subCacheItemInsert
   //
   cSubP->url = strdup(httpInfo.url.c_str());
   urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
-  cSubP->protocol = protocolFromString(cSubP->protocolString);
+  cSubP->protocol       = protocolFromString(cSubP->protocolString);
+  cSubP->ip             = strdup(cSubP->ip);
+  cSubP->protocolString = strdup(cSubP->protocolString);
+  cSubP->rest           = strdup(cSubP->rest);
 
   //
   // String filters
@@ -1163,9 +1188,9 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 #if 0
 // -----------------------------------------------------------------------------
 //
-// debugSubCache -
+// subCacheDebug -
 //
-void debugSubCache(const char* prefix, const char* title)
+void subCacheDebug(const char* prefix, const char* title)
 {
   CachedSubscription* subP = subCache.head;
 
@@ -1185,6 +1210,7 @@ void debugSubCache(const char* prefix, const char* title)
 #endif
 
 
+
 /* ****************************************************************************
 *
 * subCacheRefresh -
@@ -1196,7 +1222,7 @@ void debugSubCache(const char* prefix, const char* title)
 */
 void subCacheRefresh(void)
 {
-  // debugSubCache("KZ", "------------- BEFORE REFRESH ------------------------");
+  // subCacheDebug("KZ", "------------- BEFORE REFRESH ------------------------");
 
   // Empty the cache
   subCacheDestroy();
@@ -1221,7 +1247,7 @@ void subCacheRefresh(void)
 
   ++subCache.noOfRefreshes;
 
-  // debugSubCache("KZ", "------------- AFTER REFRESH ------------------------");
+  // subCacheDebug("KZ", "------------- AFTER REFRESH ------------------------");
 }
 
 

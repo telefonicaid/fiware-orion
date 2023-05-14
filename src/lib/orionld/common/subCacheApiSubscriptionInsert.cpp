@@ -273,6 +273,9 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
             cSubP->ip,
             cSubP->port,
             cSubP->rest));
+        cSubP->protocolString = strdup(cSubP->protocolString);
+        cSubP->ip             = strdup(cSubP->ip);
+        cSubP->rest           = strdup(cSubP->rest);
       }
 
       if (cSubP->protocol == MQTT)

@@ -145,12 +145,19 @@ void qListPresent(QNode* qP, QNode* endP, const char* prefix, const char* what)
   int ix = 0;
   while (qP != endP)
   {
-    if (qP->type == QNodeVariable)
-      LM_T(LmtQ, ("%s:  %02d: Variable (at %p) (var-name '%s' at %p)", prefix, ix, qP, qP->value.v, qP->value.v));
-    else if (qP->type == QNodeStringValue)
-      LM_T(LmtQ, ("%s:  %02d: StringValue (at %p) (string-value '%s' at %p)", prefix, ix, qP, qP->value.s, qP->value.s));
-    else
-      LM_T(LmtQ, ("%s:  %02d: %s (at %p)", prefix, ix, qNodeType(qP->type), qP));
+    bool op = (qP->type == QNodeGE) || (qP->type == QNodeGT) || (qP->type == QNodeLE) || (qP->type == QNodeLT) || (qP->type == QNodeNE) || (qP->type == QNodeEQ);
+
+    if      (qP->type == QNodeVariable)      LM_T(LmtQ, ("%s:  %02d: Variable (at %p) (var-name '%s' at %p)",        prefix, ix, qP, qP->value.v, qP->value.v));
+    else if (qP->type == QNodeIntegerValue)  LM_T(LmtQ, ("%s:  %02d: IntegerValue (at %p): %d",                      prefix, ix, qP, qP->value.i));
+    else if (qP->type == QNodeFloatValue)    LM_T(LmtQ, ("%s:  %02d: %f (FloatValue)",                               prefix, ix, qP, qP->value.f));
+    else if (qP->type == QNodeStringValue)   LM_T(LmtQ, ("%s:  %02d: StringValue (at %p) (string-value '%s' at %p)", prefix, ix, qP, qP->value.s, qP->value.s));
+    else if (qP->type == QNodeAnd)           LM_T(LmtQ, ("%s:  %02d: AND Operator",                                  prefix, ix));
+    else if (qP->type == QNodeOr)            LM_T(LmtQ, ("%s:  %02d: OR Operator",                                   prefix, ix));
+    else if (qP->type == QNodeExists)        LM_T(LmtQ, ("%s:  %02d: EXISTS Operator",                               prefix, ix));
+    else if (qP->type == QNodeNotExists)     LM_T(LmtQ, ("%s:  %02d: NOT-EXISTS Operator",                           prefix, ix));
+    else if (qP->type == QNodeRegexpValue)   LM_T(LmtQ, ("%s:  %02d: RegexpValue '%s'",                              prefix, ix, qP->value.v));
+    else if (op == true)                     LM_T(LmtQ, ("%s:  %02d: %s Operator",                                   prefix, ix, qNodeType(qP->type)));
+    else                                     LM_T(LmtQ, ("%s:  %02d: %s (at %p)",                                    prefix, ix, qNodeType(qP->type), qP));
     qP = qP->next;
     ++ix;
   }
