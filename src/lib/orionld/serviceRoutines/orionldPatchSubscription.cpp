@@ -416,7 +416,7 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
     char*           url = strdup(uriP->value.s);
     char            urlCopy[1024];
 
-    strncpy(urlCopy, url, sizeof(urlCopy));
+    strncpy(urlCopy, url, sizeof(urlCopy) - 1);
 
     if (strncmp(uriP->value.s, "mqtt", 4) == 0)
     {
