@@ -990,10 +990,18 @@ bool subCacheItemInsert
   //
   cSubP->url = strdup(httpInfo.url.c_str());
   urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
-  cSubP->protocol       = protocolFromString(cSubP->protocolString);
-  cSubP->ip             = strdup(cSubP->ip);
-  cSubP->protocolString = strdup(cSubP->protocolString);
-  cSubP->rest           = strdup(cSubP->rest);
+
+  if (cSubP->protocolString != NULL)
+  {
+    cSubP->protocol       = protocolFromString(cSubP->protocolString);
+    cSubP->protocolString = strdup(cSubP->protocolString);
+  }
+
+  if (cSubP->ip != NULL)
+    cSubP->ip = strdup(cSubP->ip);
+
+  if (cSubP->rest != NULL)
+    cSubP->rest = strdup(cSubP->rest);
 
   //
   // String filters
