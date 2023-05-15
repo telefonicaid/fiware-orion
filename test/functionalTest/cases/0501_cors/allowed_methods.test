@@ -153,7 +153,6 @@ Content-Length: 0
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Access-Control-Allow-Methods: GET, PATCH, POST, PUT, OPTIONS
 Access-Control-Allow-Origin: *
 Access-Control-Expose-Headers: REGEX(.*)

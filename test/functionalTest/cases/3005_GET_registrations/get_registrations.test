@@ -329,6 +329,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
 Content-Length: 2
 
+[]
+
 
 07. GET one registration using service path /a1/e2
 ==================================================

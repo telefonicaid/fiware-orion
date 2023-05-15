@@ -154,7 +154,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-
 05. See notification and make sure the type of E1/A1 is T1
 ===========================================================
 POST http://localhost:REGEX(\d+)/notify

@@ -169,8 +169,8 @@ Content-Length: 406
             "http": {
                 "url": "http://localhost:9997/notify"
             },
-            "lastNotification": "2050-01-01T10:00:00.000Z",
-            "lastSuccess": "2050-01-01T10:00:00.000Z",
+            "lastNotification": "2019-01-01T10:10:10.000Z",
+            "lastSuccess": "2019-01-01T10:10:10.000Z",
             "lastSuccessCode": 211,
             "onlyChangedAttrs": false
         },
@@ -219,9 +219,9 @@ Content-Length: 420
             "http": {
                 "url": "http://localhost:9997/notify"
             },
-            "lastNotification": "2050-01-01T10:00:00.000Z",
-            "lastSuccess": "2050-01-01T10:00:00.000Z",
-            "lastSuccessCode": 211,
+            "lastNotification": "202REGEX(.*)",
+            "lastSuccess": "202REGEX(.*)",
+            "lastSuccessCode": 200,
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -297,9 +297,9 @@ Content-Length: 420
             "http": {
                 "url": "http://localhost:9997/notify"
             },
-            "lastNotification": "2050-01-01T10:00:00.000Z",
-            "lastSuccess": "2050-01-01T10:00:00.000Z",
-            "lastSuccessCode": 211,
+            "lastNotification": "202REGEX(.*)",
+            "lastSuccess": "202REGEX(.*)",
+            "lastSuccessCode": 200,
             "onlyChangedAttrs": false,
             "timesSent": 1
         },

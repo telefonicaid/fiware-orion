@@ -226,6 +226,7 @@ Content-Length: 0
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 4
 Content-Type: application/json
 Content-Length: 1053
 
