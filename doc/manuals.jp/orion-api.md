@@ -645,7 +645,9 @@ Orion は階層スコープをサポートしているため、エンティテ�
     -   `entityUpdate`: 通知をトリガーする更新が更新であったが、実際の変更ではなかった場合
     -   `entityChange`: 通知をトリガーする更新が実際の変更を伴う更新であった場合、または実際の変更ではなく
         `forcedUpdate` が使用された場合
-    -   `entityDelete`: 通知をトリガーする更新がエンティティの削除操作であった場合
+    -   `entityDelete`: 通知をトリガーする更新がエンティティの削除操作であった場合。この場合、
+        [`condition`](#subscriptionsubjectcondition) 内の `attrs` フィールドは無視されます (エンティティを削除する通常
+        の方法、たとえば `DELETE /v2/entities/E` には属性が含まれないことに注意してください)
 
 通常の属性と同様に、`q` フィルタと `orderBy` (`alterationType` を除く) で使用できます。
 ただし、リソース URLs では使用できません。
