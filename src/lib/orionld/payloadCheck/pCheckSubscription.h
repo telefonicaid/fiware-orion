@@ -39,6 +39,8 @@ extern "C"
 extern bool pCheckSubscription
 (
   KjNode*   subP,
+  bool      isCreate,          // true if POST, false if PATCH
+  char*     subscriptionId,    // non-NULL if PATCH
   KjNode*   idP,
   KjNode*   typeP,
   KjNode**  endpointP,

@@ -69,14 +69,18 @@ void mongocWriteLog
   if (selectorP != NULL)
   {
     char* selector = bson_as_json(selectorP, NULL);
+
     snprintf(line, sizeof(line), "  * Selector:              '%s'", selector);
     lmOut(line, 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
     bson_free(selector);
   }
 
-  char* request = bson_as_json(requestP, NULL);
+  if (requestP != NULL)
+  {
+    char* request = bson_as_json(requestP, NULL);
 
-  snprintf(line, sizeof(line), "  * Request:               '%s'", request);
-  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
-  bson_free(request);
+    snprintf(line, sizeof(line), "  * Request:               '%s'", request);
+    lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+    bson_free(request);
+  }
 }

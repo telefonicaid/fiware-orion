@@ -84,6 +84,8 @@ bool orionldPostSubscriptions(void)
   bool     qIsMq           = false;
 
   b = pCheckSubscription(subP,
+                         true,
+                         NULL,
                          orionldState.payloadIdNode,
                          orionldState.payloadTypeNode,
                          &endpointP,
@@ -96,6 +98,9 @@ bool orionldPostSubscriptions(void)
                          &notifierInfoP,
                          &geoCoordinatesP,
                          &mqtt);
+  if (qRenderedForDb != NULL)
+    LM_T(LmtSR, ("qRenderedForDb: '%s'", qRenderedForDb));
+
   if (b == false)
   {
     if (qTree != NULL)

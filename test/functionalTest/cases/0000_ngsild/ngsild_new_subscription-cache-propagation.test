@@ -25,6 +25,7 @@ Propagation of Subscriptions between two brokers running against one and the sam
 
 --SHELL-INIT--
 dbInit CB
+dbInit CB2
 orionldStart CB  -subCacheIval 2 -experimental
 orionldStart CB2 -subCacheIval 2 -experimental
 
@@ -32,7 +33,7 @@ orionldStart CB2 -subCacheIval 2 -experimental
 
 #
 # 01. Create subscription S1 on CB
-# 02. Create subscription S2 on CB
+# 02. Create subscription S2 on CB2
 # 03. GET all subscriptions from CB - see S1
 # 04. GET all subscriptions from CB2 - see S2
 # 05. sleep 2 secs - to let the subscriptions propagate
@@ -61,8 +62,8 @@ echo
 echo
 
 
-echo "02. Create subscription S2 on CB"
-echo "================================"
+echo "02. Create subscription S2 on CB2"
+echo "================================="
 payload='{
   "type": "Subscription",
   "id": "urn:ngsi-ld:subscriptions:S2",
@@ -127,8 +128,8 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 
 
 
-02. Create subscription S2 on CB
-================================
+02. Create subscription S2 on CB2
+=================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -313,3 +314,4 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 brokerStop CB
 brokerStop CB2
 dbDrop CB
+dbDrop CB2

@@ -1,4 +1,4 @@
-# Copyright 2019 FIWARE Foundation e.V.
+# Copyright 2023 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -25,7 +25,7 @@ Subscription Patch
 
 --SHELL-INIT--
 dbInit CB
-orionldStart CB
+orionldStart CB -experimental
 
 --SHELL--
 
@@ -37,8 +37,8 @@ orionldStart CB
 # 02. MONGO: see expansions of: entities:type:T1, watchedAttributes:P2, q:P2, notification:attributes:P1,P2,A3, condition:P2
 # 03. GET subscription from the broker
 #
-# 04. PATCH 'name'
-# 05. GET subscription and see the new 'name'
+# 04. PATCH 'subscriptionName'
+# 05. GET subscription and see the new 'subscriptionName'
 # 06. PATCH 'description'
 # 07. GET subscription and see the new 'description'
 # 08. PATCH 'entities'
@@ -101,7 +101,6 @@ payload='{
     "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
-  "csf": "not implemented",
   "isActive": true,
   "notification": {
     "attributes": [ "P1", "P2", "A3" ],
@@ -133,8 +132,8 @@ echo
 echo
 
 
-echo "04. PATCH 'name'"
-echo "================"
+echo "04. PATCH 'subscriptionName'"
+echo "============================"
 payload='{
   "name": "New Name"
 }'
@@ -143,8 +142,8 @@ echo
 echo
 
 
-echo "05. GET subscription and see the new 'name'"
-echo "==========================================="
+echo "05. GET subscription and see the new 'subscriptionName'"
+echo "======================================================="
 orionCurl --url '/ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01?prettyPrint=yes&spaces=2' --noPayloadCheck
 echo
 echo
@@ -533,46 +532,45 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : REGEX(.*),
-	"reference" : "http://localhost:9997/notify",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 5,
-	"servicePath" : "/#",
+	"name" : "Test subscription S01",
 	"description" : "Description of Test subscription S01",
-	"status" : "active",
 	"entities" : [
 		{
 			"id" : "urn:ngsi-ld:E01",
-			"isPattern" : "false",
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"isPattern" : "false",
 			"isTypePattern" : false
 		}
 	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+	"expression" : {
+		"geometry" : "point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance:2000",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo0",
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+		"mq" : ""
+	},
+	"status" : "active",
+	"expiration" : REGEX(.*),
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"attrs" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P1",
 		"https://uri.etsi.org/ngsi-ld/default-context/P2",
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
-	"metadata" : [ ],
+	"format" : "keyValues",
+	"reference" : "http://localhost:9997/notify",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
 	"blacklist" : false,
-	"name" : "Test subscription S01",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
-	"conditions" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/P2"
-	],
-	"expression" : {
-		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
-		"mq" : "",
-		"geometry" : "point",
-		"coords" : "1,2",
-		"georel" : "near;maxDistance:2000",
-		"geoproperty" : "geo0"
-	},
-	"format" : "keyValues"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -580,7 +578,7 @@ bye
 03. GET subscription from the broker
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 838
+Content-Length: 831
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -602,14 +600,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
+    "georel": "near;maxDistance==2000",
     "coordinates": [
       1,
       2
     ],
-    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -626,22 +623,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
 
-04. PATCH 'name'
-================
+04. PATCH 'subscriptionName'
+============================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-05. GET subscription and see the new 'name'
-===========================================
+05. GET subscription and see the new 'subscriptionName'
+=======================================================
 HTTP/1.1 200 OK
-Content-Length: 825
+Content-Length: 818
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -663,14 +661,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
+    "georel": "near;maxDistance==2000",
     "coordinates": [
       1,
       2
     ],
-    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -687,7 +684,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -702,7 +700,7 @@ Date: REGEX(.*)
 07. GET subscription and see the new 'description'
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 804
+Content-Length: 797
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -724,14 +722,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
+    "georel": "near;maxDistance==2000",
     "coordinates": [
       1,
       2
     ],
-    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -748,7 +745,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -767,14 +765,8 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1861869600,
-	"reference" : "http://localhost:9997/notify",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 5,
-	"servicePath" : "/#",
+	"name" : "New Name",
 	"description" : "New Description",
-	"status" : "active",
 	"entities" : [
 		{
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
@@ -789,30 +781,35 @@ MongoDB server version: REGEX(.*)
 			"isTypePattern" : false
 		}
 	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+	"expression" : {
+		"geometry" : "point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance:2000",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo0",
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+		"mq" : ""
+	},
+	"status" : "active",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"attrs" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P1",
 		"https://uri.etsi.org/ngsi-ld/default-context/P2",
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
-	"metadata" : [ ],
+	"format" : "keyValues",
+	"reference" : "http://localhost:9997/notify",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
 	"blacklist" : false,
-	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
-	"conditions" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/P2"
-	],
-	"expression" : {
-		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
-		"mq" : "",
-		"geometry" : "point",
-		"coords" : "1,2",
-		"georel" : "near;maxDistance:2000",
-		"geoproperty" : "geo0"
-	},
-	"format" : "keyValues"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -820,7 +817,7 @@ bye
 10. GET subscription and see the new 'entities'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 805
+Content-Length: 798
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -844,14 +841,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
+    "georel": "near;maxDistance==2000",
     "coordinates": [
       1,
       2
     ],
-    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -868,7 +864,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -887,14 +884,8 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1861869600,
-	"reference" : "http://localhost:9997/notify",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 5,
-	"servicePath" : "/#",
+	"name" : "New Name",
 	"description" : "New Description",
-	"status" : "active",
 	"entities" : [
 		{
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
@@ -909,30 +900,35 @@ MongoDB server version: REGEX(.*)
 			"isTypePattern" : false
 		}
 	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/W1"
+	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+	"expression" : {
+		"geometry" : "point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance:2000",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo0",
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2.value>10",
+		"mq" : ""
+	},
+	"status" : "active",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"attrs" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P1",
 		"https://uri.etsi.org/ngsi-ld/default-context/P2",
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
-	"metadata" : [ ],
+	"format" : "keyValues",
+	"reference" : "http://localhost:9997/notify",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
 	"blacklist" : false,
-	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
-	"conditions" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/W1"
-	],
-	"expression" : {
-		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P2>10",
-		"mq" : "",
-		"geometry" : "point",
-		"coords" : "1,2",
-		"georel" : "near;maxDistance:2000",
-		"geoproperty" : "geo0"
-	},
-	"format" : "keyValues"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -940,7 +936,7 @@ bye
 13. GET subscription and see the new 'watchedAttributes'
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 805
+Content-Length: 798
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -964,14 +960,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
+    "georel": "near;maxDistance==2000",
     "coordinates": [
       1,
       2
     ],
-    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -988,7 +983,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -1021,14 +1017,8 @@ connecting to: REGEX(.)
 MongoDB server version: REGEX(.)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1861869600,
-	"reference" : "http://localhost:9997/notify",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 5,
-	"servicePath" : "/#",
+	"name" : "New Name",
 	"description" : "New Description",
-	"status" : "active",
 	"entities" : [
 		{
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
@@ -1043,31 +1033,35 @@ MongoDB server version: REGEX(.)
 			"isTypePattern" : false
 		}
 	],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/W1"
+	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
+	"expression" : {
+		"geometry" : "point",
+		"coords" : "1,2",
+		"georel" : "near;maxDistance:2000",
+		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo0",
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
+		"mq" : ""
+	},
+	"status" : "active",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
 	"attrs" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P1",
 		"https://uri.etsi.org/ngsi-ld/default-context/P2",
 		"https://uri.etsi.org/ngsi-ld/default-context/A3"
 	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
-	"conditions" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/W1"
-	],
-	"expression" : {
-		"q" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
-		"mq" : "",
-		"geometry" : "point",
-		"coords" : "1,2",
-		"georel" : "near;maxDistance:2000",
-		"geoproperty" : "geo0"
-	},
 	"format" : "keyValues",
-	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc"
+	"reference" : "http://localhost:9997/notify",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -1075,7 +1069,7 @@ bye
 17. GET subscription and see the new 'q'
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 814
+Content-Length: 807
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1099,14 +1093,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "A11>12;P1~=abc",
   "geoQ": {
     "geometry": "Point",
+    "georel": "near;maxDistance==2000",
     "coordinates": [
       1,
       2
     ],
-    "georel": "near;maxDistance==2000",
     "geoproperty": "geo0"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -1123,7 +1116,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -1142,14 +1136,8 @@ connecting to: REGEX(.)
 MongoDB server version: REGEX(.)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1861869600,
-	"reference" : "http://localhost:9997/notify",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 5,
-	"servicePath" : "/#",
+	"name" : "New Name",
 	"description" : "New Description",
-	"status" : "active",
 	"entities" : [
 		{
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
@@ -1164,21 +1152,10 @@ MongoDB server version: REGEX(.)
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/P1",
-		"https://uri.etsi.org/ngsi-ld/default-context/P2",
-		"https://uri.etsi.org/ngsi-ld/default-context/A3"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
 	"expression" : {
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
 		"mq" : "",
@@ -1187,8 +1164,23 @@ MongoDB server version: REGEX(.)
 		"georel" : "near;maxDistance:18",
 		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo1"
 	},
+	"status" : "active",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
 	"format" : "keyValues",
-	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc"
+	"reference" : "http://localhost:9997/notify",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -1196,7 +1188,7 @@ bye
 20. GET subscription and see the new 'geoQ'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 812
+Content-Length: 786
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1220,14 +1212,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "A11>12;P1~=abc",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": [
-      0,
-      0
-    ],
     "georel": "near;maxDistance==18",
+    "coordinates": "0,0",
     "geoproperty": "geo1"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -1244,7 +1232,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -1263,14 +1252,8 @@ connecting to: REGEX(.)
 MongoDB server version: REGEX(.)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1861869600,
-	"reference" : "http://localhost:9997/notify",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 5,
-	"servicePath" : "/#",
+	"name" : "New Name",
 	"description" : "New Description",
-	"status" : "inactive",
 	"entities" : [
 		{
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
@@ -1285,21 +1268,10 @@ MongoDB server version: REGEX(.)
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/P1",
-		"https://uri.etsi.org/ngsi-ld/default-context/P2",
-		"https://uri.etsi.org/ngsi-ld/default-context/A3"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
 	"expression" : {
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
 		"mq" : "",
@@ -1308,8 +1280,23 @@ MongoDB server version: REGEX(.)
 		"georel" : "near;maxDistance:18",
 		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo1"
 	},
+	"status" : "inactive",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/A3"
+	],
 	"format" : "keyValues",
-	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc"
+	"reference" : "http://localhost:9997/notify",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -1317,7 +1304,7 @@ bye
 25. GET subscription and see the new 'isActive'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 813
+Content-Length: 787
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1341,14 +1328,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "A11>12;P1~=abc",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": [
-      0,
-      0
-    ],
     "georel": "near;maxDistance==18",
+    "coordinates": "0,0",
     "geoproperty": "geo1"
   },
-  "csf": "not implemented",
   "status": "paused",
   "isActive": false,
   "notification": {
@@ -1365,7 +1348,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -1384,14 +1368,8 @@ connecting to: REGEX(.)
 MongoDB server version: REGEX(.)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1861869600,
-	"reference" : "http://localhost:1234/notify2",
-	"custom" : false,
-	"mimeType" : "application/json",
-	"throttling" : 5,
-	"servicePath" : "/#",
+	"name" : "New Name",
 	"description" : "New Description",
-	"status" : "inactive",
 	"entities" : [
 		{
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
@@ -1406,21 +1384,10 @@ MongoDB server version: REGEX(.)
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/R1",
-		"https://uri.etsi.org/ngsi-ld/default-context/R2",
-		"https://uri.etsi.org/ngsi-ld/default-context/P3"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
 	"expression" : {
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
 		"mq" : "",
@@ -1429,8 +1396,23 @@ MongoDB server version: REGEX(.)
 		"georel" : "near;maxDistance:18",
 		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo1"
 	},
+	"status" : "inactive",
+	"expiration" : 1861869600,
+	"throttling" : 5,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/R1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
 	"format" : "normalized",
-	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc"
+	"reference" : "http://localhost:1234/notify2",
+	"mimeType" : "application/json",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -1438,7 +1420,7 @@ bye
 28. GET subscription and see the new 'notification'
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 812
+Content-Length: 786
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1462,14 +1444,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "A11>12;P1~=abc",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": [
-      0,
-      0
-    ],
     "georel": "near;maxDistance==18",
+    "coordinates": "0,0",
     "geoproperty": "geo1"
   },
-  "csf": "not implemented",
   "status": "paused",
   "isActive": false,
   "notification": {
@@ -1486,7 +1464,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -1501,7 +1480,7 @@ Date: REGEX(.*)
 30. GET subscription and see the new 'expiresAt'
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 812
+Content-Length: 786
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1525,14 +1504,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "A11>12;P1~=abc",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": [
-      0,
-      0
-    ],
     "georel": "near;maxDistance==18",
+    "coordinates": "0,0",
     "geoproperty": "geo1"
   },
-  "csf": "not implemented",
   "status": "paused",
   "isActive": false,
   "notification": {
@@ -1549,7 +1524,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2026-04-01T12:34:56.000Z",
-  "throttling": 5
+  "throttling": 5,
+  "origin": "cache"
 }
 
 
@@ -1564,7 +1540,7 @@ Date: REGEX(.*)
 32. GET subscription and see the new 'throttling'
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 813
+Content-Length: 787
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1588,14 +1564,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "A11>12;P1~=abc",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": [
-      0,
-      0
-    ],
     "georel": "near;maxDistance==18",
+    "coordinates": "0,0",
     "geoproperty": "geo1"
   },
-  "csf": "not implemented",
   "status": "paused",
   "isActive": false,
   "notification": {
@@ -1612,7 +1584,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2026-04-01T12:34:56.000Z",
-  "throttling": 12
+  "throttling": 12,
+  "origin": "cache"
 }
 
 
@@ -1624,14 +1597,8 @@ connecting to: REGEX(.)
 MongoDB server version: REGEX(.)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1775046896,
-	"reference" : "http://localhost:1234/notify2",
-	"custom" : false,
-	"mimeType" : "application/json",
-	"throttling" : 12,
-	"servicePath" : "/#",
+	"name" : "New Name",
 	"description" : "New Description",
-	"status" : "inactive",
 	"entities" : [
 		{
 			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T2",
@@ -1646,21 +1613,10 @@ MongoDB server version: REGEX(.)
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/R1",
-		"https://uri.etsi.org/ngsi-ld/default-context/R2",
-		"https://uri.etsi.org/ngsi-ld/default-context/P3"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/W1"
 	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
 	"expression" : {
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc",
 		"mq" : "",
@@ -1669,8 +1625,23 @@ MongoDB server version: REGEX(.)
 		"georel" : "near;maxDistance:18",
 		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo1"
 	},
+	"status" : "inactive",
+	"expiration" : 1775046896,
+	"throttling" : 12,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/R1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3"
+	],
 	"format" : "normalized",
-	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/A11.value>12;https://uri=etsi=org/ngsi-ld/default-context/P1.value~=abc"
+	"reference" : "http://localhost:1234/notify2",
+	"mimeType" : "application/json",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -1685,7 +1656,7 @@ Date: REGEX(.*)
 35. GET subscription and see all the fields
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 878
+Content-Length: 852
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1711,14 +1682,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P34>34",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": [
-      34,
-      34
-    ],
     "georel": "near;maxDistance==34",
+    "coordinates": "34,34",
     "geoproperty": "geo34"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -1735,7 +1702,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:34:34.000Z",
-  "throttling": 34
+  "throttling": 34,
+  "origin": "cache"
 }
 
 
@@ -1747,14 +1715,8 @@ connecting to: REGEX(.)
 MongoDB server version: REGEX(.)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1861871674,
-	"reference" : "http://localhost:3434/notify",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 34,
-	"servicePath" : "/#",
+	"name" : "Name 34",
 	"description" : "Description 34",
-	"status" : "active",
 	"entities" : [
 		{
 			"id" : "urn:ngsi-ld:E34",
@@ -1769,21 +1731,10 @@ MongoDB server version: REGEX(.)
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/P34",
-		"https://uri.etsi.org/ngsi-ld/default-context/R34",
-		"https://uri.etsi.org/ngsi-ld/default-context/A34"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"name" : "Name 34",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P34"
 	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P34.value>34",
 	"expression" : {
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P34.value>34",
 		"mq" : "",
@@ -1792,8 +1743,23 @@ MongoDB server version: REGEX(.)
 		"georel" : "near;maxDistance:34",
 		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo34"
 	},
+	"status" : "active",
+	"expiration" : 1861871674,
+	"throttling" : 34,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P34",
+		"https://uri.etsi.org/ngsi-ld/default-context/R34",
+		"https://uri.etsi.org/ngsi-ld/default-context/A34"
+	],
 	"format" : "keyValues",
-	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P34.value>34"
+	"reference" : "http://localhost:3434/notify",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 }
 bye
 
@@ -1812,14 +1778,8 @@ connecting to: REGEX(.)
 MongoDB server version: REGEX(.)
 {
 	"_id" : "urn:ngsi-ld:subscriptions:S01",
-	"expiration" : 1861871674,
-	"reference" : "http://localhost:3434/notify",
-	"custom" : false,
-	"mimeType" : "application/ld+json",
-	"throttling" : 34,
-	"servicePath" : "/#",
+	"name" : "Name 34",
 	"description" : "Description 34",
-	"status" : "active",
 	"entities" : [
 		{
 			"id" : "urn:ngsi-ld:E34",
@@ -1834,21 +1794,10 @@ MongoDB server version: REGEX(.)
 			"isTypePattern" : false
 		}
 	],
-	"attrs" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/P34",
-		"https://uri.etsi.org/ngsi-ld/default-context/R34",
-		"https://uri.etsi.org/ngsi-ld/default-context/A34"
-	],
-	"metadata" : [ ],
-	"blacklist" : false,
-	"name" : "Name 34",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"csf" : "not implemented",
-	"createdAt" : REGEX(\d+\.\d+),
-	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [
 		"https://uri.etsi.org/ngsi-ld/default-context/P34"
 	],
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P34.value>34",
 	"expression" : {
 		"q" : "https://uri=etsi=org/ngsi-ld/default-context/P34.value>34",
 		"mq" : "",
@@ -1857,8 +1806,23 @@ MongoDB server version: REGEX(.)
 		"georel" : "near;maxDistance:34",
 		"geoproperty" : "https://uri=etsi=org/ngsi-ld/default-context/geo34"
 	},
+	"status" : "active",
+	"expiration" : 1861871674,
+	"throttling" : 34,
+	"createdAt" : REGEX(\d+\.\d+),
+	"modifiedAt" : REGEX(\d+\.\d+),
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P34",
+		"https://uri.etsi.org/ngsi-ld/default-context/R34",
+		"https://uri.etsi.org/ngsi-ld/default-context/A34"
+	],
 	"format" : "keyValues",
-	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/P34.value>34",
+	"reference" : "http://localhost:3434/notify",
+	"mimeType" : "application/ld+json",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
 	"headers" : {
 		"A" : "1"
 	}
@@ -1869,7 +1833,7 @@ bye
 39. GET subscription and see A=1 in receiverInfo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 976
+Content-Length: 950
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1895,14 +1859,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P34>34",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": [
-      34,
-      34
-    ],
     "georel": "near;maxDistance==34",
+    "coordinates": "34,34",
     "geoproperty": "geo34"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -1925,7 +1885,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:34:34.000Z",
-  "throttling": 34
+  "throttling": 34,
+  "origin": "cache"
 }
 
 
@@ -1940,7 +1901,7 @@ Date: REGEX(.*)
 41. GET subscription and see A=2 in receiverInfo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 976
+Content-Length: 950
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1966,14 +1927,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "q": "P34>34",
   "geoQ": {
     "geometry": "Point",
-    "coordinates": [
-      34,
-      34
-    ],
     "georel": "near;maxDistance==34",
+    "coordinates": "34,34",
     "geoproperty": "geo34"
   },
-  "csf": "not implemented",
   "status": "active",
   "isActive": true,
   "notification": {
@@ -1996,7 +1953,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "status": "ok"
   },
   "expiresAt": "2028-12-31T10:34:34.000Z",
-  "throttling": 34
+  "throttling": 34,
+  "origin": "cache"
 }
 
 

@@ -247,7 +247,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
     {
       fragmentP->name    = (char*) "expiration";
       fragmentP->type    = KjFloat;
-      fragmentP->value.f = parse8601Time(fragmentP->value.s);  // FIXME: Already done in pcheckSubscription() ...
+      fragmentP->value.f = parse8601Time(fragmentP->value.s);
     }
     else if (strcmp(fragmentP->name, "throttling") == 0)
       throttlingP = fragmentP;

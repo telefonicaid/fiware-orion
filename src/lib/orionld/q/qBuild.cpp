@@ -69,6 +69,8 @@
 //
 QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool qToDbModel)
 {
+  LM_T(LmtQ, ("In qBuild: %s", q));
+
   QNode*      qP = NULL;
   char*       title;
   char*       detail;

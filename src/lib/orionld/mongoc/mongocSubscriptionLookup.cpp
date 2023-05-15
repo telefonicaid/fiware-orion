@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_WLOG - FIXME: change name to mongocLog.h
 #include "orionld/mongoc/mongocSubscriptionLookup.h"             // Own interface
 
 
@@ -67,6 +68,7 @@ KjNode* mongocSubscriptionLookup(const char* subscriptionId)
   // Run the query
   //
   // semTake(&mongoSubscriptionsSem);
+  MONGOC_RLOG("Lookup Subscription", orionldState.tenantP->mongoDbName, "subscriptions", &mongoFilter, LmtMongoc);
   if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.subscriptionsP, &mongoFilter, NULL, NULL)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));

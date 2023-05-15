@@ -61,7 +61,6 @@ SET (SOURCES
      pcheckQuery.cpp
      pcheckReceiverInfo.cpp
      pcheckRegistration.cpp
-     pcheckSubscription.cpp
      pcheckTimeInterval.cpp
      pCheckQuery.cpp
      pCheckRegistrationMode.cpp

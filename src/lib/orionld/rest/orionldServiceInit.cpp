@@ -336,6 +336,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPatchSubscription)
   {
+    serviceP->options    = ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
   }
   else if (serviceP->serviceRoutine == orionldDeleteSubscription)
   {
