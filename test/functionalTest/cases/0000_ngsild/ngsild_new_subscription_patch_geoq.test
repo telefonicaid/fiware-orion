@@ -212,9 +212,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 03. See S1 in DB
 ================
-MongoDB shell version v4.4.21
-connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.21
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:S1",
 	"entities" : [
@@ -337,9 +337,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 07. See S1 in DB
 ================
-MongoDB shell version v4.4.21
-connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.21
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:S1",
 	"entities" : [
@@ -462,9 +462,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 11. See S1 in DB
 ================
-MongoDB shell version v4.4.21
-connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.21
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:S1",
 	"entities" : [
