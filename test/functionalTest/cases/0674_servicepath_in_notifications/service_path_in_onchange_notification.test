@@ -114,10 +114,10 @@ echo
 01. Add subscription to E.*/ET with service-path /entity
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "subscribeResponse": {
@@ -130,10 +130,10 @@ Date: REGEX(.*)
 02. Create entity E1/ET with service-path /entity
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 169
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 169
 
 {
     "contextResponses": [
@@ -160,10 +160,10 @@ Date: REGEX(.*)
 03. Create entity E2/ET with service-path /entity
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 169
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 169
 
 {
     "contextResponses": [
@@ -190,10 +190,10 @@ Date: REGEX(.*)
 04. Query ET-typed entities  with service-path /entity
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 356
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 356
 
 {
     "contextResponses": [

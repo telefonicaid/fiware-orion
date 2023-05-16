@@ -174,50 +174,50 @@ echo
 01. Create entity E1 with attributes A and B in CB
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Register E1-C in CP1
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. Register E2-C in CP2
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 04. Register E3-C in CP3
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Query all entities in CB filtering out C
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 116
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 [
     {
@@ -240,10 +240,10 @@ Date: REGEX(.*)
 06. Query entity E1 in CB filtering out C
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 114
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 114
 
 {
     "A": {
@@ -264,10 +264,10 @@ Date: REGEX(.*)
 07. Check in CP1 that no forwared request has been recieved
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 46
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 46
 
 {
     "services": {},
@@ -281,10 +281,10 @@ Date: REGEX(.*)
 08. Check in CP2 that no forwared request has been recieved
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 46
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 46
 
 {
     "services": {},
@@ -298,10 +298,10 @@ Date: REGEX(.*)
 09. Check in CP3 that no forwared request has been recieved
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 46
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 46
 
 {
     "services": {},

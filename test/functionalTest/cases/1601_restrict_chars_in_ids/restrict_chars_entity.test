@@ -102,10 +102,10 @@ echo
 01. POST /v2/entities to create España/T1
 =========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "Invalid characters in entity id",
@@ -116,10 +116,10 @@ Date: REGEX(.*)
 02. GET /v2/entities/España to see that A2 has not been added
 =============================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -130,10 +130,10 @@ Date: REGEX(.*)
 03. POST /v2/entities to create E1/Olé
 ======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
 
 {
     "description": "Invalid characters in entity type",
@@ -144,10 +144,10 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1 to see that E1 has not been added
 =========================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -158,10 +158,10 @@ Date: REGEX(.*)
 05. POST /v2/entities to create E#/T1
 ======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "Invalid characters in entity id",
@@ -172,10 +172,10 @@ Date: REGEX(.*)
 06. GET /v2/entities/E# that E# has not been added
 ==================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -186,10 +186,10 @@ Date: REGEX(.*)
 07. POST /v2/entities to create E1/A#
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
 
 {
     "description": "Invalid characters in entity type",
@@ -200,10 +200,10 @@ Date: REGEX(.*)
 08. GET /v2/entities/E1 to see that E1 has not been added
 =========================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",

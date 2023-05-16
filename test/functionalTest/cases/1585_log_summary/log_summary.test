@@ -143,10 +143,10 @@ echo
 01. PUT /v2/noService
 =====================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 {
     "description": "Service not found. Check your URL as probably it is wrong.",
@@ -157,10 +157,10 @@ Date: REGEX(.*)
 02. POST /v2/entities with invalid JSON
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -171,11 +171,11 @@ Date: REGEX(.*)
 03. GETT /v2/entities - bad verb
 ================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 63
-Content-Type: application/json
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "method not allowed",
@@ -186,10 +186,10 @@ Date: REGEX(.*)
 04. POST /v2/entities without payload
 =====================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -214,10 +214,10 @@ Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new
 07. GET /v2/entities (just to clear out Bad Input)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -245,10 +245,10 @@ Bad input active alarms: 0, raised: _total: 1, new: 0_, released: _total: 1, new
 10. PUT /v2/noService
 =====================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 {
     "description": "Service not found. Check your URL as probably it is wrong.",

@@ -144,10 +144,10 @@ echo
 01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 352
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 352
 
 {
     "contextResponses": [
@@ -196,10 +196,10 @@ Date: REGEX(.*)
 02. Get entity using NGSIv2 and check values are right
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 316
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 316
 
 {
     "B": {
@@ -235,10 +235,10 @@ Date: REGEX(.*)
 03. Append five new attributes with Quantity, Number, Boolean, DateTime and ISO8601 types
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 357
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 357
 
 {
     "contextResponses": [
@@ -287,10 +287,10 @@ Date: REGEX(.*)
 04. Get entity using NGSIv2 and check values are right
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 617
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 617
 
 {
     "B": {

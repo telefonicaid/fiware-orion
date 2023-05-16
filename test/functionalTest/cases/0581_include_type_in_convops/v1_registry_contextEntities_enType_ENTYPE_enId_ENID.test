@@ -83,10 +83,10 @@ echo
 01. GET /v1/registry/contextEntities/type/ET1/id/entity01 and see it fail
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -99,10 +99,10 @@ Date: REGEX(.*)
 02. POST /v1/registry/contextEntities/type/ET1/id/entity01 OK
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -113,10 +113,10 @@ Date: REGEX(.*)
 03. GET /v1/registry/contextEntities/type/ET1/id/entity01 OK
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 170
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 170
 
 {
     "contextRegistrationResponses": [
@@ -139,10 +139,10 @@ Date: REGEX(.*)
 04. POST /v1/registry/contextEntities/type/ET1/id/entity02
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -153,10 +153,10 @@ Date: REGEX(.*)
 05. GET /v1/registry/contextEntities/type/ET1/id/entity02 OK
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 170
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 170
 
 {
     "contextRegistrationResponses": [

@@ -164,10 +164,10 @@ echo
 --REGEXPECT--
 1: +++++++++ Update/Append +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 387
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 387
 
 {
     "contextResponses": [
@@ -203,10 +203,10 @@ Date: REGEX(.*)
 
 2: ++++++++++ OK Query ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -218,10 +218,10 @@ Date: REGEX(.*)
 
 3: ++++++++++ Query with invalid latitude ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 96
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 96
 
 {
     "errorCode": {
@@ -234,10 +234,10 @@ Date: REGEX(.*)
 
 4: ++++++++++ Query with invalid longitude ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 {
     "errorCode": {

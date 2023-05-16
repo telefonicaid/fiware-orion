@@ -82,10 +82,10 @@ echo
 0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 258
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 258
 
 {
     "contextResponses": [
@@ -119,10 +119,10 @@ Date: REGEX(.*)
 1. Listing of Entity Types. Response in JSON
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 115
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 115
 
 {
     "statusCode": {
@@ -146,10 +146,10 @@ Date: REGEX(.*)
 2. Listing of Entity Types. Response in JSON, with details=on
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 136
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 136
 
 {
     "statusCode": {
@@ -174,10 +174,10 @@ Date: REGEX(.*)
 3. Listing of Entity Types. Response in JSON, with details=on and collapse=true
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 96
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 96
 
 {
     "statusCode": {

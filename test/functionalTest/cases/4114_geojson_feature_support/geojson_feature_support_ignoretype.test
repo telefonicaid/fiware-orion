@@ -170,20 +170,20 @@ echo
 01. Create entity with geo:json using Feature type with ignoreType
 ==================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Get entity and see Feature
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 271
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 271
 
 {
     "id": "E",
@@ -216,10 +216,10 @@ Date: REGEX(.*)
 03. Geoquery covering the location returns nothing
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -227,18 +227,18 @@ Date: REGEX(.*)
 04. Update entity with a regular geo:json Point removing ignoreType
 ===================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Get entity and see Point
 ============================
 HTTP/1.1 200 OK
-Content-Length: 132
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 132
 
 {
     "id": "E",
@@ -260,10 +260,10 @@ Date: REGEX(.*)
 06. Geoquery covering the location returns the entity
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 134
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 134
 
 [
     {
@@ -287,18 +287,18 @@ Date: REGEX(.*)
 07. Update entity with a Feature with ignoreType again
 ======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get entity and see Feature
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 273
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 273
 
 {
     "id": "E",
@@ -331,10 +331,10 @@ Date: REGEX(.*)
 09. Geoquery covering the location returns nothing
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

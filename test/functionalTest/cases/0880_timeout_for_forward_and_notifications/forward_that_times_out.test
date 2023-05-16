@@ -141,10 +141,10 @@ echo
 01. Register E1/T1/A1 on CB with accumulator as ContextProvider
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -155,10 +155,10 @@ Date: REGEX(.*)
 02. Update/UPDATE E1/T1/A1 on CB (provoking forward to accumulator)
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 106
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 106
 
 {
     "errorCode": {
@@ -181,10 +181,10 @@ Raising alarm ForwardingError localhost:9997/noresponse/updateContext: forwardin
 05. Query E1/T1/A1 on CB (provoking forward to accumulator)
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 116
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
     "errorCode": {

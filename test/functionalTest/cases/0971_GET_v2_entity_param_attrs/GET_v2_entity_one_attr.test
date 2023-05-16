@@ -92,10 +92,10 @@ echo
 01. POST /v1/updateContext to create 8787GHY entity
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 379
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 379
 
 {
     "contextResponses": [
@@ -144,10 +144,10 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY?attrs=speed
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "id": "8787GHY",
@@ -163,10 +163,10 @@ Date: REGEX(.*)
 03. GET /v2/entities/8787GHY?attrs=speed,plateCountry
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 141
 
 {
     "id": "8787GHY",

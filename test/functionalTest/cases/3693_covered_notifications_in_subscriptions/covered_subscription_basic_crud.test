@@ -299,20 +299,20 @@ echo
 01. Create subscription without covered
 =======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 332
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 332
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -348,18 +348,18 @@ Date: REGEX(.*)
 03. Update subscription with covered=true
 =========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. GET subscription and see covered=true
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 331
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 331
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -395,18 +395,18 @@ Date: REGEX(.*)
 05. Update subscrption without touching covered
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. GET subscription and see covered=true
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 332
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 332
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -442,18 +442,18 @@ Date: REGEX(.*)
 07. Update subscription with covered=false
 ==========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 333
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 333
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -489,18 +489,18 @@ Date: REGEX(.*)
 09. Update subscription without covered
 =======================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. GET subscription and see covered=false
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 333
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 333
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -536,10 +536,10 @@ Date: REGEX(.*)
 11. Update subscription with covered=true and without attributes and see fail
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 107
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 107
 
 {
     "description": "covered true cannot be used if notification attributes list is empty",
@@ -550,10 +550,10 @@ Date: REGEX(.*)
 12. Update subscription with covered=foo and see error
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 60
 
 {
     "description": "covered is not a bool",
@@ -564,10 +564,10 @@ Date: REGEX(.*)
 13. Create subscription with covered=foo and see error
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 60
 
 {
     "description": "covered is not a bool",
@@ -578,20 +578,20 @@ Date: REGEX(.*)
 14. Create subscription with covered=false and without attributes and see ok
 ============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 15. Create subscription with covered=true and without attributes and see fail
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 107
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 107
 
 {
     "description": "covered true cannot be used if notification attributes list is empty",

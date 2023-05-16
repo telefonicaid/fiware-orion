@@ -156,10 +156,10 @@ echo
 01. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token at01
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "subscribeResponse": {
@@ -172,10 +172,10 @@ Date: REGEX(.*)
 02. Update/Append E1/A1, with auth-token at02
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 203
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 203
 
 {
     "contextResponses": [
@@ -250,10 +250,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. Update subscription, using X-Auth-Token at03
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "subscribeResponse": {
@@ -266,10 +266,10 @@ Date: REGEX(.*)
 06. Update/Append E1/A1, with auth-token at04
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 203
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 203
 
 {
     "contextResponses": [

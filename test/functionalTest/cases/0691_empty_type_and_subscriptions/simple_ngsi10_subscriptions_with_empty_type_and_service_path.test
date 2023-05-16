@@ -91,10 +91,10 @@ echo
 01. Make accumulator subscribe to E//A1 (empty type)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "subscribeResponse": {
@@ -107,10 +107,10 @@ Date: REGEX(.*)
 02. Create E/T1/A1 using convop /v1/contextEntities/type/T1/id/E
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 165
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 165
 
 {
     "contextResponses": [

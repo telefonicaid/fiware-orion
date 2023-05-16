@@ -613,10 +613,10 @@ echo
 01. POST /v2/subscriptions (id is not a string)
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "/entities/ vector item /id/ is not a string",
@@ -627,10 +627,10 @@ Date: REGEX(.*)
 02. POST /v2/subscriptions (idPattern is not an string)
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
 
 {
     "description": "/entities/ vector item /idPattern/ is not a string",
@@ -641,10 +641,10 @@ Date: REGEX(.*)
 03. POST /v2/subscriptions (type is not an string)
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "/entities/ vector item type is not a string",
@@ -655,10 +655,10 @@ Date: REGEX(.*)
 04. POST /v2/subscriptions (subject is not an object)
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "subject is not an object",
@@ -669,10 +669,10 @@ Date: REGEX(.*)
 05. POST /v2/subscriptions (notification is not an object)
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
 
 {
     "description": "notification is not an object",
@@ -683,10 +683,10 @@ Date: REGEX(.*)
 06. POST /v2/subscriptions (expires is not a string)
 ====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "description": "expires is not a string",
@@ -697,10 +697,10 @@ Date: REGEX(.*)
 07. POST /v2/subscriptions (subject entities is not an array)
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "/entities/ is not an array",
@@ -711,10 +711,10 @@ Date: REGEX(.*)
 08. POST /v2/subscriptions (condition is not an object)
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "condition is not an object",
@@ -725,10 +725,10 @@ Date: REGEX(.*)
 09. POST /v2/subscriptions (condition attributes is not an array)
 =================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "the field /attrs/ must be a JSON array",
@@ -739,10 +739,10 @@ Date: REGEX(.*)
 10. POST /v2/subscriptions (expression is not an object)
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 66
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 66
 
 {
     "description": "expression is not an object",
@@ -753,10 +753,10 @@ Date: REGEX(.*)
 11. POST /v2/subscriptions (q is not a string)
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 56
 
 {
     "description": "q is not a string",
@@ -767,10 +767,10 @@ Date: REGEX(.*)
 12. POST /v2/subscriptions (georel is not a string)
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 61
 
 {
     "description": "georel is not a string",
@@ -781,10 +781,10 @@ Date: REGEX(.*)
 13. POST /v2/subscriptions (geometry is not a string)
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "geometry is not a string",
@@ -795,10 +795,10 @@ Date: REGEX(.*)
 14. POST /v2/subscriptions (coords is not a string)
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 61
 
 {
     "description": "coords is not a string",
@@ -809,10 +809,10 @@ Date: REGEX(.*)
 15. POST /v2/subscriptions (notification attributes is not an array)
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "the field /attrs/ must be a JSON array",
@@ -823,10 +823,10 @@ Date: REGEX(.*)
 16. POST /v2/subscriptions (callback is not a string)
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "url http notification is not a string",
@@ -837,10 +837,10 @@ Date: REGEX(.*)
 17. POST /v2/subscriptions (throttling is not an integer)
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "throttling is not an int",

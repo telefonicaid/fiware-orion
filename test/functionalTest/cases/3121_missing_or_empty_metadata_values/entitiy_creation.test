@@ -206,20 +206,20 @@ echo
 01. POST /v2/entities, to create Room1 with temperature (no metadata).
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Room
+Content-Length: 0
 
 
 
 02. GET /v2/entities/Room1.
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "id": "Room1",
@@ -235,18 +235,18 @@ Date: REGEX(.*)
 03. POST /v2/entities/Room1/attrs, to add metadata with "" value to temperature and add pressure attribute with metadata with no value.
 =======================================================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. GET /v2/entities/Room1.
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 218
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 218
 
 {
     "id": "Room1",
@@ -277,18 +277,18 @@ Date: REGEX(.*)
 05. POST /v2/entities/Room1/attrs, to update temperature with metadata with no value, pressure with metadata with regular value and add humidity attribute with metadata with "" value.
 =========================================================================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. GET /v2/entities/Room1.
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 316
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 316
 
 {
     "humidity": {
@@ -329,20 +329,20 @@ Date: REGEX(.*)
 07. POST /v2/entities, to create Room2 with temperature having two metadata one with "" value and another without value.
 ========================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room2?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room2?type=Room
+Content-Length: 0
 
 
 
 08. GET /v2/entities/Room2.
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 166
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 166
 
 {
     "id": "Room2",
@@ -367,18 +367,18 @@ Date: REGEX(.*)
 09. PUT /v2/entities/Room2/attrs/temperature/value, updating the value of Room2 temperature attribute.
 ======================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. GET /v2/entities/Room2.
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 167
 
 {
     "id": "Room2",

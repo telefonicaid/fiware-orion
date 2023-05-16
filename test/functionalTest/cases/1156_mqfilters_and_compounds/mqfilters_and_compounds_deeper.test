@@ -244,40 +244,40 @@ echo
 01. Create subscription for A1.M1.L1.L2.T==true (accum 1)
 =========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create subscription for A1.M1.L1.L2.i!=10 (accum 2)
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. Create E1 with A1 having a metadata M1 with compound value containing all JSON types in deeper levels than one
 ==================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 04. EQ match with Bool: A1.M1.L1.L2.T==true: see E1
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -311,10 +311,10 @@ Date: REGEX(.*)
 05. NEQ match with Float: A1.M1.L1.L2.f!=3.15: see E1
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -348,10 +348,10 @@ Date: REGEX(.*)
 06. LT match with String: A1.M1.L1.L2.s<uest_string: See E1
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -385,10 +385,10 @@ Date: REGEX(.*)
 07. LE match with Integer: A1.M1.L1.L2.i<=10: see E1
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -422,10 +422,10 @@ Date: REGEX(.*)
 08. GT match with Float: A1.M1.L1.L2.f>3.13: see E1
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -459,10 +459,10 @@ Date: REGEX(.*)
 09. GE match with String: A1.M1.L1.L2.s>=test_string: see E1
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -496,10 +496,10 @@ Date: REGEX(.*)
 10. String match: A1.M1.L1.L2.s~=t_str: see E1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -533,10 +533,10 @@ Date: REGEX(.*)
 11. String no-match: A1.M1.L1.L2.s~=f_str: see nothing
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -544,10 +544,10 @@ Date: REGEX(.*)
 12. Existence: A1.M1.L1.L2.F: see E1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -581,10 +581,10 @@ Date: REGEX(.*)
 13. Existence: A1.M1.L1.L2: see E1
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -618,10 +618,10 @@ Date: REGEX(.*)
 14. Non Existence: A1.M1.L1.L3: see E1
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -655,10 +655,10 @@ Date: REGEX(.*)
 15. Non Existence: A1.M1.L1.L2.Not: see E1
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 [
     {
@@ -692,10 +692,10 @@ Date: REGEX(.*)
 16. Existence: A1.M1.L1.L2.Not: see nothing
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

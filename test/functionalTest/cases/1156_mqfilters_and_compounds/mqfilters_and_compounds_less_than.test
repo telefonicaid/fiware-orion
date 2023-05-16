@@ -211,20 +211,20 @@ echo
 01. Create E1 with A1 having a metadata M1 with compound value containing all JSON types
 ========================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Integer LT is true: GET /v2/entities?mq=A1.M1.i<11, see E1
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {
@@ -254,10 +254,10 @@ Date: REGEX(.*)
 03. Integer LT is false: GET /v2/entities?mq=A1.M1.i<-1, see nothing
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -265,10 +265,10 @@ Date: REGEX(.*)
 04. Integer LT is false: GET /v2/entities?mq=A1.M1.i<10, see nothing
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -276,10 +276,10 @@ Date: REGEX(.*)
 05. Integer LE is true: GET /v2/entities?mq=A1.M1.i<=12, see E1
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {
@@ -309,10 +309,10 @@ Date: REGEX(.*)
 06. Integer LE is false: GET /v2/entities?mq=A1.M1.i<=-1, see nothing
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -320,10 +320,10 @@ Date: REGEX(.*)
 07. Integer LE is true: GET /v2/entities?mq=A1.M1.i<=10, see E1
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {
@@ -353,10 +353,10 @@ Date: REGEX(.*)
 08. Float LT is true: GET /v2/entities?mq=A1.M1.f<4.0, see E1
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {
@@ -386,10 +386,10 @@ Date: REGEX(.*)
 09. Float LT is false: GET /v2/entities?mq=A1.M1.f<-1.0, see nothing
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -397,10 +397,10 @@ Date: REGEX(.*)
 10. Float LT is false: GET /v2/entities?mq=A1.M1.f<3.14, see nothing
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -408,10 +408,10 @@ Date: REGEX(.*)
 11. Float LE is true: GET /v2/entities?mq=A1.M1.f<=4.0, see E1
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {
@@ -441,10 +441,10 @@ Date: REGEX(.*)
 12. Float LE is false: GET /v2/entities?mq=A1.M1.f<=-1.0, nothing
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -452,10 +452,10 @@ Date: REGEX(.*)
 13. Float LE is true: GET /v2/entities?mq=A1.M1.f<=3.14, see E1
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {
@@ -485,10 +485,10 @@ Date: REGEX(.*)
 14. String LT is false: GET /v2/entities?mq=A1.M1.s<fest_string, see nothing
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -496,10 +496,10 @@ Date: REGEX(.*)
 15. String LT is true: GET /v2/entities?mq=A1.M1.s<uest_string, see E1
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {
@@ -529,10 +529,10 @@ Date: REGEX(.*)
 16. String LT is false: GET /v2/entities?mq=A1.M1.s<test_string, see nothing
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -540,10 +540,10 @@ Date: REGEX(.*)
 17. String GE is false: GET /v2/entities?mq=A1.M1.s<=fest_string, see nothing
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -551,10 +551,10 @@ Date: REGEX(.*)
 18. String GE is true: GET /v2/entities?mq=A1.M1.s<=test_string, see E1
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {
@@ -584,10 +584,10 @@ Date: REGEX(.*)
 19. String GE is true: GET /v2/entities?mq=A1.M1.s<=uest_string, see E1
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 190
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 190
 
 [
     {

@@ -96,20 +96,20 @@ echo
 01. Create entity E with A1 (without metadata) and A2 (with metadata M2)
 ========================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
+Content-Length: 0
 
 
 
 02. Get entity: E, A1, A2 and M2 types with their respective default values
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "A1": {
@@ -135,18 +135,18 @@ Date: REGEX(.*)
 03. Append new attribute A3 (without metadata) and A4 (with metadata M4)
 ========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get entity: E, A1, A2, A4, A4, M2, M4 types with their respective default values
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 295
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 295
 
 {
     "A1": {

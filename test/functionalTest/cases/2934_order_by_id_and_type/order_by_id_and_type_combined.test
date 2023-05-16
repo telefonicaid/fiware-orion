@@ -120,50 +120,50 @@ echo
 01. Create entity E1/A, name: Daniel
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=A
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=A
+Content-Length: 0
 
 
 
 02. Create entity E2/A, name: Carl
 ==================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=A
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=A
+Content-Length: 0
 
 
 
 03. Create entity E1/B, name: Bob
 =================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=B
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=B
+Content-Length: 0
 
 
 
 04. Create entity E2/B, name: Alice
 ===================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=B
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=B
+Content-Length: 0
 
 
 
 05. Get sorted by id, then name: E1/B/Bob, E1/A/Daniel, E2/B/Alice, E2/A/Carl
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 151
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 151
 
 [
     {
@@ -192,10 +192,10 @@ Date: REGEX(.*)
 06. Get sorted by id, then reserve name: E1/A/Daniel, E2/B/Bob, E2/A/Carl, E2/A/Alice
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 151
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 151
 
 [
     {
@@ -224,10 +224,10 @@ Date: REGEX(.*)
 07. Get sorted by type, then name: E2/A/Carl, E1/A/Daniel, E2/B/Alice, E1/B/Bob
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 151
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 151
 
 [
     {
@@ -256,10 +256,10 @@ Date: REGEX(.*)
 08. Get sorted by type, then reserve name: E1/A/Daniel, E2/A/Carl, E1/B/Bob, E2/B/Alice
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 151
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 151
 
 [
     {

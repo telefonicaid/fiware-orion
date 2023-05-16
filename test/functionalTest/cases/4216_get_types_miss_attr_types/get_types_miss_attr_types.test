@@ -104,50 +104,50 @@ echo
 01. Create E11/ET1/A-AT1
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E11?type=ET1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E11?type=ET1
+Content-Length: 0
 
 
 
 02. Create E12/ET1/A-AT2
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E12?type=ET1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E12?type=ET1
+Content-Length: 0
 
 
 
 03. Create E21/ET2/A-AT3
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E21?type=ET2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E21?type=ET2
+Content-Length: 0
 
 
 
 04. Create E22/ET2/A-AT4
 =======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E22?type=ET2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E22?type=ET2
+Content-Length: 0
 
 
 
 05. GET /v2/types and get AT1 and AT2 attribute types in ET1 and AT3 and AT4 in ET2
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 127
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 127
 
 [
     {
@@ -180,10 +180,10 @@ Date: REGEX(.*)
 06. GET /v2/types/ET1 and get AT1 and AT2 attribute types
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 49
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 49
 
 {
     "attrs": {

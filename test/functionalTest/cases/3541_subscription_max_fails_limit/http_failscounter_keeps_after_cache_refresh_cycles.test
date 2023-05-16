@@ -106,36 +106,36 @@ echo
 01. POST /v2/subscriptions, to create subscription
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Upsert entity twice to trigger notification and reach failsCounter=2
 ========================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 03. GET /v2/subscriptions/subId, and see failsCounter=2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 462
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 462
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -172,10 +172,10 @@ Date: REGEX(.*)
 04. Wait a cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 462
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 462
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -212,10 +212,10 @@ Date: REGEX(.*)
 05. Wait another cache cycle, and GET /v2/subscriptions/subId, and see failsCounter=2
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 462
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 462
 
 {
     "id": "REGEX([0-9a-f]{24})",

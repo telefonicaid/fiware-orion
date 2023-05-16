@@ -121,20 +121,20 @@ echo
 01. Create E1 with NGSIV2
 =========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create E2 with NGSIV1
 =========================
 HTTP/1.1 200 OK
-Content-Length: 236
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 236
 
 {
     "contextResponses": [
@@ -168,10 +168,10 @@ Date: REGEX(.*)
 03. Get E1 and E2 with NGSIV2
 =============================
 HTTP/1.1 200 OK
-Content-Length: 244
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 244
 
 [
     {
@@ -208,10 +208,10 @@ Date: REGEX(.*)
 04. Get E1 and E2 with NGSIV1
 =============================
 HTTP/1.1 200 OK
-Content-Length: 499
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 499
 
 {
     "contextResponses": [
@@ -272,10 +272,10 @@ Date: REGEX(.*)
 05. Make a Geo query with a polygon and check that only E2 is returned
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 122
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 122
 
 [
     {
@@ -298,10 +298,10 @@ Date: REGEX(.*)
 06. Make a Geo query with a bounding box and check that only E2 is returned
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 122
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 122
 
 [
     {

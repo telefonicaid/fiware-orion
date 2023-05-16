@@ -184,10 +184,10 @@ echo
 01. Create Room1, temp=[20] with metadata max=50
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 260
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 260
 
 {
     "contextResponses": [
@@ -223,10 +223,10 @@ Date: REGEX(.*)
 02. Query Room1
 ===============
 HTTP/1.1 200 OK
-Content-Length: 241
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 241
 
 {
     "contextElement": {
@@ -260,10 +260,10 @@ Date: REGEX(.*)
 03. Update temp=[30] and no metadata
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 202
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 202
 
 {
     "contextResponses": [
@@ -292,10 +292,10 @@ Date: REGEX(.*)
 04. Query Room1
 ===============
 HTTP/1.1 200 OK
-Content-Length: 241
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 241
 
 {
     "contextElement": {
@@ -329,10 +329,10 @@ Date: REGEX(.*)
 05. Update temp=[40], metadata max=20
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 260
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 260
 
 {
     "contextResponses": [
@@ -368,10 +368,10 @@ Date: REGEX(.*)
 06. Query Room1
 ===============
 HTTP/1.1 200 OK
-Content-Length: 241
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 241
 
 {
     "contextElement": {
@@ -405,10 +405,10 @@ Date: REGEX(.*)
 07. Update metadata max=25
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 260
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 260
 
 {
     "contextResponses": [
@@ -444,10 +444,10 @@ Date: REGEX(.*)
 08. Query Room1
 ===============
 HTTP/1.1 200 OK
-Content-Length: 241
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 241
 
 {
     "contextElement": {

@@ -268,18 +268,18 @@ echo
 01. Create E1/T1/A1=1, E2/T2/A2=2, E3/T3/A3=3, E4/T4/A4=4, using POST /v2/op/update with APPEND
 ===============================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 02. GET /v2/entities to see all four entities
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 125
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 125
 
 [
     {
@@ -308,18 +308,18 @@ Date: REGEX(.*)
 03. Add attributes A1=1 for E2,E3 and E4 using POST /v2/op/update with APPEND
 =============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. GET /v2/entities to see that all four entities have the attribute A1
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 426
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 426
 
 [
     {
@@ -379,18 +379,18 @@ Date: REGEX(.*)
 05. 'Change' the A1 attributes using POST /v2/op/update with UPDATE, all different values the the A1s
 =====================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. GET /v2/entities to see that is worked
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 150
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 150
 
 [
     {
@@ -422,18 +422,18 @@ Date: REGEX(.*)
 07. Replace attributes for A6 in all four entities using POST /v2/update?options=keyValues with REPLACE
 =======================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. GET /v2/entities to see that all four entities have only one attribute: A6
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 129
 
 [
     {
@@ -462,18 +462,18 @@ Date: REGEX(.*)
 09. DELETE the attribute A6 in E1, E2 and E4
 ============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. GET /v2/entities E3/A6 and the other entities without attributes
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 [
     {
@@ -499,18 +499,18 @@ Date: REGEX(.*)
 11. DELETE entities E1 and E3
 =============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 12. GET /v2/entities, to see E2 and E4 only
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 49
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 49
 
 [
     {

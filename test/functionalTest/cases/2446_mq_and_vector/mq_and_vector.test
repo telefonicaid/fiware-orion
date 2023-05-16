@@ -137,20 +137,20 @@ echo
 01. Create an entity E1 with attr A1 with metadata M1 = [ 1, 2 ]
 ================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 121
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 121
 
 [
     {
@@ -176,10 +176,10 @@ Date: REGEX(.*)
 03. GET /v2/entities?mq=A1.M1==1
 ================================
 HTTP/1.1 200 OK
-Content-Length: 121
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 121
 
 [
     {
@@ -205,20 +205,20 @@ Date: REGEX(.*)
 04. Create an entity E2 with attr A1 with metadata M1 = [ "one", "two", "three" ]
 =================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 05. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 257
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 257
 
 [
     {
@@ -262,11 +262,11 @@ Date: REGEX(.*)
 06. GET /v2/entities?mq=A1.M1==two&options=count
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Fiware-Total-Count: 1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 1
+Content-Type: application/json
+Content-Length: 137
 
 [
     {
@@ -293,21 +293,21 @@ Date: REGEX(.*)
 07. Create an entity room1 with attr temperature with metadata very_cold = [ "one", "two", "three" ]
 ====================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/room1?type=t96C
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/room1?type=t96C
+Content-Length: 0
 
 
 
 08. GET /v2/entities?mq=temperature.very_cold==one&options=count
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 146
-Content-Type: application/json
-Fiware-Total-Count: 1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 1
+Content-Type: application/json
+Content-Length: 146
 
 [
     {

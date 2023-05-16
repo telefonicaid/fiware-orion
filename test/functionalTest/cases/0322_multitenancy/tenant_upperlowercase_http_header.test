@@ -99,10 +99,10 @@ orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -112,10 +112,10 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -125,10 +125,10 @@ Date: REGEX(.*)
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -138,10 +138,10 @@ Date: REGEX(.*)
 
 4: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 502
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 502
 
 {
     "contextRegistrationResponses": [
@@ -187,10 +187,10 @@ Date: REGEX(.*)
 
 5: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 502
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 502
 
 {
     "contextRegistrationResponses": [
@@ -236,10 +236,10 @@ Date: REGEX(.*)
 
 6: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 502
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 502
 
 {
     "contextRegistrationResponses": [

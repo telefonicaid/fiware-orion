@@ -350,20 +350,20 @@ echo
 01. POST /v2/subscriptions, Create a subscription
 =================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. PATCH /v2/subscriptions/{subId}, to update subscription with N attributes with same name in attrs and see error
 ===================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "duplicated item /temperature/ in array",
@@ -374,10 +374,10 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions/{subId}, to update subscription with N attributes with the same name in condition and see error
 ===========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
 
 {
     "description": "duplicated item /pressure/ in array",
@@ -388,10 +388,10 @@ Date: REGEX(.*)
 04. PATCH /v2/subscriptions/{subId}, to update subscription with N attributes with same name in exceptAttrs and see error
 =========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "duplicated item /temperature/ in array",
@@ -402,10 +402,10 @@ Date: REGEX(.*)
 05. PATCH /v2/subscriptions/{subId}, to update subscription with N attributes with the same name in metadata and see error
 ==========================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "duplicated item /temperature/ in array",
@@ -416,32 +416,32 @@ Date: REGEX(.*)
 06. PATCH /v2/subscriptions/{subId}, to update subscription with N attributes with different name in attrs and see no error
 ===========================================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. PATCH /v2/subscriptions/{subId}, to update subscription with N attributes with different name in condition and see no error
 ===============================================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. PATCH /v2/subscriptions/{subId}, to update subscription with N attributes with different name in exceptAttrs and see no error
 =================================================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. PATCH /v2/subscriptions/{subId}, to update subscription with N attributes with different name in metadata and see no error
 ==============================================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

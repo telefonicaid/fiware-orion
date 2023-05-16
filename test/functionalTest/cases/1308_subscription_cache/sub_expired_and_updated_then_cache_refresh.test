@@ -201,20 +201,20 @@ echo
 01. Create entity E10, attribute A1
 ===================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E10?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E10?type=Thing
+Content-Length: 0
 
 
 
 02. Subscribe to E1.*/A1, duration 2 secs
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "subscribeResponse": {
@@ -228,10 +228,10 @@ Date: REGEX(.*)
 03. Statistics - just for fun
 =============================
 HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "ids": "REGEX(.*)",
@@ -250,10 +250,10 @@ Date: REGEX(.*)
 05. Update subscription, duration 30 secs
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 {
     "subscribeResponse": {
@@ -266,10 +266,10 @@ Date: REGEX(.*)
 06. Statistics - to see the sub-update
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "ids": "REGEX(.*)",
@@ -288,10 +288,10 @@ Date: REGEX(.*)
 08. Statistics - see 2 refresh, one notification
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "ids": "REGEX(.*)",
@@ -306,34 +306,34 @@ Date: REGEX(.*)
 09. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 11. Update E10/A1
 =================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 12. Statistics - see 2 refresh, three notifications
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "ids": "REGEX(.*)",

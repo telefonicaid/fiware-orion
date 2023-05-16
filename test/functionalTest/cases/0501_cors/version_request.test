@@ -73,10 +73,10 @@ echo
 01. GET Version (Access-Control-Allow-Origin header not included)
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
 "orion" : {
@@ -107,12 +107,12 @@ Date: REGEX(.*)
 02. GET Version with arrakis origin (Access-Control-Allow-Origin header included)
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Access-Control-Expose-Headers: REGEX(.*)
-Access-Control-Allow-Origin: arrakis
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Access-Control-Allow-Origin: arrakis
+Access-Control-Expose-Headers: REGEX(.*)
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
 "orion" : {
@@ -143,10 +143,10 @@ Date: REGEX(.*)
 03. GET Version with caladan origin (Access-Control-Allow-Origin header not included)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
 "orion" : {
@@ -177,9 +177,9 @@ Date: REGEX(.*)
 04. OPTIONS Version (Access-Control-Allow-Origin header not included)
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
@@ -187,14 +187,14 @@ Date: REGEX(.*)
 05. OPTIONS Version with arrakis origin (Access-Control-Allow-Origin header included)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Access-Control-Max-Age: REGEX([0-9]+)
-Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Expose-Headers: REGEX(.*)
-Access-Control-Allow-Methods: REGEX(.*)
-Access-Control-Allow-Origin: arrakis
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Access-Control-Allow-Origin: arrakis
+Access-Control-Allow-Methods: REGEX(.*)
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Max-Age: REGEX([0-9]+)
+Content-Length: 0
 
 
 
@@ -202,9 +202,9 @@ Date: REGEX(.*)
 06. OPTIONS Version with caladan origin (Access-Control-Allow-Origin header not included)
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 

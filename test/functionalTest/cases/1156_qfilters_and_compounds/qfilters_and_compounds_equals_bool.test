@@ -124,20 +124,20 @@ echo
 01. Create E1 with A1 with compound value containing all JSON types
 ===================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. True Equal to True: GET /v2/entities?q=A1.T:true, see E1
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 225
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 225
 
 [
     {
@@ -168,10 +168,10 @@ Date: REGEX(.*)
 03. True Equal to True: GET /v2/entities?q=A1.T==true, see E1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 225
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 225
 
 [
     {
@@ -202,10 +202,10 @@ Date: REGEX(.*)
 04. True Equal to False: GET /v2/entities?q=A1.T:false, see nothing
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -213,10 +213,10 @@ Date: REGEX(.*)
 05. True Equal to False: GET /v2/entities?q=A1.T==false, see nothing
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -224,10 +224,10 @@ Date: REGEX(.*)
 06. False Equal to True: GET /v2/entities?q=A1.F:true, see nothing
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -235,10 +235,10 @@ Date: REGEX(.*)
 07. False Equal to True: GET /v2/entities?q=A1.F==true, see nothing
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -246,10 +246,10 @@ Date: REGEX(.*)
 08. False Equal to False: GET /v2/entities?q=A1.F:false, see E1
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 225
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 225
 
 [
     {
@@ -280,10 +280,10 @@ Date: REGEX(.*)
 09. False Equal to False: GET /v2/entities?q=A1.F==false, see E1
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 225
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 225
 
 [
     {

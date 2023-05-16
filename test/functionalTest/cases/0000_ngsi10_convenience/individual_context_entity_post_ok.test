@@ -58,10 +58,10 @@ orionCurl --url "$url" --payload "$payload"
 --REGEXPECT--
 +++++ 1. create an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 183
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 183
 
 {
     "contextResponses": [
@@ -86,10 +86,10 @@ Date: REGEX(.*)
 
 +++++++++++++ 2. add to the entity
 HTTP/1.1 200 OK
-Content-Length: 179
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 179
 
 {
     "contextResponses": [

@@ -143,10 +143,10 @@ echo
 01. Subscribe to E1/T1:ONCHANGE (POST /v1/contextSubscriptions)
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 103
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 103
 
 {
     "subscribeResponse": {
@@ -160,10 +160,10 @@ Date: REGEX(.*)
 02. Create E1/T2
 ================
 HTTP/1.1 200 OK
-Content-Length: 184
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 184
 
 {
     "contextResponses": [
@@ -196,10 +196,10 @@ Date: REGEX(.*)
 04. Create E1/T1
 ================
 HTTP/1.1 200 OK
-Content-Length: 184
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 184
 
 {
     "contextResponses": [

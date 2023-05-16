@@ -394,29 +394,29 @@ echo
 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=2
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Upsert entity to trigger notification (ok)
 ==============================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 03. GET /v2/subscriptions/subId, to check the status=active, timesSent=1, failsCounter=0 (omitted), maxFailsLimit=2
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 436
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 436
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -457,28 +457,28 @@ Date: REGEX(.*)
 05. Upsert entity to trigger notification (fail)
 ================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 06. Upsert entity to trigger notification (fail)
 ================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 07. GET /v2/subscriptions/subId, to check the status=active, timesSent=3, failsCounter=2, maxFailsLimit=2
 =========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 543
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 543
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -518,19 +518,19 @@ Date: REGEX(.*)
 08. Upsert entity to trigger notification (fail that causes change to status=inactive)
 ======================================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 09. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=4, failsCounter=3, maxFailsLimit=2
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 545
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 545
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -570,28 +570,28 @@ Date: REGEX(.*)
 10. Upsert entity to trigger notification (not triggered due to status=inactive)
 ================================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 11. Upsert entity to trigger notification (not triggered due to status=inactive)
 ================================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 12. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=4, failsCounter=3, maxFailsLimit=2 (same as last GET)
 ==============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 545
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 545
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -631,27 +631,27 @@ Date: REGEX(.*)
 13. PATCH /v2/subscriptions/subId to set status=active again
 ============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 14. Upsert entity to trigger notification (fail that causes change to status=inactive)
 ======================================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 15. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=5, failsCounter=4, maxFailsLimit=2
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 545
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 545
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -691,27 +691,27 @@ Date: REGEX(.*)
 16. PATCH /v2/subscriptions/subId to enlarge maxFailLimit to 5 and set status=active again
 ==========================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 17. Upsert entity to trigger notification (fail)
 ================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 18. GET /v2/subscriptions/subId, to check the status=active, timesSent=6, failsCounter=5, maxFailsLimit=5
 =========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 543
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 543
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -751,19 +751,19 @@ Date: REGEX(.*)
 19. Upsert entity to trigger notification (fail that causes change to status=inactive)
 ======================================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 20. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=7, failsCounter=6, maxFailsLimit=5
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 545
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 545
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -803,28 +803,28 @@ Date: REGEX(.*)
 21. Upsert entity to trigger notification (not triggered due to status=inactive)
 ================================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 22. Upsert entity to trigger notification (not triggered due to status=inactive)
 ================================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 23. GET /v2/subscriptions/subId, to check the status=inactive, timesSent=7, failsCounter=6, maxFailsLimit=5 (same as last GET)
 ==============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 545
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 545
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -869,27 +869,27 @@ accumulator running as PID REGEX(.*)
 25. PATCH /v2/subscriptions/subId to set status=active again
 ============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 26. Upsert entity to trigger notification (ok)
 ==============================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 27. GET /v2/subscriptions/subId, to check the status=active, timesSent=8, failsCounter=0 (omitted), maxFailsLimit=5
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 526
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 526
 
 {
     "id": "REGEX([0-9a-f]{24})",
