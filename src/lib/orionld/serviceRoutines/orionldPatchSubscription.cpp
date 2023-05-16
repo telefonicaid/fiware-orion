@@ -457,10 +457,19 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
       cSubP->url = url;
       cSubP->httpInfo.url = url;
 
+      if (cSubP->protocolString != NULL)
+        free(cSubP->protocolString);
       cSubP->protocolString = strdup(protocol);
-      cSubP->ip             = strdup(ip);
+
+      if (cSubP->ip != NULL)
+        free(cSubP->ip);
+      cSubP->ip = strdup(ip);
+
+      if (cSubP->rest != NULL)
+        free(cSubP->rest);
+      cSubP->rest = strdup(rest);
+
       cSubP->port           = port;
-      cSubP->rest           = strdup(rest);
       cSubP->protocol       = protocolFromString(cSubP->protocolString);
     }
     else
