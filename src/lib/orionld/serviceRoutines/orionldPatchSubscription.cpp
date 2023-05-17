@@ -51,6 +51,7 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
+#include "orionld/q/qRelease.h"                                // qRelease
 #include "orionld/mongoc/mongocSubscriptionLookup.h"           // mongocSubscriptionLookup
 #include "orionld/mongoc/mongocSubscriptionReplace.h"          // mongocSubscriptionReplace
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
@@ -319,7 +320,16 @@ static void fixDbSubscription(KjNode* dbSubscriptionP, char* qRenderedForDb)
 //
 static bool subCacheItemUpdateEntities(CachedSubscription* cSubP, KjNode* entityArray)
 {
+  //
+  // To replace "entities", we first need to frre up the old "entities"
+  //
+  for (long unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ix++)
+  {
+    cSubP->entityIdInfos[ix]->release();
+    delete cSubP->entityIdInfos[ix];
+  }
   cSubP->entityIdInfos.clear();
+
   for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     KjNode*      idP          = kjLookup(entityP, "id");
@@ -457,10 +467,19 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
       cSubP->url = url;
       cSubP->httpInfo.url = url;
 
+      if (cSubP->protocolString != NULL)
+        free(cSubP->protocolString);
       cSubP->protocolString = strdup(protocol);
-      cSubP->ip             = strdup(ip);
+
+      if (cSubP->ip != NULL)
+        free(cSubP->ip);
+      cSubP->ip = strdup(ip);
+
+      if (cSubP->rest != NULL)
+        free(cSubP->rest);
+      cSubP->rest = strdup(rest);
+
       cSubP->port           = port;
-      cSubP->rest           = strdup(rest);
       cSubP->protocol       = protocolFromString(cSubP->protocolString);
     }
     else
@@ -579,7 +598,11 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
   }
 
   if (qNodeP != NULL)
+  {
+    if (cSubP->qP != NULL)
+      qRelease(cSubP->qP);
     cSubP->qP = qNodeP;
+  }
 
   for (KjNode* itemP = subscriptionTree->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
@@ -800,6 +823,8 @@ bool orionldPatchSubscription(void)
                          &mqttChange);
   if (r == false)
   {
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
     LM_E(("pCheckSubscription FAILED"));
     return false;
   }
@@ -811,6 +836,8 @@ bool orionldPatchSubscription(void)
 
   if (dbSubscriptionP == NULL)
   {
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
     orionldError(OrionldResourceNotFound, "Subscription not found", subscriptionId, 404);
     return false;
   }
@@ -866,7 +893,11 @@ bool orionldPatchSubscription(void)
   CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
 
   if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP, qRenderedForDb) == false)
+  {
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
     LM_RE(false, ("ngsildSubscriptionPatch failed!"));
+  }
 
   //
   // Update modifiedAt
@@ -889,6 +920,8 @@ bool orionldPatchSubscription(void)
     mqttInfoFromDbTree(dbSubscriptionP, newUriP, &newMqttInfo);
     if (mqttConnectFromInfo(&newMqttInfo) == false)
     {
+      if (qNodeP != NULL)
+        qRelease(qNodeP);
       orionldError(OrionldInternalError, "MQTT Error", "unable to connect to MQTT broker", 500);
       return false;
     }
@@ -906,6 +939,8 @@ bool orionldPatchSubscription(void)
   //
   if (mongocSubscriptionReplace(subscriptionId, dbSubscriptionP) == false)
   {
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
     orionldError(OrionldInternalError, "Database Error", "patching a subscription", 500);
     return false;
   }
