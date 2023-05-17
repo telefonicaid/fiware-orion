@@ -127,40 +127,40 @@ echo
 01. Create an entity E1 with attribute A1=10
 ============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Create an entity E2 with attribute A1=20
 ============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 03. Create an entity E3 with attribute A1=30
 ============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 04. GET all entities (3 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 226
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 226
 
 [
     {
@@ -196,10 +196,10 @@ Date: REGEX(.*)
 05. Erroneous GET entities with q=A1>=0..20
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "description": "ranges only valid for equal and not equal ops",
@@ -210,10 +210,10 @@ Date: REGEX(.*)
 06. Erroneous GET entities with q=A1>0..20
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "description": "ranges only valid for equal and not equal ops",
@@ -224,10 +224,10 @@ Date: REGEX(.*)
 07. Erroneous GET entities with q=A1<=0..20
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "description": "ranges only valid for equal and not equal ops",
@@ -238,10 +238,10 @@ Date: REGEX(.*)
 08. Erroneous GET entities with q=A1<0..20
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "description": "ranges only valid for equal and not equal ops",
@@ -252,10 +252,10 @@ Date: REGEX(.*)
 09. Correct GET entities with q=A1==0..20 (2 hits)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 151
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 151
 
 [
     {
@@ -282,10 +282,10 @@ Date: REGEX(.*)
 10. Correct GET entities with q=A1!=0..20 (1 hit)
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 [
     {

@@ -65,9 +65,9 @@ static long defaultTimeout = DEFAULT_TIMEOUT;
 
 /* ****************************************************************************
 *
-* httpRequestInit -
+* setHttpTimeout -
 */
-void httpRequestInit(long defaultTimeoutInMilliseconds)
+void setHttpTimeout(long defaultTimeoutInMilliseconds)
 {
   if (defaultTimeoutInMilliseconds != -1)
   {

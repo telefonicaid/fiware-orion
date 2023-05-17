@@ -134,10 +134,10 @@ echo
 01. POST /v1/contextEntities/E1?entity::type=T1
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 166
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 166
 
 {
     "contextResponses": [
@@ -164,10 +164,10 @@ Date: REGEX(.*)
 02. POST /v1/contextEntities/E2?entity::type=T2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 166
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 166
 
 {
     "contextResponses": [
@@ -194,10 +194,10 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities - see 2 entities
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 352
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 352
 
 {
     "contextResponses": [
@@ -244,10 +244,10 @@ Date: REGEX(.*)
 04. DELETE /v1/contextEntities/type/T1/id/E4, and see it fail
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "code": "404",
@@ -259,10 +259,10 @@ Date: REGEX(.*)
 05. DELETE /v1/contextEntities/type/T1/id/E1?entity::type=T2, and see it fail
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 89
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
 
 {
     "code": "400",
@@ -274,10 +274,10 @@ Date: REGEX(.*)
 06. DELETE /v1/contextEntities/type/T1/id/E1?!exist=entity::type, and see it fail
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 101
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 101
 
 {
     "code": "400",
@@ -289,10 +289,10 @@ Date: REGEX(.*)
 07. GET /v1/contextEntities - see 2 entities
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 352
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 352
 
 {
     "contextResponses": [
@@ -339,10 +339,10 @@ Date: REGEX(.*)
 08. DELETE /v1/contextEntities/T1/id/E1?exist=entity::type
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -353,10 +353,10 @@ Date: REGEX(.*)
 09. DELETE /v1/contextEntities/T2/id/E2?entity::type=T2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -367,10 +367,10 @@ Date: REGEX(.*)
 10. GET /v1/contextEntities - see 0 entities
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {

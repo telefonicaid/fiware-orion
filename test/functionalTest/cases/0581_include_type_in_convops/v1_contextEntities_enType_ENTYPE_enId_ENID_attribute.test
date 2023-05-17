@@ -272,10 +272,10 @@ echo
 01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 114
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 114
 
 {
     "statusCode": {
@@ -289,10 +289,10 @@ Date: REGEX(.*)
 02. POST /v1/contextEntities/type/T1/id/E1attributes/A1 with A1=12 in payload
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -303,10 +303,10 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 157
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 157
 
 {
     "attributes": [
@@ -333,10 +333,10 @@ Date: REGEX(.*)
 04. PUT /v1/contextEntities/type/T1/id/E2/attributes/A2 and see it fail
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "code": "404",
@@ -348,10 +348,10 @@ Date: REGEX(.*)
 05. POST /v1/contextEntities/type/T1/id/E1/attributes/A2 with A2=12 in payload
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -362,10 +362,10 @@ Date: REGEX(.*)
 06. PUT /v1/contextEntities/type/T1/id/E1/attributes/A2 with A2=13 in payload
 =============================================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -376,10 +376,10 @@ Date: REGEX(.*)
 07. GET /v1/contextEntities/type/T1/id/E1/attributes/A2 to see A2=13
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 157
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 157
 
 {
     "attributes": [
@@ -406,10 +406,10 @@ Date: REGEX(.*)
 08. POST /v1/contextEntities/type/T1/id/E2/attributes/A1 with A1=21 in payload
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -420,10 +420,10 @@ Date: REGEX(.*)
 09. POST /v1/contextEntities/type/T1/id/E2/attributes/A2 with A2=22 in payload
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -434,10 +434,10 @@ Date: REGEX(.*)
 10. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 157
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 157
 
 {
     "attributes": [
@@ -464,10 +464,10 @@ Date: REGEX(.*)
 11. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -478,10 +478,10 @@ Date: REGEX(.*)
 12. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 166
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 166
 
 {
     "code": "472",
@@ -493,10 +493,10 @@ Date: REGEX(.*)
 13. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 114
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 114
 
 {
     "statusCode": {
@@ -510,20 +510,20 @@ Date: REGEX(.*)
 14. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
 =======================================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET, PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET, PUT, DELETE
+Content-Length: 0
 
 
 
 15. POST /v1/contextEntities/type/T1/id/E1/attributes/A1
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -534,10 +534,10 @@ Date: REGEX(.*)
 16. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -548,10 +548,10 @@ Date: REGEX(.*)
 17. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 OK
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "attributes": [

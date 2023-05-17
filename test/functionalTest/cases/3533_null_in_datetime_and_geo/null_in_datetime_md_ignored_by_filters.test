@@ -171,40 +171,40 @@ echo
 01. Create entity E1 with attribute A with DateTime metadata T with value 2018-12-10T00:00:00.000Z
 ==================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create entity E2 with attribute A with DateTime metadata T with value 2018-12-20T00:00:00.000Z
 ==================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Create entity E1 with attribute A with DateTime metadata T with value null
 ==============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 04. GET /v2/entities?mq=A.T<2018-12-15 -> get E1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 128
 
 [
     {
@@ -227,10 +227,10 @@ Date: REGEX(.*)
 05. GET /v2/entities?mq=A.T>2018-12-15 -> get E2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 128
 
 [
     {
@@ -253,26 +253,26 @@ Date: REGEX(.*)
 06. Update E2-A-T: null
 =======================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. Update E3-A-T: 2018-12-16T00:00:00.000Z
 ===========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. GET /v2/entities?mq=A.T<2018-12-15 -> get E1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 128
 
 [
     {
@@ -295,10 +295,10 @@ Date: REGEX(.*)
 09. GET /v2/entities?mq=A.T>2018-12-15 -> get E3
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 128
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 128
 
 [
     {

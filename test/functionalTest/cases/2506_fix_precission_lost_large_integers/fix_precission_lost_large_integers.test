@@ -60,20 +60,20 @@ echo
 01. Create entity with large integer 2523232323232323
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Get entity a see integer 2523232323232323
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {"id":"E","type":"T","A":{"type":"Number","value":2523232323232323,"metadata":{}}}
 

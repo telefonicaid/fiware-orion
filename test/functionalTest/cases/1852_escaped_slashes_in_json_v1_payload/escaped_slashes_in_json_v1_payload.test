@@ -75,10 +75,10 @@ echo
 01. Create a subscription with escaped slashes in reference
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
 
 {
     "subscribeResponse": {
@@ -92,10 +92,10 @@ Date: REGEX(.*)
 02. Make sure it was correctly created
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 348
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 378
 
 [
     {
@@ -117,7 +117,8 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "movement"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

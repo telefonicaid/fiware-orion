@@ -110,40 +110,40 @@ echo
 01. Create E1 with attribute ts=2020-05-10T01:02:03.123Z
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create E2 with attribute ts=2020-05-10T01:02:03.456Z
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Create E3 with attribute ts=2020-05-10T01:02:03.789Z
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 04. Query for entities ts>2020-05-10T01:02:03Z, get E1, E2, E3
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 292
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 292
 
 [
     {
@@ -179,10 +179,10 @@ Date: REGEX(.*)
 05. Query for entities ts<2020-05-10T01:02:03.200Z, get E1
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 [
     {
@@ -200,10 +200,10 @@ Date: REGEX(.*)
 06. Query for entities ts=2020-05-10T01:02:03.200Z..2020-05-10T01:02:03.600Z, get E2
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 [
     {

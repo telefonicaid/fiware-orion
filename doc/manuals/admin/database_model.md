@@ -304,7 +304,7 @@ Fields:
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
-    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
+    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues** and **values** (the last five used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions), `inactive` (for inactive subscriptions) or
     `oneshot` (for [oneshot subscriptions](../orion-api.md#oneshot-subscriptions)). Note that Orion API consider additional states (e.g. `expired`)
     but they never hit the DB (they are managed by Orion).
@@ -343,6 +343,7 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
 -   **covered**: a boolean field that specifies if all `attrs` have to be included in notifications (if value is true)
     or only the ones existing in the triggering entity (if value is false or field is omitted).
     More information in [covered subscription section in Orion API specification](../orion-api.md#covered-subscriptions).
+-   **notifyOnMetadataChange**: if `true` metadata is considered part of the value of the attribute regarding subscription triggering. If `false` metadata is not considered part of the value of the attribute regarding subscription triggering. Default behaviour (if omitted) is the one for `true`.
 
 Example document:
 

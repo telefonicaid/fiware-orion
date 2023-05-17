@@ -104,30 +104,30 @@ echo
 01. Creating entity E1 at 2016-09-30T22:48:51.000Z
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Creating entity E2 at 2016-10-01T01:23:45.000Z
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Get entities after 2016-10-01, get E2
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 [
     {
@@ -145,10 +145,10 @@ Date: REGEX(.*)
 04. Get entities before 2016-10-01, get E1
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 [
     {
@@ -166,10 +166,10 @@ Date: REGEX(.*)
 05. Get entities after 2016-10-01T0000Z, get E2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 [
     {
@@ -187,10 +187,10 @@ Date: REGEX(.*)
 06. Get entities before 2016-10-01T0000Z, get E1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 [
     {

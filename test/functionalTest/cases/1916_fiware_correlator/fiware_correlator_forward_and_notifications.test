@@ -180,30 +180,30 @@ echo
 01. Make accumulator subscribe to E1/A1, in CB
 ==============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create E1/A1 in CB, using correlator CORRELATOR1, which is notified to accumulator
 ======================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: CORRELATOR1
 Date: REGEX(.*)
+Fiware-Correlator: CORRELATOR1
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 03. Register E2/A2 for CPR1 in CB
 =================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -214,30 +214,30 @@ Date: REGEX(.*)
 04. Make accumulator subscribe to E2/A2 in CPR1
 ===============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Create E2/A2 in CPR1, using CORRELATOR2
 ===========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: CORRELATOR2
 Date: REGEX(.*)
+Fiware-Correlator: CORRELATOR2
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 06. Update E2/A2 in CB, using correlator CORRELATOR3, provoking a forward and after that a notification to accumulator of E2/A2
 ===============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/json
-Fiware-Correlator: CORRELATOR3
 Date: REGEX(.*)
+Fiware-Correlator: CORRELATOR3
+Content-Type: application/json
+Content-Length: 192
 
 {
     "contextResponses": [

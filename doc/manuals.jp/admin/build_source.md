@@ -7,7 +7,7 @@ Orion Context Broker のリファレンス配布は Debian 11 です。これは
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
 
 * boost: 1.74
-* libmicrohttpd: 0.9.73 (ソースから)
+* libmicrohttpd: 0.9.76 (ソースから)
 * libcurl: 7.74.0
 * openssl: 1.1.1n
 * libuuid: 2.36.1
@@ -46,9 +46,9 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.73.tar.gz
-        tar xvf libmicrohttpd-0.9.73.tar.gz
-        cd libmicrohttpd-0.9.73
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz
+        tar xvf libmicrohttpd-0.9.76.tar.gz
+        cd libmicrohttpd-0.9.76
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
@@ -125,7 +125,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
         . scripts/testEnv.sh
         virtualenv /opt/ft_env --python=/usr/bin/python3
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.10.1
 
 * この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
@@ -154,7 +154,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 して次のライブラリを使用します :
 
 * boost: 1.71.0
-* libmicrohttpd: 0.9.73 (ソースから)
+* libmicrohttpd: 0.9.76 (ソースから)
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
@@ -195,9 +195,9 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを
 得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.73.tar.gz
-        tar xvf libmicrohttpd-0.9.73.tar.gz
-        cd libmicrohttpd-0.9.73
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz
+        tar xvf libmicrohttpd-0.9.76.tar.gz
+        cd libmicrohttpd-0.9.76
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
@@ -286,7 +286,7 @@ aarch64 アーキテクチャの場合、`.-configure` を `--build=arm-linux` �
         . scripts/testEnv.sh
         virtualenv /opt/ft_env
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.10.1
 
 * テスト・ハーネスを実行してください (時間がかかりますので、気をつけてください) make コマンドでテストを開始する前に、テストが失敗しないように次のパッチを適用してください。
 

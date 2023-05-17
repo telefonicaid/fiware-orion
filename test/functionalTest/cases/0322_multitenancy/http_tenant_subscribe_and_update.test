@@ -151,10 +151,10 @@ echo
 1. Make a subscription for E/att on tenant t_01
 +++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "subscribeResponse": {
@@ -166,10 +166,10 @@ Date: REGEX(.*)
 2. Make a subscription for E/att on tenant t_02
 +++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "subscribeResponse": {
@@ -181,10 +181,10 @@ Date: REGEX(.*)
 3. Update t_01/E/att
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -212,10 +212,10 @@ Date: REGEX(.*)
 4. Update t_02/E/att
 ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [

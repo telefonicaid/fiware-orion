@@ -197,28 +197,28 @@ echo
 01. Create entity
 =================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=ET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=ET
+Content-Length: 0
 
 
 
 02. Create subscriptions with ngsi field with unbalanced macro ${B
 ==================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. Update entity
 =================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -228,7 +228,7 @@ POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 174
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
+Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
 Accept: application/json
 Content-Type: application/json; charset=utf-8
@@ -259,16 +259,16 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. Update subscriptions with ngsi field with unbalanced macro B}
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Update entity
 =================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -278,7 +278,7 @@ POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 173
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
+Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
 Accept: application/json
 Content-Type: application/json; charset=utf-8
@@ -309,16 +309,16 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. Update subscriptions with ngsi field with unbalanced macro ${${B}}
 ======================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. Update entity
 =================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -328,7 +328,7 @@ POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 176
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: custom
+Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:9997
 Accept: application/json
 Content-Type: application/json; charset=utf-8

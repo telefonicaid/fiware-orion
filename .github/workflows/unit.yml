@@ -2,9 +2,12 @@ name: Unit Tests
 
 on:
   push:
+     branches:
+      - master
   pull_request:
     branches:
       - master
+      - '!checkvalgrind**'
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,7 +18,7 @@ env:
 
 jobs:
   unit:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     services:
       mongodb:

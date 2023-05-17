@@ -61,7 +61,9 @@ but the connection to it is done first time a MQTT notification is published.
 
 Once established, connection is kept opened while it is being used, i.e. MQTT notifications are published. If
 a connections is not used (i.e. no MQTT is published) Orion will close it after a predefined keepalive time
-(specified with the `-mqttMaxAge` [CLI parameter](../admin/cli.md), one hour by default).
+(specified with the `-mqttMaxAge` [CLI parameter](../admin/cli.md), one hour by default). Orion also closes
+connection in case of MQTT notification errors (e.g. MQTT broker is down), so it will be re-created next
+time a successfully MQTT notification gets published.
 
 ## MQTT cheatsheet
 

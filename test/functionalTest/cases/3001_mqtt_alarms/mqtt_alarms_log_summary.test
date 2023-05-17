@@ -170,19 +170,19 @@ MQTT connection failure active alarms: 0, raised: (total: 0, new: 0), released: 
 02. Create MQTT sub with wrong user/pass
 ========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Upsert to trigger MQTT notification, which fails but not re-raises alarm
 ============================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
@@ -199,17 +199,17 @@ MQTT connection failure active alarms: 1, raised: (total: 1, new: 0), released: 
 06. Update subscription to fix user/pass
 ========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. Upsert to trigger third MQTT notification, which is ok and releases alarm
 =============================================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 

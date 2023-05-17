@@ -233,10 +233,10 @@ echo
 --REGEXPECT--
 === 1. Create ONCHANGE subscription
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "subscribeResponse": {
@@ -247,10 +247,10 @@ Date: REGEX(.*)
 
 === 2. Create an entity with metadata (a notification with metadata is sent)
 HTTP/1.1 200 OK
-Content-Length: 320
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 320
 
 {
     "contextResponses": [
@@ -289,10 +289,10 @@ Date: REGEX(.*)
 
 === 3. Change the value (a notification with metadata is sent)
 HTTP/1.1 200 OK
-Content-Length: 320
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 320
 
 {
     "contextResponses": [
@@ -331,10 +331,10 @@ Date: REGEX(.*)
 
 === 4. Change the metadata (a notification with metadata is sent)
 HTTP/1.1 200 OK
-Content-Length: 320
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 320
 
 {
     "contextResponses": [
@@ -373,10 +373,10 @@ Date: REGEX(.*)
 
 === 5. Change both value and metadata (a notification with metadata is sent)
 HTTP/1.1 200 OK
-Content-Length: 322
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 322
 
 {
     "contextResponses": [
@@ -415,10 +415,10 @@ Date: REGEX(.*)
 
 === 6. Update without changes (no notification is sent)
 HTTP/1.1 200 OK
-Content-Length: 322
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 322
 
 {
     "contextResponses": [

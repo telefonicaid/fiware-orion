@@ -231,10 +231,10 @@ echo
 01. Subscribe to OfficeRoom.* / Room
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "subscribeResponse": {
@@ -247,10 +247,10 @@ Date: REGEX(.*)
 02. Create OfficeRoom/Room/pressure
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 {
     "contextResponses": [
@@ -279,10 +279,10 @@ Date: REGEX(.*)
 03. 0.5 seconds later, update OfficeRoom/Room/pressure
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 {
     "contextResponses": [
@@ -311,10 +311,10 @@ Date: REGEX(.*)
 04. 0.5 seconds later, create OfficeRoom2/Room/pressure
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 205
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 205
 
 {
     "contextResponses": [
@@ -343,10 +343,10 @@ Date: REGEX(.*)
 05. Add attribute 'temperature' to OfficeRoom/Room
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 208
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 208
 
 {
     "contextResponses": [
@@ -375,10 +375,10 @@ Date: REGEX(.*)
 06. Unsubscribe
 ===============
 HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 {
     "statusCode": {
@@ -392,10 +392,10 @@ Date: REGEX(.*)
 07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 387
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 387
 
 {
     "contextResponses": [

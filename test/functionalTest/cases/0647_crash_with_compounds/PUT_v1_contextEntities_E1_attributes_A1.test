@@ -131,10 +131,10 @@ echo
 01. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "code": "404",
@@ -146,10 +146,10 @@ Date: REGEX(.*)
 02. POST /v1/updateContext to create Entity E, attribute A
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 239
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 239
 
 {
     "contextResponses": [
@@ -185,10 +185,10 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities/E to make sure 03 worked
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 217
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 217
 
 {
     "contextElement": {
@@ -220,10 +220,10 @@ Date: REGEX(.*)
 04. PUT /v1/contextEntities/E/attributes/A with compound attribute value using JSON
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -234,10 +234,10 @@ Date: REGEX(.*)
 05. GET /v1/contextEntities/E to make sure 05 worked
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 224
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 224
 
 {
     "contextElement": {

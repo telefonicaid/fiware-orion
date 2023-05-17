@@ -96,30 +96,30 @@ echo
 01. Create E1 with 10 attributes, from 1 to 10 decimal digits (0.9999... pattern)
 =================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create E2 with 10 attributes, from 1 to 10 decimal digits (0.0..01 pattern)
 ===============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Get E1 (A10 get rounded to next integer)
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 136
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 136
 
 {
     "A1": 42.9,
@@ -138,10 +138,10 @@ Date: REGEX(.*)
 04. Get E2 (A10 get rounded to previous integer)
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 126
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 126
 
 {
     "A1": 42.1,

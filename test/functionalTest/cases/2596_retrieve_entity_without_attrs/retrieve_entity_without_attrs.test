@@ -85,30 +85,30 @@ echo
 01. Create Person entity 100
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/100?type=Person
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/100?type=Person
+Content-Length: 0
 
 
 
 02. Create Person entity 101
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/101?type=Person
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/101?type=Person
+Content-Length: 0
 
 
 
 03. Get entities filtering by nonexisting attribute, to get only id and type
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 59
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 59
 
 [
     {

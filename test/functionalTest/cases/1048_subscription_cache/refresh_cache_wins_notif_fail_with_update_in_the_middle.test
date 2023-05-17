@@ -171,10 +171,10 @@ echo
 01. GET /v2/subscriptions and see lastNotification/Failure in a the past and reason 'some reason' and without timeSent
 ======================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 388
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 418
 
 [
     {
@@ -194,7 +194,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -210,20 +211,20 @@ Date: REGEX(.*)
 02. Create entity E to trigger notification
 ===========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions and see lastNotification/Failure in the present and reason 'coult not connect' (as cache data is newer), timesSent 1, failsCounter 1
 ==============================================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 434
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 464
 
 [
     {
@@ -245,7 +246,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -298,8 +300,8 @@ Date: REGEX(.*)
 05. PATCH /v2/subscription to add a description
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -331,6 +333,7 @@ Date: REGEX(.*)
     "lastFailureReason": "some reason",
     "lastNotification": 1546337410,
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",
@@ -344,10 +347,10 @@ Date: REGEX(.*)
 07. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
 =============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 471
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 501
 
 [
     {
@@ -370,7 +373,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -413,6 +417,7 @@ Date: REGEX(.*)
     "lastFailureReason": "Couldn't connect to server",
     "lastNotification": REGEX(1[6-9]\d+),
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",

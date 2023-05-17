@@ -237,10 +237,10 @@ echo
 01. GET /v1/contextEntities and see it fail
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -253,10 +253,10 @@ Date: REGEX(.*)
 02. Update/APPEND E1/T1/A1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -285,10 +285,10 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities and see it work
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 191
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 191
 
 {
     "contextResponses": [
@@ -317,10 +317,10 @@ Date: REGEX(.*)
 04. GET /v1/contextEntities?attributesFormat=object and see it work
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 184
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 184
 
 {
     "contextResponses": [
@@ -348,10 +348,10 @@ Date: REGEX(.*)
 05. GET /v1/contextEntities?entity::type=T1 and see it work
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 191
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 191
 
 {
     "contextResponses": [
@@ -380,10 +380,10 @@ Date: REGEX(.*)
 06. GET /v1/contextEntities?exist=entity::type and see it work
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 191
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 191
 
 {
     "contextResponses": [
@@ -412,10 +412,10 @@ Date: REGEX(.*)
 07. GET /v1/contextEntities?entity::type=T2 and see it fail
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -428,10 +428,10 @@ Date: REGEX(.*)
 08. GET /v1/contextEntities?!exist=entity::type and see it fail
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -444,10 +444,10 @@ Date: REGEX(.*)
 09. Update/APPEND E2/T1/A1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -476,10 +476,10 @@ Date: REGEX(.*)
 10. Update/APPEND E3/T1/A1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -508,10 +508,10 @@ Date: REGEX(.*)
 11. Update/APPEND E4/T1/A1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -540,10 +540,10 @@ Date: REGEX(.*)
 12. GET /v1/contextEntities?limit=2&details=on
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 428
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 428
 
 {
     "contextResponses": [
@@ -595,10 +595,10 @@ Date: REGEX(.*)
 13. GET /v1/contextEntities?offset=2&details=on
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 428
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 428
 
 {
     "contextResponses": [
@@ -650,10 +650,10 @@ Date: REGEX(.*)
 14. Update/APPEND E5//A1
 ========================
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 187
 
 {
     "contextResponses": [
@@ -682,10 +682,10 @@ Date: REGEX(.*)
 15. GET /v1/contextEntities?!exist=entity::type and see it work
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [

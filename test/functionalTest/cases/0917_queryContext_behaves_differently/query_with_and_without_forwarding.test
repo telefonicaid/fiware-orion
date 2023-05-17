@@ -115,9 +115,9 @@ echo
 01. Update/APPEND E1/T WITHOUT ATTRIBUTES in CB
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 239
-Content-Type: application/json
 Date: REGEX(.*)
+Content-Type: application/json
+Content-Length: 239
 
 {
     "contextResponses": [
@@ -139,9 +139,9 @@ Date: REGEX(.*)
 02. Query E1/T/*
 ================
 HTTP/1.1 200 OK
-Content-Length: 239
-Content-Type: application/json
 Date: REGEX(.*)
+Content-Type: application/json
+Content-Length: 239
 
 {
     "contextResponses": [
@@ -163,9 +163,9 @@ Date: REGEX(.*)
 03. Register E1/T/A2 for accumulator
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
 Date: REGEX(.*)
+Content-Type: application/json
+Content-Length: 74
 
 {
     "duration": "P1M",
@@ -176,9 +176,9 @@ Date: REGEX(.*)
 04. Query E1/T/*
 ================
 HTTP/1.1 200 OK
-Content-Length: 239
-Content-Type: application/json
 Date: REGEX(.*)
+Content-Type: application/json
+Content-Length: 239
 
 {
     "contextResponses": [

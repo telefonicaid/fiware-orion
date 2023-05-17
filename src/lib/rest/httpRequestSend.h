@@ -37,9 +37,9 @@
 
 /***************************************************************************
 *
-* httpRequestInit -
+* setHttpTimeout -
 */
-extern void httpRequestInit(long defaultTimeoutInMilliseconds);
+extern void setHttpTimeout(long defaultTimeoutInMilliseconds);
 
 
 

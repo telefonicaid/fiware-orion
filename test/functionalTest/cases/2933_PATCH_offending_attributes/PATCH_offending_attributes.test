@@ -106,18 +106,18 @@ echo
 01. POST /v2/entities, to create Room1 with temperature and pressure.
 =====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 02. PATCH /v2/entities/Room1/attrs, to update existing attribute (temperature) and non existing attribute (pressur), resulting in 422 Unprocessable error
 =========================================================================================================================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 112
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 112
 
 {
     "description": "one or more of the attributes in the request do not exist: [ pressur ]",
@@ -127,11 +127,11 @@ Date: REGEX(.*)
 
 03. PATCH /v2/entities/Room1/attrs, to update existing attribute (temperature) and non existing attribute (temper and pressur), resulting in 422 Unprocessable error
 ====================================================================================================================================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 120
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 120
 
 {
     "description": "one or more of the attributes in the request do not exist: [ temper, pressur ]",
@@ -142,10 +142,10 @@ Date: REGEX(.*)
 04. GET Entities.
 =================
 HTTP/1.1 200 OK
-Content-Length: 141
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 141
 
 [
     {

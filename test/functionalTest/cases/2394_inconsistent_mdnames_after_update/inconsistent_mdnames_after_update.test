@@ -97,10 +97,10 @@ echo
 01. Create E-temperature with metadata named 34.4E-34_1 and 34.4E-34_0
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
+Content-Length: 0
 
 
 
@@ -112,8 +112,8 @@ Date: REGEX(.*)
 03. Update E-temperature, including metatata
 ============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

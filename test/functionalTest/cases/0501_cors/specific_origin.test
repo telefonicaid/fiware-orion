@@ -73,10 +73,10 @@ echo
 01. GET Entry Points (Access-Control-Allow-Origin header not included)
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 135
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 135
 
 {
     "entities_url": "/v2/entities",
@@ -89,12 +89,12 @@ Date: REGEX(.*)
 02. GET Entry Points with arrakis origin (Access-Control-Allow-Origin header included)
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 135
-Access-Control-Expose-Headers: REGEX(.*)
-Access-Control-Allow-Origin: arrakis
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Access-Control-Allow-Origin: arrakis
+Access-Control-Expose-Headers: REGEX(.*)
+Content-Length: 135
 
 {
     "entities_url": "/v2/entities",
@@ -107,10 +107,10 @@ Date: REGEX(.*)
 03. GET Entry Points with caladan origin (Access-Control-Allow-Origin header not included)
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 135
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 135
 
 {
     "entities_url": "/v2/entities",
@@ -123,32 +123,32 @@ Date: REGEX(.*)
 04. OPTIONS Entry Points (Access-Control-Allow-Origin header not included)
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 05. OPTIONS Entry Points with arrakis origin (Access-Control-Allow-Origin header included)
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Access-Control-Max-Age: REGEX([0-9]+)
-Access-Control-Allow-Headers: REGEX(.*)
-Access-Control-Expose-Headers: REGEX(.*)
-Access-Control-Allow-Origin: arrakis
-Access-Control-Allow-Methods: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Access-Control-Allow-Methods: REGEX(.*)
+Access-Control-Allow-Origin: arrakis
+Access-Control-Expose-Headers: REGEX(.*)
+Access-Control-Allow-Headers: REGEX(.*)
+Access-Control-Max-Age: REGEX([0-9]+)
+Content-Length: 0
 
 
 
 06. OPTIONS Entry Points with caladan origin (Access-Control-Allow-Origin header not included)
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 

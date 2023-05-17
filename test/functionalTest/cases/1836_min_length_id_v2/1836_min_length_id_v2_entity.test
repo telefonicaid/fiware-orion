@@ -72,20 +72,20 @@ echo
 01. Create entity E without type
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
+Content-Length: 0
 
 
 
 02. Check entity E has type Thing
 =================================
 HTTP/1.1 200 OK
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "A1": {
@@ -101,10 +101,10 @@ Date: REGEX(.*)
 03. Create entity E with type empty string
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "description": "entity type length: 0, min length supported: 1",

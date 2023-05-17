@@ -59,6 +59,8 @@ Broker が起動すると、サブスクリプション・キャッシュには�
   char*                            servicePath;
   char*                            subscriptionId;
   int64_t                          failsCounter;
+  int64_t                          failsCounterFromDb;
+  bool                             failsCounterFromDbValid;
   int64_t                          maxFailsLimit;
   int64_t                          throttling;
   int64_t                          expirationTime;
@@ -71,6 +73,7 @@ Broker が起動すると、サブスクリプション・キャッシュには�
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;
+  bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
@@ -96,6 +99,7 @@ Broker が起動すると、サブスクリプション・キャッシュには�
 * `lastNotificationTime` は、*データベースに格納されている、`lastNotificationTime`* より **遅い時間** の場合のみデータベースで更新されます。他のブローカが最新の値で更新した可能性があります。
 * サブスクリプション・キャッシュの `count` と `failsCounter` は、サブキャッシュの更新ごとにゼロに設定されるため、キャッシュにある `count` と `failsCounter` は単にアキュムレータであり、
   その累積値がカウンタに追加されます。データベース内にあると、*キャッシュ内のカウンター*がゼロにリセットされます
+* `failsCounterFromDb` (およびサイドの `failsCounterFromDbValid`) は、DB で見られるように失敗カウンタ (fails counter) を追跡するために使用され、(同じキャッシュ・リフレッシュ・サイクル内の失敗のみをカウントする) キャッシュで `failsCounter` と組み合わされます
 * `lastFailure` (および `lastFailureReason`) は、`lastNotificationTime` のように、データベース内の *`lastFailure` より大きい場合に設定されます*
 * `lastSuccess` (および `lastSuccessCode`) は、`lastNotificationTime` のように、データベース内の *`lastSuccess` より大きい場合に設定されます*
 * `status` は、データベースに保存されている時間よりも**遅い時間**である場合にのみデータベースで更新されます。どちらが新しいかを確認するには、サイドフィールド `statusLastChange` を使用します
@@ -184,7 +188,7 @@ typedef struct CachedSubSaved
 
 その重要な情報をベクトルに保存した後は、サブスクリプション・キャッシュ全体が消去され、`subCacheRefresh()` を呼び出してデータベースから取り込まれます。
 
-サブスクリプションキャッシュを再生成した後、`CachedSubSaved` ベクトルに保存された情報はサブスクリプション・キャッシュにマージされ、最後に `CongSubSaved` ベクタは `mongoSubCountersUpdate` 関数を使用してデータベースにマージされます。[特殊サブスクリプションフィールド](#special-subscription-fields) を参照してください
+サブスクリプションキャッシュを再生成した後、`CachedSubSaved` ベクトルに保存された情報はサブスクリプション・キャッシュにマージされ、最後に `CongSubSaved` ベクタは `mongoSubUpdateOnCacheSync` 関数を使用してデータベースにマージされます。[特殊サブスクリプションフィールド](#special-subscription-fields) を参照してください
 
 これはコストのかかる操作であり、サブスクリプション・キャッシュを保護するセマフォは、成功の結果を保証するためにプロセス全体で実行する必要があります。`subCacheSync()` がいくつかのサブスクリプション・キャッシュ関数を呼び出すため、これらの関数はセマフォを**取ってはいけません**。セマフォはよりハイ・レベルで取る必要があります。したがって、関数を個別に使用する場合、呼び出し元は、使用する前にセマフォが取得されていることを確認する必要があります。基礎となる機能は、セマフォを取得/提供**しない**場合もあります。
 

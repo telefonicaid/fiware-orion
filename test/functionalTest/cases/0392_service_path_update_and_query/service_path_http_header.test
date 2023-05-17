@@ -84,10 +84,10 @@ echo
 --REGEXPECT--
 +++++ 0. OK
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -98,10 +98,10 @@ Date: REGEX(.*)
 
 +++++ 1. Path-Component more than 50 chars
 HTTP/1.1 200 OK
-Content-Length: 109
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 109
 
 {
     "orionError": {
@@ -113,10 +113,10 @@ Date: REGEX(.*)
 
 +++++ 2. Too many levels in path
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "orionError": {
@@ -128,10 +128,10 @@ Date: REGEX(.*)
 
 +++++ 3: bad char in component
 HTTP/1.1 200 OK
-Content-Length: 127
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 127
 
 {
     "orionError": {
@@ -143,10 +143,10 @@ Date: REGEX(.*)
 
 +++++ 4: service path must start with a '/'
 HTTP/1.1 200 OK
-Content-Length: 143
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 143
 
 {
     "orionError": {
@@ -158,10 +158,10 @@ Date: REGEX(.*)
 
 +++++ 5: four service paths
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -183,10 +183,10 @@ Service Path 3: '/home/kz/4'
 
 +++++ 7: eleven service paths
 HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 137
 
 {
     "orionError": {

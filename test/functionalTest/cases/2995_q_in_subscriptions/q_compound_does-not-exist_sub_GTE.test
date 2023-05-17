@@ -154,20 +154,20 @@ echo
 01. Create subscription for entity E, attribute t with a filter q=t.'a.b'.'c.d'>=20
 ===================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity E1 with t.a.b.c.d == 20
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
@@ -178,10 +178,10 @@ Date: REGEX(.*)
 04. Create entity E2 with t.'a.b'.'c.d' == 19
 =============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
@@ -192,10 +192,10 @@ Date: REGEX(.*)
 06. Create entity E3 with t.'a.b'.'c.d' == 20
 =============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 

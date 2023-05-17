@@ -242,10 +242,10 @@ echo
 01. Update/APPEND E1/T1/A1 without service-path
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -274,10 +274,10 @@ Date: REGEX(.*)
 02. Update/APPEND E1//A1 with service-path /A1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 187
 
 {
     "contextResponses": [
@@ -306,10 +306,10 @@ Date: REGEX(.*)
 03. Update/APPEND E1/T1/A2 with service-path /A2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -338,10 +338,10 @@ Date: REGEX(.*)
 04. Update/APPEND E1//A2 with service-path /A3
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 187
 
 {
     "contextResponses": [
@@ -370,10 +370,10 @@ Date: REGEX(.*)
 05. Update/APPEND E2/T2/A2 with service-path /A2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -402,10 +402,10 @@ Date: REGEX(.*)
 06. Update/APPEND E3//A2 with service-path /A2
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 187
 
 {
     "contextResponses": [
@@ -434,10 +434,10 @@ Date: REGEX(.*)
 07. Query E2 with service-path '/A2'
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 174
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 174
 
 {
     "contextElement": {
@@ -462,10 +462,10 @@ Date: REGEX(.*)
 08. Query E1 with service-path '/A2' and URI param !exist=entity::type
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 158
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 158
 
 {
     "contextElement": {
@@ -484,10 +484,10 @@ Date: REGEX(.*)
 09. Query E1 with service-path '/A2' and URI param exist=entity::type
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 172
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 172
 
 {
     "contextElement": {
@@ -512,10 +512,10 @@ Date: REGEX(.*)
 10. Query E1 with service-path '/A2' and URI param entity::type=T1
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 172
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 172
 
 {
     "contextElement": {
@@ -540,10 +540,10 @@ Date: REGEX(.*)
 11. Query E3 with service-path '/A2' and URI param !exist=entity::type
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 170
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 170
 
 {
     "contextElement": {
@@ -568,10 +568,10 @@ Date: REGEX(.*)
 12. Query E2 with service-path '/A2' and attributesFormat set to JSON-object
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 167
 
 {
     "contextElement": {

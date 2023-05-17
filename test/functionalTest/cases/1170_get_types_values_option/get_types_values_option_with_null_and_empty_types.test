@@ -153,10 +153,10 @@ echo
 01. GET /v2/types?options=values and get an empty list
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -169,10 +169,10 @@ WriteResult({ "nInserted" : 1 })
 03. GET /v2/types?options=values and get a non-empty list
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 4
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 4
 
 [
     ""
@@ -182,10 +182,10 @@ Date: REGEX(.*)
 04. Create E2/<null>/A1+A3 (using NGSIv1)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 226
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 226
 
 {
     "contextResponses": [
@@ -219,20 +219,20 @@ Date: REGEX(.*)
 05. Create E3/T3/A2+A4
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T3
+Content-Length: 0
 
 
 
 06. GET /v2/types?options=values and get a list of two types
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 9
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 9
 
 [
     "",
@@ -243,11 +243,11 @@ Date: REGEX(.*)
 07. GET /v2/types?options=values with limit, getting 1 types but Fiware-Total-Count 2
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 4
-Content-Type: application/json
-Fiware-Total-Count: 2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 2
+Content-Type: application/json
+Content-Length: 4
 
 [
     ""
@@ -257,11 +257,11 @@ Date: REGEX(.*)
 08. GET /v2/types?options=values with offset=2, thus out of limits
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Total-Count: 2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 2
+Content-Type: application/json
+Content-Length: 2
 
 []
 

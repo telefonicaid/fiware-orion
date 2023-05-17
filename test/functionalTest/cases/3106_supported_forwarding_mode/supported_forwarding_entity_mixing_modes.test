@@ -173,50 +173,50 @@ echo
 01. Create Dev1 entity with attrs lazyAttr=2 and command=init in CP1
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Dev1?type=Device
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Dev1?type=Device
+Content-Length: 0
 
 
 
 02. Create Dev1 entity with localAttr=1 in CB
 =============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Dev1?type=Device
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Dev1?type=Device
+Content-Length: 0
 
 
 
 03. Register lazyAttr with mode query
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 04. Register command with mode update
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Query Dev1 entity in CB - get localAttr=1 and lazyAttrs=2
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 136
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 136
 
 {
     "id": "Dev1",
@@ -237,18 +237,18 @@ Date: REGEX(.*)
 06. Update Dev1 entity localAttr=10 command=exec in CB
 ======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. Query Dev1 entity in CB - get localAttr=10 and lazyAttrs=2
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 137
 
 {
     "id": "Dev1",
@@ -269,10 +269,10 @@ Date: REGEX(.*)
 08. Query Dev1 in CP1 - get lazyAttr=2 and command=exec
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 140
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 140
 
 {
     "command": {

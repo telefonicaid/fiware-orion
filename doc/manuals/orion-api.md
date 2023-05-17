@@ -100,7 +100,7 @@
             - [Get Attribute Value `GET /v2/entities/{entityId}/attrs/{attrName}/value`](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
             - [Update Attribute Value `PUT /v2/entities/{entityId}/attrs/{attrName}/value`](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [Types](#types)
-            - [List Entity Types `GET /v2/type`](#list-entity-types-get-v2type)
+            - [List Entity Types `GET /v2/types`](#list-entity-types-get-v2types)
             - [Retrieve entity information for a given type `GET /v2/types/{type}`](#retrieve-entity-information-for-a-given-type-get-v2typestype)
     - [Subscriptions Operations](#subscriptions-operations)
         - [Subscription payload datamodel](#subscription-payload-datamodel)
@@ -1958,7 +1958,7 @@ Notifications include two fields:
 If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation
 is used:
 
-```
+```json
 {
   "subscriptionId": "12345",
   "data": [
@@ -1980,6 +1980,26 @@ is used:
 }
 ```
 
+If `attrsFormat` is `simplifiedNormalized` then a simplified variant of `normalized` (ommiting `subscriptionId`
+and the `data` holder) is used:
+
+```json
+{
+  "id": "Room1",
+  "type": "Room",
+  "temperature": {
+    "value": 23,
+    "type": "Number",
+    "metadata": {}
+  },
+  "humidity": {
+    "value": 70,
+    "type": "percentage",
+    "metadata": {}
+  }
+}
+```
+
 If `attrsFormat` is `keyValues` then keyValues partial entity representation mode is used:
 
 ```json
@@ -1996,6 +2016,17 @@ If `attrsFormat` is `keyValues` then keyValues partial entity representation mod
 }
 ```
 
+If `attrsFormat` is `simplifiedKeyValues` then a simplified variant of `keyValues` (ommiting `subscriptionId`
+and the `data` holder) is used:
+
+```json
+{
+  "id": "Room1",
+  "type": "Room",
+  "temperature": 23,
+  "humidity": 70
+}
+```
 
 If `attrsFormat` is `values` then values partial entity representation mode is used:
 
@@ -2042,6 +2073,11 @@ Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notific
 Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` is `legacy`)
 HTTP header with the value of the format of the associated subscription, so that notification receivers
 are aware of the format without needing to process the notification payload.
+
+**NOTE:** note that noficiations always include exactly one entity so you may ask why the `data` array
+is really needed. In the past we have multi-entity notifications (in particular, the so called "initial
+notification" that was deprecated in Orion 3.1.0 and removed in Orion 3.2.0) and the `data` array remains as
+a legacy.
 
 ## Custom Notifications
 
@@ -2334,10 +2370,10 @@ Some considerations to take into account when using custom notifications:
   [CLI parameter](admin/cli.md). In this case:
   * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
   * No `${...}` macro substitution is performed.
-
-Note that if a custom payload is used for the notification (the field `payload`, `json` or `ngsi`
-is given in the corresponding subscription), then a value of `custom`
-is used for the `Ngsiv2-AttrsFormat` header in the notification.
+* If text based or JSON payloads are used (i.e. field `payload` or `json` is used) then
+  `Ngsiv2-AttrsFormat` header is set to `custom`. However, note that if NGSI patching is used
+  (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
+  notification (given that the notification format is actually the same).
 
 ## Oneshot Subscriptions
 
@@ -2488,7 +2524,10 @@ subscription is triggered. At the present moment, the following alteration types
   and it actually changes (or if it is not an actual update, but `forcedUpdate` option is used
   in the update request)
 * `entityCreate`: notification is sent whenever a entity covered by the subscription is created
-* `entityDelete`: notification is sent whenever a entity covered by the subscription is deleted
+* `entityDelete`: notification is sent whenever a entity covered by the subscription is deleted.
+  In this case, the `attrs` field within [`condition`](#subscriptionsubjectcondition) is
+  ignored (note that usual way of deleting entities, e.g. `DELETE /v2/entities/E` doesn't include
+  any attribute).
 
 For instance:
 
@@ -3469,7 +3508,7 @@ _**Response code**_
 
 ### Types
 
-#### List Entity Types `GET /v2/type`
+#### List Entity Types `GET /v2/types`
 
 Retrieves a list of entity types, as described in the response payload section below.
 
@@ -3660,6 +3699,7 @@ A `condition` contains the following subfields:
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification. Empty list is not allowed.                                       |
 | `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed |
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
+| `notifyOnMetadataChange` | ✓   | boolean | If `true` then metadata is considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is triggered. If `false` then the metadata is not considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is not triggered. Default value is `true`. |
 
 Notification triggering (i.e. when a notification is triggered based on entity updates)
 is described in [this specific section](#notification-triggering).
@@ -3672,7 +3712,7 @@ A `notification` object contains the following subfields:
 |--------------------|-------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field. It must be a non-empty list.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
 | [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
-| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
 | `metadata`         | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
 | `onlyChangedAttrs` | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is omitted)) |
 | `covered`          | ✓                 | boolean | If `true` then notifications will include all the attributes defined in `attrs` field, even if they are not present in the entity (in this, case, with `null` value). (default value is false). For further information see [Covered subscriptions](#covered-subscriptions) section |

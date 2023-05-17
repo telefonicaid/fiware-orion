@@ -154,28 +154,28 @@ echo
 01. Create entity E1 with two geo:json attributes to null: loc1 and loc2
 ========================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Update E1-loc1 to actual location: it works
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. Update E1-loc2 to actual location: forbidden as it overpass the limit of one
 ================================================================================
-HTTP/1.1 413 Payload Too Large
-Content-Length: 202
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 202
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
@@ -186,10 +186,10 @@ Date: REGEX(.*)
 04. Get the entity and see loc1 with actual location and loc2 with null
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 166
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 166
 
 [
     {
@@ -218,26 +218,26 @@ Date: REGEX(.*)
 05. Update E1-loc1 back to null
 ===============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Update E1-loc2 to actual location: it works
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. Update E1-loc1 to actual location: forbidden as it overpass the limit of one
 ================================================================================
-HTTP/1.1 413 Payload Too Large
-Content-Length: 202
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+HTTP/1.1 413 Content Too Large
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 202
 
 {
     "description": "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations.",
@@ -248,10 +248,10 @@ Date: REGEX(.*)
 08. Get the entity and see loc1 with null and loc2 with actual location
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 166
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 166
 
 [
     {

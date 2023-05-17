@@ -140,10 +140,10 @@ echo
 01. Register entity 'device' of type 'devicetest', attribute 'ping' in CB, provApp: accumulator
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -154,10 +154,10 @@ Date: REGEX(.*)
 02. Create device/devicetest in CB
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 413
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 413
 
 {
     "contextResponses": [
@@ -206,10 +206,10 @@ Date: REGEX(.*)
 03. Update/UPDATE device/devicetest in CB, 'ping' with a compound value
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 116
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
     "errorCode": {

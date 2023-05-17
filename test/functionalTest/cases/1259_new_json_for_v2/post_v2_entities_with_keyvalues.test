@@ -180,30 +180,30 @@ echo
 01. POST /v2/entities?options=keyValues
 =======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. POST /v2/entities, creating 'normal' E2/a1, same payload, just without options=keyValues
 ============================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T1
+Content-Length: 0
 
 
 
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 351
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 351
 
 [
     {
@@ -251,10 +251,10 @@ Date: REGEX(.*)
 04. GET /v2/entities?options=keyValues
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 147
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 147
 
 [
     {

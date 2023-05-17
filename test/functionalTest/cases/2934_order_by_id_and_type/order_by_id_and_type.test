@@ -120,50 +120,50 @@ echo
 01. Create entity E2/A
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=A
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=A
+Content-Length: 0
 
 
 
 02. Create entity E4/B
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=B
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=B
+Content-Length: 0
 
 
 
 03. Create entity E1/D
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=D
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=D
+Content-Length: 0
 
 
 
 04. Create entity E3/C
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=C
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=C
+Content-Length: 0
 
 
 
 05. Get sorted by id: E1/D, E2/A, E3/C, E4/B
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 152
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 152
 
 [
     {
@@ -192,10 +192,10 @@ Date: REGEX(.*)
 06. Get sorted by id in reverse order: E4/B, E3/C, E2/A, E1/D
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 152
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 152
 
 [
     {
@@ -224,10 +224,10 @@ Date: REGEX(.*)
 07. Get sorted by type: E2/A, E4/B, E3/C, E1/D
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 152
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 152
 
 [
     {
@@ -256,10 +256,10 @@ Date: REGEX(.*)
 08. Get sorted by type in reverse order: E1/D, E3/C, E4/B, E2/A
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 152
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 152
 
 [
     {

@@ -157,10 +157,10 @@ echo
 01. Set up entities
 ===================
 HTTP/1.1 200 OK
-Content-Length: 207
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 207
 
 {
     "contextResponses": [
@@ -190,10 +190,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 208
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 208
 
 {
     "contextResponses": [
@@ -223,10 +223,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 209
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 209
 
 {
     "contextResponses": [
@@ -256,10 +256,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 209
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 209
 
 {
     "contextResponses": [
@@ -291,10 +291,10 @@ Date: REGEX(.*)
 02. Query type T on / (returns: T - [a, b])
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "attributes": [
@@ -312,10 +312,10 @@ Date: REGEX(.*)
 03. Query type T on /# (returns: T - [a, b, c, d, e])
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "attributes": [
@@ -336,10 +336,10 @@ Date: REGEX(.*)
 04. Query type T on /A (returns: T - [b, c])
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "attributes": [
@@ -357,10 +357,10 @@ Date: REGEX(.*)
 05. Query type T on /A/# (returns: T - [b, c, d, e])
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 {
     "attributes": [
@@ -380,10 +380,10 @@ Date: REGEX(.*)
 06. Query type T on /A/A1 (returns: T- [c, d])
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "attributes": [
@@ -401,10 +401,10 @@ Date: REGEX(.*)
 07. Query type T on /A/A1/# (returns: T - [c, d])
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "attributes": [

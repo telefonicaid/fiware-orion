@@ -192,10 +192,10 @@ echo
 0. Query all entities using convop /v1/contextEntities
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -208,10 +208,10 @@ Date: REGEX(.*)
 1. APPEND entity E1, type T1 with attribute A1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -240,10 +240,10 @@ Date: REGEX(.*)
 2. APPEND entity E2, WITHOUT TYPE and with attribute A2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 184
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 184
 
 {
     "contextResponses": [
@@ -272,10 +272,10 @@ Date: REGEX(.*)
 3. APPEND entity E2, type T2 with attribute A2
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -304,10 +304,10 @@ Date: REGEX(.*)
 4. APPEND entity E3, type T3 with attribute A3
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -336,10 +336,10 @@ Date: REGEX(.*)
 5. APPEND entity E4, type T3 with attribute A4
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -368,10 +368,10 @@ Date: REGEX(.*)
 6. Query all entities using convop /v1/contextEntities?entity::type=T1
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 188
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 188
 
 {
     "contextResponses": [
@@ -400,10 +400,10 @@ Date: REGEX(.*)
 7. Query all entities using convop /v1/contextEntities?entity::type=T2
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 188
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 188
 
 {
     "contextResponses": [
@@ -432,10 +432,10 @@ Date: REGEX(.*)
 8. Query all entities using convop /v1/contextEntities?entity::type=T3
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 354
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 354
 
 {
     "contextResponses": [

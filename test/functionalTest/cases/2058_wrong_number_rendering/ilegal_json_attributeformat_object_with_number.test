@@ -68,20 +68,20 @@ echo
 01. Create entity with attributes which are not strings
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 287
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 287
 
 {
     "contextElement": {
@@ -121,10 +121,10 @@ Date: REGEX(.*)
 02. Get entity with attributeFormat=object
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 259
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 259
 
 {
     "contextElement": {

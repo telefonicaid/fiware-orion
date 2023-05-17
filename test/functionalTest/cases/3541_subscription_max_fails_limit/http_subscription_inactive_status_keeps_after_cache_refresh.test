@@ -1,0 +1,234 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Inactive status changed due to maxFailsLimit keeps after csubs cache refresh (HTTP case)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPv4 -multiservice -subCacheIval 2 --cache
+
+--SHELL--
+
+#
+# 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=1
+# 02. Upsert entity to trigger notification (fail)
+# 03. Upsert entity to trigger notification (fail that causes change to status=inactive)
+# 04. GET /v2/subscriptions/subId before cache refresh to check the status=inactive
+# 05. Sleep 2.5s so cache refresh takes place
+# 06. GET /v2/subscriptions/subId after cache refresh to check the status=inactive
+#
+
+
+echo "01. POST /v2/subscriptions, to create subscription with maxFailsLimit=1"
+echo "======================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "maxFailsLimit" : 1
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Upsert entity to trigger notification (fails)"
+echo "================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "03. Upsert entity to trigger notification (fail that causes change to status=inactive)"
+echo "======================================================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "04. GET /v2/subscriptions/subId before cache refresh to check the status=inactive"
+echo "================================================================================="
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo "05. Sleep 2.5s so cache refresh takes place"
+echo "==========================================="
+sleep 2.5s
+echo
+echo
+
+
+echo "06. GET /v2/subscriptions/subId after cache refresh to check the status=inactive"
+echo "================================================================================"
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/subscriptions, to create subscription with maxFailsLimit=1
+=======================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Upsert entity to trigger notification (fails)
+=================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+03. Upsert entity to trigger notification (fail that causes change to status=inactive)
+======================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+04. GET /v2/subscriptions/subId before cache refresh to check the status=inactive
+=================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 482
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 2,
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "maxFailsLimit": 1,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "inactive",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Sleep 2.5s so cache refresh takes place
+===========================================
+
+
+06. GET /v2/subscriptions/subId after cache refresh to check the status=inactive
+================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 482
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 2,
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "maxFailsLimit": 1,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "inactive",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

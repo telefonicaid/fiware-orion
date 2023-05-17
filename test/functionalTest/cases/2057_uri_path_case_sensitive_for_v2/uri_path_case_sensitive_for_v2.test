@@ -94,10 +94,10 @@ echo
 01. v1 discovery with all uppercase - ok
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -110,10 +110,10 @@ Date: REGEX(.*)
 02. v1 discovery with all lowercase - ok
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -126,10 +126,10 @@ Date: REGEX(.*)
 03. v1 unknown service /v1/no_service - see error
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 129
 
 {
     "orionError": {
@@ -143,10 +143,10 @@ Date: REGEX(.*)
 04. v2 query with all uppercase - see error (NGSIv1 error response as not /v2 but /V2)
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 129
 
 {
     "orionError": {
@@ -160,10 +160,10 @@ Date: REGEX(.*)
 05. v2 query with all lowercase - ok
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

@@ -176,30 +176,30 @@ echo
 01. Create entity E1 with attribute A with DateTime metadata T with value 2018-12-03T13:21:42.000Z
 ==================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create entity E2 with attribute A with DateTime metadata T with value null
 ==============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Get entities (E1-A-T: 2018-12-03T13:21:42.000Z, E2-A-T: null)
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 235
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 235
 
 [
     {
@@ -236,26 +236,26 @@ Date: REGEX(.*)
 04. Update E1-A-T: null
 =======================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Update E2-A-T: 2020-10-01T12:43:18.000Z
 ===========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Get entities (E1-A-T: null, E2-A-T: 2020-10-01T12:43:18.000Z)
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 235
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 235
 
 [
     {
@@ -292,10 +292,10 @@ Date: REGEX(.*)
 07. Update E1-A-T: foo, see error
 =================================
 HTTP/1.1 400 Bad Request
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "description": "date has invalid format",
@@ -306,10 +306,10 @@ Date: REGEX(.*)
 08. Update E2-A-T: bar, see error
 =================================
 HTTP/1.1 400 Bad Request
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "description": "date has invalid format",

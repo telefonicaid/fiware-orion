@@ -1,16 +1,18 @@
 # 管理用 REST インタフェース
 
-## ログレベルとトレース・レベル
+## ログ設定とトレース・レベル
 
-Orion Context Broker は、NGSI インターフェースの他に、ログレベルとトレース・レベル (初期値は `-t` と `-logLevel` のコマンドライン・オプションを使用して設定) を変更できる管理用 REST API を公開しています。
+Orion Context Broker は、NGSI インターフェースの他に、ログ設定とトレース・レベル (初期値は `-t` と `-logLevel` のコマンドライン・オプションを使用して設定) を変更できる管理用 REST API を公開しています。
 
-ログレベルを変更するには :
+ログ設定を変更するには :
 
 ```
 curl -X PUT <host>:<port>/admin/log?level=<NONE|FATAL|ERROR|WARN|INFO|DEBUG>
+curl -X PUT <host>:<port>/admin/log?infoPayloadMaxSize=<logPayloadSizeValue>
+curl -X PUT <host>:<port>/admin/log?lineMaxSize=<logLineSizeValue>
 ```
 
-ログレベルを取得するには :
+ログ設定を取得するには :
 
 ```
 curl <host>:<port>:/admin/log
@@ -20,7 +22,9 @@ curl <host>:<port>:/admin/log
 
 ```
 {
-   "level": "INFO"
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768
 }
 ```
 
