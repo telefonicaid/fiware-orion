@@ -58,7 +58,7 @@ echo
 echo
 
 
-echo '02. Create subscription with onlyChangedAttrs true covering the entity'
+echo '02. Create subscription with onlyChangedAttrs true and special metadata'
 echo '======================================================================'
 payload='{
   "subject": {
@@ -128,7 +128,7 @@ Content-Length: 0
 
 
 
-02. Create subscription with onlyChangedAttrs true covering the entity
+02. Create subscription with onlyChangedAttrs true and special metadata
 ======================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
