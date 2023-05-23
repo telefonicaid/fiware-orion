@@ -3208,7 +3208,6 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 
 
 
-
 /* ****************************************************************************
 *
 * calculateOperator -
