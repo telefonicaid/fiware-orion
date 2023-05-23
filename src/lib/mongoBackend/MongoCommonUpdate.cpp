@@ -3208,6 +3208,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 
 
 
+
 /* ****************************************************************************
 *
 * calculateOperator -
@@ -4407,7 +4408,6 @@ unsigned int processContextElement
         /* Successful creation: send potential notifications */
         std::map<std::string, TriggeredSubscription*>  subsToNotify;
         std::vector<std::string>                       attrNames;
-        std::vector<std::string>                       attributes;
 
         for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
         {

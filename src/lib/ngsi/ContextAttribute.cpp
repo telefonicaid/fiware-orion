@@ -141,6 +141,76 @@ void ContextAttribute::bsonAppendAttrValue
 
 /* ****************************************************************************
 *
+* ContextAttribute::calculateOperator -
+*
+*/
+void ContextAttribute::calculateOperator
+(
+  const std::string&         valueKey,
+  orion::CompoundValueNode*  upOp,
+  orion::BSONObjBuilder*     bsonAttr
+) const
+{
+  std::string op = upOp->name;
+  if (op == "$inc")
+  {
+    bsonAttr->append(valueKey, upOp->numberValue);
+  }
+  else if (op == "$min")
+  {
+    if (upOp->numberValue > 0)
+    {
+      bsonAttr->append(valueKey, 0);
+    }
+    else
+    {
+      bsonAttr->append(valueKey, upOp->numberValue);
+    }
+  }
+  else if (op == "$max")
+  {
+    if (upOp->numberValue > 0)
+    {
+      bsonAttr->append(valueKey, upOp->numberValue);
+    }
+    else
+    {
+      bsonAttr->append(valueKey, 0);
+    }
+  }
+  else if (op == "$mul")
+  {
+    bsonAttr->append(valueKey, 0);
+  }
+  else if ((op == "$push") || (op == "$addToSet"))
+  {
+    // TODO
+  }
+  else if (op == "$pull")
+  {
+    // No effect in entity creation
+  }
+  else if (op == "$set")
+  {
+    // TODO
+  }
+  else if (op == "$unset")
+  {
+    // No effect in entity creation
+  }
+  else if (op == "$pullAll")
+  {
+    // No effect in entity creation
+  }
+  else
+  {
+    LM_E(("Runtime Error (uknown operator: %s", op.c_str()));
+  }
+}
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::valueBson -
 *
 */
@@ -167,10 +237,17 @@ void ContextAttribute::valueBson
     }
     else if (compoundValueP->valueType == orion::ValueTypeObject)
     {
-      orion::BSONObjBuilder b;
-
-      compoundValueBson(compoundValueP->childV, b, strings2numbers);
-      bsonAttr->append(valueKey, b.obj());
+      // Special processing of update operators
+      if ((compoundValueP->childV.size() > 0) && (isUpdateOperator(compoundValueP->childV[0]->name)))
+      {
+        calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr);
+      }
+      else
+      {
+        orion::BSONObjBuilder b;
+        compoundValueBson(compoundValueP->childV, b, strings2numbers);
+        bsonAttr->append(valueKey, b.obj());
+      }
     }
     else if (compoundValueP->valueType == orion::ValueTypeString)
     {

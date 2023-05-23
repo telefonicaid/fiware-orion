@@ -146,6 +146,9 @@ private:
 
   bool hasIgnoreType(void) const;
 
+  void calculateOperator(const std::string&         valueKey,
+                         orion::CompoundValueNode*  upOp,
+                         orion::BSONObjBuilder*     bsonAttr) const;
 
 } ContextAttribute;
 
