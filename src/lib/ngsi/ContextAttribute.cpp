@@ -143,7 +143,7 @@ void ContextAttribute::bsonAppendAttrValue
 *
 * ContextAttribute::calculateOperator -
 *
-* Return true if the some append was done in bsonAttr, true otherwise
+* Return true if the some append was done in bsonAttr, false otherwise
 */
 bool ContextAttribute::calculateOperator
 (

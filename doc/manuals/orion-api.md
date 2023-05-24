@@ -50,8 +50,7 @@
            - [`$unset`](#unset)
            - [Combining `$set` and `$unset`](#combining-set-and-unset)
         - [How Orion deals with operators](#how-orion-deals-with-operators)
-        - [Current limitations](#current-limitations)
-           - [Create or replace entities](#create-or-replace-entities)
+        - [Usage in create or replace entity operations](#usage-in-create-or-replace-entity-operations)
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
     - [Metadata update semantics](#metadata-update-semantics)
       - [`overrideMetadata` option](#overridemetadata-option)
@@ -1629,41 +1628,16 @@ So be careful of avoiding these situations.
 The only exception to "use only one operator" rule is the case of `$set` and
 `$unset`, that can be used together [as described above](#combining-set-and-unset).
 
-### Current limitations
+### Usage in create or replace entity operations
 
-#### Create or replace entities
+Update operators can be used in entity creation or replace operations. In particular:
 
-Update operators cannot be used in entity creation or replace operations. For instance if
-you create an entity this way:
-
-```
-POST /v2/entities
-{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-the attribute A in the just created entity will have as value (literally) this JSON object: `{ "$inc": 2 }`.
-
-However, note that the case of adding new attributes to existing entities will work. For instance if
-we already have an entity E with attributes A and B and we append C this way:
-
-```
-POST /v2/entities/E/attrs
-{
-  "C": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-then C will be created with value `2`.
+* Numeric operators takes 0 as reference. For instance, `{"$inc": 4}` results in 4,
+  `{$mul: 1000}` results in 0, etc.
+* `$set` takes the empty object (`{}`) as reference. For instance, `"$set": {"X": 1}` results in just `{"X": 1}`
+* `$push` and `$addToSet` take the empty array (`[]`) as reference. For instance, `{"$push": 4}`
+  results in `[ 4 ]`.
+* `$pull`, `$pullAll` and `$unset` are ignored.
 
 ## Filtering out attributes and metadata
 

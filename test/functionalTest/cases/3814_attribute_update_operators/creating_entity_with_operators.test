@@ -223,5 +223,5 @@ Content-Length: 114
 
 
 --TEARDOWN--
-#brokerStop CB
+brokerStop CB
 dbDrop CB
