@@ -560,3 +560,90 @@ void ContextAttributeVector::toBson
     attrNamesToAdd->append(this->vec[ix]->name);
   }
 }
+
+
+
+/* ****************************************************************************
+*
+* ContextAttributeVector::applyUpdateOperators -
+*/
+void ContextAttributeVector::applyUpdateOperators(void)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->compoundValueP != NULL)
+    {
+      if ((vec[ix]->compoundValueP->valueType == orion::ValueTypeObject) && (vec[ix]->compoundValueP->childV.size() > 0) && (isUpdateOperator(vec[ix]->compoundValueP->childV[0]->name)))
+      {
+        orion::CompoundValueNode* upOp = vec[ix]->compoundValueP->childV[0];
+        std::string op = upOp->name;
+        if (op == "$inc")
+        {
+          vec[ix]->valueType = orion::ValueTypeNumber;
+          vec[ix]->numberValue = upOp->numberValue;
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else if (op == "$min")
+        {
+          vec[ix]->valueType = orion::ValueTypeNumber;
+          if (upOp->numberValue > 0)
+          {
+            vec[ix]->numberValue = 0;
+          }
+          else
+          {
+            vec[ix]->numberValue = upOp->numberValue;
+          }
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else if (op == "$max")
+        {
+          vec[ix]->valueType = orion::ValueTypeNumber;
+          if (upOp->numberValue > 0)
+          {
+            vec[ix]->numberValue = upOp->numberValue;
+          }
+          else
+          {
+            vec[ix]->numberValue = 0;
+          }
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else if (op == "$mul")
+        {
+          vec[ix]->valueType = orion::ValueTypeNumber;
+          vec[ix]->numberValue = 0;
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else if ((op == "$push") || (op == "$addToSet"))
+        {
+          // TODO
+        }
+        else if (op == "$pull")
+        {
+          // No effect in entity creation
+        }
+        else if (op == "$set")
+        {
+          // TODO
+        }
+        else if (op == "$unset")
+        {
+          // No effect in entity creation
+        }
+        else if (op == "$pullAll")
+        {
+          // No effect in entity creation
+        }
+        else
+        {
+          LM_E(("Runtime Error (uknown operator: %s", op.c_str()));
+        }
+      }
+    }
+  }
+}

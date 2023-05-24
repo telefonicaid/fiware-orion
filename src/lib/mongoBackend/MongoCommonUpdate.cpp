@@ -4437,6 +4437,7 @@ unsigned int processContextElement
         // one item, so it should be safe to get item 0
         //
         ContextElementResponse* notifyCerP = new ContextElementResponse(eP, apiVersion == V2);
+        notifyCerP->applyUpdateOperators();
 
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);

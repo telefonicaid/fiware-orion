@@ -100,6 +100,8 @@ class Entity
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
 
+  void         applyUpdateOperators(void);
+
   void         release(void);
 
   void         fill(const std::string&             id,
