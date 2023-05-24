@@ -143,8 +143,9 @@ void ContextAttribute::bsonAppendAttrValue
 *
 * ContextAttribute::calculateOperator -
 *
+* Return true if the some append was done in bsonAttr, true otherwise
 */
-void ContextAttribute::calculateOperator
+bool ContextAttribute::calculateOperator
 (
   const std::string&         valueKey,
   orion::CompoundValueNode*  upOp,
@@ -218,17 +219,14 @@ void ContextAttribute::calculateOperator
 
     case orion::ValueTypeNotGiven:
       LM_E(("Runtime Error (value not given in compound value)"));
-      break;
+      return false;
 
     default:
       LM_E(("Runtime Error (unknown attribute type: %d)", valueType));
+      return false;
     }
 
     bsonAttr->append(valueKey, ba.arr());
-  }
-  else if (op == "$pull")
-  {
-    // No effect in entity creation
   }
   else if (op == "$set")
   {
@@ -251,24 +249,25 @@ void ContextAttribute::calculateOperator
 
     case orion::ValueTypeNotGiven:
       LM_E(("Runtime Error (value not given in compound value)"));
-      break;
+      return false;
 
     default:
       LM_E(("Runtime Error (unknown attribute type: %d)", valueType));
+      return false;
     }
   }
-  else if (op == "$unset")
+  else if ((op == "$unset") || (op == "$pull") || (op == "$pullAll"))
   {
-    // No effect in entity creation
-  }
-  else if (op == "$pullAll")
-  {
-    // No effect in entity creation
+    // By returning false we signal that attribute must be removed (by the caller)
+    return false;
   }
   else
   {
-    LM_E(("Runtime Error (uknown operator: %s", op.c_str()));
+    LM_E(("Runtime Error (uknown operator: %s)", op.c_str()));
+    return false;
   }
+
+  return true;
 }
 
 
@@ -276,8 +275,9 @@ void ContextAttribute::calculateOperator
 *
 * ContextAttribute::valueBson -
 *
+* Return true if some append operation was done bsonAttr, false otherwise
 */
-void ContextAttribute::valueBson
+bool ContextAttribute::valueBson
 (
   const std::string&      valueKey,
   orion::BSONObjBuilder*  bsonAttr,
@@ -303,7 +303,11 @@ void ContextAttribute::valueBson
       // Special processing of update operators
       if ((compoundValueP->childV.size() > 0) && (isUpdateOperator(compoundValueP->childV[0]->name)))
       {
-        calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr, strings2numbers);
+        if (!calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr, strings2numbers))
+        {
+          // in this case we return without generating any BSON
+          return false;
+        }
       }
       else
       {
@@ -335,12 +339,16 @@ void ContextAttribute::valueBson
     else if (compoundValueP->valueType == orion::ValueTypeNotGiven)
     {
       LM_E(("Runtime Error (value not given in compound value)"));
+      return false;
     }
     else
     {
       LM_E(("Runtime Error (Unknown type in compound value)"));
+      return false;
     }
   }
+
+  return true;
 }
 
 

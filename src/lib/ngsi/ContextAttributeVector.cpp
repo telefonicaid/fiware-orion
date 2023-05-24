@@ -536,6 +536,7 @@ void ContextAttributeVector::toBson
       bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
     }
 
+    // FIXME P7: boolean return value should be managed?
     this->vec[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbEncode(this->vec[ix]->name);
@@ -569,6 +570,8 @@ void ContextAttributeVector::toBson
 */
 void ContextAttributeVector::applyUpdateOperators(void)
 {
+  std::vector<std::string> toErase;
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if (vec[ix]->compoundValueP != NULL)
@@ -673,10 +676,6 @@ void ContextAttributeVector::applyUpdateOperators(void)
           delete vec[ix]->compoundValueP;
           vec[ix]->compoundValueP = v;
         }
-        else if (op == "$pull")
-        {
-          // No effect in entity creation
-        }
         else if (op == "$set")
         {
           orion::CompoundValueNode* o = new orion::CompoundValueNode(orion::ValueTypeObject);
@@ -695,12 +694,6 @@ void ContextAttributeVector::applyUpdateOperators(void)
             break;
 
           case orion::ValueTypeObject:
-            /*inner = new orion::CompoundValueNode(orion::ValueTypeObject);
-            for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
-            {
-              inner->add(upOp->childV[jx]->clone());
-            }
-            o->add(inner);*/
             for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
             {
               o->add(upOp->childV[jx]->clone());
@@ -720,13 +713,16 @@ void ContextAttributeVector::applyUpdateOperators(void)
           vec[ix]->compoundValueP = o;
 
         }
-        else if (op == "$unset")
+        else if ((op == "$unset") || (op == "$pull") || (op == "$pullAll"))
         {
-          // No effect in entity creation
-        }
-        else if (op == "$pullAll")
-        {
-          // No effect in entity creation
+          // FIXME P5: we are forcing shadowed semantics here. It could be a problem if the attribute used in the update
+          // triggering the notification (eg. A: {$unset: 1}) is also in the notifications.attrs list (note that shadowed
+          // was designed for built-in attributes, and they are included if splicitelly included in notifications.attr).
+          // However, this case would be *very rare* and the alternative (to keep track of items in vec[] to be removed
+          // at the end of 'for' processing) would be much more complex
+          vec[ix]->shadowed = true;
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
         }
         else
         {
