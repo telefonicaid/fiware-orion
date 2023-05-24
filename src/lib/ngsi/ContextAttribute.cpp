@@ -148,7 +148,8 @@ void ContextAttribute::calculateOperator
 (
   const std::string&         valueKey,
   orion::CompoundValueNode*  upOp,
-  orion::BSONObjBuilder*     bsonAttr
+  orion::BSONObjBuilder*     bsonAttr,
+  bool                       strings2numbers
 ) const
 {
   std::string op = upOp->name;
@@ -184,7 +185,46 @@ void ContextAttribute::calculateOperator
   }
   else if ((op == "$push") || (op == "$addToSet"))
   {
-    // TODO
+    orion::BSONArrayBuilder ba;
+    orion::BSONArrayBuilder ba2;
+    orion::BSONArrayBuilder bo;
+    switch (upOp->valueType)
+    {
+    case orion::ValueTypeString:
+      ba.append(upOp->stringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      ba.append(upOp->numberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      ba.append(upOp->boolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      ba.appendNull();
+      break;
+
+    case orion::ValueTypeVector:
+      compoundValueBson(compoundValueP->childV, ba2, strings2numbers);
+      ba.append(ba2.arr());
+      break;
+
+    case orion::ValueTypeObject:
+      compoundValueBson(compoundValueP->childV, bo, strings2numbers);
+      ba.append(bo.arr());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given in compound value)"));
+      break;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type: %d)", valueType));
+    }
+
+    bsonAttr->append(valueKey, ba.arr());
   }
   else if (op == "$pull")
   {
@@ -240,7 +280,7 @@ void ContextAttribute::valueBson
       // Special processing of update operators
       if ((compoundValueP->childV.size() > 0) && (isUpdateOperator(compoundValueP->childV[0]->name)))
       {
-        calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr);
+        calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr, strings2numbers);
       }
       else
       {

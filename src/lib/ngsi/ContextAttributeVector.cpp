@@ -621,7 +621,57 @@ void ContextAttributeVector::applyUpdateOperators(void)
         }
         else if ((op == "$push") || (op == "$addToSet"))
         {
-          // TODO
+          orion::CompoundValueNode* v = new orion::CompoundValueNode(orion::ValueTypeVector);
+          orion::CompoundValueNode* inner;
+          vec[ix]->valueType = orion::ValueTypeVector;
+
+          switch (upOp->valueType)
+          {
+          case orion::ValueTypeString:
+            v->add(orion::ValueTypeString, "", upOp->stringValue);
+            break;
+
+          case orion::ValueTypeNumber:
+            v->add(orion::ValueTypeNumber, "", upOp->numberValue);
+            break;
+
+          case orion::ValueTypeBoolean:
+            v->add(orion::ValueTypeBoolean, "", upOp->boolValue);
+            break;
+
+          case orion::ValueTypeNull:
+            v->add(orion::ValueTypeNull, "", "");
+            break;
+
+          case orion::ValueTypeVector:
+            inner = new orion::CompoundValueNode(orion::ValueTypeVector);
+            for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
+            {
+              inner->add(upOp->childV[jx]->clone());
+            }
+            v->add(inner);
+            break;
+
+          case orion::ValueTypeObject:
+            inner = new orion::CompoundValueNode(orion::ValueTypeObject);
+            for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
+            {
+              inner->add(upOp->childV[jx]->clone());
+            }
+            v->add(inner);
+            break;
+
+          case orion::ValueTypeNotGiven:
+            LM_E(("Runtime Error (value not given in compound value)"));
+            break;
+
+          default:
+            LM_E(("Runtime Error (unknown attribute type: %d)", upOp->valueType));
+          }
+
+          // Replace old compound value (with $push) with the new one ([])
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = v;
         }
         else if (op == "$pull")
         {

@@ -148,7 +148,8 @@ private:
 
   void calculateOperator(const std::string&         valueKey,
                          orion::CompoundValueNode*  upOp,
-                         orion::BSONObjBuilder*     bsonAttr) const;
+                         orion::BSONObjBuilder*     bsonAttr,
+                         bool                       strings2numbers) const;
 
 } ContextAttribute;
 
