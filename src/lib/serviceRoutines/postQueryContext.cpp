@@ -94,7 +94,7 @@ static char* jsonPayloadClean(const char* payload)
 * And we can get the actualTotalCount value that includes total Entities of CP+CB.
 *
 */
-void getProviderCount (std::string cpResponse, long long*  totalCount)
+static void getProviderCount(std::string cpResponse, long long*  totalCount)
 {
   std::string token1 = "Fiware-Total-Count", token2 = "\n", token3 = " ", cpCount, tempStr;
   size_t pos1 = 0;
@@ -302,10 +302,7 @@ static bool queryForward
   snprintf(portV, sizeof(portV), "%d", port);
   url = ip + ":" + portV + resource;
 
-  r = httpRequestSend(providerLimit,
-		      providerOffset,
-		      ciP->apiVersion,
-		      NULL,
+  r = httpRequestSend(NULL,
                       "regId: " + regId,
                       fromIp,  // thread variable
                       ip,
@@ -323,6 +320,8 @@ static bool queryForward
                       &out,
                       &statusCode,
                       noHeaders,
+                      providerLimit,
+                      providerOffset,
                       mimeType);
   
   if (r != 0)

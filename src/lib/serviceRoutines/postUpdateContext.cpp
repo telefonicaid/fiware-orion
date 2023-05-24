@@ -151,8 +151,6 @@ static bool updateForward
   std::string     mimeType     = "application/json";
   std::string     out;
   int             r;
-  int             providerLimit  = DEFAULT_PAGINATION_LIMIT_INT;
-  int             providerOffset = DEFAULT_PAGINATION_OFFSET_INT;
 
   if (upcrP->providerFormat == PfJson)
   {
@@ -209,10 +207,7 @@ static bool updateForward
   snprintf(portV, sizeof(portV), "%d", port);
   url = ip + ":" + portV + resource;
 
-  r = httpRequestSend(providerLimit,
-		      providerOffset,
-		      ciP->apiVersion,
-		      NULL,
+  r = httpRequestSend(NULL,
                       "regId: " + regId,
                       fromIp,   // thread variable
                       ip,
@@ -230,6 +225,8 @@ static bool updateForward
                       &out,
                       &statusCode,
                       noHeaders,
+                      -1,
+                      -1,
                       mimeType);
 
   if (r != 0)

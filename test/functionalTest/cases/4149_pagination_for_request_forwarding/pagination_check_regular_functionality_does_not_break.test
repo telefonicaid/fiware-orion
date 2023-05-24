@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-pagination
+pagination check regular functionality does not break
 
 --SHELL-INIT--
 dbInit CB
@@ -154,60 +154,60 @@ echo
 01. Create entity A1/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A1?type=T
+Content-Length: 0
 
 
 
 02. Create entity A2/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A2?type=T
+Content-Length: 0
 
 
 
 03. Create entity A3/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A3?type=T
+Content-Length: 0
 
 
 
 04. Create entity A4/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A4?type=T
+Content-Length: 0
 
 
 
 05. Create entity A5/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A5?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A5?type=T
+Content-Length: 0
 
 
 
 06. GET /v2/entities with limit=5
 =================================
 HTTP/1.1 200 OK
-Content-Length: 116
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 [
     {
@@ -236,10 +236,10 @@ Date: REGEX(.*)
 07. GET /v2/entities with offset=2
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 [
     {
@@ -260,11 +260,11 @@ Date: REGEX(.*)
 08. GET /v2/entities with options=count
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 116
-Content-Type: application/json
-Fiware-Total-Count: 5
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 5
+Content-Type: application/json
+Content-Length: 116
 
 [
     {
@@ -293,10 +293,10 @@ Date: REGEX(.*)
 09. GET /v2/entities with limit=5 and offset=2
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 [
     {
@@ -317,11 +317,11 @@ Date: REGEX(.*)
 10. GET /v2/entities with limit=2 and options=count
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 47
-Content-Type: application/json
-Fiware-Total-Count: 5
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 5
+Content-Type: application/json
+Content-Length: 47
 
 [
     {
@@ -338,11 +338,11 @@ Date: REGEX(.*)
 11. GET /v2/entities with offset=2 and options=count
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Total-Count: 5
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 5
+Content-Type: application/json
+Content-Length: 70
 
 [
     {

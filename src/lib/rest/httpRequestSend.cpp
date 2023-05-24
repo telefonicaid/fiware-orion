@@ -239,9 +239,6 @@ static int contentLenParse(char* s)
 */
 int httpRequestSend
 (
-   int                                        providerLimit,
-   int                                        providerOffset,
-   ApiVersion                                 apiVersion,
    CURL*                                      _curl,
    const std::string&                         idStringForLogs,
    const std::string&                         from,
@@ -260,6 +257,8 @@ int httpRequestSend
    std::string*                               outP,
    long long*                                 statusCodeP,
    const std::map<std::string, std::string>&  extraHeaders,
+   int                                        providerLimit,
+   int                                        providerOffset,
    const std::string&                         acceptFormat,
    long                                       timeoutInMilliseconds
 )
@@ -576,16 +575,13 @@ int httpRequestSend
   {
     url = ip;
   }
+  url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
-  if (apiVersion == V2 && verb == "POST" && resource == "/v2/op/query")
+  if ((providerLimit >= 0) && (providerOffset >=0))
   {
     std::string pLimit = std::to_string(providerLimit);
     std::string pOffset = std::to_string(providerOffset);
-    url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource + "?limit=" + pLimit + "&offset=" + pOffset + "&options=count";
-  }
-  else
-  {
-    url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+    url += "?limit=" + pLimit + "&offset=" + pOffset + "&options=count";
   }
 
   if (insecureNotif)

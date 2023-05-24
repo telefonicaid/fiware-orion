@@ -63,15 +63,20 @@ accumulatorStart --pretty-print
 # 25. Create entity C10/T with attribute A2, in CP2
 # 26. Register entities of type T, with ID .*, and attribute A1, for CP1
 # 27. Register entities of type T, with ID .*, and attribute A2, for CP2
-# 28. GET /v2/entities with limit=5 and check no limit forwarded to CP
-# 29. GET /v2/entities with limit=10 and check remaining limit forwarded to CP
-# 30. GET /v2/entities with limit=20 and check remaining limit forwarded to both CP
-# 31. GET /v2/entities with offset=5 and check no offset is forwarded to CP
-# 32. GET /v2/entities with offset=5 and check remaining offset is forwarded to CP
-# 33. GET /v2/entities with options=count and check total count of CB+CP1+CP2
-# 34. GET /v2/entities with limit=10 and offset=5
-# 35. GET /v2/entities with limit=10 and options=count
-# 36. GET /v2/entities with offset=5 and options=count
+# 28. GET /v2/entities with limit=3 and check no limit forwarded to CP
+# 29. GET /v2/entities with limit=5 and check no limit forwarded to CP
+# 30. GET /v2/entities with limit=10 and check remaining limit forwarded to CP
+# 31. GET /v2/entities with limit=20 and check remaining limit forwarded to both CP
+# 32. GET /v2/entities with offset=3 and check no offset is forwarded to CP
+# 33. GET /v2/entities with offset=5 and check no offset is forwarded to CP
+# 34. GET /v2/entities with offset=10 and check remaining offset is forwarded to CP
+# 35. GET /v2/entities with options=count and check total count of CB+CP1+CP2
+# 36. GET /v2/entities with limit=10 and offset=5
+# 37. GET /v2/entities with limit=10 and options=count
+# 38. GET /v2/entities with offset=5 and options=count
+# 39. GET /v2/entities with limit=0
+# 40. GET /v2/entities with offset=0
+# 41. GET /v2/entities without pagination parameter
 #
 
 echo "01. Create entity A1/T in CB"
@@ -434,7 +439,7 @@ echo
 
 
 
-echo "28. GET /v2/entities with limit<5 and check no limit forwarded to CP"
+echo "28. GET /v2/entities with limit=3 and check no limit forwarded to CP"
 echo "===================================================================="
 orionCurl --url '/v2/entities?idPattern=.*&type=T&limit=3'
 echo
@@ -449,7 +454,7 @@ echo
 echo
 
 
-echo "30. GET /v2/entities with limit>5 and check remaining limit forwarded to CP"
+echo "30. GET /v2/entities with limit=10 and check remaining limit forwarded to CP"
 echo "==========================================================================="
 orionCurl --url '/v2/entities?idPattern=.*&type=T&limit=10'
 echo
@@ -465,7 +470,7 @@ echo
 
 
 
-echo "32. GET /v2/entities with offset<5 and check no offset is forwarded to CP"
+echo "32. GET /v2/entities with offset=3 and check no offset is forwarded to CP"
 echo "========================================================================="
 orionCurl --url '/v2/entities?idPattern=.*&type=T&offset=3'
 echo
@@ -481,7 +486,7 @@ echo
 
 
 
-echo "34. GET /v2/entities with offset>5 and check remaining offset is forwarded to CP"
+echo "34. GET /v2/entities with offset=10 and check remaining offset is forwarded to CP"
 echo "================================================================================"
 orionCurl --url '/v2/entities?idPattern=.*&type=T&offset=10'
 echo
@@ -549,280 +554,280 @@ echo
 01. Create entity A1/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A1?type=T
+Content-Length: 0
 
 
 
 02. Create entity A2/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A2?type=T
+Content-Length: 0
 
 
 
 03. Create entity A3/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A3?type=T
+Content-Length: 0
 
 
 
 04. Create entity A4/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A4?type=T
+Content-Length: 0
 
 
 
 05. Create entity A5/T in CB
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A5?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A5?type=T
+Content-Length: 0
 
 
 
 06. Create entity B1/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B1?type=T
+Content-Length: 0
 
 
 
 07. Create entity B2/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B2?type=T
+Content-Length: 0
 
 
 
 08. Create entity B3/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B3?type=T
+Content-Length: 0
 
 
 
 09. Create entity B4/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B4?type=T
+Content-Length: 0
 
 
 
 10. Create entity B5/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B5?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B5?type=T
+Content-Length: 0
 
 
 
 11. Create entity B6/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B6?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B6?type=T
+Content-Length: 0
 
 
 
 12. Create entity B7/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B7?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B7?type=T
+Content-Length: 0
 
 
 
 13. Create entity B8/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B8?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B8?type=T
+Content-Length: 0
 
 
 
 14. Create entity B9/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B9?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B9?type=T
+Content-Length: 0
 
 
 
 15. Create entity B10/T with attribute A1, in CP1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B10?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B10?type=T
+Content-Length: 0
 
 
 
 16. Create entity C1/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C1?type=T
+Content-Length: 0
 
 
 
 17. Create entity C2/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C2?type=T
+Content-Length: 0
 
 
 
 18. Create entity C3/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C3?type=T
+Content-Length: 0
 
 
 
 19. Create entity C4/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C4?type=T
+Content-Length: 0
 
 
 
 20. Create entity C5/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C5?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C5?type=T
+Content-Length: 0
 
 
 
 21. Create entity C6/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C6?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C6?type=T
+Content-Length: 0
 
 
 
 22. Create entity C7/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C7?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C7?type=T
+Content-Length: 0
 
 
 
 23. Create entity C8/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C8?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C8?type=T
+Content-Length: 0
 
 
 
 24. Create entity C9/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C9?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C9?type=T
+Content-Length: 0
 
 
 
 25. Create entity C10/T with attribute A2, in CP2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C10?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C10?type=T
+Content-Length: 0
 
 
 
 26. Register entities of type T, with ID .*, and attribute A1, for CP1
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 27. Register entities of type T, with ID .*, and attribute A2, for CP2
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
-28. GET /v2/entities with limit<5 and check no limit forwarded to CP
+28. GET /v2/entities with limit=3 and check no limit forwarded to CP
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 [
     {
@@ -843,10 +848,10 @@ Date: REGEX(.*)
 29. GET /v2/entities with limit=5 and check no limit forwarded to CP
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 116
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 [
     {
@@ -872,13 +877,13 @@ Date: REGEX(.*)
 ]
 
 
-30. GET /v2/entities with limit>5 and check remaining limit forwarded to CP
+30. GET /v2/entities with limit=10 and check remaining limit forwarded to CP
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 466
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 466
 
 [
     {
@@ -952,10 +957,10 @@ Date: REGEX(.*)
 31. GET /v2/entities with limit=20 and check remaining limit forwarded to both CP
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1167
 
 [
     {
@@ -1116,13 +1121,13 @@ Date: REGEX(.*)
 ]
 
 
-32. GET /v2/entities with offset<5 and check no offset is forwarded to CP
+32. GET /v2/entities with offset=3 and check no offset is forwarded to CP
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 1308
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1308
 
 [
     {
@@ -1301,10 +1306,10 @@ Date: REGEX(.*)
 33. GET /v2/entities with offset=5 and check no offset is forwarded to CP
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 1403
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1403
 
 [
     {
@@ -1490,13 +1495,13 @@ Date: REGEX(.*)
 ]
 
 
-34. GET /v2/entities with offset>5 and check remaining offset is forwarded to CP
+34. GET /v2/entities with offset=10 and check remaining offset is forwarded to CP
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1053
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1053
 
 [
     {
@@ -1640,11 +1645,11 @@ Date: REGEX(.*)
 35. GET /v2/entities with options=count and check total count of CB+CP1+CP2
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 1167
-Content-Type: application/json
-Fiware-Total-Count: 25
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 25
+Content-Type: application/json
+Content-Length: 1167
 
 [
     {
@@ -1808,10 +1813,10 @@ Date: REGEX(.*)
 36. GET /v2/entities with limit=10 and offset=5
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 702
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 702
 
 [
     {
@@ -1910,11 +1915,11 @@ Date: REGEX(.*)
 37. GET /v2/entities with limit=10 and options=count
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 466
-Content-Type: application/json
-Fiware-Total-Count: 25
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 25
+Content-Type: application/json
+Content-Length: 466
 
 [
     {
@@ -1988,11 +1993,11 @@ Date: REGEX(.*)
 38. GET /v2/entities with offset=5 and options=count
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 1403
-Content-Type: application/json
-Fiware-Total-Count: 25
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 25
+Content-Type: application/json
+Content-Length: 1403
 
 [
     {
@@ -2181,10 +2186,10 @@ Date: REGEX(.*)
 39. GET /v2/entities with limit=0
 =================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -2192,10 +2197,10 @@ Date: REGEX(.*)
 40. GET /v2/entities with offset=0
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 1167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1167
 
 [
     {
@@ -2359,10 +2364,10 @@ Date: REGEX(.*)
 41. GET /v2/entities without pagination parameter
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 1167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1167
 
 [
     {

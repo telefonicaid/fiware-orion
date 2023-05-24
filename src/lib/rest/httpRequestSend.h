@@ -49,9 +49,6 @@ extern void setHttpTimeout(long defaultTimeoutInMilliseconds);
 */
 extern int httpRequestSend
 (
-  int                                        providerLimit,
-  int                                        providerOffset,
-  ApiVersion                                 apiVersion,
   CURL*                                      curl,
   const std::string&                         idStringForLogs,
   const std::string&                         from,
@@ -70,6 +67,8 @@ extern int httpRequestSend
   std::string*                               outP,
   long long*                                 statusCodeP,
   const std::map<std::string, std::string>&  extraHeaders,
+  int                                        providerLimit         = -1,
+  int                                        providerOffset        = -1,
   const std::string&                         acceptFormat          = "",
   long                                       timeoutInMilliseconds = -1
 );
