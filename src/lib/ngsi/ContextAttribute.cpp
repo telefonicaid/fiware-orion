@@ -187,7 +187,7 @@ void ContextAttribute::calculateOperator
   {
     orion::BSONArrayBuilder ba;
     orion::BSONArrayBuilder ba2;
-    orion::BSONArrayBuilder bo;
+    orion::BSONArrayBuilder bo; // FIXME PR
     switch (upOp->valueType)
     {
     case orion::ValueTypeString:
@@ -232,7 +232,30 @@ void ContextAttribute::calculateOperator
   }
   else if (op == "$set")
   {
-    // TODO
+    orion::BSONObjBuilder bo;
+    switch (upOp->valueType)
+    {
+    case orion::ValueTypeString:
+    case orion::ValueTypeNumber:
+    case orion::ValueTypeBoolean:
+    case orion::ValueTypeNull:
+    case orion::ValueTypeVector:
+      // Nothing to do in the case of inconsisent $set, e.g. {$set: 1}
+      // FIXME P4: this could be detected at parsing stage and deal with it as Bad Input, but it is harder...
+      break;
+
+    case orion::ValueTypeObject:
+      compoundValueBson(upOp->childV, bo, strings2numbers);
+      bsonAttr->append(valueKey, bo.obj());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given in compound value)"));
+      break;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type: %d)", valueType));
+    }
   }
   else if (op == "$unset")
   {

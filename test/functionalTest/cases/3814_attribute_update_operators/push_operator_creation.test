@@ -25,7 +25,7 @@ Attribute update operator: push (create entity variant)
 
 --SHELL-INIT--
 dbInit CB
-#brokerStart CB
+brokerStart CB
 accumulatorStart --pretty-print
 
 --SHELL--
@@ -447,6 +447,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 
 --TEARDOWN--
-#brokerStop CB
+brokerStop CB
 accumulatorStop $LISTENER_PORT
 dbDrop CB

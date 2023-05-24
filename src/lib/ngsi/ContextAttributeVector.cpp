@@ -679,7 +679,46 @@ void ContextAttributeVector::applyUpdateOperators(void)
         }
         else if (op == "$set")
         {
-          // TODO
+          orion::CompoundValueNode* o = new orion::CompoundValueNode(orion::ValueTypeObject);
+          //orion::CompoundValueNode* inner;
+          vec[ix]->valueType = orion::ValueTypeObject;
+
+          switch (upOp->valueType)
+          {
+          case orion::ValueTypeString:
+          case orion::ValueTypeNumber:
+          case orion::ValueTypeBoolean:
+          case orion::ValueTypeNull:
+          case orion::ValueTypeVector:
+            // Nothing to do in the case of inconsisent $set, e.g. {$set: 1}
+            // FIXME P4: this could be detected at parsing stage and deal with it as Bad Input, but it is harder...
+            break;
+
+          case orion::ValueTypeObject:
+            /*inner = new orion::CompoundValueNode(orion::ValueTypeObject);
+            for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
+            {
+              inner->add(upOp->childV[jx]->clone());
+            }
+            o->add(inner);*/
+            for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
+            {
+              o->add(upOp->childV[jx]->clone());
+            }
+            break;
+
+          case orion::ValueTypeNotGiven:
+            LM_E(("Runtime Error (value not given in compound value)"));
+            break;
+
+          default:
+            LM_E(("Runtime Error (unknown attribute type: %d)", upOp->valueType));
+          }
+
+          // Replace old compound value (with $push) with the new one ([])
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = o;
+
         }
         else if (op == "$unset")
         {
