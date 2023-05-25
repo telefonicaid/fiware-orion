@@ -50,8 +50,7 @@
             - [`$unset`](#unset)
             - [`$set` と `$unset` の組み合わせ](#combining-set-and-unset)
         - [Orion が演算子を処理する方法](#how-orion-deals-with-operators)
-        - [現在の制限](#current-limitations)
-            - [エンティティの作成または置換](#create-or-replace-entities)
+        - [エンティティの作成または置換操作での使用法](#usage-in-create-or-replace-entity-operations)
     - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
     - [メタデータ更新のセマンティクス (Metadata update semantics)](#metadata-update-semantics)
       - [`overrideMetadata` オプション](#overridemetadata-option)
@@ -1588,46 +1587,18 @@ PUT /v2/entities/E/attrs/A
 "1つの演算子のみを使用する" ルールの唯一の例外は、[上記のように](#combining-set-and-unset)、
 一緒に使用できる `$set` と `$unset` の場合です。
 
-<a name="current-limitations"></a>
+<a name="usage-in-create-or-replace-entity-operations"></a>
 
-### 現在の制限
+### エンティティの作成または置換操作での使用法
 
-<a name="create-or-replace-entities"></a>
+更新演算子は、エンティティの作成または置換操作で使用できます。特に:
 
-#### エンティティの作成または置換
-
-更新演算子は、エンティティの作成または置換操作では使用できません。たとえば、この方法で
-エンティティを作成する場合:
-
-```
-POST /v2/entities
-{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-作成されたばかりのエンティティの属性Aは、(文字通り) 次の JSON オブジェクトを値として持ちます
-: `{ "$inc": 2 }`
-
-ただし、既存のエンティティに新しい属性を追加する場合は機能することに注意してください。
-たとえば、属性AとBを持つエンティティEがすでにあり、この方法でCを追加する場合:
-
-```
-POST /v2/entities/E/attrs
-{
-  "C": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-Cは値 `2` で作成されます。
+* 数値演算子は 0 を基準とします。たとえば、`{"$inc": 4}` の結果は 4、`{$mul: 1000}` の結果は 0 になります
+* `$set` は空のオブジェクト (`{}`) を参照として受け取ります。たとえば、`"$set": {"X": 1}` は単に `{"X": 1}` になります
+* `$push` と `$addToSet` は空の配列 (`[]`) を参照として受け取ります。たとえば、`{"$push": 4}` は `[ 4 ]` になります
+* `$pull`、`$pullAll`、および `$unset` は無視されます。これは、演算子が使用される属性がエンティティ内に作成されないことを意味します。
+   たとえば、2つの属性を持つエンティティを作成すると、最初の属性には演算子 `"A": {"value": {"$unset": 1}, ... }"` が含まれ、2番目の属性には
+  `"B" が含まれます。 {"value": 3, ...}` (通常のもの) は、属性 `B` を1つだけ持つエンティティになります
 
 <a name="filtering-out-attributes-and-metadata"></a>
 
