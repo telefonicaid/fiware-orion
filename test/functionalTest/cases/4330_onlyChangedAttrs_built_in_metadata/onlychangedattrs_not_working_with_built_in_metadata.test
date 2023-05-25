@@ -21,11 +21,11 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-onlyChangedAttrrs not working with csubs cache
+Ensure onlyChangedAttrrs and previousMetadata work ok together
 
 --SHELL-INIT--
 dbDrop ${CB_DB_NAME} tk
-brokerStart CB 0 IPv4 -subCacheIval 2 -multiservice
+brokerStart CB 0 IPv4 -subCacheIval 2
 accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 --SHELL--
@@ -73,8 +73,7 @@ payload='{
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
     "onlyChangedAttrs":true,
-    "metadata": [ "previousValue" ],
-    "throttling": 0
+    "metadata": [ "previousValue" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload" --tenant tk --servicePath /
