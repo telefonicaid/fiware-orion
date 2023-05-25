@@ -90,9 +90,13 @@ static char* jsonPayloadClean(const char* payload)
 *
 * getProviderCount -
 *
-* getProviderCount is created for extrating the 'Fiware-Total-Count' header value so that we can add the same into total count,
+* getProviderCount is created for extracting the 'Fiware-Total-Count' header value so that we can add the same into total count,
 * And we can get the actualTotalCount value that includes total Entities of CP+CB.
 *
+* FIXME: this functions relies in text-based processing of the HTTP response stream (which includes headers).
+* It would be smarted to parse all the response headers in the response (for instance in a std::map) in the part
+* of the code dealing with response processing, so in this part we can just access to 'fiware-total-count' easily
+* using something like reponseHeaders["fiware-total-count"]
 */
 static void getProviderCount(std::string cpResponse, long long*  totalCount)
 {
@@ -854,6 +858,9 @@ std::string postQueryContext
     }
   }
 
+  // Before implementing pagination for CPrs, this block of code was part of step 02.
+  // However, in that step we only have the count for CB entities. It is in the new location
+  // (after queryForward() invocation) when we have the total count CB+CPr
   if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
   {
     char cV[32];
