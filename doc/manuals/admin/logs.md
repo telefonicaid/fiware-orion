@@ -217,7 +217,7 @@ time=2020-10-22T19:51:03.602Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 ```
 
 * If `-logDeprecate` is used, then NGSIv1 requests (both with and without payload) are logged at WARN level (note this doesn't
-  include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresonding
+  include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding
   to registrations using [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
 
 ```

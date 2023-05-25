@@ -73,7 +73,7 @@ A list of deprecated features and the version in which they were deprecated foll
 Some (not all) usages of deprecated features can be logged using the `-logDeprecate` [CLI flag](admin/cli.md)
 in the WARN log level. In particular, if this flag is activated:
 
-* NGSIv1 requests are logged. More information in [this section of the documentation](logs.md#info-level-in-detail)
+* NGSIv1 requests are logged. More information in [this section of the documentation](admin/logs.md#info-level-in-detail)
 
 ## Using old Orion versions
 
