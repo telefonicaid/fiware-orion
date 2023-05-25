@@ -179,7 +179,7 @@ The list of available options is the following:
 -   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
     Use this parameter to start the broker without metrics overhead.
 -   **-disableNgsiv1**. To turn off NGSIv1 operations. Note that only API endpoints are disabled, notifications using
-    [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresonding to registrations
+    [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding to registrations
     using [`"legacyForwarding": true`](../orion-api.md#registrationprovider) will work.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
