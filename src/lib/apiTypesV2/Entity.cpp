@@ -774,6 +774,17 @@ void Entity::fill(const QueryContextResponse& qcrs, OrionError* oeP)
 
 /* ****************************************************************************
 *
+* Entity::applyUpdateOperators -
+*/
+void Entity::applyUpdateOperators(void)
+{
+  attributeVector.applyUpdateOperators();
+}
+
+
+
+/* ****************************************************************************
+*
 * Entity::release - 
 */
 void Entity::release(void)
