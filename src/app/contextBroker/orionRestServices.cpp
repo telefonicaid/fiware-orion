@@ -158,6 +158,38 @@ static RestService getServiceV[] =
   { SubscriptionRequest,                           3, { "v2", "subscriptions", "*"                                                     },  getSubscription                                  },
   { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     },  getRegistration                                  },
   { RegistrationsRequest,                          2, { "v2", "registrations"                                                          },  getRegistrations                                 },
+  { LogTraceRequest,                               2, { "log", "trace"                                                                 },  logTraceTreat                                    },
+  { StatisticsRequest,                             1, { "statistics"                                                                   },  statisticsTreat                                  },
+  { StatisticsRequest,                             2, { "cache", "statistics"                                                          },  statisticsCacheTreat                             },
+  { VersionRequest,                                1, { "version"                                                                      },  versionTreat                                     },
+  { LogLevelRequest,                               2, { "admin", "log"                                                                 },  getLogConfig                                     },
+  { SemStateRequest,                               2, { "admin", "sem"                                                                 },  semStateTreat                                    },
+  { MetricsRequest,                                2, { "admin", "metrics"                                                             },  getMetrics                                       },
+
+#ifdef DEBUG
+  { ExitRequest,                                   2, { "exit", "*"                                                                    },  exitTreat                                        },
+  { ExitRequest,                                   1, { "exit"                                                                         },  exitTreat                                        },
+  { LeakRequest,                                   2, { "leak", "*"                                                                    },  leakTreat                                        },
+  { LeakRequest,                                   1, { "leak"                                                                         },  leakTreat                                        },
+#endif
+
+  ORION_REST_SERVICE_END
+};
+
+static RestService getServiceVlegacy[] =
+{
+  { EntryPointsRequest,                            1, { "v2"                                                                           },  entryPointsTreat                                 },
+  { EntitiesRequest,                               2, { "v2", "entities"                                                               },  getEntities                                      },
+  { EntityRequest,                                 3, { "v2", "entities", "*"                                                          },  getEntity                                        },
+  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 },  getEntity                                        },
+  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                   },  getEntityAttributeValue                          },
+  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                            },  getEntityAttribute                               },
+  { EntityTypeRequest,                             3, { "v2", "types", "*"                                                             },  getEntityType                                    },
+  { EntityAllTypesRequest,                         2, { "v2", "types"                                                                  },  getEntityAllTypes                                },
+  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          },  getAllSubscriptions                              },
+  { SubscriptionRequest,                           3, { "v2", "subscriptions", "*"                                                     },  getSubscription                                  },
+  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     },  getRegistration                                  },
+  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          },  getRegistrations                                 },
   // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
   //{ ContextEntitiesByEntityId,                     3, { "ngsi9", "contextEntities", "*"                                                },  getContextEntitiesByEntityId                     },
   //{ ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         },  getContextEntityAttributes                       },
@@ -229,6 +261,19 @@ static RestService postServiceV[] =
   { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, postBatchQuery                                    },
   { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, postBatchUpdate                                   },
   { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, postSubscriptions                                 },
+  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, postRegistration                                  },  
+
+  ORION_REST_SERVICE_END
+};
+
+static RestService postServiceVlegacy[] =
+{
+  { EntitiesRequest,                               2, { "v2", "entities"                                                               }, postEntities                                      },
+  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 }, postEntity                                        },
+  { NotifyContext,                                 3, { "v2", "op", "notify"                                                           }, postNotifyContext                                 },
+  { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, postBatchQuery                                    },
+  { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, postBatchUpdate                                   },
+  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, postSubscriptions                                 },
   { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, postRegistration                                  },
   // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
   //{ RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, postRegisterContext                               },
@@ -281,7 +326,6 @@ static RestService postServiceV[] =
 };
 
 
-
 /* ****************************************************************************
 *
 * putServiceV - 
@@ -291,9 +335,20 @@ static RestService putServiceV[] =
   { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                               }, putEntity                                        },
   { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                 }, putEntityAttributeValue                          },
   { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, putEntityAttribute                               },
+  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                     }, logTraceTreat                                    },
+  { LogLevelRequest,                               2, { "admin", "log"                                                               }, changeLogConfig                                  },
+
+  ORION_REST_SERVICE_END
+};
+
+static RestService putServiceVlegacy[] =
+{
+  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                               }, putEntity                                        },
+  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                 }, putEntityAttributeValue                          },
+  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, putEntityAttribute                               },
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                            }, putIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, putIndividualContextEntity                       },
-  { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, putIndividualContextEntityAttribute              },  
+  { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, putIndividualContextEntityAttribute              },
   { Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                       }, putSubscriptionConvOp                            },
   { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, putIndividualContextEntity                       },
   { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                              }, putIndividualContextEntity                       },
@@ -313,7 +368,6 @@ static RestService putServiceV[] =
 };
 
 
-
 /* ****************************************************************************
 *
 * patchServiceV - 
@@ -327,12 +381,26 @@ static RestService patchServiceV[] =
 };
 
 
-
 /* ****************************************************************************
 *
 * deleteServiceV - 
 */
 static RestService deleteServiceV[] =
+{
+  { EntityRequest,                                 3, { "v2", "entities", "*"                                                        }, deleteEntity                                        },
+  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, deleteEntity                                        },
+  { SubscriptionRequest,                           3, { "v2", "subscriptions", "*"                                                   }, deleteSubscription                                  },
+  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                   }, deleteRegistration                                  },
+  { LogTraceRequest,                               2, { "log", "trace"                                                               }, logTraceTreat                                       },
+  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                     }, logTraceTreat                                       },
+  { StatisticsRequest,                             1, { "statistics"                                                                 }, statisticsTreat                                     },
+  { StatisticsRequest,                             2, { "cache", "statistics"                                                        }, statisticsCacheTreat                                },
+  { MetricsRequest,                                2, { "admin", "metrics"                                                           }, deleteMetrics                                       },
+
+  ORION_REST_SERVICE_END
+};
+
+static RestService deleteServiceVlegacy[] =
 {
   { EntityRequest,                                 3, { "v2", "entities", "*"                                                        }, deleteEntity                                        },
   { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, deleteEntity                                        },
@@ -368,12 +436,42 @@ static RestService deleteServiceV[] =
 };
 
 
-
 /* ****************************************************************************
 *
 * badVerbV - 
 */
 static RestService badVerbV[] =
+{
+  { EntryPointsRequest,                            1, { "v2"                                                                           }, badVerbGetOnly            },
+  { EntitiesRequest,                               2, { "v2", "entities"                                                               }, badVerbGetPostOnly        },
+  { EntityRequest,                                 3, { "v2", "entities", "*"                                                          }, badVerbGetDeleteOnly      },
+  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 }, badVerbAllNotDelete       },
+  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                   }, badVerbGetPutOnly         },
+  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                            }, badVerbGetPutDeleteOnly   },
+  { EntityTypeRequest,                             3, { "v2", "types", "*"                                                             }, badVerbGetOnly            },
+  { EntityAllTypesRequest,                         2, { "v2", "types"                                                                  }, badVerbGetOnly            },
+  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, badVerbGetPostOnly        },
+  { SubscriptionRequest,                           3, { "v2", "subscriptions", "*"                                                     }, badVerbGetDeletePatchOnly },
+  { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, badVerbPostOnly           },
+  { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, badVerbPostOnly           },
+  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     }, badVerbGetDeleteOnly      },
+  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, badVerbGetPostOnly        },
+  { LogTraceRequest,                               2, { "log", "trace"                                                                 }, badVerbGetDeleteOnly      },
+  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                       }, badVerbPutDeleteOnly      },
+  { StatisticsRequest,                             1, { "statistics"                                                                   }, badVerbGetDeleteOnly      },
+  { StatisticsRequest,                             2, { "cache", "statistics"                                                          }, badVerbGetDeleteOnly      },
+  { VersionRequest,                                1, { "version"                                                                      }, badVerbGetOnly            },
+  { LogLevelRequest,                               2, { "admin", "log"                                                                 }, badVerbPutOnly            },
+  { SemStateRequest,                               2, { "admin", "sem"                                                                 }, badVerbGetOnly            },
+  { MetricsRequest,                                2, { "admin", "metrics"                                                             }, badVerbGetDeleteOnly      },
+
+  { InvalidRequest,                                0, { "*", "*", "*", "*", "*", "*"                                                   }, badRequest                },
+  { InvalidRequest,                                0, {                                                                                }, NULL                      },
+
+  ORION_REST_SERVICE_END
+};
+
+static RestService badVerbVlegacy[] =
 {
   { EntryPointsRequest,                            1, { "v2"                                                                           }, badVerbGetOnly            },
   { EntitiesRequest,                               2, { "v2", "entities"                                                               }, badVerbGetPostOnly        },
@@ -415,7 +513,7 @@ static RestService badVerbV[] =
   { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, badVerbGetPostOnly        },
   { ContextEntityTypes,                            4, { "v1", "registry", "contextEntityTypes", "*"                                    }, badVerbGetPostOnly        },
   { ContextEntityTypeAttributeContainer,           5, { "v1", "registry", "contextEntityTypes", "*", "attributes"                      }, badVerbGetPostOnly        },
-  { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },   
+  { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },
   { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, badVerbAllFour            },
   { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, badVerbAllFour            },
   { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, badVerbAllFour            },
@@ -436,7 +534,7 @@ static RestService badVerbV[] =
   { AttributesForEntityType,                       3, { "v1", "contextTypes", "*"                                                      }, badVerbGetOnly            },
   { AllContextEntities,                            2, { "v1", "contextEntities"                                                        }, badVerbGetPostOnly        },
   { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                                }, badVerbAllFour            },
-  { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, badVerbAllFour            }, 
+  { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, badVerbAllFour            },
   { ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, badVerbGetPostOnly        },
   { EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, badVerbGetPostOnly        },
   // FIXME: disable administrative API routes not aligned with documentation in Orion 3.8.0,
@@ -518,6 +616,7 @@ void orionRestServicesInit
    const char*         allowedOrigin,
    int                 corsMaxAge,
    int                 mhdTimeoutInSeconds,
+   bool                disableNgsiv1,
    const char*         httpsKey,
    const char*         httpsCert
 )
@@ -525,23 +624,47 @@ void orionRestServicesInit
   // Use options service vector (optionsServiceV) only when CORS is enabled
   RestService* optionsServiceV  = (strlen(allowedOrigin) > 0) ? optionsV : NULL;
 
-  restInit(getServiceV,
-           putServiceV,
-           postServiceV,
-           patchServiceV,
-           deleteServiceV,
-           optionsServiceV,
-           badVerbV,
-           ipVersion,
-           bindAddress,
-           port,
-           multitenant,
-           connectionMemory,
-           maxConnections,
-           mhdThreadPoolSize,
-           allowedOrigin,
-           corsMaxAge,
-           mhdTimeoutInSeconds,
-           httpsKey,
-           httpsCert);
+  if (disableNgsiv1)
+  {
+    restInit(getServiceV,
+             putServiceV,
+             postServiceV,
+             patchServiceV,
+             deleteServiceV,
+             optionsServiceV,
+             badVerbV,
+             ipVersion,
+             bindAddress,
+             port,
+             multitenant,
+             connectionMemory,
+             maxConnections,
+             mhdThreadPoolSize,
+             allowedOrigin,
+             corsMaxAge,
+             mhdTimeoutInSeconds,
+             httpsKey,
+             httpsCert);
+  }
+  else
+  {
+    restInit(getServiceVlegacy,
+             putServiceVlegacy,
+             postServiceVlegacy,
+             patchServiceV,
+             deleteServiceVlegacy,
+             optionsServiceV,
+             badVerbVlegacy,
+             ipVersion,
+             bindAddress,
+             port,
+             multitenant,
+             connectionMemory,
+             maxConnections,
+             mhdThreadPoolSize,
+             allowedOrigin,
+             corsMaxAge,
+             mhdTimeoutInSeconds,
+             httpsKey,
+             httpsCert);  }
 }

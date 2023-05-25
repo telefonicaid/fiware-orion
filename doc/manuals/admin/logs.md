@@ -216,6 +216,15 @@ time=2020-10-22T19:51:03.601Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 time=2020-10-22T19:51:03.602Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908 | trans=1603396258-520-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[79]:logInfoRequestWithoutPayload | msg=Request received: GET /v2/entities/E1?type=T1, response code: 200
 ```
 
+* If `-logDeprecate` is used, then NGSIv1 requests (both with and without payload) are logged at WARN level (note this doesn't
+  include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresonding
+  to registrations using [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
+
+```
+time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
+time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
+```
+
 [Top](#top)  
 
 ## Alarms

@@ -1,0 +1,92 @@
+--NAME--
+Disable NGSIv1 CLI
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPV4 -logDeprecate
+
+--SHELL--
+
+#
+# 01. Query E1-T1
+# 02. GET /v1/contextEntities/E
+# 03. Get WARNING trace in logs
+#
+
+echo "01. Query E1-T1"
+echo "==============="
+payload='{
+  "entities": [
+    {
+      "type": "T1",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}"
+echo
+echo
+
+
+echo "02. GET /v1/contextEntities/E"
+echo "============================="
+orionCurl --url /v1/contextEntities/E
+echo
+echo
+
+
+echo "03. Get WARNING trace in logs"
+echo "============================="
+cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+--REGEXPECT--
+01. Query E1-T1
+===============
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+02. GET /v1/contextEntities/E
+=============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 156
+
+{
+    "contextElement": {
+        "id": "E",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /E/",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+03. Get WARNING trace in logs
+=============================
+Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
+Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -68,6 +68,13 @@ A list of deprecated features and the version in which they were deprecated foll
 * Configuration Manager role (deprecated in 0.21.0, removed in 0.25.0)
 * Associations (deprecated in 0.21.0, removed in 0.25.0).
 
+## Log deprecation warnings
+
+Some (not all) usages of deprecated features can be logged using the `-logDeprecate` [CLI flag](admin/cli.md)
+in the WARN log level. In particular, if this flag is activated:
+
+* NGSIv1 requests are logged. More information in [this section of the documentation](logs.md#info-level-in-detail)
+
 ## Using old Orion versions
 
 Although you are encouraged to use always the newest Orion version, take into account the following
