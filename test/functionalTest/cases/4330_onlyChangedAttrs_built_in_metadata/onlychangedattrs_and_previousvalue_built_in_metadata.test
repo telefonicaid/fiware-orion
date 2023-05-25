@@ -80,8 +80,6 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
-sleep 2s
-
 echo '03. Update E1-A'
 echo '==============='
 payload='{
@@ -97,7 +95,7 @@ echo
 
 echo '04. Sleep until cache refres, update E1-A again'
 echo '==============================================='
-sleep 2.5s
+sleep 4.5s
 payload='{
    "A": {
      "value": "zzz",
