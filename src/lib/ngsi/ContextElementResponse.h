@@ -86,6 +86,8 @@ typedef struct ContextElementResponse
                       const std::vector<std::string>&      metadataFilter,
                       std::map<std::string, std::string>*  replacementsP);
 
+  void         applyUpdateOperators(void);
+
   void         release(void);
 
   std::string  check(ApiVersion          apiVersion,
