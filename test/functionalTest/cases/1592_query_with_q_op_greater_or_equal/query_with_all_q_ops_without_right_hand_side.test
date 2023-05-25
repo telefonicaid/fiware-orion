@@ -166,10 +166,10 @@ echo
 01. Empty q
 ===========
 HTTP/1.1 400 Bad Request
-Content-Length: 78
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 78
 
 {
     "description": "Empty right-hand-side for URI param /q/",
@@ -180,10 +180,10 @@ Date: REGEX(.*)
 02. Operation NOT EXIST
 =======================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "empty right-hand-side in q-item",
@@ -194,10 +194,10 @@ Date: REGEX(.*)
 03. Operation ==
 ================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "empty right-hand-side in q-item",
@@ -208,10 +208,10 @@ Date: REGEX(.*)
 04. Operation !=
 ================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "empty right-hand-side in q-item",
@@ -222,10 +222,10 @@ Date: REGEX(.*)
 05. Operation >
 ===============
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "empty right-hand-side in q-item",
@@ -236,10 +236,10 @@ Date: REGEX(.*)
 06. Operation <
 ===============
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "empty right-hand-side in q-item",
@@ -250,10 +250,10 @@ Date: REGEX(.*)
 07. Operation >=
 ================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "empty right-hand-side in q-item",
@@ -264,10 +264,10 @@ Date: REGEX(.*)
 08. Operation <=
 ================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "empty right-hand-side in q-item",
@@ -278,10 +278,10 @@ Date: REGEX(.*)
 09. Q-part empty I
 ==================
 HTTP/1.1 400 Bad Request
-Content-Length: 46
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 46
 
 {
     "description": "empty q",
@@ -292,10 +292,10 @@ Date: REGEX(.*)
 10. Q-part empty II
 ===================
 HTTP/1.1 400 Bad Request
-Content-Length: 51
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 51
 
 {
     "description": "empty q-item",
@@ -306,10 +306,10 @@ Date: REGEX(.*)
 11. Operation == without left-hand-side
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "description": "empty left-hand-side in q-item",
@@ -320,10 +320,10 @@ Date: REGEX(.*)
 12. Operation != without left-hand-side
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "description": "empty left-hand-side in q-item",
@@ -334,10 +334,10 @@ Date: REGEX(.*)
 13. Operation > without left-hand-side
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "description": "empty left-hand-side in q-item",
@@ -348,10 +348,10 @@ Date: REGEX(.*)
 14. Operation < without left-hand-side
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "description": "empty left-hand-side in q-item",
@@ -362,10 +362,10 @@ Date: REGEX(.*)
 15. Operation >= without left-hand-side
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "description": "empty left-hand-side in q-item",
@@ -376,10 +376,10 @@ Date: REGEX(.*)
 16. Operation <= without left-hand-side
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "description": "empty left-hand-side in q-item",

@@ -230,10 +230,10 @@ echo
 01. Create en1, en2/t, en3/t, en4/t in CB (with a small delay to have different creDates)
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 193
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 193
 
 {
     "contextResponses": [
@@ -260,10 +260,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 193
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 193
 
 {
     "contextResponses": [
@@ -290,10 +290,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 193
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 193
 
 {
     "contextResponses": [
@@ -320,10 +320,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 193
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 193
 
 {
     "contextResponses": [
@@ -352,10 +352,10 @@ Date: REGEX(.*)
 02. Create en4/ping in CP1
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 196
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 196
 
 {
     "contextResponses": [
@@ -384,10 +384,10 @@ Date: REGEX(.*)
 03. Register en4/ping in CB
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -398,10 +398,10 @@ Date: REGEX(.*)
 04. Query all
 =============
 HTTP/1.1 200 OK
-Content-Length: 757
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 757
 
 {
     "contextResponses": [
@@ -489,10 +489,10 @@ Date: REGEX(.*)
 05. Query offset=0, limit=1
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 194
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 194
 
 {
     "contextResponses": [
@@ -521,10 +521,10 @@ Date: REGEX(.*)
 06. Query offset=0, limit=2
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 413
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 413
 
 {
     "contextResponses": [
@@ -576,10 +576,10 @@ Date: REGEX(.*)
 07. Query offset=0, limit=3
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 585
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 585
 
 {
     "contextResponses": [
@@ -649,10 +649,10 @@ Date: REGEX(.*)
 08. Query offset=0, limit=4
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 757
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 757
 
 {
     "contextResponses": [
@@ -740,10 +740,10 @@ Date: REGEX(.*)
 09. Query offset=0, limit=5
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 757
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 757
 
 {
     "contextResponses": [
@@ -831,10 +831,10 @@ Date: REGEX(.*)
 10. Query offset=1, limit=1
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 241
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 241
 
 {
     "contextResponses": [

@@ -230,10 +230,10 @@ echo
 01. Intent to register an entity with '<' as part of entity::id
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 142
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 142
 
 {
     "errorCode": {
@@ -248,10 +248,10 @@ Date: REGEX(.*)
 02. Intent to discover an entity with '>' as part of entity::type
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "errorCode": {
@@ -265,10 +265,10 @@ Date: REGEX(.*)
 03. Intent to register an entity with '=' as part of providingApplication
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 142
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 142
 
 {
     "errorCode": {
@@ -283,10 +283,10 @@ Date: REGEX(.*)
 04. Intent to query an entity with  ';' as part of a scopeType
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "errorCode": {
@@ -300,10 +300,10 @@ Date: REGEX(.*)
 05. Intent to update an entity with '(' as part of contextAttribute::type
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "errorCode": {
@@ -317,10 +317,10 @@ Date: REGEX(.*)
 06. Intent to update an entity with '(' as part of a value in compound contextAttribute::value
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "errorCode": {
@@ -334,10 +334,10 @@ Date: REGEX(.*)
 07: Intent to subscribe to an entity with ')' as part of reference
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
     "subscribeError": {

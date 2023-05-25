@@ -82,10 +82,10 @@ echo
 01. Create entity E using NGSIv1 without type in entity, attribute and metadata
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 230
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 230
 
 {
     "contextResponses": [
@@ -121,10 +121,10 @@ Date: REGEX(.*)
 02. Get entity using NGSIv1 operation
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 210
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 210
 
 {
     "contextElement": {
@@ -156,10 +156,10 @@ Date: REGEX(.*)
 03. Get entity using NGSIv2 operation
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 106
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 106
 
 {
     "A": {

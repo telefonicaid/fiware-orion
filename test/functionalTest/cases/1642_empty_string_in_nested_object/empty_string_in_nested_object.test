@@ -81,10 +81,10 @@ echo
 01. POST /v1/updateContext with empty string in nested object
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 296
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 296
 
 {
     "contextResponses": [
@@ -123,10 +123,10 @@ Date: REGEX(.*)
 02. GET /v1/contextEntities/E1
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 287
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 287
 
 {
     "contextElement": {

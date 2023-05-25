@@ -134,10 +134,10 @@ echo
 0. Query all entities using convop /v1/contextEntities
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -150,10 +150,10 @@ Date: REGEX(.*)
 1. APPEND entity E1, type T1 with attribute A1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -182,10 +182,10 @@ Date: REGEX(.*)
 2. APPEND entity E2, WITHOUT TYPE and with attribute A2
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 184
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 184
 
 {
     "contextResponses": [
@@ -214,10 +214,10 @@ Date: REGEX(.*)
 3. APPEND entity E3, type T3 with attribute A3
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -246,10 +246,10 @@ Date: REGEX(.*)
 4. Query all entities using convop /v1/contextEntities
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 518
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 518
 
 {
     "contextResponses": [
@@ -314,10 +314,10 @@ Date: REGEX(.*)
 5. Statistics
 =============
 HTTP/1.1 200 OK
-Content-Length: 51
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 51
 
 {
     "measuring_interval_in_secs": REGEX(\d+),

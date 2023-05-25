@@ -92,20 +92,20 @@ echo
 01. Create an entity with double undercore
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/KMZ1211?type=Bus
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/KMZ1211?type=Bus
+Content-Length: 0
 
 
 
 02. Retreive entity
 ===================
 HTTP/1.1 200 OK
-Content-Length: 482
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 482
 
 {
     "__UID": {

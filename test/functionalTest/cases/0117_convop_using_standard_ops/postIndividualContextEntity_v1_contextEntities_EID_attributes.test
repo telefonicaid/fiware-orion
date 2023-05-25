@@ -226,10 +226,10 @@ echo
 01. POST /v1/contextEntities/E1/attributes
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 165
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 165
 
 {
     "contextResponses": [
@@ -256,10 +256,10 @@ Date: REGEX(.*)
 02. Query the entity 'E1' that was just created
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -288,10 +288,10 @@ Date: REGEX(.*)
 03. Query the entity 'E1' with URI-param attributesFormat=object
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 179
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 179
 
 {
     "contextResponses": [
@@ -319,10 +319,10 @@ Date: REGEX(.*)
 04. POST /v1/contextEntities/E2/attributes?entity::type=E (id='E2', type='F' in payload) and see it fail
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 111
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 111
 
 {
     "errorCode": {
@@ -336,10 +336,10 @@ Date: REGEX(.*)
 05. POST /v1/contextEntities/E2/attributes?entity::type=E (id='E3', type='E' in payload) and see it fail
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 109
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 109
 
 {
     "errorCode": {
@@ -353,10 +353,10 @@ Date: REGEX(.*)
 06. POST /v1/contextEntities/E2/attributes?entity::type=E (isPattern='true' in payload) and see it fail
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 140
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 140
 
 {
     "errorCode": {
@@ -370,10 +370,10 @@ Date: REGEX(.*)
 07. POST /v1/contextEntities/E2/attributes?entity::type=E (id='E2', type='E' in payload) and see it work
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 165
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 165
 
 {
     "contextResponses": [
@@ -400,10 +400,10 @@ Date: REGEX(.*)
 08. Query the entity 'E2' that was just created
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -432,10 +432,10 @@ Date: REGEX(.*)
 09. Change attribute 'A' of the entity 'E2'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 165
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 165
 
 {
     "contextResponses": [
@@ -462,10 +462,10 @@ Date: REGEX(.*)
 10. Query the entity 'E2' that was just modified
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 187
 
 {
     "contextResponses": [

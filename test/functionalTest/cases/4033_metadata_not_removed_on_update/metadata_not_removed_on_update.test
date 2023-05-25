@@ -245,30 +245,30 @@ echo
 01. Create subscription for entity E
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity E with attribute A=foo and metadata MD1=1 and MD2=2
 =====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 03. GET entity E and see A=foo with metadata MD1=1 and MD2=2
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 136
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 136
 
 {
     "A": {
@@ -331,18 +331,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. Update entity E with A=bar
 ==============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. GET entity E and see A=bar with metadata MD1=1 and MD2=2
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 136
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 136
 
 {
     "A": {
@@ -405,18 +405,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. Update entity E with A=zzz and metadata MD1=10
 ==================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. GET entity E and see A=zzz and metadata MD1=10 and MD2=2
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 137
 
 {
     "A": {
@@ -479,18 +479,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 11. Update entity E with A=yyy and metadata MD3=30
 ==================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 12. GET entity E and see A=yyy and metadata MD1=10, MD2=2 and MD3=30
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 172
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 172
 
 {
     "A": {
@@ -561,18 +561,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 14. Update entity E with A=www and metadata MD2=null
 ====================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 15. GET entity E and see A=www and metadata MD1=10, MD2=null and MD3=30
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 173
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 173
 
 {
     "A": {

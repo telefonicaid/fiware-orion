@@ -89,10 +89,10 @@ echo
 01. Add subscription to E.*/ET
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "subscribeResponse": {
@@ -105,10 +105,10 @@ Date: REGEX(.*)
 02. Create entity E1/ET
 =======================
 HTTP/1.1 200 OK
-Content-Length: 169
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 169
 
 {
     "contextResponses": [

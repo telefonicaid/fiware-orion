@@ -316,10 +316,10 @@ echo
 01. Create subscription for E1 with empty template part - see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "url httpCustom notification is missing",
@@ -330,10 +330,10 @@ Date: REGEX(.*)
 02. Create subscription for E1 with everything except URL in template part - see error
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "url httpCustom notification is missing",
@@ -344,10 +344,10 @@ Date: REGEX(.*)
 03. Create subscription for E1 with URL and invalid VERB in template part - see error
 =====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "unknown method httpCustom notification",
@@ -358,10 +358,10 @@ Date: REGEX(.*)
 04. Create subscription for E1 without URL in http-part - see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "description": "url http notification is missing",
@@ -372,10 +372,10 @@ Date: REGEX(.*)
 05. Create subscription for E1 without http-part nor template part - see error
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 {
     "description": "http, httpCustom, mqtt or mqttCustom is missing",
@@ -386,10 +386,10 @@ Date: REGEX(.*)
 06. Create subscription for E1 with both http-part and template part - see error
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "only one of http, httpCustom, mqtt or mqttCustom is allowed",
@@ -400,10 +400,10 @@ Date: REGEX(.*)
 07. Create subscription for E1 with forbidden chars in http:url - see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 79
 
 {
     "description": "forbidden characters in http field /url/",
@@ -414,10 +414,10 @@ Date: REGEX(.*)
 08. Create subscription for E1 with forbidden chars in template:url - see error
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "forbidden characters in custom /url/",
@@ -428,10 +428,10 @@ Date: REGEX(.*)
 09. Create subscription for E1 with forbidden chars in template:payload - see error
 ===================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 79
 
 {
     "description": "forbidden characters in custom /payload/",
@@ -442,10 +442,10 @@ Date: REGEX(.*)
 10. Create subscription for E1 with forbidden chars in template:qs - see error
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 96
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 96
 
 {
     "description": "forbidden characters in custom notification httpCustom qs",
@@ -456,10 +456,10 @@ Date: REGEX(.*)
 11. Create subscription for E1 with forbidden chars in template:headers - see error
 ===================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 101
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 101
 
 {
     "description": "forbidden characters in custom notification httpCustom headers",

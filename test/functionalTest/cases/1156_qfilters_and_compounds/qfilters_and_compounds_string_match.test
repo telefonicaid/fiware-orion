@@ -99,20 +99,20 @@ echo
 01. Create E1 with A1 with compound value containing all JSON types
 ===================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. end-match: GET /v2/entities?q=A1.s~=ing, see E1
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 194
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 194
 
 [
     {
@@ -142,10 +142,10 @@ Date: REGEX(.*)
 03. start-match: GET /v2/entities?q=A1.s~=test_, see E1
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 194
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 194
 
 [
     {
@@ -175,10 +175,10 @@ Date: REGEX(.*)
 04. middle-match: GET /v2/entities?q=A1.s~=t_st, see E1
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 194
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 194
 
 [
     {
@@ -208,10 +208,10 @@ Date: REGEX(.*)
 05. one-char-match: GET /v2/entities?q=A1.s~=_, see E1
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 194
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 194
 
 [
     {
@@ -241,10 +241,10 @@ Date: REGEX(.*)
 06. no-match: GET /v2/entities?q=A1.s~=none, see nothing
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

@@ -88,10 +88,10 @@ echo
 01. Create entity with metadata with dot in the name
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 289
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 289
 
 {
     "contextResponses": [
@@ -132,10 +132,10 @@ Date: REGEX(.*)
 02. Retrieve entity
 ===================
 HTTP/1.1 200 OK
-Content-Length: 269
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 269
 
 {
     "contextElement": {
@@ -171,7 +171,7 @@ Date: REGEX(.*)
 
 03. Check the '=' in DB
 =======================
-{ "attrs" : { "A" : { "type" : "T", "creDate" : REGEX(.*), "value" : "foo", "md" : { "m=x" : { "type" : "string", "value" : "black" }, "m=y" : { "type" : "string", "value" : "sweet" } }, "mdNames" : [ "m.x", "m.y" ] } } }
+{ "attrs" : { "A" : { "value" : "foo", "type" : "T", "creDate" : REGEX(.*), "md" : { "m=x" : { "type" : "string", "value" : "black" }, "m=y" : { "type" : "string", "value" : "sweet" } }, "mdNames" : [ "m.x", "m.y" ] } } }
 
 
 --TEARDOWN--

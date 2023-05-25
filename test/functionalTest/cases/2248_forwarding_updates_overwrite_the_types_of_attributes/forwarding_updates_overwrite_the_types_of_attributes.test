@@ -118,20 +118,20 @@ echo
 01. Create E1/T1/A1 in CP1, A1 with type 'string'
 =================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. Register E1/T1/A1 in CB, as belonging to CP1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -143,10 +143,10 @@ Date: REGEX(.*)
 Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1
 =============================================================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -157,10 +157,10 @@ Date: REGEX(.*)
 04. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 78
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 78
 
 [
     {
@@ -179,10 +179,10 @@ Date: REGEX(.*)
 Note: we get 404 Not Found, but is ok. It is due to accumulator-server.py doesn't answers in NGSIv1
 =============================================================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -193,10 +193,10 @@ Date: REGEX(.*)
 06. Make sure that the value of E1/T1/A1 is updated in CP1, but that its attribute type stays intact (as 'string')
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 [
     {

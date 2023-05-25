@@ -158,10 +158,10 @@ echo
 01. Empty entity-id: GET    /v2/entities//attrs/A1
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -172,10 +172,10 @@ Date: REGEX(.*)
 02. Empty entity-id: PUT    /v2/entities//attrs/A1
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -186,10 +186,10 @@ Date: REGEX(.*)
 03. Empty entity-id: DELETE /v2/entities//attrs/A1
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -200,10 +200,10 @@ Date: REGEX(.*)
 04. Empty entity-id: GET    /v2/entities//attrs
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -214,10 +214,10 @@ Date: REGEX(.*)
 05. Empty entity-id: POST   /v2/entities//attrs
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -228,10 +228,10 @@ Date: REGEX(.*)
 06. Empty entity-id: PUT    /v2/entities//attrs
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -242,10 +242,10 @@ Date: REGEX(.*)
 07. Empty entity-id: PATCH  /v2/entities//attrs
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -256,10 +256,10 @@ Date: REGEX(.*)
 08. Empty entity-id: GET    /v2/entities//attrs/A1/value
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -270,10 +270,10 @@ Date: REGEX(.*)
 09. Empty entity-id: PUT    /v2/entities//attrs/A1/value
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -284,10 +284,10 @@ Date: REGEX(.*)
 10. Empty attr-name: GET    /v2/entities/E1/attrs//value
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
 
 {
     "description": "attribute name length: 0, min length supported: 1",
@@ -298,10 +298,10 @@ Date: REGEX(.*)
 11. Empty attr-name: PUT    /v2/entities/E1/attrs//value
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
 
 {
     "description": "attribute name length: 0, min length supported: 1",

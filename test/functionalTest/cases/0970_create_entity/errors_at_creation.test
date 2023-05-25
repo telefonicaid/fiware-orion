@@ -151,10 +151,10 @@ echo
 01. POST /v2/entities without Entity::id
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -165,10 +165,10 @@ Date: REGEX(.*)
 02. POST /v2/entities with empty Entity::id
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -179,10 +179,10 @@ Date: REGEX(.*)
 03. POST /v2/entities with boolean Entity::id
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "Invalid JSON type for entity id",
@@ -193,10 +193,10 @@ Date: REGEX(.*)
 04. POST /v2/entities with Entity::id as a number
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "Invalid JSON type for entity id",
@@ -207,10 +207,10 @@ Date: REGEX(.*)
 05. POST /v2/entities with boolean Entity::type
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
 
 {
     "description": "Invalid JSON type for entity type",
@@ -221,10 +221,10 @@ Date: REGEX(.*)
 06. POST /v2/entities with Entity::type as a number
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
 
 {
     "description": "Invalid JSON type for entity type",
@@ -235,10 +235,10 @@ Date: REGEX(.*)
 07. POST /v2/entities without Attribute::name
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
 
 {
     "description": "attribute name length: 0, min length supported: 1",
@@ -249,10 +249,10 @@ Date: REGEX(.*)
 08. POST /v2/entities with Attribute::name as a number
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -263,10 +263,10 @@ Date: REGEX(.*)
 09. POST /v2/entities with boolean Attribute::name
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",

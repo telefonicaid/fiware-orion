@@ -180,18 +180,18 @@ echo
 01. Create E1/T1/A1=1,A2=1, using POST /v2/op/update with APPEND
 ================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 02. GET /v2/entities/E1 to see E1/T1/A1=1,A2=1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
     "A1": {
@@ -212,10 +212,10 @@ Date: REGEX(.*)
 03. Modify A1=3, with idPattern(.*) using POST /v2/op/update with UPDATE, see error
 ===================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 57
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 57
 
 {
     "description": "NotImplemented",
@@ -226,10 +226,10 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1 to see E1/T1/A1=1,A2=1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
     "A1": {
@@ -250,10 +250,10 @@ Date: REGEX(.*)
 05. Modify A1=4, with idPattern(E.*) using POST /v2/op/update with UPDATE, see error
 ====================================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 57
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 57
 
 {
     "description": "NotImplemented",
@@ -264,10 +264,10 @@ Date: REGEX(.*)
 06. GET /v2/entities/E1 to see E1/T1/A1=1,A2=1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
     "A1": {
@@ -288,10 +288,10 @@ Date: REGEX(.*)
 07. Try to UPDATE non-existing attribute A3, with idPattern(.*), see error
 ==========================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 57
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 57
 
 {
     "description": "NotImplemented",
@@ -302,10 +302,10 @@ Date: REGEX(.*)
 08. GET /v2/entities/E1 to see E1/T1/A1=1,A2=1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
     "A1": {
@@ -326,10 +326,10 @@ Date: REGEX(.*)
 09. Try to UPDATE non-existing attribute A3, with idPattern(E.*), see error
 ===========================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 57
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 57
 
 {
     "description": "NotImplemented",
@@ -340,10 +340,10 @@ Date: REGEX(.*)
 10. GET /v2/entities/E1 to see E1/T1/A1=1,A2=1
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
     "A1": {

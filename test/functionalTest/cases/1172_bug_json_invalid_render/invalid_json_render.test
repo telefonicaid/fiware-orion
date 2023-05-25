@@ -71,10 +71,10 @@ echo
 01. Update with \n in the JSON
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 193
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 193
 
 {
     "contextResponses": [
@@ -103,10 +103,10 @@ Date: REGEX(.*)
 02. Query entity
 ================
 HTTP/1.1 200 OK
-Content-Length: 182
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 182
 
 {
     "contextElement": {

@@ -231,6 +231,17 @@ std::string ContextElementResponse::toJson
 
 /* ****************************************************************************
 *
+* ContextElementResponse::applyUpdateOperators -
+*/
+void ContextElementResponse::applyUpdateOperators(void)
+{
+  entity.applyUpdateOperators();
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElementResponse::release - 
 */
 void ContextElementResponse::release(void)

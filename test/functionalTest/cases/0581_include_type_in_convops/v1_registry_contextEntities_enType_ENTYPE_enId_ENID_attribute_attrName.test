@@ -98,10 +98,10 @@ echo
 01. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 and see it fail
 ===========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -114,10 +114,10 @@ Date: REGEX(.*)
 02. POST /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 OK
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -128,10 +128,10 @@ Date: REGEX(.*)
 03. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 OK
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 213
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 213
 
 {
     "contextRegistrationResponses": [
@@ -160,10 +160,10 @@ Date: REGEX(.*)
 04. POST /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -174,10 +174,10 @@ Date: REGEX(.*)
 05. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 213
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 213
 
 {
     "contextRegistrationResponses": [
@@ -206,10 +206,10 @@ Date: REGEX(.*)
 06. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: 247
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 247
 
 {
     "counters": {

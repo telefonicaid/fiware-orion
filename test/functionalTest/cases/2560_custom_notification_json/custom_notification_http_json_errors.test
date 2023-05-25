@@ -87,10 +87,10 @@ echo
 01. Create custom subscription with payload and json field, see error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 133
 
 {
     "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
@@ -101,10 +101,10 @@ Date: REGEX(.*)
 02. Create custom subscription with json field as string, see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 102
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 102
 
 {
     "description": "json fields in httpCustom or mqttCustom must be object or array",

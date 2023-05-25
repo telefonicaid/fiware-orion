@@ -241,20 +241,20 @@ echo
 01. POST /v2/subscriptions, to create subscription.
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. POST /v2/entities, to create Room1 with temperature and pressure.
 =====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Room
+Content-Length: 0
 
 
 
@@ -290,8 +290,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 04. POST /v2/entities/Room1?options=forcedUpdate, update entity with same value.
 ================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -327,8 +327,8 @@ Fiware-Correlator: REGEX(.*)
 06. POST /v2/entities/Room1/attrs?options=append,forcedUpdate, update entity with same value.
 =============================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -339,8 +339,8 @@ Date: REGEX(.*)
 08. PUT /v2/entities/Room1?options=forcedUpdate, update entity with same value.
 ===============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -376,8 +376,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 10. PUT /v2/entities/Room1/attrs/pressure?options=forcedUpdate, update entity with same value.
 ==============================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -413,8 +413,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 12. PUT /v2/entities/Room1/attrs/pressure/value?options=forcedUpdate, update entity with same value.
 ====================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -450,8 +450,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 14. PATCH /v2/entities/Room1/attrs?options=forcedUpdate, update entity with same value.
 =======================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

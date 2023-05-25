@@ -207,10 +207,10 @@ orionCurl --url "$url" --payload "$payload"
 --REGEXPECT--
 1. Create entity corresponding to Madrid
 HTTP/1.1 200 OK
-Content-Length: 267
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 267
 
 {
     "contextResponses": [
@@ -244,10 +244,10 @@ Date: REGEX(.*)
 
 2. Create entity corresponding to Alcobendas
 HTTP/1.1 200 OK
-Content-Length: 271
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 271
 
 {
     "contextResponses": [
@@ -281,10 +281,10 @@ Date: REGEX(.*)
 
 3. Create entity corresponding to Leganes
 HTTP/1.1 200 OK
-Content-Length: 268
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 268
 
 {
     "contextResponses": [
@@ -317,10 +317,10 @@ Date: REGEX(.*)
 }
 4: ++++++++++ Madrid in 13.5 kms ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 549
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 549
 
 {
     "contextResponses": [
@@ -378,10 +378,10 @@ Date: REGEX(.*)
 }
 5: +++++++++++ Madrid in 15 kms +++++++++
 HTTP/1.1 200 OK
-Content-Length: 818
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 818
 
 {
     "contextResponses": [
@@ -464,10 +464,10 @@ Date: REGEX(.*)
 }
 6: ++++++++++++ Madrid out 13.5 kms ++++++++
 HTTP/1.1 200 OK
-Content-Length: 291
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 291
 
 {
     "contextResponses": [

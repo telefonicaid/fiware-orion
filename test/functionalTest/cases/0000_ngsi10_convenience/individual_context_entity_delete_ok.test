@@ -53,10 +53,10 @@ orionCurl --url "/v1/contextEntities/entity01"
 --REGEXPECT--
 +++++ 1. create an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 183
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 183
 
 {
     "contextResponses": [
@@ -80,10 +80,10 @@ Date: REGEX(.*)
 }
 +++++ 2. lookup the entity +++++
 HTTP/1.1 200 OK
-Content-Length: 181
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 181
 
 {
     "contextElement": {
@@ -105,10 +105,10 @@ Date: REGEX(.*)
 }
 +++++ 3. delete the entity +++++
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",
@@ -116,10 +116,10 @@ Date: REGEX(.*)
 }
 +++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++
 HTTP/1.1 200 OK
-Content-Length: 170
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 170
 
 {
     "contextElement": {

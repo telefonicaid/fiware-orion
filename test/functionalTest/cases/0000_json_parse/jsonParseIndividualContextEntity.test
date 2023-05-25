@@ -107,10 +107,10 @@ orionCurl --url "/v1/contextEntities/ENTITY_ID" -X "DELETE"
 --REGEXPECT--
 1: ++++++++ GET that fails +++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 172
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 172
 
 {
     "contextElement": {
@@ -126,10 +126,10 @@ Date: REGEX(.*)
 }
 2: ++++++++ DELETE that fails +++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 78
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 78
 
 {
     "code": "404",
@@ -138,10 +138,10 @@ Date: REGEX(.*)
 }
 3: ++++++++ POST that is OK ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 180
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 180
 
 {
     "contextResponses": [
@@ -165,10 +165,10 @@ Date: REGEX(.*)
 }
 4: +++++++++ PUT that fails +++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 172
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 172
 
 {
     "errorCode": {
@@ -179,10 +179,10 @@ Date: REGEX(.*)
 }
 5: +++++++++ Register an entity +++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -190,10 +190,10 @@ Date: REGEX(.*)
 }
 6: ++++++++++++ GET that is OK +++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 179
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 179
 
 {
     "contextElement": {
@@ -215,10 +215,10 @@ Date: REGEX(.*)
 }
 7: +++++++++++++ PUT that is OK ++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 133
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 133
 
 {
     "contextResponses": [
@@ -239,10 +239,10 @@ Date: REGEX(.*)
 }
 8: ++++++++++++++ DELETE that is OK +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "code": "200",

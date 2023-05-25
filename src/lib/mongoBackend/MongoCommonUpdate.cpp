@@ -405,6 +405,7 @@ static ChangeType mergeAttrInfo
     // value is omitted from toSet in the case some operator ($inc, etc.) is used
     if (!isSomeCalculatedOperatorUsed(caP))
     {
+      // FIXME P7: boolean return value should be managed?
       caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
     }
   }
@@ -663,6 +664,7 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_CREATION_DATE, now);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
+    // FIXME P7: boolean return value should be managed?
     caP->valueBson(std::string(ENT_ATTRS_VALUE), &newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     /* Custom metadata */
@@ -742,6 +744,7 @@ static bool appendAttribute
   // value is omitted from toSet in the case some operator ($inc, etc.) is used
   if (!isSomeCalculatedOperatorUsed(caP))
   {
+    // FIXME P7: boolean return value should be managed?
     caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, caP->type, ngsiv1Autocast && (apiVersion == V1));
   }
 
@@ -1684,7 +1687,7 @@ static bool addTriggeredSubscriptions_noCache
       bool  notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
 
       // Depending of the alteration type, we use the list of attributes in the request or the list
-      // with effective modifications
+      // with effective modifications. Note that EntityDelete doesn't check the list
       if (targetAltType == ngsiv2::EntityUpdate)
       {
         if (!condValueAttrMatch(sub, attributes))
@@ -1692,7 +1695,7 @@ static bool addTriggeredSubscriptions_noCache
           continue;
         }
       }
-      else
+      else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
       {
         if (!condValueAttrMatch(sub, attrsWithModifiedValue) && !(notifyOnMetadataChange && condValueAttrMatch(sub, attrsWithModifiedMd)))
         {
@@ -2930,11 +2933,16 @@ static bool createEntity
       attrType = attrsV[ix]->type;
     }
 
+    if (!attrsV[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1)))
+    {
+      // nothing added to bsonAttr, so attribute is not going to be included in the update to the MongoDB
+      // (for example, when $unset:1 is used)
+      continue;
+    }
+
     bsonAttr.append(ENT_ATTRS_TYPE, attrType);
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
-
-    attrsV[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbEncode(attrsV[ix]->name);
 
@@ -3335,7 +3343,9 @@ static bool calculateSetOperator(ContextElementResponse* cerP, orion::BSONObjBui
       {
         CompoundValueNode* child = theChild->childV[jx];
 
-        std::string valueKey = baseKey + "." + child->name;
+        // dbEncode is needed, in order to avoid problems as the one
+        // described in issue #4315
+        std::string valueKey = baseKey + "." + dbEncode(child->name);
 
         if (child->valueType == orion::ValueTypeString)
         {
@@ -3469,7 +3479,9 @@ static bool calculateUnsetOperator(ContextElementResponse* cerP, orion::BSONObjB
     {
       CompoundValueNode* child = theChild->childV[jx];
 
-      std::string valueKey = baseKey + "." + child->name;
+      // dbEncode is needed, in order to avoid problems as the one
+      // described in issue #4315
+      std::string valueKey = baseKey + "." + dbEncode(child->name);
       b->append(valueKey, 1);
     }
   }
@@ -4403,7 +4415,6 @@ unsigned int processContextElement
         /* Successful creation: send potential notifications */
         std::map<std::string, TriggeredSubscription*>  subsToNotify;
         std::vector<std::string>                       attrNames;
-        std::vector<std::string>                       attributes;
 
         for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
         {
@@ -4434,6 +4445,7 @@ unsigned int processContextElement
         // one item, so it should be safe to get item 0
         //
         ContextElementResponse* notifyCerP = new ContextElementResponse(eP, apiVersion == V2);
+        notifyCerP->applyUpdateOperators();
 
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);

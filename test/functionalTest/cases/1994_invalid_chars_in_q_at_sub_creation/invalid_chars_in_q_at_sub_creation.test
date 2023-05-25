@@ -186,10 +186,10 @@ echo
 01. Attempt to create subscription with qstring filter 'house<flat>' - see error for invalid chars
 ==================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "forbidden characters in String Filter",
@@ -200,10 +200,10 @@ Date: REGEX(.*)
 02. Attempt to create subscription with qstring filter 'house==flat>' - see error for invalid chars
 ===================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "forbidden characters in String Filter",
@@ -214,10 +214,10 @@ Date: REGEX(.*)
 03. Attempt to create subscription with qstring filter 'house==flat,flat>' - see error for invalid chars
 ========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "forbidden characters in String Filter",
@@ -228,10 +228,10 @@ Date: REGEX(.*)
 04. Attempt to create subscription with qstring filter 'house==flat..flat>' - see error for invalid chars
 =========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "forbidden characters in String Filter",
@@ -242,10 +242,10 @@ Date: REGEX(.*)
 05. Attempt to create subscription with qstring filter  q=house'flat' - see error for invalid chars
 ===================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "forbidden characters in String Filter",
@@ -256,10 +256,10 @@ Date: REGEX(.*)
 06. Attempt to create subscription with qstring filter  q=a==house'flat' - see error for invalid chars
 ======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "forbidden characters in String Filter",

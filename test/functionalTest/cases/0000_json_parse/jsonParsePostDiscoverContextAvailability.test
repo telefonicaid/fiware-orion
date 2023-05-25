@@ -160,10 +160,10 @@ echo "+++++ Discovery 2 Done +++++++++++++++"
 --REGEXPECT--
 +++++ Starting +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1M",
@@ -171,10 +171,10 @@ Date: REGEX(.*)
 }
 +++++ Registration 1 Done +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 300
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 300
 
 {
     "contextRegistrationResponses": [
@@ -206,10 +206,10 @@ Date: REGEX(.*)
 +++++ Discovery 1 Done +++++++++++++++
 +++++ Register 2: two attributes in vector +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1M",
@@ -217,10 +217,10 @@ Date: REGEX(.*)
 }
 +++++ Registration 2 Done +++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 273
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 273
 
 {
     "contextRegistrationResponses": [

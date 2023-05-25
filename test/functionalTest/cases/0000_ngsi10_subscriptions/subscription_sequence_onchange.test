@@ -312,10 +312,10 @@ echo
 01. Create subscription for Room conditions: lightstatus, temperature
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "subscribeResponse": {
@@ -328,10 +328,10 @@ Date: REGEX(.*)
 02. Create Room entity with lightstatus=L23: triggers notif (1)
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 253
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 253
 
 {
     "contextResponses": [
@@ -365,10 +365,10 @@ Date: REGEX(.*)
 03. Append Room temperature=t100: triggers notif (2)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 257
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 257
 
 {
     "contextResponses": [
@@ -402,10 +402,10 @@ Date: REGEX(.*)
 04. Update subscription trottling to 6 seconds
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "subscribeResponse": {
@@ -422,10 +422,10 @@ Date: REGEX(.*)
 06. Update Room lightstatus=L53: triggers notif (3)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 253
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 253
 
 {
     "contextResponses": [
@@ -459,10 +459,10 @@ Date: REGEX(.*)
 07. Update Room lightstatus=L63: notif avoided by throttling
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 253
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 253
 
 {
     "contextResponses": [
@@ -500,10 +500,10 @@ Date: REGEX(.*)
 09. Update Room temperature=t39: triggers notif (4)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 208
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 208
 
 {
     "contextResponses": [
@@ -532,10 +532,10 @@ Date: REGEX(.*)
 10. Update Room pressure=p230: doesn't trigger notif
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 204
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 204
 
 {
     "contextResponses": [
@@ -564,10 +564,10 @@ Date: REGEX(.*)
 11. Remove subscription
 =======================
 HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 {
     "statusCode": {
@@ -581,10 +581,10 @@ Date: REGEX(.*)
 12. Update Room temperature=t40: no subscription to trigger
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 208
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 208
 
 {
     "contextResponses": [

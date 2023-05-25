@@ -93,30 +93,30 @@ echo
 01. Create subscription without mq on a given metadata
 ======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity not included the given metadata
 =================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/room15?type=house
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/room15?type=house
+Content-Length: 0
 
 
 
 03. Get entity to ensure CB has not crashed
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 134
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 134
 
 {
     "id": "room15",

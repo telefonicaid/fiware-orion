@@ -232,10 +232,10 @@ echo
 1. POST /v1/registry/registerContext
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 64
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 64
 
 {
     "duration": "PT24H",
@@ -246,20 +246,20 @@ Date: REGEX(.*)
 1. NOP /v1/registry/registerContext
 ===================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST
+Content-Length: 0
 
 
 
 2. POST /v1/registry/discoverContextAvailability
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 168
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 168
 
 {
     "contextRegistrationResponses": [
@@ -282,20 +282,20 @@ Date: REGEX(.*)
 2. NOP /v1/registry/discoverContextAvailability
 ===============================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST
+Content-Length: 0
 
 
 
 3. POST /v1/registry/contextEntities/E
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -306,10 +306,10 @@ Date: REGEX(.*)
 3. GET /v1/registry/contextEntities/E
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "contextRegistrationResponses": [
@@ -332,20 +332,20 @@ Date: REGEX(.*)
 3. NOP /v1/registry/contextEntities/E
 =====================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET
+Content-Length: 0
 
 
 
 4. POST /v1/registry/contextEntities/F/attributes
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -356,10 +356,10 @@ Date: REGEX(.*)
 4. GET /v1/registry/contextEntities/F/attributes
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "contextRegistrationResponses": [
@@ -382,20 +382,20 @@ Date: REGEX(.*)
 4. NOP /v1/registry/contextEntities/F/attributes
 ================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET
+Content-Length: 0
 
 
 
 5. POST /v1/registry/contextEntities/G/attributes/A
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -406,10 +406,10 @@ Date: REGEX(.*)
 5. GET /v1/registry/contextEntities/G/attributes/A
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 198
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 198
 
 {
     "contextRegistrationResponses": [
@@ -438,20 +438,20 @@ Date: REGEX(.*)
 5. NOP /v1/registry/contextEntities/G/attributes/A
 ==================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET
+Content-Length: 0
 
 
 
 6. POST /v1/registry/contextEntityTypes/S
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 64
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 64
 
 {
     "duration": "PT24H",
@@ -462,10 +462,10 @@ Date: REGEX(.*)
 6. GET /v1/registry/contextEntityTypes/S
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "contextRegistrationResponses": [
@@ -488,20 +488,20 @@ Date: REGEX(.*)
 6. NOP /v1/registry/contextEntityTypes/S
 ========================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET
+Content-Length: 0
 
 
 
 7. POST /v1/registry/contextEntityTypes/U/attributes
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 64
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 64
 
 {
     "duration": "PT24H",
@@ -512,10 +512,10 @@ Date: REGEX(.*)
 7. GET /v1/registry/contextEntityTypes/U/attributes
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 160
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 160
 
 {
     "contextRegistrationResponses": [
@@ -538,20 +538,20 @@ Date: REGEX(.*)
 7. NOP /v1/registry/contextEntityTypes/U/attributes
 ===================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET
+Content-Length: 0
 
 
 
 8. POST /v1/registry/contextEntityTypes/V/attributes/A
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "duration": "PT1H",
@@ -562,10 +562,10 @@ Date: REGEX(.*)
 8. GET /v1/registry/contextEntityTypes/V/attributes/A
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 198
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 198
 
 {
     "contextRegistrationResponses": [
@@ -594,10 +594,10 @@ Date: REGEX(.*)
 8. NOP /v1/registry/contextEntityTypes/V/attributes/A
 =====================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET
+Content-Length: 0
 
 
 

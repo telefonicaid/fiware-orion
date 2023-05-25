@@ -180,10 +180,10 @@ orionCurl --url "/v1/contextEntities/Room1"
 --REGEXPECT--
 === 1. Create an entity with an attribute with metadata
 HTTP/1.1 200 OK
-Content-Length: 476
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 476
 
 {
     "contextResponses": [
@@ -238,10 +238,10 @@ Date: REGEX(.*)
 }
 === 2. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 462
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 462
 
 {
     "contextElement": {
@@ -292,10 +292,10 @@ Date: REGEX(.*)
 }
 === 3. Update the entity changing metadata value an adding a new one
 HTTP/1.1 200 OK
-Content-Length: 320
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 320
 
 {
     "contextResponses": [
@@ -333,10 +333,10 @@ Date: REGEX(.*)
 }
 === 4. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 511
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 511
 
 {
     "contextElement": {
@@ -392,10 +392,10 @@ Date: REGEX(.*)
 }
 === 5. Append a new attribute with metadata
 HTTP/1.1 200 OK
-Content-Length: 318
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 318
 
 {
     "contextResponses": [
@@ -433,10 +433,10 @@ Date: REGEX(.*)
 }
 === 6. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 680
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 680
 
 {
     "contextElement": {
@@ -509,10 +509,10 @@ Date: REGEX(.*)
 }
 === 7. Remove an attribute with metadata
 HTTP/1.1 200 OK
-Content-Length: 207
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 207
 
 {
     "contextResponses": [
@@ -538,10 +538,10 @@ Date: REGEX(.*)
 }
 === 8. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 460
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 460
 
 {
     "contextElement": {

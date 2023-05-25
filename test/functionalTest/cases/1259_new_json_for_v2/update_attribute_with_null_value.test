@@ -282,20 +282,20 @@ echo
 01. Create (POST /v2/entities) E1/A1=null
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Get E1/A1 (see that A1 has null value)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "A1": {
@@ -311,28 +311,28 @@ Date: REGEX(.*)
 03. Create E2/A2='03'
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 04. Modify E2/A2=null (PATCH)
 =============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Get E2/A2 (value of A2 has been replaced)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "A2": {
@@ -348,28 +348,28 @@ Date: REGEX(.*)
 06. Create E3/A3='06'
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 07. Modify E3/A3=null (PUT)
 ===========================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get E3/A3 (value of A3 has been replaced)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "A3": {
@@ -385,28 +385,28 @@ Date: REGEX(.*)
 09. Create E4/A4='09'
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T
+Content-Length: 0
 
 
 
 10. Modify E4/A4=null (POST)
 ============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 11. Get E4/A4 (value of A4 has been replaced)
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "A4": {
@@ -422,20 +422,20 @@ Date: REGEX(.*)
 12. Create (POST /v2/entities) E5/A5=null using URI param keyValues
 ===================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E5?type=T5
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=T5
+Content-Length: 0
 
 
 
 13. Get E5/A5 (see that A5 has null value)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 33
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 33
 
 {
     "A5": null,
@@ -447,28 +447,28 @@ Date: REGEX(.*)
 14. Create E6/A6='14'
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E6?type=T6
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E6?type=T6
+Content-Length: 0
 
 
 
 15. Modify E6/A6=null (PATCH), with keyValues (A6 is null)
 ==========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 16. Get E6/A6 (see that A6 is null)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 33
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 33
 
 {
     "A6": null,
@@ -480,28 +480,28 @@ Date: REGEX(.*)
 17. Create E7/A7='17'
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E7?type=T7
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E7?type=T7
+Content-Length: 0
 
 
 
 18. Modify E7/A7=null (PUT), with keyValues
 ===========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 19. Get E7/A7 (see that A7 has been replaced with null)
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 33
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 33
 
 {
     "A7": null,
@@ -513,28 +513,28 @@ Date: REGEX(.*)
 20. Create E8/A8='20'
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E8?type=T8
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E8?type=T8
+Content-Length: 0
 
 
 
 21. Modify E8/A8=null (POST), with keyValues
 ============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 22. GET E8/A8 (see A8 null)
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 33
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 33
 
 {
     "A8": null,

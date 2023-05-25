@@ -163,28 +163,28 @@ echo
 01. POST /v2/entities, creating E1
 ==================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. POST /v2/entities/E1/attrs?options=keyValues, adding A1 to E1
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "A1": {
@@ -200,18 +200,18 @@ Date: REGEX(.*)
 04. POST /v2/entities/E1/attrs?options=keyValues, adding A2 to E1
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. GET /v2/entities/E1?options=keyValues
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 37
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 37
 
 {
     "A1": 1,
@@ -224,18 +224,18 @@ Date: REGEX(.*)
 06. PUT /v2/entities/E1/attrs?options=keyValues, replacing A1+A2 with A3
 ========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. GET /v2/entities/E1?options=keyValues
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 30
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 30
 
 {
     "A3": 3,
@@ -247,18 +247,18 @@ Date: REGEX(.*)
 08. POST /v2/entities/E1/attrs?options=keyValues, adding A4 to E1
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. GET /v2/entities/E1?options=keyValues
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 37
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 37
 
 {
     "A3": 3,
@@ -271,18 +271,18 @@ Date: REGEX(.*)
 10. PATCH /v2/entities/E1/attrs, setting A4 to 10
 =================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 11. GET /v2/entities/E1, to see A4 == 10
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 38
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 38
 
 {
     "A3": 3,
@@ -295,20 +295,20 @@ Date: REGEX(.*)
 12. POST /v2/entities, creating one more E1, different type
 ===========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T2
+Content-Length: 0
 
 
 
 13. GET /v2/entities/E1?options=keyValues
 =========================================
 HTTP/1.1 409 Conflict
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "More than one matching entity. Please refine your query",

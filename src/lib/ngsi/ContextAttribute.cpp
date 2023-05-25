@@ -141,10 +141,143 @@ void ContextAttribute::bsonAppendAttrValue
 
 /* ****************************************************************************
 *
+* ContextAttribute::calculateOperator -
+*
+* Return true if the some append was done in bsonAttr, false otherwise
+*/
+bool ContextAttribute::calculateOperator
+(
+  const std::string&         valueKey,
+  orion::CompoundValueNode*  upOp,
+  orion::BSONObjBuilder*     bsonAttr,
+  bool                       strings2numbers
+) const
+{
+  std::string op = upOp->name;
+  if (op == "$inc")
+  {
+    bsonAttr->append(valueKey, upOp->numberValue);
+  }
+  else if (op == "$min")
+  {
+    if (upOp->numberValue > 0)
+    {
+      bsonAttr->append(valueKey, 0);
+    }
+    else
+    {
+      bsonAttr->append(valueKey, upOp->numberValue);
+    }
+  }
+  else if (op == "$max")
+  {
+    if (upOp->numberValue > 0)
+    {
+      bsonAttr->append(valueKey, upOp->numberValue);
+    }
+    else
+    {
+      bsonAttr->append(valueKey, 0);
+    }
+  }
+  else if (op == "$mul")
+  {
+    bsonAttr->append(valueKey, 0);
+  }
+  else if ((op == "$push") || (op == "$addToSet"))
+  {
+    orion::BSONArrayBuilder ba;
+    orion::BSONArrayBuilder ba2;
+    orion::BSONArrayBuilder bo; // FIXME PR
+    switch (upOp->valueType)
+    {
+    case orion::ValueTypeString:
+      ba.append(upOp->stringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      ba.append(upOp->numberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      ba.append(upOp->boolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      ba.appendNull();
+      break;
+
+    case orion::ValueTypeVector:
+      compoundValueBson(compoundValueP->childV, ba2, strings2numbers);
+      ba.append(ba2.arr());
+      break;
+
+    case orion::ValueTypeObject:
+      compoundValueBson(compoundValueP->childV, bo, strings2numbers);
+      ba.append(bo.arr());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given in compound value)"));
+      return false;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type: %d)", valueType));
+      return false;
+    }
+
+    bsonAttr->append(valueKey, ba.arr());
+  }
+  else if (op == "$set")
+  {
+    orion::BSONObjBuilder bo;
+    switch (upOp->valueType)
+    {
+    case orion::ValueTypeString:
+    case orion::ValueTypeNumber:
+    case orion::ValueTypeBoolean:
+    case orion::ValueTypeNull:
+    case orion::ValueTypeVector:
+      // Nothing to do in the case of inconsisent $set, e.g. {$set: 1}
+      // FIXME P4: this could be detected at parsing stage and deal with it as Bad Input, but it is harder...
+      break;
+
+    case orion::ValueTypeObject:
+      compoundValueBson(upOp->childV, bo, strings2numbers);
+      bsonAttr->append(valueKey, bo.obj());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value not given in compound value)"));
+      return false;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type: %d)", valueType));
+      return false;
+    }
+  }
+  else if ((op == "$unset") || (op == "$pull") || (op == "$pullAll"))
+  {
+    // By returning false we signal that attribute must be removed (by the caller)
+    return false;
+  }
+  else
+  {
+    LM_E(("Runtime Error (uknown operator: %s)", op.c_str()));
+    return false;
+  }
+
+  return true;
+}
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::valueBson -
 *
+* Return true if some append operation was done bsonAttr, false otherwise
 */
-void ContextAttribute::valueBson
+bool ContextAttribute::valueBson
 (
   const std::string&      valueKey,
   orion::BSONObjBuilder*  bsonAttr,
@@ -167,10 +300,21 @@ void ContextAttribute::valueBson
     }
     else if (compoundValueP->valueType == orion::ValueTypeObject)
     {
-      orion::BSONObjBuilder b;
-
-      compoundValueBson(compoundValueP->childV, b, strings2numbers);
-      bsonAttr->append(valueKey, b.obj());
+      // Special processing of update operators
+      if ((compoundValueP->childV.size() > 0) && (isUpdateOperator(compoundValueP->childV[0]->name)))
+      {
+        if (!calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr, strings2numbers))
+        {
+          // in this case we return without generating any BSON
+          return false;
+        }
+      }
+      else
+      {
+        orion::BSONObjBuilder b;
+        compoundValueBson(compoundValueP->childV, b, strings2numbers);
+        bsonAttr->append(valueKey, b.obj());
+      }
     }
     else if (compoundValueP->valueType == orion::ValueTypeString)
     {
@@ -195,12 +339,16 @@ void ContextAttribute::valueBson
     else if (compoundValueP->valueType == orion::ValueTypeNotGiven)
     {
       LM_E(("Runtime Error (value not given in compound value)"));
+      return false;
     }
     else
     {
       LM_E(("Runtime Error (Unknown type in compound value)"));
+      return false;
     }
   }
+
+  return true;
 }
 
 

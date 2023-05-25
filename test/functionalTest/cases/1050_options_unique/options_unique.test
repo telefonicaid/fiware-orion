@@ -82,20 +82,20 @@ echo
 01. Create an entity CarPool with 6 attributes with values that are car brands
 ==============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/CarPool?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/CarPool?type=Thing
+Content-Length: 0
 
 
 
 02. Get all values of entity CarPool
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 48
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 48
 
 [
     "Mercedes",
@@ -110,10 +110,10 @@ Date: REGEX(.*)
 03. Get all UNIQUE values of entity CarPool
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 25
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 25
 
 [
     "Mercedes",

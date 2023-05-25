@@ -123,10 +123,10 @@ echo
 1. Create entity E1, without type and with attribute A=222
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 181
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 181
 
 {
     "contextResponses": [
@@ -155,10 +155,10 @@ Date: REGEX(.*)
 2. Create entity E1, with type T1 and with attribute A=22
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 183
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 183
 
 {
     "contextResponses": [
@@ -187,10 +187,10 @@ Date: REGEX(.*)
 3. Update attribute E1/<empty> A=000
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 122
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 122
 
 {
     "contextResponses": [
@@ -214,10 +214,10 @@ Date: REGEX(.*)
 4. Lookup E1/<empty> to check A=000
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 161
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 161
 
 {
     "contextElement": {
@@ -242,10 +242,10 @@ Date: REGEX(.*)
 5. Lookup E1/T1 to check A=22 (not touched)
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 162
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 162
 
 {
     "contextElement": {

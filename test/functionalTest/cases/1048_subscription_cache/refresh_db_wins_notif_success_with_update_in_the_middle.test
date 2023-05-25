@@ -170,10 +170,10 @@ echo
 01. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 and without timeSent
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 406
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 406
 
 [
     {
@@ -210,20 +210,20 @@ Date: REGEX(.*)
 02. Create entity E to trigger notification
 ===========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 (as cache data is older), timesSent 1
 ====================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 420
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 420
 
 [
     {
@@ -298,8 +298,8 @@ Date: REGEX(.*)
 05. PATCH /v2/subscription to add a description
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -345,10 +345,10 @@ Date: REGEX(.*)
 07. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
 =============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 457
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 457
 
 [
     {

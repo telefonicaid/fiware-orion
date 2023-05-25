@@ -192,10 +192,10 @@ echo
 01. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {
@@ -208,10 +208,10 @@ Date: REGEX(.*)
 02. Register E1/T1/A1 (without service-path)
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -222,10 +222,10 @@ Date: REGEX(.*)
 03. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1 and see it work
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 215
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 215
 
 {
     "contextRegistrationResponses": [
@@ -254,10 +254,10 @@ Date: REGEX(.*)
 04. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?exist=entity::type and see it work
 ===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 215
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 215
 
 {
     "contextRegistrationResponses": [
@@ -286,10 +286,10 @@ Date: REGEX(.*)
 05. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1 and see it work
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 215
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 215
 
 {
     "contextRegistrationResponses": [
@@ -318,10 +318,10 @@ Date: REGEX(.*)
 06. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type and see it fail
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 115
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 115
 
 {
     "errorCode": {
@@ -335,10 +335,10 @@ Date: REGEX(.*)
 07. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2 and see it fail
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 103
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 103
 
 {
     "errorCode": {
@@ -352,10 +352,10 @@ Date: REGEX(.*)
 08. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?attributesFormat=object and see it work
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 215
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 215
 
 {
     "contextRegistrationResponses": [
@@ -384,10 +384,10 @@ Date: REGEX(.*)
 09. Register E1/T1/A1, service-path /s1 (service-path /s1)
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "duration": "P1M",
@@ -398,10 +398,10 @@ Date: REGEX(.*)
 10. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, without service-path, see two hits
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 394
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 394
 
 {
     "contextRegistrationResponses": [
@@ -448,10 +448,10 @@ Date: REGEX(.*)
 11. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, with service-path /#, see two hits
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 394
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 394
 
 {
     "contextRegistrationResponses": [
@@ -498,10 +498,10 @@ Date: REGEX(.*)
 12. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, with service-path /, see one hit
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 215
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 215
 
 {
     "contextRegistrationResponses": [
@@ -530,10 +530,10 @@ Date: REGEX(.*)
 13. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, with service-path /s1, see one hit
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 213
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 213
 
 {
     "contextRegistrationResponses": [
@@ -562,10 +562,10 @@ Date: REGEX(.*)
 14. GET /v1/registry/contextEntities/type/T1/id/E1/attributes/A1, with service-path /s2, see no hits
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "errorCode": {

@@ -119,20 +119,20 @@ echo
 01. Create entity with geo:point in NGSIv2
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Update entity with geo:line with NGSIv1 (APPEND)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 196
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 196
 
 {
     "contextResponses": [
@@ -206,10 +206,10 @@ Date: REGEX(.*)
 04. Update entity with geo:line with NGSIv1 (UPDATE)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 196
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 196
 
 {
     "contextResponses": [

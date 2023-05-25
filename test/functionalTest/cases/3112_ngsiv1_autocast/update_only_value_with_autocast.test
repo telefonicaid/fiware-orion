@@ -215,10 +215,10 @@ echo
 01. Create entity with Quantity, Number, Boolean, DateTime and ISO8601 types
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 352
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 352
 
 {
     "contextResponses": [
@@ -267,10 +267,10 @@ Date: REGEX(.*)
 02. Get entity using NGSIv2 and check types are right
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 316
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 316
 
 {
     "B": {
@@ -306,10 +306,10 @@ Date: REGEX(.*)
 03. Update only the value of the Quantity
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 180
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 180
 
 {
     "contextResponses": [
@@ -338,10 +338,10 @@ Date: REGEX(.*)
 04. Update only the value of the Number
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 180
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 180
 
 {
     "contextResponses": [
@@ -370,10 +370,10 @@ Date: REGEX(.*)
 05. Update only the value of the Boolean
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 180
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 180
 
 {
     "contextResponses": [
@@ -402,10 +402,10 @@ Date: REGEX(.*)
 06. Update only the value of the DateTime
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 180
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 180
 
 {
     "contextResponses": [
@@ -434,10 +434,10 @@ Date: REGEX(.*)
 07 Update only the value of the ISO8601
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 180
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 180
 
 {
     "contextResponses": [
@@ -466,10 +466,10 @@ Date: REGEX(.*)
 08. Get entity using NGSIv2 and check types are right
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 316
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 316
 
 {
     "B": {

@@ -213,10 +213,10 @@ echo
 01. GET /v1/contextTypes and see a list of zero types
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "statusCode": {
@@ -229,10 +229,10 @@ Date: REGEX(.*)
 02. POST /v1/updateContext, creating E1-T1-A1+A2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 230
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 230
 
 {
     "contextResponses": [
@@ -266,10 +266,10 @@ Date: REGEX(.*)
 03. POST /v1/updateContext, creating E1-T2-A1
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -298,10 +298,10 @@ Date: REGEX(.*)
 04. POST /v1/updateContext, creating E1-T3-A1+A2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 230
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 230
 
 {
     "contextResponses": [
@@ -335,10 +335,10 @@ Date: REGEX(.*)
 05. GET /v1/contextTypes and see a list of three types
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 171
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 171
 
 {
     "statusCode": {
@@ -377,10 +377,10 @@ Date: REGEX(.*)
 06. POST /v1/updateContext, creating E1-T4-A1, servicePath /s1
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -409,10 +409,10 @@ Date: REGEX(.*)
 07. POST /v1/updateContext, creating E1-T5-A1, servicePath /s2
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 189
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 189
 
 {
     "contextResponses": [
@@ -441,10 +441,10 @@ Date: REGEX(.*)
 08. GET /v1/contextTypes, servicePath /s1 and see a list of one type (T4)
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 {
     "statusCode": {
@@ -465,10 +465,10 @@ Date: REGEX(.*)
 09. GET /v1/contextTypes, servicePath /s2 and see a list of one type (T5)
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 {
     "statusCode": {
@@ -489,10 +489,10 @@ Date: REGEX(.*)
 10. GET /v1/contextTypes and see a list of five types
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 239
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 239
 
 {
     "statusCode": {
@@ -543,10 +543,10 @@ Date: REGEX(.*)
 11. GET /v1/contextTypes?collapse=true and see the list without attributes
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 129
 
 {
     "statusCode": {

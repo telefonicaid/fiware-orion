@@ -258,50 +258,50 @@ echo
 01. Create entity E1 t=20, t.acc=0.9, p=200, location=inside
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create entity E2 t=40, t.acc=0.7, p=100, location=inside
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Create entity E3 t=10, t.acc=0.8, p=400, location=outise
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 04. Create entity E4 t=70, t.acc=0.3, p=150, location=outise
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T
+Content-Length: 0
 
 
 
 05. Query t<30 -> E1, E3
 ========================
 HTTP/1.1 200 OK
-Content-Length: 443
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 443
 
 [
     {
@@ -358,10 +358,10 @@ Date: REGEX(.*)
 06. Query t<30, p<250  -> E1
 ============================
 HTTP/1.1 200 OK
-Content-Length: 222
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 222
 
 [
     {
@@ -394,10 +394,10 @@ Date: REGEX(.*)
 07. Query t.acc<0.75 -> E2, E4
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 443
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 443
 
 [
     {
@@ -454,10 +454,10 @@ Date: REGEX(.*)
 08. Query inside -> E1, E2
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 443
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 443
 
 [
     {
@@ -514,10 +514,10 @@ Date: REGEX(.*)
 09. Query t>15, t.acc<0.85, inside -> E2
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 222
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 222
 
 [
     {

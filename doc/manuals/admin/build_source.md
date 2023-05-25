@@ -7,7 +7,7 @@ Orion Context Broker reference distribution is Debian 11. This doesn't mean that
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.74
-* libmicrohttpd: 0.9.73 (from source)
+* libmicrohttpd: 0.9.76 (from source)
 * libcurl: 7.74.0
 * openssl: 1.1.1n
 * libuuid: 2.36.1
@@ -47,9 +47,9 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.73.tar.gz
-        tar xvf libmicrohttpd-0.9.73.tar.gz
-        cd libmicrohttpd-0.9.73
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz
+        tar xvf libmicrohttpd-0.9.76.tar.gz
+        cd libmicrohttpd-0.9.76
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
@@ -153,7 +153,7 @@ And it includes the instruction to build MongoDB 4.4 that the Orion depends on.
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.71.0
-* libmicrohttpd: 0.9.73 (from source)
+* libmicrohttpd: 0.9.76 (from source)
 * libcurl: 7.68.0
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
@@ -194,9 +194,9 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.73.tar.gz
-        tar xvf libmicrohttpd-0.9.73.tar.gz
-        cd libmicrohttpd-0.9.73
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz
+        tar xvf libmicrohttpd-0.9.76.tar.gz
+        cd libmicrohttpd-0.9.76
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib

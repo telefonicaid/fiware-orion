@@ -122,10 +122,10 @@ echo
 01. Create 2 subscriptions
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
 
 {
     "subscribeResponse": {
@@ -137,10 +137,10 @@ Date: REGEX(.*)
 
 
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "subscribeResponse": {
@@ -153,11 +153,11 @@ Date: REGEX(.*)
 02. GET /v2/subscriptions?limit=1&options=count
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 459
-Content-Type: application/json
-Fiware-Total-Count: 2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 2
+Content-Type: application/json
+Content-Length: 459
 
 [
     {
@@ -204,11 +204,11 @@ Date: REGEX(.*)
 03. GET /v2/subscriptions?limit=1&offset=1&options=count
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 393
-Content-Type: application/json
-Fiware-Total-Count: 2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 2
+Content-Type: application/json
+Content-Length: 393
 
 [
     {

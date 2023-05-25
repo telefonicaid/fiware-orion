@@ -217,10 +217,10 @@ echo
 01. Second call to GET /statistics (gives time stat of FIRST request for /statistics)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(.*)
 
 {
     "measuring_interval_in_secs": REGEX(\d+),
@@ -239,10 +239,10 @@ Date: REGEX(.*)
 02. Create entity E2/A1-A5 with v1 JSON
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 665
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 665
 
 {
     "contextResponses": [
@@ -326,10 +326,10 @@ Date: REGEX(.*)
 03. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(.*)
 
 {
     "measuring_interval_in_secs": REGEX(\d+),
@@ -360,20 +360,20 @@ Date: REGEX(.*)
 04. Create entity E3/A1-A5 (identical) with v2 JSON
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Test
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Test
+Content-Length: 0
 
 
 
 05. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
     "measuring_interval_in_secs": REGEX(\d+),
@@ -405,10 +405,10 @@ Date: REGEX(.*)
 06. GET /v1/contextTypes
 ========================
 HTTP/1.1 200 OK
-Content-Length: 115
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 115
 
 #SORT_START
 {
@@ -435,10 +435,10 @@ Date: REGEX(.*)
 07. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(.*)
 
 {
     "measuring_interval_in_secs": REGEX(\d+),

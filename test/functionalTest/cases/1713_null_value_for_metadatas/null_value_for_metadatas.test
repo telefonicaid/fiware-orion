@@ -55,20 +55,20 @@ echo
 01. Create a metadata with value NULL
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/room17?type=room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/room17?type=room
+Content-Length: 0
 
 
 
 02. GET the entity to make sure the creation worked
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 122
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 122
 
 {
     "id": "room17",

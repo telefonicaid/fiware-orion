@@ -80,10 +80,10 @@ echo
 01. Attempt to create a subscription with an invalid notification::http::url (http://localhost:900000), see it fail
 ===================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid URL parsing notification url",
@@ -94,10 +94,10 @@ Date: REGEX(.*)
 02. Attempt to create a subscription with an invalid notification::http::url (http://localhost:dsfsdf), see it fail
 ===================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid URL parsing notification url",
