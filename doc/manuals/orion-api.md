@@ -1637,7 +1637,10 @@ Update operators can be used in entity creation or replace operations. In partic
 * `$set` takes the empty object (`{}`) as reference. For instance, `"$set": {"X": 1}` results in just `{"X": 1}`
 * `$push` and `$addToSet` take the empty array (`[]`) as reference. For instance, `{"$push": 4}`
   results in `[ 4 ]`.
-* `$pull`, `$pullAll` and `$unset` are ignored.
+* `$pull`, `$pullAll` and `$unset` are ignored. This means that the attribute in which the operator is used
+  is not created in the entity. For instance, creating an entity with 2 attributes, the first one containing an operator 
+  `"A": {"value": {"$unset": 1}, ... }"` and the second one `"B": {"value": 3, ...}`, just a normal one, will result in an
+  entity with just one attribute, `B`.
 
 ## Filtering out attributes and metadata
 
