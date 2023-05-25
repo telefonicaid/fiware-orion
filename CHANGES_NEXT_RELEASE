@@ -14,3 +14,4 @@
 - Fix: MQTT disconnection when MQTT publish fail (so re-connection is forced at next MQTT notification)
 - Fix: lineMaxSize and infoPayloadMaxSize in the log admin REST API (#3707)
 - Fix: check for service database name too long at cache sync logic (#2848)
+- Fix: pagination support in request query forwarding to Context Providers (#4149, #847, #4337)

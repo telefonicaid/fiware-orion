@@ -42,6 +42,7 @@
 #include "common/limits.h"
 #include "common/statistics.h"
 #include "common/logTracing.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -81,6 +82,8 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
                        &out,
                        &statusCode,
                        params->extraHeaders,
+                       -1,
+                       -1,
                        "",                         //default acceptFormat
                        params->timeout);
 

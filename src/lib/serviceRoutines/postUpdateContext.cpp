@@ -225,6 +225,8 @@ static bool updateForward
                       &out,
                       &statusCode,
                       noHeaders,
+                      -1,
+                      -1,
                       mimeType);
 
   if (r != 0)
