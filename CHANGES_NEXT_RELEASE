@@ -1,5 +1,3 @@
 Fixed issues:
-#1368 - bug in subscription patch regarding modification of cached fields 'description', 'q', and 'entities'
-#1374 - similar to #1368
-#280  - error handling in registration creation - making sure exclusive registrations specify mandatory fields entity-id and attributes
-#280  - error handling in registration updates  - making sure exclusive registrations specify mandatory fields entity-id and attributes
+  #1356  New CLI param: -inReqPayloadMaxSize - to modify the maximum size of incoming payloads
+  #280   Default Core Context now part of the broker - meant for airgapped setups
