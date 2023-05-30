@@ -1,4 +1,4 @@
-## How to run functional tests
+## How to run functional tests 
 
 ### Prerequisites
 
