@@ -42,7 +42,7 @@
 PgConnectionPool* pgConnectionPoolGet(char* db)
 {
   //
-  // The default db, name NULL, has its pool as the very first pool in the pool list
+  // The default db (with name NULL) has its pool as the very first pool in the pool list
   //
   if (db == NULL)
     return pgPoolMaster;
