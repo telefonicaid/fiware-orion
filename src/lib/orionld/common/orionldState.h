@@ -539,6 +539,7 @@ extern __thread char  static_buffer[STATIC_BUFFER_SIZE + 1];
 // Global state
 //
 extern char*             coreContextUrl;
+extern const char*       builtinCoreContext;
 extern char              orionldHostName[128];
 extern int               orionldHostNameLen;
 extern char              kallocBuffer[32 * 1024];
