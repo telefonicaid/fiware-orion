@@ -81,13 +81,13 @@ Content-Length: 70
 }
 
 
-02. 02. GET /v1/contextEntities/E/attributes/A
-==============================================
+02. GET /v1/contextEntities/E/attributes/A
+==========================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 156
+Content-Length: 98
 
 {
     "statusCode": {
@@ -102,6 +102,7 @@ Content-Length: 156
 =============================
 Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
 Deprecated NGSIv1 request received: GET /v1/contextEntities/E/attributes/A, response code: 200
+
 
 --TEARDOWN--
 brokerStop CB
