@@ -346,7 +346,7 @@ static RestService putServiceV[] =
 };
 
 static RestService putServiceVlegacy[] =
-{  
+{
   { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                               }, putEntity                                        },
   { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                 }, putEntityAttributeValue                          },
   { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, putEntityAttribute                               },
