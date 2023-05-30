@@ -50,9 +50,9 @@ echo
 echo
 
 
-echo "02. GET /v1/contextEntities/E"
-echo "============================="
-orionCurl --url /v1/contextEntities/E
+echo "02. GET /v1/contextEntities/E/attributes/A"
+echo "=========================================="
+orionCurl --url /v1/contextEntities/E/attributes/A
 echo
 echo
 
@@ -81,8 +81,8 @@ Content-Length: 70
 }
 
 
-02. GET /v1/contextEntities/E
-=============================
+02. 02. GET /v1/contextEntities/E/attributes/A
+==============================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -90,11 +90,6 @@ Content-Type: application/json
 Content-Length: 156
 
 {
-    "contextElement": {
-        "id": "E",
-        "isPattern": "false",
-        "type": ""
-    },
     "statusCode": {
         "code": "404",
         "details": "Entity id: /E/",
@@ -106,8 +101,7 @@ Content-Length: 156
 03. Get WARNING trace in logs
 =============================
 Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
-Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
-
+Deprecated NGSIv1 request received: GET /v1/contextEntities/E/attributes/A, response code: 200
 
 --TEARDOWN--
 brokerStop CB
