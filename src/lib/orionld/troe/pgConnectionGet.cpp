@@ -149,7 +149,14 @@ PgConnection* pgConnectionGet(const char* db)
   sem_post(&poolP->queueSem);
 
   if (cP == NULL)
-    LM_RE(NULL, ("Internal Error (bug in postgres connection pool logic)"));
+  {
+    LM_W(("Internal Error (bug in postgres connection pool logic?)"));
+    LM_W(("poolP at %p", poolP));
+    LM_W(("poolP->items: %d", poolP->items));
+    LM_W(("poolP->connectionV at %p", poolP->connectionV));
+
+    return NULL;
+  }
 
   if (cP->connectionP == NULL)  // Virgin connection
   {
