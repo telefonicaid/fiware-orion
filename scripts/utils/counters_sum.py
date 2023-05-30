@@ -37,6 +37,10 @@
 # - At the present moment this script only aggregates information in the "counters" section, but it would be
 #   easily extended to take into account other sections
 
+# Configuration
+# PRUNE: if true remove entries with 0
+PRUNE = True
+
 __author__ = 'fermin'
 
 import sys
@@ -54,6 +58,9 @@ accum = files[0]['counters']
 for f in files[1:]:
     counters = f['counters']
 
+    # Request types
+    request_types = ['requests', 'requestsLegacy']
+
     # Update summaries
     summary_fields = [
         'jsonRequests',
@@ -70,9 +77,27 @@ for f in files[1:]:
         accum[field] += counters[field]
 
     # Process request blocks
-    for field in ['requests', 'requestsLegacy']:
+    for field in request_types:
         for url in accum[field]:
             for verb in accum[field][url]:
                 accum[field][url][verb] += counters[field][url][verb]
+
+if PRUNE:
+    for field in request_types:
+        # First pass: prune verbs with 0
+        for url in accum[field].keys():
+            to_delete = []
+            for verb in accum[field][url].keys():
+                if accum[field][url][verb] == 0:
+                    to_delete.append(verb)
+            for verb in to_delete:
+                accum[field][url].pop(verb)
+        # Second pass: prune URL without content
+        to_delete = []
+        for url in accum[field].keys():
+            if len(accum[field][url].keys()) == 0:
+                to_delete.append(url)
+        for url in to_delete:
+            accum[field].pop(url)
 
 print(json.dumps(accum))
