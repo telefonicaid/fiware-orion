@@ -98,7 +98,7 @@ bool legacyPostSubscriptions(void)
   {
     KjNode* uriP = kjLookup(endpointP, "uri");
 
-   if ((strncmp(uriP->value.s, "mqtt://", 7) == 0) || (strncmp(uriP->value.s, "mqtts://", 8) == 0))
+    if ((strncmp(uriP->value.s, "mqtt://", 7) == 0) || (strncmp(uriP->value.s, "mqtts://", 8) == 0))
     {
       char*           detail        = NULL;
       char*           uri           = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!

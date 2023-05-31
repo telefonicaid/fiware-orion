@@ -292,7 +292,7 @@ void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArra
     int len = strlen(attrList->array[ix]);
     strcpy(&attrs[pos], attrList->array[ix]);
 
-    // Add comma unless it's the last attr (in which case we add a zero, just in case
+    // Add comma unless it's the last attr (in which case we add a zero, just in case)
     pos += len;
 
     if (ix != attrList->items - 1)  // Not the last attr
@@ -449,10 +449,15 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add that)
     // They MUST be sent with NORMALIZED and SYSATTRS, as without that, there's no way to pick attributes in case we have clashes
     //
-    uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
-
+    // There is one exception though - when only the entity ids are wanted as output
+    //
     if (distOpP->onlyIds == true)
       uriParamAdd(&urlParts, "onlyIds=true", NULL, 12);
+    else
+      uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
+
+    if ((distOpP->operation == DoQueryEntity) && (distOpP->entityId != NULL))
+      uriParamAdd(&urlParts, "id", distOpP->entityId, -1);
 
     //
     // If we know the Entity Type, we pass that piece of information as well

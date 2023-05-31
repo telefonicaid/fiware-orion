@@ -33,6 +33,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"        // kjEntityIdLookupInEntityArray
 #include "orionld/forwarding/distOpEntityMerge.h"                // Own interface
 
 
@@ -109,7 +111,7 @@ static KjNode* newerAttribute(KjNode* currentP, KjNode* pretenderP)
 //
 // distOpEntityMerge -
 //
-bool distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary)
+void distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary)
 {
   KjNode* idP             = kjLookup(additionP,  "id");
   KjNode* typeP           = kjLookup(additionP,  "type");
@@ -158,6 +160,27 @@ bool distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, boo
 
     attrP = next;
   }
+}
 
-  return true;
+
+
+// -----------------------------------------------------------------------------
+//
+// distOpEntityMerge -
+//
+void distOpEntityMerge(KjNode* entityArray, KjNode* entityP)
+{
+  KjNode* entityIdNode = kjLookup(entityP, "id");
+
+  if (entityIdNode == NULL)
+    LM_RVE(("Invalid entity in response from forwarded request"));
+
+  char* entityId = entityIdNode->value.s;
+
+  KjNode* arrayEntityP = kjEntityIdLookupInEntityArray(entityArray, entityId);
+
+  if (arrayEntityP == NULL)  // Not there yet - let's add it
+    kjChildAdd(entityArray, entityP);
+  else  // Need to merge the two entities
+    distOpEntityMerge(arrayEntityP, entityP, orionldState.uriParamOptions.sysAttrs, false);
 }

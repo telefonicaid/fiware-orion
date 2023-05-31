@@ -591,6 +591,24 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     cSubP->url = NULL;
   }
 
+  if (cSubP->protocolString != NULL)
+  {
+    free(cSubP->protocolString);
+    cSubP->protocolString = NULL;
+  }
+
+  if (cSubP->ip != NULL)
+  {
+    free(cSubP->ip);
+    cSubP->ip = NULL;
+  }
+
+  if (cSubP->rest != NULL)
+  {
+    free(cSubP->rest);
+    cSubP->rest = NULL;
+  }
+
   if (cSubP->tenant != NULL)
   {
     free(cSubP->tenant);
@@ -863,6 +881,10 @@ bool subCacheItemInsert
   cSubP->next                  = NULL;
   cSubP->count                 = 0;
   cSubP->status                = status;
+  cSubP->url                   = NULL;
+  cSubP->ip                    = NULL;
+  cSubP->protocolString        = NULL;
+  cSubP->rest                  = NULL;
 
   if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < orionldState.requestTime))
   {
@@ -917,7 +939,11 @@ bool subCacheItemInsert
   {
     if (orionldState.apiVersion == NGSI_LD_V1)
     {
+      // FIXME: Instead of calling qBuild here, I should pass the pointer from pCheckSubscription
+      if (cSubP->qP != NULL)
+        qRelease(cSubP->qP);
       cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true);  // cSubP->qText needs real allocation
+
       if (cSubP->qText != NULL)
         cSubP->qText = strdup(cSubP->qText);
       else
@@ -968,7 +994,18 @@ bool subCacheItemInsert
   //
   cSubP->url = strdup(httpInfo.url.c_str());
   urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
-  cSubP->protocol = protocolFromString(cSubP->protocolString);
+
+  if (cSubP->protocolString != NULL)
+  {
+    cSubP->protocol       = protocolFromString(cSubP->protocolString);
+    cSubP->protocolString = strdup(cSubP->protocolString);
+  }
+
+  if (cSubP->ip != NULL)
+    cSubP->ip = strdup(cSubP->ip);
+
+  if (cSubP->rest != NULL)
+    cSubP->rest = strdup(cSubP->rest);
 
   //
   // String filters
@@ -1163,9 +1200,9 @@ int subCacheItemRemove(CachedSubscription* cSubP)
 #if 0
 // -----------------------------------------------------------------------------
 //
-// debugSubCache -
+// subCacheDebug -
 //
-void debugSubCache(const char* prefix, const char* title)
+void subCacheDebug(const char* prefix, const char* title)
 {
   CachedSubscription* subP = subCache.head;
 
@@ -1197,7 +1234,7 @@ void debugSubCache(const char* prefix, const char* title)
 */
 void subCacheRefresh(void)
 {
-  // debugSubCache("KZ", "------------- BEFORE REFRESH ------------------------");
+  // subCacheDebug("KZ", "------------- BEFORE REFRESH ------------------------");
 
   // Empty the cache
   subCacheDestroy();
@@ -1222,7 +1259,7 @@ void subCacheRefresh(void)
 
   ++subCache.noOfRefreshes;
 
-  // debugSubCache("KZ", "------------- AFTER REFRESH ------------------------");
+  // subCacheDebug("KZ", "------------- AFTER REFRESH ------------------------");
 }
 
 

@@ -303,7 +303,18 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   // IP, port and rest
   cSubP->url = strdup(cSubP->httpInfo.url.c_str());
   urlParse(cSubP->url, &cSubP->protocolString, &cSubP->ip, &cSubP->port, &cSubP->rest);
-  cSubP->protocol = protocolFromString(cSubP->protocolString);
+
+  if (cSubP->protocolString != NULL)
+  {
+    cSubP->protocol = protocolFromString(cSubP->protocolString);
+    cSubP->protocolString = strdup(cSubP->protocolString);
+  }
+
+  if (cSubP->rest != NULL)
+    cSubP->rest = strdup(cSubP->rest);
+
+  if (cSubP->ip != NULL)
+    cSubP->ip = strdup(cSubP->ip);
 
   // q
   cSubP->qText = sub.hasField("ldQ")? strdup(getStringFieldF(&sub, "ldQ")) : NULL;

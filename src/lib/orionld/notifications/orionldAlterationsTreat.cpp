@@ -206,8 +206,11 @@ bool notificationResponseRead
 
   // Step over all \r | \n  and assign the bodyP
   ++headerBodyDelimiterP;
+
   while ((*headerBodyDelimiterP == '\r') || (*headerBodyDelimiterP == '\n'))
+  {
     ++headerBodyDelimiterP;
+  }
 
   body = headerBodyDelimiterP;
 
@@ -274,7 +277,6 @@ bool notificationResponseRead
   ssize_t headersLen    = (ssize_t) headerBodyDelimiterP - (ssize_t) buf;  // Including the Start-Line
   ssize_t bodyBytesRead = bytesRead - headersLen;
 
-  LM_T(LmtNotificationMsg, ("%s: total no of bytes of Start-Line + Headers: %d", npP->subP->subscriptionId, headersLen));
   LM_T(LmtNotificationMsg, ("%s: total no of bytes read: %d", npP->subP->subscriptionId, bytesRead));
   LM_T(LmtNotificationMsg, ("%s: no of bytes of body read: %d", npP->subP->subscriptionId, bodyBytesRead));
 
@@ -353,6 +355,8 @@ static void notificationResponseTreat(NotificationPending* npP, double notificat
   char* body           = NULL;
   char* headers        = NULL;
   char* subId          = npP->subP->subscriptionId;
+
+  bzero(buf, sizeof(buf));
 
   if (notificationResponseRead(npP, buf, sizeof(buf), &httpStatusCode, &contentLength, &headers, &body, notificationTime) == false)
   {

@@ -1,0 +1,518 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Patch
+
+--SHELL-INIT--
+dbInit CB
+dbInit CB openiot
+orionldStart CB -experimental -multiservice
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 with a description field
+# 02. Create a subscription S2 with a description field
+# 03. PATCH S1, setting "description" to "Sub S1"
+# 04. PATCH S2, setting "description" to "Sub S2" and "entities" to as new array
+# 05. GET S1 from cache, see "description" == "Sub S1"
+# 06. GET S2 from cache, see "description" == "Sub S2" and the new value for "entities"
+# 07. GET S1 from DB, see "description" == "Sub S1"
+# 08. GET S2 from DV, see "description" == "Sub S2"
+# 09. PATCH in a 'geoQ' for S1
+# 10. GET S1 to see the geoQ
+# 11. PATCH "notification" for S2
+# 12. GET GET S2 from cache, see the new "notification"
+# 13. GET GET S2 from DB, see the new "notification"
+#
+
+echo '01. Create a subscription S1 with a description field'
+echo '====================================================='
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "name": "Test subscription S01",
+  "description": "Description of Test subscription S01",
+  "entities": [
+    {
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:1234/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --tenant openiot
+echo
+echo
+
+
+echo '02. Create a subscription S2 with a description field'
+echo '====================================================='
+payload='{
+  "id": "urn:S2",
+  "type": "Subscription",
+  "name": "Test subscription S02",
+  "description": "Description of Test subscription S02",
+  "entities": [
+    {
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://localhost:1234/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --tenant openiot
+echo
+echo
+
+
+echo '03. PATCH S1, setting "description" to "Sub S1"'
+echo '==============================================='
+payload='{
+  "description": "Sub S1"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1 --payload "$payload" -X PATCH --tenant openiot
+echo
+echo
+
+
+echo '04. PATCH S2, setting "description" to "Sub S2" and "entities" to as new array'
+echo '=============================================================================='
+payload='{
+  "description": "Sub S2",
+  "entities": [
+    {
+      "id": "urn:E2",
+      "type": "T2"
+    },
+    {
+      "id": "urn:E3",
+      "type": "T3"
+    }
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S2 --payload "$payload" -X PATCH --tenant openiot
+echo
+echo
+
+
+echo '05. GET S1 from cache, see "description" == "Sub S1"'
+echo '===================================================='
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1 --tenant openiot
+echo
+echo
+
+
+echo '06. GET S2 from cache, see "description" == "Sub S2" and the new value for "entities"'
+echo '====================================================================================='
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S2 --tenant openiot
+echo
+echo
+
+
+echo '07. GET S1 from DB, see "description" == "Sub S1"'
+echo '================================================='
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1?options=fromDb --tenant openiot
+echo
+echo
+
+
+echo '08. GET S2 from DV, see "description" == "Sub S2"and the new value for "entities"'
+echo '================================================================================='
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S2?options=fromDb --tenant openiot
+echo
+echo
+
+
+echo "09. PATCH in a 'geoQ' for S1"
+echo "============================"
+payload='{
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [0,0],
+    "georel": "near;maxDistance==18",
+    "geoproperty": "geo1"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1 -X PATCH --payload "$payload" --tenant openiot
+echo
+echo
+
+
+echo "10. GET S1 to see the geoQ"
+echo "=========================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1 --tenant openiot
+echo
+echo
+
+
+echo '11. PATCH "notification" for S2'
+echo '==============================='
+payload='{
+  "notification": {
+    "attributes": [ "R1", "R2", "P3" ],
+    "format": "concise",
+    "endpoint": {
+      "uri": "http://localhost:11/notifai",
+      "accept": "application/json"
+    }  
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S2 -X PATCH --payload "$payload" --tenant openiot
+echo
+echo
+
+
+echo '12. GET GET S2 from cache, see the new "notification"'
+echo '====================================================='
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S2 --tenant openiot
+echo
+echo
+
+
+echo '13. GET GET S2 from DB, see the new "notification"'
+echo '=================================================='
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S2?options=fromDb --tenant openiot
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 with a description field
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+NGSILD-Tenant: openiot
+
+
+
+02. Create a subscription S2 with a description field
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S2
+NGSILD-Tenant: openiot
+
+
+
+03. PATCH S1, setting "description" to "Sub S1"
+===============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. PATCH S2, setting "description" to "Sub S2" and "entities" to as new array
+==============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET S1 from cache, see "description" == "Sub S1"
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 312
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S1",
+    "entities": [
+        {
+            "type": "T1"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:1234/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Test subscription S01",
+    "type": "Subscription"
+}
+
+
+06. GET S2 from cache, see "description" == "Sub S2" and the new value for "entities"
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 354
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S2",
+    "entities": [
+        {
+            "id": "urn:E2",
+            "type": "T2"
+        },
+        {
+            "id": "urn:E3",
+            "type": "T3"
+        }
+    ],
+    "id": "urn:S2",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:1234/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Test subscription S02",
+    "type": "Subscription"
+}
+
+
+07. GET S1 from DB, see "description" == "Sub S1"
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 315
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S1",
+    "entities": [
+        {
+            "type": "T1"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:1234/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "database",
+    "status": "active",
+    "subscriptionName": "Test subscription S01",
+    "type": "Subscription"
+}
+
+
+08. GET S2 from DV, see "description" == "Sub S2"and the new value for "entities"
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: 357
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S2",
+    "entities": [
+        {
+            "id": "urn:E2",
+            "type": "T2"
+        },
+        {
+            "id": "urn:E3",
+            "type": "T3"
+        }
+    ],
+    "id": "urn:S2",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:1234/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "database",
+    "status": "active",
+    "subscriptionName": "Test subscription S02",
+    "type": "Subscription"
+}
+
+
+09. PATCH in a 'geoQ' for S1
+============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+10. GET S1 to see the geoQ
+==========================
+HTTP/1.1 200 OK
+Content-Length: 413
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S1",
+    "entities": [
+        {
+            "type": "T1"
+        }
+    ],
+    "geoQ": {
+        "coordinates": "0,0",
+        "geometry": "Point",
+        "geoproperty": "geo1",
+        "georel": "near;maxDistance==18"
+    },
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:1234/notify"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Test subscription S01",
+    "type": "Subscription"
+}
+
+
+11. PATCH "notification" for S2
+===============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+12. GET GET S2 from cache, see the new "notification"
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S2",
+    "entities": [
+        {
+            "id": "urn:E2",
+            "type": "T2"
+        },
+        {
+            "id": "urn:E3",
+            "type": "T3"
+        }
+    ],
+    "id": "urn:S2",
+    "isActive": true,
+    "notification": {
+        "attributes": [
+            "R1",
+            "R2",
+            "P3"
+        ],
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:11/notifai"
+        },
+        "format": "concise",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Test subscription S02",
+    "type": "Subscription"
+}
+
+
+13. GET GET S2 from DB, see the new "notification"
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Sub S2",
+    "entities": [
+        {
+            "id": "urn:E2",
+            "type": "T2"
+        },
+        {
+            "id": "urn:E3",
+            "type": "T3"
+        }
+    ],
+    "id": "urn:S2",
+    "isActive": true,
+    "notification": {
+        "attributes": [
+            "R1",
+            "R2",
+            "P3"
+        ],
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:11/notifai"
+        },
+        "format": "concise",
+        "status": "ok"
+    },
+    "origin": "database",
+    "status": "active",
+    "subscriptionName": "Test subscription S02",
+    "type": "Subscription"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB openiot

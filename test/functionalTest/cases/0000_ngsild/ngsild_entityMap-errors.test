@@ -35,7 +35,7 @@ orionldStart CP1 -experimental
 # 02. In CB,  create an entity urn:E1 with attribute  P0
 # 03. In CP1, create an entity urn:E1 with attributes P1-P3+R1
 # 04. Create an exclusive registration R1 on urn:E1/P1 for CP1
-# 05. Query the CB with type=T, just to get the entity map (FIXME: shouldn't get one as all entities are returned in the very first query)
+# 05. Query the CB with type=T, to get urn:E1 and the entity map (FIXME: shouldn't get one as all entities are returned in the very first query)
 # 06. Query the CB using the correct entity map but with offset=10 (we don't have that many entities in the map)
 # 07. Query the CB with an entity map that doesn't exist (yes, again, but this time the broker has a valid entity map)
 # 08. Query the CB using the correct entity map AND with URL parameter 'id' - see error as the entities are already selected
@@ -106,8 +106,8 @@ echo
 echo
 
 
-echo "05. Query the CB with type=T, to get the entity map back"
-echo "========================================================"
+echo "05. Query the CB with type=T, to get urn:E1 and the entity map"
+echo "=============================================================="
 orionCurl --url /ngsi-ld/v1/entities?type=T
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
@@ -163,16 +163,29 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg1
 
 
 
-05. Query the CB with type=T, to get the entity map back
-========================================================
+05. Query the CB with type=T, to get urn:E1 and the entity map
+==============================================================
 HTTP/1.1 200 OK
-Content-Length: 2
+Content-Length: 
 Content-Type: application/json
 Date: REGEX(.*)
 Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
-[]
+[
+    {
+        "P0": {
+            "type": "Property",
+            "value": "In CB"
+        },
+        "P1": {
+            "type": "Property",
+            "value": "P1 in CP1"
+        }
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
 
 
 06. Query the CB using the correct entity map but with offset=10 (we don't have that many entities in the map)

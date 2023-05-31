@@ -96,7 +96,7 @@ extern "C"
 //
 // distOpsSend - FIXME: move to orionld/forwarding/distOpsSend.cpp/h
 //
-int distOpsSend(DistOp* distOpList)
+int distOpsSend(DistOp* distOpList, bool onlyIds)
 {
   char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
 
@@ -109,7 +109,7 @@ int distOpsSend(DistOp* distOpList)
     // Send the forwarded request and await all responses
     if ((distOpP->regP != NULL) && (distOpP->error == false))
     {
-      distOpP->onlyIds = true;
+      distOpP->onlyIds = onlyIds;
 
       if (distOpSend(distOpP, dateHeader, xff) == 0)
         distOpP->error = false;
@@ -171,6 +171,7 @@ typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam)
 //
 void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam)
 {
+  LM_T(LmtSR, ("Receiving responses"));
   //
   // Read the responses to the forwarded requests
   //
@@ -207,11 +208,50 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 
 
 
+//
+// Entity Map
+//
+// Right now it looks like this:
+// {
+//   "urn:entities:E1": [ "urn:registrations:R1", "urn:registrations:R2", ... "local" ],
+//   "urn:entities:E1": [ "urn:registrations:R1", "urn:registrations:R2", ... ],
+// }
+//
+// which is later turned into:
+// {
+//   "urn:registrations:R1": ["urn:entities:E1", "urn:entities:E2" ],
+//   "urn:registrations:R2": ["urn:entities:E1", "urn:entities:E2" ],
+//   "local":                ["urn:entities:E1"]
+// }
+//
+// BUT, I need also entity type and attrs ...
+//
+// New Entity Map:
+// {
+//   "urn:entities:E1": {
+//     "regs": [ "urn:registrations:R1", "urn:registrations:R2", ... "local" ]
+//     "type": "T",
+//     "attrs": [ "urn:attribute:P1", "urn:attribute:P2", ... ]
+//   }
+// }
+//
+// And turn it into:
+// {
+//   "urn:registrations:R1": [
+//     {
+//       "ids": [ "urn:entities:E1", "urn:entities:E2" ],
+//       "type": "T",
+//       "attrs": [ "urn:attribute:P1", "urn:attribute:P2", ... ]
+//     }
+//   ]
+// }
+//
+
 // -----------------------------------------------------------------------------
 //
-// orionldDistOpMatchAdd -
+// entityMapItemAdd -
 //
-void orionldDistOpMatchAdd(const char* entityId, const char* regId)
+static void entityMapItemAdd(const char* entityId, const char* regId)
 {
   KjNode* matchP = kjLookup(orionldEntityMap, entityId);
 
@@ -241,13 +281,13 @@ int idListResponse(DistOp* distOpP, void* callbackParam)
 {
   if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
   {
-    LM_T(LmtEntityMapDetail, ("Entity map from registration '%s'", distOpP->regP->regId));
+    LM_T(LmtEntityMapDetail, ("Entity map from registration '%s' (distOp at %p)", distOpP->regP->regId, distOpP));
     for (KjNode* eIdNodeP = distOpP->responseBody->value.firstChildP; eIdNodeP != NULL; eIdNodeP = eIdNodeP->next)
     {
       char* entityId = eIdNodeP->value.s;
 
       LM_T(LmtEntityMapDetail, ("o Entity '%s', registration '%s'", entityId, distOpP->regP->regId));
-      orionldDistOpMatchAdd(entityId, distOpP->regP->regId);
+      entityMapItemAdd(entityId, distOpP->regP->regId);
     }
   }
 
@@ -266,7 +306,7 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
     return;
 
   // Send all distributed requests
-  int forwards = distOpsSend(distOpList);
+  int forwards = distOpsSend(distOpList, true);
 
   // Await all responses, if any
   if (forwards > 0)
@@ -319,7 +359,7 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
     {
       const char* entityId = eidNodeP->value.s;
 
-      orionldDistOpMatchAdd(entityId, NULL);
+      entityMapItemAdd(entityId, NULL);
     }
   }
 

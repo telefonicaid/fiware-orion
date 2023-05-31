@@ -36,6 +36,10 @@ extern "C"
 #include "orionld/common/orionldState.h"                            // orionldState, orionldEntityMapCount
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
+#include "orionld/regCache/regCacheItemLookup.h"                    // regCacheItemLookup
+#include "orionld/forwarding/DistOp.h"                              // DistOp
+#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
+#include "orionld/forwarding/distOpEntityMerge.h"                   // distOpEntityMerge
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // Own interface
 
@@ -62,6 +66,98 @@ static void idListFix(KjNode* entityIdArray)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// distOpAdd -
+//
+DistOp* distOpAdd(DistOp* distOpList, const char* registrationId, char* idString)
+{
+  LM_T(LmtEntityMap, ("Creating DistOp for reg '%s'", registrationId));
+
+  DistOp* doP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
+
+  if (doP == NULL)
+    LM_X(1, ("Out of memory"));
+
+  bzero(doP, sizeof(DistOp));
+
+  doP->regP = regCacheItemLookup(orionldState.tenantP->regCache, registrationId);
+  if (doP->regP == NULL)
+  {
+    LM_E(("Internal Error (unable to find the registration '%s' in the cache", registrationId));
+    return distOpList;
+  }
+
+  doP->operation = DoQueryEntity;
+  doP->entityId  = idString;
+
+  if (distOpList != NULL)
+    doP->next = distOpList;
+
+  return doP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// queryResponse -
+//
+static int queryResponse(DistOp* distOpP, void* callbackParam)
+{
+  LM_T(LmtSR, ("Got a response. status code: %d. body: '%s'", distOpP->httpResponseCode, distOpP->rawResponse));
+  KjNode* entityArray = (KjNode*) callbackParam;
+  kjTreeLog(distOpP->responseBody, "Response", LmtSR);
+
+  if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
+  {
+    LM_T(LmtSR, ("Got a body from endpoint registered in reg '%s'", distOpP->regP->regId));
+    LM_T(LmtSR, ("Must merge these new entities with the once already received"));
+
+    KjNode* entityP = distOpP->responseBody->value.firstChildP;
+    KjNode* next;
+    while (entityP != NULL)
+    {
+      next = entityP->next;
+      kjChildRemove(distOpP->responseBody, entityP);
+      distOpEntityMerge(entityArray, entityP);
+      entityP = next;
+    }
+  }
+
+  return 0;
+}
+
+
+
+//
+// FIXME: these two functions need to get their own modules in orionld/forwarding
+//        Move from orionldGetEntitiesDistributed.cpp
+//
+extern int distOpsSend(DistOp* distOpList, bool onlyIds);
+typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam);
+extern void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// distOpQueryRequest -
+//
+static void distOpQueryRequest(DistOp* distOpList, KjNode* entityArray)
+{
+  // Send all distributed requests
+  LM_T(LmtSR, ("Calling distOpsSend"));
+  int forwards = distOpsSend(distOpList, false);
+  LM_T(LmtSR, ("distOpsSend says %d forwards", forwards));
+
+  // Await all responses, if any
+  if (forwards > 0)
+    distOpsReceive(distOpList, queryResponse, entityArray);
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntitiesPage -
@@ -73,10 +169,10 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
 
   KjNode* entityArray = kjArray(orionldState.kjsonP, NULL);
 
-  LM_T(LmtSR, ("entity map:          '%s'", orionldEntityMapId));
-  LM_T(LmtSR, ("items in entity map:  %d",  orionldEntityMapCount));
-  LM_T(LmtSR, ("offset:               %d",  offset));
-  LM_T(LmtSR, ("limit:                %d",  limit));
+  LM_T(LmtEntityMap, ("entity map:          '%s'", orionldEntityMapId));
+  LM_T(LmtEntityMap, ("items in entity map:  %d",  orionldEntityMapCount));
+  LM_T(LmtEntityMap, ("offset:               %d",  offset));
+  LM_T(LmtEntityMap, ("limit:                %d",  limit));
 
   // HTTP Status code and payload body
   orionldState.responseTree   = entityArray;
@@ -85,7 +181,7 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
   if (orionldState.uriParams.count == true)
   {
     LM_T(LmtEntityMap, ("%d entities match, in the entire federation", orionldEntityMapCount));
-    LM_T(LmtSR, ("COUNT: Adding HttpResultsCount header: %d", orionldEntityMapCount));
+    LM_T(LmtEntityMap, ("COUNT: Adding HttpResultsCount header: %d", orionldEntityMapCount));
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, orionldEntityMapCount);
   }
 
@@ -96,7 +192,7 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
   }
 
   //
-  // Fast forward to offset indes in the KJNode array
+  // Fast forward to offset index in the KJNode array that is the entity map
   //
   KjNode* entityMap = orionldEntityMap->value.firstChildP;
   for (int ix = 0; ix < offset; ix++)
@@ -154,8 +250,9 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
     entityMap = entityMap->next;
   }
 
-  kjTreeLog(sources, "sources", LmtSR);
+  kjTreeLog(sources, "sources", LmtEntityMapDetail);
 
+  DistOp* distOpList = NULL;
   for (KjNode* sourceP = sources->value.firstChildP; sourceP != NULL; sourceP = sourceP->next)
   {
     if (strcmp(sourceP->name, "localDB") == 0)
@@ -176,11 +273,11 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
       orionldState.uriParams.offset = 0;
       orionldState.uriParams.limit  = orionldState.in.idList.items;
 
-      LM_T(LmtSR, ("Query local database for %d entities", orionldState.in.idList.items));
+      LM_T(LmtEntityMap, ("Query local database for %d entities", orionldState.in.idList.items));
       orionldGetEntitiesLocal(NULL, NULL, NULL, true);
 
       // Response comes in orionldState.responseTree - move those to entityArray
-      kjTreeLog(orionldState.responseTree, "orionldState.responseTree", LmtSR);
+      kjTreeLog(orionldState.responseTree, "orionldState.responseTree", LmtEntityMapDetail);
       if ((orionldState.responseTree != NULL) && (orionldState.responseTree->value.firstChildP != NULL))
       {
         orionldState.responseTree->lastChild->next = entityArray->value.firstChildP;
@@ -190,14 +287,14 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
     else
     {
       int idStringSize = 0;
-      LM_T(LmtSR, ("Query '%s' for:", sourceP->name));
+      LM_T(LmtEntityMap, ("Query '%s' for:", sourceP->name));
       for (KjNode* entityNodeP = sourceP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
       {
-        LM_T(LmtSR, ("  o %s", entityNodeP->value.s));
+        LM_T(LmtEntityMap, ("  o %s", entityNodeP->value.s));
         idStringSize += strlen(entityNodeP->value.s) + 1;  // +1 for the comma
       }
 
-      char* idString = kaAlloc(&orionldState.kalloc, idStringSize);
+      char* idString   = kaAlloc(&orionldState.kalloc, idStringSize);
       int   idStringIx = 0;
 
       for (KjNode* entityNodeP = sourceP->value.firstChildP; entityNodeP != NULL; entityNodeP = entityNodeP->next)
@@ -211,8 +308,16 @@ bool orionldGetEntitiesPage(KjNode* localDbMatches)
           idStringIx += 1;
         }
       }
-      LM_T(LmtSR, ("Query '%s' with id=%s", sourceP->name, idString));
+
+      LM_T(LmtEntityMap, ("Query '%s' with id=%s", sourceP->name, idString));
+      distOpList = distOpAdd(distOpList, sourceP->name, idString);
     }
+  }
+
+  if (distOpList != NULL)
+  {
+    distOpListDebug(distOpList, "To Forward for GET /entities");
+    distOpQueryRequest(distOpList, entityArray);
   }
 
   return true;

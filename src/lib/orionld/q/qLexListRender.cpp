@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qVariableFix.h"                            // qVariableFix
+#include "orionld/q/qPresent.h"                                // qListPresent
 #include "orionld/q/qLexListRender.h"                          // Own interface
 
 
@@ -68,17 +69,6 @@ const char* floatToString(QNode* qItemP, char* buf, int bufLen)
 
 // -----------------------------------------------------------------------------
 //
-// regexToString -
-//
-const char* regexToString(QNode* qItemP, char* buf, int bufLen)
-{
-  return "REGEX";
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // qLexListRender -
 //
 char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
@@ -87,6 +77,8 @@ char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
   char*  outP    = kaAlloc(&orionldState.kalloc, outSize);  // kaRealloc if needed
   int    outIx   = 0;
   char*  detail;
+
+  qListPresent(qListP, NULL, "QList", "Q-List to render");
 
   *validInV2P = true;   // Set to false later if need be (in the switch below)
   *isMqP      = false;  // Set to true later if need be (qVariableFix)
@@ -121,7 +113,7 @@ char* qLexListRender(QNode* qListP, bool* validInV2P, bool* isMqP)
     case QNodeTrueValue:    bufP = (char*) "true";                       break;
     case QNodeFalseValue:   bufP = (char*) "false";                      break;
     case QNodeRegexpValue:
-      regexToString(qItemP, buf, sizeof(buf));
+      bufP = qItemP->value.s;
       *validInV2P = false;
       break;
     case QNodeVariable:

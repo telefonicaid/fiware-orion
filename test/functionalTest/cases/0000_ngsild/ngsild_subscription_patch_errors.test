@@ -789,11 +789,11 @@ echo "======================================================================"
 payload='{
   "notification": {
     "attributes": [ "A1" ],
-    "endpoint": "localhost:9999/here"    
+    "endpoint": { "uri": "localhost:9999/here" }
   },
   "notification": {
     "attributes": [ "A1" ],
-    "endpoint": "localhost:9999/here"    
+    "endpoint": { "uri": "localhost:9999/here" }
   }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
@@ -1183,13 +1183,13 @@ Date: REGEX(.*)
 03. Attempt to PATCH the subscription with a payload data that is not a JSON object
 ===================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 170
+Content-Length: 137
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "The payload data for updating a subscription must be a JSON Object",
-    "title": "Invalid Subscription",
+    "detail": "A Subscription must be a JSON Object",
+    "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -1239,12 +1239,12 @@ Date: REGEX(.*)
 07. Attempt to PATCH the subscription with a 'name' that is not a string
 ========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 105
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "name",
+    "detail": "Subscription::subscriptionName",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1253,12 +1253,12 @@ Date: REGEX(.*)
 08. Attempt to PATCH the subscription with duplicate 'name'
 ===========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 104
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "name",
+    "detail": "Subscription::subscriptionName",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1267,12 +1267,12 @@ Date: REGEX(.*)
 09. Attempt to PATCH the subscription with a 'description' that is not a string
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "description",
+    "detail": "Subscription::description",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1281,12 +1281,12 @@ Date: REGEX(.*)
 10. Attempt to PATCH the subscription with duplicate 'description'
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "description",
+    "detail": "Subscription::description",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1295,12 +1295,12 @@ Date: REGEX(.*)
 11. Attempt to PATCH the subscription with an 'entities' that is not an array
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 108
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities",
+    "detail": "Subscription::entities",
     "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1309,12 +1309,12 @@ Date: REGEX(.*)
 12. Attempt to PATCH the subscription with an 'entities' as an empty array
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 103
+Content-Length: 117
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "entities",
+    "detail": "Subscription::entities",
     "title": "Empty Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1505,12 +1505,12 @@ Date: REGEX(.*)
 26. Attempt to PATCH the subscription with a 'watchedAttributes' that is not an array
 =====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 117
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "watchedAttributes",
+    "detail": "Subscription::watchedAttributes",
     "title": "Not a JSON Array",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1519,12 +1519,12 @@ Date: REGEX(.*)
 27. Attempt to PATCH the subscription with a 'watchedAttributes' that is an array with one non-string
 =====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 123
+Content-Length: 135
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "watchedAttributes item",
+    "detail": "Subscription::watchedAttributes[X]",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1533,12 +1533,12 @@ Date: REGEX(.*)
 28. Attempt to PATCH the subscription with a duplicated 'watchedAttributes'
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 117
+Content-Length: 131
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "watchedAttributes",
+    "detail": "Subscription::watchedAttributes",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1547,12 +1547,12 @@ Date: REGEX(.*)
 29. Attempt to PATCH the subscription with a 'q' that is not a string
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 102
+Content-Length: 116
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "q",
+    "detail": "Subscription::q",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1561,12 +1561,12 @@ Date: REGEX(.*)
 30. Attempt to PATCH the subscription with a duplicated 'q'
 ===========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 101
+Content-Length: 115
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "q",
+    "detail": "Subscription::q",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1575,12 +1575,12 @@ Date: REGEX(.*)
 31. Attempt to PATCH the subscription with a 'geoQ' that is not a JSON Object
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 105
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "geoQ",
+    "detail": "Subscription::geoQ",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1589,12 +1589,12 @@ Date: REGEX(.*)
 32. Attempt to PATCH the subscription with a duplicated 'geoQ'
 ==============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 104
+Content-Length: 118
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "geoQ",
+    "detail": "Subscription::geoQ",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1784,41 +1784,41 @@ Date: REGEX(.*)
 
 59. Attempt to PATCH the subscription with a 'csf' that is not a string
 =======================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 104
+HTTP/1.1 501 Not Implemented
+Content-Length: 151
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "csf",
-    "title": "Not a JSON String",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "CSF (Context Source Filter) for Subscriptions",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 
 60. Attempt to PATCH the subscription with a duplicated 'csf'
 =============================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 103
+HTTP/1.1 501 Not Implemented
+Content-Length: 151
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "csf",
-    "title": "Duplicated field",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "detail": "CSF (Context Source Filter) for Subscriptions",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 
 61. Attempt to PATCH the subscription with a 'isActive' that is not a boolean
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 110
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "isActive",
+    "detail": "Subscription::isActive",
     "title": "Not a JSON Boolean",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1827,12 +1827,12 @@ Date: REGEX(.*)
 62. Attempt to PATCH the subscription with a duplicated 'isActive'
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 108
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "isActive",
+    "detail": "Subscription::isActive",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1841,12 +1841,12 @@ Date: REGEX(.*)
 63. Attempt to PATCH the subscription with a 'notification' that is not an object
 =================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "notification",
+    "detail": "Subscription::notification",
     "title": "Not a JSON Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1855,12 +1855,12 @@ Date: REGEX(.*)
 64. Attempt to PATCH the subscription with a 'notification' that is an empty object
 ===================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 108
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "notification",
+    "detail": "Subscription::notification",
     "title": "Empty Object",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -1869,12 +1869,12 @@ Date: REGEX(.*)
 65. Attempt to PATCH the subscription with a duplicated 'notification'
 ======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 112
+Content-Length: 126
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "notification",
+    "detail": "Subscription::notification",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2177,12 +2177,12 @@ Date: REGEX(.*)
 87. Attempt to PATCH the subscription with an 'expires' that is not a string
 ============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 108
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "expires",
+    "detail": "Subscription::expiresAt",
     "title": "Not a JSON String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2191,12 +2191,12 @@ Date: REGEX(.*)
 88. Attempt to PATCH the subscription with a duplicated 'expires'
 =================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 107
+Content-Length: 123
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "expires",
+    "detail": "Subscription::expiresAt",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2205,13 +2205,13 @@ Date: REGEX(.*)
 89. Attempt to PATCH the subscription with an 'expires' that is an empty string
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 103
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "expires",
-    "title": "Empty String",
+    "detail": "Subscription::expiresAt",
+    "title": "Invalid ISO8601",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2219,13 +2219,13 @@ Date: REGEX(.*)
 90. Attempt to PATCH the subscription with an 'expires' that is not a valid DateTime
 ====================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "expires",
-    "title": "Invalid DateTime value",
+    "detail": "Subscription::expiresAt",
+    "title": "Invalid ISO8601",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -2233,12 +2233,12 @@ Date: REGEX(.*)
 91. Attempt to PATCH the subscription with a 'throttling' that is not a number
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 125
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "throttling",
+    "detail": "Subscription::throttling",
     "title": "Not a JSON Number",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2247,12 +2247,12 @@ Date: REGEX(.*)
 92. Attempt to PATCH the subscription with a duplicated 'throttling'
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 110
+Content-Length: 124
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "throttling",
+    "detail": "Subscription::throttling",
     "title": "Duplicated field",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2261,12 +2261,12 @@ Date: REGEX(.*)
 93. Attempt to PATCH the subscription with a 'throttling' that is negative
 ==========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 138
+Content-Length: 152
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "throttling",
+    "detail": "Subscription::throttling",
     "title": "Negative Number not allowed in this position",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

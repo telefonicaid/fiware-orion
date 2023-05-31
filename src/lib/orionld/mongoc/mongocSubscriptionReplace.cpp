@@ -64,11 +64,6 @@ bool mongocSubscriptionReplace(const char* subscriptionId, KjNode* dbSubscriptio
   LM_T(LmtMongoc, ("Creating the _id selector for subscription id '%s'", subscriptionId));
   bson_append_utf8(&selector, "_id", 3, subscriptionId, -1);
 
-  // The "_id" field cannot be present in the payload - mongodb complains if it is
-  KjNode* _idP = kjLookup(dbSubscriptionP, "_id");
-  if (_idP != NULL)
-    kjChildRemove(dbSubscriptionP, _idP);
-
   mongocKjTreeToBson(dbSubscriptionP, &replacement);
 
   MONGOC_WLOG("Updating Subscription", orionldState.tenantP->mongoDbName, "subscriptions", &selector, &replacement, LmtMongoc);

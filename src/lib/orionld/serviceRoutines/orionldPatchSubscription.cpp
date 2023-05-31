@@ -50,7 +50,8 @@ extern "C"
 #include "orionld/types/MqttInfo.h"                            // MqttInfo
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
-#include "orionld/payloadCheck/pcheckSubscription.h"           // pcheckSubscription
+#include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
+#include "orionld/q/qRelease.h"                                // qRelease
 #include "orionld/mongoc/mongocSubscriptionLookup.h"           // mongocSubscriptionLookup
 #include "orionld/mongoc/mongocSubscriptionReplace.h"          // mongocSubscriptionReplace
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
@@ -110,14 +111,18 @@ static bool okToRemove(const char* fieldName)
 // If "geoQ" replaces "expression", then we may need to maintain the "q" inside the old "expression".
 // OR, if "q" is also in the patch tree, then we'll simply move it inside "expression" (former "geoQ").
 //
-static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription* cSubP, KjNode* patchTree, KjNode* qP, KjNode* expressionP)
+static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription* cSubP, KjNode* patchTree, KjNode* qP, KjNode* expressionP, char* qRenderedForDb)
 {
   KjNode* fragmentP = patchTree->value.firstChildP;
   KjNode* next;
 
+  LM_T(LmtSR, ("expressionP at %p", expressionP));
+
   while (fragmentP != NULL)
   {
     next = fragmentP->next;
+
+    LM_T(LmtSR, ("Patching subscription fragment '%s' for DB", fragmentP->name));
 
     if (fragmentP->type == KjNull)
     {
@@ -158,33 +163,62 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription*
   }
 
 
+  if (qRenderedForDb != NULL)
+  {
+    KjNode* ldQNode = kjLookup(dbSubscriptionP, "ldQ");
+
+    if (ldQNode == NULL)  // Add
+    {
+      ldQNode = kjString(orionldState.kjsonP, "ldQ", qRenderedForDb);
+      kjChildAdd(dbSubscriptionP, ldQNode);
+    }
+    else
+      ldQNode->value.s = qRenderedForDb;
+  }
+
   //
   // If geoqP/expressionP != NULL, then it replaces the "expression" in the DB
   // If also qP != NULL, then this qP is added to geoqP/expressionP
   // If not, we have to lookup 'q' in the old "expression" and add it to geoqP/expressionP
   //
-  if (expressionP != NULL)
+  if (expressionP != NULL)  // expressionP points to the geoQ of the PATCH payload body
   {
+    // For each field in expressionP, replace in dbExpressionP
     KjNode* dbExpressionP = kjLookup(dbSubscriptionP, "expression");
+    KjNode* geoqNodeP     = expressionP->value.firstChildP;
+    KjNode* next;
 
-    if (dbExpressionP != NULL)
-      kjChildRemove(dbSubscriptionP, dbExpressionP);
-    kjChildRemove(patchTree, expressionP);
-    kjChildAdd(dbSubscriptionP, expressionP);
+    while (geoqNodeP != NULL)
+    {
+      next = geoqNodeP->next;
 
-    //
-    // If 'q' is not present in the patch tree, and we have replaced the 'expression', then
-    // we need to get the 'q' from the old 'expression' and add it to the new expression.
-    //
-    if ((qP == NULL) && (dbExpressionP != NULL))
-      qP = kjLookup(dbExpressionP, "q");
+      LM_T(LmtSR, ("Checking field '%s'", geoqNodeP->name));
+      // 1. Remove the node from patch payload body
+      kjChildRemove(expressionP, geoqNodeP);
 
-    if (qP != NULL)
-      kjChildAdd(expressionP, qP);
+      // 2. Lookup the node in the DB subscription and remove it if found
+      KjNode* dbGeoqNodeP = kjLookup(dbExpressionP, geoqNodeP->name);
+      if (dbGeoqNodeP != NULL)
+      {
+        LM_T(LmtSR, ("Found '%s' in DB Expression - removing it from there", geoqNodeP->name));
+        kjChildRemove(dbExpressionP, dbGeoqNodeP);
+      }
+      else
+        LM_T(LmtSR, ("Did not find '%s' in DB Expression", geoqNodeP->name));
+
+      // 3, Add the new geoqNodeP to dbExpressionP
+      LM_T(LmtSR, ("Adding '%s' to DB Expression", geoqNodeP->name));
+      kjChildAdd(dbExpressionP, geoqNodeP);
+
+      geoqNodeP = next;
+    }
   }
   else if (qP != NULL)
   {
     KjNode* dbExpressionP = kjLookup(dbSubscriptionP, "expression");
+
+    if (qRenderedForDb != NULL)
+      qP->value.s = qRenderedForDb;
 
     if (dbExpressionP != NULL)
       kjChildAddOrReplace(dbExpressionP, "q", qP);
@@ -212,9 +246,40 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription*
 //
 // In a Subscription, this must be done for "expiration", and "throttling".
 //
-static void fixDbSubscription(KjNode* dbSubscriptionP)
+static void fixDbSubscription(KjNode* dbSubscriptionP, char* qRenderedForDb)
 {
   KjNode* nodeP;
+
+  if (qRenderedForDb != NULL)
+  {
+    //
+    // Enter "expression and fix "q"
+    //
+    KjNode* expressionP = kjLookup(dbSubscriptionP, "expression");
+    if (expressionP != NULL)
+    {
+      KjNode* qP = kjLookup(expressionP, "q");
+      if (qP != NULL)
+        qP->value.s = qRenderedForDb;
+      else
+      {
+        qP = kjString(orionldState.kjsonP, "q", qRenderedForDb);
+        kjChildAdd(expressionP, qP);
+      }
+    }
+
+    //
+    // Fix "ldQ"
+    //
+    KjNode* ldqP = kjLookup(dbSubscriptionP, "ldQ");
+    if (ldqP != NULL)
+      ldqP->value.s = qRenderedForDb;
+    else
+    {
+      ldqP = kjString(orionldState.kjsonP, "ldQ", qRenderedForDb);
+      kjChildAdd(dbSubscriptionP, ldqP);
+    }
+  }
 
   //
   // If 'expiration' is an Object, it means it's a NumberLong and it is then changed to a double
@@ -255,7 +320,16 @@ static void fixDbSubscription(KjNode* dbSubscriptionP)
 //
 static bool subCacheItemUpdateEntities(CachedSubscription* cSubP, KjNode* entityArray)
 {
-  cSubP->entityIdInfos.empty();
+  //
+  // To replace "entities", we first need to frre up the old "entities"
+  //
+  for (long unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ix++)
+  {
+    cSubP->entityIdInfos[ix]->release();
+    delete cSubP->entityIdInfos[ix];
+  }
+  cSubP->entityIdInfos.clear();
+
   for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     KjNode*      idP          = kjLookup(entityP, "id");
@@ -350,6 +424,9 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
     unsigned short  port;
     char*           rest;
     char*           url = strdup(uriP->value.s);
+    char            urlCopy[1024];
+
+    strncpy(urlCopy, url, sizeof(urlCopy) - 1);
 
     if (strncmp(uriP->value.s, "mqtt", 4) == 0)
     {
@@ -383,15 +460,26 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
     // FIXME: if mqtt, I parse the URL twice, and save IP, port + rest (topic) twice as well
     //        I should remove the MQTT info from HttpInfo and save directly in CachedSubscription - next to protocol, ip, port, rest
     //
-    if (urlParse(url, &protocol, &ip, &port, &rest) == true)
+    if (urlParse(urlCopy, &protocol, &ip, &port, &rest) == true)
     {
       if (cSubP->url != NULL)
         free(cSubP->url);
-      cSubP->url            = url;  // Only ... it's already destroyed by 'urlParse' - need it to free up later
-      cSubP->protocolString = protocol;
-      cSubP->ip             = ip;
+      cSubP->url = url;
+      cSubP->httpInfo.url = url;
+
+      if (cSubP->protocolString != NULL)
+        free(cSubP->protocolString);
+      cSubP->protocolString = strdup(protocol);
+
+      if (cSubP->ip != NULL)
+        free(cSubP->ip);
+      cSubP->ip = strdup(ip);
+
+      if (cSubP->rest != NULL)
+        free(cSubP->rest);
+      cSubP->rest = strdup(rest);
+
       cSubP->port           = port;
-      cSubP->rest           = rest;
       cSubP->protocol       = protocolFromString(cSubP->protocolString);
     }
     else
@@ -460,7 +548,7 @@ static bool subCacheItemUpdateNotification(CachedSubscription* cSubP, KjNode* it
 
   if (attributesP != NULL)  // Those present in the notification
   {
-    cSubP->attributes.empty();
+    cSubP->attributes.clear();
     for (KjNode* attrNodeP = attributesP->value.firstChildP; attrNodeP != NULL; attrNodeP = attrNodeP->next)
     {
       char* longName = orionldAttributeExpand(orionldState.contextP, attrNodeP->value.s, true, NULL);
@@ -483,7 +571,7 @@ static bool subCacheItemUpdateNotification(CachedSubscription* cSubP, KjNode* it
 //
 // subCacheItemUpdate -
 //
-static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionId, KjNode* subscriptionTree, KjNode* geoCoordinatesP)
+static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionId, KjNode* subscriptionTree, KjNode* geoCoordinatesP, QNode* qNodeP, char* qText)
 {
   CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, subscriptionId);
   bool                r     = true;
@@ -501,25 +589,37 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
     cSubP->geoCoordinatesP = kjClone(NULL, geoCoordinatesP);
   }
 
+  if (qNodeP != NULL)
+  {
+    if (cSubP->qText != NULL)
+      free(cSubP->qText);
+
+    cSubP->qText = strdup(qText);
+  }
+
+  if (qNodeP != NULL)
+  {
+    if (cSubP->qP != NULL)
+      qRelease(cSubP->qP);
+    cSubP->qP = qNodeP;
+  }
+
   for (KjNode* itemP = subscriptionTree->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
+    LM_T(LmtSR, ("Patching subscription fragment '%s' for sub-cache", itemP->name));
+
     if ((strcmp(itemP->name, "subscriptionName") == 0) || (strcmp(itemP->name, "name") == 0))
       cSubP->name = itemP->value.s;
     else if (strcmp(itemP->name, "description") == 0)
     {
-      //
-      // The description is only stored in the database ...
-      //
-      // cSubP->description = itemP->value.s;
+      if (cSubP->description != NULL)
+        free(cSubP->description);
+      cSubP->description = strdup(itemP->value.s);
     }
     else if (strcmp(itemP->name, "entities") == 0)
-    {
       subCacheItemUpdateEntities(cSubP, itemP);
-    }
     else if (strcmp(itemP->name, "watchedAttributes") == 0)
-    {
       subCacheItemUpdateWatchedAttributes(cSubP, itemP);
-    }
     else if (strcmp(itemP->name, "timeInterval") == 0)
     {
       LM_W(("Not Implemented (Orion-LD doesn't implement periodical notifications"));
@@ -530,6 +630,7 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
     }
     else if (strcmp(itemP->name, "q") == 0)
     {
+      LM_T(LmtSR, ("Change in 'q' (%s)", itemP->value.s));
       cSubP->expression.q = itemP->value.s;
     }
     else if (strcmp(itemP->name, "geoQ") == 0)
@@ -590,6 +691,7 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
   }
 
   subCacheState = ScsIdle;
+
   cacheSemGive(__FUNCTION__, "Updated a cached subscription");
   return r;
 }
@@ -688,68 +790,56 @@ bool orionldPatchSubscription(void)
 {
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Subscription ID must be a valid URI", orionldState.wildcard[0], 400);
 
-  char*   subscriptionId         = orionldState.wildcard[0];
-  KjNode* watchedAttributesNodeP = NULL;
-  KjNode* timeIntervalNodeP      = NULL;
-  KjNode* qP                     = NULL;
-  KjNode* geoqP                  = NULL;
-  KjNode* geoCoordinatesP        = NULL;
-  bool    mqttChange             = false;
+  char*    subscriptionId         = orionldState.wildcard[0];
+  KjNode*  qP                     = NULL;
+  KjNode*  geoqP                  = kjLookup(orionldState.requestTree, "geoQ");
+  KjNode*  geoCoordinatesP        = NULL;
+  bool     mqttChange             = false;
+  KjNode*  subTree                = orionldState.requestTree;
+  KjNode*  idNode                 = orionldState.payloadIdNode;
+  KjNode*  typeNode               = orionldState.payloadTypeNode;
+  QNode*   qNodeP                 = NULL;
+  char*    qRenderedForDb         = NULL;
+  bool     qValidForV2            = false;
+  bool     qIsMq                  = false;
+  KjNode*  uriP                   = NULL;
+  KjNode*  notifierInfoP          = NULL;
+  bool     r;
 
-  if (pcheckSubscription(orionldState.requestTree, false, &watchedAttributesNodeP, &timeIntervalNodeP, &qP, &geoqP, &geoCoordinatesP, true, &mqttChange) == false)
+  r = pCheckSubscription(subTree,
+                         false,
+                         subscriptionId,
+                         idNode,
+                         typeNode,
+                         NULL,
+                         &qP,
+                         &qNodeP,
+                         &qRenderedForDb,
+                         &qValidForV2,
+                         &qIsMq,
+                         &uriP,
+                         &notifierInfoP,
+                         &geoCoordinatesP,
+                         &mqttChange);
+  if (r == false)
   {
-    LM_E(("pcheckSubscription FAILED"));
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
+    LM_E(("pCheckSubscription FAILED"));
     return false;
   }
+
+  if (qRenderedForDb != NULL)
+    LM_T(LmtSR, ("qRenderedForDb: '%s'", qRenderedForDb));
 
   KjNode* dbSubscriptionP = mongocSubscriptionLookup(subscriptionId);
 
   if (dbSubscriptionP == NULL)
   {
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
     orionldError(OrionldResourceNotFound, "Subscription not found", subscriptionId, 404);
     return false;
-  }
-
-  //
-  // Make sure we don't get both watchedAttributed AND timeInterval
-  // If so, the PATCH is invalid
-  // Right now, timeInterval is not supported, but once it is, if ever, this code will come in handy
-  //
-  if (timeIntervalNodeP != NULL)
-  {
-    orionldError(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented", 501);
-    return false;
-  }
-
-  if ((watchedAttributesNodeP != NULL) && (timeIntervalNodeP != NULL))
-  {
-    LM_W(("Bad Input (Both 'watchedAttributes' and 'timeInterval' given in Subscription Payload Data)"));
-    orionldError(OrionldBadRequestData, "Invalid Subscription Payload Data", "Both 'watchedAttributes' and 'timeInterval' given", 400);
-    return false;
-  }
-  else if (watchedAttributesNodeP != NULL)
-  {
-    KjNode* dbTimeIntervalNodeP = kjLookup(dbSubscriptionP, "timeInterval");
-
-    if ((dbTimeIntervalNodeP != NULL) && (dbTimeIntervalNodeP->value.i != -1))
-    {
-      orionldError(OrionldBadRequestData,
-                   "Invalid Subscription Payload Data",
-                   "Attempt to set 'watchedAttributes' to a Subscription that is of type 'timeInterval'",
-                   400);
-      return false;
-    }
-  }
-  else if (timeIntervalNodeP != NULL)
-  {
-    KjNode* dbConditionsNodeP = kjLookup(dbSubscriptionP, "conditions");
-
-    if ((dbConditionsNodeP != NULL) && (dbConditionsNodeP->value.firstChildP != NULL))
-    {
-      LM_W(("Bad Input (Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes')"));
-      orionldError(OrionldBadRequestData, "Invalid Subscription Payload Data", "Attempt to set 'timeInterval' to a Subscription that is of type 'watchedAttributes'", 400);
-      return false;
-    }
   }
 
   //
@@ -789,7 +879,7 @@ bool orionldPatchSubscription(void)
   //
   // FIXME: This is BAD ... shouldn't change the type of these fields
   //
-  fixDbSubscription(dbSubscriptionP);
+  fixDbSubscription(dbSubscriptionP, qRenderedForDb);
   KjNode* patchBody = kjClone(orionldState.kjsonP, orionldState.requestTree);
 
   dbModelFromApiSubscription(orionldState.requestTree, true);
@@ -802,8 +892,12 @@ bool orionldPatchSubscription(void)
   //
   CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
 
-  if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP) == false)
+  if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP, qRenderedForDb) == false)
+  {
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
     LM_RE(false, ("ngsildSubscriptionPatch failed!"));
+  }
 
   //
   // Update modifiedAt
@@ -826,6 +920,8 @@ bool orionldPatchSubscription(void)
     mqttInfoFromDbTree(dbSubscriptionP, newUriP, &newMqttInfo);
     if (mqttConnectFromInfo(&newMqttInfo) == false)
     {
+      if (qNodeP != NULL)
+        qRelease(qNodeP);
       orionldError(OrionldInternalError, "MQTT Error", "unable to connect to MQTT broker", 500);
       return false;
     }
@@ -843,12 +939,14 @@ bool orionldPatchSubscription(void)
   //
   if (mongocSubscriptionReplace(subscriptionId, dbSubscriptionP) == false)
   {
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
     orionldError(OrionldInternalError, "Database Error", "patching a subscription", 500);
     return false;
   }
 
   // Modify the subscription in the subscription cache
-  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP) == false)
+  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP, qNodeP, qRenderedForDb) == false)
     LM_E(("Internal Error (unable to update the cached subscription '%s' after a PATCH)", subscriptionId));
 
   // All OK? 204 No Content

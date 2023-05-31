@@ -172,6 +172,7 @@ function usage()
   empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
+  echo "$empty [-t (trace level for broker)]"
   echo "$empty [--loud (loud - see travis extra info)]"
   echo "$empty [-ld (only ngsild tests)]"
   echo "$empty [-troe (only ngsild TRoE (Temporal Representation of Entities) tests)]"
@@ -434,6 +435,7 @@ while [ "$#" != 0 ]
 do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
+  elif [ "$1" == "-t" ];             then export CB_TRACELEVELS="$2"; shift;
   elif [ "$1" == "-ld" ];            then ngsild=on;
   elif [ "$1" == "-troe" ];          then troe=on;
   elif [ "$1" == "-eb" ];            then externalBroker=ON;
