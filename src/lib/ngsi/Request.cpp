@@ -172,35 +172,87 @@ std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
     }
 
   // pure v1
-  case RegisterContext:                      return "/v1/registry/registerContext";
-  case ContextEntitiesByEntityId:            return "/v1/registry/contextEntities/{id}";
-  case ContextEntitiesByEntityIdAndType:     return "/v1/registry/contextEntities/type/{type}/id/{id}";
-  case ContextEntityAttributes:              return "/v1/registry/contextEntities/{id}/attributes";
-  case ContextEntityTypeAttribute:           return "/v1/registry/contextEntityTypes/{type}/attributes/{name}";
-  case ContextEntityTypeAttributeContainer:  return "/v1/registry/contextEntityTypes/{type}/attributes";
-  case ContextEntityTypes:                   return "/v1/registry/contextEntityTypes/{type}";
-  case DiscoverContextAvailability:          return "/v1/registry/discoverContextAvailability";
-  case EntityByIdAttributeByName:            return "/v1/registry/contextEntities/{id}/attributes/{name}";
-  case EntityByIdAttributeByNameIdAndType:   return "/v1/registry/contextEntities/type/{type}/id/{id}/attributes/{name}";
-  case EntityTypes:                          return "/v1/contextTypes";
+  // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
+  //case RegisterContext:                      return "/v1/registry/registerContext";
+  //case ContextEntitiesByEntityId:            return "/v1/registry/contextEntities/{id}";
+  //case ContextEntitiesByEntityIdAndType:     return "/v1/registry/contextEntities/type/{type}/id/{id}";
+  //case ContextEntityAttributes:              return "/v1/registry/contextEntities/{id}/attributes";
+  //case ContextEntityTypeAttribute:           return "/v1/registry/contextEntityTypes/{type}/attributes/{name}";
+  //case ContextEntityTypeAttributeContainer:  return "/v1/registry/contextEntityTypes/{type}/attributes";
+  //case ContextEntityTypes:                   return "/v1/registry/contextEntityTypes/{type}";
+  //case DiscoverContextAvailability:          return "/v1/registry/discoverContextAvailability";
+  //case EntityByIdAttributeByName:            return "/v1/registry/contextEntities/{id}/attributes/{name}";
+  //case EntityByIdAttributeByNameIdAndType:   return "/v1/registry/contextEntities/type/{type}/id/{id}/attributes/{name}";
+  //case EntityTypes:                          return "/v1/contextTypes";
+  case RegisterContext:
+  case ContextEntitiesByEntityId:
+  case ContextEntitiesByEntityIdAndType:
+  case ContextEntityAttributes:
+  case ContextEntityTypeAttribute:
+  case ContextEntityTypeAttributeContainer:
+  case ContextEntityTypes:
+  case DiscoverContextAvailability:
+  case EntityByIdAttributeByName:
+  case EntityByIdAttributeByNameIdAndType:
+  case EntityTypes:
+    return "skip";
 
   // v1 or NGSI10;
-  case AllContextEntities:                             return prefix + "/contextEntitites";
-  case AllEntitiesWithTypeAndId:                       return prefix + "/contextEntities/type/{type}/id/{id}";
-  case AttributesForEntityType:                        return prefix + "/contextType/{type}";
-  case IndividualContextEntity:                        return prefix + "/contextEntities/{id}";
-  case IndividualContextEntityAttribute:               return prefix + "/contextEntities/{id}/attributes/{name}";
-  case IndividualContextEntityAttributes:              return prefix + "/contextEntities/{id}/attributes/";
-  case IndividualContextEntityAttributeWithTypeAndId:  return prefix + "/contextEntities/type/{type}/id/{id}/attributes/{name}";
-  case Ngsi10ContextEntityTypes:                       return prefix + "/contextEntityTypes/{type}";
-  case Ngsi10ContextEntityTypesAttribute:              return prefix + "/contextEntityTypes/{type}/attributes/{name}";
-  case Ngsi10ContextEntityTypesAttributeContainer:     return prefix + "/contextEntityTypes/{type}/attributes/";
-  case Ngsi10SubscriptionsConvOp:                      return prefix + "/contextSubscriptions/{id}";
+  // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
+  //case AllContextEntities:                             return prefix + "/contextEntitites";
+  //case AllEntitiesWithTypeAndId:                       return prefix + "/contextEntities/type/{type}/id/{id}";
+  //case AttributesForEntityType:                        return prefix + "/contextType/{type}";
+  //case IndividualContextEntity:                        return prefix + "/contextEntities/{id}";
+  case IndividualContextEntity:
+    if (prefix == "/v1")
+    {
+      return "/v1/contextEntities/{id}";
+    }
+    else
+    {
+      // ngsi10 case
+      return "skip";
+    }
+
+  //case IndividualContextEntityAttribute:               return prefix + "/contextEntities/{id}/attributes/{name}";
+  case IndividualContextEntityAttribute:
+    if (prefix == "/v1")
+    {
+      return "/v1/contextEntities/{id}/attributes/{name}";
+    }
+    else
+    {
+      // ngsi10 case
+      return "skip";
+    }
+  //case IndividualContextEntityAttributes:              return prefix + "/contextEntities/{id}/attributes/";
+  //case IndividualContextEntityAttributeWithTypeAndId:  return prefix + "/contextEntities/type/{type}/id/{id}/attributes/{name}";
+  //case Ngsi10ContextEntityTypes:                       return prefix + "/contextEntityTypes/{type}";
+  //case Ngsi10ContextEntityTypesAttribute:              return prefix + "/contextEntityTypes/{type}/attributes/{name}";
+  //case Ngsi10ContextEntityTypesAttributeContainer:     return prefix + "/contextEntityTypes/{type}/attributes/";
+  //case Ngsi10SubscriptionsConvOp:                      return prefix + "/contextSubscriptions/{id}";
   case QueryContext:                                   return prefix + "/queryContext";
-  case SubscribeContext:                               return prefix + "/subscribeContext|contextSubscriptions";
-  case UnsubscribeContext:                             return prefix + "/unsubscribeContext";
+  //case SubscribeContext:                               return prefix + "/subscribeContext|contextSubscriptions";
+  //case UnsubscribeContext:                             return prefix + "/unsubscribeContext";
   case UpdateContext:                                  return prefix + "/updateContext";
-  case UpdateContextSubscription:                      return prefix + "/updateContextSubscription";
+  //case UpdateContextSubscription:                      return prefix + "/updateContextSubscription";
+  case AllContextEntities:
+  case AllEntitiesWithTypeAndId:
+  case AttributesForEntityType:
+  //case IndividualContextEntity:
+  //case IndividualContextEntityAttribute:
+  case IndividualContextEntityAttributes:
+  case IndividualContextEntityAttributeWithTypeAndId:
+  case Ngsi10ContextEntityTypes:
+  case Ngsi10ContextEntityTypesAttribute:
+  case Ngsi10ContextEntityTypesAttributeContainer:
+  case Ngsi10SubscriptionsConvOp:
+  //case QueryContext:
+  case SubscribeContext:
+  case UnsubscribeContext:
+  //case UpdateContext:
+  case UpdateContextSubscription:
+    return "skip";
 
   // v2, v1 or NGSIv2
   case NotifyContext:
@@ -210,7 +262,9 @@ std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
     }
     else  // v1 or NGSI10 case
     {
-      return prefix + "/notifyContext";
+      // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
+      //return prefix + "/notifyContext";
+      return "skip";
     }
 
   default:
