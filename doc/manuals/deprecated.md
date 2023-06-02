@@ -27,7 +27,7 @@ A list of deprecated features and the version in which they were deprecated foll
   Use NGSIv2 API instead.
     * Context availability subscriptions (AKA NGSI9 subscriptions), as part of NGSIv1, in Orion 2.0.0
       (removed in Orion 2.6.0)
-    * All the other NGSIv1 operations removed in Orion 3.9.0, except the following ones:
+    * All the other NGSIv1 operations removed in Orion 3.10.0, except the following ones:
         * `PUT /v1/contextEntities/{id}`
         * `DELETE /v1/contextEntities/{id}`
         * `GET /v1/contextEntities/{id}/attributes/{name}`
@@ -105,7 +105,7 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
-| NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | 3.8.0 (*)                                 | January 12th, 2023              |
+| NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | 3.9.0 (*)                                 | June 2nd, 2023                  |
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
