@@ -996,6 +996,14 @@ std::string double2string(double f)
     }
   }
 
+  /* At this point a value like 7.999999999536117 ends as "8." in buf
+   * which is not a legal JSON (see issue #4346). This check will remove
+   * the trailing dot in this case */
+  if (buf[strlen(buf) - 1] == '.')
+  {
+    buf[strlen(buf) - 1] = 0;
+  }
+
   return std::string(buf);
 }
 
