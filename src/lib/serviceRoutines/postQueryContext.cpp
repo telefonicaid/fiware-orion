@@ -325,9 +325,10 @@ static bool queryForward
                       &out,
                       &statusCode,
                       noHeaders,
+                      mimeType,
+                      -1,  // default timeout
                       qcrP->providerFormat == PfJson? -1 : providerLimit,
-                      qcrP->providerFormat == PfJson? -1 : providerOffset,
-                      mimeType);
+                      qcrP->providerFormat == PfJson? -1 : providerOffset);
   
   if (r != 0)
   {
