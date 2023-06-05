@@ -306,6 +306,7 @@ static bool queryForward
   snprintf(portV, sizeof(portV), "%d", port);
   url = ip + ":" + portV + resource;
 
+  // Note that pagination is activated only in the case of NGSIv2-based CPrs
   r = httpRequestSend(NULL,
                       "regId: " + regId,
                       fromIp,  // thread variable
@@ -324,8 +325,8 @@ static bool queryForward
                       &out,
                       &statusCode,
                       noHeaders,
-                      providerLimit,
-                      providerOffset,
+                      qcrP->providerFormat == PfJson? -1 : providerLimit,
+                      qcrP->providerFormat == PfJson? -1 : providerOffset,
                       mimeType);
   
   if (r != 0)
