@@ -42,7 +42,6 @@
 #include "common/limits.h"
 #include "common/statistics.h"
 #include "common/logTracing.h"
-#include "rest/uriParamNames.h"
 
 
 
