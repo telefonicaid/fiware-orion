@@ -82,8 +82,6 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
                        &out,
                        &statusCode,
                        params->extraHeaders,
-                       -1,
-                       -1,
                        "",                         //default acceptFormat
                        params->timeout);
 

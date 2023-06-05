@@ -238,7 +238,7 @@ Content-Length: 2
 
 04. Dump accumulator requests
 =============================
-POST http://localhost:REGEX(\d+)/v1/queryContext?limit=20&offset=0&options=count
+POST http://localhost:REGEX(\d+)/v1/queryContext
 Fiware-Servicepath: /
 Content-Length: 124
 User-Agent: REGEX(.*)

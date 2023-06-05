@@ -257,10 +257,10 @@ int httpRequestSend
    std::string*                               outP,
    long long*                                 statusCodeP,
    const std::map<std::string, std::string>&  extraHeaders,
-   int                                        providerLimit,
-   int                                        providerOffset,
    const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
+   long                                       timeoutInMilliseconds,
+   int                                        providerLimit,
+   int                                        providerOffset
 )
 {
   CURL*                curl;
