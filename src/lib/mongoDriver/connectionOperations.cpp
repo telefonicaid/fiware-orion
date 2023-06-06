@@ -36,6 +36,7 @@
 #include "mongoDriver/BSONObjBuilder.h"
 #include "mongoDriver/BSONArrayBuilder.h"
 #include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/safeMongo.h"
 
 
 
@@ -115,6 +116,11 @@ bool orion::collectionQuery
 * Different from others, this function doesn't use getMongoConnection() and
 * releaseMongoConnection(). It is assumed that the caller will do, as the
 * connection cannot be released before the cursor has been used.
+*
+* Note we have _q (query for search) and _countQuery (query for count) given that
+* in some rare occasions they may be different (in particular, when geo-queries are
+* used, see processAreaScopeV2 function for more detail). However, most of the times
+* this function is called with same value for _q and _countQuery
 */
 bool orion::collectionRangedQuery
 (
@@ -122,6 +128,7 @@ bool orion::collectionRangedQuery
   const std::string&         db,
   const std::string&         col,
   const orion::BSONObj&      _q,
+  const orion::BSONObj&      _countQuery,
   const orion::BSONObj&      _sort,
   int                        limit,
   int                        offset,
@@ -143,18 +150,21 @@ bool orion::collectionRangedQuery
   }
 
   // Getting low level driver object
-  bson_t*     q = _q.get();
-  char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
+  bson_t*  q  = _q.get();
+  bson_t*  qc = _countQuery.get();
 
-  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'",
-                  ns.c_str(), limit, offset, bsonStr));
+  char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
+  char* bsonStrCount = bson_as_relaxed_extended_json(qc, NULL);
+
+  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d, query='%s', count='%s'",
+                  ns.c_str(), limit, offset, bsonStr, bsonStrCount));
   mongoc_collection_t *collection = mongoc_client_get_collection(connection, db.c_str(), col.c_str());
 
   // First, set countP (if used). In the case of error, we return early and the actual query doesn't take place
   if (count != NULL)
   {
     bson_error_t error;
-    long long n = mongoc_collection_count_documents(collection, q, NULL, NULL, NULL, &error);
+    long long n = mongoc_collection_count_documents(collection, qc, NULL, NULL, NULL, &error);
     if (n >= 0)
     {
       *count = n;
@@ -162,7 +172,7 @@ bool orion::collectionRangedQuery
     else
     {
       std::string msg = std::string("collection: ") + ns.c_str() +
-        " - count_documents(): " + bsonStr +
+        " - count_documents(): " + bsonStrCount +
         " - exception: " + error.message;
 
       *err = "Database Error (" + msg + ")";
@@ -170,6 +180,7 @@ bool orion::collectionRangedQuery
 
       mongoc_collection_destroy(collection);
       bson_free(bsonStr);
+      bson_free(bsonStrCount);
 
       return false;
     }
@@ -212,6 +223,7 @@ bool orion::collectionRangedQuery
   }
 
   bson_free(bsonStr);
+  bson_free(bsonStrCount);
   bson_free(bsonOptStr);
 
   return r;
@@ -318,7 +330,7 @@ bool orion::collectionFindOne
 
   *err = "";
 
-  if (!collectionRangedQuery(connection, db, col, _q, orion::BSONObj(), 1, 0, &cursor, NULL, err))
+  if (!collectionRangedQuery(connection, db, col, _q, orion::BSONObj(), orion::BSONObj(), 1, 0, &cursor, NULL, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();

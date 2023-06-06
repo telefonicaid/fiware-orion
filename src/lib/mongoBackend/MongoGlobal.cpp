@@ -855,9 +855,19 @@ static std::string sortCriteria(const std::string& sortToken)
 *
 * processAreaScopeV2 -
 *
-* Returns true if areaQueryP was filled, false otherwise
+* Returns true if queryP/countQueryP were filled, false otherwise
+*
+* Most of the cases queryP and countQueryP are filled the same way. However, in the case of near georel they
+* are different. This is due to:
+*
+* - we need to use $near in the query used to search (queryP), due to the alternative using $geoWithin
+*   (described in https://stackoverflow.com/a/76416103/1485926) doesn't sort result by center proximity, so
+*   ?orderBy=distance will break
+* - we cannot use $near in the query used to count (countQueryP) as it doesn't work with modern count functions
+*   (see the aforementioned link).
+*
 */
-bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsage)
+bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
   // FIXME #3774: previously this part was based in streamming instead of append()
 
@@ -964,119 +974,115 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
   orion::BSONObjBuilder bobArea;
   if (scoP->georel.type == "near")
   {
-    if (avoidNearUsage)
+    // 1. query used for count (without $near)
+
+    // This works as far as we don't have any other $and field in the query, in which
+    // case the array for $and here needs to be combined with other items. Currently,
+    // users of processAreaScopesV2() doesn't do add any new $and clause.
+    //
+    // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
+    // at least minDistance or maxDistance are there. Check functional tests
+    //
+    // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
+    // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
+
+    orion::BSONArrayBuilder andArray;
+
+    orion::BSONArrayBuilder coordsBuilder;
+    coordsBuilder.append(scoP->point.longitude());
+    coordsBuilder.append(scoP->point.latitude());
+    orion::BSONArray coords = coordsBuilder.arr();
+
+    if (scoP->georel.maxDistance >= 0)
     {
-      // $near operation is problematic in countDocument()
-      // operation (see https://stackoverflow.com/questions/66143435/countdocuments-with-geo-queries-using-mindistance-semantics)
-      // In abscence of a better alternative I have used a solution as the one
-      // described at https://jira.mongodb.org/browse/DOCS-12834
-      // This works as far as we don't have any other $and field in the query, in which
-      // case the array for $and here needs to be combined with other items
-      //
-      // Why don't use this query style without $near all the time? Because $near provides
-      // ordering of results based in distance to the center, so in regular find() is the one
-      // we want to use
-      //
-      // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
-      // at least minDistance or maxDistance are there. Check functional tests
-      //
-      // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
-      // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
+      orion::BSONObjBuilder andToken;
 
-      orion::BSONArrayBuilder andArray;
+      orion::BSONObjBuilder geoWithinMax;
+      orion::BSONArrayBuilder centerMax;
+      centerMax.append(coords);
+      centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
+      geoWithinMax.append("$centerSphere", centerMax.arr());
 
-      orion::BSONArrayBuilder coordsBuilder;
-      coordsBuilder.append(scoP->point.longitude());
-      coordsBuilder.append(scoP->point.latitude());
-      orion::BSONArray coords = coordsBuilder.arr();
+      orion::BSONObjBuilder loc;
+      loc.append("$geoWithin", geoWithinMax.obj());
 
-      if (scoP->georel.maxDistance >= 0)
-      {
-        orion::BSONObjBuilder andToken;
+      andToken.append(keyLoc, loc.obj());
 
-        orion::BSONObjBuilder geoWithinMax;
-        orion::BSONArrayBuilder centerMax;
-        centerMax.append(coords);
-        centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
-        geoWithinMax.append("$centerSphere", centerMax.arr());
-
-        orion::BSONObjBuilder loc;
-        loc.append("$geoWithin", geoWithinMax.obj());
-
-        andToken.append(keyLoc, loc.obj());
-
-        andArray.append(andToken.obj());
-      }
-
-      if (scoP->georel.minDistance == 0)
-      {
-        // This is somehow a degenerate case, as any point in the space is
-        // more than 0 distance than any other point :). In this case we only
-        // check for existance of the location
-        orion::BSONObjBuilder existTrue;
-        existTrue.append("$exists", true);
-
-        orion::BSONObjBuilder andToken;
-        andToken.append(keyLoc, existTrue.obj());
-
-        andArray.append(andToken.obj());
-      }
-      else if (scoP->georel.minDistance > 0)
-      {
-        orion::BSONObjBuilder andToken;
-
-        orion::BSONObjBuilder geoWithinMin;
-        orion::BSONArrayBuilder centerMin;
-        centerMin.append(coords);
-        centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
-        geoWithinMin.append("$centerSphere", centerMin.arr());
-
-        orion::BSONObjBuilder loc;
-        loc.append("$geoWithin", geoWithinMin.obj());
-
-        orion::BSONObjBuilder notx;
-        notx.append("$not", loc.obj());
-
-        andToken.append(keyLoc, notx.obj());
-
-        andArray.append(andToken.obj());
-      }
-
-      queryP->append("$and", andArray.arr());
+      andArray.append(andToken.obj());
     }
-    else
+
+    if (scoP->georel.minDistance == 0)
     {
-      orion::BSONObjBuilder near;
+      // This is somehow a degenerate case, as any point in the space is
+      // more than 0 distance than any other point :). In this case we only
+      // check for existance of the location
+      orion::BSONObjBuilder existTrue;
+      existTrue.append("$exists", true);
 
-      near.append("$geometry", geometry);
+      orion::BSONObjBuilder andToken;
+      andToken.append(keyLoc, existTrue.obj());
 
-      if (scoP->georel.maxDistance >= 0)
-      {
-        near.append("$maxDistance", scoP->georel.maxDistance);
-      }
-
-      if (scoP->georel.minDistance >= 0)
-      {
-        near.append("$minDistance", scoP->georel.minDistance);
-      }
-
-      bobArea.append("$near", near.obj());
-      queryP->append(keyLoc, bobArea.obj());
+      andArray.append(andToken.obj());
     }
+    else if (scoP->georel.minDistance > 0)
+    {
+      orion::BSONObjBuilder andToken;
+
+      orion::BSONObjBuilder geoWithinMin;
+      orion::BSONArrayBuilder centerMin;
+      centerMin.append(coords);
+      centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
+      geoWithinMin.append("$centerSphere", centerMin.arr());
+
+      orion::BSONObjBuilder loc;
+      loc.append("$geoWithin", geoWithinMin.obj());
+
+      orion::BSONObjBuilder notx;
+      notx.append("$not", loc.obj());
+
+      andToken.append(keyLoc, notx.obj());
+
+      andArray.append(andToken.obj());
+    }
+
+    countQueryP->append("$and", andArray.arr());
+
+    // 2. Query used for count (with $near)
+
+    orion::BSONObjBuilder near;
+
+    near.append("$geometry", geometry);
+
+    if (scoP->georel.maxDistance >= 0)
+    {
+      near.append("$maxDistance", scoP->georel.maxDistance);
+    }
+
+    if (scoP->georel.minDistance >= 0)
+    {
+      near.append("$minDistance", scoP->georel.minDistance);
+    }
+
+    bobArea.append("$near", near.obj());
+    queryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "coveredBy")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoWithin", bobGeom.obj());
+
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "intersects")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoIntersects", bobGeom.obj());
+
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "disjoint")
   {
@@ -1088,10 +1094,12 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
     bobArea.append("$not", bobNot.obj());
 
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "equals")
   {
     queryP->append(keyLoc, geometry);
+    countQueryP->append(keyLoc, geometry);
   }
   else
   {
@@ -1401,6 +1409,7 @@ bool entitiesQuery
    */
 
   orion::BSONObjBuilder    finalQuery;
+  orion::BSONObjBuilder    finalCountQuery;
   orion::BSONArrayBuilder  orEnt;
 
   /* Part 1: entities - avoid $or in the case of a single element */
@@ -1492,7 +1501,7 @@ bool entitiesQuery
       {
         if (scopeP->type == FIWARE_LOCATION_V2)
         {
-           processAreaScopeV2(scopeP, &finalQuery);
+           processAreaScopeV2(scopeP, &finalQuery, &finalCountQuery);
         }
         else  // FIWARE Location NGSIv1 (legacy)
         {
@@ -1507,6 +1516,7 @@ bool entitiesQuery
         for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
         {
           finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
+          finalCountQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
         }
       }
     }
@@ -1517,6 +1527,7 @@ bool entitiesQuery
         for (unsigned int ix = 0; ix < scopeP->mdStringFilterP->mongoFilters.size(); ++ix)
         {
           finalQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
+          finalCountQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
         }
       }
     }
@@ -1530,6 +1541,7 @@ bool entitiesQuery
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     finalQuery.appendElements(filters[ix]);
+    finalCountQuery.appendElements(filters[ix]);
   }
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
@@ -1538,6 +1550,7 @@ bool entitiesQuery
   orion::DBCursor  cursor;
 
   orion::BSONObj query = finalQuery.obj();
+  orion::BSONObj countQuery = finalCountQuery.obj();
   orion::BSONObj sort;
 
   if (sortOrderList.empty())
@@ -1584,7 +1597,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, sort, limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, countQuery, sort, limit, offset, &cursor, countP, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -2113,7 +2126,7 @@ bool registrationsQuery
   orion::BSONObjBuilder bobSort;
   bobSort.append("_id", 1);
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, bobSort.obj(), limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, query, bobSort.obj(), limit, offset, &cursor, countP, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();

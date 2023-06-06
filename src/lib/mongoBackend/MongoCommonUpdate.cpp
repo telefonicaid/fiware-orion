@@ -2025,8 +2025,9 @@ static unsigned int processSubscriptions
         continue;
       }
 
-      orion::BSONObjBuilder bobQuery;
-      if (!processAreaScopeV2(&geoScope, &bobQuery, true))
+      orion::BSONObjBuilder bobQuery;  // used only to keep processAreaScopeV2() signature
+      orion::BSONObjBuilder bobCountQuery;
+      if (!processAreaScopeV2(&geoScope, &bobQuery, &bobCountQuery))
       {
         // Error in processAreaScopeV2 is interpreted as no-match (conservative approach)
         continue;
@@ -2042,12 +2043,12 @@ static unsigned int processSubscriptions
       std::string  type    = notifyCerP->entity.type;
       std::string  sp      = notifyCerP->entity.servicePath;
 
-      bobQuery.append(keyId, id);
-      bobQuery.append(keyType, type);
-      bobQuery.append(keySp, sp);
+      bobCountQuery.append(keyId, id);
+      bobCountQuery.append(keyType, type);
+      bobCountQuery.append(keySp, sp);
 
       unsigned long long n;
-      if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bobQuery.obj(), &n, &filterErr))
+      if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, bobCountQuery.obj(), &n, &filterErr))
       {
         // Error in database access is interpreted as no-match (conservative approach)
         continue;

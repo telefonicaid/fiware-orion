@@ -1,0 +1,283 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query (circle) with geo:point (NGSIv2) with count
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+# Same as geoquery_circle_geopoint_count.test but with options=count in every query
+#
+# 01. Create entity corresponding to Madrid
+# 02. Create entity corresponding to Alcobendas
+# 03. Create entity corresponding to Leganes
+# 04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes
+# 05. Query inside 15 kms radius from Madrid center  -> Madrid, Alcobendas, Leganes
+# 06. Query in 13.5 kms radius outside Madrid center -> Alcobendas
+# 07. Query minDistance 0 kms to Madrid center -> Madrid, Alcobendas, Leganes
+
+echo "01. Create entity corresponding to Madrid"
+echo "========================================="
+payload='{
+  "id": "Madrid",
+  "type": "City",
+  "location": {
+    "value": "40.418889, -3.691944",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+sleep 1.1
+
+
+echo "02. Create entity corresponding to Alcobendas"
+echo "============================================="
+payload='{
+  "id": "Alcobendas",
+  "type": "City",
+  "location": {
+    "value": "40.533333, -3.633333",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+sleep 1.1
+
+
+echo "03. Create entity corresponding to Leganes"
+echo "=========================================="
+payload='{
+  "id": "Leganes",
+  "type": "City",
+  "location": {
+    "value": "40.316667, -3.75",
+    "type": "geo:point"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes"
+echo "======================================================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance:13500&geometry=point&coords=40.418889,-3.691944&options=count'
+echo
+echo
+
+
+echo "05. Query inside 15 kms radius from Madrid center -> Madrid, Alcobendas, Leganes"
+echo "================================================================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance:15000&geometry=point&coords=40.418889,-3.691944&options=count'
+echo
+echo
+
+
+echo "06. Query in 13.5 kms radius outside Madrid center -> Alcobendas"
+echo "================================================================"
+orionCurl --url '/v2/entities?georel=near;minDistance:13500&geometry=point&coords=40.418889,-3.691944&options=count'
+echo
+echo
+
+
+echo "07. Query minDistance 0 kms to Madrid center -> Madrid, Alcobendas, Leganes"
+echo "==========================================================================="
+orionCurl --url '/v2/entities?georel=near;minDistance:0&geometry=point&coords=40.418889,-3.691944&options=count'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity corresponding to Madrid
+=========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Madrid?type=City
+Content-Length: 0
+
+
+
+02. Create entity corresponding to Alcobendas
+=============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Alcobendas?type=City
+Content-Length: 0
+
+
+
+03. Create entity corresponding to Leganes
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Leganes?type=City
+Content-Length: 0
+
+
+
+04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes
+======================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 2
+Content-Type: application/json
+Content-Length: 212
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    }
+]
+
+
+05. Query inside 15 kms radius from Madrid center -> Madrid, Alcobendas, Leganes
+================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 3
+Content-Type: application/json
+Content-Length: 323
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    }
+]
+
+
+06. Query in 13.5 kms radius outside Madrid center -> Alcobendas
+================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 1
+Content-Type: application/json
+Content-Length: 112
+
+[
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    }
+]
+
+
+07. Query minDistance 0 kms to Madrid center -> Madrid, Alcobendas, Leganes
+===========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 3
+Content-Type: application/json
+Content-Length: 323
+
+[
+    {
+        "id": "Madrid",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.418889, -3.691944"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Alcobendas",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.533333, -3.633333"
+        },
+        "type": "City"
+    },
+    {
+        "id": "Leganes",
+        "location": {
+            "metadata": {},
+            "type": "geo:point",
+            "value": "40.316667, -3.75"
+        },
+        "type": "City"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
