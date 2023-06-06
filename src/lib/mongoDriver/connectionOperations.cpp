@@ -36,6 +36,7 @@
 #include "mongoDriver/BSONObjBuilder.h"
 #include "mongoDriver/BSONArrayBuilder.h"
 #include "mongoDriver/mongoConnectionPool.h"
+#include "mongoDriver/safeMongo.h"
 
 
 
@@ -143,18 +144,45 @@ bool orion::collectionRangedQuery
   }
 
   // Getting low level driver object
-  bson_t*     q = _q.get();
-  char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
+  bson_t*       q; // for actual query
+  bson_t*      qc; // for count
 
-  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d: '%s'",
-                  ns.c_str(), limit, offset, bsonStr));
+  orion::BSONObj bq;
+  orion::BSONObj bqc;
+
+  if (_q.hasField("__count")) // same as q.hasField("__sever") as they come together
+  {
+    // Query composed of both count and actual query variants
+    // see processAreaScopeV2() for details
+
+    // We cannot do e.g 'q = getObjectFieldF(_q, "__query").get()' as this created a transient orion::BSONObj which
+    // destructor would be called at the end of the "if" block, so running the 'q' content. Using 'bq/bqc' initialized
+    // at the same level than q/qc we ensure this cannot happend
+    bq = getObjectFieldF(_q, "__query");
+    bqc = getObjectFieldF(_q, "__count");
+    q = bq.get();
+    qc = bqc.get();
+  }
+  else
+  {
+    // Same for count and actual query
+    q = _q.get();
+    qc = _q.get();
+  }
+
+  char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
+  char* bsonStrCount = bson_as_relaxed_extended_json(qc, NULL);
+
+  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d, query='%s', count='%s'",
+                  ns.c_str(), limit, offset, bsonStr, bsonStrCount));
   mongoc_collection_t *collection = mongoc_client_get_collection(connection, db.c_str(), col.c_str());
 
   // First, set countP (if used). In the case of error, we return early and the actual query doesn't take place
   if (count != NULL)
   {
     bson_error_t error;
-    long long n = mongoc_collection_count_documents(collection, q, NULL, NULL, NULL, &error);
+    // FIXME PR: look for other usages of mongoc_collection_count_documents(), do the same
+    long long n = mongoc_collection_count_documents(collection, qc, NULL, NULL, NULL, &error);
     if (n >= 0)
     {
       *count = n;
@@ -162,7 +190,7 @@ bool orion::collectionRangedQuery
     else
     {
       std::string msg = std::string("collection: ") + ns.c_str() +
-        " - count_documents(): " + bsonStr +
+        " - count_documents(): " + bsonStrCount +
         " - exception: " + error.message;
 
       *err = "Database Error (" + msg + ")";
@@ -170,6 +198,7 @@ bool orion::collectionRangedQuery
 
       mongoc_collection_destroy(collection);
       bson_free(bsonStr);
+      bson_free(bsonStrCount);
 
       return false;
     }
@@ -212,6 +241,7 @@ bool orion::collectionRangedQuery
   }
 
   bson_free(bsonStr);
+  bson_free(bsonStrCount);
   bson_free(bsonOptStr);
 
   return r;

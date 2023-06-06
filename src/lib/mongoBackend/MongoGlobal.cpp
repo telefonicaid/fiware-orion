@@ -964,7 +964,8 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
   orion::BSONObjBuilder bobArea;
   if (scoP->georel.type == "near")
   {
-    if (avoidNearUsage)
+    // FIXME PR: clean this, avoidNearUsage no longer needed
+    //if (avoidNearUsage)
     {
       // $near operation is problematic in countDocument()
       // operation (see https://stackoverflow.com/questions/66143435/countdocuments-with-geo-queries-using-mindistance-semantics)
@@ -1042,10 +1043,13 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
         andArray.append(andToken.obj());
       }
 
-      queryP->append("$and", andArray.arr());
-    }
+      orion::BSONObjBuilder forCount;
+      forCount.append("$and", andArray.arr());
+
+    //  queryP->append("$and", andArray.arr());
+    /*}
     else
-    {
+    {*/
       orion::BSONObjBuilder near;
 
       near.append("$geometry", geometry);
@@ -1061,7 +1065,13 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
       }
 
       bobArea.append("$near", near.obj());
-      queryP->append(keyLoc, bobArea.obj());
+      //queryP->append(keyLoc, bobArea.obj());
+
+      orion::BSONObjBuilder forQuery;
+      forQuery.append(keyLoc, bobArea.obj());
+
+      queryP->append("__query", forQuery.obj());
+      queryP->append("__count", forCount.obj());
     }
   }
   else if (scoP->georel.type == "coveredBy")
