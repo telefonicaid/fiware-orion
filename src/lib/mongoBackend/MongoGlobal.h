@@ -214,7 +214,7 @@ extern bool includedAttribute(const std::string& attrName, const StringList& att
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsasge = false);
+extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP);
 
 
 

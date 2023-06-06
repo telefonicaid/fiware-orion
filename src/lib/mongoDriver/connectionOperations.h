@@ -61,6 +61,7 @@ extern bool collectionRangedQuery
   const std::string&   db,
   const std::string&   col,
   const BSONObj&       q,
+  const BSONObj&       countQuery,
   const BSONObj&       sort,
   int                  limit,
   int                  offset,
