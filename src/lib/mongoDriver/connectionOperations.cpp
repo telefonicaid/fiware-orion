@@ -116,6 +116,11 @@ bool orion::collectionQuery
 * Different from others, this function doesn't use getMongoConnection() and
 * releaseMongoConnection(). It is assumed that the caller will do, as the
 * connection cannot be released before the cursor has been used.
+*
+* Note we have _q (query for search) and _countQuery (query for count) given that
+* in some rare occasions they may be different (in particular, when geo-queries are
+* used, see processAreaScopeV2 function for more detail). However, most of the times
+* this function is called with same value for _q and _countQuery
 */
 bool orion::collectionRangedQuery
 (
@@ -159,7 +164,6 @@ bool orion::collectionRangedQuery
   if (count != NULL)
   {
     bson_error_t error;
-    // FIXME PR: look for other usages of mongoc_collection_count_documents(), do the same
     long long n = mongoc_collection_count_documents(collection, qc, NULL, NULL, NULL, &error);
     if (n >= 0)
     {

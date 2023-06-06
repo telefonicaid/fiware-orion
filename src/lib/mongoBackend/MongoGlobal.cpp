@@ -855,7 +855,17 @@ static std::string sortCriteria(const std::string& sortToken)
 *
 * processAreaScopeV2 -
 *
-* Returns true if areaQueryP was filled, false otherwise
+* Returns true if queryP/countQueryP were filled, false otherwise
+*
+* Most of the cases queryP and countQueryP are filled the same way. However, in the case of near georel they
+* are different. This is due to:
+*
+* - we need to use $near in the query used to search (queryP), due to the alternative using $geoWithin
+*   (described in https://stackoverflow.com/a/76416103/1485926) doesn't sort result by center proximity, so
+*   ?orderBy=distance will break
+* - we cannot use $near in the query used to count (countQueryP) as it doesn't work with modern count functions
+*   (see the aforementioned link).
+*
 */
 bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
@@ -961,112 +971,100 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion:
     return false;
   }
 
-  // Note that *countQueryP = *queryP at the end in all cases except in "near"
   orion::BSONObjBuilder bobArea;
   if (scoP->georel.type == "near")
   {
-    // FIXME PR: clean this, avoidNearUsage no longer needed
-    //if (avoidNearUsage)
+    // 1. query used for count (without $near)
+
+    // This works as far as we don't have any other $and field in the query, in which
+    // case the array for $and here needs to be combined with other items. Currently,
+    // users of processAreaScopesV2() doesn't do add any new $and clause.
+    //
+    // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
+    // at least minDistance or maxDistance are there. Check functional tests
+    //
+    // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
+    // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
+
+    orion::BSONArrayBuilder andArray;
+
+    orion::BSONArrayBuilder coordsBuilder;
+    coordsBuilder.append(scoP->point.longitude());
+    coordsBuilder.append(scoP->point.latitude());
+    orion::BSONArray coords = coordsBuilder.arr();
+
+    if (scoP->georel.maxDistance >= 0)
     {
-      // $near operation is problematic in countDocument()
-      // operation (see https://stackoverflow.com/questions/66143435/countdocuments-with-geo-queries-using-mindistance-semantics)
-      // In abscence of a better alternative I have used a solution as the one
-      // described at https://jira.mongodb.org/browse/DOCS-12834
-      // This works as far as we don't have any other $and field in the query, in which
-      // case the array for $and here needs to be combined with other items
-      //
-      // Why don't use this query style without $near all the time? Because $near provides
-      // ordering of results based in distance to the center, so in regular find() is the one
-      // we want to use
-      //
-      // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
-      // at least minDistance or maxDistance are there. Check functional tests
-      //
-      // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
-      // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
+      orion::BSONObjBuilder andToken;
 
+      orion::BSONObjBuilder geoWithinMax;
+      orion::BSONArrayBuilder centerMax;
+      centerMax.append(coords);
+      centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
+      geoWithinMax.append("$centerSphere", centerMax.arr());
 
-      // query used for count (without $near)
-      orion::BSONArrayBuilder andArray;
+      orion::BSONObjBuilder loc;
+      loc.append("$geoWithin", geoWithinMax.obj());
 
-      orion::BSONArrayBuilder coordsBuilder;
-      coordsBuilder.append(scoP->point.longitude());
-      coordsBuilder.append(scoP->point.latitude());
-      orion::BSONArray coords = coordsBuilder.arr();
+      andToken.append(keyLoc, loc.obj());
 
-      if (scoP->georel.maxDistance >= 0)
-      {
-        orion::BSONObjBuilder andToken;
-
-        orion::BSONObjBuilder geoWithinMax;
-        orion::BSONArrayBuilder centerMax;
-        centerMax.append(coords);
-        centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
-        geoWithinMax.append("$centerSphere", centerMax.arr());
-
-        orion::BSONObjBuilder loc;
-        loc.append("$geoWithin", geoWithinMax.obj());
-
-        andToken.append(keyLoc, loc.obj());
-
-        andArray.append(andToken.obj());
-      }
-
-      if (scoP->georel.minDistance == 0)
-      {
-        // This is somehow a degenerate case, as any point in the space is
-        // more than 0 distance than any other point :). In this case we only
-        // check for existance of the location
-        orion::BSONObjBuilder existTrue;
-        existTrue.append("$exists", true);
-
-        orion::BSONObjBuilder andToken;
-        andToken.append(keyLoc, existTrue.obj());
-
-        andArray.append(andToken.obj());
-      }
-      else if (scoP->georel.minDistance > 0)
-      {
-        orion::BSONObjBuilder andToken;
-
-        orion::BSONObjBuilder geoWithinMin;
-        orion::BSONArrayBuilder centerMin;
-        centerMin.append(coords);
-        centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
-        geoWithinMin.append("$centerSphere", centerMin.arr());
-
-        orion::BSONObjBuilder loc;
-        loc.append("$geoWithin", geoWithinMin.obj());
-
-        orion::BSONObjBuilder notx;
-        notx.append("$not", loc.obj());
-
-        andToken.append(keyLoc, notx.obj());
-
-        andArray.append(andToken.obj());
-      }
-
-      countQueryP->append("$and", andArray.arr());
-
-      // Query used for count (with $near)
-
-      orion::BSONObjBuilder near;
-
-      near.append("$geometry", geometry);
-
-      if (scoP->georel.maxDistance >= 0)
-      {
-        near.append("$maxDistance", scoP->georel.maxDistance);
-      }
-
-      if (scoP->georel.minDistance >= 0)
-      {
-        near.append("$minDistance", scoP->georel.minDistance);
-      }
-
-      bobArea.append("$near", near.obj());
-      queryP->append(keyLoc, bobArea.obj());
+      andArray.append(andToken.obj());
     }
+
+    if (scoP->georel.minDistance == 0)
+    {
+      // This is somehow a degenerate case, as any point in the space is
+      // more than 0 distance than any other point :). In this case we only
+      // check for existance of the location
+      orion::BSONObjBuilder existTrue;
+      existTrue.append("$exists", true);
+
+      orion::BSONObjBuilder andToken;
+      andToken.append(keyLoc, existTrue.obj());
+
+      andArray.append(andToken.obj());
+    }
+    else if (scoP->georel.minDistance > 0)
+    {
+      orion::BSONObjBuilder andToken;
+
+      orion::BSONObjBuilder geoWithinMin;
+      orion::BSONArrayBuilder centerMin;
+      centerMin.append(coords);
+      centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
+      geoWithinMin.append("$centerSphere", centerMin.arr());
+
+      orion::BSONObjBuilder loc;
+      loc.append("$geoWithin", geoWithinMin.obj());
+
+      orion::BSONObjBuilder notx;
+      notx.append("$not", loc.obj());
+
+      andToken.append(keyLoc, notx.obj());
+
+      andArray.append(andToken.obj());
+    }
+
+    countQueryP->append("$and", andArray.arr());
+
+    // 2. Query used for count (with $near)
+
+    orion::BSONObjBuilder near;
+
+    near.append("$geometry", geometry);
+
+    if (scoP->georel.maxDistance >= 0)
+    {
+      near.append("$maxDistance", scoP->georel.maxDistance);
+    }
+
+    if (scoP->georel.minDistance >= 0)
+    {
+      near.append("$minDistance", scoP->georel.minDistance);
+    }
+
+    bobArea.append("$near", near.obj());
+    queryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "coveredBy")
   {
