@@ -123,6 +123,7 @@ bool orion::collectionRangedQuery
   const std::string&         db,
   const std::string&         col,
   const orion::BSONObj&      _q,
+  const orion::BSONObj&      _countQuery,
   const orion::BSONObj&      _sort,
   int                        limit,
   int                        offset,
@@ -144,31 +145,8 @@ bool orion::collectionRangedQuery
   }
 
   // Getting low level driver object
-  bson_t*       q; // for actual query
-  bson_t*      qc; // for count
-
-  orion::BSONObj bq;
-  orion::BSONObj bqc;
-
-  if (_q.hasField("__count")) // same as q.hasField("__sever") as they come together
-  {
-    // Query composed of both count and actual query variants
-    // see processAreaScopeV2() for details
-
-    // We cannot do e.g 'q = getObjectFieldF(_q, "__query").get()' as this created a transient orion::BSONObj which
-    // destructor would be called at the end of the "if" block, so running the 'q' content. Using 'bq/bqc' initialized
-    // at the same level than q/qc we ensure this cannot happend
-    bq = getObjectFieldF(_q, "__query");
-    bqc = getObjectFieldF(_q, "__count");
-    q = bq.get();
-    qc = bqc.get();
-  }
-  else
-  {
-    // Same for count and actual query
-    q = _q.get();
-    qc = _q.get();
-  }
+  bson_t*  q  = _q.get();
+  bson_t*  qc = _countQuery.get();
 
   char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
   char* bsonStrCount = bson_as_relaxed_extended_json(qc, NULL);
@@ -348,7 +326,7 @@ bool orion::collectionFindOne
 
   *err = "";
 
-  if (!collectionRangedQuery(connection, db, col, _q, orion::BSONObj(), 1, 0, &cursor, NULL, err))
+  if (!collectionRangedQuery(connection, db, col, _q, orion::BSONObj(), orion::BSONObj(), 1, 0, &cursor, NULL, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();

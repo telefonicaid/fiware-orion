@@ -857,7 +857,7 @@ static std::string sortCriteria(const std::string& sortToken)
 *
 * Returns true if areaQueryP was filled, false otherwise
 */
-bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsage)
+bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
   // FIXME #3774: previously this part was based in streamming instead of append()
 
@@ -961,6 +961,7 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
     return false;
   }
 
+  // Note that *countQueryP = *queryP at the end in all cases except in "near"
   orion::BSONObjBuilder bobArea;
   if (scoP->georel.type == "near")
   {
@@ -984,6 +985,8 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
       // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
       // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
 
+
+      // query used for count (without $near)
       orion::BSONArrayBuilder andArray;
 
       orion::BSONArrayBuilder coordsBuilder;
@@ -1043,13 +1046,10 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
         andArray.append(andToken.obj());
       }
 
-      orion::BSONObjBuilder forCount;
-      forCount.append("$and", andArray.arr());
+      countQueryP->append("$and", andArray.arr());
 
-    //  queryP->append("$and", andArray.arr());
-    /*}
-    else
-    {*/
+      // Query used for count (with $near)
+
       orion::BSONObjBuilder near;
 
       near.append("$geometry", geometry);
@@ -1065,13 +1065,7 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
       }
 
       bobArea.append("$near", near.obj());
-      //queryP->append(keyLoc, bobArea.obj());
-
-      orion::BSONObjBuilder forQuery;
-      forQuery.append(keyLoc, bobArea.obj());
-
-      queryP->append("__query", forQuery.obj());
-      queryP->append("__count", forCount.obj());
+      queryP->append(keyLoc, bobArea.obj());
     }
   }
   else if (scoP->georel.type == "coveredBy")
@@ -1079,14 +1073,18 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoWithin", bobGeom.obj());
+
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "intersects")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoIntersects", bobGeom.obj());
+
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "disjoint")
   {
@@ -1098,10 +1096,12 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
     bobArea.append("$not", bobNot.obj());
 
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "equals")
   {
     queryP->append(keyLoc, geometry);
+    countQueryP->append(keyLoc, geometry);
   }
   else
   {
@@ -1411,6 +1411,7 @@ bool entitiesQuery
    */
 
   orion::BSONObjBuilder    finalQuery;
+  orion::BSONObjBuilder    finalCountQuery;
   orion::BSONArrayBuilder  orEnt;
 
   /* Part 1: entities - avoid $or in the case of a single element */
@@ -1502,7 +1503,7 @@ bool entitiesQuery
       {
         if (scopeP->type == FIWARE_LOCATION_V2)
         {
-           processAreaScopeV2(scopeP, &finalQuery);
+           processAreaScopeV2(scopeP, &finalQuery, &finalCountQuery);
         }
         else  // FIWARE Location NGSIv1 (legacy)
         {
@@ -1517,6 +1518,7 @@ bool entitiesQuery
         for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
         {
           finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
+          finalCountQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
         }
       }
     }
@@ -1527,6 +1529,7 @@ bool entitiesQuery
         for (unsigned int ix = 0; ix < scopeP->mdStringFilterP->mongoFilters.size(); ++ix)
         {
           finalQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
+          finalCountQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
         }
       }
     }
@@ -1540,6 +1543,7 @@ bool entitiesQuery
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     finalQuery.appendElements(filters[ix]);
+    finalCountQuery.appendElements(filters[ix]);
   }
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
@@ -1548,6 +1552,7 @@ bool entitiesQuery
   orion::DBCursor  cursor;
 
   orion::BSONObj query = finalQuery.obj();
+  orion::BSONObj countQuery = finalCountQuery.obj();
   orion::BSONObj sort;
 
   if (sortOrderList.empty())
@@ -1594,7 +1599,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, sort, limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, countQuery, sort, limit, offset, &cursor, countP, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -2123,7 +2128,7 @@ bool registrationsQuery
   orion::BSONObjBuilder bobSort;
   bobSort.append("_id", 1);
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, bobSort.obj(), limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, query, bobSort.obj(), limit, offset, &cursor, countP, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
