@@ -1443,7 +1443,6 @@ bool entitiesQuery
   {
     finalQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
     finalCountQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
-
   }
 
   /* Part 3: attributes */
