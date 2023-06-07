@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-notifyOnMetadataChange false (empty conditions attribute variant)
+notifyOnMetadataChange false (empty conditions.attrs variant)
 
 --SHELL-INIT--
 dbInit CB
