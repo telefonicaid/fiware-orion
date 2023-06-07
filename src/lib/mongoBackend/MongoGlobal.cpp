@@ -2210,6 +2210,12 @@ bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string
 {
   std::vector<orion::BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
 
+  // If the list of attributes to check is empty, then no match
+  if (modifiedAttrs.size() == 0)
+  {
+    return false;
+  }
+
   if (conds.size() == 0)
   {
     // ONANYCHANGE case: always match
