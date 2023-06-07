@@ -184,7 +184,7 @@ The list of available options is the following:
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
 -   **-mqttMaxAge**. Max time (in minutes) that an unused MQTT connection is kept. Default: 60
--   **-logDeprecate**. Log deprecation usages as warnings. More information in [this section of the documentation](../deprecated.mdinfo-level-in-detail#log-deprecation-warnings).
+-   **-logDeprecate**. Log deprecation usages as warnings. More information in [this section of the documentation](../deprecated.md#log-deprecation-warnings).
 
 ## Configuration using environment variables
 
