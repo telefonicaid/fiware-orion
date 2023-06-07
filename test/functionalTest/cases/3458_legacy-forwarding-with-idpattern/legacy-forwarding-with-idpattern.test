@@ -178,20 +178,20 @@ echo
 01. Register entities of type Weather|OffStreetParking, with ID .*, and three attributes
 ========================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. GET the registration to check it's correct
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 332
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 332
 
 [
     {
@@ -228,10 +228,10 @@ Date: REGEX(.*)
 03. Query all the Weather entities - only to provoke the query being forwarded to the accumulator
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -267,40 +267,40 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
 05. Register entities of type Weather2|OffStreetParking2, with ID .*, and three attributes, for CPr1
 ====================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 06. Create Weather2 entity with availableSpotNumber in CPr1
 ===========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/w2?type=Weather2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/w2?type=Weather2
+Content-Length: 0
 
 
 
 07. Create OffStreetParking2 entity with temperature and humidity in CPr1
 =========================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/op2?type=OffStreetParking2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/op2?type=OffStreetParking2
+Content-Length: 0
 
 
 
 08. Query all the Weather2 entities, and see the one from CPr1
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 [
     {
@@ -318,10 +318,10 @@ Date: REGEX(.*)
 09. Query all the OffStreetParking2 entities, and see the one from CPr1
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 156
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 156
 
 [
     {

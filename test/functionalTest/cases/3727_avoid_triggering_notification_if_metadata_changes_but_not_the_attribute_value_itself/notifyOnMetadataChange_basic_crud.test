@@ -202,20 +202,20 @@ echo
 01. POST /v2/subscriptions, to without notifyOnMetadataChange (defaults to true)
 ================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. GET subscription and see notifyOnMetadataChange true
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 304
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 304
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -249,18 +249,18 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions, with notifyOnMetadataChange: false
 ===============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. GET subscription and see notifyOnMetadataChange false
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 305
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 305
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -294,18 +294,18 @@ Date: REGEX(.*)
 05. PATCH /v2/subscriptions, with notifyOnMetadataChange: true
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. GET subscription and see notifyOnMetadataChange true
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 304
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 304
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -339,18 +339,18 @@ Date: REGEX(.*)
 07. PATCH /v2/subscriptions, with notifyOnMetadataChange: false
 ===============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. GET subscription and see notifyOnMetadataChange false
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 305
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 305
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -384,18 +384,18 @@ Date: REGEX(.*)
 09. PATCH /v2/subscriptions, witout notifyOnMetadataChange (defaults to true)
 =============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. GET subscription and see notifyOnMetadataChange true
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 304
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 304
 
 {
     "id": "REGEX([0-9a-f]{24})",

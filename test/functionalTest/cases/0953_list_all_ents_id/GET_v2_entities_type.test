@@ -125,60 +125,60 @@ echo
 01. POST /v2/entities, creating E1/T1
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. POST /v2/entities, creating E2/T1
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T1
+Content-Length: 0
 
 
 
 03. POST /v2/entities, creating E3/T2
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T2
+Content-Length: 0
 
 
 
 04. POST /v2/entities, creating E1/T3
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T3
+Content-Length: 0
 
 
 
 05. POST /v2/entities, creating E2/T3
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T3
+Content-Length: 0
 
 
 
 06. GET /v2/entities?type=T1
 ============================
 HTTP/1.1 200 OK
-Content-Length: 49
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 49
 
 [
     {
@@ -195,10 +195,10 @@ Date: REGEX(.*)
 07. GET /v2/entities?type=T3
 ============================
 HTTP/1.1 200 OK
-Content-Length: 49
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 49
 
 [
     {
@@ -215,10 +215,10 @@ Date: REGEX(.*)
 08. GET /v2/entities?type=NONE
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

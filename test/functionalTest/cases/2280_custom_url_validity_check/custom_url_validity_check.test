@@ -104,10 +104,10 @@ echo
 01. Attempt to create subscription with custom URL 'abc' - see error
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 59
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 59
 
 {
     "description": "invalid custom /url/",
@@ -118,10 +118,10 @@ Date: REGEX(.*)
 02. Get /v2/subscriptions, see no subscriptions
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -129,20 +129,20 @@ Date: REGEX(.*)
 03. Create subscription with custom URL '${abc}' - see NO error, as url contains ${}
 ====================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 04. Get /v2/subscriptions, see the subscription from step 03
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 286
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 286
 
 [
     {

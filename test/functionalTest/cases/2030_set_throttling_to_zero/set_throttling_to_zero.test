@@ -91,20 +91,20 @@ echo
 01. Create subscription with throttling set to 5
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Get the subscription, see throttling=5
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 364
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 364
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
@@ -142,18 +142,18 @@ Date: REGEX(.*)
 03. Modify subscription, setting throttling to 0
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get the subscription, see throttling=0 (throttling is not rendered in the response if it is zero)
 =====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 349
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 349
 
 {
     "expires": "2050-04-05T14:00:00.000Z",

@@ -74,21 +74,21 @@ echo
 01. POST /v2/entities to create 8787GHY entity
 ==============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/8787GHY?type=Car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/8787GHY?type=Car
+Content-Length: 0
 
 
 
 02. DELETE /v2/entities/8787GHY/attrs
 =====================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 63
-Content-Type: application/json
-Allow: GET, PATCH, POST, PUT
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: GET, PATCH, POST, PUT
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "method not allowed",

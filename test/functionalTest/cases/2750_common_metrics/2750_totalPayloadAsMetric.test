@@ -103,10 +103,10 @@ echo
 01. Send a GET /v2/entities
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -114,10 +114,10 @@ Date: REGEX(.*)
 02. Ask for Metrics, see 1 Incoming Transaction, but nothing about incomingTransactionRequestSize
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
     "services": {
@@ -156,20 +156,20 @@ Date: REGEX(.*)
 03. Create an entity (with payload of exactly 50 bytes)
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 04. Ask for Metrics, see 3 Incoming Transactions, and 50 bytes in incomingTransactionRequestSize
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
     "services": {
@@ -231,20 +231,20 @@ Date: REGEX(.*)
 05. Create an entity (with payload of exactly 100 bytes)
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T2
+Content-Length: 0
 
 
 
 06. Ask for Metrics, see 6 Incoming Transactions, and 150 bytes in incomingTransactionRequestSize
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
     "services": {
@@ -306,10 +306,10 @@ Date: REGEX(.*)
 07. GET /v2/entities - to provoke payload in response
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -317,10 +317,10 @@ Date: REGEX(.*)
 08. Ask for Metrics, see 8, and see incomingTransactionResponseSize
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
     "services": {

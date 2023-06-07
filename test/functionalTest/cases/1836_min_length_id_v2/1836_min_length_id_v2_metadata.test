@@ -75,20 +75,20 @@ echo
 01. Create entity with metadata without type
 ============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Check metadata has type Text
 ================================
 HTTP/1.1 200 OK
-Content-Length: 101
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 101
 
 {
     "A1": {
@@ -109,10 +109,10 @@ Date: REGEX(.*)
 03. Create entity with metadata with type empty string
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "description": "metadata type length: 0, min length supported: 1",

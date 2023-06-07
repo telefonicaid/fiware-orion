@@ -18,6 +18,14 @@
 * Orion 2.0.0 での NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)。代わりに NGSIv2 API を使用してください
     * Orion 2.0.0 の NGSIv1 の一部としてのコンテキスト・アベイラビリティ・サブスクリプション (別名 NGSI9 サブスクリプション)
       (Orion 2.6.0 で削除)
+    * 次の操作を除く、他のすべての NGSIv1 操作は Orion 3.10.0 で削除されました:
+        * `PUT /v1/contextEntities/{id}`
+        * `DELETE /v1/contextEntities/{id}`
+        * `GET /v1/contextEntities/{id}/attributes/{name}`
+        * `POST /v1/updateContext`
+        * `POST /NGSI10/updateContext`
+        * `POST /v1/queryContext`
+        * `POST /NGSI10/queryContext`
 * `POST /v2/op/query` の `attributes` フィールドは、Orion 1.15.0 にあります。これらの属性を持つエンティティのみを返すためには、クエリに対するレスポンスにどの属性を含めるかを選択する `attrs` と、`expression` 内の `q` の単項属性フィルタ (unary attribute filter) の組み合わせです。それらを代わりに指定していください
 * Orion 1.14.0 では `POST /v2/op/update` の `APPEND`, `APPEND_STRICT`, `UPDATE`, `DELETE`,  `REPLACE` の使用は非推奨です。`append`, `appendStrict`, `update`, `delete`, `replace` を代わりに使ってください
 * Orion 1.13.0 ではメタデータ ID が推奨されていません (Orion 2.2.0 で削除されました)。一方、この機能は NGSIv2 と互換性がありません。JSON 表現形式の属性名は JSON オブジェクトのキーとして使用されるため、名前を複製することはできません。一方、IDs は、属性名にプレフィックス/サフィックスを使用して簡単に実装することができます。たとえば、`temperature:ground` および `temperature:ceiling` です。 この非推奨の結果、次のオペレーションも非推奨になりました :
@@ -43,6 +51,13 @@
 * Configuration Manager のロールは、0.21.0 で非推奨になり、0.25.0 で削除されました
 * Associations は、0.21.0 で非推奨になり、0.25.0 で削除されました
 
+## 非推奨の警告をログに記録
+
+非推奨の機能の一部 (すべてではない) の使用状況は、WARN ログ・レベルで、`-logDeprecate` [CLI フラグ](admin/cli.md) を使用してログに記録できます。
+特に、このフラグがアクティブ化されている場合は次のようになります:
+
+* NGSIv1 リクエストはログに記録されます。詳細については、[ドキュメントのこのセクション](admin/logs.md#info-level-in-detail) を参照してください
+
 ## 古い Orion バージョンの使用
 
 常に最新の Orion バージョンを使用することをお勧めしますが、古いバージョンを使用する場合は、次の情報を考慮してください :
@@ -59,7 +74,7 @@
 
 | **削除された機能**                                                                   | **機能をサポートする Orion ラスト・バージョン** | **バージョンのリリース日** |
 |--------------------------------------------------------------------------------------|-------------------------------------------------|----------------------------|
-| NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)             | まだ定義されていません                          | まだ定義されていません     |
+| NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)             | 3.9.0 (*)                                       | 2023年6月2日               |
 | `POST /v2/entities` オペレーションの `attributes` フィールド                         | まだ定義されていません                          | まだ定義されていません     |
 | `APPEND`, `UPDATE`, など。`POST /v2/op/update` でのアクション・タイプ                | まだ定義されていません                          | まだ定義されていません     |
 | URI パラメータでの `dateCreated` および `dateModified`                               | まだ定義されていません                          | まだ定義されていません     |

@@ -209,20 +209,20 @@ echo
 01. Create E1 with A1 with M1 having a compound value containing all JSON types
 ===============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Equal to Same Integer: GET /v2/entities?q=A1.M1.i:10, see E1
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {
@@ -253,10 +253,10 @@ Date: REGEX(.*)
 03. Equal to Same Integer: GET /v2/entities?q=A1.M1.i==10, see E1
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {
@@ -287,10 +287,10 @@ Date: REGEX(.*)
 04. Equal to Different Integer: GET /v2/entities?q=A1.M1.i:11, see nothing
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -298,10 +298,10 @@ Date: REGEX(.*)
 05. Equal to Different Integer: GET /v2/entities?q=A1.M1.i==11, see nothing
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -309,10 +309,10 @@ Date: REGEX(.*)
 06. Not Equal to Same Integer: GET /v2/entities?q=A1.M1.i!=10, see nothing
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -320,10 +320,10 @@ Date: REGEX(.*)
 07. Not Equal to Different Integer: GET /v2/entities?q=A1.M1.i!=11, see E1
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {
@@ -354,10 +354,10 @@ Date: REGEX(.*)
 08. Equal to Incorrect Int-Range: GET /v2/entities?q=A1.M1.i:1..9, see nothing
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -365,10 +365,10 @@ Date: REGEX(.*)
 09. Equal to Correct Int-Range: GET /v2/entities?q=A1.M1.i:1..10, see E1
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {
@@ -399,10 +399,10 @@ Date: REGEX(.*)
 10. Equal to Incorrect Int-Range: GET /v2/entities?q=A1.M1.i==1..9, see nothing
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -410,10 +410,10 @@ Date: REGEX(.*)
 11. Equal to Correct Int-Range: GET /v2/entities?q=A1.M1.i==1..10, see E1
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {
@@ -444,10 +444,10 @@ Date: REGEX(.*)
 12. Not Equal to Correct Int-Range: GET /v2/entities?q=A1.M1.i!=1..10, see nothing
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -455,10 +455,10 @@ Date: REGEX(.*)
 13. Not Equal to Incorrect Int-Range: GET /v2/entities?q=A1.M1.i!=1..9, see E1
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {
@@ -489,10 +489,10 @@ Date: REGEX(.*)
 14. Equal to Correct Int-List:  GET /v2/entities?q=A1.M1.i:0,5,10,15, see E1
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {
@@ -523,10 +523,10 @@ Date: REGEX(.*)
 15. Equal to Correct Int-List: GET /v2/entities?q=A1.M1.i==0,5,10,15, see E1
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {
@@ -557,10 +557,10 @@ Date: REGEX(.*)
 16. Equal to Incorrect Int-List: GET /v2/entities?q=A1.M1.i:0,5,15, see nothing
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -568,10 +568,10 @@ Date: REGEX(.*)
 17. Equal to Incorrect Int-List: GET /v2/entities?q=A1.M1.i==0,5,15, see nothing
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -579,10 +579,10 @@ Date: REGEX(.*)
 18. Not Equal to Correct Int-List: GET /v2/entities?q=A1.M1.i!=0,5,10,15, see nothing
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -590,10 +590,10 @@ Date: REGEX(.*)
 19. Not Equal to Incorrect Int-List: GET /v2/entities?q=A1.M1.i!=0,5,15, see E1
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 221
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 221
 
 [
     {

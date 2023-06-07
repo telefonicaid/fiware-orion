@@ -270,18 +270,18 @@ WriteResult({ "nInserted" : 1 })
 02. Update the entity as described in #3706 and check we don't get 413 error
 ============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. Get entity and check location has been set to [-4,41]
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 1807
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1807
 
 {
     "TimeInstant": {

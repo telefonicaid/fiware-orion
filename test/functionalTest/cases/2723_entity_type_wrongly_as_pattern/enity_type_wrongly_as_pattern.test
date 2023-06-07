@@ -131,70 +131,70 @@ echo
 01. Create entity E1, type JuridicaParams
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=JuridicaParams
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=JuridicaParams
+Content-Length: 0
 
 
 
 02. Create entity E2, type Juridica
 ===================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Juridica
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Juridica
+Content-Length: 0
 
 
 
 03. Create entity E3, type JuridicaParams
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=JuridicaParams
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=JuridicaParams
+Content-Length: 0
 
 
 
 04. Create entity E4, type Juridica
 ===================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=Juridica
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=Juridica
+Content-Length: 0
 
 
 
 05. Create entity E5, type JuridicaParams
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E5?type=JuridicaParams
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=JuridicaParams
+Content-Length: 0
 
 
 
 06. Create entity E6, type XXX
 ==============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E6?type=XXX
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E6?type=XXX
+Content-Length: 0
 
 
 
 07. GET entities of type Juridica - see 2 results
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 366
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 366
 
 {
     "contextResponses": [

@@ -76,6 +76,8 @@ typedef struct ContextAttributeVector
                             orion::BSONArrayBuilder*  attrNamesToAdd,
                             ApiVersion                apiVersion) const;
 
+  void               applyUpdateOperators(void);
+
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

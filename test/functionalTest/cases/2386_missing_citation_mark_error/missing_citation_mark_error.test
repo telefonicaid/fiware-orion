@@ -71,20 +71,20 @@ echo
 01. Create E entity, attribute A with textual value
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
+Content-Length: 0
 
 
 
 02. Try to update value missing citation mark at the end, get error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "Missing citation-mark at end of string",
@@ -95,10 +95,10 @@ Date: REGEX(.*)
 03. Try to update value missing citation mark at the begining, get error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
 
 {
     "description": "attribute value type not recognized",

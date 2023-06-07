@@ -138,10 +138,10 @@ echo
 01. GET /v2/types?options=values and get an empty list
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -149,20 +149,20 @@ Date: REGEX(.*)
 02. Create E1/T1/A1+A2
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. GET /v2/types?options=values and get a non-empty list
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 6
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 6
 
 [
     "T1"
@@ -177,20 +177,20 @@ WriteResult({ "nInserted" : 1 })
 05. Create E3/T3/A2+A4
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T3
+Content-Length: 0
 
 
 
 06. GET /v2/types?options=values and get a list of three types
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 14
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 14
 
 [
     "",
@@ -202,11 +202,11 @@ Date: REGEX(.*)
 07. GET /v2/types?options=values with limit, getting 2 types but Fiware-Total-Count 3
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 9
-Content-Type: application/json
-Fiware-Total-Count: 3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 3
+Content-Type: application/json
+Content-Length: 9
 
 [
     "",
@@ -217,11 +217,11 @@ Date: REGEX(.*)
 08. GET /v2/types?options=values with offset=3, thus out of limits
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Total-Count: 3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 3
+Content-Type: application/json
+Content-Length: 2
 
 []
 

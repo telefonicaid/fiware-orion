@@ -125,30 +125,30 @@ echo
 01. Create E1 with a String attribute S == '123'
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Create E2 with a Number attribute S == 123
 ==============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 03a. Query with q=S:'123', see E1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 38
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 38
 
 [
     {
@@ -162,10 +162,10 @@ Date: REGEX(.*)
 03b. Query with q=S=='123', see E1
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 38
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 38
 
 [
     {
@@ -179,10 +179,10 @@ Date: REGEX(.*)
 04a. Query with q=S:123, see E2
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 36
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 36
 
 [
     {
@@ -196,10 +196,10 @@ Date: REGEX(.*)
 04b. Query with q=S==123, see E2
 ================================
 HTTP/1.1 200 OK
-Content-Length: 36
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 36
 
 [
     {
@@ -213,10 +213,10 @@ Date: REGEX(.*)
 05a. Query with int-list: q=S:121,122,123 - see E2
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 36
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 36
 
 [
     {
@@ -230,10 +230,10 @@ Date: REGEX(.*)
 05b. Query with int-list: q=S:121,122,124 - see no hit
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -241,10 +241,10 @@ Date: REGEX(.*)
 06a. Query with string-list: q=S:'121','122','123' - see E1
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 38
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 38
 
 [
     {
@@ -258,10 +258,10 @@ Date: REGEX(.*)
 06b. Query with string-list: q=S:'121','122','124' - see no hit
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

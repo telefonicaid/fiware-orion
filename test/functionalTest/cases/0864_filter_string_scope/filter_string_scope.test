@@ -133,60 +133,60 @@ echo
 01. v2 Create E1 temperature=20, humidity=80, status=OK
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. v2 Create E2 temperature=30, humidity=70, status=ERR
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. v2 Create E3 temperature=40, humidity=60, status=OK
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 04. v2 Create E4 temperature=50, humidity=50, status=ERR
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T
+Content-Length: 0
 
 
 
 05. v2 Create E5 temperature=60, humidity=40, status=OK
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E5?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=T
+Content-Length: 0
 
 
 
 06. v1 Query: temperature<60;humidity==61..83;status==ERR -> E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 290
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 290
 
 {
     "contextResponses": [

@@ -159,30 +159,30 @@ echo
 01. Create entity E1 with geo:point attribute loc -3.5,45.20
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create entity E2 with geo:point attribute loc with value null
 =================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Get entities (E1-loc: with actual location, E2-loc: null)
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 163
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 163
 
 [
     {
@@ -209,10 +209,10 @@ Date: REGEX(.*)
 04. Geoquery covering all planet, shows only E1
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 [
     {
@@ -230,26 +230,26 @@ Date: REGEX(.*)
 05. Update E1-loc: null
 =======================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Update E2-loc: -3.5,45.20
 =============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. Get entities (E1-loc: null, E2-loc: actual location)
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 163
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 163
 
 [
     {
@@ -276,10 +276,10 @@ Date: REGEX(.*)
 08. Geoquery covering all planet, shows only E2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 [
     {
@@ -297,10 +297,10 @@ Date: REGEX(.*)
 09. Update E1-loc, see error
 ============================
 HTTP/1.1 400 Bad Request
-Content-Length: 153
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 153
 
 {
     "description": "error parsing location attribute for existing attribute: geo coordinates format error [see Orion user manual]: foo",
@@ -311,10 +311,10 @@ Date: REGEX(.*)
 08. Update E2-loc, see error
 ============================
 HTTP/1.1 400 Bad Request
-Content-Length: 130
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 130
 
 {
     "description": "error parsing location attribute: geo coordinates format error [see Orion user manual]: bar",

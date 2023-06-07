@@ -70,20 +70,20 @@ echo
 01. Create entity E/T A=1
 =========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. GET /v2/entities?attrs=alterationType shows no attribute
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 23
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 23
 
 [
     {
@@ -96,10 +96,10 @@ Date: REGEX(.*)
 03. GET /v2/entities?attrs=alterationType,* shows A
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 [
     {

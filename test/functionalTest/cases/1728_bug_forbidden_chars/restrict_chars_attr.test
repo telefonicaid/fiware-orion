@@ -99,10 +99,10 @@ echo
 01. POST /v2/entities
 ====================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid characters in attribute name",
@@ -113,10 +113,10 @@ Date: REGEX(.*)
 02. POST /v2/entities attr type ol)
 ===================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid characters in attribute type",
@@ -127,10 +127,10 @@ Date: REGEX(.*)
 03. POST /v2/entities attr name A;
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid characters in attribute name",

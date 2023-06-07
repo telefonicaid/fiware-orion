@@ -115,10 +115,10 @@ echo
 01. Create entity E1/A/ID=ID1 using NGSIv1
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 241
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 241
 
 {
     "contextResponses": [
@@ -154,20 +154,20 @@ Date: REGEX(.*)
 02. Create entity E2/A/ID=ID2 using NGSIv2
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Get both entities using POST /v1/queryContext
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 466
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 466
 
 {
     "contextResponses": [
@@ -228,10 +228,10 @@ Date: REGEX(.*)
 04. Get both entities using GET /v2/entities
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 211
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 211
 
 [
     {

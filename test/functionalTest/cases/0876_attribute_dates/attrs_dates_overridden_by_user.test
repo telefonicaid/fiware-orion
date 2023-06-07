@@ -175,20 +175,20 @@ echo
 01. Create entity with user provided dateCreated and dateModified metadata in a far away future
 ===============================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. GET /v2/entities/E1 and and get user defined dates
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 207
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 207
 
 {
     "A": {
@@ -213,10 +213,10 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1?metadata=dateModified,dateCreated and get user defined dates
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 207
 
 {
     "A": {
@@ -241,10 +241,10 @@ Date: REGEX(.*)
 04. GET /v2/entities?mq=A.dateCreated>2049-01-01 and get nothing [should be E1]
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -252,10 +252,10 @@ Date: REGEX(.*)
 05. GET /v2/entities?mq=A.dateModified>2049-01-01 and get nothing [should be E1]
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -263,10 +263,10 @@ Date: REGEX(.*)
 06. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1-user [should get no entity]
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 209
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 209
 
 [
     {
@@ -293,10 +293,10 @@ Date: REGEX(.*)
 07. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1-user [should get no entity]
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 209
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 209
 
 [
     {
@@ -323,18 +323,18 @@ Date: REGEX(.*)
 08. Modify attribute A (with overrideMetadata) so metadatas dateModified and dateCreated are removed (so automatic metadata will be used)
 =========================================================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. GET /v2/entities/E1 and don't get dateModified or dateCreated metadata
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "A": {
@@ -350,10 +350,10 @@ Date: REGEX(.*)
 10. GET /v2/entities/E1?metadata=dateModified,dateCreated and get automatic metadata
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 207
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 207
 
 {
     "A": {
@@ -378,10 +378,10 @@ Date: REGEX(.*)
 11. GET /v2/entities?mq=A.dateCreated>2049-01-01 and get nothing
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -389,10 +389,10 @@ Date: REGEX(.*)
 12. GET /v2/entities?mq=A.dateModified>2049-01-01 and get nothing
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -400,10 +400,10 @@ Date: REGEX(.*)
 13. GET /v2/entities?mq=A.dateCreated<2049-01-01 and get E1
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 [
     {
@@ -421,10 +421,10 @@ Date: REGEX(.*)
 14. GET /v2/entities?mq=A.dateModified<2049-01-01 and get E1
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 [
     {

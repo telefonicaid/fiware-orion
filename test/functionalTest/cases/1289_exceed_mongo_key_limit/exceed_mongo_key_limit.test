@@ -58,10 +58,10 @@ echo
 01. POST /v2/entities (Room1)
 =============================
 HTTP/1.1 400 Bad Request
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 {
     "description": "Too long entity id/type/servicePath combination",
@@ -72,10 +72,10 @@ Date: REGEX(.*)
 02. GET /v2/entities/Room1
 ==========================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",

@@ -76,30 +76,30 @@ echo
 01. Create entity E1 with a compound attribute A1 having a field called 'value', using URI param 'options' = 'keyValues'
 ========================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. Same operation (entity id is E2) but without 'keyValues', to see that the attribute is NOT a compound
 =========================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T1
+Content-Length: 0
 
 
 
 03. GET /v2/entities (E1/A1 is compound, E2/A1 is not compound)
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 [
     {

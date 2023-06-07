@@ -112,30 +112,30 @@ echo
 01. Create reg1 in service path /foo
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Create reg2 in service path /foo
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. GET /v2/registrations in service path /foo, get reg1
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 254
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 254
 
 [
     {
@@ -167,10 +167,10 @@ Date: REGEX(.*)
 04. GET /v2/registrations/reg1 in service path /foo, get reg1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 252
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 252
 
 {
     "dataProvided": {
@@ -200,10 +200,10 @@ Date: REGEX(.*)
 05. GET /v2/registrations/reg2 in service path /foo, get nothing
 ================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "The requested registration has not been found. Check id",

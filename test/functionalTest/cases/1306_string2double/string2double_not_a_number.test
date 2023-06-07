@@ -117,10 +117,10 @@ echo
 01. Not a number for q, op == (OK, as == can compare with strings as well)
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -128,10 +128,10 @@ Date: REGEX(.*)
 02. Not a number for q, op != (OK, as != can compare with strings as well)
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -139,10 +139,10 @@ Date: REGEX(.*)
 03. Not a number for q op == and range, lower limit
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "invalid range: types mixed",
@@ -153,10 +153,10 @@ Date: REGEX(.*)
 04. Not a number for q op == and range, upper limit
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "invalid range: types mixed",
@@ -167,10 +167,10 @@ Date: REGEX(.*)
 05. Not a number for q op != and range, lower limit
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "invalid range: types mixed",
@@ -181,10 +181,10 @@ Date: REGEX(.*)
 06. Not a number for q op != and range, upper limit
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "invalid range: types mixed",
@@ -195,10 +195,10 @@ Date: REGEX(.*)
 07. Not a number for circle center latitude
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "Invalid query: invalid coordinates",
@@ -209,10 +209,10 @@ Date: REGEX(.*)
 08. Not a number for circle center longitude
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "Invalid query: invalid coordinates",
@@ -223,10 +223,10 @@ Date: REGEX(.*)
 09. Not a number for polygon vertex latitude
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "Invalid query: invalid coordinates",
@@ -237,10 +237,10 @@ Date: REGEX(.*)
 10. Not a number for polygon vertex longitude
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "Invalid query: invalid coordinates",
