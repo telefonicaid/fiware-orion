@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-notifyOnMetadataChange false
+notifyOnMetadataChange false (empty conditions.attrs variant)
 
 --SHELL-INIT--
 dbInit CB
@@ -73,9 +73,6 @@ payload='{
       }
     ],
     "condition": {
-      "attrs": [
-        "A1"
-      ],
       "notifyOnMetadataChange": false
     }
   },

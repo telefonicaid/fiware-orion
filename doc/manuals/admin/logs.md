@@ -7,7 +7,8 @@
 * [Summary traces](#summary-traces)
 * [Log rotation](#log-rotation)
 * [Log examples for HTTP notification transactions](#log-examples-for-http-notification-transactions)
-* [Command line options related with logs](#command-line-options-related-with-logs)
+* [Log deprecated usages](#log-deprecated-usages)
+* [Other options related with logs](#other-options-related-with-logs)
 
 ## Log file
 
@@ -190,8 +191,9 @@ time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 
 Some additional considerations:
 
-* The `-logInfoPayloadMaxSize` setting is used to specify the maximum size that the payloads in the
-  above traces may have. If the payload overpasses this limit, then only the first `-logInfoPayloadMaxSize`
+* The `-logInfoPayloadMaxSize` CLI setting (or `infoPayloadMaxSize` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels))
+  is used to specify the maximum size that the payloads in the
+  above traces may have. If the payload overpasses this limit, then only the first info payload max size
   bytes are printed (and an ellipsis in the form of `(...)` is shown in traces). Default value: 5 Kbytes.
 * The response code in notifications and forwarding traces can be either a number (corresponding to the
   HTTP response code of the notification or forwarded request) or a string when some connectivity problem
@@ -214,15 +216,6 @@ time=2020-10-22T19:51:03.584Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 time=2020-10-22T19:51:03.593Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908; cbfwd=4 | trans=1603396258-520-00000000010 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[212]:logInfoFwdRequest | msg=Request forwarded (regId: 5f91e2a719595ac73da06982): POST http://localhost:9804/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A4"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A4":{"type":"Text","value":"A4 in CP4","metadata":{}}}], response code: 200
 time=2020-10-22T19:51:03.601Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908; cbfwd=5 | trans=1603396258-520-00000000011 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[212]:logInfoFwdRequest | msg=Request forwarded (regId: 5f91e2a719595ac73da06983): POST http://localhost:9805/v2/op/query, request payload (53 bytes): {"entities":[{"id":"E1","type":"T1"}],"attrs":["A5"]}, response payload (80 bytes): [{"id":"E1","type":"T1","A5":{"type":"Text","value":"A5 in CP5","metadata":{}}}], response code: 200
 time=2020-10-22T19:51:03.602Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df7908 | trans=1603396258-520-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[79]:logInfoRequestWithoutPayload | msg=Request received: GET /v2/entities/E1?type=T1, response code: 200
-```
-
-* If `-logDeprecate` is used, then NGSIv1 requests (both with and without payload) are logged at WARN level (note this doesn't
-  include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding
-  to registrations using [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
-
-```
-time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
-time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
 ```
 
 [Top](#top)  
@@ -407,12 +400,30 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 
 [Top](#top)
 
-## Command line options related with logs
 
-Apart from the ones already described in this document (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-relogAlarms` and `-logSummary`), the following command line options are related with logs:
+## Log deprecated usages
+
+If `-logDeprecate` CLI setting is used (or `deprecate` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels)) the
+following WARN traces are generated:
+
+* NGSIv1 requests (both with and without payload). Nnote this doesn't
+  include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding
+  to registrations using [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
+
+```
+time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
+time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
+```
+
+[Top](#top)
+
+
+## Other options related with logs
+
+Apart from the ones already described in this document (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-logDeprecate`, `-relogAlarms` and `-logSummary`), the following command line options are related with logs:
 
 * `-logForHumans`
-* `-logLineMaxSize`
+* `-logLineMaxSize` (or `lineMaxSize` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels))
 
 Please have a look to the [command line options documentation](cli.md) for more information about them.
 

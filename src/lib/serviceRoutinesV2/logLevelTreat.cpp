@@ -78,8 +78,9 @@ std::string changeLogConfig
   int logSizeValue        = atoi(logSize.c_str());
   std::string payloadSize = ciP->uriParam[URI_PARAM_PAYLOAD_SIZE];
   int payloadSizeValue    = atoi(payloadSize.c_str());
+  std::string deprecate   = ciP->uriParam[URI_PARAM_DEPRECATE];
 
-  if (level.empty() && logSize.empty() && payloadSize.empty())
+  if (level.empty() && logSize.empty() && payloadSize.empty() && deprecate.empty())
   {
     ciP->httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "no log configs in URI param");
@@ -112,6 +113,12 @@ std::string changeLogConfig
       alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
       return "{\"error\":\"invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0\"}";
     }
+  }
+
+  if (!deprecate.empty())
+  {
+    std::transform(deprecate.begin(), deprecate.end(), deprecate.begin(), ::tolower);
+    logDeprecate = deprecate == "true" ? true : false;
   }
 
   //
@@ -165,8 +172,10 @@ std::string getLogConfig
   std::string  level = lmLevelMaskStringGet();
   std::string  payloadMaxSize = std::to_string(logInfoPayloadMaxSize);
   std::string  lineMaxSize    = std::to_string(logLineMaxSize);
+  std::string  deprecate     = logDeprecate ? "true" : "false";
 
   return "{\"level\":\"" + level + "\", \
            \"infoPayloadMaxSize\":" + payloadMaxSize + ", \
-           \"lineMaxSize\":" + lineMaxSize + "}";
+           \"lineMaxSize\":" + lineMaxSize + ", \
+           \"deprecate\":" + deprecate + "}";
 }

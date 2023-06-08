@@ -291,6 +291,12 @@ int subCacheItems(void)
 */
 static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::string>& attrV)
 {
+  // If the list of attributes to check is empty, then no match
+  if (attrV.size() == 0)
+  {
+    return false;
+  }
+
   if (cSubP->notifyConditionV.size() == 0)
   {
     return true;

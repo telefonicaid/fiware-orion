@@ -63,6 +63,8 @@ extern int mongoSubCacheItemInsert
   long long              lastSuccessCode,
   long long              count,
   long long              failsCounter,
+  long long              failsCounterFromDb,
+  bool                   failsCounterFromDbValid,
   long long              expirationTime,
   const std::string&     status,
   double                 statusLastChange,
