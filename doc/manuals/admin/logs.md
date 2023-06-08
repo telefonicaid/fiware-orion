@@ -406,7 +406,7 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 If `-logDeprecate` CLI setting is used (or `deprecate` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels)) the
 following WARN traces are generated:
 
-* NGSIv1 requests (both with and without payload). Nnote this doesn't
+* NGSIv1 requests (both with and without payload). Note this doesn't
   include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding
   to registrations using [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
 

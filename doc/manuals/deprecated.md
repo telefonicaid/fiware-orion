@@ -82,7 +82,7 @@ Some (not all) usages of deprecated features can be logged using the `-logDeprec
 (or `deprecate` parameter in the [log admin REST API](admin/management_api.md#log-configs-and-trace-levels))
 in the WARN log level).
 
-Have a look to [this section of the documentation](admin/logs.md#log-deprecated-usages) for more detail about thi
+Have a look to [this section of the documentation](admin/logs.md#log-deprecated-usages) for more detail about this.
 
 ## Using old Orion versions
 
