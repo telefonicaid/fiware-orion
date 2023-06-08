@@ -15,6 +15,7 @@ not maintained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types in Orion 3.10.0. Use `geo:json` instead.
 * `GET /v2` operation in Orion 3.8.0. This operation is pretty useless and not actually used.
 * Initial notification in subscriptions (along with `skipInitialNotification` option) in Orion 3.1.0.
   (removed in Orion 3.2.0). The results covered by initial notification can be very large and we cannot apply pagination here
@@ -58,7 +59,7 @@ A list of deprecated features and the version in which they were deprecated foll
   use `/v1` and `/v1/registry` instead.
         * `/ngsi9` URL paths removed in Orion 3.8.0
 * `location` metadata to specify entity location is deprecated in Orion 1.1.0. The new way
-  of specifying entity location is to use `geo:point` type for the attribute (see details in
+  of specifying entity location is to use `geo:json` type for the attribute (see details in
   [the corresponding section of the Orion API specification](orion-api.md#geospatial-properties-of-entities).
 * Deprecated command line argument in Orion 0.26.1 (removed in Orion 1.0.0).
   * **--silent**. Suppress all log output except errors (Please use *-logLevel ERROR* instead)
@@ -106,15 +107,16 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
-| NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | 3.9.0 (*)                                 | June 2nd, 2023                  |
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
-| `/ngsi10` and `/ngsi9` URL prefixes                                        | 3.7.0 (*)                                 | May 26th, 2022                 |
 | `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
 | `GET /v2` operation                                                        | Not yet defined                           | Not yet defined                 |
+| `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types       | Not yet defined                           | Not yet defined                 |
+| NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | 3.9.0 (*)                                 | June 2nd, 2023                  |
+| `/ngsi10` and `/ngsi9` URL prefixes                                        | 3.7.0 (*)                                 | May 26th, 2022                  |
 | Initial notification upon subscription creation or update                  | 3.1.0                                     | June 9th, 2021                  |
-| NGSIv1 Context availability subscriptions (NGSI9 suscriptions)             | 2.5.2                                     | December 17th, 2020              |
+| NGSIv1 Context availability subscriptions (NGSI9 suscriptions)             | 2.5.2                                     | December 17th, 2020             |
 | Rush (along with CLI: `-rush`)                                             | 2.2.0                                     | February 21st, 2019             |
 | `id` metadata (and associated NGSIv1 operations)                           | 2.1.0                                     | December 19th, 2018             |
 | XML API                                                                    | 0.28.0                                    | February 29th, 2016             |

@@ -3,6 +3,7 @@
 - Fix: count option not working when georel=near was in use (500 error was returned)
 - Fix: maxFailsLimit didn't work in some cases when update subscription is done just after cache refresh (only when csubs cache is enabled)
 - Fix: conditions.notifyOnMetadataChange false not working if condition.attrs is empty
+- Deprecate: `geo:json`, `geo:line`, `geo:box` and `geo:polygon` attribute types (use `geo:json` instead)
 - Remove: all NGSIv1 operations (deprecated in Orion 2.0.0) except the following ones
     - PUT /v1/contextEntities/{id}
     - DELETE /v1/contextEntities/{id}

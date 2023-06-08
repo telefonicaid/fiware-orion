@@ -324,6 +324,11 @@ static bool getGeoJson
     // This corresponds to the legacy way in NGSIv1 based in metadata
     // The block is the same that for GEO_POINT but it is clearer if we keep it separated
 
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of metadata location %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
+    }
+
     double  aLat;
     double  aLong;
 
@@ -341,6 +346,11 @@ static bool getGeoJson
     geoJson->append("coordinates", ba.arr());
 
     return true;
+  }
+
+  if ((logDeprecate) && ((caP->type == GEO_POINT) || (caP->type == GEO_LINE) || (caP->type == GEO_BOX) || (caP->type != GEO_POLYGON)))
+  {
+    LM_W(("Deprecated usage of %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
   }
 
   if (caP->type == GEO_POINT)

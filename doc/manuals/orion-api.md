@@ -31,7 +31,6 @@
     - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
     - [Datetime support](#datetime-support)
     - [Geospatial properties of entities](#geospatial-properties-of-entities)
-        - [Simple Location Format](#simple-location-format)
         - [GeoJSON](#geojson)
     - [Simple Query Language](#simple-query-language)
     - [Geographical Queries](#geographical-queries)
@@ -628,7 +627,7 @@ meaning:
   operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
   check the section [Datetime support](#datetime-support) of this documentation.
 
-* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
+* `geo:json`. It has special semantics
   related with entity location. Attributes with `null` value will not be taken into account in
   geo-queries and they doesn't count towards the limit of one geospatial attribute per entity.
   See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
@@ -693,7 +692,7 @@ semantics associated to the attribute type. Note that Orion ignored attribute ty
 this metadata is not needed most of the cases, but there are two cases in which attribute
 type has an special semantic for Orion:
    * `DateTime`
-   * Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+   * `geo:json`
 
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
@@ -861,10 +860,7 @@ The geospatial properties of a context entity can be represented by means of reg
 context attributes.
 The provision of geospatial properties enables the resolution of geographical queries.
 
-Two different syntaxes are supported by Orion:
-
-* *Simple Location Format*. It is meant as a very lightweight format for developers and users to
-  quickly and easily add to their existing entities.
+The following syntax is supported by Orion:
 
 * *GeoJSON*.  [GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) is a geospatial data
   interchange format based on the JavaScript Object Notation (JSON).
@@ -922,73 +918,6 @@ If extra locations are defined in this way take, into account that the location 
 is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
 the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
 part in geo-queries.
-
-### Simple Location Format
-
-Simple Location Format supports basic geometries ( *point*, *line*, *box*, *polygon* ) and covers
-the typical use cases when encoding geographical locations. It has been inspired by
-[GeoRSS Simple](http://www.georss.org/simple.html).
-
-It is noteworthy that the Simple Location Format is not intended to represent complex positions on
-Earth surface.
-For instance, applications that require to capture altitude coordinates will have to use GeoJSON as
-representation format for the geospatial properties of their entities. 
-
-A context attribute representing a location encoded with the Simple Location Format
-must conform to the following syntax:
-
-* The attribute type must be one of the following values: (`geo:point`, `geo:line`, `geo:box` or 
-  `geo:polygon`).
-* The attribute value must be a list of coordinates. By default, coordinates are defined
-  using the [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-  [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) coordinate reference system (CRS),
-  with latitude and longitude units of decimal degrees. Such coordinate list allow to encode
-  the geometry specified by the `type` attribute and are encoded according to the specific
-  rules defined below:
-
-  * Type `geo:point`:   the attribute value must contain a string containing a
-    valid latitude-longitude pair, separated by comma.
-  * Type `geo:line`:    the attribute value must contain a string array of
-    valid latitude-longitude pairs. There must be at least two pairs.
-  * Type `geo:polygon`: the attribute value must contain a string array
-    of valid latitude-longitude pairs.
-    There must be at least four pairs, with the last being identical to the first
-    (so a polygon has a minimum of three actual points).
-    Coordinate pairs should be properly ordered so that the line segments
-    that compose the polygon remain on the outer edge of the defined area.
-    For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid
-    polygon definition. 
-    Orion should raise an error when none of the former conditions are met by input data.
-  * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of
-    a map or a rough area of interest. A box is represented by a two-length string array of
-    latitude-longitude pairs.
-    The first pair is the lower corner, the second is the upper corner.
-
-Note: Circle geometries are not supported, as the [literature](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)
-describes different shortcomings for implementations. 
-
-The examples below illustrate the referred syntax:
-
-```
-{
-  "location": {
-    "value": "41.3763726, 2.186447514",
-    "type": "geo:point"
-  }
-}
-```
-
-```
-{
-  "location": {
-    "value": [
-      "40.63913831188419, -8.653321266174316",
-      "40.63881265804603, -8.653149604797363"
-    ],
-    "type": "geo:box"
-  }
-}
-```
 
 ### GeoJSON
 
@@ -1190,7 +1119,7 @@ provide more information about the relationship. The following values are recogn
   reference geometry. 
 
 `geometry` allows to define the reference shape to be used when resolving the query.
- The following geometries (see [Simple Location Format](#simple-location-format)) must be supported:
+ The following geometries must be supported:
 
 + `geometry=point`, defines a point on the Earth surface.
 + `geometry=line`, defines a polygonal line.
@@ -1228,8 +1157,8 @@ the API implementation is responsible for determining which entity attribute
 contains the geographical location to be used for matching purposes.
 To this aim, the following rules must be followed:
 
-* If an entity has no attribute corresponding to a location (encoded as GeoJSON or the
-  Simple Location Format), then such an entity has not declared any geospatial property and will not
+* If an entity has no attribute corresponding to a location (encoded as GeoJSON),
+  then such an entity has not declared any geospatial property and will not
   match any geographical query.
 
 * If an entity only exposes one attribute corresponding to a location, then such an attribute will
@@ -2778,8 +2707,11 @@ Example:
     "value": 60
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84"
@@ -2871,8 +2803,11 @@ Example:
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
@@ -2951,8 +2886,11 @@ Example:
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
