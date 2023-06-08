@@ -32,7 +32,7 @@ brokerStart CB
 #
 # 01. POST /v2/entities, to create entity E1 with attr A1 and metadata M1
 # 02. POST /v2/entities, to create entity E2 with attr A2 and metadata M2
-# 05. GET all entities, with service path
+# 03. GET all entities, with service path
 #
 
 
@@ -89,30 +89,30 @@ echo
 01. POST /v2/entities, to create entity E1 with attr A1 and metadata M1
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. POST /v2/entities, to create entity E2 with attr A2 and metadata M2
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 03. GET all entities, with service path
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 167
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 167
 
 [
     {
