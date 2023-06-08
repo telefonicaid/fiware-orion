@@ -55,10 +55,10 @@
 
 ## 非推奨の警告をログに記録
 
-非推奨の機能の一部 (すべてではない) の使用状況は、WARN ログ・レベルで、`-logDeprecate` [CLI フラグ](admin/cli.md) を使用してログに記録できます。
-特に、このフラグがアクティブ化されている場合は次のようになります:
+非推奨の機能の一部 (すべてではない) の使用状況は、WARN ログ・レベルで `-logDeprecate` [CLI flag](admin/cli.md)
+フラグ (またはログ管理 REST API の `deprecate` パラメータ) を使用してログに記録できます。
 
-* NGSIv1 リクエストはログに記録されます。詳細については、[ドキュメントのこのセクション](admin/logs.md#info-level-in-detail) を参照してください
+詳細については、[ドキュメントのこのセクション](admin/logs.md#log-deprecated-usages)を参照してください。
 
 ## 古い Orion バージョンの使用
 

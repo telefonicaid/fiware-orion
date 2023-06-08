@@ -112,7 +112,7 @@ broker はデフォルトでバックグラウンドで実行されるため、�
     [`"legacyForwarding": true`](../orion-api.md#registrationprovider) を使用するレジストレーションに対応するリクエスト転送は機能します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
 -   **-mqttMaxAge** : 未使用の MQTT 接続が保持される最大時間 (分単位)。デフォルト値: 60
--   **-logDeprecate** : 非推奨の使用法を警告として記録します。詳細については、[ドキュメントのこのセクション](../deprecated.md#log-deprecation-warnings) を参照してください
+-   **-logDeprecate** : 非推奨の使用法を警告として記録します。詳細については、[ドキュメントのこのセクション](../deprecated.md#log-deprecation-warnings) を参照してください。デフォルトは false です。これは、Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) を使用して `deprecated` フィールドを使用して変更できます
 
 ## 環境変数を使用した設定
 
