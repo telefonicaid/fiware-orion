@@ -315,6 +315,8 @@ int mongoSubCacheItemInsert
   long long              lastSuccessCode,
   long long              count,
   long long              failsCounter,
+  long long              failsCounterFromDb,
+  bool                   failsCounterFromDbValid,
   long long              expirationTime,
   const std::string&     status,
   double                 statusLastChange,
@@ -419,6 +421,8 @@ int mongoSubCacheItemInsert
   cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->count                 = count;
   cSubP->failsCounter          = failsCounter;
+  cSubP->failsCounterFromDb    = failsCounterFromDb;
+  cSubP->failsCounterFromDbValid  = failsCounterFromDbValid;
   cSubP->status                = status;
   cSubP->statusLastChange      = statusLastChange;
 
