@@ -1,7 +1,6 @@
 - Add: option to change deprecate log setting in the REST management API
 - Fix: decimal rounding in some cases was generating wrong JSON in query responses and notifications (#4346)
 - Fix: pagination support in request query forwarding to Context Providers (#4149, #847, #1647)
-- Fix: pagination support in request query forwarding to Context Providers (#4149, #847, #4337)
 - Fix: count option not working when georel=near was in use (500 error was returned)
 - Fix: maxFailsLimit didn't work in some cases when update subscription is done just after cache refresh (only when csubs cache is enabled)
 - Fix: conditions.notifyOnMetadataChange false not working if condition.attrs is empty
