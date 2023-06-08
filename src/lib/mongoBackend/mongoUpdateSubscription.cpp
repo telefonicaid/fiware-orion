@@ -231,6 +231,8 @@ static void updateInCache
   long long    lastSuccessCode;
   long long    count;
   long long    failsCounter;
+  long long    failsCounterFromDb;
+  bool         failsCounterFromDbValid;
   std::string  status;
   double       statusLastChange;
 
@@ -243,6 +245,8 @@ static void updateInCache
     lastSuccessCode      = subCacheP->lastSuccessCode;
     count                = subCacheP->count;
     failsCounter         = subCacheP->failsCounter;
+    failsCounterFromDb   = subCacheP->failsCounterFromDb;
+    failsCounterFromDbValid = subCacheP->failsCounterFromDbValid;
     status               = subCacheP->status;
     statusLastChange     = subCacheP->statusLastChange;
   }
@@ -255,6 +259,8 @@ static void updateInCache
     lastSuccessCode      = -1;
     count                = 0;
     failsCounter         = 0;
+    failsCounterFromDb   = 0;
+    failsCounterFromDbValid = false;
     status               = "";
     statusLastChange     = -1;
   }
@@ -278,6 +284,8 @@ static void updateInCache
                                           lastSuccessCode,
                                           count,
                                           failsCounter,
+                                          failsCounterFromDb,
+                                          failsCounterFromDbValid,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           effectiveStatus,
                                           effectiveStatusLastChante,

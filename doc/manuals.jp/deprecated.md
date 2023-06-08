@@ -51,6 +51,8 @@
 * Configuration Manager のロールは、0.21.0 で非推奨になり、0.25.0 で削除されました
 * Associations は、0.21.0 で非推奨になり、0.25.0 で削除されました
 
+<a name="log-deprecation-warnings"></a>
+
 ## 非推奨の警告をログに記録
 
 非推奨の機能の一部 (すべてではない) の使用状況は、WARN ログ・レベルで、`-logDeprecate` [CLI フラグ](admin/cli.md) を使用してログに記録できます。

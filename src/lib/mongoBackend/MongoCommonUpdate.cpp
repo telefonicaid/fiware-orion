@@ -1697,6 +1697,8 @@ static bool addTriggeredSubscriptions_noCache
       }
       else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
       {
+        // Skip if: 1) there is no change in the *value* of attributes listed in conditions.attrs and 2) there is no change
+        // in the *metadata* of the attributes listed in conditions.attrs (the 2) only if notifyOnMetadtaChange is true)
         if (!condValueAttrMatch(sub, attrsWithModifiedValue) && !(notifyOnMetadataChange && condValueAttrMatch(sub, attrsWithModifiedMd)))
         {
           continue;
