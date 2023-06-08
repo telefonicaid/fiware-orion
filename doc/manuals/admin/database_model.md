@@ -126,7 +126,7 @@ Note that coordinate pairs use the longitude-latitude order, which is opposite t
 in the [Geographical Queries](../orion-api.md#geographica-queries). This is due to the internal
 [MongoDB geolocation implementation](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
 (which is based in GeoJSON) uses longitude-latitude order. However, other systems closer
-to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the API.
+to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the Geographical Queries API.
 
 Example document:
 
