@@ -1,6 +1,7 @@
 - Add: servicePath field to builtin attributes, so return ServicePath in the entity response (#2877)
 - Fix: decimal rounding in some cases was generating wrong JSON in query responses and notifications (#4346)
 - FiX: count option not working when georel=near was in use (500 error was returned)
+- Fix: conditions.notifyOnMetadataChange false not working if condition.attrs is empty
 - Remove: all NGSIv1 operations (deprecated in Orion 2.0.0) except the following ones
     - PUT /v1/contextEntities/{id}
     - DELETE /v1/contextEntities/{id}

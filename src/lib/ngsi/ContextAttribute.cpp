@@ -188,7 +188,6 @@ bool ContextAttribute::calculateOperator
   {
     orion::BSONArrayBuilder ba;
     orion::BSONArrayBuilder ba2;
-    orion::BSONArrayBuilder bo; // FIXME PR
     switch (upOp->valueType)
     {
     case orion::ValueTypeString:
@@ -208,13 +207,9 @@ bool ContextAttribute::calculateOperator
       break;
 
     case orion::ValueTypeVector:
+    case orion::ValueTypeObject:
       compoundValueBson(compoundValueP->childV, ba2, strings2numbers);
       ba.append(ba2.arr());
-      break;
-
-    case orion::ValueTypeObject:
-      compoundValueBson(compoundValueP->childV, bo, strings2numbers);
-      ba.append(bo.arr());
       break;
 
     case orion::ValueTypeNotGiven:

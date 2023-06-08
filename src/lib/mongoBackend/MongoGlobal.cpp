@@ -1424,6 +1424,7 @@ bool entitiesQuery
     fillQueryEntity(&bob, enV[0]);
     orion::BSONObj entObj = bob.obj();
     finalQuery.appendElements(entObj);
+    finalCountQuery.appendElements(entObj);
 
     LM_T(LmtMongo, ("Entity single query token: '%s'", entObj.toString().c_str()));
   }
@@ -1439,12 +1440,14 @@ bool entitiesQuery
       LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
     }
     finalQuery.append("$or", orEnt.arr());
+    finalCountQuery.append("$or", orEnt.arr());
   }
 
   /* Part 2: service path */
   if (servicePathFilterNeeded(servicePath))
   {
     finalQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
+    finalCountQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
   }
 
   /* Part 3: attributes */
@@ -1478,6 +1481,7 @@ bool entitiesQuery
     orion::BSONObjBuilder bob;
     bob.append("$in", attrs.arr());
     finalQuery.append(ENT_ATTRNAMES, bob.obj());
+    finalCountQuery.append(ENT_ATTRNAMES, bob.obj());
   }
 
   /* Part 5: scopes */
@@ -2214,6 +2218,12 @@ bool isCondValueInContextElementResponse(ConditionValueList* condValues, Context
 bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
   std::vector<orion::BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
+
+  // If the list of attributes to check is empty, then no match
+  if (modifiedAttrs.size() == 0)
+  {
+    return false;
+  }
 
   if (conds.size() == 0)
   {
