@@ -55,6 +55,7 @@
 #define URI_PARAM_LEVEL                   "level"
 #define URI_PARAM_PAYLOAD_SIZE            "infoPayloadMaxSize"
 #define URI_PARAM_LOG_SIZE                "lineMaxSize"
+#define URI_PARAM_DEPRECATE               "deprecate"
 
 
 
