@@ -1,3 +1,4 @@
+- Add: option to change deprecate log setting in the REST management API
 - Fix: decimal rounding in some cases was generating wrong JSON in query responses and notifications (#4346)
 - Fix: count option not working when georel=near was in use (500 error was returned)
 - Fix: maxFailsLimit didn't work in some cases when update subscription is done just after cache refresh (only when csubs cache is enabled)
