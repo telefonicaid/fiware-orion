@@ -269,7 +269,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
     "updateAction": "UPDATE"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/v1/queryContext?limit=20&offset=0&options=count
+POST http://localhost:REGEX(\d+)/v1/queryContext
 Fiware-Servicepath: /
 Content-Length: 77
 X-Auth-Token: kz
@@ -319,7 +319,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbfwd=1
     "updateAction": "UPDATE"
 }
 =======================================
-POST http://localhost:REGEX(\d+)/v1/queryContext?limit=20&offset=0&options=count
+POST http://localhost:REGEX(\d+)/v1/queryContext
 Fiware-Servicepath: /
 Content-Length: 77
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)

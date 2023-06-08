@@ -529,18 +529,13 @@ std::string postQueryContext
   // For API version 1, if the URI parameter 'details' is set to 'on', then the total of local
   // entities is returned in the errorCode of the payload.
   //
-  // In API version 2, this has changed completely. Here, the total count of local entities is returned
-  // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
-  //
-  if ((ciP->apiVersion == V2) /*&& (ciP->uriParamOptions["count"])*/)
+  // In API version 2, this has changed completely. The total count is returned to client the HTTP header Fiware-Total-Count
+  // only when count option is enabled, but we enable internally the countP variable, as if CPrs are involved in the
+  // query execution we need it
+  if ((ciP->apiVersion == V2) || ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on")))
   {
     countP = &count;
   }
-  else if ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on"))
-  {
-    countP = &count;
-  }
-
 
   //
   // 01. Call mongoBackend/mongoQueryContext
@@ -793,13 +788,13 @@ std::string postQueryContext
           if (providerOffset > (*countP - brokerCount))
           {
             providerOffset -= (*countP - brokerCount);
-	    brokerCount += (*countP - brokerCount);
+            brokerCount += (*countP - brokerCount);
           }
           else
           {
             providerOffset = 0;
           }
-	}
+        }
         //
         // Each ContextElementResponse of qP should be tested to see whether there
         // is already an existing ContextElementResponse in responseV
