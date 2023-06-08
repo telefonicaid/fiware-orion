@@ -11,6 +11,7 @@ To change the log config:
 curl -X PUT <host>:<port>/admin/log?level=<NONE|FATAL|ERROR|WARN|INFO|DEBUG>
 curl -X PUT <host>:<port>/admin/log?infoPayloadMaxSize=<logPayloadSizeValue>
 curl -X PUT <host>:<port>/admin/log?lineMaxSize=<logLineSizeValue>
+curl -X PUT <host>:<port>/admin/log?deprecate=true|false
 ```
 
 To retrieve the log config:
@@ -25,7 +26,8 @@ which response follows the following pattern:
 {
     "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
-    "lineMaxSize": 32768
+    "lineMaxSize": 32768,
+    "deprecate": false
 }
 ```
 
