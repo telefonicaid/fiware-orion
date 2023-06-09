@@ -79,9 +79,10 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 87
+Content-Length: 117
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
     "lineMaxSize": 32768
@@ -103,9 +104,10 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 86
+Content-Length: 116
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -127,9 +129,10 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 87
+Content-Length: 117
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "ERROR",
     "lineMaxSize": 32768
