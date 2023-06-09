@@ -1,0 +1,2537 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+pagination
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+brokerStart CB
+brokerStart CP1
+brokerStart CP2 
+
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create entity A1/T in CB
+# 02. Create entity A2/T in CB
+# 03. Create entity A3/T in CB
+# 04. Create entity A4/T in CB
+# 05. Create entity A5/T in CB
+# 06. Create entity B1/T with attribute A1, in CP1
+# 07. Create entity B2/T with attribute A1, in CP1
+# 08. Create entity B3/T with attribute A1, in CP1
+# 09. Create entity B4/T with attribute A1, in CP1
+# 10. Create entity B5/T with attribute A1, in CP1
+# 11. Create entity B6/T with attribute A1, in CP1
+# 12. Create entity B7/T with attribute A1, in CP1
+# 13. Create entity B8/T with attribute A1, in CP1
+# 14. Create entity B9/T with attribute A1, in CP1
+# 15. Create entity B10/T with attribute A1, in CP1
+# 16. Create entity C1/T with attribute A2, in CP2
+# 17. Create entity C2/T with attribute A2, in CP2
+# 18. Create entity C3/T with attribute A2, in CP2
+# 19. Create entity C4/T with attribute A2, in CP2
+# 20. Create entity C5/T with attribute A2, in CP2
+# 21. Create entity C6/T with attribute A2, in CP2
+# 22. Create entity C7/T with attribute A2, in CP2
+# 23. Create entity C8/T with attribute A2, in CP2
+# 24. Create entity C9/T with attribute A2, in CP2
+# 25. Create entity C10/T with attribute A2, in CP2
+# 26. Register entities of type T, with ID .*, and attribute A1, for CP1
+# 27. Register entities of type T, with ID .*, and attribute A2, for CP2
+# 28. GET /v2/entities with limit=3 and check no limit forwarded to CP
+# 29. GET /v2/entities with limit=5 and check no limit forwarded to CP
+# 30. GET /v2/entities with limit=10 and check remaining limit forwarded to CP
+# 31. GET /v2/entities with limit=20 and check remaining limit forwarded to both CP
+# 32. GET /v2/entities with offset=3 and check no offset is forwarded to CP
+# 33. GET /v2/entities with offset=5 and check no offset is forwarded to CP
+# 34. GET /v2/entities with offset=10 and check remaining offset is forwarded to CP
+# 35. GET /v2/entities with options=count and check total count of CB+CP1+CP2
+# 36. GET /v2/entities with limit=10 and offset=5
+# 37. GET /v2/entities with limit=10 and options=count
+# 38. GET /v2/entities with offset=5 and options=count
+# 39. GET /v2/entities with limit=0
+# 40. GET /v2/entities with offset=0
+# 41. GET /v2/entities without pagination parameter
+#
+
+echo "01. Create entity A1/T in CB"
+echo "============================"
+payload='{
+  "id": "A1",
+  "type": "T"
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+
+echo "02. Create entity A2/T in CB"
+echo "============================"
+payload='{
+  "id": "A2",
+  "type": "T"
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+
+echo "03. Create entity A3/T in CB"
+echo "============================"
+payload='{
+  "id": "A3",
+  "type": "T"
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity A4/T in CB"
+echo "============================"
+payload='{
+  "id": "A4",
+  "type": "T"
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity A5/T in CB"
+echo "============================"
+payload='{
+  "id": "A5",
+  "type": "T"
+}'
+orionCurl --url /v2/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "06. Create entity B1/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B1",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "07. Create entity B2/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B2",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+
+echo "08. Create entity B3/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B3",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+
+echo "09. Create entity B4/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B4",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+
+echo "10. Create entity B5/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B5",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "11. Create entity B6/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B6",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+
+echo "12. Create entity B7/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B7",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+
+echo "13. Create entity B8/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B8",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+
+echo "14. Create entity B9/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B9",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+
+echo "15. Create entity B10/T with attribute A1, in CP1"
+echo "================================================"
+payload='{
+  "id": "B10",
+  "type": "T",
+  "A1": { "value": 1 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+
+echo "16. Create entity C1/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C1",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "17. Create entity C2/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C2",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "18. Create entity C3/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C3",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+
+echo "19. Create entity C4/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C4",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+
+echo "20. Create entity C5/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C5",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+
+echo "21. Create entity C6/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C6",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+
+echo "22. Create entity C7/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C7",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+
+echo "23. Create entity C8/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C8",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "24. Create entity C9/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C9",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+
+echo "25. Create entity C10/T with attribute A2, in CP2"
+echo "================================================"
+payload='{
+  "id": "C10",
+  "type": "T",
+  "A2": { "value": 2 }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+
+echo "26. Register entities of type T, with ID .*, and attribute A1, for CP1"
+echo "======================================================================"
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [ "A1" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+
+echo "27. Register entities of type T, with ID .*, and attribute A2, for CP2"
+echo "======================================================================"
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T",
+        "idPattern": ".*"
+      }
+    ],
+    "attrs": [ "A2" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP2_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+
+echo "28. GET /v2/entities with limit=3 and check no limit forwarded to CP"
+echo "===================================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&limit=3'
+echo
+echo
+
+
+
+echo "29. GET /v2/entities with limit=5 and check no limit forwarded to CP"
+echo "===================================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&limit=5'
+echo
+echo
+
+
+echo "30. GET /v2/entities with limit=10 and check remaining limit forwarded to CP"
+echo "==========================================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&limit=10'
+echo
+echo
+
+
+
+echo "31. GET /v2/entities with limit=20 and check remaining limit forwarded to both CP"
+echo "================================================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&limit=20'
+echo
+echo
+
+
+
+echo "32. GET /v2/entities with offset=3 and check no offset is forwarded to CP"
+echo "========================================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&offset=3'
+echo
+echo
+
+
+
+echo "33. GET /v2/entities with offset=5 and check no offset is forwarded to CP"
+echo "========================================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&offset=5'
+echo
+echo
+
+
+
+echo "34. GET /v2/entities with offset=10 and check remaining offset is forwarded to CP"
+echo "================================================================================"
+orionCurl --url '/v2/entities?idPattern=.*&type=T&offset=10'
+echo
+echo
+
+
+
+echo "35. GET /v2/entities with options=count and check total count of CB+CP1+CP2"
+echo "==========================================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&options=count'
+echo
+echo
+
+
+
+echo "36. GET /v2/entities with limit=10 and offset=5"
+echo "==============================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&limit=10&offset=5'
+echo
+echo
+
+
+
+echo "37. GET /v2/entities with limit=10 and options=count"
+echo "===================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&options=count&limit=10'
+echo
+echo
+
+
+
+echo "38. GET /v2/entities with offset=5 and options=count"
+echo "===================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&offset=5&options=count'
+echo
+echo
+
+
+
+echo "39. GET /v2/entities with limit=0"
+echo "================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&limit=0'
+echo
+echo
+
+
+
+echo "40. GET /v2/entities with offset=0"
+echo "=================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T&offset=0'
+echo
+echo
+
+
+
+echo "41. GET /v2/entities without pagination parameter"
+echo "================================================="
+orionCurl --url '/v2/entities?idPattern=.*&type=T'
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create entity A1/T in CB
+============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A1?type=T
+Content-Length: 0
+
+
+
+02. Create entity A2/T in CB
+============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A2?type=T
+Content-Length: 0
+
+
+
+03. Create entity A3/T in CB
+============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A3?type=T
+Content-Length: 0
+
+
+
+04. Create entity A4/T in CB
+============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A4?type=T
+Content-Length: 0
+
+
+
+05. Create entity A5/T in CB
+============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A5?type=T
+Content-Length: 0
+
+
+
+06. Create entity B1/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B1?type=T
+Content-Length: 0
+
+
+
+07. Create entity B2/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B2?type=T
+Content-Length: 0
+
+
+
+08. Create entity B3/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B3?type=T
+Content-Length: 0
+
+
+
+09. Create entity B4/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B4?type=T
+Content-Length: 0
+
+
+
+10. Create entity B5/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B5?type=T
+Content-Length: 0
+
+
+
+11. Create entity B6/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B6?type=T
+Content-Length: 0
+
+
+
+12. Create entity B7/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B7?type=T
+Content-Length: 0
+
+
+
+13. Create entity B8/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B8?type=T
+Content-Length: 0
+
+
+
+14. Create entity B9/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B9?type=T
+Content-Length: 0
+
+
+
+15. Create entity B10/T with attribute A1, in CP1
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B10?type=T
+Content-Length: 0
+
+
+
+16. Create entity C1/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C1?type=T
+Content-Length: 0
+
+
+
+17. Create entity C2/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C2?type=T
+Content-Length: 0
+
+
+
+18. Create entity C3/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C3?type=T
+Content-Length: 0
+
+
+
+19. Create entity C4/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C4?type=T
+Content-Length: 0
+
+
+
+20. Create entity C5/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C5?type=T
+Content-Length: 0
+
+
+
+21. Create entity C6/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C6?type=T
+Content-Length: 0
+
+
+
+22. Create entity C7/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C7?type=T
+Content-Length: 0
+
+
+
+23. Create entity C8/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C8?type=T
+Content-Length: 0
+
+
+
+24. Create entity C9/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C9?type=T
+Content-Length: 0
+
+
+
+25. Create entity C10/T with attribute A2, in CP2
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C10?type=T
+Content-Length: 0
+
+
+
+26. Register entities of type T, with ID .*, and attribute A1, for CP1
+======================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+27. Register entities of type T, with ID .*, and attribute A2, for CP2
+======================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+28. GET /v2/entities with limit=3 and check no limit forwarded to CP
+====================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+[
+    {
+        "id": "A1",
+        "type": "T"
+    },
+    {
+        "id": "A2",
+        "type": "T"
+    },
+    {
+        "id": "A3",
+        "type": "T"
+    }
+]
+
+
+29. GET /v2/entities with limit=5 and check no limit forwarded to CP
+====================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
+
+[
+    {
+        "id": "A1",
+        "type": "T"
+    },
+    {
+        "id": "A2",
+        "type": "T"
+    },
+    {
+        "id": "A3",
+        "type": "T"
+    },
+    {
+        "id": "A4",
+        "type": "T"
+    },
+    {
+        "id": "A5",
+        "type": "T"
+    }
+]
+
+
+30. GET /v2/entities with limit=10 and check remaining limit forwarded to CP
+===========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 466
+
+[
+    {
+        "id": "A1",
+        "type": "T"
+    },
+    {
+        "id": "A2",
+        "type": "T"
+    },
+    {
+        "id": "A3",
+        "type": "T"
+    },
+    {
+        "id": "A4",
+        "type": "T"
+    },
+    {
+        "id": "A5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    }
+]
+
+
+31. GET /v2/entities with limit=20 and check remaining limit forwarded to both CP
+=================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1167
+
+[
+    {
+        "id": "A1",
+        "type": "T"
+    },
+    {
+        "id": "A2",
+        "type": "T"
+    },
+    {
+        "id": "A3",
+        "type": "T"
+    },
+    {
+        "id": "A4",
+        "type": "T"
+    },
+    {
+        "id": "A5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C1",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C2",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C3",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C4",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C5",
+        "type": "T"
+    }
+]
+
+
+32. GET /v2/entities with offset=3 and check no offset is forwarded to CP
+=========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1308
+
+[
+    {
+        "id": "A4",
+        "type": "T"
+    },
+    {
+        "id": "A5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C1",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C2",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C3",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C4",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C5",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C6",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C7",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C8",
+        "type": "T"
+    }
+]
+
+
+33. GET /v2/entities with offset=5 and check no offset is forwarded to CP
+=========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1403
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C1",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C2",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C3",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C4",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C5",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C6",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C7",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C8",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C9",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C10",
+        "type": "T"
+    }
+]
+
+
+34. GET /v2/entities with offset=10 and check remaining offset is forwarded to CP
+================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1053
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C1",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C2",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C3",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C4",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C5",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C6",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C7",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C8",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C9",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C10",
+        "type": "T"
+    }
+]
+
+
+35. GET /v2/entities with options=count and check total count of CB+CP1+CP2
+===========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 25
+Content-Type: application/json
+Content-Length: 1167
+
+[
+    {
+        "id": "A1",
+        "type": "T"
+    },
+    {
+        "id": "A2",
+        "type": "T"
+    },
+    {
+        "id": "A3",
+        "type": "T"
+    },
+    {
+        "id": "A4",
+        "type": "T"
+    },
+    {
+        "id": "A5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C1",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C2",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C3",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C4",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C5",
+        "type": "T"
+    }
+]
+
+
+36. GET /v2/entities with limit=10 and offset=5
+===============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 702
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    }
+]
+
+
+37. GET /v2/entities with limit=10 and options=count
+====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 25
+Content-Type: application/json
+Content-Length: 466
+
+[
+    {
+        "id": "A1",
+        "type": "T"
+    },
+    {
+        "id": "A2",
+        "type": "T"
+    },
+    {
+        "id": "A3",
+        "type": "T"
+    },
+    {
+        "id": "A4",
+        "type": "T"
+    },
+    {
+        "id": "A5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    }
+]
+
+
+38. GET /v2/entities with offset=5 and options=count
+====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 25
+Content-Type: application/json
+Content-Length: 1403
+
+[
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C1",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C2",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C3",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C4",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C5",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C6",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C7",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C8",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C9",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C10",
+        "type": "T"
+    }
+]
+
+
+39. GET /v2/entities with limit=0
+=================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+40. GET /v2/entities with offset=0
+==================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1167
+
+[
+    {
+        "id": "A1",
+        "type": "T"
+    },
+    {
+        "id": "A2",
+        "type": "T"
+    },
+    {
+        "id": "A3",
+        "type": "T"
+    },
+    {
+        "id": "A4",
+        "type": "T"
+    },
+    {
+        "id": "A5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C1",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C2",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C3",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C4",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C5",
+        "type": "T"
+    }
+]
+
+
+41. GET /v2/entities without pagination parameter
+=================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1167
+
+[
+    {
+        "id": "A1",
+        "type": "T"
+    },
+    {
+        "id": "A2",
+        "type": "T"
+    },
+    {
+        "id": "A3",
+        "type": "T"
+    },
+    {
+        "id": "A4",
+        "type": "T"
+    },
+    {
+        "id": "A5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B1",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B2",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B3",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B4",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B5",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B6",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B7",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B8",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B9",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "B10",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C1",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C2",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C3",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C4",
+        "type": "T"
+    },
+    {
+        "A2": {
+            "metadata": {},
+            "type": "Number",
+            "value": 2
+        },
+        "id": "C5",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
