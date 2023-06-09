@@ -355,6 +355,20 @@ time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c2958
 time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
 ```
 
+* 位置メタデータの NGSIv1 での使用。例：
+
+```
+time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c29583ca5 | trans=1686237259-703-00000000003 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[329]:getGeoJson | msg=Deprecated usage of metadata location coords detected in attribute location at entity update, please use geo:json instead
+```
+
+* `geo:point`, `geo:line`, `geo:box` また `geo:line` の使用
+
+```
+time=2023-06-08T15:14:21.176Z | lvl=WARN | corr=2518249e-060f-11ee-9e76-000c29583ca5 | trans=1686237259-703-00000000004 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[353]:getGeoJson | msg=Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
+```
+
+非推奨の機能とその解決方法の詳細については、[非推奨ドキュメント](../deprecated.md) を参照してください。
+
 [トップ](#top)
 
 <a name="other-options-related-with-logs"></a>
