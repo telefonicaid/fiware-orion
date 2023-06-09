@@ -1119,7 +1119,7 @@ provide more information about the relationship. The following values are recogn
   reference geometry. 
 
 `geometry` allows to define the reference shape to be used when resolving the query.
- The following geometries must be supported:
+ The following geometries are supported:
 
 + `geometry=point`, defines a point on the Earth surface.
 + `geometry=line`, defines a polygonal line.
