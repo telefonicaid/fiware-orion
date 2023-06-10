@@ -205,6 +205,7 @@ User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Ngsild-Attribute-Format: Concise
 
 {
@@ -278,6 +279,7 @@ User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Ngsild-Attribute-Format: Concise
 
 {
