@@ -489,7 +489,12 @@ bool legacyGetEntities(void)
   mongoRequest.release();
 
   if (orionldState.out.contentType == GEOJSON)
-    orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree);
+    orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree,
+                                                           orionldState.uriParams.attrs,
+                                                           orionldState.uriParams.geometryProperty,
+                                                           orionldState.preferHeader,
+                                                           false,
+                                                           orionldState.contextP->url);
 
   return true;
 }

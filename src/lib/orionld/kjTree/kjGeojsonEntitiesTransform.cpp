@@ -74,7 +74,15 @@ static KjNode* geoPropertyNodeLookup(KjNode* geoPropertyNodes, KjNode* entityIdN
 //
 // kjGeojsonEntitiesTransform -
 //
-KjNode* kjGeojsonEntitiesTransform(KjNode* tree)
+KjNode* kjGeojsonEntitiesTransform
+(
+  KjNode*      tree,
+  const char*  attrs,
+  const char*  geometryProperty,
+  const char*  preferHeader,
+  bool         concise,
+  const char*  context
+)
 {
   KjNode* geojsonTreeP        = kjObject(orionldState.kjsonP, NULL);
   KjNode* geojsonTypeP        = kjString(orionldState.kjsonP, "type", "FeatureCollection");
@@ -88,22 +96,41 @@ KjNode* kjGeojsonEntitiesTransform(KjNode* tree)
   // 'attrs', then (an extra query to mongo was done by the service routine to extract the info needed)
   // the geometry-property is taken from orionldState.geoPropertyNodes
   //
-  const char* geometryProperty        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
-  bool        geometryPropertyInAttrs = false;
+  char*       geoProp                 = ((geometryProperty != NULL) && (geometryProperty[0] != 0))? (char*) geometryProperty : (char*) "location";
+  bool        geometryPropertyInAttrs = false;  // Lookup in 'attrs'
+  char*       linkHeader              = NULL;   // Need this as a parameter to this function
+  bool        linkHeaderAdded         = false;  // Need this as a parameter to this function
+
+  // FIXME: This strstr isn't 100% reliable ...
+  if (attrs != NULL)
+  {
+    if (strstr(attrs, geoProp) != NULL)
+      geometryPropertyInAttrs = true;
+  }
 
   for (KjNode* entityP = tree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
-    KjNode* geoPropertyNode = NULL;
+    KjNode* geoPropertyNode    = NULL;
+    bool    geoPropertyMissing = false;
 
-    if ((orionldState.uriParams.attrs != NULL) && (geometryPropertyInAttrs == false))
+    if ((attrs != NULL) && (geometryPropertyInAttrs == false))
     {
       KjNode* entityIdNode    = kjLookup(entityP, "id");
-      geoPropertyNode = geoPropertyNodeLookup(orionldState.geoPropertyNodes, entityIdNode, geometryProperty);
-      // if geoPropertyNode == NULL)
-      //   geoPropertyNodeReallyNotThere = true;
+      geoPropertyNode = geoPropertyNodeLookup(orionldState.geoPropertyNodes, entityIdNode, geoProp);
+      if (geoPropertyNode == NULL)
+        geoPropertyMissing = true;
     }
 
-    KjNode* geojsonEntityP  = kjGeojsonEntityTransform(entityP, geoPropertyNode);  // , geoPropertyNodeReallyNotThere
+    KjNode* geojsonEntityP = kjGeojsonEntityTransform(entityP,
+                                                      geoPropertyNode,
+                                                      linkHeader,
+                                                      preferHeader,
+                                                      geoProp,
+                                                      geoPropertyMissing,
+                                                      linkHeaderAdded,
+                                                      concise,
+                                                      context);
+
     kjChildAdd(geojsonFeatureArray, geojsonEntityP);
   }
 
