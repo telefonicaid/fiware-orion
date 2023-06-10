@@ -360,7 +360,15 @@ bool orionldGetEntity(void)
 
   if (orionldState.out.contentType == GEOJSON)
   {
-    apiEntityP = kjGeojsonEntityTransform(apiEntityP, orionldState.geoPropertyNode);
+    apiEntityP = kjGeojsonEntityTransform(apiEntityP,
+                                          orionldState.geoPropertyNode,
+                                          orionldState.link,
+                                          orionldState.preferHeader,
+                                          orionldState.uriParams.geometryProperty,
+                                          orionldState.geoPropertyMissing,
+                                          orionldState.linkHeaderAdded,
+                                          orionldState.uriParamOptions.concise,
+                                          orionldState.contextP->url);
 
     //
     // If URI params 'attrs' and 'geometryProperty' are given BUT 'geometryProperty' is not part of 'attrs', then we need to remove 'geometryProperty' from

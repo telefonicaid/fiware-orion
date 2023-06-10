@@ -146,7 +146,6 @@ User-Agent: orionld/REGEX(.*)
 REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
-Link: REGEX(.*)
 Ngsild-Attribute-Format: Normalized
 
 {
@@ -211,7 +210,6 @@ User-Agent: orionld/REGEX(.*)
 REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
-Link: REGEX(.*)
 Ngsild-Attribute-Format: Normalized
 
 {

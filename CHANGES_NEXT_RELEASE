@@ -1,3 +1,4 @@
 Fixed issues:
   #1356  New CLI param: -inReqPayloadMaxSize - to modify the maximum size of incoming payloads
   #280   Default Core Context now part of the broker - meant for airgapped setups
+  #1381  Bug in GeoJSON notifications

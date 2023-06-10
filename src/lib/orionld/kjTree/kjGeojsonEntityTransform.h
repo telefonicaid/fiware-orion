@@ -36,6 +36,16 @@ extern "C"
 //
 // kjGeojsonEntityTransform -
 //
-extern KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode);
-
+extern KjNode* kjGeojsonEntityTransform
+(
+  KjNode*      tree,
+  KjNode*      geoPropertyNode,
+  const char*  linkHeader,
+  const char*  preferHeader,
+  const char*  geometryProperty,
+  bool         geoPropertyMissing,
+  bool         linkHeaderAdded,
+  bool         concise,
+  const char*  context
+);
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJGEOJSONENTITYTRANSFORM_H_
