@@ -1,0 +1,1 @@
+- Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
