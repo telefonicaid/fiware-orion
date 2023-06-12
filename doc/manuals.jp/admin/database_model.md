@@ -49,7 +49,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 
 `location.coordsin` については、いくつかの形式を使用することができます :
 
-* ポイントを表します (geo:point で使用されるもの) :
+* ポイントを表します:
 
 ```
 {
@@ -58,7 +58,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 }
 ```
 
-* ラインを表します (geo:line で使用されているもの) :
+* ラインを表します:
 
 ```
 {
@@ -67,7 +67,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 }
 ```
 
-* ポリゴンを表します (geo:box と geo:polygon で使用されるもの) :
+* ポリゴンを表します:
 
 ```
 {
@@ -78,7 +78,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 
 * 最後に、`location.coords` は、[GeoJSON](http://www.macwright.org/2015/03/23/geojson-second-bite.html) 形式で場所を表現する任意の JSON オブジェクトを保持できます。任意の GeoJSON は geo:json 属性型で使用でき、有効なオブジェクトを導入するのはユーザの責任です。上記3つのケースは、実際には "fixed" ケースの GeoJSON 表現です。
 
-座標ペアは、[geo-location API](../orion-api.md#simple-location-format) で使用されている順序とは反対の経度－緯度順 (longitude-latitude order) を使用することに注意してください。これは内部の [MongoDB ジオロケーション実装](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/) (GeoJSON に基づいています) が経度－緯度順を使用するためです。しかし、ユーザに近い他のシステム (Google マップなど) では、緯度－経度形式 (latitude-longitude format) を使用しているため、後者を API に使用しています。
+座標ペアでは経度-緯度 (longitude-latitude) の順序が使用されますが、これは[地理的クエリ (Geographical Queries)](../orion-api.md#geographica-queries)で使用される順序とは逆であることに注意してください。これは、[MongoDB の地理位置情報の内部実装](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/) (GeoJSON に基づく) が経度-緯度 (longitude-latitude) の順序を使用するためです。 ただし、ユーザに近い他のシステム (GoogleMaps など) は緯度経度形式 (latitude-longitude format) を使用するため、Geographical Queries API には後者を使用しました。
 
 サンプルドキュメント :
 

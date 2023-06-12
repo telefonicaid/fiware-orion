@@ -406,7 +406,7 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 If `-logDeprecate` CLI setting is used (or `deprecate` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels)) the
 following WARN traces are generated:
 
-* NGSIv1 requests (both with and without payload). Nnote this doesn't
+* NGSIv1 requests (both with and without payload). Note this doesn't
   include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding
   to registrations using [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
 
@@ -414,6 +414,20 @@ following WARN traces are generated:
 time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
 time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
 ```
+
+* Usages NGSIv1 usages of location metadata. Example:
+
+```
+time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c29583ca5 | trans=1686237259-703-00000000003 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[329]:getGeoJson | msg=Deprecated usage of metadata location coords detected in attribute location at entity update, please use geo:json instead
+```
+
+* Usages of `geo:point`, `geo:line`, `geo:box` or `geo:line`.
+
+```
+time=2023-06-08T15:14:21.176Z | lvl=WARN | corr=2518249e-060f-11ee-9e76-000c29583ca5 | trans=1686237259-703-00000000004 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[353]:getGeoJson | msg=Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
+```
+
+Get more information about deprecated features and how to overcome them in the [deprecation documentation](../deprecated.md).
 
 [Top](#top)
 
