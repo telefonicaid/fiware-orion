@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-avoid_triggering_notification_if_metadata_changes_but_not_the_attribute_value_itself
+notifyOnMetadataChange false (attribute with no value variant)
 
 --SHELL-INIT--
 dbInit CB
@@ -151,28 +151,28 @@ echo
 01. POST /v2/entities, to create entity E1 with attr A1 and metadata M1
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. POST /v2/subscriptions, to create subscription for E1 with notifyOnMetadataChange=false
 ===========================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. PATCH /v2/entities/E1/attrs, to update the value of metadata (and implicitely the attribute, which takes value null)
 ========================================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -213,8 +213,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. PATCH /v2/entities/E1/attrs, to update the value of attribute
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

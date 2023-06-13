@@ -7,7 +7,8 @@
 * [サマリ・トレース](#summary-traces)
 * [ログ・ローテーション](#log-rotation)
 * [HTTP 通知トランザクションのログの例](#log-examples-for-http-notification-transactions)
-* [ログに関連するコマンドライン・オプション](#command-line-options-related-with-logs)
+* [非推奨の使用法をログに記録](#log-deprecated-usages)
+* [ログに関連するその他のオプション](#other-options-related-with-logs)
 
 <a name="log-file"></a>
 ## ログ・ファイル
@@ -146,9 +147,10 @@ time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 
 いくつかの追加の考慮事項:
 
-* `-logInfoPayloadMaxSize` 設定は、上記のトレースのペイロードが持つ可能性のある最大サイズを指定するために
-  使用されます。ペイロードがこの制限を超えると、最初の `-logInfoPayloadMaxSize` バイトのみが出力されます
-  (`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値:5キロバイト
+* `-logInfoPayloadMaxSize` CLI 設定 (または、[log admin REST API](management_api.md#log-configs-and-trace-levels)
+  の `-logInfoPayloadMaxSize` パラメータ) は、上記のトレース内のペイロードの最大サイズを指定するために使用されます。
+  ペイロードがこの制限を超える場合、最初の情報ペイロードの最大サイズのバイトのみが出力されます (そして、`(...)`
+  の形式の省略記号がトレースに表示されます)。デフォルト値: 5KB
 * ノーティフィケーションおよびフォワーディング・トレースのレスポンス・コードは、番号
   (ノーティフィケーションまたはフォワードされたリクエストの HTTP レスポンス・コードに対応)
   または接続の問題が発生した場合の文字列のいずれかになります。 例えば:
@@ -338,13 +340,46 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 
 [トップ](#top)
 
-## ログに関連するコマンドライン・オプション
+<a name="log-deprecated-usages"></a>
+## 非推奨の使用法をログに記録
 
-このドキュメントですでに説明されているもの (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-relogAlarms` and `-logSummary`) とは別に、次のコマンドライン・オプションはログに関連しています:
+`-logDeprecate` CLI 設定 (または [ログ管理 REST API](management_api.md#log-configs-and-trace-levels) の `deprecate` パラメータ)
+が使用されている場合、次の WARN トレースが生成されます:
+
+* NGSIv1 リクエスト (ペイロードありとペイロードなしの両方)。 注: これには、[`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification)
+  を使用した通知や、[`"legacyForwarding": true`](../orion-api.md#registrationprovider)
+  を使用したレジストレーションに対応する転送リクエストは含まれないことに注意してください)。例えば：
+
+```
+time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
+time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
+```
+
+* 位置メタデータの NGSIv1 での使用。例：
+
+```
+time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c29583ca5 | trans=1686237259-703-00000000003 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[329]:getGeoJson | msg=Deprecated usage of metadata location coords detected in attribute location at entity update, please use geo:json instead
+```
+
+* `geo:point`, `geo:line`, `geo:box` また `geo:line` の使用
+
+```
+time=2023-06-08T15:14:21.176Z | lvl=WARN | corr=2518249e-060f-11ee-9e76-000c29583ca5 | trans=1686237259-703-00000000004 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[353]:getGeoJson | msg=Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
+```
+
+非推奨の機能とその解決方法の詳細については、[非推奨ドキュメント](../deprecated.md) を参照してください。
+
+[トップ](#top)
+
+<a name="other-options-related-with-logs"></a>
+## ログに関連するその他のオプション
+
+このドキュメントですでに説明されているもの (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-logDeprecate`, `-relogAlarms` および `-logSummary`) とは別に、次のコマンドライン・オプションはログに関連しています:
 
 * `-logForHumans`
-* `-logLineMaxSize`
+* `-logLineMaxSize` (または [ログ管理 REST API](management_api.md#log-configs-and-trace-levels) の `lineMaxSize` パラメータ)
 
 詳細については、[コマンドライン・オプションのドキュメント](cli.md)を参照してください。
 
 [トップ](#top)
+

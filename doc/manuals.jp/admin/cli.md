@@ -107,8 +107,12 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-logLineMaxSize** : ログ行の最大長 (超過すると、Orion は `LINE TOO LONG` をログ・トレースとして出力します)。最小許容値:100バイト。デフォルト値:32キロバイト。Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) の `lineMaxSize` フィールドで変更できます
 -   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト。Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) で `infoPayloadMaxSize` フィールドを使用して変更できます。
 -   **-disableMetrics** : 'metrics' 機能をオフにします。メトリックの収集は、システムコールやセマフォが関与するため、少しコストがかかります。メトリックオーバーヘッドなしで broker を起動するには、このパラメータを使用します
+-   **-disableNgsiv1** : NGSIv1 操作をオフにします。 API エンドポイントのみが無効になることに注意してください。
+    [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) を使用する通知や、
+    [`"legacyForwarding": true`](../orion-api.md#registrationprovider) を使用するレジストレーションに対応するリクエスト転送は機能します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
 -   **-mqttMaxAge** : 未使用の MQTT 接続が保持される最大時間 (分単位)。デフォルト値: 60
+-   **-logDeprecate** : 非推奨の使用法を警告として記録します。詳細については、[ドキュメントのこのセクション](../deprecated.md#log-deprecation-warnings) を参照してください。デフォルトは false です。これは、Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) を使用して `deprecated` フィールドを使用して変更できます
 
 ## 環境変数を使用した設定
 
@@ -182,6 +186,7 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_LOG_LINE_MAX_SIZE |   logLineMaxSize  |
 |   ORION_LOG_INFO_PAYLOAD_MAX_SIZE | logInfoPayloadMaxSize |
 |   ORION_DISABLE_METRICS   |   disableMetrics  |
+|   ORION_DISABLE_NGSIV1    |   disableNgsiv1   |
 |   ORION_INSECURE_NOTIF    |   insecureNotif   |
 |   ORION_NGSIV1_AUTOCAST   |   ngsiv1Autocast  |
 |   ORION_MQTT_MAX_AGE      |  mqttMaxAge  |

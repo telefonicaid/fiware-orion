@@ -78,6 +78,8 @@ bool          disableCusNotif      = false;
 unsigned long logInfoPayloadMaxSize = 5 * 1024;
 unsigned long logLineMaxSize        = 32 * 1024;
 
+bool          logDeprecate = false;
+
 char          dbHost[256];
 char          rplSet[64];
 char          dbName[64];

@@ -317,12 +317,13 @@ echo
 01. GET initial log config
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
     "lineMaxSize": 32768
@@ -332,10 +333,10 @@ Date: REGEX(.*)
 02. PUT /admin/log and see error
 ================================
 HTTP/1.1 400 Bad Request
-Content-Length: 30
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 30
 
 {
     "error": "log config missing"
@@ -345,12 +346,13 @@ Date: REGEX(.*)
 03. GET log config, see initial log config
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
     "lineMaxSize": 32768
@@ -360,21 +362,22 @@ Date: REGEX(.*)
 04. PUT /admin/log?level=ERROR and see it work
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 05. GET log config, see level=ERROR
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "ERROR",
     "lineMaxSize": 32768
@@ -384,10 +387,10 @@ Date: REGEX(.*)
 06. PUT /admin/log?level=xyz and see error
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 29
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 29
 
 {
     "error": "invalid log level"
@@ -397,12 +400,13 @@ Date: REGEX(.*)
 07. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "ERROR",
     "lineMaxSize": 32768
@@ -412,21 +416,22 @@ Date: REGEX(.*)
 08. PUT /admin/log?level=INFO and see it work
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 09. GET log config, see level=INFO
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -436,21 +441,22 @@ Date: REGEX(.*)
 10. PUT /admin/log?infoPayloadMaxSize=5000 and see it work
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 11. GET log config, see infoPayloadMaxSize=5000
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5000,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -460,10 +466,10 @@ Date: REGEX(.*)
 12. PUT /admin/log?infoPayloadMaxSize= and see error
 ====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
 
 {
     "error": "Empty right-hand-side for URI param /infoPayloadMaxSize/"
@@ -473,12 +479,13 @@ Date: REGEX(.*)
 13. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5000,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -488,10 +495,10 @@ Date: REGEX(.*)
 14. PUT /admin/log?infoPayloadMaxSize=-2000 and see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 90
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 90
 
 {
     "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
@@ -501,12 +508,13 @@ Date: REGEX(.*)
 15. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5000,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -516,10 +524,10 @@ Date: REGEX(.*)
 16. PUT /admin/log?infoPayloadMaxSize=3.1416 and see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 90
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 90
 
 {
     "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
@@ -529,12 +537,13 @@ Date: REGEX(.*)
 17. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5000,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -544,10 +553,10 @@ Date: REGEX(.*)
 18. PUT /admin/log?infoPayloadMaxSize=nonumber and see error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 90
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 90
 
 {
     "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
@@ -557,12 +566,13 @@ Date: REGEX(.*)
 19. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5000,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -572,21 +582,22 @@ Date: REGEX(.*)
 20. PUT /admin/log?infoPayloadMaxSize=100000 and see it work
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 21. GET log config, see infoPayloadMaxSize=100000
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 100000,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -596,21 +607,22 @@ Date: REGEX(.*)
 22. PUT /admin/log?lineMaxSize=32000 and see it work
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 23. GET log config, see lineMaxSize=32000
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 100000,
     "level": "INFO",
     "lineMaxSize": 32000
@@ -620,10 +632,10 @@ Date: REGEX(.*)
 24. PUT /admin/log?lineMaxSize= and see error
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 61
 
 {
     "error": "Empty right-hand-side for URI param /lineMaxSize/"
@@ -633,12 +645,13 @@ Date: REGEX(.*)
 25. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 100000,
     "level": "INFO",
     "lineMaxSize": 32000
@@ -648,10 +661,10 @@ Date: REGEX(.*)
 26. PUT /admin/log?lineMaxSize=-30000 and see error
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
@@ -661,12 +674,13 @@ Date: REGEX(.*)
 27. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 100000,
     "level": "INFO",
     "lineMaxSize": 32000
@@ -676,10 +690,10 @@ Date: REGEX(.*)
 28. PUT /admin/log?lineMaxSize=3.1416 and see error
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
@@ -689,12 +703,13 @@ Date: REGEX(.*)
 29. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 100000,
     "level": "INFO",
     "lineMaxSize": 32000
@@ -704,10 +719,10 @@ Date: REGEX(.*)
 30. PUT /admin/log?lineMaxSize=nonumber and see error
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
@@ -717,12 +732,13 @@ Date: REGEX(.*)
 31. GET log config, see previous data
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 100000,
     "level": "INFO",
     "lineMaxSize": 32000
@@ -732,21 +748,22 @@ Date: REGEX(.*)
 32. PUT /admin/log?lineMaxSize=400000 and see it work
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 33. GET log config, see lineMaxSize=400000
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 89
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 119
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 100000,
     "level": "INFO",
     "lineMaxSize": 400000

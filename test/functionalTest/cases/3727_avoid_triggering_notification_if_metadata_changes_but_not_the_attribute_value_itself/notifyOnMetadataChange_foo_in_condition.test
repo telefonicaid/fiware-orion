@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-notfiyOnMetadataChange errors
+notifyOnMetadataChange errors
 
 --SHELL-INIT--
 dbInit CB
@@ -71,10 +71,10 @@ echo
 01. POST /v2/subscriptions, to create subscription for E3 with notifyOnMetadataChange=foo and see error
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "notifyOnMetadataChange is not a bool",

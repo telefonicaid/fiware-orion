@@ -243,104 +243,104 @@ echo
 01. Register entities of type T1, with ID .*, and attribute A1, for CP1
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Register entities of type T1, with ID .*, and attribute A2, for CP2
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Register entities of type T1, with ID .*, and attribute A3, for CP3
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 04. Create E4/T1 with attribute A1='untouched' in CP1
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T1
+Content-Length: 0
 
 
 
 05. Create E5/T1 with attribute A2='untouched' in CP2
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E5?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=T1
+Content-Length: 0
 
 
 
 06. Create E6/T1 with attribute A3='untouched' in CP3
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E6?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E6?type=T1
+Content-Length: 0
 
 
 
 07. Create E7/T1 with attribute A4='untouched' in CP3
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E7?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E7?type=T1
+Content-Length: 0
 
 
 
 08. Update entities E4 of type T1, setting A1 to 'updated-4'
 ============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. Update entities E5 of type T1, setting A2 to 'updated-5'
 ============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Update entities E6 of type T1, setting A3 to 'updated-6'
 ============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 11. Query CP1, see E4/A1 == 'updated-4'
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 [
     {
@@ -358,10 +358,10 @@ Date: REGEX(.*)
 12. Query CP2, see E5/A2 == 'updated-5'
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 [
     {
@@ -379,10 +379,10 @@ Date: REGEX(.*)
 13. Query CP3, see E6/A3 == 'updated-6' and E7/A4 == 'untouched'
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 159
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 159
 
 [
     {

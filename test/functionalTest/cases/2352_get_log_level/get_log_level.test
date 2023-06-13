@@ -76,12 +76,13 @@ echo
 01. GET initial log-config (level=DEBUG)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
     "lineMaxSize": 32768
@@ -91,21 +92,22 @@ Date: REGEX(.*)
 02. Change log level to INFO
 ============================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 03. GET log-config (level=INFO)
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "INFO",
     "lineMaxSize": 32768
@@ -115,21 +117,22 @@ Date: REGEX(.*)
 04. Change log level to 'error'
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 05. GET log-config (level=ERROR)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
+    "deprecate": false,
     "infoPayloadMaxSize": 5120,
     "level": "ERROR",
     "lineMaxSize": 32768

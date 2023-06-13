@@ -1,0 +1,229 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update attribute type
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create E with A/T/V
+# 02. Subscribe to changes of A in E
+# 03. Update only attribute type, i.e. A/T2/V
+# 04. Do update without actually updating anything, i.e. A/T2/V
+# 05. Check that 1 notification arrived (the one due to step 3)
+#
+
+echo "01. Create E with A/T/V"
+echo "======================="
+payload='{
+  "attributes" : [
+    {
+      "name" : "A",
+      "type" : "T",
+      "value" : "V"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/TEnt/id/E --payload "${payload}"
+echo
+echo
+
+
+echo "02. Subscribe to changes of A in E"
+echo "=================================="
+payload='{
+  "entities": [
+    {
+        "type": "TEnt",
+        "isPattern": "false",
+        "id": "E"
+    }
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "P1M",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A"
+        ]
+    }
+  ]
+}
+'
+orionCurl --url /v1/subscribeContext --payload "${payload}"
+echo
+echo
+
+
+echo "03. Update only attribute type, i.e. A/T2/V"
+echo "==========================================="
+payload='{
+   "type" : "T2",
+   "value" : "V"
+}'
+orionCurl --url /v1/contextEntities/type/TEnt/id/E/attributes/A --payload "${payload}" -X PUT
+echo
+echo
+
+
+echo "04. Do update without actually updating anything, i.e. A/T2/V"
+echo "============================================================="
+payload='{
+   "type" : "T2",
+   "value" : "V"
+}'
+orionCurl --url /v1/contextEntities/type/TEnt/id/E/attributes/A --payload "${payload}" -X PUT
+echo
+echo
+
+
+echo "05. Check that 1 notification arrived (the one due to step 3)"
+echo "============================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E with A/T/V
+=======================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 165
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A",
+                    "type": "T",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E",
+    "isPattern": "false",
+    "type": "TEnt"
+}
+
+
+02. Subscribe to changes of A in E
+==================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+03. Update only attribute type, i.e. A/T2/V
+===========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+04. Do update without actually updating anything, i.e. A/T2/V
+=============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
+
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
+
+
+05. Check that 1 notification arrived (the one due to step 3)
+=============================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 255
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "T2",
+                        "value": "V"
+                    }
+                ],
+                "id": "E",
+                "isPattern": "false",
+                "type": "TEnt"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

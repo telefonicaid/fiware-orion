@@ -151,20 +151,20 @@ echo
 01. Create E1 with attr1
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. Get E1 (only attr1)
 =======================
 HTTP/1.1 200 OK
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "attr1": {
@@ -180,10 +180,10 @@ Date: REGEX(.*)
 03. v1 APPEND_STRICT with attr2 -> OK
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 {
     "contextResponses": [
@@ -212,10 +212,10 @@ Date: REGEX(.*)
 04. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 123
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 123
 
 {
     "attr1": {
@@ -236,10 +236,10 @@ Date: REGEX(.*)
 05. v1 APPEND_STRICT with attr2 -> fails
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 224
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 224
 
 {
     "contextResponses": [
@@ -262,10 +262,10 @@ Date: REGEX(.*)
 06. Get E1 (attr1, attr2)
 =========================
 HTTP/1.1 200 OK
-Content-Length: 123
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 123
 
 {
     "attr1": {
@@ -286,10 +286,10 @@ Date: REGEX(.*)
 07. v1 APPEND_STRICT with attr2, attrs3 -> fails, but attr3 is added
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 388
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 388
 
 {
     "contextResponses": [
@@ -330,10 +330,10 @@ Date: REGEX(.*)
 08. Get E1 (attr1, attr2, attr3)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 173
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 173
 
 {
     "attr1": {

@@ -212,10 +212,10 @@ echo
 01. Create custom subscription with payload and ngsi field, see error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 133
 
 {
     "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
@@ -226,10 +226,10 @@ Date: REGEX(.*)
 02. Create custom subscription with json and ngsi field, see error
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 133
 
 {
     "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
@@ -240,10 +240,10 @@ Date: REGEX(.*)
 03. Create custom subscription with ngsi field with metadata, see error
 =======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 101
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 101
 
 {
     "description": "metadata are not allowed in ngsi field in custom notifications",
@@ -254,10 +254,10 @@ Date: REGEX(.*)
 04. Create custom subscription with ngsi field with invalidad id, see error
 ===========================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "Invalid JSON type for entity id",
@@ -268,10 +268,10 @@ Date: REGEX(.*)
 05. Create custom subscription with ngsi field with invalidad type, see error
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
 
 {
     "description": "Invalid JSON type for entity type",
@@ -282,10 +282,10 @@ Date: REGEX(.*)
 06. Create custom subscription with ngsi field with invalidad attribute, see error
 ==================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "invalid JSON type for attribute type",

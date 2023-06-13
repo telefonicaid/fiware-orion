@@ -114,20 +114,20 @@ echo
 01. Create entity E1 with attribute A1=1, having a metadata M1=1, and A2=a_string, having a metadata M2=m_string
 ================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. List entities with q=A2~=st, see E1
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 233
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 233
 
 [
     {
@@ -164,10 +164,10 @@ Date: REGEX(.*)
 03. List entities with q=A2~=st;A1==1, see E1
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 233
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 233
 
 [
     {
@@ -204,10 +204,10 @@ Date: REGEX(.*)
 04. List entities with q=A2~=st;A1==2, see nothing
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -215,10 +215,10 @@ Date: REGEX(.*)
 05. List entities with mq=A2.M1~=st, see E1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 233
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 233
 
 [
     {
@@ -255,10 +255,10 @@ Date: REGEX(.*)
 06. List entities with mq=A2.M1~=st;A2.M2==2, see E1
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 233
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 233
 
 [
     {
@@ -295,10 +295,10 @@ Date: REGEX(.*)
 07. List entities with mq=A2.M1~=st;A2.M2==1, see nothing
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

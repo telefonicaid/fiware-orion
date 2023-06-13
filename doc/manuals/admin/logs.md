@@ -7,7 +7,8 @@
 * [Summary traces](#summary-traces)
 * [Log rotation](#log-rotation)
 * [Log examples for HTTP notification transactions](#log-examples-for-http-notification-transactions)
-* [Command line options related with logs](#command-line-options-related-with-logs)
+* [Log deprecated usages](#log-deprecated-usages)
+* [Other options related with logs](#other-options-related-with-logs)
 
 ## Log file
 
@@ -190,8 +191,9 @@ time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 
 Some additional considerations:
 
-* The `-logInfoPayloadMaxSize` setting is used to specify the maximum size that the payloads in the
-  above traces may have. If the payload overpasses this limit, then only the first `-logInfoPayloadMaxSize`
+* The `-logInfoPayloadMaxSize` CLI setting (or `infoPayloadMaxSize` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels))
+  is used to specify the maximum size that the payloads in the
+  above traces may have. If the payload overpasses this limit, then only the first info payload max size
   bytes are printed (and an ellipsis in the form of `(...)` is shown in traces). Default value: 5 Kbytes.
 * The response code in notifications and forwarding traces can be either a number (corresponding to the
   HTTP response code of the notification or forwarded request) or a string when some connectivity problem
@@ -398,12 +400,44 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 
 [Top](#top)
 
-## Command line options related with logs
 
-Apart from the ones already described in this document (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-relogAlarms` and `-logSummary`), the following command line options are related with logs:
+## Log deprecated usages
+
+If `-logDeprecate` CLI setting is used (or `deprecate` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels)) the
+following WARN traces are generated:
+
+* NGSIv1 requests (both with and without payload). Note this doesn't
+  include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding
+  to registrations using [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
+
+```
+time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
+time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
+```
+
+* Usages NGSIv1 usages of location metadata. Example:
+
+```
+time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c29583ca5 | trans=1686237259-703-00000000003 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[329]:getGeoJson | msg=Deprecated usage of metadata location coords detected in attribute location at entity update, please use geo:json instead
+```
+
+* Usages of `geo:point`, `geo:line`, `geo:box` or `geo:line`.
+
+```
+time=2023-06-08T15:14:21.176Z | lvl=WARN | corr=2518249e-060f-11ee-9e76-000c29583ca5 | trans=1686237259-703-00000000004 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[353]:getGeoJson | msg=Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
+```
+
+Get more information about deprecated features and how to overcome them in the [deprecation documentation](../deprecated.md).
+
+[Top](#top)
+
+
+## Other options related with logs
+
+Apart from the ones already described in this document (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-logDeprecate`, `-relogAlarms` and `-logSummary`), the following command line options are related with logs:
 
 * `-logForHumans`
-* `-logLineMaxSize`
+* `-logLineMaxSize` (or `lineMaxSize` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels))
 
 Please have a look to the [command line options documentation](cli.md) for more information about them.
 

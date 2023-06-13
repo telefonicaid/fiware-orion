@@ -38,9 +38,9 @@ echo
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 129
-Content-Type: application/xml
 Date: REGEX(.*)
+Content-Type: application/xml
+Content-Length: 129
 
 <?xml version="1.0"?>
 <orionError>
@@ -51,9 +51,9 @@ Date: REGEX(.*)
 
 2: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 146
-Content-Type: application/xml
 Date: REGEX(.*)
+Content-Type: application/xml
+Content-Length: 146
 
 <?xml version="1.0"?>
 <orionError>

@@ -53,10 +53,10 @@ echo
 01. Try to create an entity with more than one service path - see error
 =======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 {
     "description": "more than one service path in context update request",
@@ -67,10 +67,10 @@ Date: REGEX(.*)
 02. Make sure the entity hasn't been created
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

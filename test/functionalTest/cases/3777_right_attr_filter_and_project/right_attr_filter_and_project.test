@@ -117,30 +117,30 @@ echo
 01. Create entity E1 with attributes A, B
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create entity E2 with attributes A, C
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. GET /v2/entities?q=C, gets E2 attrs A and C
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 118
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
 
 [
     {
@@ -163,10 +163,10 @@ Date: REGEX(.*)
 04. GET /v2/entities?attrs=C, gets E1 without attributes and E2 with attr C
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 94
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 94
 
 [
     {
@@ -188,10 +188,10 @@ Date: REGEX(.*)
 05. GET /v2/entities?q=C&attrs=A, get E2 attr A
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 [
     {
@@ -209,10 +209,10 @@ Date: REGEX(.*)
 06. GET /v2/entities?q=foo, get no entity
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -220,10 +220,10 @@ Date: REGEX(.*)
 07. GET /v2/entities?attrs=foo, get both entities without attributes
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 47
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 47
 
 [
     {

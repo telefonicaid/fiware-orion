@@ -93,10 +93,10 @@ echo
 01. Create entity with geo:point
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/line1?type=bus
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/line1?type=bus
+Content-Length: 0
 
 
 
@@ -108,10 +108,10 @@ Date: REGEX(.*)
 03. Update entity using v1 updateContext APPEND
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 197
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 197
 
 {
     "contextResponses": [

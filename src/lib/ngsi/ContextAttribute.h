@@ -122,7 +122,7 @@ public:
   std::string  getName(void);
 
   /* Used to render attribute value to BSON */
-  void valueBson(const std::string&      valueKey,
+  bool valueBson(const std::string&      valueKey,
                  orion::BSONObjBuilder*  bsonAttr,
                  const std::string&      attrType,
                  bool                    autocast,
@@ -146,6 +146,10 @@ private:
 
   bool hasIgnoreType(void) const;
 
+  bool calculateOperator(const std::string&         valueKey,
+                         orion::CompoundValueNode*  upOp,
+                         orion::BSONObjBuilder*     bsonAttr,
+                         bool                       strings2numbers) const;
 
 } ContextAttribute;
 

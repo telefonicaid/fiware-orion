@@ -31,7 +31,6 @@
     - [組み込み名に一致するユーザ属性またはメタデータ (User attributes or metadata matching builtin name)](#user-attributes-or-metadata-matching-builtin-name)
     - [Datetime サポート](#datetime-support)
     - [エンティティの地理空間プロパティ (Geospatial properties of entities)](#geospatial-properties-of-entities)
-        - [シンプル・ロケーション・フォーマット (Simple Location Format)](#simple-location-format)
         - [GeoJSON](#geojson)
     - [シンプル・クエリ言語 (Simple Query Language)](#simple-query-language)
     - [地理的クエリ (Geographical Queries)](#geographical-queries)
@@ -50,8 +49,7 @@
             - [`$unset`](#unset)
             - [`$set` と `$unset` の組み合わせ](#combining-set-and-unset)
         - [Orion が演算子を処理する方法](#how-orion-deals-with-operators)
-        - [現在の制限](#current-limitations)
-            - [エンティティの作成または置換](#create-or-replace-entities)
+        - [エンティティの作成または置換操作での使用法](#usage-in-create-or-replace-entity-operations)
     - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
     - [メタデータ更新のセマンティクス (Metadata update semantics)](#metadata-update-semantics)
       - [`overrideMetadata` オプション](#overridemetadata-option)
@@ -602,7 +600,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   `DateTime`: ISO8601 形式で日付を識別します。これらの属性は、クエリ演算子の greater-than, less-than,
     greater-or-equal, less-or-equal および range で使用できます。詳細については、このドキュメントの
     [Datetime サポート](#datetime-support)のセクションを確認してください
--   `geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`。それらには、エンティティの場所に関連する特別な
+-   `geo:json`。それには、エンティティの場所に関連する特別な
     セマンティクスがあります。`null` 値を持つ属性は地理クエリでは考慮されず、エンティティごとに1つの地理空間属性の制限に
     カウントされません。[エンティティの地理空間プロパティ](#geospatial-properties-of-entities)のセクションを
     参照してください
@@ -666,7 +664,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
     無視します。Orion は一般的に属性タイプを無視するため、このメタデータはほとんどの場合必要ありませんが、属性タイプが
     Orion の特別なセマンティックを持つ 2 つのケースがあることに注意してください:
     -   `DateTime`
-    -   Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`)
+    -   `geo:json`
 
 現時点では、'ignoreType' は地理位置情報タイプに対してのみサポートされており、この方法により、エンティティごとに1つの
 地理位置情報のみという制限を克服するメカニズムが可能になります
@@ -833,9 +831,8 @@ Orion は常に `YYYY-MM-DDThh:mm:ss.sssZ` の形式を使用して日時属性/
 コンテキストのエンティティの地理空間プロパティは、通常のコンテキスト属性を用いて表すことができます。地理空間的
 プロパティの提供は、地理的クエリの解決を可能にします。
 
-Orion では 2 つの異なる構文がサポートされています:
+Orion では、次の構文がサポートされています:
 
--   *Simple Location Format*。これは、開発者とユーザが既存のエンティティに素早く簡単に追加できる、非常に軽量な形式です
 -   *GeoJSON*。[GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) は、JSON (JavaScript Object Notation) に
     基づく地理空間データ交換フォーマットです。GeoJSON は、より高度な柔軟性を提供し、ポイント高度またはより複雑な
     地理空間形状、たとえば、
@@ -890,64 +887,6 @@ Orion は、バックエンド・データベースによって課されるリ�
 追加の場所 (locations) がこのように定義されている場合、地理クエリの解決に使用される場所は、`ignoreType` が `true`
 メタデータに設定されていない場所であることを考慮してください (上記の例では `location` 属性)。`ignoreType` を `true`
 に設定して定義されたすべての場所は Orion によって無視され、この意味で地理クエリには影響しません。
-
-<a name="simple-location-format"></a>
-
-### シンプル・ロケーション・フォーマット (Simple Location Format)
-
-シンプル・ロケーション・フォーマットは、基本的なジオメトリ (*point*, *line*, *box*, *polygon*) をサポートし、
-地理的位置をエンコードする際の典型的な使用例をカバーしています。[GeoRSS Simple](http://www.georss.org/simple.html)
-に触発されています。
-
-シンプル・ロケーション・フォーマットは、地球表面上の複雑な位置を表すことを意図していないことに注目してください。
-たとえば、高度座標を取得する必要のあるアプリケーションでは、GeoJSON をそのエンティティの地理空間プロパティの表現形式
-として使用する必要があります。
-
-シンプル・ロケーション・フォーマットでエンコードされたロケーションを表すコンテキスト属性は、次の構文に準拠している必要が
-あります:
-
--   属性型は、(`geo:point`, `geo:line`, `geo:box`, `geo:polygon`) のいずれかの値でなければなりません
--   属性値は座標のリストでなければなりません。既定では、座標は、
-    [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-    [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) 座標リファレンス・システム (CRS) を使用して定義され、
-    緯度と経度の単位は小数です。このような座標リストは、`type` 属性で指定されたジオメトリをエンコードすることを可能に
-    し、以下で定義される特定の規則に従ってエンコードされます:
-    -   `geo:point` 型: 属性値には有効な緯度経度のペアをカンマで区切った文字列を含める必要があります
-    -   `geo:line` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも2つのペアが必要です
-    -   `geo:polygon` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも4つのペアが存在
-        しなければならず、最後のペアは最初のものと同一であるため、ポリゴンには最低 3つの実際のポイントがあります。
-        ポリゴンを構成する線分が定義された領域の外縁に残るように、座標ペアを適切に順序付けする必要があります。たとえば、
-        次のパス ```[0,0], [0,2], [2,0], [2, 2]``` は無効なポリゴン定義の例です。Orion は、入力データが前者の条件を
-        満たさない場合にエラーを発生させる必要があります
-    -   `geo:box` 型: バウンディング・ボックスは矩形領域であり、地図の範囲や関心のある大まかな領域を定義するためによく
-        使用されます。ボックスは、緯度経度ペアの2つの長さの文字列配列によって表現されます。最初のペアは下のコーナー、
-        2番目のペアは上のコーナーです
-
-注: [この文献](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)で、
-実装のさまざまな欠点を説明しているように、サークル・ジオメトリはサポートされていません。
-
-以下の例は、参照される構文を示しています:
-
-```
-{
-  "location": {
-    "value": "41.3763726, 2.186447514",
-    "type": "geo:point"
-  }
-}
-```
-
-```
-{
-  "location": {
-    "value": [
-      "40.63913831188419, -8.653321266174316",
-      "40.63881265804603, -8.653149604797363"
-    ],
-    "type": "geo:box"
-  }
-}
-```
 
 <a name="geojson"></a>
 
@@ -1134,8 +1073,8 @@ color を一致させます。また、`q=title=='20'` は文字列 "20" にマ�
 -   `georel=disjoint`。一致するエンティティは、リファレンス・参照ジオメトリと**交差しない**エンティティであることを
     示します
 
-`geometry` はクエリを解決する際に使われるリファレンス・シェイプを定義することを可能にします。次のジオメトリ (シンプル・
-ロケーション・フォーマットを参照) をサポートする必要があります。
+`geometry` はクエリを解決する際に使われるリファレンス・シェイプを定義することを可能にします。次のジオメトリ
+をサポートします:
 
 -   `geometry=point` は、地球表面上の点を定義します
 -   `geometry=line` は、折れ線を定義します
@@ -1171,7 +1110,7 @@ Orion が地理的なクエリを解決できない場合、レスポンスの H
 地理的クエリを解決する際には、シンプル・クエリ言語を介して、API 実装は、マッチング目的で使用される地理的位置を含む
 エンティティ属性を決定する責任があります。この目的のために、以下の規則を遵守しなければなりません。
 
--   エンティティに、GeoJSON または、シンプル・ロケーション・フォーマットとしてエンコードされた場所に対応する属性がない
+-   エンティティに、GeoJSON としてエンコードされた場所に対応する属性がない
     場合、そのようなエンティティは地理空間プロパティを宣言せず、地理的なクエリに一致しません
 -   エンティティがロケーションに対応する1つの属性のみを公開する場合、そのような属性は地理的クエリを解決する際に使用
     されます
@@ -1588,46 +1527,18 @@ PUT /v2/entities/E/attrs/A
 "1つの演算子のみを使用する" ルールの唯一の例外は、[上記のように](#combining-set-and-unset)、
 一緒に使用できる `$set` と `$unset` の場合です。
 
-<a name="current-limitations"></a>
+<a name="usage-in-create-or-replace-entity-operations"></a>
 
-### 現在の制限
+### エンティティの作成または置換操作での使用法
 
-<a name="create-or-replace-entities"></a>
+更新演算子は、エンティティの作成または置換操作で使用できます。特に:
 
-#### エンティティの作成または置換
-
-更新演算子は、エンティティの作成または置換操作では使用できません。たとえば、この方法で
-エンティティを作成する場合:
-
-```
-POST /v2/entities
-{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-作成されたばかりのエンティティの属性Aは、(文字通り) 次の JSON オブジェクトを値として持ちます
-: `{ "$inc": 2 }`
-
-ただし、既存のエンティティに新しい属性を追加する場合は機能することに注意してください。
-たとえば、属性AとBを持つエンティティEがすでにあり、この方法でCを追加する場合:
-
-```
-POST /v2/entities/E/attrs
-{
-  "C": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-Cは値 `2` で作成されます。
+* 数値演算子は 0 を基準とします。たとえば、`{"$inc": 4}` の結果は 4、`{$mul: 1000}` の結果は 0 になります
+* `$set` は空のオブジェクト (`{}`) を参照として受け取ります。たとえば、`"$set": {"X": 1}` は単に `{"X": 1}` になります
+* `$push` と `$addToSet` は空の配列 (`[]`) を参照として受け取ります。たとえば、`{"$push": 4}` は `[ 4 ]` になります
+* `$pull`、`$pullAll`、および `$unset` は無視されます。これは、演算子が使用される属性がエンティティ内に作成されないことを意味します。
+   たとえば、2つの属性を持つエンティティを作成すると、最初の属性には演算子 `"A": {"value": {"$unset": 1}, ... }"` が含まれ、2番目の属性には
+  `"B" が含まれます。 {"value": 3, ...}` (通常のもの) は、属性 `B` を1つだけ持つエンティティになります
 
 <a name="filtering-out-attributes-and-metadata"></a>
 
@@ -2793,8 +2704,11 @@ _**リクエスト・ペイロード**_
     "value": 60
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84"
@@ -2891,8 +2805,11 @@ _**レスポンス・ペイロード**_
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
@@ -2972,8 +2889,11 @@ _**レスポンス・ペイロード**_
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",

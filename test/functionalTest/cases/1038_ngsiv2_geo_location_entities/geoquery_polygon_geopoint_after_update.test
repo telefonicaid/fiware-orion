@@ -153,58 +153,58 @@ echo
 01. Create and update Point A
 =============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A?type=Point
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A?type=Point
+Content-Length: 0
 
 
 
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 02. Create and update Point B
 =============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/B?type=Point
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/B?type=Point
+Content-Length: 0
 
 
 
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. Create and update Point C
 =============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/C?type=Point
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/C?type=Point
+Content-Length: 0
 
 
 
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Rectangle in: A, B
 ======================
 HTTP/1.1 200 OK
-Content-Length: 175
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 175
 
 [
     {
@@ -231,10 +231,10 @@ Date: REGEX(.*)
 05. Rectangle in: B, C
 ======================
 HTTP/1.1 200 OK
-Content-Length: 175
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 175
 
 [
     {
@@ -261,10 +261,10 @@ Date: REGEX(.*)
 06. Triangle in: A
 ==================
 HTTP/1.1 200 OK
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
 
 [
     {
@@ -282,10 +282,10 @@ Date: REGEX(.*)
 07. Rectangle out: A
 ====================
 HTTP/1.1 200 OK
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
 
 [
     {
@@ -303,10 +303,10 @@ Date: REGEX(.*)
 08. Triangle out: B, C
 ======================
 HTTP/1.1 200 OK
-Content-Length: 175
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 175
 
 [
     {

@@ -196,10 +196,10 @@ echo
 01. Update/APPEND E1 with attributes d.o.t=1 and normal=2
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 237
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 237
 
 {
     "contextResponses": [
@@ -233,10 +233,10 @@ Date: REGEX(.*)
 02. Query E1 gets d.o.t=1 and normal=2
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 239
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 239
 
 {
     "contextResponses": [
@@ -270,10 +270,10 @@ Date: REGEX(.*)
 03. Update/UPDATE E1 attribute d.o.t=10
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 192
 
 {
     "contextResponses": [
@@ -302,10 +302,10 @@ Date: REGEX(.*)
 04. Query E1 gets d.o.t=10 and normal=2
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 240
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 240
 
 {
     "contextResponses": [
@@ -339,10 +339,10 @@ Date: REGEX(.*)
 05. Update/APPEND E1 attribute d.o.t.bis=3
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 196
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 196
 
 {
     "contextResponses": [
@@ -371,10 +371,10 @@ Date: REGEX(.*)
 06. Query E1 gets d.o.t=10, normal=2, d.o.t.bis=3
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 289
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 289
 
 {
     "contextResponses": [
@@ -413,10 +413,10 @@ Date: REGEX(.*)
 07. Update/DELETE E1 attribute d.o.t
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 192
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 192
 
 {
     "contextResponses": [
@@ -445,10 +445,10 @@ Date: REGEX(.*)
 08. Query E1 gets normal=2, d.o.t.bis=3
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 243
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 243
 
 {
     "contextResponses": [

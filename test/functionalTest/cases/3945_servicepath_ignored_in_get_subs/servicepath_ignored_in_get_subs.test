@@ -108,30 +108,30 @@ echo
 01. Create sub1 in service path /foo
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Create sub2 in service path /foo
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions in service path /foo, get sub1
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 315
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 315
 
 [
     {
@@ -165,10 +165,10 @@ Date: REGEX(.*)
 04. GET /v2/subscriptions/sub1 in service path /foo, get sub1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 313
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 313
 
 {
     "description": "Sub1",
@@ -200,10 +200,10 @@ Date: REGEX(.*)
 05. GET /v2/subscriptions/sub2 in service path /foo, get nothing
 ================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "The requested subscription has not been found. Check id",

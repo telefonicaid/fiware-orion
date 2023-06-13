@@ -115,11 +115,11 @@ echo
 01. POST /admin/log and see error 'method not allowed'
 ======================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 63
-Content-Type: application/json
-Allow: PUT
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: PUT
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "method not allowed",
@@ -130,10 +130,10 @@ Date: REGEX(.*)
 02. PUT /admin/log and see error 'log config missing'
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 30
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 30
 
 {
     "error": "log config missing"
@@ -143,10 +143,10 @@ Date: REGEX(.*)
 03. PUT /admin/log?level= and see error 'Empty right-hand-side for URI param'
 =============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 55
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 55
 
 {
     "error": "Empty right-hand-side for URI param /level/"
@@ -156,10 +156,10 @@ Date: REGEX(.*)
 04. PUT /admin/log?level=notValid and see error 'invalid log level'
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 29
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 29
 
 {
     "error": "invalid log level"
@@ -169,54 +169,54 @@ Date: REGEX(.*)
 05. PUT /admin/log?level=ERROR and see it work
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 06. PUT /admin/log?level=Info and see it work
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 07. PUT /admin/log?level=warn and see it work
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 08. PUT /admin/log?level=wArNiNg and see it work
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 09. PUT /admin/log?level=Fatal and see it work
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 
 10. PUT /admin/log?level=DEBUG and see it work
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
 
 
 

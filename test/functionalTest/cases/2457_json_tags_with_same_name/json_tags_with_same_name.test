@@ -181,10 +181,10 @@ echo
 01. V2: Try to create an entity E1 with attr A1 with compound value { "a": 1, "a": 2 } - see error
 ==================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
 
 {
     "description": "duplicated tag-name: /a/ in path: /",
@@ -195,30 +195,30 @@ Date: REGEX(.*)
 02. V2: Create an entity E2 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK
 =============================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 03. V2: Try to create an entity E3 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK
 ====================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 04. V1: Try to create an entity E4 with attr A1 with compound value { "a": 1, "a": 2 } - see error
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 127
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 127
 
 {
     "errorCode": {
@@ -232,10 +232,10 @@ Date: REGEX(.*)
 05. V1: Create an entity E5 with attr A1 with compound value { "a": 1, "b": { "a": 2 } } - OK
 =============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 181
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 181
 
 {
     "contextResponses": [
@@ -264,10 +264,10 @@ Date: REGEX(.*)
 06. V1: Try to create an entity E6 with attr A1 with compound value { "a": 1, "b": { "b": 2 } } - OK
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 181
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 181
 
 {
     "contextResponses": [
@@ -296,10 +296,10 @@ Date: REGEX(.*)
 07. V2: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error
 ==================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "duplicated tag-name: /a/ in path: /b/",
@@ -310,10 +310,10 @@ Date: REGEX(.*)
 08. V1: Try to create an entity E7 with attr A1 with compound value { "a": 1, "b": { "a": 1, "a": 2} } - see error
 ==================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 129
 
 {
     "errorCode": {

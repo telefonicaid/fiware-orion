@@ -82,38 +82,38 @@ echo
 01. Create 4 entities
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/room1?type=house
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/car?type=vehicle
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/nothing?type=tetetete
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/numeric?type=12345678
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/numeric?type=12345678
+Content-Length: 0
 
 
 
 02. Query for numeric id in the URL
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 48
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 48
 
 [
     {
@@ -127,10 +127,10 @@ Date: REGEX(.*)
 03. Query for numeric type in the URL
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 53
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 53
 
 [
     {

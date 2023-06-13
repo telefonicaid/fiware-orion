@@ -115,10 +115,10 @@ orionCurl --url "$url" --payload "$payload" --tenant "t_04"
 1. Update/append entity E with HTTP-Tenant t_03
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 193
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 193
 
 {
     "contextResponses": [
@@ -147,10 +147,10 @@ Date: REGEX(.*)
 2. Update/append entity E with HTTP-Tenant t_04
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 193
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 193
 
 {
     "contextResponses": [
@@ -179,10 +179,10 @@ Date: REGEX(.*)
 3. Query entity E with HTTP-Tenant t_03
 ++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 195
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 195
 
 {
     "contextResponses": [
@@ -211,10 +211,10 @@ Date: REGEX(.*)
 4. Query entity E with HTTP-Tenant t_04
 ++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 195
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 195
 
 {
     "contextResponses": [
