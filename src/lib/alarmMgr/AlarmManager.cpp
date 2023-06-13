@@ -58,6 +58,8 @@ AlarmManager::AlarmManager()
   badInputResets(0),
   notificationErrors(0),
   notificationErrorResets(0),
+  notificationQueues(0),
+  notificationQueueResets(0),
   forwardingErrors(0),
   forwardingErrorResets(0),
   mqttConnectionErrors(0),
@@ -66,6 +68,7 @@ AlarmManager::AlarmManager()
   dbErrorResets(0),
   dbOk(true),
   notificationErrorLogAlways(false),
+  notificationQueueLogAlways(false),
   forwardingErrorLogAlways(false),
   mqttConnectionErrorLogAlways(false),
   badInputLogAlways(false),
@@ -82,6 +85,7 @@ AlarmManager::AlarmManager()
 int AlarmManager::init(bool logAlreadyRaisedAlarms)
 {
   notificationErrorLogAlways   = logAlreadyRaisedAlarms;
+  notificationQueueLogAlways   = logAlreadyRaisedAlarms;
   badInputLogAlways            = logAlreadyRaisedAlarms;
   dbErrorLogAlways             = logAlreadyRaisedAlarms;
   mqttConnectionErrorLogAlways = logAlreadyRaisedAlarms;
@@ -243,6 +247,21 @@ void AlarmManager::notificationErrorGet(int64_t* active, int64_t* raised, int64_
   *active    = notificationV.size();
   *raised    = notificationErrors;
   *released  = notificationErrorResets;
+}
+
+
+/* ****************************************************************************
+*
+* AlarmManager::notificationErrorGet -
+*
+* NOTE
+*   To read values, no semaphore is used.
+*/
+void AlarmManager::notificationQueueGet(int64_t* active, int64_t* raised, int64_t* released)
+{
+  *active    = notificationQ.size();
+  *raised    = notificationQueues;
+  *released  = notificationQueueResets;
 }
 
 
@@ -587,6 +606,62 @@ bool AlarmManager::forwardingErrorReset(const std::string& url)
   return true;
 }
 
+/*notification Queue*/
+bool AlarmManager::notificationQueue(const std::string& service, const std::string& details)
+{
+  semTake();
+
+  std::map<std::string, int>::iterator iter = notificationQ.find(details);
+
+  if (iter != notificationQ.end())  // Already exists - add to the 'url-specific' counter
+  {
+    iter->second += 1;
+
+    if (notificationQueueLogAlways)
+    {
+      LM_W(("Repeated notificationQueue %s: %s", service.c_str(), details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtCPrForwardRequestPayload, ("Repeated notificationQueue %s: %s", service.c_str(), details.c_str()));
+    }
+
+    semGive();
+    return false;
+  }
+
+  ++notificationQueues;
+
+  notificationQ[details] = 1;
+  semGive();
+
+  LM_W(("Raising alarm notificationQueue %s: %s", service.c_str(), details.c_str()));
+
+  return true;
+}
+
+
+
+/*notificationReset*/
+bool AlarmManager::notificationQueuesResets(const std::string& details)
+{
+  semTake();
+
+  if (notificationQ.find(details) == notificationQ.end())  // Doesn't exist
+  {
+    semGive();
+    return false;
+  }
+
+  notificationQ.erase(details);
+  ++notificationQueues;
+  semGive();
+
+  LM_W(("Releasing alarm notificationQueue %s", details.c_str()));
+
+  return true;
+}
 
 
 /* ****************************************************************************

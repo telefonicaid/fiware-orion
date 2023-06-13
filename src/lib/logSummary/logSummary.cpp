@@ -114,6 +114,7 @@ static void* logSummary(void* vP)
     alarmMgr.dbErrorsGet(&deActive, &deRaised, &deReleased);
     alarmMgr.badInputGet(&biActive, &biRaised, &biReleased);
     alarmMgr.notificationErrorGet(&neActive, &neRaised, &neReleased);
+    alarmMgr.notificationQueueGet(&neActive, &neRaised, &neReleased);
     alarmMgr.forwardingErrorGet(&fwdActive, &fwdRaised, &fwdReleased);
     alarmMgr.mqttConnectionErrorGet(&mceActive, &mceRaised, &mceReleased);
 

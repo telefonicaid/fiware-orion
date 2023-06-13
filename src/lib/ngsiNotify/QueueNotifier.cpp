@@ -31,7 +31,7 @@
 
 #include "ngsiNotify/QueueStatistics.h"
 #include "ngsiNotify/QueueNotifier.h"
-
+#include "common/globals.h"
 
 
 /* ****************************************************************************
@@ -153,6 +153,8 @@ void QueueNotifier::sendNotifyContextRequest
 
   // Early return if some problem occurred with params building
   // Nothing is added to the queue in this case
+  //
+	  
   if (paramsP == NULL)
   {
     return;
@@ -165,6 +167,7 @@ void QueueNotifier::sendNotifyContextRequest
 
   std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(nsf.tenant);
   std::string queueName;
+//  std::string         out;
   if (iter != serviceSq.end())
   {
     queueName = nsf.tenant;
@@ -176,7 +179,21 @@ void QueueNotifier::sendNotifyContextRequest
     sq = &defaultSq;
   }
 
+  std::string details; 
+  extern int  thresholdMaxSize;
+
+  details = "Notification queue exceed the thresholdMaxSize limit";
   bool enqueued = sq->try_push(paramsP);
+
+  if (QueueStatistics::getOut() <= thresholdMaxSize)
+  {
+    alarmMgr.notificationQueue(service, "notification queue is full: " + details);
+  }
+  else
+  {
+    alarmMgr.notificationQueuesResets(service);
+  }
+
   if (!enqueued)
   {
     QueueStatistics::incReject(1);
