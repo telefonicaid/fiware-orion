@@ -31,7 +31,7 @@
 
 #include "ngsiNotify/QueueStatistics.h"
 #include "ngsiNotify/QueueNotifier.h"
-#include "common/globals.h"
+
 
 
 /* ****************************************************************************
@@ -153,8 +153,6 @@ void QueueNotifier::sendNotifyContextRequest
 
   // Early return if some problem occurred with params building
   // Nothing is added to the queue in this case
-  //
-	  
   if (paramsP == NULL)
   {
     return;
@@ -167,7 +165,6 @@ void QueueNotifier::sendNotifyContextRequest
 
   std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(nsf.tenant);
   std::string queueName;
-
   if (iter != serviceSq.end())
   {
     queueName = nsf.tenant;

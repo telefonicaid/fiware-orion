@@ -256,7 +256,7 @@ bool            logDeprecate;
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
 #define IN_REQ_PAYLOAD_MAX_SIZE_DESC   "maximum size (in bytes) of the payload of incoming requests"
 #define OUT_REQ_MSG_MAX_SIZE_DESC      "maximum size (in bytes) of outgoing forward and notification request messages"
-#define THRESHOLD_MAX_SIZE_DESC      "Alarm for notification queue overpassing a given threshold"
+#define THRESHOLD_MAX_SIZE_DESC        "maximum threshold limit for notificationQueue"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
@@ -335,7 +335,6 @@ PaArgument paArgs[] =
   { "-connectionMemory",            &connectionMemory,      "CONN_MEMORY",              PaUInt,   PaOpt, 64,                              0,     1024,                  CONN_MEMORY_DESC             },
   { "-maxConnections",              &maxConnections,        "MAX_CONN",                 PaUInt,   PaOpt, 1020,                            1,     PaNL,                  MAX_CONN_DESC                },
   { "-reqPoolSize",                 &reqPoolSize,           "TRQ_POOL_SIZE",            PaUInt,   PaOpt, 0,                               0,     1024,                  REQ_POOL_SIZE                },
-
   { "-inReqPayloadMaxSize",         &inReqPayloadMaxSize,   "IN_REQ_PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE, 0,     PaNL,                  IN_REQ_PAYLOAD_MAX_SIZE_DESC },
   { "-outReqMsgMaxSize",            &outReqMsgMaxSize,      "OUT_REQ_MSG_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_OUT_REQ_MSG_MAX_SIZE,    0,     PaNL,                  OUT_REQ_MSG_MAX_SIZE_DESC    },
   { "-notificationMode",            &notificationMode,      "NOTIF_MODE",               PaString, PaOpt, _i "transient",                  PaNL,  PaNL,                  NOTIFICATION_MODE_DESC       },

@@ -252,7 +252,7 @@ void AlarmManager::notificationErrorGet(int64_t* active, int64_t* raised, int64_
 
 /* ****************************************************************************
 *
-* AlarmManager::notificationErrorGet -
+* AlarmManager::notificationQueueGet -
 *
 * NOTE
 *   To read values, no semaphore is used.
@@ -606,14 +606,21 @@ bool AlarmManager::forwardingErrorReset(const std::string& url)
   return true;
 }
 
-/*notification Queue*/
+
+
+/* ****************************************************************************
+*
+* AlarmManager::notificationQueue -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*/
 bool AlarmManager::notificationQueue(const std::string& service, const std::string& details)
 {
   semTake();
 
   std::map<std::string, int>::iterator iter = notificationQ.find(details);
 
-  if (iter != notificationQ.end())  // Already exists - add to the 'url-specific' counter
+  if (iter != notificationQ.end())
   {
     iter->second += 1;
 
@@ -643,7 +650,12 @@ bool AlarmManager::notificationQueue(const std::string& service, const std::stri
 
 
 
-/*notificationReset*/
+/* ****************************************************************************
+*
+* AlarmManager::notificationQueuesResets -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*/
 bool AlarmManager::notificationQueuesResets(const std::string& details)
 {
   semTake();

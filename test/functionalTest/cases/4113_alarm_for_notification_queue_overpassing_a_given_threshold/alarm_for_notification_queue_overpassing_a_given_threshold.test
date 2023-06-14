@@ -1,4 +1,4 @@
-# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Per service notification queues (regression case)
+alarm for notification queue overpassing a given threshold
 
 --SHELL-INIT--
 dbInit ${CB_DB_NAME} serv1
@@ -32,17 +32,14 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 --SHELL--
 
-# This test is like the base case in per_service_notif_queue.test but without
-# using any per-service queue, so the default servie queue will saturate
-# earlier
 #
 # 01. Subscribe serv1 to the accumulator endpoint that never responses
 # 02. Subscribe serv2 to the accumulator endpoint that never responses
 # 03. Subscribe serv3 to the accumulator endpoint that never responses
 # 04. Create/update entity in serv1 3 times
-# 05. Create/update entity in serv2 4 times, causing 2 ERRORs
-# 06. Create/update entity in serv3 5 times, causing 5 ERRORs
-# 07. Grep log for ERROR, getting 7 in the default service
+# 05. Create/update entity in serv2 4 times
+# 06. Create/update entity in serv3 5 times
+# 07. Grep log for notificationQueue alarm
 #
 
 
@@ -83,7 +80,7 @@ payload='{
   },
   "notification": {
     "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/waitForever"
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
     }
   }
 }'
@@ -106,7 +103,7 @@ payload='{
   },
   "notification": {
     "http": {
-      "url": "http://localhost:'$LISTENER_PORT'/waitForever"
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
     }
   }
 }'
@@ -134,8 +131,8 @@ echo
 echo
 
 
-echo "05. Create/update entity in serv2 4 times, causing 2 ERRORs"
-echo "==========================================================="
+echo "05. Create/update entity in serv2 4 times"
+echo "========================================="
 for i in {1..4}
 do
    echo $i
@@ -145,8 +142,8 @@ echo
 echo
 
 
-echo "06. Create/update entity in serv3 5 times, causing 5 ERRORs"
-echo "==========================================================="
+echo "06. Create/update entity in serv3 5 times"
+echo "========================================="
 for i in {1..5}
 do
    echo $i
@@ -156,16 +153,13 @@ echo
 echo
 
 
-echo "07. Grep log for ERROR, getting 7 in the default service"
-echo "========================================================"
-grep ERROR /tmp/contextBroker.log | grep "Runtime Error" |  awk -F 'Runtime Error ' '{print $2}'
+echo "07. Grep log for notificationQueue alarm"
+echo "========================================"
+egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
 
 
-# It is not usual to stop accumulator in the SHELL section, but this way we
-# ensure all connections are terminated so upon stopping of Context Broker
-# no memory is lost and no false positive is reported by valgrind pass
 accumulatorStop $LISTENER_PORT
 
 
@@ -207,16 +201,16 @@ Content-Length: 0
 3
 
 
-05. Create/update entity in serv2 4 times, causing 2 ERRORs
-===========================================================
+05. Create/update entity in serv2 4 times
+=========================================
 1
 2
 3
 4
 
 
-06. Create/update entity in serv3 5 times, causing 5 ERRORs
-===========================================================
+06. Create/update entity in serv3 5 times
+=========================================
 1
 2
 3
@@ -224,15 +218,9 @@ Content-Length: 0
 5
 
 
-07. Grep log for ERROR, getting 7 in the default service
-========================================================
-(default notification queue is full)
-(default notification queue is full)
-(default notification queue is full)
-(default notification queue is full)
-(default notification queue is full)
-(default notification queue is full)
-(default notification queue is full)
+07. Grep log for notificationQueue alarm
+========================================
+Raising alarm NotificationQueue serv2: notification queue reached the threshold (Max threshold limit: 3)
 
 
 --TEARDOWN--
