@@ -125,7 +125,7 @@ payload='{
    "type": "Number"
   }
 }'
-for i in {1..50}
+for i in {1..3}
 do
    echo $i
    orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload" --tenant serv1 > /dev/null
@@ -136,7 +136,7 @@ echo
 
 echo "05. Create/update entity in serv2 4 times, causing 2 ERRORs"
 echo "==========================================================="
-for i in {1..470}
+for i in {1..4}
 do
    echo $i
    orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload" --tenant serv2 > /dev/null
@@ -147,7 +147,7 @@ echo
 
 echo "06. Create/update entity in serv3 5 times, causing 5 ERRORs"
 echo "==========================================================="
-for i in {1..500}
+for i in {1..5}
 do
    echo $i
    orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload" --tenant serv3 > /dev/null

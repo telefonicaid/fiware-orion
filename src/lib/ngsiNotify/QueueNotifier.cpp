@@ -167,7 +167,7 @@ void QueueNotifier::sendNotifyContextRequest
 
   std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(nsf.tenant);
   std::string queueName;
-//  std::string         out;
+
   if (iter != serviceSq.end())
   {
     queueName = nsf.tenant;
@@ -179,19 +179,22 @@ void QueueNotifier::sendNotifyContextRequest
     sq = &defaultSq;
   }
 
-  std::string details; 
-  extern int  thresholdMaxSize;
-
-  details = "Notification queue exceed the thresholdMaxSize limit";
   bool enqueued = sq->try_push(paramsP);
 
-  if (QueueStatistics::getOut() <= thresholdMaxSize)
+  if (enqueued)
   {
-    alarmMgr.notificationQueue(service, "notification queue is full: " + details);
-  }
-  else
-  {
-    alarmMgr.notificationQueuesResets(service);
+    std::string details;
+    extern int thresholdMaxSize;
+    details = "(Max threshold limit: 3)";
+
+    if (QueueStatistics::getIn() >= thresholdMaxSize)
+    {
+      alarmMgr.notificationQueue(service, "notification queue reached the threshold " + details);
+    }
+    else
+    {
+      alarmMgr.notificationQueuesResets(service);
+    }
   }
 
   if (!enqueued)

@@ -619,12 +619,12 @@ bool AlarmManager::notificationQueue(const std::string& service, const std::stri
 
     if (notificationQueueLogAlways)
     {
-      LM_W(("Repeated notificationQueue %s: %s", service.c_str(), details.c_str()));
+      LM_W(("Repeated NotificationQueue %s: %s", service.c_str(), details.c_str()));
     }
     else
     {
       // even if repeat alarms is off, this is a relevant event in debug level
-      LM_T(LmtCPrForwardRequestPayload, ("Repeated notificationQueue %s: %s", service.c_str(), details.c_str()));
+      LM_T(LmtCPrForwardRequestPayload, ("Repeated NotificationQueue %s: %s", service.c_str(), details.c_str()));
     }
 
     semGive();
@@ -636,7 +636,7 @@ bool AlarmManager::notificationQueue(const std::string& service, const std::stri
   notificationQ[details] = 1;
   semGive();
 
-  LM_W(("Raising alarm notificationQueue %s: %s", service.c_str(), details.c_str()));
+  LM_W(("Raising alarm NotificationQueue %s: %s", service.c_str(), details.c_str()));
 
   return true;
 }
@@ -658,7 +658,7 @@ bool AlarmManager::notificationQueuesResets(const std::string& details)
   ++notificationQueues;
   semGive();
 
-  LM_W(("Releasing alarm notificationQueue %s", details.c_str()));
+  LM_W(("Releasing alarm NotificationQueue %s:", details.c_str()));
 
   return true;
 }
