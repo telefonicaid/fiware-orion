@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESPAGE_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESPAGE_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPSSEND_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPSSEND_H_
 
 /*
 *
@@ -25,13 +25,22 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/forwarding/DistOp.h"                              // DistOp, DistOpListItem
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldGetEntitiesPage -
+// distOpsSend -
 //
-extern bool orionldGetEntitiesPage(void);
+extern int distOpsSend(DistOp* distOpList);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESPAGE_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// distOpsSend2 -
+//
+extern int distOpsSend2(DistOpListItem* distOpList);
+
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPSSEND_H_

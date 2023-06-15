@@ -32,6 +32,7 @@ extern "C"
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
 #include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
 #include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery
 #include "orionld/forwarding/regMatchAttributesForGet.h"         // regMatchAttributesForGet
@@ -68,16 +69,10 @@ DistOp* regMatchInformationItemForQuery
       //   - it is NULLed, and
       //   - it is allocated again in the next round of the loop
       //
-      if (distOpP == NULL)
-        distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
+      distOpP = distOpCreate(DoQueryEntity, regP, idListP, typeListP, attrListP, true);
 
       if (regMatchEntityInfoForQuery(regP, entityInfoP, idListP, typeListP, distOpP) == true)
       {
-        distOpP->regP       = regP;
-        distOpP->operation  = DoQueryEntity;
-        distOpP->attrList   = NULL;  // Might come later (regMatchAttributesForGet)
-        distOpP->next       = NULL;
-
         if (distOpList == NULL)
           distOpList = distOpP;
         else
@@ -85,9 +80,9 @@ DistOp* regMatchInformationItemForQuery
           distOpP->next = distOpList;
           distOpList    = distOpP;
         }
-
-        distOpP = NULL;
       }
+      else
+        free(distOpP);  // FIXME: Allocate AFTER calling regMatchEntityInfoForQuery, not before!
     }
 
     if (distOpList == NULL)
@@ -95,14 +90,7 @@ DistOp* regMatchInformationItemForQuery
   }
   else
   {
-    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
-
-    distOpP->regP       = regP;
-    distOpP->operation  = DoQueryEntity;
-    distOpP->idList     = idListP;
-    distOpP->typeList   = typeListP;
-    distOpP->attrList   = NULL;  // Comes later (regMatchAttributesForGet)
-    distOpP->next       = NULL;
+    DistOp* distOpP = distOpCreate(DoQueryEntity, regP, NULL, typeListP, attrListP, true);
 
     if (distOpList == NULL)
       distOpList = distOpP;

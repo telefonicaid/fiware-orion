@@ -24,6 +24,7 @@ SET (SOURCES
     DistOpType.cpp
     distOpInit.cpp
     distOpSend.cpp
+    distOpsSend.cpp
     distOpListsMerge.cpp
     distOpListRelease.cpp
     distOpListDebug.cpp
@@ -33,6 +34,7 @@ SET (SOURCES
     distOpEntityMerge.cpp
     distOpRequests.cpp
     distOpResponses.cpp
+    distOpCreate.cpp
     regMatchEntityInfo.cpp
     regMatchOperation.cpp
     regMatchInformationItem.cpp

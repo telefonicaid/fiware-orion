@@ -27,13 +27,26 @@
 */
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
-
+#include "orionld/types/StringArray.h"                           // StringArray
 
 
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntitiesLocal -
 //
-extern bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP, bool countAlreadyAdded);
+extern bool orionldGetEntitiesLocal
+(
+  StringArray*     typeList,
+  StringArray*     idList,
+  StringArray*     attrList,
+  char*            idPattern,
+  QNode*           qNode,
+  OrionldGeoInfo*  geoInfoP,
+  const char*      lang,
+  bool             sysAttrs,
+  const char*      geometryProperty,
+  bool             onlyIds,
+  bool             countHeaderAlreadyAdded
+);
 
 #endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESLOCAL_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESPAGE_H_
-#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESPAGE_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPCREATE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPCREATE_H_
 
 /*
 *
@@ -25,13 +25,24 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldGetEntitiesPage -
+// distOpCreate -
 //
-extern bool orionldGetEntitiesPage(void);
+extern DistOp* distOpCreate
+(
+  DistOpType    operation,
+  RegCacheItem* regP,
+  StringArray*  idListP,
+  StringArray*  typeListP,
+  StringArray*  attrListP,
+  bool          permanent
+);
 
-#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITIESPAGE_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPCREATE_H_

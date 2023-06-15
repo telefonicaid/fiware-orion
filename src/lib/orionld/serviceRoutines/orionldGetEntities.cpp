@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                           // KjNode
+#include "kjson/kjClone.h"                                          // kjClone
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
@@ -39,6 +40,7 @@ extern "C"
 #include "orionld/q/QNode.h"                                        // QNode
 #include "orionld/q/qLex.h"                                         // qLex
 #include "orionld/q/qParse.h"                                       // qParse
+#include "orionld/q/qClone.h"                                       // qClone
 #include "orionld/payloadCheck/pCheckGeo.h"                         // pCheckGeo
 #include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpRequests.h"                      // distOpRequests
@@ -47,6 +49,7 @@ extern "C"
 #include "orionld/forwarding/xForwardedForMatch.h"                  // xForwardedForMatch
 #include "orionld/forwarding/regMatchOperation.h"                   // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForQuery.h"    // regMatchInformationArrayForQuery
+#include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
 #include "orionld/serviceRoutines/orionldGetEntitiesDistributed.h"  // orionldGetEntitiesDistributed
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntities.h"             // Own interface
@@ -201,10 +204,6 @@ DistOp* distOpRequestsForEntitiesQuery(char* idPattern, QNode* qNode)
   distOpList = distOpListsMerge(distOpList, inclusiveList);
   distOpList = distOpListsMerge(distOpList, auxiliarList);
 
-  distOpListDebug2(distOpList, "Final distOpList");
-
-  // What more? :)
-
   return distOpList;
 }
 
@@ -237,6 +236,9 @@ bool orionldGetEntities(void)
   char*   entityMap = orionldState.uriParams.entityMap;
   QNode*  qNode     = NULL;
 
+  if (orionldState.uriParams.onlyIds == true)
+    LM_W(("orionldState.uriParams.onlyIds == true"));
+
   // According to the spec, id takes precedence over idPattern, so, if both are present, idPattern is NULLed out
   if ((orionldState.in.idList.items > 0) && (orionldState.uriParams.idPattern != NULL))
     idPattern = NULL;
@@ -245,7 +247,7 @@ bool orionldGetEntities(void)
   if (pCheckQueryParams(id, type, idPattern, q, geometry, attrs, local, entityMap, &qNode, &geoInfo) == false)
     return false;
 
-  // Is an entity map requested?
+  // Is an entity map in use?
   if (orionldState.uriParams.entityMap != NULL)
   {
     if (strcmp(orionldState.uriParams.entityMap, orionldEntityMapId) != 0)
@@ -259,6 +261,8 @@ bool orionldGetEntities(void)
       orionldEntityMapRelease();
       orionldEntityMap      = NULL;
       orionldEntityMapCount = 0;
+      orionldState.uriParams.entityMap = NULL;
+      entityMap = NULL;
     }
     else
     {
@@ -273,22 +277,63 @@ bool orionldGetEntities(void)
   }
 
   if (orionldState.distributed == false)
-    return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo, false);
+    return orionldGetEntitiesLocal(&orionldState.in.typeList,
+                                   &orionldState.in.idList,
+                                   &orionldState.in.attrList,
+                                   idPattern,
+                                   qNode,
+                                   &geoInfo,
+                                   orionldState.uriParams.lang,
+                                   orionldState.uriParamOptions.sysAttrs,
+                                   orionldState.uriParams.geometryProperty,
+                                   orionldState.uriParams.onlyIds,
+                                   true);
 
-  DistOp* distOpList = NULL;
   if (orionldState.uriParams.entityMap == NULL)
   {
     //
     // Find matching registrations
     //
-    distOpList = distOpRequestsForEntitiesQuery(idPattern, qNode);
+    orionldDistOps = distOpRequestsForEntitiesQuery(idPattern, qNode);
 
     //
     // if there are no matching registrations, the request is treated as a local request
     //
-    if (distOpList == NULL)
-      return orionldGetEntitiesLocal(idPattern, qNode, &geoInfo, false);
+    if (orionldDistOps == NULL)
+      return orionldGetEntitiesLocal(&orionldState.in.typeList,
+                                     &orionldState.in.idList,
+                                     &orionldState.in.attrList,
+                                     idPattern,
+                                     qNode,
+                                     &geoInfo,
+                                     orionldState.uriParams.lang,
+                                     orionldState.uriParamOptions.sysAttrs,
+                                     orionldState.uriParams.geometryProperty,
+                                     orionldState.uriParams.onlyIds,
+                                     true);
+
+    // Create the "local" DistOp
+    DistOp* local  = distOpCreate(DoQueryEntity, NULL, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList, true);
+
+    // Add lang, geometryProperty, qNode, ...   to the "local" DistOp
+    local->lang                = (orionldState.uriParams.lang             != NULL)? strdup(orionldState.uriParams.lang)        : NULL;
+    local->geoInfo.geometry    = geoInfo.geometry;
+    local->geoInfo.georel      = geoInfo.georel;
+    local->geoInfo.coordinates = (geoInfo.coordinates != NULL)? kjClone(NULL, geoInfo.coordinates) : NULL;
+    local->geoInfo.minDistance = geoInfo.minDistance;
+    local->geoInfo.maxDistance = geoInfo.maxDistance;
+    local->geoInfo.geoProperty = (geoInfo.geoProperty != NULL)? strdup(geoInfo.geoProperty)        : NULL;
+    local->geometryProperty    = (orionldState.uriParams.geometryProperty != NULL)? strdup(orionldState.uriParams.geometryProperty) : NULL;
+    local->qNode               = (qNode != NULL)? qClone(qNode) : NULL;
+    
+    // Add the "local" DistOp to the linked list of DistOps
+    local->next    = orionldDistOps;
+    orionldDistOps = local;
+
+    // This is the DistOp list to be used over pagination - it is "malloqued" so it survives the current request
+    distOpListDebug2(orionldDistOps, "distOpList for Entity Query");
+    LM_T(LmtDistOpList, ("--------------- "));
   }
 
-  return orionldGetEntitiesDistributed(distOpList, idPattern, qNode, &geoInfo);
+  return orionldGetEntitiesDistributed(orionldDistOps, idPattern, qNode, &geoInfo);
 }

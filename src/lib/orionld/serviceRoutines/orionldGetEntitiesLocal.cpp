@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                            // orionldHeaderAdd, HttpResultsCount
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                        // QNode
+#include "orionld/context/orionldContextItemExpand.h"               // orionldContextItemExpand
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
 #include "orionld/kjTree/kjChildPrepend.h"                          // kjChildPrepend
 #include "orionld/dbModel/dbModelToApiEntity.h"                     // dbModelToApiEntity2
@@ -154,33 +155,51 @@ KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, bool geoPr
 //
 // orionldGetEntitiesLocal -
 //
-bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP, bool countAlreadyAdded)
+bool orionldGetEntitiesLocal
+(
+  StringArray*     typeList,
+  StringArray*     idList,
+  StringArray*     attrList,
+  char*            idPattern,
+  QNode*           qNode,
+  OrionldGeoInfo*  geoInfoP,
+  const char*      lang,
+  bool             sysAttrs,
+  const char*      geometryProperty,
+  bool             onlyIds,
+  bool             countHeaderAlreadyAdded
+)
 {
+  LM_W(("onlyIds: %s", (onlyIds == true)? "TRUE" : "FALSE"));
+
   char* geojsonGeometryLongName = NULL;
+
   if (orionldState.out.contentType == GEOJSON)
-    geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
+    geojsonGeometryLongName = orionldContextItemExpand(orionldState.contextP, geometryProperty, true, NULL);
 
   int64_t       count;
-  KjNode*       dbEntityArray = mongocEntitiesQuery(&orionldState.in.typeList,
-                                                    &orionldState.in.idList,
+  KjNode*       dbEntityArray = mongocEntitiesQuery(typeList,
+                                                    idList,
                                                     idPattern,
-                                                    &orionldState.in.attrList,
+                                                    attrList,
                                                     qNode,
                                                     geoInfoP,
                                                     &count,
                                                     geojsonGeometryLongName,
-                                                    orionldState.uriParams.onlyIds);
-
+                                                    onlyIds);
+  LM_W(("After mongocEntitiesQuery. dbEntityArray aat %p", dbEntityArray));
   if (dbEntityArray == NULL)
     return false;
 
-  if (orionldState.uriParams.onlyIds == true)
+  if (onlyIds == true)
   {
+    LM_W(("Here: inside 'onlyIds == true'"));
     orionldState.responseTree = dbModelToEntityIdAndTypeObject(dbEntityArray);
     orionldState.noLinkHeader = true;
   }
   else
   {
+    LM_W(("Here: inside 'onlyIds == false'"));
     KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
     RenderFormat  rf              = RF_NORMALIZED;
 
@@ -208,8 +227,8 @@ bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoI
         // Must remove dbEntityP from dbEntityArray as dbEntityP gets transformed into apiEntityP and then inserted into featuresP
         kjChildRemove(dbEntityArray, dbEntityP);
 
-        KjNode*     apiEntityP           = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, true, &orionldState.pd);
-        const char* geometryPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
+        KjNode*     apiEntityP           = dbModelToApiEntity2(dbEntityP, sysAttrs, rf, lang, true, &orionldState.pd);
+        const char* geometryPropertyName = (geometryProperty == NULL)? "location" : geometryProperty;
         KjNode*     geometryNodeP        = kjLookup(apiEntityP, geometryPropertyName);
 
         apiEntityP = apiEntityToGeoJson(apiEntityP, geometryNodeP, orionldState.geoPropertyFromProjection);
@@ -224,13 +243,13 @@ bool orionldGetEntitiesLocal(char* idPattern, QNode* qNode, OrionldGeoInfo* geoI
 
       for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
       {
-        KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, true, &orionldState.pd);
+        KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, lang, true, &orionldState.pd);
         kjChildAdd(apiEntityArray, apiEntityP);
       }
     }
   }
 
-  if ((orionldState.uriParams.count == true) && (countAlreadyAdded == false))
+  if ((orionldState.uriParams.count == true) && (countHeaderAlreadyAdded == false))
   {
     LM_T(LmtSR, ("COUNT: Adding HttpResultsCount header: %d", count));
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);

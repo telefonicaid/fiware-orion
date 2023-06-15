@@ -70,14 +70,16 @@ void distOpListDebug2(DistOp* distOpP, const char* what)
 
   while (distOpP != NULL)
   {
-    LM_T(LmtDistOpList, ("  Registration:      %s", distOpP->regP->regId));
+    LM_T(LmtDistOpList, ("  DistOp ID:         %s", distOpP->id));
+    LM_T(LmtDistOpList, ("  Registration:      %s", (distOpP->regP != NULL)? distOpP->regP->regId : "local DB"));
     LM_T(LmtDistOpList, ("  Operation:         %s", distOpTypes[distOpP->operation]));
 
     if (distOpP->error == true)
     {
-      LM_T(LmtDistOpList, ("  Title:             %s", distOpP->title));
-      LM_T(LmtDistOpList, ("  Detail:            %s", distOpP->detail));
-      LM_T(LmtDistOpList, ("  Status:            %d", distOpP->httpResponseCode));
+      LM_T(LmtDistOpList, ("  Error:"));
+      LM_T(LmtDistOpList, ("    Title:             %s", distOpP->title));
+      LM_T(LmtDistOpList, ("    Detail:            %s", distOpP->detail));
+      LM_T(LmtDistOpList, ("    Status:            %d", distOpP->httpResponseCode));
     }
 
     if (distOpP->requestBody != NULL)
@@ -113,6 +115,11 @@ void distOpListDebug2(DistOp* distOpP, const char* what)
       {
         LM_T(LmtDistOpList, ("    Attribute %d:   '%s'", ix, distOpP->attrList->array[ix]));
       }
+    }
+
+    if (distOpP->attrsParam != NULL)
+    {
+      LM_T(LmtDistOpList, ("  URL Attributes:        %s (len: %d)", distOpP->attrsParam, distOpP->attrsParamLen));
     }
 
     if (distOpP->typeList != NULL)

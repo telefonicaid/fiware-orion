@@ -60,6 +60,7 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                         // OrionldHeaderSet
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
@@ -415,6 +416,7 @@ typedef struct OrionldConnectionState
   // General Behavior
   //
   bool                    distOpAttrsCompacted;
+  int                     distOpNo;
   uint32_t                acceptMask;            // "1 << MimeType" mask for all accepted Mime Types, regardless of which is chosen and of weight
 
   //
@@ -597,6 +599,7 @@ extern unsigned long long  outReqMsgMaxSize;
 extern char                orionldEntityMapId[64];   // Used by GET /entities in the distributed case, for pagination
 extern KjNode*             orionldEntityMap;
 extern int                 orionldEntityMapCount;
+extern DistOp*             orionldDistOps;
 
 
 

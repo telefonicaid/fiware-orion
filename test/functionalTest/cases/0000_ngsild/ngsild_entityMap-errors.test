@@ -26,6 +26,7 @@ Error handling for entity maps
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
+export CB_TRACELEVELS=${CB_TRACELEVELS:-70-79,80}
 orionldStart CB  -experimental -forwarding
 orionldStart CP1 -experimental
 

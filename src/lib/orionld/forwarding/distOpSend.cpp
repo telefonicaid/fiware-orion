@@ -260,57 +260,6 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
 
 // -----------------------------------------------------------------------------
 //
-// attrsParam -
-//
-void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArray* attrList)
-{
-  if (contextP == NULL)
-    contextP = orionldCoreContextP;
-
-  //
-  // The attributes are in longnames but ... should probably compact them.
-  // A registration can have its own @context, in cSourceInfo - for now, we use the @context of the original request.
-  // The attrList is always cloned, so, no problem modifying it.
-  //
-  int attrsLen = 0;
-  for (int ix = 0; ix < attrList->items; ix++)
-  {
-    attrList->array[ix]  = orionldContextItemAliasLookup(contextP, attrList->array[ix], NULL, NULL);
-    attrsLen            += strlen(attrList->array[ix]) + 1;
-  }
-
-  // Make room for "attrs=" and the string-end zero
-  attrsLen += 7;
-
-  char* attrs = kaAlloc(&orionldState.kalloc, attrsLen);
-
-  strcpy(attrs, "attrs=");
-
-  int   pos = 6;
-  for (int ix = 0; ix < attrList->items; ix++)
-  {
-    int len = strlen(attrList->array[ix]);
-    strcpy(&attrs[pos], attrList->array[ix]);
-
-    // Add comma unless it's the last attr (in which case we add a zero, just in case)
-    pos += len;
-
-    if (ix != attrList->items - 1)  // Not the last attr
-    {
-      attrs[pos] = ',';
-      pos += 1;
-    }
-    else
-      attrs[pos] = 0;
-  }
-
-  uriParamAdd(urlPartsP, attrs, NULL, pos);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // responseHeaderDebug -
 //
 static size_t responseHeaderDebug(char* buffer, size_t size, size_t nitems, void* userdata)
@@ -442,8 +391,8 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   //
   if (orionldState.verb == GET)
   {
-    if ((distOpP->attrList != NULL) && (distOpP->attrList->items > 0))
-      attrsParam(fwdContextP, &urlParts, distOpP->attrList);
+    if (distOpP->attrsParam != NULL)
+      uriParamAdd(&urlParts, distOpP->attrsParam, NULL, distOpP->attrsParamLen);
 
     //
     // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add that)
