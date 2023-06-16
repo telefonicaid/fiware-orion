@@ -58,11 +58,10 @@ For source code contributions, please see the [Contribution guidelines](doc/manu
 Its payloads are encoded as [linked data](https://en.wikipedia.org/wiki/Linked_data) using JSON.
 
 The NGSI-LD Specification is regularly updated and published by ETSI.
-The latest specification is [version 1.6.1](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_CIM009v010601p.pdf)
-and it was published in December 2022.
-Version 1.7.1 is about to be released (May 2023).
+The latest specification is [version 1.7.1](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.07.01_60/gs_CIM009v010701p.pdf)
+and it was published in June 2023.
 
-This presentation from FIWARE Summit Malaga 2018 might be of interest:
+This presentation from the FIWARE Summit in Malaga 2018 might be of interest:
 https://www.slideshare.net/FI-WARE/fiware-global-summit-ngsild-ngsi-with-linked-data
 
 Examples of **NGSI-LD** can be found in [ETSI](https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/tree/master/examples).

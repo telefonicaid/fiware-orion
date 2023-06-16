@@ -9,7 +9,7 @@ Orion-LD is an enhanced [Orion](https://github.com/telefonicaid/fiware-orion) an
 The NGSI-LD API is specified [here](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_CIM009v010601p.pdf) and while it's a pretty extensive
 document, anybody that is really going to work with NGSI-LD should definitely read this document. And use it as a reference, of course.
 
-The first thing to do is to thoroughly read [this quick guide to the @context](doc/manuals-ld/the-context.md).
+The first thing to do is to thoroughly read [this quick guide to the @context](the-context.md).
 There are also a number of tutorials about NGSI-LD:
 * [FIWARE 601: Introduction to Linked Data](https://fiware-tutorials.readthedocs.io/en/latest/linked-data)
 * [FIWARE 602: Linked Data Relationships and Data Models](https://fiware-tutorials.readthedocs.io/en/latest/relationships-linked-data)
@@ -47,7 +47,7 @@ Let's create an entity with two attributes:
 * status (which is part of the Core Context)
 * state  (which is **not** part of the Core Context)
 
-We will be using `curl` which you have already installed if you have followed the [installation guide](doc/manuals-ld/installation-guide.md).
+We will be using `curl` which you have already installed if you have followed the [installation guide](installation-guide.md).
 If not, make sure you have `curl` installed before proceeding.
 However, there are code snippets also for Python and JavaScript (node.js), so if you prefer those ... 
 
