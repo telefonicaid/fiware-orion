@@ -125,6 +125,9 @@ bool pcheckNotifierInfo(KjNode* niP, bool* mqttChangeP)
 
       *mqttChangeP = true;
     }
+    else if (strcmp(keyP->value.s, "Prefer") == 0)
+    {
+    }
     else
     {
       orionldError(OrionldBadRequestData, "Non-supported key in notifierInfo", keyP->value.s, 400);

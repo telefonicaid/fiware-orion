@@ -256,9 +256,12 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
 
   bool asSimplified = false;
 
-  if      (simplified)  attributeToSimplified(attrP, subP->lang.c_str());
-  else if (concise)     attributeToConcise(attrP, &asSimplified, subP->lang.c_str());
-  else                  attributeToNormalized(attrP, subP->lang.c_str());
+  if (attrP->type == KjObject)
+  {
+    if      (simplified)  attributeToSimplified(attrP, subP->lang.c_str());
+    else if (concise)     attributeToConcise(attrP, &asSimplified, subP->lang.c_str());
+    else                  attributeToNormalized(attrP, subP->lang.c_str());
+  }
 
   if ((asSimplified == false) && (simplified == false))
   {
@@ -276,10 +279,13 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
       eqForDot(saP->name);
       saP->name = orionldContextItemAliasLookup(subP->contextP, saP->name, NULL, NULL);
 
-      if (subP->renderFormat == RF_KEYVALUES)
-        attributeToSimplified(saP, subP->lang.c_str());
-      else if (subP->renderFormat == RF_CONCISE)
-        attributeToConcise(saP, &asSimplified, subP->lang.c_str());  // asSimplified is not used down here
+      if (saP->type == KjObject)
+      {
+        if (subP->renderFormat == RF_KEYVALUES)
+          attributeToSimplified(saP, subP->lang.c_str());
+        else if (subP->renderFormat == RF_CONCISE)
+          attributeToConcise(saP, &asSimplified, subP->lang.c_str());  // asSimplified is not used down here
+      }
     }
   }
 }
@@ -601,9 +607,27 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   // Outgoing Payload Body
   //
   KjNode* notificationP = (ngsiv2 == false)? notificationTree(mAltP) : notificationTreeForNgsiV2(mAltP);
-
+  char*   preferHeader  = NULL;
   if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == GEOJSON))
-    notificationDataToGeoJson(notificationP);
+  {
+    char*       geometryProperty = (char*) mAltP->subP->expression.geoproperty.c_str();
+    char*       attrs            = NULL;
+    bool        concise          = mAltP->subP->renderFormat == RF_CONCISE;
+    const char* context          = mAltP->subP->ldContext.c_str();
+
+    if (geometryProperty[0] == 0)
+      geometryProperty = (char*) "location";
+
+    // Extract attrs from (mAltP->subP->attributes
+    for (unsigned int ix = 0; ix < mAltP->subP->httpInfo.notifierInfo.size(); ix++)
+    {
+      KeyValue* kvP = mAltP->subP->httpInfo.notifierInfo[ix];
+      if (strcmp(kvP->key, "Prefer") == 0)
+        preferHeader = kvP->value;
+    }
+
+    notificationDataToGeoJson(notificationP, attrs, geometryProperty, preferHeader, concise, context);
+  }
 
   long unsigned int  payloadBodySize  = kjFastRenderSize(notificationP);
   char*              payloadBody      = (payloadBodySize < sizeof(body))? body : kaAlloc(&orionldState.kalloc, payloadBodySize);
@@ -683,6 +707,13 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   // Content-Type and Link
   //
   bool addLinkHeader = true;
+
+  if (preferHeader != NULL)
+  {
+    if (strcmp(preferHeader, "body=json") == 0)
+      addLinkHeader = false;
+  }
+
   if (mAltP->subP->httpInfo.mimeType == JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
   {
     ioVec[2].iov_base = (void*) contentTypeHeaderJsonLd;  // REPLACE "application/json" with "application/ld+json"

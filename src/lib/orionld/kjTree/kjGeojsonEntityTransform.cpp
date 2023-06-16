@@ -45,7 +45,7 @@ extern "C"
 // If it really is a GeoProperty (normalized, keyValues or concise) a cloned Simplified representation, with name "geometry", is returned.
 // Is it NOT a valid GeoProperty, then a NULL clone is returned (with name "geometry")
 //
-static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
+static KjNode* geoPropertyAsSimplified(KjNode* attributeP, bool concise)
 {
   if (attributeP->type != KjObject)
   {
@@ -55,7 +55,7 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
   KjNode* typeP = kjLookup(attributeP, "type");
   if (typeP == NULL)
   {
-    if (orionldState.uriParamOptions.concise == true)
+    if (concise == true)
     {
       // In 'Concise' attribute format, there may be no type field
       KjNode* valueP = kjLookup(attributeP, "value");
@@ -152,7 +152,18 @@ static KjNode* geoPropertyAsSimplified(KjNode* attributeP)
 //   ]
 // }
 //
-KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
+KjNode* kjGeojsonEntityTransform
+(
+  KjNode*      tree,
+  KjNode*      geoPropertyNode,
+  const char*  linkHeader,
+  const char*  preferHeader,
+  const char*  geometryProperty,
+  bool         geoPropertyMissing,
+  bool         linkHeaderAdded,
+  bool         concise,
+  const char*  context
+)
 {
   //
   // 1. Find and remove 'id' and 'type' from the original entity
@@ -179,20 +190,22 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
   //
   // Should the @context be added to the payload body?
   //
-  if (orionldState.linkHeaderAdded == false)
+  if (linkHeaderAdded == false)
   {
+    //
     // Only if Prefer is not set to body=json
-    if ((orionldState.preferHeader == NULL) || (strcasecmp(orionldState.preferHeader, "body=json") != 0))
+    //
+    if ((preferHeader == NULL) || (strcasecmp(preferHeader, "body=json") != 0))
     {
       KjNode* contextP;
 
-      if (orionldState.link == NULL)
+      if (context == NULL)
         contextP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
       else
-        contextP = kjString(orionldState.kjsonP, "@context", orionldState.link);
+        contextP = kjString(orionldState.kjsonP, "@context", context);
 
       kjChildAdd(geojsonTreeP, contextP);
-      orionldState.noLinkHeader = true;
+      orionldState.noLinkHeader = true;  // Won't work for Notifications. Is it needed there?
     }
   }
 
@@ -205,15 +218,15 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
   //
   // Get the geometry property
   // No expansion of 'geoPropertyName' is necessary/needed as the tree context has been compressed already
-  // FIXME: Only problem is if orionldState.uriParams.geometryProperty is given in its expanded form ...
+  // FIXME: Only problem is if geometryProperty is given in its expanded form ...
   //
   KjNode* geoPropertyP = NULL;
 
   if (geoPropertyNode == NULL)
   {
-    if (orionldState.geoPropertyMissing == false)
+    if (geoPropertyMissing == false)
     {
-      const char* geoPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
+      const char* geoPropertyName = (geometryProperty == NULL)? "location" : geometryProperty;
 
       geoPropertyP = kjLookup(tree, geoPropertyName);
     }
@@ -222,7 +235,7 @@ KjNode* kjGeojsonEntityTransform(KjNode* tree, KjNode* geoPropertyNode)
     geoPropertyP = geoPropertyNode;
 
   if (geoPropertyP != NULL)
-    geoPropertyP = geoPropertyAsSimplified(geoPropertyP);  // as KeyValues if GeoProperty (and cloned), else NULL
+    geoPropertyP = geoPropertyAsSimplified(geoPropertyP, concise);  // as KeyValues if GeoProperty (and cloned), else NULL
   if (geoPropertyP == NULL)
     geoPropertyP = kjNull(orionldState.kjsonP, "geometry");
 
