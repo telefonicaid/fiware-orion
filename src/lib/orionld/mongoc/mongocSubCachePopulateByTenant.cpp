@@ -102,7 +102,8 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     QNode*  qTree        = NULL;
     KjNode* contextNodeP = NULL;
     KjNode* coordinatesP = NULL;
-    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, tenantP->tenant, true, &qTree, &coordinatesP, &contextNodeP);
+    KjNode* showChangesP = NULL;
+    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, tenantP->tenant, true, &qTree, &coordinatesP, &contextNodeP, &showChangesP);
 
     if (apiSubP == NULL)
       continue;
@@ -111,7 +112,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     if (contextNodeP != NULL)
       contextP = orionldContextFromUrl(contextNodeP->value.s, NULL);
 
-    subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant);
+    subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP);
   }
 
   mongoc_client_pool_push(mongocPool, connectionP);

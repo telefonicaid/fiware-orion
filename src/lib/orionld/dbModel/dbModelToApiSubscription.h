@@ -38,6 +38,15 @@ extern "C"
 //
 // dbModelToApiSubscription - modify the DB Model tree into an API Subscription
 //
-extern KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* database, bool forSubCache, QNode** qNodePP, KjNode** coordinatesPP, KjNode** contextNodePP);
+extern KjNode* dbModelToApiSubscription
+(
+  KjNode*      dbSubP,
+  const char*  tenant,
+  bool         forSubCache,
+  QNode**      qNodePP,
+  KjNode**     coordinatesPP,
+  KjNode**     contextNodePP,
+  KjNode**     showChangesP
+);
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_

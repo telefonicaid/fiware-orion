@@ -170,7 +170,16 @@ static bool notificationStatus(KjNode* dbLastSuccessP, KjNode* dbLastFailureP)
 //   "throttling": 5                          => SAME
 // }
 //
-KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSubCache, QNode** qNodePP, KjNode** coordinatesPP, KjNode** contextNodePP)
+KjNode* dbModelToApiSubscription
+(
+  KjNode*      dbSubP,
+  const char*  tenant,
+  bool         forSubCache,
+  QNode**      qNodePP,
+  KjNode**     coordinatesPP,
+  KjNode**     contextNodePP,
+  KjNode**     showChangesP
+)
 {
   KjNode* dbSubIdP            = kjLookup(dbSubP, "_id");         DB_ITEM_NOT_FOUND(dbSubIdP, "id",          tenant);
   KjNode* dbNameP             = kjLookup(dbSubP, "name");
@@ -194,6 +203,7 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   KjNode* dbLastNotificationP = kjLookup(dbSubP, "lastNotification");
   KjNode* dbLastSuccessP      = kjLookup(dbSubP, "lastSuccess");
   KjNode* dbLastFailureP      = kjLookup(dbSubP, "lastFailure");
+  KjNode* dbShowChangesP      = kjLookup(dbSubP, "showChanges");
   KjNode* dbCreatedAtP        = NULL;
   KjNode* dbModifiedAtP       = NULL;
 
@@ -214,6 +224,10 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   // type
   KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", "Subscription");
   kjChildAdd(apiSubP, typeNodeP);
+
+  // showChanges
+  if ((dbShowChangesP != NULL) && (showChangesP != NULL))
+    *showChangesP = dbShowChangesP;
 
   //
   // If dbSubIdP is a JSON Object, it's an NGSIv2 subscription and its "id" looks like this:
@@ -438,6 +452,13 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   KjNode* endpointP = kjObject(orionldState.kjsonP, "endpoint");
 
   kjChildAdd(notificationP, endpointP);
+
+  // notification::showChanges
+  if ((dbShowChangesP != NULL) && (dbShowChangesP->value.b == true))
+  {
+    KjNode* showChangesP = kjBoolean(orionldState.kjsonP, "showChanges", true);
+    kjChildAdd(notificationP, showChangesP);
+  }
 
   // notification::status
   bool    nStatus      = notificationStatus(dbLastSuccessP, dbLastFailureP);

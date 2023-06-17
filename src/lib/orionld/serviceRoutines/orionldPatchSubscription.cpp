@@ -540,7 +540,7 @@ static bool subCacheItemUpdateNotificationEndpoint(CachedSubscription* cSubP, Kj
 //
 // subCacheItemUpdateNotification -
 //
-static bool subCacheItemUpdateNotification(CachedSubscription* cSubP, KjNode* itemP)
+static bool subCacheItemUpdateNotification(CachedSubscription* cSubP, KjNode* itemP, KjNode* showChangesP)
 {
   KjNode* attributesP = kjLookup(itemP, "attributes");
   KjNode* formatP     = kjLookup(itemP, "format");
@@ -562,6 +562,9 @@ static bool subCacheItemUpdateNotification(CachedSubscription* cSubP, KjNode* it
   if (endpointP != NULL)
     return subCacheItemUpdateNotificationEndpoint(cSubP, endpointP);
 
+  if (showChangesP != NULL)
+    cSubP->showChanges = showChangesP->value.b;
+
   return true;
 }
 
@@ -571,7 +574,16 @@ static bool subCacheItemUpdateNotification(CachedSubscription* cSubP, KjNode* it
 //
 // subCacheItemUpdate -
 //
-static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionId, KjNode* subscriptionTree, KjNode* geoCoordinatesP, QNode* qNodeP, char* qText)
+static bool subCacheItemUpdate
+(
+  OrionldTenant* tenantP,
+  const char*    subscriptionId,
+  KjNode*        subscriptionTree,
+  KjNode*        geoCoordinatesP,
+  QNode*         qNodeP,
+  char*          qText,
+  KjNode*        showChangesP
+)
 {
   CachedSubscription* cSubP = subCacheItemLookup(tenantP->tenant, subscriptionId);
   bool                r     = true;
@@ -659,7 +671,7 @@ static bool subCacheItemUpdate(OrionldTenant* tenantP, const char* subscriptionI
     }
     else if (strcmp(itemP->name, "notification") == 0)
     {
-      subCacheItemUpdateNotification(cSubP, itemP);
+      subCacheItemUpdateNotification(cSubP, itemP, showChangesP);
     }
     else if ((strcmp(itemP->name, "expires") == 0) || (strcmp(itemP->name, "expiresAt") == 0))
     {
@@ -804,6 +816,7 @@ bool orionldPatchSubscription(void)
   bool     qIsMq                  = false;
   KjNode*  uriP                   = NULL;
   KjNode*  notifierInfoP          = NULL;
+  KjNode*  showChangesP           = NULL;
   bool     r;
 
   r = pCheckSubscription(subTree,
@@ -820,7 +833,8 @@ bool orionldPatchSubscription(void)
                          &uriP,
                          &notifierInfoP,
                          &geoCoordinatesP,
-                         &mqttChange);
+                         &mqttChange,
+                         &showChangesP);
   if (r == false)
   {
     if (qNodeP != NULL)
@@ -946,7 +960,7 @@ bool orionldPatchSubscription(void)
   }
 
   // Modify the subscription in the subscription cache
-  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP, qNodeP, qRenderedForDb) == false)
+  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP, qNodeP, qRenderedForDb, showChangesP) == false)
     LM_E(("Internal Error (unable to update the cached subscription '%s' after a PATCH)", subscriptionId));
 
   // All OK? 204 No Content

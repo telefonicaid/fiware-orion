@@ -227,6 +227,51 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
 
 // -----------------------------------------------------------------------------
 //
+// previousValue -
+//
+static void previousValue(KjNode* attrP, const char* attrLongNam)
+{
+  KjNode* typeP     = kjLookup(attrP, "type");
+  char*   fieldName = (char*) "previousValue";
+  KjNode* previousP = NULL;
+
+  LM_T(LmtShowChanges, ("Adding 'previousX' for attribute '%s'", attrLongNam));
+  if (orionldState.previousValues != NULL)
+    kjTreeLog(orionldState.previousValues, "orionldState.previousValues", LmtShowChanges);
+  else
+    LM_T(LmtShowChanges, ("orionldState.previousValues == NULL"));
+
+  if (typeP != NULL)
+  {
+    if (strcmp(typeP->value.s, "Relationship") == 0)
+      fieldName = (char*) "previousObject";
+    else if (strcmp(typeP->value.s, "GeoProperty") == 0)
+      fieldName = (char*) "previousValue";
+    else if (strcmp(typeP->value.s, "LanguageProperty") == 0)
+      fieldName = (char*) "previousLanguageMap";
+  }
+
+  if (orionldState.previousValues != NULL)
+  {
+    previousP = kjLookup(orionldState.previousValues, attrLongNam);
+    if (previousP == NULL)
+      previousP = kjString(orionldState.kjsonP, fieldName, "urn:ngsi-ld:null");
+    else
+    {
+      previousP = kjClone(orionldState.kjsonP, previousP);
+      previousP->name = fieldName;
+    }
+  }
+  // else if (orionldState.previousValueArray != NULL)  // When more than one entity
+
+  if (previousP != NULL)
+    kjChildAdd(attrP, previousP);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // attributeFix - compaction and format (concise, simplified, normalized)
 //
 static void attributeFix(KjNode* attrP, CachedSubscription* subP)
@@ -239,6 +284,8 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
   // do three string-comparisons in every loop
   //
   eqForDot(attrP->name);
+  char* attrLongName = attrP->name;
+
   attrP->name = orionldContextItemAliasLookup(subP->contextP, attrP->name, NULL, NULL);
 
   //
@@ -268,6 +315,10 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
     //
     // Here we're "in subAttributeFix"
     //
+
+    // Add the "previousValue", unless RF_KEYVALUES
+    if ((subP->renderFormat != RF_KEYVALUES) && (subP->showChanges == true))
+      previousValue(attrP, attrLongName);
 
     for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
     {
@@ -461,6 +512,7 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
         if (strcmp(dotName, attrName) == 0)
         {
           clone = true;
+          LM_T(LmtShowChanges, ("Adding the attribute '%s' to a notification entity - add also the previousValue!", attrName));
           break;
         }
       }

@@ -82,6 +82,7 @@ bool orionldPostSubscriptions(void)
   bool     b               = false;
   bool     qValidForV2     = false;
   bool     qIsMq           = false;
+  KjNode*  showChangesP    = NULL;
 
   b = pCheckSubscription(subP,
                          true,
@@ -97,7 +98,8 @@ bool orionldPostSubscriptions(void)
                          &uriP,
                          &notifierInfoP,
                          &geoCoordinatesP,
-                         &mqtt);
+                         &mqtt,
+                         &showChangesP);
   if (qRenderedForDb != NULL)
     LM_T(LmtSR, ("qRenderedForDb: '%s'", qRenderedForDb));
 
@@ -244,7 +246,7 @@ bool orionldPostSubscriptions(void)
   }
 
   // sub to cache - BEFORE we change the tree to be according to the DB Model (as the DB model might change some day ...)
-  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP, qTree, geoCoordinatesP, orionldState.contextP, orionldState.tenantP->tenant);
+  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP, qTree, geoCoordinatesP, orionldState.contextP, orionldState.tenantP->tenant, showChangesP);
 
   // dbModel
   KjNode* dbSubscriptionP = subP;

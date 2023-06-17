@@ -92,6 +92,7 @@ static void mdItemAdd(KjNode* mdArray, const char* subAttrName)
 
 
 
+extern void previousValue(KjNode* dbAttrsP, KjNode* dbAttrP, const char* attrName);
 // -----------------------------------------------------------------------------
 //
 // attributeMerge -
@@ -147,6 +148,7 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
     //
     if (isValue == true)
     {
+      previousValue(NULL, dbAttrP, orionldState.in.pathAttrExpanded);
       // Can't be null - must have been captured earlier (pCheckAttribute?)
       KjNode* dbValueP = kjLookup(dbAttrP, "value");
       if (dbValueP != NULL)

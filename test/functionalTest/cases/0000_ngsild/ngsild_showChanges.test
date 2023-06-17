@@ -1,0 +1,446 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+showChanges in Subscription - provoke a notification and see the previousValue
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create E1 with an attribute A1 == 1
+# 02. Create a matching subscription S1, with showChanges set to true
+# 03. See S1 in the database - make sure showChanges is there
+# 04. PATCH /entities/urn:E1/attrs/A1, setting its value to 4
+# 05. Dump/Reset accumulator, see A1's value and previousValue
+# 06. GET the subscription, from cache, to see showChanges=true
+# 07. GET the subscription, from DB, to see showChanges=true
+# 08. Restart broker
+# 09. GET the subscription, from cache, to see showChanges=true
+# 10. GET the subscription, from DB, to see showChanges=true
+# 11. PATCH /entities/urn:E1/attrs/A1, setting its value to 11
+# 12. Dump/Reset accumulator, see A1's value and previousValue
+# 13. PATCH S1, setting showChanges=false
+# 14. See S1 in the database - make sure showChanges is false
+# 15. GET the subscription, from cache, to see showChanges=false
+# 16. GET the subscription, from DB, to see showChanges=false
+# 17. PATCH S1, setting showChanges=true
+# 18. See S1 in the database - make sure showChanges is true
+# 19. GET the subscription, from cache, to see showChanges=true
+# 20. GET the subscription, from DB, to see showChanges=true
+#
+
+echo "01. Create E1 with an attribute A1 == 1"
+echo "======================================="
+payload='{
+  "id": "urn:E1",
+  "type": "Device",
+  "A1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a matching subscription S1, with showChanges set to true"
+echo "==================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "Device"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "showChanges": true
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. See S1 in the database - make sure showChanges is there"
+echo "==========================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "04. PATCH /entities/urn:E1/attrs/A1, setting its value to 4"
+echo "==========================================================="
+payload='{
+  "value": 4
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/A1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. Dump/Reset accumulator, see A1's value and previousValue"
+echo "============================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. GET the subscription, from cache, to see showChanges=true"
+echo "============================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "07. GET the subscription, from DB, to see showChanges=true"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1?options=fromDb
+echo
+echo
+
+
+echo "08. Restart broker"
+echo "=================="
+brokerStop CB
+orionldStart CB -experimental
+echo
+echo
+
+
+echo "09. GET the subscription, from cache, to see showChanges=true"
+echo "============================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "10. GET the subscription, from DB, to see showChanges=true"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1?options=fromDb
+echo
+echo
+
+
+echo "11. PATCH /entities/urn:E1/attrs/A1, setting its value to 11"
+echo "============================================================"
+payload='{
+  "value": 11
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/A1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "12. Dump/Reset accumulator, see A1's value and previousValue"
+echo "============================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with an attribute A1 == 1
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create a matching subscription S1, with showChanges set to true
+===================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+
+
+
+03. See S1 in the database - make sure showChanges is there
+===========================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"entities" : [
+		{
+			"id" : "urn:E1",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		}
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"reference" : "http://REGEX(.*)/notify",
+	"mimeType" : "application/json",
+	"showChanges" : true,
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+04. PATCH /entities/urn:E1/attrs/A1, setting its value to 4
+===========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Dump/Reset accumulator, see A1's value and previousValue
+============================================================
+POST http://xps/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 265
+User-Agent: orionld/REGEX(.*)
+Host: xps
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "previousValue": 1,
+                "type": "Property",
+                "value": 4
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+06. GET the subscription, from cache, to see showChanges=true
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 397
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "lastSuccess": "202REGEX(.*)Z",
+        "showChanges": true,
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+07. GET the subscription, from DB, to see showChanges=true
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 400
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "lastSuccess": "202REGEX(.*)Z",
+        "showChanges": true,
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "database",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+08. Restart broker
+==================
+
+
+09. GET the subscription, from cache, to see showChanges=true
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 296
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "showChanges": true,
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+10. GET the subscription, from DB, to see showChanges=true
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "showChanges": true,
+        "status": "ok"
+    },
+    "origin": "database",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+11. PATCH /entities/urn:E1/attrs/A1, setting its value to 11
+============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+12. Dump/Reset accumulator, see A1's value and previousValue
+============================================================
+POST http://xps/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 266
+User-Agent: orionld/REGEX(.*)
+Host: xps
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "previousValue": 4,
+                "type": "Property",
+                "value": 11
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

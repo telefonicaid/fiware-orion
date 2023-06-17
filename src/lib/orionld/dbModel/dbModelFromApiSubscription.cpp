@@ -374,6 +374,11 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
         kjChildRemove(notificationP, formatP);
         kjChildAdd(apiSubscriptionP, formatP);
       }
+      else if (strcmp(nItemP->name, "showChanges") == 0)
+      {
+        kjChildRemove(notificationP, nItemP);
+        kjChildAdd(apiSubscriptionP, nItemP);
+      }
       else if (strcmp(nItemP->name, "endpoint") == 0)
       {
         KjNode* uriP           = kjLookup(nItemP, "uri");

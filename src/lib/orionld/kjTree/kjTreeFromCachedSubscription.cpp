@@ -282,6 +282,14 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   NULL_CHECK(nodeP);
   kjChildAdd(notificationNodeP, nodeP);
 
+  // notification::showChanges
+  if (cSubP->showChanges == true)
+  {
+    nodeP = kjBoolean(orionldState.kjsonP, "showChanges", true);
+    NULL_CHECK(nodeP);
+    kjChildAdd(notificationNodeP, nodeP);
+  }
+
   // notification::endpoint
   KjNode* endpointNodeP = kjObject(orionldState.kjsonP, "endpoint");
   NULL_CHECK(endpointNodeP);

@@ -45,6 +45,7 @@ const char* SubscriptionNotificationFormatPath         = "Subscription::notifica
 const char* SubscriptionNotificationAttributesPath     = "Subscription::notification::attributes";
 const char* SubscriptionNotificationAttributesItemPath = "Subscription::notification::attributes[X]";
 const char* SubscriptionNotificationEndpointPath       = "Subscription::notification::endpoint";
+const char* SubscriptionNotificationShowChangesPath    = "Subscription::notification::showChanges";
 const char* SubscriptionQPath                          = "Subscription::q";
 const char* SubscriptionGeoqPath                       = "Subscription::geoQ";
 const char* SubscriptionIsActivePath                   = "Subscription::isActive";

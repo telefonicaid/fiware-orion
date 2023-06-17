@@ -110,7 +110,7 @@ static bool orionldGetSubscriptionsFromDb(void)
     QNode*  qTree        = NULL;
     KjNode* contextNodeP = NULL;
     KjNode* coordinatesP = NULL;
-    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, orionldState.tenantP->tenant, false, &qTree, &coordinatesP, &contextNodeP);
+    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, orionldState.tenantP->tenant, false, &qTree, &coordinatesP, &contextNodeP, NULL);
 
     if (apiSubP == NULL)
     {

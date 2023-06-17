@@ -44,11 +44,12 @@ extern "C"
 //
 // pCheckNotification -
 //
-bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP, bool* mqttChangeP)
+bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP, bool* mqttChangeP, KjNode** showChangesOutP)
 {
-  KjNode* attributesP = NULL;
-  KjNode* formatP     = NULL;
-  KjNode* endpointP   = NULL;
+  KjNode* attributesP  = NULL;
+  KjNode* formatP      = NULL;
+  KjNode* endpointP    = NULL;
+  KjNode* showChangesP = NULL;
 
   PCHECK_OBJECT(notificationP, 0, NULL, SubscriptionNotificationPath, 400);
   PCHECK_OBJECT_EMPTY(notificationP, 0, NULL, SubscriptionNotificationPath, 400);
@@ -88,6 +89,12 @@ bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNod
 
       if (pcheckEndpoint(endpointP, patch, uriPP, notifierInfoPP, mqttChangeP) == false)
         return false;
+    }
+    else if (strcmp(nItemP->name, "showChanges") == 0)
+    {
+      PCHECK_DUPLICATE(showChangesP, nItemP, 0, NULL, SubscriptionNotificationShowChangesPath, 400);
+      PCHECK_BOOL(showChangesP, 0, NULL, SubscriptionNotificationShowChangesPath, 400);
+      *showChangesOutP = showChangesP;
     }
     else if (strcmp(nItemP->name, "status")           == 0) {}  // Ignored
     else if (strcmp(nItemP->name, "timesSent")        == 0) {}  // Ignored

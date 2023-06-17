@@ -54,6 +54,7 @@ typedef enum TraceLevels
   LmtNotificationSend,                 // Sending of notifications
   LmtNotificationHeaders,              // notification request/response headers
   LmtNotificationBody,                 // notification request/response body
+  LmtShowChanges,                      // Add the field 'previousX' to attributes in notifications
 
   //
   // Subscription Cache

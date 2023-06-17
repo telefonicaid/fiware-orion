@@ -43,6 +43,7 @@ extern const char* SubscriptionNotificationFormatPath;
 extern const char* SubscriptionNotificationAttributesPath;
 extern const char* SubscriptionNotificationAttributesItemPath;
 extern const char* SubscriptionNotificationEndpointPath;
+extern const char* SubscriptionNotificationShowChangesPath;
 extern const char* SubscriptionWatchedAttributesPath;
 extern const char* SubscriptionWatchedAttributesItemPath;
 extern const char* SubscriptionQPath;
