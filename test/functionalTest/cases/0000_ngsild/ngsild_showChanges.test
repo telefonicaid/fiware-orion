@@ -167,6 +167,72 @@ echo
 echo
 
 
+echo "13. PATCH S1, setting showChanges=false"
+echo "======================================="
+payload='{
+  "notification": {
+    "showChanges": false
+   }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "14. See S1 in the database - make sure showChanges is false"
+echo "==========================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "15. GET the subscription, from cache, to see showChanges=false"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "16. GET the subscription, from DB, to see showChanges=false"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1?options=fromDb
+echo
+echo
+
+
+echo "17. PATCH S1, setting showChanges=true"
+echo "======================================"
+payload='{
+  "notification": {
+    "showChanges": true
+   }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "18. See S1 in the database - make sure showChanges is true"
+echo "=========================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "19. GET the subscription, from cache, to see showChanges=true"
+echo "============================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+echo
+echo
+
+
+echo "20. GET the subscription, from DB, to see showChanges=true"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1?options=fromDb
+echo
+echo
+
+
 --REGEXPECT--
 01. Create E1 with an attribute A1 == 1
 =======================================
@@ -439,6 +505,240 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+
+
+13. PATCH S1, setting showChanges=false
+=======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+14. See S1 in the database - make sure showChanges is false
+===========================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"entities" : [
+		{
+			"id" : "urn:E1",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		}
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"reference" : "http://REGEX(.*)/notify",
+	"mimeType" : "application/json",
+	"showChanges" : false,
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+15. GET the subscription, from cache, to see showChanges=false
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 378
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "20REGEX(.*)Z",
+        "lastSuccess": "20REGEX(.*)Z",
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+16. GET the subscription, from DB, to see showChanges=false
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 381
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "20REGEX(.*)Z",
+        "lastSuccess": "20REGEX(.*)Z",
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "database",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+17. PATCH S1, setting showChanges=true
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+18. See S1 in the database - make sure showChanges is true
+==========================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subs:S1",
+	"entities" : [
+		{
+			"id" : "urn:E1",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		}
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"reference" : "http://REGEX(.*)/notify",
+	"mimeType" : "application/json",
+	"showChanges" : true,
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+19. GET the subscription, from cache, to see showChanges=true
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 397
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "20REGEX(.*)Z",
+        "lastSuccess": "20REGEX(.*)Z",
+        "showChanges": true,
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+20. GET the subscription, from DB, to see showChanges=true
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 400
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "20REGEX(.*)Z",
+        "lastSuccess": "20REGEX(.*)Z",
+        "showChanges": true,
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "database",
+    "status": "active",
+    "type": "Subscription"
+}
 
 
 --TEARDOWN--

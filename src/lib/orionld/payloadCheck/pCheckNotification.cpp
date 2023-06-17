@@ -108,7 +108,7 @@ bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNod
     }
   }
 
-  if (endpointP == NULL)
+  if ((endpointP == NULL) && (patch == false))
   {
     orionldError(OrionldBadRequestData, "Mandatory field missing", SubscriptionNotificationEndpointPath, 400);
     return false;
