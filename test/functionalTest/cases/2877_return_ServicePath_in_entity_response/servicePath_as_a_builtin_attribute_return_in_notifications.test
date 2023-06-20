@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-servicePath as a builtin attribute return in notifications
+return servicePath as a builtin attribute in notifications
 
 --SHELL-INIT--
 dbInit CB
