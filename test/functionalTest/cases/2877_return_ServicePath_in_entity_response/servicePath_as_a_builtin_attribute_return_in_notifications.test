@@ -144,7 +144,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /Madrid/A
 Content-Length: 244
-User-Agent: orion/3.10.0-next libcurl/7.68.0
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:9997
 Accept: application/json
