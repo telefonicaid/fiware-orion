@@ -46,6 +46,7 @@ extern void mongoVersionGet(int* mayor, int* minor);
 */
 extern int mongoConnectionPoolInit
 (
+  const char* dbURI,
   const char* host,
   const char* db,
   const char* rplSet,
