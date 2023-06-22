@@ -79,6 +79,8 @@ ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")
   TARGET_LINK_LIBRARIES(orionld ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} STREQUAL "Fedora_20")
   TARGET_LINK_LIBRARIES(orionld ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_22.04.2_LTS")
+  TARGET_LINK_LIBRARIES(orionld ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
 
 # Finally this is a "best effort" option to try to build on distros that don't have a
 # specify switch
