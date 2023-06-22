@@ -55,6 +55,7 @@ add_definitions(-DORIONLD)
 
 add_definitions(-fPIC)
 add_definitions(-std=c++11)
+add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY)
 
 # Baseline compiler flags, any change here will affect all build types
 
