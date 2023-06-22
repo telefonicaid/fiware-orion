@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
+#include "orionld/notifications/previousValues.h"                // previousValues
 #include "orionld/serviceRoutines/orionldPutEntity.h"            // Own Interface
 
 
@@ -290,6 +291,8 @@ bool orionldPutEntity(void)
   KjNode* dbAttrsP = kjLookup(oldDbEntityP, "attrs");
   if (pCheckEntity(orionldState.requestTree, false, dbAttrsP) == false)
     return false;
+
+  previousValues(orionldState.requestTree, dbAttrsP);
 
   //
   // Create the new DB Entity, based mainly on orionldState.requestTree

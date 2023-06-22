@@ -48,6 +48,7 @@ extern "C"
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/notifications/previousValues.h"                // previousValues
 #include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
@@ -158,6 +159,8 @@ bool orionldPostEntity(void)
   //
   if (pCheckEntity(orionldState.requestTree, false, dbAttrsP) == false)
     return false;
+
+  previousValues(orionldState.requestTree, dbAttrsP);
 
   //
   // We need the Entity Type for ALTERATIONS - match subscriptions

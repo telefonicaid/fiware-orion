@@ -178,6 +178,7 @@ typedef struct OrionLdRestService
   int                    matchForSecondWildcardLen;     // strlen of last path to match
   uint32_t               options;                       // Peculiarities of this type of requests (bitmask)
   uint64_t               uriParams;                     // Supported URI parameters (bitmask)
+  bool                   isBatchOp;                     // true for BATCH operations
 } OrionLdRestService;
 
 

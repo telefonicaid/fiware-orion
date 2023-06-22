@@ -55,6 +55,7 @@ extern "C"
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/notifications/previousValuePopulate.h"         // previousValuePopulate
 #include "orionld/serviceRoutines/orionldPutAttribute.h"         // Own Interface
 
 
@@ -144,6 +145,8 @@ bool orionldPutAttribute(void)
 
   if (pCheckAttribute(entityId, orionldState.requestTree, true, NoAttributeType, true, NULL) == false)
     return false;  // pcheckAttribute() calls orionldError
+
+  previousValuePopulate(NULL, dbAttrP, orionldState.in.pathAttrExpanded);
 
   // Distributed requests?
   DistOp* distOpList   = NULL;

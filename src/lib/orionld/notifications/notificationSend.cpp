@@ -43,13 +43,15 @@ extern "C"
 #include "logMsg/logMsg.h"
 
 #include "cache/CachedSubscription.h"                            // CachedSubscription
+
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl, userAgentHeader
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/langStringExtract.h"                    // langStringExtract
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration, orionldAlterationType
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
+#include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"        // kjEntityIdLookupInEntityArray
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
@@ -57,6 +59,7 @@ extern "C"
 #include "orionld/notifications/httpNotify.h"                    // httpNotify
 #include "orionld/notifications/httpsNotify.h"                   // httpsNotify
 #include "orionld/notifications/notificationDataToGeoJson.h"     // notificationDataToGeoJson
+#include "orionld/notifications/previousValueAdd.h"              // previousValueAdd
 #include "orionld/notifications/notificationSend.h"              // Own interface
 
 
@@ -227,51 +230,6 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
 
 // -----------------------------------------------------------------------------
 //
-// previousValue -
-//
-static void previousValue(KjNode* attrP, const char* attrLongNam)
-{
-  KjNode* typeP     = kjLookup(attrP, "type");
-  char*   fieldName = (char*) "previousValue";
-  KjNode* previousP = NULL;
-
-  LM_T(LmtShowChanges, ("Adding 'previousX' for attribute '%s'", attrLongNam));
-  if (orionldState.previousValues != NULL)
-    kjTreeLog(orionldState.previousValues, "orionldState.previousValues", LmtShowChanges);
-  else
-    LM_T(LmtShowChanges, ("orionldState.previousValues == NULL"));
-
-  if (typeP != NULL)
-  {
-    if (strcmp(typeP->value.s, "Relationship") == 0)
-      fieldName = (char*) "previousObject";
-    else if (strcmp(typeP->value.s, "GeoProperty") == 0)
-      fieldName = (char*) "previousValue";
-    else if (strcmp(typeP->value.s, "LanguageProperty") == 0)
-      fieldName = (char*) "previousLanguageMap";
-  }
-
-  if (orionldState.previousValues != NULL)
-  {
-    previousP = kjLookup(orionldState.previousValues, attrLongNam);
-    if (previousP == NULL)
-      previousP = kjString(orionldState.kjsonP, fieldName, "urn:ngsi-ld:null");
-    else
-    {
-      previousP = kjClone(orionldState.kjsonP, previousP);
-      previousP->name = fieldName;
-    }
-  }
-  // else if (orionldState.previousValueArray != NULL)  // When more than one entity
-
-  if (previousP != NULL)
-    kjChildAdd(attrP, previousP);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // attributeFix - compaction and format (concise, simplified, normalized)
 //
 static void attributeFix(KjNode* attrP, CachedSubscription* subP)
@@ -318,10 +276,12 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
 
     // Add the "previousValue", unless RF_KEYVALUES
     if ((subP->renderFormat != RF_KEYVALUES) && (subP->showChanges == true))
-      previousValue(attrP, attrLongName);
+      previousValueAdd(attrP, attrLongName);
 
+    LM_W(("Fixing attribute '%s'", attrP->name));
     for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
     {
+      LM_W(("Fixing attribute '%s', sub-attribute '%s'", attrP->name, saP->name));
       if (strcmp(saP->name, "value")       == 0) continue;
       if (strcmp(saP->name, "object")      == 0) continue;
       if (strcmp(saP->name, "languageMap") == 0) continue;
@@ -597,7 +557,21 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
 
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
+    kjTreeLog(matchP->altP->finalApiEntityP, "matchP->altP->finalApiEntityP", LmtSR);
     KjNode* apiEntityP = matchP->altP->finalApiEntityP;
+
+    // If the entity is already in "data", and, it's not a BATCH Operation, skip - already there
+    if (orionldState.serviceP->isBatchOp == false)
+    {
+      KjNode* idP = kjLookup(apiEntityP, "id");
+      if (idP == NULL)
+        LM_X(1, ("Internal Error (notification entity without an id)"));
+      if (kjEntityIdLookupInEntityArray(dataNodeP, idP->value.s) != NULL)
+      {
+        LM_T(LmtNotificationBody, ("Skipping entity '%s'", idP->value.s));
+        continue;
+      }
+    }
 
     //
     // Filter out unwanted attributes, if so requested (by the Subscription)
@@ -605,6 +579,7 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
     if (matchP->subP->attributes.size() > 0)
       apiEntityP = attributeFilter(apiEntityP, matchP);
 
+    kjTreeLog(apiEntityP, "apiEntityP before entityFix", LmtSR);
     apiEntityP = entityFix(apiEntityP, subP);
     kjChildAdd(dataNodeP, apiEntityP);
   }

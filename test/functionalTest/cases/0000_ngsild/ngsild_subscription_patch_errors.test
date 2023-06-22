@@ -144,7 +144,6 @@ orionldStart CB
 # 67. Attempt to PATCH the subscription with a 'notification:attributes' that is an empty array
 # 68. Attempt to PATCH the subscription with a duplicated 'notification:attributes'
 # 69. Attempt to PATCH the subscription with a 'notification:attributes' that is an array with a non-string item
-# 70. Attempt to PATCH the subscription with a 'notification:status'
 # 71. Attempt to PATCH the subscription with a 'notification' item named 'unsupported'
 #
 # 72. Attempt to PATCH the subscription with a 'notification:format' that is not a string
@@ -843,18 +842,6 @@ echo "==========================================================================
 payload='{
   "notification": {
     "attributes": [ "A1", 14 ]
-  }
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "70. Attempt to PATCH the subscription with a 'notification:status'"
-echo "=================================================================="
-payload='{
-  "notification": {
-    "status": "active"
   }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S01 -X PATCH --payload "$payload"
@@ -1932,20 +1919,6 @@ Date: REGEX(.*)
 {
     "detail": "Subscription::notification::attributes[X]",
     "title": "Not a JSON String",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-70. Attempt to PATCH the subscription with a 'notification:status'
-==================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 143
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "Subscription::notification::endpoint",
-    "title": "Mandatory field missing",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

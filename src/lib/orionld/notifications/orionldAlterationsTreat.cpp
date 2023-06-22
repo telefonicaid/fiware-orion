@@ -466,7 +466,7 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
-#if 0
+#if 1
   // <DEBUG>
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
@@ -543,11 +543,19 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   //
   if ((altList->dbEntityP != NULL) && (altList->finalApiEntityP == NULL))
   {
+    LM_T(LmtSR, ("Calling dbModelToApiEntity to obtain 'finalApiEntity'"));
+    kjTreeLog(altList->dbEntityP, "dbEntityP", LmtSR);
     altList->finalApiEntityP = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
+    kjTreeLog(altList->finalApiEntityP, "finalApiEntityP", LmtSR);
 
+    int patchNo = 0;
     for (KjNode* patchP = altList->inEntityP->value.firstChildP; patchP != NULL; patchP = patchP->next)
     {
+      ++patchNo;
+      LM_T(LmtSR, ("Calling orionldPatchApply for PATCH %d", patchNo));
+      kjTreeLog(patchP, "patchP", LmtSR);
       orionldPatchApply(altList->finalApiEntityP, patchP);
+      kjTreeLog(altList->finalApiEntityP, "Patch Applied", LmtSR);
     }
   }
 

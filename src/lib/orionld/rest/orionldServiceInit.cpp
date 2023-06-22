@@ -344,17 +344,23 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPostBatchCreate)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->options    = 0;  // Tenant will be created if necessary
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->options    = 0;  // Tenant will be created if necessary
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
 
@@ -362,11 +368,15 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPostBatchDelete)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
   else if (serviceP->serviceRoutine == orionldPostQuery)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
     serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;

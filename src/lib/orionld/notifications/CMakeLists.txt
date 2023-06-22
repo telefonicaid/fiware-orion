@@ -31,6 +31,9 @@ SET (SOURCES
     httpNotify.cpp
     httpsNotify.cpp
     alteration.cpp
+    previousValues.cpp
+    previousValuePopulate.cpp
+    previousValueAdd.cpp
 )
 
 # Include directories

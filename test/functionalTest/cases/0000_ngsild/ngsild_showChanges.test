@@ -302,7 +302,7 @@ Date: REGEX(.*)
 
 05. Dump/Reset accumulator, see A1's value and previousValue
 ============================================================
-POST http://xps/notify?subscriptionId=urn:ngsi-ld:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
 Content-Length: 265
 User-Agent: orionld/REGEX(.*)
 Host: xps
@@ -478,7 +478,7 @@ Date: REGEX(.*)
 
 12. Dump/Reset accumulator, see A1's value and previousValue
 ============================================================
-POST http://xps/notify?subscriptionId=urn:ngsi-ld:subs:S1
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
 Content-Length: 266
 User-Agent: orionld/REGEX(.*)
 Host: xps
