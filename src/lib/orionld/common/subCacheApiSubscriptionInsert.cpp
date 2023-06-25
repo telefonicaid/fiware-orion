@@ -55,7 +55,15 @@ extern "C"
 //
 // subCacheApiSubscriptionInsert -
 //
-CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNode* qTree, KjNode* geoCoordinatesP, OrionldContext* contextP, const char* tenant)
+CachedSubscription* subCacheApiSubscriptionInsert
+(
+  KjNode*         apiSubscriptionP,
+  QNode*          qTree,
+  KjNode*         geoCoordinatesP,
+  OrionldContext* contextP,
+  const char*     tenant,
+  KjNode*         showChangesP
+)
 {
   CachedSubscription* cSubP = new CachedSubscription();
 
@@ -65,6 +73,7 @@ CachedSubscription* subCacheApiSubscriptionInsert(KjNode* apiSubscriptionP, QNod
   cSubP->contextP            = contextP;        // Right now, this is orionldState.contextP, i.e., the @context used when creating, except if "refresh"!
   cSubP->ldContext           = (contextP != NULL)? contextP->url : "";
   cSubP->geoCoordinatesP     = NULL;
+  cSubP->showChanges         = (showChangesP != NULL)? showChangesP->value.b : false;
 
   KjNode* subscriptionIdP    = kjLookup(apiSubscriptionP, "_id");  // "id" was changed to "_id" by orionldPostSubscriptions to accomodate the DB insertion
   KjNode* subscriptionNameP  = kjLookup(apiSubscriptionP, "subscriptionName");  // "name" is accepted too ...

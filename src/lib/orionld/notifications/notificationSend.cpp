@@ -43,13 +43,15 @@ extern "C"
 #include "logMsg/logMsg.h"
 
 #include "cache/CachedSubscription.h"                            // CachedSubscription
+
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl, userAgentHeader
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/langStringExtract.h"                    // langStringExtract
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlterationMatch, OrionldAlteration, orionldAlterationType
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
+#include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"        // kjEntityIdLookupInEntityArray
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
@@ -57,6 +59,7 @@ extern "C"
 #include "orionld/notifications/httpNotify.h"                    // httpNotify
 #include "orionld/notifications/httpsNotify.h"                   // httpsNotify
 #include "orionld/notifications/notificationDataToGeoJson.h"     // notificationDataToGeoJson
+#include "orionld/notifications/previousValueAdd.h"              // previousValueAdd
 #include "orionld/notifications/notificationSend.h"              // Own interface
 
 
@@ -239,6 +242,8 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
   // do three string-comparisons in every loop
   //
   eqForDot(attrP->name);
+  char* attrLongName = attrP->name;
+
   attrP->name = orionldContextItemAliasLookup(subP->contextP, attrP->name, NULL, NULL);
 
   //
@@ -269,6 +274,11 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
     // Here we're "in subAttributeFix"
     //
 
+    // Add the "previousValue", unless RF_KEYVALUES
+    if ((subP->renderFormat != RF_KEYVALUES) && (subP->showChanges == true))
+      previousValueAdd(attrP, attrLongName);
+
+    LM_T(LmtPatchEntity, ("Fixing attribute '%s' (JSON type: %s)", attrP->name, kjValueType(attrP->type)));
     for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
     {
       if (strcmp(saP->name, "value")       == 0) continue;
@@ -461,6 +471,7 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
         if (strcmp(dotName, attrName) == 0)
         {
           clone = true;
+          LM_T(LmtShowChanges, ("Adding the attribute '%s' to a notification entity - add also the previousValue!", attrName));
           break;
         }
       }
@@ -545,7 +556,21 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
 
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
+    kjTreeLog(matchP->altP->finalApiEntityP, "matchP->altP->finalApiEntityP", LmtSR);
     KjNode* apiEntityP = matchP->altP->finalApiEntityP;
+
+    // If the entity is already in "data", and, it's not a BATCH Operation, skip - already there
+    if (orionldState.serviceP->isBatchOp == false)
+    {
+      KjNode* idP = kjLookup(apiEntityP, "id");
+      if (idP == NULL)
+        LM_X(1, ("Internal Error (notification entity without an id)"));
+      if (kjEntityIdLookupInEntityArray(dataNodeP, idP->value.s) != NULL)
+      {
+        LM_T(LmtNotificationBody, ("Skipping entity '%s'", idP->value.s));
+        continue;
+      }
+    }
 
     //
     // Filter out unwanted attributes, if so requested (by the Subscription)
@@ -553,6 +578,7 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
     if (matchP->subP->attributes.size() > 0)
       apiEntityP = attributeFilter(apiEntityP, matchP);
 
+    kjTreeLog(apiEntityP, "apiEntityP before entityFix", LmtSR);
     apiEntityP = entityFix(apiEntityP, subP);
     kjChildAdd(dataNodeP, apiEntityP);
   }

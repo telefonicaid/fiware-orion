@@ -456,6 +456,9 @@ typedef struct OrionldConnectionState
   // FIWARE Correlator
   char* correlator;
 
+  // Previous Values
+  KjNode* previousValues;
+
   //
   // Compounds
   //

@@ -109,6 +109,7 @@ struct CachedSubscription
   QNode*                      qP;
   char*                       qText;  // Note that NGSIv2/mongoBackend q/mq are inside SubscriptionExpression
   KjNode*                     geoCoordinatesP;
+  bool                        showChanges;
 
   bool                        isActive;
   std::string                 status;

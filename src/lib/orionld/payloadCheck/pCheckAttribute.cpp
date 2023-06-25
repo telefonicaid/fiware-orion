@@ -498,20 +498,29 @@ bool datasetIdCheck(KjNode* datasetIdP)
 }
 
 
+
+static bool objectArrayCheck(KjNode* arrayP);
 // -----------------------------------------------------------------------------
 //
 // objectCheck -
 //
-bool objectCheck(KjNode* objectP)
+static bool objectCheck(KjNode* objectP)
 {
-  if (objectP->type != KjString)
+  if (objectP->type == KjString)
   {
-    orionldError(OrionldBadRequestData, "Invalid JSON type - not a string", objectP->name, 400);
+    if (pCheckUri(objectP->value.s, objectP->name, true) == false)
+      return false;
+  }
+  else if (objectP->type == KjArray)
+  {
+    if (objectArrayCheck(objectP) == false)
+      return false;
+  }
+  else
+  {
+    orionldError(OrionldBadRequestData, "Invalid JSON type - not a string nor an array", objectP->name, 400);
     return false;
   }
-
-  if (pCheckUri(objectP->value.s, objectP->name, true) == false)
-    return false;
 
   return true;
 }
@@ -520,18 +529,15 @@ bool objectCheck(KjNode* objectP)
 
 // -----------------------------------------------------------------------------
 //
-// stringArrayCheck -
+// objectArrayCheck -
 //
 // NOTE
-//   A Relationship must have an "object field that is a string that is a valid URI.
-//   However, Orion-LD (against the ETSI NGSI-LD API spec) allows for the "object" field to also ne an array of URIs.
-//   Once datasetId is fully implemented, this will no longer be allowed.
+//   A Relationship must have an "object field that is a string that is a valid URI".
+//   However, Orion-LD (against the ETSI NGSI-LD API spec) allows for the "object" field to also be an array of URIs.
+//   Once ListRelationahip is implemented, this will be deprecated.
 //
-bool stringArrayCheck(KjNode* arrayP)
+static bool objectArrayCheck(KjNode* arrayP)
 {
-  if (arrayP->type != KjArray)
-    return false;
-
   for (KjNode* uriP = arrayP->value.firstChildP; uriP != NULL; uriP = uriP->next)
   {
     if (objectCheck(uriP) == false)
@@ -1012,8 +1018,9 @@ static bool pCheckAttributeObject
       if (attributeType == Relationship)
       {
         // Until datasetId is fully implemented - string array allowed for Relationship
-        if ((objectCheck(fieldP) == false) && (stringArrayCheck(fieldP) == false))
+        if (objectCheck(fieldP) == false)
           return false;
+
         // All OK - clear part errors
         orionldState.pd.status = 200;
       }

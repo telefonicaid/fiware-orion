@@ -51,7 +51,7 @@ bool troePatchEntity2(void)
 
   for (KjNode* patchP = patchTree->value.firstChildP; patchP != NULL; patchP = patchP->next)
   {
-    orionldPatchApply(patchBase, patchP);
+    orionldPatchApply(patchBase, patchP, false);
   }
 
   //

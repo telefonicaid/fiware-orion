@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_
-#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_
+#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_PREVIOUSVALUES_H_
+#define SRC_LIB_ORIONLD_NOTIFICATIONS_PREVIOUSVALUES_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -23,19 +23,19 @@
 * For those usages not covered by this license please contact with
 * orionld at fiware dot org
 *
-* Author: Ken Zangelin
+* Author: Gabriel Quaresma and Ken Zangelin
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                        // KjNode
 }
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pCheckNotification -
+// previousValues -
 //
-extern bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP, bool* mqttChangeP, KjNode** showChangesP);
+extern void previousValues(KjNode* entityP, KjNode* dbAttrsP);
 
-#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_
+#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_PREVIOUSVALUES_H_

@@ -131,9 +131,74 @@ static char* pathArrayJoin(char* out, char** compV, int components)
 
 // -----------------------------------------------------------------------------
 //
+// attributeValueNames -
+//
+static void attributeValueNames(KjNode* patchBase, int components, char** compV)
+{
+  //
+  // Change "value" for "object"/"languageMap"?
+  //
+  if ((components >= 2) && (strcmp(compV[1], "value") == 0))
+  {
+    // Attribute: change "value" for "object", "languageMap", ... ?
+    // Depends on the type of the attribute
+    char* compv2 = compV[2];
+    compV[1] = (char*) "type";
+    compV[2] = NULL;
+    KjNode* typeNodeP = kjNavigate(patchBase, (const char**) compV, NULL, NULL);
+    compV[1] = (char*) "value";  // Set it back
+    compV[2] = compv2;           // Set it back
+
+    if (typeNodeP != NULL)
+    {
+      if (strcmp(typeNodeP->value.s, "Relationship") == 0)
+      {
+        LM_T(LmtPatchEntity, ("Changing 'value' for 'object' as '%s' is a Relationship", compV[0]));
+        compV[1] = (char*) "object";
+      }
+      else if (strcmp(typeNodeP->value.s, "LanguageProperty") == 0)
+      {
+        LM_T(LmtPatchEntity, ("Changing 'value' for 'languageMap' as '%s' is a LanguageProperty", compV[0]));
+        compV[1] = (char*) "languageMap";
+      }
+    }
+    else
+      LM_T(LmtPatchEntity, ("Didn't find any attribute type!"));
+  }
+  else if ((components >= 3) && (strcmp(compV[2], "value") == 0))
+  {
+    // Sub-Attribute: change "value" for "object", "languageMap", ... ?
+    // Depends on the type of the sub-attribute
+    char* compv3 = compV[3];
+    compV[2] = (char*) "type";
+    compV[3] = NULL;
+    KjNode* typeNodeP = kjNavigate(patchBase, (const char**) compV, NULL, NULL);
+    compV[2] = (char*) "value";  // Set it back
+    compV[3] = compv3;           // Set it back
+
+    if (typeNodeP != NULL)
+    {
+      if (strcmp(typeNodeP->value.s, "Relationship") == 0)
+      {
+        LM_T(LmtPatchEntity, ("Changing 'value' for 'object' as '%s' is a Sub-Relationship", compV[0]));
+        compV[2] = (char*) "object";
+      }
+      else if (strcmp(typeNodeP->value.s, "LanguageProperty") == 0)
+      {
+        LM_T(LmtPatchEntity, ("Changing 'value' for 'languageMap' as '%s' is a Sub-LanguageProperty", compV[0]));
+        compV[2] = (char*) "languageMap";
+      }
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldPatchApply
 //
-void orionldPatchApply(KjNode* patchBase, KjNode* patchP)
+void orionldPatchApply(KjNode* patchBase, KjNode* patchP, bool api)
 {
   KjNode* pathNode = kjLookup(patchP, "PATH");
   KjNode* treeNode = kjLookup(patchP, "TREE");
@@ -141,6 +206,9 @@ void orionldPatchApply(KjNode* patchBase, KjNode* patchP)
   if (pathNode == NULL)           return;
   if (treeNode == NULL)           return;
   if (pathNode->type != KjString) return;
+
+  LM_T(LmtPatchEntity, ("Applying patch for '%s'", pathNode->value.s));
+  // kjTreeLog(patchBase, "patchBase", LmtPatchEntity);
 
   char* compV[7];
   bool  skip       = false;
@@ -151,6 +219,17 @@ void orionldPatchApply(KjNode* patchBase, KjNode* patchP)
   components = pathComponentsFix(compV, components, &skip);
   if (skip)
     return;
+
+#if 0
+  LM_T(LmtPatchEntity, ("Components: %d", components));
+  for (int ix = 0; ix < components; ix++)
+  {
+    LM_T(LmtPatchEntity, ("component %d: '%s'", ix, compV[ix]));
+  }
+#endif
+
+  if (api == true)
+    attributeValueNames(patchBase, components, compV);
 
   pathNode->value.s = kaStrdup(&orionldState.kalloc, pathArrayJoin(buf, compV, components));  // FIXME: buf is 512 bytes long ...
 
@@ -176,6 +255,7 @@ void orionldPatchApply(KjNode* patchBase, KjNode* patchP)
     treeNode->name = pathNode->value.s;
     kjChildAdd(patchBase, treeNode);
   }
+
   if (nodeP == NULL)  // Did not exist in the "patch base" - add to parentP
   {
     if (onlyLastMissing == true)

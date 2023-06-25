@@ -54,6 +54,7 @@ typedef enum TraceLevels
   LmtNotificationSend,                 // Sending of notifications
   LmtNotificationHeaders,              // notification request/response headers
   LmtNotificationBody,                 // notification request/response body
+  LmtShowChanges,                      // Add the field 'previousX' to attributes in notifications
 
   //
   // Subscription Cache
@@ -102,8 +103,9 @@ typedef enum TraceLevels
   LmtSql,                              // SQL command for TRoE
   LmtPgPool,                           // Postgres Connection Pool
   LmtSocketService,                    // Socket Service
-  LmtCurl,                             // CURL library
+  LmtCurl    = 250,                    // CURL library
   LmtToDo,                             // To Do list
+  LmtPatchEntity,                      // Real merge+patch
   LmtLeak                              // Used when debugging leaks and valgrind errors
 } TraceLevels;
 

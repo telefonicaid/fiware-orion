@@ -2,3 +2,5 @@ Fixed issues:
   #1356  New CLI param: -inReqPayloadMaxSize - to modify the maximum size of incoming payloads
   #280   Default Core Context now part of the broker - meant for airgapped setups
   #1381  Bug in GeoJSON notifications
+  #1385  Fixed a bug in PATCH /entities/{EID}/attrs, about patching a relationship object to an array (this is not supported by the NGSI-LD spec, but Orion-LD supports it anyway - for now)
+  #1387  Part 1 of showChanges + previous values of attributes in notifications - for non-batch operations, non-distributed attributes, and non-delete operations

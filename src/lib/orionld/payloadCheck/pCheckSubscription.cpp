@@ -110,7 +110,8 @@ bool pCheckSubscription
   KjNode**  uriPP,
   KjNode**  notifierInfoPP,
   KjNode**  geoCoordinatesPP,
-  bool*     mqttChangeP
+  bool*     mqttChangeP,
+  KjNode**  showChangesP
 )
 {
   PCHECK_OBJECT(subP, 0, NULL, "A Subscription must be a JSON Object", 400);
@@ -230,7 +231,7 @@ bool pCheckSubscription
     {
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionNotificationPath, 400);
       PCHECK_DUPLICATE(notificationP,  subItemP, 0, NULL, SubscriptionNotificationPath, 400);
-      if (pCheckNotification(notificationP, isCreate == false, uriPP, notifierInfoPP, mqttChangeP) == false)
+      if (pCheckNotification(notificationP, isCreate == false, uriPP, notifierInfoPP, mqttChangeP, showChangesP) == false)
         return false;
     }
     else if ((strcmp(subItemP->name, "expiresAt") == 0) || (strcmp(subItemP->name, "expires") == 0))

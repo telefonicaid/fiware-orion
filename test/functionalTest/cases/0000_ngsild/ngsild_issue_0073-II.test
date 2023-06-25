@@ -132,7 +132,7 @@ bye
 
 03. Drop Database so that db.entities.findOne() can be used in Step 5
 =====================================================================
-{ "dropped" : "ftest", "ok" : 1 }
+REGEX(({ "dropped" : "ftest", "ok" : 1 }|{ "ok" : 1 }))
 
 
 04. Create another entity with same context, and with the attribute "owner", which is an object in the context ("owner": { "@id": "fiware:owner", "@type": "@id" })

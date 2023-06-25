@@ -61,6 +61,7 @@ extern "C"
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/notifications/previousValuePopulate.h"         // previousValuePopulate
 #include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own interface
@@ -260,6 +261,7 @@ bool orionldPatchEntity(void)
     return false;
   }
 
+
   //
   // Distributed Operations
   //
@@ -293,10 +295,12 @@ bool orionldPatchEntity(void)
 
   attrP = orionldState.requestTree->value.firstChildP;
 
+  LM_T(LmtShowChanges, ("Looping over modified attributes"));
   while (attrP != NULL)
   {
     next = attrP->next;
 
+    LM_T(LmtShowChanges, ("Modified attribute: '%s'", attrP->name));
     if (attributeLookup(dbAttrsP, attrP->name) == false)
     {
       kjChildRemove(orionldState.requestTree, attrP);
@@ -308,7 +312,14 @@ bool orionldPatchEntity(void)
         kjChildRemove(incomingP, attrP);
     }
     else
+    {
+      LM_T(LmtShowChanges, ("Lookup attribute '%s' in dbAttrsP and copy its value - store in orionldState", attrP->name));
+      char* eqName = kaStrdup(&orionldState.kalloc, attrP->name);
+      dotForEq(eqName);
+
+      previousValuePopulate(dbAttrsP, NULL, eqName);
       dbModelFromApiAttribute(attrP, dbAttrsP, NULL, NULL, NULL, true);
+    }
 
     attrP = next;
   }

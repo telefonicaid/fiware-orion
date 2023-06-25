@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_
-
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,28 +22,36 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                              // strcmp
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 }
 
-#include "orionld/q/QNode.h"                                     // QNode
+#include "logMsg/logMsg.h"                                       // LM_*
+
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/notifications/previousValuePopulate.h"         // previousValuePopulate
+#include "orionld/notifications/previousValues.h"                // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// dbModelToApiSubscription - modify the DB Model tree into an API Subscription
+// previousValues -
 //
-extern KjNode* dbModelToApiSubscription
-(
-  KjNode*      dbSubP,
-  const char*  tenant,
-  bool         forSubCache,
-  QNode**      qNodePP,
-  KjNode**     coordinatesPP,
-  KjNode**     contextNodePP,
-  KjNode**     showChangesP
-);
-
-#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_
+void previousValues(KjNode* entityP, KjNode* dbAttrsP)
+{
+  for (KjNode* attrP = entityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    if ((strcmp(attrP->name, "id") != 0) && (strcmp(attrP->name, "type") != 0))
+    {
+      char* eqName = kaStrdup(&orionldState.kalloc, attrP->name);
+      dotForEq(eqName);
+      previousValuePopulate(dbAttrsP, NULL, eqName);
+    }
+  }
+}

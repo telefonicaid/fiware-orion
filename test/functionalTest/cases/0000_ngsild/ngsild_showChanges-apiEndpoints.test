@@ -1,0 +1,1249 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+showChanges in Subscription - provoke a notification and see the previousValue for ALL ENDPOINTS on single Entity
+
+--SHELL-INIT--
+dbInit CB
+export CB_TRACELEVELS=${CB_TRACELEVELS:-47,241,252}
+orionldStart CB -experimental
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 for entity urn:E1, with showChanges set to true
+# 02. Create E1 with an attribute A1 == 1
+# 02b. Dump/Reset accumulator, see A1's value but no previousValue, as it's a creation
+# 03. PATCH /entities/urn:E1/attrs/A1, setting its value to 4
+# 03b. Dump/Reset accumulator, see A1's value and previousValue
+# 04. PATCH /entities/urn:E1/attrs/R1, setting its object to urn:E6
+# 04b. Dump/Reset accumulator, see R1's object and previousObject
+# 05. PATCH /entities/urn:E1/attrs/L1, setting its languageMap to OCHO/EIGHT
+# 05b. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap
+# 06. PATCH /entities/urn:E1/attrs/G1, setting its coords to [10,10]
+# 06b. Dump/Reset accumulator, see G1's value and previousValue
+# 07. PATCH /entities/urn:E1 - setting A1, R1, L1, and G1 in payload body
+# 07b. Dump/Reset accumulator, see all previous values
+# 08. PATCH /entities/urn:E1/attrs - setting A1, R1, L1, and G1 in payload body
+# 08b. Dump/Reset accumulator, see all previous values
+# 09. POST /entities/urn:E1/attrs - setting A1, R1, L1, and G1 in payload body
+# 09b. Dump/Reset accumulator, see all previous values
+# 10. PUT /ngsi-ld/v1/entities/urn:E1/attrs/A1, setting its value to 18
+# 10b. Dump/Reset accumulator, see A1's value and previousValue
+# 11. PUT /ngsi-ld/v1/entities/urn:E1/attrs/R1, setting its object to urn:E20
+# 11b. Dump/Reset accumulator, see R1's object and previousObject
+# 12. PUT /ngsi-ld/v1/entities/urn:E1/attrs/L1, setting its languageMap to veintidos/twenty-two
+# 12b. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap
+# 13. PUT /ngsi-ld/v1/entities/urn:E1/attrs/G1, setting its coords to [24,24]
+# 13b. Dump/Reset accumulator, see G1's value and previousValue
+# 14. PUT /ngsi-ld/v1/entities/urn:E1 - setting A1, R1, L1, and G1 in payload body
+# 14b. Dump/Reset accumulator, see all previous values
+#
+# Later
+# 15. DELETE /ngsi-ld/v1/entities/urn:E1/attrs/A1
+# 15b. Dump/Reset accumulator, see A1's NULL value and previousValue
+#
+# 16. /ngsi-ld/v1/entityOperations/upsert
+# 16b. DUMP
+# 17. /ngsi-ld/v1/entityOperations/update
+# 17b. DUMP
+# 18. /ngsi-ld/v1/entityOperations/delete
+# 18b. DUMP
+# 19 - 36?:  All ops but in a distributed env
+#
+# And then we have the put/path/post delete possibilities:
+# Ex 1:
+#   - we have an entity E1 with attrs A,B,C
+#   - PUT /entities/E1 with attrs A,B
+#   - A and B have been modified, C has been deleted
+# Ex 2:
+#   - There are a few examples, especially in batch ops
+#
+
+echo "01. Create a subscription S1 for entity urn:E1, with showChanges set to true"
+echo "============================================================================"
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "Device"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "showChanges": true
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 with an attribute A1 == 1"
+echo "======================================="
+payload='{
+  "id": "urn:E1",
+  "type": "Device",
+  "A1": 1,
+  "R1": { "object": "urn:E1" },
+  "L1": { "languageMap": { "es": "dos", "en": "two" } },
+  "G1": { "type": "Point", "coordinates": [ 1, 1 ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02b. Dump/Reset accumulator, see A1's value but no previousValue, as it's a creation"
+echo "===================================================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "03. PATCH /entities/urn:E1/attrs/A1, setting its value to 4"
+echo "==========================================================="
+payload='{
+  "value": 4
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/A1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "03b. Dump/Reset accumulator, see A1's value and previousValue"
+echo "============================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. PATCH /entities/urn:E1/attrs/R1, setting its object to urn:E6"
+echo "================================================================="
+payload='{
+  "object": "urn:E6" 
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/R1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04b. Dump/Reset accumulator, see R1's object and previousObject"
+echo "==============================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "05. PATCH /entities/urn:E1/attrs/L1, setting its languageMap to OCHO/EIGHT"
+echo "=========================================================================="
+payload='{
+  "languageMap": { "es": "ocho", "en": "eight" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/L1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05b. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap"
+echo "========================================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "06. PATCH /entities/urn:E1/attrs/G1, setting its coords to [10,10]"
+echo "=================================================================="
+payload='{
+  "value": { "type": "Point", "coordinates": [10,10] }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/G1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06b. Dump/Reset accumulator, see G1's value and previousValue"
+echo "============================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. PATCH /entities/urn:E1 - setting A1, R1, L1, and G1 in payload body"
+echo "======================================================================="
+payload='{
+  "A1": 12,
+  "A2": 12,
+  "R1": { "object": "urn:E12" },
+  "L1": { "languageMap": { "es": "doce", "en": "twelve" } },
+  "G1": { "type": "Point", "coordinates": [ 12, 12 ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07b. Dump/Reset accumulator, see all previous values"
+echo "===================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. PATCH /entities/urn:E1/attrs - setting A1, R1, L1, and G1 in payload body"
+echo "============================================================================="
+payload='{
+  "A1": 14,
+  "R1": { "object": "urn:E14" },
+  "L1": { "languageMap": { "es": "catorce", "en": "fourteen" } },
+  "G1": { "type": "Point", "coordinates": [ 14, 14 ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08b. Dump/Reset accumulator, see all previous values"
+echo "===================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "09. POST /entities/urn:E1/attrs - setting A1, R1, L1, and G1 in payload body"
+echo "============================================================================"
+payload='{
+  "A1": 16,
+  "R1": { "object": "urn:E16" },
+  "L1": { "languageMap": { "es": "dieciseis", "en": "sixteen" } },
+  "G1": { "type": "Point", "coordinates": [ 16, 16 ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs --payload "$payload" -X POST
+echo
+echo
+
+
+echo "09b. Dump/Reset accumulator, see all previous values"
+echo "===================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "10. PUT /ngsi-ld/v1/entities/urn:E1/attrs/A1, setting its value to 18"
+echo "====================================================================="
+payload='{
+  "value": 18
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/A1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "10b. Dump/Reset accumulator, see A1's value and previousValue"
+echo "============================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "11. PUT /ngsi-ld/v1/entities/urn:E1/attrs/R1, setting its object to urn:E20"
+echo "==========================================================================="
+payload='{
+  "object": "urn:E20" 
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/R1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "11b. Dump/Reset accumulator, see R1's object and previousObject"
+echo "==============================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "12. PUT /ngsi-ld/v1/entities/urn:E1/attrs/L1, setting its languageMap to veintidos/twenty-two"
+echo "============================================================================================="
+payload='{
+  "languageMap": { "es": "veintidos", "en": "twenty-two" }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/L1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "12b. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap"
+echo "========================================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "13. PUT /ngsi-ld/v1/entities/urn:E1/attrs/G1, setting its coords to [24,24]"
+echo "==========================================================================="
+payload='{
+  "value": { "type": "Point", "coordinates": [24,24] }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/G1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "13b. Dump/Reset accumulator, see G1's value and previousValue"
+echo "============================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "14. PUT /ngsi-ld/v1/entities/urn:E1 - setting A1, R1, L1, and G1 in payload body"
+echo "================================================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "Device",
+  "A1": 26,
+  "R1": { "object": "urn:E26" },
+  "L1": { "languageMap": { "es": "veintiseis", "en": "twenty-six" }  },
+  "G1": { "type": "Point", "coordinates": [ 26, 26 ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "14b. Dump/Reset accumulator, see all previous values"
+echo "===================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 for entity urn:E1, with showChanges set to true
+============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+
+
+
+02. Create E1 with an attribute A1 == 1
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02b. Dump/Reset accumulator, see A1's value but no previousValue, as it's a creation
+====================================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 438
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "type": "Property",
+                "value": 1
+            },
+            "G1": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        1,
+                        1
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "two",
+                    "es": "dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+03. PATCH /entities/urn:E1/attrs/A1, setting its value to 4
+===========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03b. Dump/Reset accumulator, see A1's value and previousValue
+=============================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 456
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "previousValue": 1,
+                "type": "Property",
+                "value": 4
+            },
+            "G1": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        1,
+                        1
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "two",
+                    "es": "dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E1",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+04. PATCH /entities/urn:E1/attrs/R1, setting its object to urn:E6
+=================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04b. Dump/Reset accumulator, see R1's object and previousObject
+===============================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 464
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "type": "Property",
+                "value": 4
+            },
+            "G1": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        1,
+                        1
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "two",
+                    "es": "dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E6",
+                "previousObject": "urn:E1",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+05. PATCH /entities/urn:E1/attrs/L1, setting its languageMap to OCHO/EIGHT
+==========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05b. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap
+=========================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 487
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "type": "Property",
+                "value": 4
+            },
+            "G1": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        1,
+                        1
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "eight",
+                    "es": "ocho"
+                },
+                "previousLanguageMap": {
+                    "en": "two",
+                    "es": "dos"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E6",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+06. PATCH /entities/urn:E1/attrs/G1, setting its coords to [10,10]
+==================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06b. Dump/Reset accumulator, see G1's value and previousValue
+=============================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 496
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "type": "Property",
+                "value": 4
+            },
+            "G1": {
+                "previousValue": {
+                    "coordinates": [
+                        1,
+                        1
+                    ],
+                    "type": "Point"
+                },
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        10,
+                        10
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "eight",
+                    "es": "ocho"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E6",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+07. PATCH /entities/urn:E1 - setting A1, R1, L1, and G1 in payload body
+=======================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07b. Dump/Reset accumulator, see all previous values
+====================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 630
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "previousValue": 4,
+                "type": "Property",
+                "value": 12
+            },
+            "A2": {
+                "type": "Property",
+                "value": 12
+            },
+            "G1": {
+                "previousValue": {
+                    "coordinates": [
+                        10,
+                        10
+                    ],
+                    "type": "Point"
+                },
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        12,
+                        12
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "twelve",
+                    "es": "doce"
+                },
+                "previousLanguageMap": {
+                    "en": "eight",
+                    "es": "ocho"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E12",
+                "previousObject": "urn:E6",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+08. PATCH /entities/urn:E1/attrs - setting A1, R1, L1, and G1 in payload body
+=============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+08b. Dump/Reset accumulator, see all previous values
+====================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 638
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "previousValue": 12,
+                "type": "Property",
+                "value": 14
+            },
+            "A2": {
+                "type": "Property",
+                "value": 12
+            },
+            "G1": {
+                "previousValue": {
+                    "coordinates": [
+                        12,
+                        12
+                    ],
+                    "type": "Point"
+                },
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        14,
+                        14
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "fourteen",
+                    "es": "catorce"
+                },
+                "previousLanguageMap": {
+                    "en": "twelve",
+                    "es": "doce"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E14",
+                "previousObject": "urn:E12",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+09. POST /entities/urn:E1/attrs - setting A1, R1, L1, and G1 in payload body
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+09b. Dump/Reset accumulator, see all previous values
+====================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 644
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "previousValue": 14,
+                "type": "Property",
+                "value": 16
+            },
+            "A2": {
+                "type": "Property",
+                "value": 12
+            },
+            "G1": {
+                "previousValue": {
+                    "coordinates": [
+                        14,
+                        14
+                    ],
+                    "type": "Point"
+                },
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        16,
+                        16
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "sixteen",
+                    "es": "dieciseis"
+                },
+                "previousLanguageMap": {
+                    "en": "fourteen",
+                    "es": "catorce"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E16",
+                "previousObject": "urn:E14",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+10. PUT /ngsi-ld/v1/entities/urn:E1/attrs/A1, setting its value to 18
+=====================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+10b. Dump/Reset accumulator, see A1's value and previousValue
+=============================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 507
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "previousValue": 16,
+                "type": "Property",
+                "value": 18
+            },
+            "A2": {
+                "type": "Property",
+                "value": 12
+            },
+            "G1": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        16,
+                        16
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "sixteen",
+                    "es": "dieciseis"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E16",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+11. PUT /ngsi-ld/v1/entities/urn:E1/attrs/R1, setting its object to urn:E20
+===========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+11b. Dump/Reset accumulator, see R1's object and previousObject
+===============================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 515
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "type": "Property",
+                "value": 18
+            },
+            "A2": {
+                "type": "Property",
+                "value": 12
+            },
+            "G1": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        16,
+                        16
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "sixteen",
+                    "es": "dieciseis"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E20",
+                "previousObject": "urn:E16",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+12. PUT /ngsi-ld/v1/entities/urn:E1/attrs/L1, setting its languageMap to veintidos/twenty-two
+=============================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+12b. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap
+=========================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 547
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "type": "Property",
+                "value": 18
+            },
+            "A2": {
+                "type": "Property",
+                "value": 12
+            },
+            "G1": {
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        16,
+                        16
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "twenty-two",
+                    "es": "veintidos"
+                },
+                "previousLanguageMap": {
+                    "en": "sixteen",
+                    "es": "dieciseis"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E20",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+13. PUT /ngsi-ld/v1/entities/urn:E1/attrs/G1, setting its coords to [24,24]
+===========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+13b. Dump/Reset accumulator, see G1's value and previousValue
+=============================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 546
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "type": "Property",
+                "value": 18
+            },
+            "A2": {
+                "type": "Property",
+                "value": 12
+            },
+            "G1": {
+                "previousValue": {
+                    "coordinates": [
+                        16,
+                        16
+                    ],
+                    "type": "Point"
+                },
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        24,
+                        24
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "twenty-two",
+                    "es": "veintidos"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E20",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+14. PUT /ngsi-ld/v1/entities/urn:E1 - setting A1, R1, L1, and G1 in payload body
+================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+14b. Dump/Reset accumulator, see all previous values
+====================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 616
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "A1": {
+                "previousValue": 18,
+                "type": "Property",
+                "value": 26
+            },
+            "G1": {
+                "previousValue": {
+                    "coordinates": [
+                        24,
+                        24
+                    ],
+                    "type": "Point"
+                },
+                "type": "GeoProperty",
+                "value": {
+                    "coordinates": [
+                        26,
+                        26
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L1": {
+                "languageMap": {
+                    "en": "twenty-six",
+                    "es": "veintiseis"
+                },
+                "previousLanguageMap": {
+                    "en": "twenty-two",
+                    "es": "veintidos"
+                },
+                "type": "LanguageProperty"
+            },
+            "R1": {
+                "object": "urn:E26",
+                "previousObject": "urn:E20",
+                "type": "Relationship"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "20REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
