@@ -35,6 +35,6 @@ extern "C"
 //
 // orionldPatchApply
 //
-extern void orionldPatchApply(KjNode* patchBase, KjNode* patchP);
+extern void orionldPatchApply(KjNode* patchBase, KjNode* patchP, bool api);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDPATCHAPPLY_H_

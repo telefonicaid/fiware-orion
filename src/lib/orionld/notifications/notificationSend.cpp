@@ -278,10 +278,9 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
     if ((subP->renderFormat != RF_KEYVALUES) && (subP->showChanges == true))
       previousValueAdd(attrP, attrLongName);
 
-    LM_W(("Fixing attribute '%s'", attrP->name));
+    LM_T(LmtPatchEntity, ("Fixing attribute '%s' (JSON type: %s)", attrP->name, kjValueType(attrP->type)));
     for (KjNode* saP = attrP->value.firstChildP; saP != NULL; saP = saP->next)
     {
-      LM_W(("Fixing attribute '%s', sub-attribute '%s'", attrP->name, saP->name));
       if (strcmp(saP->name, "value")       == 0) continue;
       if (strcmp(saP->name, "object")      == 0) continue;
       if (strcmp(saP->name, "languageMap") == 0) continue;

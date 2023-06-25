@@ -105,17 +105,34 @@ static bool attributeToDbArray(KjNode* dbAttrArray, KjNode* apiAttributeP, KjNod
 //
 static void dbAttrsMerge(KjNode* dbAttrsP, KjNode* dbAttrsUpdate, bool replace)
 {
-  for (KjNode* dbAttrP = dbAttrsUpdate->value.firstChildP; dbAttrP != NULL; dbAttrP = dbAttrP->next)
+  KjNode* newAttrP = dbAttrsUpdate->value.firstChildP;
+  KjNode* next;
+
+  while (newAttrP != NULL)
   {
-    if (replace)
+    LM_T(LmtSR, ("Incoming attribute '%s'", newAttrP->name));
+
+    next = newAttrP->next;
+
+    kjChildRemove(dbAttrsUpdate, newAttrP);
+
+    KjNode* oldAttrP = kjLookup(dbAttrsP, newAttrP->name);
+
+    if (oldAttrP != NULL)
     {
-      KjNode* toRemoveP = kjLookup(dbAttrsP, dbAttrP->name);
-      if (toRemoveP != NULL)
-        kjChildRemove(dbAttrsP, toRemoveP);
+      // Either REPLACE or IGNORE
+      if (replace == true)
+        kjChildRemove(dbAttrsP, oldAttrP);
+      else
+      {
+        newAttrP = next;
+        continue;
+      }
     }
 
-    kjChildRemove(dbAttrsUpdate, dbAttrP);
-    kjChildAdd(dbAttrsP, dbAttrP);
+    kjChildAdd(dbAttrsP, newAttrP);
+
+    newAttrP = next;
   }
 }
 

@@ -552,9 +552,11 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
     for (KjNode* patchP = altList->inEntityP->value.firstChildP; patchP != NULL; patchP = patchP->next)
     {
       ++patchNo;
+
       LM_T(LmtSR, ("Calling orionldPatchApply for PATCH %d", patchNo));
       kjTreeLog(patchP, "patchP", LmtSR);
-      orionldPatchApply(altList->finalApiEntityP, patchP);
+
+      orionldPatchApply(altList->finalApiEntityP, patchP, true);
       kjTreeLog(altList->finalApiEntityP, "Patch Applied", LmtSR);
     }
   }

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PATCH a Relationship and see the notification
+PATCH a LanguageProperty and see the notification
 
 --SHELL-INIT--
 dbInit CB
@@ -33,22 +33,22 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create an entity urn:E1 with a Relationship R1 == "urn:E1"
+# 01. Create an entity urn:E1 with a LanguageProperty L1 == { "en": "one", "es": "uno" }
 # 02. Create a matching subscription
-# 03. GET urn:E1 to see R1
+# 03. GET urn:E1 to see L1
 # 03b. See urn:E1 in the DB
-# 04. PATCH urn:E1, setting R1 == "urn:E2"
-# 05. GET urn:E1 to see R1
+# 04. PATCH urn:E1, setting L1 == { "en": "two", "es": "dos" }
+# 05. GET urn:E1 to see L1
 # 05b. See urn:E1 in the DB
-# 06. Dump/Reset accumulator, see R1's object and previousObject
+# 06. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap
 #
 
-echo '01. Create an entity urn:E1 with a Relationship R1 == "urn:E1"'
-echo '=============================================================='
+echo '01. Create an entity urn:E1 with a LanguageProperty L1 == { "en": "one", "es": "uno" }'
+echo '======================================================================================'
 payload='{
   "id": "urn:E1",
   "type": "Device",
-  "R1": { "object": "urn:E1" }
+  "L1": { "languageMap": { "en": "one", "es": "uno" } }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
 echo
@@ -78,7 +78,7 @@ echo
 echo
 
 
-echo '03. GET urn:E1 to see R1'
+echo '03. GET urn:E1 to see L1'
 echo '========================'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1
 echo
@@ -92,17 +92,17 @@ echo
 echo
 
 
-echo '04. PATCH urn:E1, setting R1 == "urn:E2"'
-echo '========================================'
+echo '04. PATCH urn:E1, setting L1 == { "en": "two", "es": "dos" }'
+echo '============================================================'
 payload='{
-  "R1": { "object": "urn:E2" }
+  "L1": { "languageMap": { "en": "two", "es": "dos" } }
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
 echo
 echo
 
 
-echo '05. GET urn:E1 to see R1'
+echo '05. GET urn:E1 to see L1'
 echo '========================'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1
 echo
@@ -116,8 +116,8 @@ echo
 echo
 
 
-echo "06. Dump/Reset accumulator, see R1's object and previousObject"
-echo "=============================================================="
+echo "06. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap"
+echo "========================================================================"
 sleep .2
 accumulatorDump
 accumulatorReset
@@ -126,8 +126,8 @@ echo
 
 
 --REGEXPECT--
-01. Create an entity urn:E1 with a Relationship R1 == "urn:E1"
-==============================================================
+01. Create an entity urn:E1 with a LanguageProperty L1 == { "en": "one", "es": "uno" }
+======================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -144,18 +144,21 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 
 
 
-03. GET urn:E1 to see R1
+03. GET urn:E1 to see L1
 ========================
 HTTP/1.1 200 OK
-Content-Length: 78
+Content-Length: 102
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "R1": {
-        "object": "urn:E1",
-        "type": "Relationship"
+    "L1": {
+        "languageMap": {
+            "en": "one",
+            "es": "uno"
+        },
+        "type": "LanguageProperty"
     },
     "id": "urn:E1",
     "type": "Device"
@@ -174,14 +177,17 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/R1"
+		"https://uri.etsi.org/ngsi-ld/default-context/L1"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
-			"type" : "Relationship",
+		"https://uri=etsi=org/ngsi-ld/default-context/L1" : {
+			"type" : "LanguageProperty",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "urn:E1",
+			"value" : {
+				"en" : "one",
+				"es" : "uno"
+			},
 			"mdNames" : [ ]
 		}
 	},
@@ -192,25 +198,28 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-04. PATCH urn:E1, setting R1 == "urn:E2"
-========================================
+04. PATCH urn:E1, setting L1 == { "en": "two", "es": "dos" }
+============================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-05. GET urn:E1 to see R1
+05. GET urn:E1 to see L1
 ========================
 HTTP/1.1 200 OK
-Content-Length: 78
+Content-Length: 102
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 {
-    "R1": {
-        "object": "urn:E2",
-        "type": "Relationship"
+    "L1": {
+        "languageMap": {
+            "en": "two",
+            "es": "dos"
+        },
+        "type": "LanguageProperty"
     },
     "id": "urn:E1",
     "type": "Device"
@@ -229,14 +238,17 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/default-context/R1"
+		"https://uri.etsi.org/ngsi-ld/default-context/L1"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/default-context/R1" : {
-			"type" : "Relationship",
+		"https://uri=etsi=org/ngsi-ld/default-context/L1" : {
+			"type" : "LanguageProperty",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "urn:E2",
+			"value" : {
+				"en" : "two",
+				"es" : "dos"
+			},
 			"mdNames" : [ ]
 		}
 	},
@@ -247,10 +259,10 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-06. Dump/Reset accumulator, see R1's object and previousObject
-==============================================================
+06. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap
+========================================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
-Content-Length: 285
+Content-Length: 329
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -261,10 +273,16 @@ Ngsild-Attribute-Format: Normalized
 {
     "data": [
         {
-            "R1": {
-                "object": "urn:E2",
-                "previousObject": "urn:E1",
-                "type": "Relationship"
+            "L1": {
+                "languageMap": {
+                    "en": "two",
+                    "es": "dos"
+                },
+                "previousLanguageMap": {
+                    "en": "one",
+                    "es": "uno"
+                },
+                "type": "LanguageProperty"
             },
             "id": "urn:E1",
             "type": "Device"

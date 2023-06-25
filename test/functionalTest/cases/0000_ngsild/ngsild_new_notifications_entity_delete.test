@@ -150,6 +150,7 @@ echo
 
 echo "03.  Delete urn:E1, with a FIWARE-Correlator header set"
 echo "======================================================="
+sleep .3
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE -H "FIWARE-Correlator: c846fdbb-b8ad-41f7-ba21-84"
 echo
 echo

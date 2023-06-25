@@ -164,7 +164,8 @@ echo
 
 echo "11. GET all entities with idPattern=urn.*E[1359] - see E1, E3, and E5"
 echo "====================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E[1359]&prettyPrint=yes" --noPayloadCheck
+#orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E[1359]&prettyPrint=yes" --noPayloadCheck
+orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E\[1359\]&prettyPrint=yes" --noPayloadCheck
 echo
 echo
 

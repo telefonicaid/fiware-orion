@@ -244,6 +244,7 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
 
   if (newP->type != oldP->type)  // Different type?  - overwrite the old
   {
+    LM_T(LmtPatchEntity, ("Attribute '%s': its type has changed (from %d to %d) - overwriting", newP->name, newP->type, oldP->type));
     patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
@@ -304,6 +305,7 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
       int     newPathLen  = strlen(path) + 1 + strlen(newItemP->name) + 1;
       char*   newPathV    = kaAlloc(&orionldState.kalloc, newPathLen);
 
+      LM_T(LmtPatchEntity, ("Adding name '%s' to PATH '%s'", newItemP->name, path));
       snprintf(newPathV, newPathLen, "%s.%s", path, newItemP->name);
       newPath = newPathV;
     }
@@ -473,7 +475,6 @@ bool apiEntitySimplifiedToNormalized(KjNode* apiEntityFragmentP, KjNode* dbAttrs
       if (dbAttrTypeP != NULL)  // Can't be NULL
       {
         attrTypeFromDb = orionldAttributeType(dbAttrTypeP->value.s);
-        LM_T(LmtSR, ("Attribute '%s', type from DB: %d", attrP->name, attrTypeFromDb));
 
         //
         // If the attribute already existed, then we take the DB info and we modify the payload body, adding value/object/languageMap
@@ -481,8 +482,6 @@ bool apiEntitySimplifiedToNormalized(KjNode* apiEntityFragmentP, KjNode* dbAttrs
         //
         if ((attrTypeFromDb != Property) && (attrTypeFromDb != GeoProperty) && (attrTypeFromDb != NoAttributeType))
         {
-          LM_T(LmtSR, ("Attribute '%s': not a Property nor a GeoProperty", attrP->name));
-
           //
           // Before transforming, we need to check that the type is OK, cause, we here "modify the input" and this may lead to
           // confusing error messages ("Invalid JSON type - not a string, it is an 'object'"), when in reality the original input was a Number, not an Object
@@ -533,10 +532,7 @@ bool apiEntitySimplifiedToNormalized(KjNode* apiEntityFragmentP, KjNode* dbAttrs
       }
     }
     else  // The attribute is NEW. Then it's ALWAYS a Property or GeoProperty - adding "value" and let the decision come later
-    {
-      LM_T(LmtSR, ("New attribute. ALWAYS a Property or GeoProperty??? (%s)", attrP->name));
       attributeValueAdd(attrP);
-    }
   }
 
   return true;

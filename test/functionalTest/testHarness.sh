@@ -685,6 +685,10 @@ else
 fi
 
 
+# Mongo may also run in a docker container:
+# docker run -p 27017:27017 mongo:4.4
+# docker run -p 27017:27017 mongo:5.0
+# docker run -p 27017:27017 mongo:6.0
 
 # ------------------------------------------------------------------------------
 #

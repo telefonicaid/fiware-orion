@@ -132,6 +132,7 @@ echo
 
 echo "05. Dump accumulator to see another GeoJSON format notification"
 echo "==============================================================="
+sleep .3
 accumulatorDump
 echo
 echo

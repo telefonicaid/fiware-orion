@@ -103,8 +103,9 @@ typedef enum TraceLevels
   LmtSql,                              // SQL command for TRoE
   LmtPgPool,                           // Postgres Connection Pool
   LmtSocketService,                    // Socket Service
-  LmtCurl,                             // CURL library
+  LmtCurl    = 250,                    // CURL library
   LmtToDo,                             // To Do list
+  LmtPatchEntity,                      // Real merge+patch
   LmtLeak                              // Used when debugging leaks and valgrind errors
 } TraceLevels;
 
