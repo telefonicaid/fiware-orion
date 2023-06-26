@@ -558,6 +558,10 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
   {
     KjNode* apiEntityP = (subP->sysAttrs == false)? matchP->altP->finalApiEntityP : matchP->altP->finalApiEntityWithSysAttrsP;
 
+    LM_T(LmtSysAttrs, ("sysAttrs:%s, apiEntityP at %p", (subP->sysAttrs == true)? "true" : "false", apiEntityP));
+    if (apiEntityP == NULL)
+      apiEntityP = matchP->altP->finalApiEntityP;  // Temporary !!!
+
     // If the entity is already in "data", and, it's not a BATCH Operation, skip - already there
     if (orionldState.serviceP->isBatchOp == false)
     {

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_ALTERATION_H_
-#define SRC_LIB_ORIONLD_NOTIFICATIONS_ALTERATION_H_
+#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_SYSATTRSSTRIP_H_
+#define SRC_LIB_ORIONLD_NOTIFICATIONS_SYSATTRSSTRIP_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionldAlteration.h"                 // OrionldAlteration
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// alteration -
+// sysAttrsStrip -
 //
-extern OrionldAlteration* alteration(const char* entityId, const char* entityType, KjNode* apiEntityP, KjNode* incomingP, KjNode* dbEntityBeforeP);
+extern void sysAttrsStrip(KjNode* finalApiEntityWithoutSysAttrsP);
 
-#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_ALTERATION_H_
+#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_SYSATTRSSTRIP_H_
