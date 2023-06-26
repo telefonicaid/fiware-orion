@@ -42,7 +42,6 @@ extern "C"
 #include "orionld/common/subCacheApiSubscriptionInsert.h"      // subCacheApiSubscriptionInsert
 #include "orionld/legacyDriver/legacyPostSubscriptions.h"      // legacyPostSubscriptions
 #include "orionld/kjTree/kjChildPrepend.h"                     // kjChildPrepend
-#include "orionld/kjTree/kjTreeLog.h"                          // kjTreeLog
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
 #include "orionld/mongoc/mongocSubscriptionExists.h"           // mongocSubscriptionExists
 #include "orionld/mongoc/mongocSubscriptionInsert.h"           // mongocSubscriptionInsert
@@ -68,21 +67,23 @@ bool orionldPostSubscriptions(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyPostSubscriptions();  // this will be removed!! (after thorough testing)
 
-  KjNode*  subP            = orionldState.requestTree;
-  KjNode*  subIdP          = orionldState.payloadIdNode;
-  KjNode*  endpointP       = NULL;
-  KjNode*  ldqNodeP        = NULL;
-  KjNode*  uriP            = NULL;
-  KjNode*  notifierInfoP   = NULL;
-  KjNode*  geoCoordinatesP = NULL;
-  QNode*   qTree           = NULL;
-  char*    qRenderedForDb  = NULL;
-  bool     mqtt            = false;
-  char*    subId           = NULL;
-  bool     b               = false;
-  bool     qValidForV2     = false;
-  bool     qIsMq           = false;
-  KjNode*  showChangesP    = NULL;
+  KjNode*       subP            = orionldState.requestTree;
+  KjNode*       subIdP          = orionldState.payloadIdNode;
+  KjNode*       endpointP       = NULL;
+  KjNode*       ldqNodeP        = NULL;
+  KjNode*       uriP            = NULL;
+  KjNode*       notifierInfoP   = NULL;
+  KjNode*       geoCoordinatesP = NULL;
+  QNode*        qTree           = NULL;
+  char*         qRenderedForDb  = NULL;
+  bool          mqtt            = false;
+  char*         subId           = NULL;
+  bool          b               = false;
+  bool          qValidForV2     = false;
+  bool          qIsMq           = false;
+  KjNode*       showChangesP    = NULL;
+  KjNode*       sysAttrsP       = NULL;
+  RenderFormat  renderFormat    = RF_NORMALIZED;
 
   b = pCheckSubscription(subP,
                          true,
@@ -99,7 +100,10 @@ bool orionldPostSubscriptions(void)
                          &notifierInfoP,
                          &geoCoordinatesP,
                          &mqtt,
-                         &showChangesP);
+                         &showChangesP,
+                         &sysAttrsP,
+                         &renderFormat);
+
   if (qRenderedForDb != NULL)
     LM_T(LmtSR, ("qRenderedForDb: '%s'", qRenderedForDb));
 
@@ -246,7 +250,14 @@ bool orionldPostSubscriptions(void)
   }
 
   // sub to cache - BEFORE we change the tree to be according to the DB Model (as the DB model might change some day ...)
-  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP, qTree, geoCoordinatesP, orionldState.contextP, orionldState.tenantP->tenant, showChangesP);
+  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP,
+                                                            qTree,
+                                                            geoCoordinatesP,
+                                                            orionldState.contextP,
+                                                            orionldState.tenantP->tenant,
+                                                            showChangesP,
+                                                            sysAttrsP,
+                                                            renderFormat);
 
   // dbModel
   KjNode* dbSubscriptionP = subP;

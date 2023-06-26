@@ -106,6 +106,7 @@ typedef enum TraceLevels
   LmtCurl    = 250,                    // CURL library
   LmtToDo,                             // To Do list
   LmtPatchEntity,                      // Real merge+patch
+  LmtSysAttrs,                         // System Attributes
   LmtLeak                              // Used when debugging leaks and valgrind errors
 } TraceLevels;
 

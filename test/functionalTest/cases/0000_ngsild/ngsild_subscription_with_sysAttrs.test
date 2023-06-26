@@ -1,0 +1,353 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription with sysAttrs
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Attempt to create a subscription with sysAttrs AND format==simplified - see error
+# 02. Attempt to create a subscription with a non-bool sysAttrs - see error
+# 03. Create a subscription with sysAttrs set to true
+# 04. GET the subscription and see the sysAttrs=true
+# 05. GET the subscription from DB and see the sysAttrs=true
+# 06. See the subscription in the database - sysAttrs=true on top level
+# 07. POST /entities - Create an entity matching the subscription
+# 08. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+# 09. PATCH /entities/urn:E1/attrs/P1
+# 10. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+# 11. PATCH /entities/urn:E1
+# 12. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+# 13. PATCH /entities/urn:E1/attrs
+# 14. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+# 15. POST /entities/urn:E1/attrs
+# 16. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+# 17. PUT /ngsi-ld/v1/entities/urn:E1/attrs/P1
+# 18. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+# 19. PUT /ngsi-ld/v1/entities/urn:E1
+# 20. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+#
+
+echo "01. Attempt to create a subscription with sysAttrs AND format==simplified - see error"
+echo "====================================================================================="
+payload='{
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "sysAttrs": true,
+    "format": "simplified",
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }   
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to create a subscription with a non-bool sysAttrs - see error"
+echo "========================================================================="
+payload='{
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "sysAttrs": 14,
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }   
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create a subscription with sysAttrs set to true"
+echo "==================================================="
+payload='{
+  "type": "Subscription",
+  "id": "urn:S1",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "sysAttrs": true,
+    "endpoint": {
+      "uri": "http://localhost:'$LISTENER_PORT'/notify"
+    }   
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. GET the subscription and see the sysAttrs=true"
+echo "=================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
+echo
+echo
+
+
+echo "05. GET the subscription from DB and see the sysAttrs=true"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1?options=fromDb
+echo
+echo
+
+
+echo "06. See the subscription in the database - sysAttrs=true on top level"
+echo "====================================================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "07. POST /entities - Create an entity matching the subscription"
+echo "==============================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": {
+   "type": "Property",
+    "value": 127
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)"
+echo "==========================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Attempt to create a subscription with sysAttrs AND format==simplified - see error
+=====================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 191
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Subscription::notification::sysAttrs",
+    "title": "Inconsistent fields in Subscription (format=simplified + sysAttrs=true)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+02. Attempt to create a subscription with a non-bool sysAttrs - see error
+=========================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 138
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Subscription::notification::sysAttrs",
+    "title": "Not a JSON Boolean",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Create a subscription with sysAttrs set to true
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+04. GET the subscription and see the sysAttrs=true
+==================================================
+HTTP/1.1 200 OK
+Content-Length: 261
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:9997/notify"
+        },
+        "format": "normalized",
+        "status": "ok",
+        "sysAttrs": true
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+05. GET the subscription from DB and see the sysAttrs=true
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 264
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://localhost:9997/notify"
+        },
+        "format": "normalized",
+        "status": "ok",
+        "sysAttrs": true
+    },
+    "origin": "database",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+06. See the subscription in the database - sysAttrs=true on top level
+=====================================================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:S1",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"sysAttrs" : true,
+	"reference" : "http://localhost:9997/notify",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+}
+bye
+
+
+07. POST /entities - Create an entity matching the subscription
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+08. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+===========================================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 389
+User-Agent: REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "createdAt": "202REGEX(.*)",
+                "modifiedAt": "202REGEX(.*)",
+                "type": "Property",
+                "value": 127
+            },
+            "createdAt": "202REGEX(.*)",
+            "id": "urn:E1",
+            "modifiedAt": "202REGEX(.*)",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
+dbDrop CB openiot

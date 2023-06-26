@@ -29,8 +29,8 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheHeadGet, subCacheItemLookup
+#include "common/RenderFormat.h"                                 // RenderFormat
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -107,10 +107,21 @@ static bool orionldGetSubscriptionsFromDb(void)
   //
   for (KjNode* dbSubP = dbSubV->value.firstChildP; dbSubP != NULL; dbSubP = dbSubP->next)
   {
-    QNode*  qTree        = NULL;
-    KjNode* contextNodeP = NULL;
-    KjNode* coordinatesP = NULL;
-    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, orionldState.tenantP->tenant, false, &qTree, &coordinatesP, &contextNodeP, NULL);
+    QNode*       qTree         = NULL;
+    KjNode*      contextNodeP  = NULL;
+    KjNode*      coordinatesP  = NULL;
+    KjNode*      showChangesP  = NULL;
+    KjNode*      sysAttrsP     = NULL;
+    RenderFormat renderFormat  = RF_NORMALIZED;
+    KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,
+                                                          orionldState.tenantP->tenant,
+                                                          false,
+                                                          &qTree,
+                                                          &coordinatesP,
+                                                          &contextNodeP,
+                                                          &showChangesP,
+                                                          &sysAttrsP,
+                                                          &renderFormat);
 
     if (apiSubP == NULL)
     {

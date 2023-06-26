@@ -144,9 +144,20 @@ static bool orionldGetSubscriptionFromDb(void)
     return false;
   }
 
-  KjNode* contextNodeP;      // Not used, but dbModelToApiSubscription requires it
-  KjNode* coordinatesNodeP;  // Not used, but dbModelToApiSubscription requires it
-  KjNode* apiSubP = dbModelToApiSubscription(dbSubP, orionldState.tenantP->tenant, false, NULL, &coordinatesNodeP, &contextNodeP, NULL);
+  KjNode*      coordinatesNodeP = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*      contextNodeP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*      showChangesP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*      sysAttrsP        = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  RenderFormat renderFormat     = RF_NORMALIZED;  // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*      apiSubP          = dbModelToApiSubscription(dbSubP,
+                                                           orionldState.tenantP->tenant,
+                                                           false,
+                                                           NULL,
+                                                           &coordinatesNodeP,
+                                                           &contextNodeP,
+                                                           &showChangesP,
+                                                           &sysAttrsP,
+                                                           &renderFormat);
 
   if (apiSubP == NULL)
   {

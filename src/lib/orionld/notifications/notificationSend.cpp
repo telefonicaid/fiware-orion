@@ -556,8 +556,7 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
 
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
-    kjTreeLog(matchP->altP->finalApiEntityP, "matchP->altP->finalApiEntityP", LmtSR);
-    KjNode* apiEntityP = matchP->altP->finalApiEntityP;
+    KjNode* apiEntityP = (subP->sysAttrs == false)? matchP->altP->finalApiEntityP : matchP->altP->finalApiEntityWithSysAttrsP;
 
     // If the entity is already in "data", and, it's not a BATCH Operation, skip - already there
     if (orionldState.serviceP->isBatchOp == false)
@@ -578,7 +577,6 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
     if (matchP->subP->attributes.size() > 0)
       apiEntityP = attributeFilter(apiEntityP, matchP);
 
-    kjTreeLog(apiEntityP, "apiEntityP before entityFix", LmtSR);
     apiEntityP = entityFix(apiEntityP, subP);
     kjChildAdd(dataNodeP, apiEntityP);
   }
@@ -634,6 +632,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   //
   KjNode* notificationP = (ngsiv2 == false)? notificationTree(mAltP) : notificationTreeForNgsiV2(mAltP);
   char*   preferHeader  = NULL;
+
   if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == GEOJSON))
   {
     char*       geometryProperty = (char*) mAltP->subP->expression.geoproperty.c_str();

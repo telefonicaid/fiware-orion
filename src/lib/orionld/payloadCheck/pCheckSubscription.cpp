@@ -30,6 +30,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+#include "common/RenderFormat.h"                                 // RenderFormat
 
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/q/qBuild.h"                                    // qBuild
@@ -96,22 +97,24 @@ extern "C"
 //
 bool pCheckSubscription
 (
-  KjNode*   subP,
-  bool      isCreate,          // true if POST, false if PATCH
-  char*     subscriptionId,    // non-NULL if PATCH
-  KjNode*   idP,
-  KjNode*   typeP,
-  KjNode**  endpointP,
-  KjNode**  qNodeP,
-  QNode**   qTreeP,
-  char**    qRenderedForDbP,
-  bool*     qValidForV2P,
-  bool*     qIsMqP,
-  KjNode**  uriPP,
-  KjNode**  notifierInfoPP,
-  KjNode**  geoCoordinatesPP,
-  bool*     mqttChangeP,
-  KjNode**  showChangesP
+  KjNode*        subP,
+  bool           isCreate,          // true if POST, false if PATCH
+  char*          subscriptionId,    // non-NULL if PATCH
+  KjNode*        idP,
+  KjNode*        typeP,
+  KjNode**       endpointP,
+  KjNode**       qNodeP,
+  QNode**        qTreeP,
+  char**         qRenderedForDbP,
+  bool*          qValidForV2P,
+  bool*          qIsMqP,
+  KjNode**       uriPP,
+  KjNode**       notifierInfoPP,
+  KjNode**       geoCoordinatesPP,
+  bool*          mqttChangeP,
+  KjNode**       showChangesP,
+  KjNode**       sysAttrsP,
+  RenderFormat*  renderFormatP
 )
 {
   PCHECK_OBJECT(subP, 0, NULL, "A Subscription must be a JSON Object", 400);
@@ -128,6 +131,10 @@ bool pCheckSubscription
   KjNode* geoqP               = NULL;
   KjNode* langP               = NULL;
   double  expiresAt;
+
+  *mqttChangeP  = NULL;
+  *showChangesP = NULL;
+  *sysAttrsP    = NULL;
 
   if (idP != NULL)
   {
@@ -231,7 +238,7 @@ bool pCheckSubscription
     {
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionNotificationPath, 400);
       PCHECK_DUPLICATE(notificationP,  subItemP, 0, NULL, SubscriptionNotificationPath, 400);
-      if (pCheckNotification(notificationP, isCreate == false, uriPP, notifierInfoPP, mqttChangeP, showChangesP) == false)
+      if (pCheckNotification(notificationP, isCreate == false, uriPP, notifierInfoPP, mqttChangeP, showChangesP, sysAttrsP, renderFormatP) == false)
         return false;
     }
     else if ((strcmp(subItemP->name, "expiresAt") == 0) || (strcmp(subItemP->name, "expires") == 0))
