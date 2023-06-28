@@ -235,6 +235,24 @@ echo
 echo
 
 
+echo "17. PUT /ngsi-ld/v1/entities/urn:E1/attrs/P1"
+echo "============================================"
+payload='{
+  "value": 17
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "18. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)"
+echo "==========================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
 echo "19. PUT /ngsi-ld/v1/entities/urn:E1"
 echo "==================================="
 payload='{
@@ -583,6 +601,47 @@ Ngsild-Attribute-Format: Normalized
                 "modifiedAt": "202REGEX(.*)Z",
                 "type": "Property",
                 "value": 15
+            },
+            "createdAt": "202REGEX(.*)Z",
+            "id": "urn:E1",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+17. PUT /ngsi-ld/v1/entities/urn:E1/attrs/P1
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+18. See the notification in the accumulator, especially the sysAttrs (createdAt+modifiedAt)
+===========================================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 388
+User-Agent: orionld/REGEX(.*)
+Host: tux
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "createdAt": "202REGEX(.*)Z",
+                "modifiedAt": "202REGEX(.*)Z",
+                "type": "Property",
+                "value": 17
             },
             "createdAt": "202REGEX(.*)Z",
             "id": "urn:E1",
