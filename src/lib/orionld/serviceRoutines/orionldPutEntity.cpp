@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityReplace.h"                  // mongocEntityReplace
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
+#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity2
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
@@ -311,15 +312,18 @@ bool orionldPutEntity(void)
     return false;
   }
 
+  KjNode* finalApiEntityWithSysAttrs = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, NULL, false, &orionldState.pd);
+
   orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
-  orionldState.alterations->entityId          = entityId;
-  orionldState.alterations->entityType        = typeNodeP->value.s;
-  orionldState.alterations->inEntityP         = orionldState.requestTree;
-  orionldState.alterations->dbEntityP         = NULL;
-  orionldState.alterations->finalApiEntityP   = orionldState.requestTree;  // entity id, createdAt, modifiedAt ...
-  orionldState.alterations->alteredAttributes = 0;
-  orionldState.alterations->alteredAttributeV = NULL;
-  orionldState.alterations->next              = NULL;
+  orionldState.alterations->entityId                    = entityId;
+  orionldState.alterations->entityType                  = typeNodeP->value.s;
+  orionldState.alterations->inEntityP                   = orionldState.requestTree;
+  orionldState.alterations->dbEntityP                   = NULL;
+  orionldState.alterations->finalApiEntityWithSysAttrsP = finalApiEntityWithSysAttrs;
+  orionldState.alterations->finalApiEntityP             = orionldState.requestTree;
+  orionldState.alterations->alteredAttributes           = 0;
+  orionldState.alterations->alteredAttributeV           = NULL;
+  orionldState.alterations->next                        = NULL;
 
   //
   // Is the entity id inside orionldState.requestTree?
