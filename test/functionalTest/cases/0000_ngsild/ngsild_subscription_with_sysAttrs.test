@@ -509,7 +509,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 230
 User-Agent: orionld/REGEX(.*)
-Host: tux
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -546,7 +546,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 388
 User-Agent: orionld/REGEX(.*)
-Host: tux
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -587,7 +587,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 388
 User-Agent: orionld/REGEX(.*)
-Host: tux
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -628,7 +628,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 388
 User-Agent: orionld/REGEX(.*)
-Host: tux
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -669,7 +669,7 @@ Date: REGEX(.*)
 POST http://REGEX(.*)/notify?subscriptionId=urn:S1
 Content-Length: 388
 User-Agent: orionld/REGEX(.*)
-Host: tux
+Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
