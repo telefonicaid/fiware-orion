@@ -30,12 +30,24 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "common/RenderFormat.h"                               // RenderFormat
+
 
 
 // -----------------------------------------------------------------------------
 //
 // pCheckNotification -
 //
-extern bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP, bool* mqttChangeP, KjNode** showChangesP);
+extern bool pCheckNotification
+(
+  KjNode*        notificationP,
+  bool           patch,
+  KjNode**       uriPP,
+  KjNode**       notifierInfoPP,
+  bool*          mqttChangeP,
+  KjNode**       showChangesOutP,
+  KjNode**       sysAttrsOutP,
+  RenderFormat*  renderFormatP
+);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_

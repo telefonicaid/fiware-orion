@@ -30,6 +30,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+#include "common/RenderFormat.h"                                 // RenderFormat
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -172,13 +173,15 @@ static bool notificationStatus(KjNode* dbLastSuccessP, KjNode* dbLastFailureP)
 //
 KjNode* dbModelToApiSubscription
 (
-  KjNode*      dbSubP,
-  const char*  tenant,
-  bool         forSubCache,
-  QNode**      qNodePP,
-  KjNode**     coordinatesPP,
-  KjNode**     contextNodePP,
-  KjNode**     showChangesP
+  KjNode*        dbSubP,
+  const char*    tenant,
+  bool           forSubCache,
+  QNode**        qNodePP,
+  KjNode**       coordinatesPP,
+  KjNode**       contextNodePP,
+  KjNode**       showChangesP,
+  KjNode**       sysAttrsP,
+  RenderFormat*  renderFormatP
 )
 {
   KjNode* dbSubIdP            = kjLookup(dbSubP, "_id");         DB_ITEM_NOT_FOUND(dbSubIdP, "id",          tenant);
@@ -204,6 +207,7 @@ KjNode* dbModelToApiSubscription
   KjNode* dbLastSuccessP      = kjLookup(dbSubP, "lastSuccess");
   KjNode* dbLastFailureP      = kjLookup(dbSubP, "lastFailure");
   KjNode* dbShowChangesP      = kjLookup(dbSubP, "showChanges");
+  KjNode* dbSysAttrsP         = kjLookup(dbSubP, "sysAttrs");
   KjNode* dbCreatedAtP        = NULL;
   KjNode* dbModifiedAtP       = NULL;
 
@@ -228,6 +232,10 @@ KjNode* dbModelToApiSubscription
   // showChanges
   if ((dbShowChangesP != NULL) && (showChangesP != NULL))
     *showChangesP = dbShowChangesP;
+
+  // sysAttrs
+  if ((dbSysAttrsP != NULL) && (sysAttrsP != NULL))
+    *sysAttrsP = dbShowChangesP;
 
   //
   // If dbSubIdP is a JSON Object, it's an NGSIv2 subscription and its "id" looks like this:
@@ -447,17 +455,27 @@ KjNode* dbModelToApiSubscription
   }
 
   if (dbFormatP != NULL)
+  {
     kjChildAdd(notificationP, dbFormatP);
+    *renderFormatP = stringToRenderFormat(dbFormatP->value.s);
+  }
 
   KjNode* endpointP = kjObject(orionldState.kjsonP, "endpoint");
 
   kjChildAdd(notificationP, endpointP);
 
-  // notification::showChanges
+  // Notification::showChanges
   if ((dbShowChangesP != NULL) && (dbShowChangesP->value.b == true))
   {
     KjNode* showChangesP = kjBoolean(orionldState.kjsonP, "showChanges", true);
     kjChildAdd(notificationP, showChangesP);
+  }
+
+  // notification::sysAttrs
+  if ((dbSysAttrsP != NULL) && (dbSysAttrsP->value.b == true))
+  {
+    KjNode* sysAttrsP = kjBoolean(orionldState.kjsonP, "sysAttrs", true);
+    kjChildAdd(notificationP, sysAttrsP);
   }
 
   // notification::status

@@ -74,8 +74,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
   //
   bson_init(&mongoFilter);
 
-  mongoc_client_t* connectionP = mongoc_client_pool_pop(mongocPool);
-
+  mongoc_client_t*     connectionP    = mongoc_client_pool_pop(mongocPool);
   mongoc_collection_t* subscriptionsP = mongoc_client_get_collection(connectionP, tenantP->mongoDbName, "csubs");
 
   //
@@ -99,11 +98,21 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
       continue;
     }
 
-    QNode*  qTree        = NULL;
-    KjNode* contextNodeP = NULL;
-    KjNode* coordinatesP = NULL;
-    KjNode* showChangesP = NULL;
-    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, tenantP->tenant, true, &qTree, &coordinatesP, &contextNodeP, &showChangesP);
+    QNode*       qTree         = NULL;
+    KjNode*      contextNodeP  = NULL;
+    KjNode*      coordinatesP  = NULL;
+    KjNode*      showChangesP  = NULL;
+    KjNode*      sysAttrsP     = NULL;
+    RenderFormat renderFormat  = RF_NORMALIZED;
+    KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,
+                                                          tenantP->tenant,
+                                                          true,
+                                                          &qTree,
+                                                          &coordinatesP,
+                                                          &contextNodeP,
+                                                          &showChangesP,
+                                                          &sysAttrsP,
+                                                          &renderFormat);
 
     if (apiSubP == NULL)
       continue;
@@ -112,7 +121,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     if (contextNodeP != NULL)
       contextP = orionldContextFromUrl(contextNodeP->value.s, NULL);
 
-    subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP);
+    subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat);
   }
 
   mongoc_client_pool_push(mongocPool, connectionP);

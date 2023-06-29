@@ -55,6 +55,7 @@ extern "C"
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/notifications/sysAttrsStrip.h"                 // sysAttrsStrip
 #include "orionld/notifications/previousValuePopulate.h"         // previousValuePopulate
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own interface
 
@@ -427,7 +428,7 @@ bool orionldPatchAttribute(void)
 
         if (entityType != NULL)
         {
-          KjNode* finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
+          KjNode* finalApiEntityWithSysAttrsP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, NULL, false, &orionldState.pd);
 
           // We need the "Incoming Entity", we have just an attribute ...
           KjNode* attributeNodeP = incomingP;
@@ -440,7 +441,11 @@ bool orionldPatchAttribute(void)
 
           kjChildAdd(inEntityP, attributeNodeP);
 
-          alteration(entityId, entityType, finalApiEntityP, inEntityP, initialDbEntityP);
+          KjNode* finalApiEntityWithoutSysAttrsP = kjClone(orionldState.kjsonP, finalApiEntityWithSysAttrsP);
+          sysAttrsStrip(finalApiEntityWithoutSysAttrsP);
+
+          OrionldAlteration* alterationP = alteration(entityId, entityType, finalApiEntityWithoutSysAttrsP, inEntityP, initialDbEntityP);
+          alterationP->finalApiEntityWithSysAttrsP = finalApiEntityWithSysAttrsP;
         }
         else
           LM_E(("Database Error (no _id::type in the DB for entity '%s')", entityId));

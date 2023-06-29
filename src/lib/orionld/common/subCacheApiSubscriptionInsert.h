@@ -30,7 +30,9 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "common/RenderFormat.h"                               // RenderFormat
 #include "cache/subCache.h"                                    // CachedSubscription
+
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 
@@ -47,7 +49,9 @@ extern CachedSubscription* subCacheApiSubscriptionInsert
   KjNode*         geoCoordinatesP,
   OrionldContext* contextP,
   const char*     tenant,
-  KjNode*         showChangesP
+  KjNode*         showChangesP,
+  KjNode*         sysAttrsP,
+  RenderFormat    renderFormat
 );
 
 #endif  // SRC_LIB_ORIONLD_COMMON_SUBCACHEAPISUBSCRIPTIONINSERT_H_

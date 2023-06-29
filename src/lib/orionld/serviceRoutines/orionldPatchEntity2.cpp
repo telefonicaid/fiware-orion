@@ -614,6 +614,10 @@ bool orionldPatchEntity2(void)
   bool    dbUpdateResult  = false;
   KjNode* requestForLocal = (orionldState.requestTree != NULL)? kjClone(orionldState.kjsonP, orionldState.requestTree) : NULL;
 
+  //
+  // Anything left for local database?
+  // Remember: distOpRequests() removes all attributes that match exclusive/redirect regiostrations
+  //
   if (requestForLocal != NULL)
   {
     orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP, false);

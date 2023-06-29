@@ -38,7 +38,7 @@ extern "C"
 
 #include "cache/CachedSubscription.h"                            // CachedSubscription
 #include "cache/subCache.h"                                      // subCacheItemInsert
-#include "common/RenderFormat.h"                                 // stringToRenderFormat
+#include "common/RenderFormat.h"                                 // RenderFormat, stringToRenderFormat
 
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
@@ -62,7 +62,9 @@ CachedSubscription* subCacheApiSubscriptionInsert
   KjNode*         geoCoordinatesP,
   OrionldContext* contextP,
   const char*     tenant,
-  KjNode*         showChangesP
+  KjNode*         showChangesP,
+  KjNode*         sysAttrsP,
+  RenderFormat    renderFormat
 )
 {
   CachedSubscription* cSubP = new CachedSubscription();
@@ -74,6 +76,10 @@ CachedSubscription* subCacheApiSubscriptionInsert
   cSubP->ldContext           = (contextP != NULL)? contextP->url : "";
   cSubP->geoCoordinatesP     = NULL;
   cSubP->showChanges         = (showChangesP != NULL)? showChangesP->value.b : false;
+  cSubP->sysAttrs            = (sysAttrsP != NULL)? sysAttrsP->value.b : false;
+  cSubP->renderFormat        = renderFormat;
+
+  LM_T(LmtSysAttrs, ("sysAttrs: %s", (cSubP->sysAttrs == true)? "true" : "false"));
 
   KjNode* subscriptionIdP    = kjLookup(apiSubscriptionP, "_id");  // "id" was changed to "_id" by orionldPostSubscriptions to accomodate the DB insertion
   KjNode* subscriptionNameP  = kjLookup(apiSubscriptionP, "subscriptionName");  // "name" is accepted too ...
@@ -243,7 +249,7 @@ CachedSubscription* subCacheApiSubscriptionInsert
   if (notificationP != NULL)
   {
     KjNode* attributesP = kjLookup(notificationP, "attributes");
-    KjNode* formatP     = kjLookup(notificationP, "format");
+    KjNode* formatP     = kjLookup(notificationP, "format");      // FIXME: pCheckSubscription has already found this field. Can be removed
     KjNode* endpointP   = kjLookup(notificationP, "endpoint");
 
     if (attributesP != NULL)
@@ -254,6 +260,7 @@ CachedSubscription* subCacheApiSubscriptionInsert
       }
     }
 
+     // FIXME: pCheckSubscription has already found the "notificatrion::format" field. Can be removed
     if (formatP != NULL)
     {
       cSubP->renderFormat = stringToRenderFormat(formatP->value.s, true);

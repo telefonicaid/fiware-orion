@@ -49,6 +49,7 @@ extern "C"
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
 #include "orionld/notifications/alteration.h"                    // alteration
 #include "orionld/notifications/previousValues.h"                // previousValues
+#include "orionld/notifications/sysAttrsStrip.h"                 // sysAttrsStrip
 #include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
@@ -297,9 +298,11 @@ bool orionldPostEntity(void)
       dbAttrsMerge(dbAttrsP, dbAttrsUpdate, orionldState.uriParamOptions.noOverwrite == false);
 
       OrionldProblemDetails  pd;
-      KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, false, &pd);
-
-      alteration(entityId, entityType, finalApiEntityP, orionldState.requestTree, initialDbEntityP);
+      KjNode*                finalApiEntityWithSysAttrs = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, orionldState.uriParams.lang, false, &pd);
+      KjNode*                finalApiEntity             = kjClone(orionldState.kjsonP, finalApiEntityWithSysAttrs);
+      sysAttrsStrip(finalApiEntity);
+      OrionldAlteration*     alterationP                = alteration(entityId, entityType, finalApiEntity, orionldState.requestTree, initialDbEntityP);
+      alterationP->finalApiEntityWithSysAttrsP = finalApiEntityWithSysAttrs;
     }
   }
 

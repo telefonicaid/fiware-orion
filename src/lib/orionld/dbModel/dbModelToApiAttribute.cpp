@@ -80,11 +80,15 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs, bool eqsForDots)
     {
       if ((sysAttrs == true) && (ix > 2))
       {
-        char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
-        numberToDate(dbAttrP->value.f, dateTimeBuf, 32);
-        dbAttrP->name       = (char*) ngsildName[ix];
-        dbAttrP->value.s    = dateTimeBuf;
-        dbAttrP->type       = KjString;
+        nodeP->name = (char*) ngsildName[ix];
+
+        if (dbAttrP->type == KjFloat)
+        {
+          char* dateTimeBuf = kaAlloc(&orionldState.kalloc, 32);
+          numberToDate(dbAttrP->value.f, dateTimeBuf, 32);
+          nodeP->value.s    = dateTimeBuf;
+          nodeP->type       = KjString;
+        }
       }
       else
         kjChildRemove(dbAttrP, nodeP);

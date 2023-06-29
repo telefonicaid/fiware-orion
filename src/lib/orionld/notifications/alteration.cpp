@@ -41,7 +41,7 @@ extern "C"
 //
 // alteration -
 //
-void alteration(const char* entityId, const char* entityType, KjNode* apiEntityP, KjNode* incomingP, KjNode* dbEntityBeforeP)
+OrionldAlteration* alteration(const char* entityId, const char* entityType, KjNode* apiEntityP, KjNode* incomingP, KjNode* dbEntityBeforeP)
 {
   OrionldAlteration* alterationP = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
 
@@ -71,4 +71,6 @@ void alteration(const char* entityId, const char* entityType, KjNode* apiEntityP
   orionldState.alterationsTail = alterationP;
 
   LM_T(LmtAlt, ("Added alteration for entity '%s'", entityId));
+
+  return alterationP;
 }

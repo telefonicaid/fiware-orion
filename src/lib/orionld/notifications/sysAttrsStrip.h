@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_SYSATTRSSTRIP_H_
+#define SRC_LIB_ORIONLD_NOTIFICATIONS_SYSATTRSSTRIP_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,27 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "common/RenderFormat.h"                                 // RenderFormat
-
-#include "orionld/q/QNode.h"                                     // QNode
-
 
 
 // -----------------------------------------------------------------------------
 //
-// dbModelToApiSubscription - modify the DB Model tree into an API Subscription
+// sysAttrsStrip -
 //
-extern KjNode* dbModelToApiSubscription
-(
-  KjNode*        dbSubP,
-  const char*    tenant,
-  bool           forSubCache,
-  QNode**        qNodePP,
-  KjNode**       coordinatesPP,
-  KjNode**       contextNodePP,
-  KjNode**       showChangesP,
-  KjNode**       sysAttrsP,
-  RenderFormat*  renderFormatP
-);
+extern void sysAttrsStrip(KjNode* finalApiEntityWithoutSysAttrsP);
 
-#endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_
+#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_SYSATTRSSTRIP_H_

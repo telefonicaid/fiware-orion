@@ -34,6 +34,7 @@ SET (SOURCES
     previousValues.cpp
     previousValuePopulate.cpp
     previousValueAdd.cpp
+    sysAttrsStrip.cpp
 )
 
 # Include directories
