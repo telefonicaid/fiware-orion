@@ -129,6 +129,7 @@ extern "C"
 #include "orionld/regCache/regCacheInit.h"                    // regCacheInit
 #include "orionld/regCache/regCacheCreate.h"                  // regCacheCreate
 #include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
+#include "orionld/pernot/pernotLoop.h"                        // pernotLoopStart
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -1314,6 +1315,9 @@ int main(int argC, char* argV[])
   // Startup is done - we can free up the allocated kalloc buffers - assuming socketService doesn't use kalloc ...
   kaBufferReset(&orionldState.kalloc, KFALSE);
 
+
+  // Start the thread for periodic notifications
+  pernotLoopStart();
 
   if (socketService == true)
   {

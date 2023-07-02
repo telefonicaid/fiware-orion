@@ -208,6 +208,7 @@ SET (ORION_LIBS
     orionld_troe
     orionld_dbModel
     orionld_apiModel
+    orionld_pernot
     serviceRoutines
     serviceRoutinesV2
     ngsiNotify
@@ -366,6 +367,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/jsonParse)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
+  ADD_SUBDIRECTORY(src/lib/orionld/pernot)
   ADD_SUBDIRECTORY(src/lib/orionld/socketService)
   ADD_SUBDIRECTORY(src/lib/orionld/notifications)
   ADD_SUBDIRECTORY(src/lib/orionld/forwarding)
