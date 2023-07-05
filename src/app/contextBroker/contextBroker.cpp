@@ -206,6 +206,7 @@ unsigned long   fcMaxInterval;
 int             mqttMaxAge;
 
 bool            logDeprecate;
+long int        maxthreshold;
 
 
 
@@ -256,7 +257,6 @@ bool            logDeprecate;
 #define REQ_POOL_SIZE          "size of thread pool for incoming connections"
 #define IN_REQ_PAYLOAD_MAX_SIZE_DESC   "maximum size (in bytes) of the payload of incoming requests"
 #define OUT_REQ_MSG_MAX_SIZE_DESC      "maximum size (in bytes) of outgoing forward and notification request messages"
-#define THRESHOLD_MAX_SIZE_DESC        "maximum threshold limit for notificationQueue"
 #define SIMULATED_NOTIF_DESC   "simulate notifications instead of actual sending them (only for testing)"
 #define STAT_COUNTERS          "enable request/notification counters statistics"
 #define STAT_SEM_WAIT          "enable semaphore waiting time statistics"
@@ -276,8 +276,8 @@ bool            logDeprecate;
 #define INSECURE_NOTIF_DESC    "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST_DESC   "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
-//#define MAX_THRESHOLD_DESC     "max time (in minutes) that an unused MQTT connection is kept, default: 60"
 #define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
+#define MAX_THRESHOLD_DESC     "maximum threshold for notification queue, default: 80%"
 
 
 
@@ -367,6 +367,8 @@ PaArgument paArgs[] =
   { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 60,                              PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
 
   { "-logDeprecate",                &logDeprecate,          "LOG_DEPRECATE",            PaBool,   PaOpt, false,                           false, true,                  LOG_DEPRECATE_DESC           },
+
+  { "-maxthreshold",                &maxthreshold,          "MAX_THRESHOLD",            PaInt,    PaOpt, 0,                               PaNL,  PaNL,                  MAX_THRESHOLD_DESC           },
 
   PA_END_OF_ARGS
 };
@@ -657,6 +659,15 @@ static void contextBrokerInit(void)
   {
     QueueNotifier*  pQNotifier = new QueueNotifier(notificationQueueSize, notificationThreadNum, serviceV, serviceQueueSizeV, serviceNumThreadV);
     int             rc         = pQNotifier->start();
+
+    if (maxthreshold > 0)
+    {
+      maxthreshold=notificationQueueSize*maxthreshold/100;
+    }
+    else
+    {
+      maxthreshold=notificationQueueSize*80;
+    }
 
     if (rc != 0)
     {

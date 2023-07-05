@@ -1,2 +1,2 @@
-- Fix: Alarm for notification queue overpassing a given threshold (#4113)
+- Fix: alarm for notification queue overpassing a given threshold (#4113)
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)

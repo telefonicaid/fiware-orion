@@ -180,17 +180,19 @@ void QueueNotifier::sendNotifyContextRequest
 
   if (enqueued)
   {
-    std::string details;
-    extern int thresholdMaxSize;
-    details = "(Max threshold limit: 3)";
 
-    if (QueueStatistics::getIn() >= thresholdMaxSize)
+    extern long int maxthreshold;
+    extern int notificationQueueSize;
+
+    std::string details = ("notification queue reached maximum threshold");
+
+    if (maxthreshold >= notificationQueueSize)
     {
-      alarmMgr.notificationQueue(service, "notification queue reached the threshold " + details);
+      alarmMgr.notificationQueue(queueName.c_str(), details);
     }
     else
     {
-      alarmMgr.notificationQueuesResets(service);
+      alarmMgr.notificationQueuesResets(queueName.c_str());
     }
   }
 

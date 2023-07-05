@@ -112,8 +112,6 @@
 #define DEFAULT_OUT_REQ_MSG_MAX_SIZE (8 * 1024 * 1024)  // 8 MB default max size of any outgoing request message (see CLI -outReqMsgMaxSize)
 
 
-#define DEFAULT_THRESHOLD_MAX_SIZE 3
-
 
 /* ****************************************************************************
 *
