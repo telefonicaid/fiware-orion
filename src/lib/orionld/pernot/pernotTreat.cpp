@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
-
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -25,13 +22,16 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
+#include "orionld/pernot/pernotTreat.h"                     // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotLoopStart -
+// pernotTreat -
 //
-extern void pernotLoopStart(void);
-
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
+bool pernotTreat(PernotSubscription* subP)
+{
+  return false;
+}

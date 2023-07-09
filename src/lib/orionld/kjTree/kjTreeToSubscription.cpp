@@ -256,8 +256,14 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if (strcmp(kNodeP->name, "timeInterval") == 0)
     {
-      orionldError(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented", 501);
-      return false;
+      DUPLICATE_CHECK(timeIntervalP, "Subscription::timeInterval", kNodeP);
+      INTEGER_CHECK(timeIntervalP, "Subscription::timeInterval");
+      subP->timeInterval = timeIntervalP->value.i;
+      if (subP->timeInterval <= 0)
+      {
+        orionldError(OrionldBadRequestData, "Invalid value for Subscription::timeInterval", "must be an integer value > 0", 400);
+        return false;
+      }
     }
     else if ((kNodeP->name[0] == 'q') && (kNodeP->name[1] == 0))
     {

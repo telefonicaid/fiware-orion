@@ -25,6 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdint.h>                                            // types: uint64_t, ...
+#include <curl/curl.h>                                         // CURL
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                      // KjNode
+}
+
 
 
 

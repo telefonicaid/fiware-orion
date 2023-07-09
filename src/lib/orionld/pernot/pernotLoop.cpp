@@ -30,21 +30,16 @@
 
 #include "orionld/common/orionldState.h"                    // orionldState
 #include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
+#include "orionld/pernot/PernotSubCache.h"                  // PernotSubCache
+#include "orionld/pernot/pernotTreat.h"                     // pernotTreat
 #include "orionld/pernot/pernotLoop.h"                      // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PernotSubCache - move to pernot/PernotSubCache.h
+// pernotSubCache -
 //
-typedef struct PernotSubCache
-{
-  PernotSubscription* head;
-  PernotSubscription* tail;
-} PernotSubCache;
-
-
 PernotSubCache pernotSubCache;
 
 
@@ -104,7 +99,7 @@ static void* pernotLoop(void* vP)
         continue;
 
       if (subP->expiresAt <= now)
-        subP->state = SubExpired;
+        subP->state = SubExpired;  // Should it be removed?
 
       if (subP->state == SubExpired)
         continue;
@@ -143,6 +138,7 @@ static void* pernotLoop(void* vP)
 
 
 
+pthread_t pernotThreadID;
 // -----------------------------------------------------------------------------
 //
 // pernotLoopStart -

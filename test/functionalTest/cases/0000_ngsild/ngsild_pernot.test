@@ -1,0 +1,74 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Pernot Subscription - periodic notifications
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB
+
+--SHELL--
+
+#
+# 01. Create a subscription urn:S1 with timeInterval
+# 02. See urn:S1 in the database
+# 03. GET urn:S1 from cache
+# 04. GET urn:S1 from database
+# 05. Restart broker
+# 06. GET urn:S1 from cache
+# 07. GET urn:S1 from database
+#
+
+echo "01. Create a subscription urn:S1 with timeInterval"
+echo "=================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "timeInterval": 2,
+  "notification": {
+    "endpoint": {
+    "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. See urn:S1 in the database"
+echo "=============================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+--REGEXPECT--
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

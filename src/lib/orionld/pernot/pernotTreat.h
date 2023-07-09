@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTTREAT_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTTREAT_H_
 
 /*
 *
@@ -25,13 +25,14 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotLoopStart -
+// pernotTreat -
 //
-extern void pernotLoopStart(void);
+extern bool pernotTreat(PernotSubscription* subP);
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTTREAT_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
 
 /*
 *
@@ -25,13 +25,18 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotLoopStart -
+// PernotSubCache -
 //
-extern void pernotLoopStart(void);
+typedef struct PernotSubCache
+{
+  PernotSubscription* head;
+  PernotSubscription* tail;
+} PernotSubCache;
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTLOOP_H_
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
