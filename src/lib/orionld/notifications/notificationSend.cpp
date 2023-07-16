@@ -720,6 +720,11 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   if (headers > 50)
     LM_X(1, ("Too many HTTP headers (>50) for a Notification - to support that many, the broker needs a SW update and to be recompiled"));
 
+  char          hostHeader[256];
+  size_t        hostHeaderLen;
+
+  hostHeaderLen = snprintf(hostHeader, sizeof(hostHeader), "Host: %s\r\n", mAltP->subP->ip);
+
   int           ioVecLen   = headers + 3;  // Request line + X headers + empty line + payload body
   int           headerIx   = 7;
   struct iovec  ioVec[53]  = {

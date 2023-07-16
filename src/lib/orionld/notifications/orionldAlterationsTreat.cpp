@@ -625,8 +625,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM_E(("Error starting HTTPS notifications: curl_multi_perform: error %d", cm));
       curlError = true;
     }
-    else
-      LM_T(LmtNotificationSend, ("Started HTTPS notifications"));
   }
   else
     LM_T(LmtNotificationSend, ("No HTTPS notifications"));
