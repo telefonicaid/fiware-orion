@@ -25,7 +25,6 @@
 #include <stdio.h>                                               // snprintf
 #include <unistd.h>                                              // gethostname
 
-#include "orionld/common/orionldState.h"                         // hostHeaderNoLF
 #include "orionld/forwarding/distOpInit.h"                       // Own interface
 
 
@@ -36,10 +35,4 @@
 //
 void distOpInit(void)
 {
-  char hostName[100];
-
-  if (gethostname(hostName, sizeof(hostName) - 1) == -1)
-    snprintf(hostHeaderNoLF, sizeof(hostHeaderNoLF), "Host: unknown");
-  else
-    snprintf(hostHeaderNoLF, sizeof(hostHeaderNoLF), "Host: %s", hostName);
 }

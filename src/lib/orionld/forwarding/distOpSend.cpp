@@ -494,8 +494,12 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Date
   headers = curl_slist_append(headers, dateHeader);
 
+#if 0
   // Host
-  headers = curl_slist_append(headers, hostHeaderNoLF);
+  char hostHeader[256];
+  snprintf(hostHeader, sizeof(hostHeader), "Host: %s", ip);
+  headers = curl_slist_append(headers, hostHeader);
+#endif
 
   // X-Forwarded-For
   headers = curl_slist_append(headers, xForwardedForHeader);

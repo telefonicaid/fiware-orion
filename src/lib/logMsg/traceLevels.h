@@ -78,6 +78,7 @@ typedef enum TraceLevels
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
+  LmtDistOpRequestHeaders,             // HTTP headers of request of distributed requests
   LmtDistOpList,                       // Linked list of DistOps
 
   //
