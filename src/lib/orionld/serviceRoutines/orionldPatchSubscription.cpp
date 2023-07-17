@@ -613,6 +613,7 @@ static bool subCacheItemUpdate
   {
     if (cSubP->qP != NULL)
       qRelease(cSubP->qP);
+
     cSubP->qP = qNodeP;
   }
 

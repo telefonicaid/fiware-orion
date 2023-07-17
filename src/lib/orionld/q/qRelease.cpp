@@ -48,6 +48,8 @@ void qRelease(QNode* qP)
       (qP->type == QNodeLE)         ||
       (qP->type == QNodeLT)         ||
       (qP->type == QNodeRange)      ||
+      (qP->type == QNodeMatch)      ||
+      (qP->type == QNodeNoMatch)    ||
       (qP->type == QNodeComma))
   {
     QNode* childP = qP->value.children;
@@ -57,10 +59,7 @@ void qRelease(QNode* qP)
       qRelease(childP);
       childP = next;
     }
-  }
-  else if ((qP->type == QNodeMatch) || (qP->type == QNodeNoMatch))
-  {
-    // regfree(qP->value.regex);
+    // if (QNodeNoMatch || QNodeMatch) regfree(qP->value.regex);
   }
 
   if ((qP->type == QNodeVariable) && (qP->value.v != NULL))

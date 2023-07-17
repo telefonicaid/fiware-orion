@@ -1,0 +1,93 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Deletion in HA with two brokers
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -mongocOnly
+
+--SHELL--
+
+#
+# 01. Create a subscription S1
+# 02. Create an entity to provoke a notification
+#
+
+echo "01. Create a subscription S1"
+echo "============================"
+#       "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7",
+#       "uri": "https://wwqva6mx2k.execute-api.eu-west-1.amazonaws.com/api",
+#       "uri": "https://d2o7dsk1qk8qnq.cloudfront.net/api",
+payload='{
+  "id": "urn:KZ:S1",
+  "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+  "subscriptionName": "KZ",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "IndoorEnvironmentObserved"
+    }
+  ],
+  "notification": {
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "https://d2o7dsk1qk8qnq.cloudfront.net/",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity to provoke a notification"
+echo "=============================================="
+payload='{
+  "id": "urn:E1",
+  "type": "IndoorEnvironmentObserved",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
+
+
+
+02.
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
