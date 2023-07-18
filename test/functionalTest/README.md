@@ -62,6 +62,49 @@ CMD ["--port", "1028", "--url", "/accumulate", "--host", "0.0.0.0", "-v"]
 
 **Important note**: copy the accumulator-server.py to the same directory in which Dockerfile is, before running your `docker build` command.
 
+**Probably error**: If during the building of docker image you get a similar error:
+```
+ > [5/8] RUN pip install Flask==2.3.0 #2.0.2:
+#0 0.446 error: externally-managed-environment
+#0 0.446
+#0 0.446 × This environment is externally managed
+#0 0.446 ╰─> To install Python packages system-wide, try apt install
+#0 0.446     python3-xyz, where xyz is the package you are trying to
+#0 0.446     install.
+#0 0.446
+#0 0.446     If you wish to install a non-Debian-packaged Python package,
+#0 0.446     create a virtual environment using python3 -m venv path/to/venv.
+#0 0.446     Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
+#0 0.446     sure you have python3-full installed.
+#0 0.446
+#0 0.446     If you wish to install a non-Debian packaged Python application,
+#0 0.446     it may be easiest to use pipx install xyz, which will manage a
+#0 0.446     virtual environment for you. Make sure you have pipx installed.
+#0 0.446
+#0 0.446     See /usr/share/doc/python3.11/README.venv for more information.
+#0 0.446
+#0 0.446 note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+#0 0.446 hint: See PEP 668 for the detailed specification.
+```
+This is produced by the current Dockerfile configuration because tis behavior is specific to the Debian-based container we are using. If you get this error, just change the Dockerfile for:
+```
+FROM debian:stable
+RUN apt-get update -y
+RUN apt-get install -y python3 python3-venv python3-pip
+
+# Create a virtual environment
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+# Install required packages within the virtual environment
+RUN pip install Flask==2.0.2 paho-mqtt==1.6.1
+
+COPY . /app
+WORKDIR /app
+ENTRYPOINT [ "python3", "./accumulator-server.py"]
+CMD ["--port", "1028", "--url", "/accumulate", "--host", "0.0.0.0", "-v"]
+```
+
 Once build (let's say with name 'accum') you can run it with:
 
 ```
