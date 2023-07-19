@@ -836,6 +836,11 @@ static std::string sortCriteria(const std::string& sortToken)
     return ENT_MODIFICATION_DATE;
   }
 
+  if (sortToken == SERVICE_PATH)
+  {
+    return std::string("_id.") + ENT_SERVICE_PATH;
+  }
+
   if (sortToken == ENT_ENTITY_ID)
   {
     return std::string("_id.") + ENT_ENTITY_ID;

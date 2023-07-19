@@ -1835,6 +1835,10 @@ bool StringFilter::mongoFilterPopulate(std::string* errorStringP)
     {
       k = ENT_MODIFICATION_DATE;
     }
+    else if (left == SERVICE_PATH)
+    {
+      k = std::string("_id.") + ENT_SERVICE_PATH;
+    }
     else if (left == itemP->attributeName + "." + ENT_ATTRS_MD "." + NGSI_MD_DATECREATED)
     {
       k = std::string(ENT_ATTRS) + "." + itemP->attributeName + "." + ENT_ATTRS_CREATION_DATE;

@@ -36,6 +36,7 @@ brokerStart CB
 # 04. Create entity E4 with temperature = 40 in servicePath /Barcelona/B
 # 05. GET entities with q parameter and servicePath /Madrid/A
 # 06. GET entities with orderBy servicePath
+# 07. GET entities with orderBy !servicePath
 #
 
 
@@ -113,6 +114,13 @@ echo
 echo
 
 
+echo "07. GET entities with orderBy !servicePath"
+echo "=========================================="
+orionCurl --url /v2/entities?orderBy=!servicePath
+echo
+echo
+
+
 --REGEXPECT--
 01. Create entity E1 with temperature = 35 in servicePath /Madrid/A
 ===================================================================
@@ -160,13 +168,80 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 163
 
-[]
+[
+    {
+        "id": "E1",
+        "temperature": {
+            "metadata": {},
+            "type": "Integer",
+            "value": 35
+        },
+        "type": "T"
+    },
+    {
+        "id": "E3",
+        "temperature": {
+            "metadata": {},
+            "type": "Integer",
+            "value": 30
+        },
+        "type": "T"
+    }
+]
 
 
 06. GET entities with orderBy servicePath
 =========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 325
+
+[
+    {
+        "id": "E2",
+        "temperature": {
+            "metadata": {},
+            "type": "Integer",
+            "value": 25
+        },
+        "type": "T"
+    },
+    {
+        "id": "E4",
+        "temperature": {
+            "metadata": {},
+            "type": "Integer",
+            "value": 40
+        },
+        "type": "T"
+    },
+    {
+        "id": "E1",
+        "temperature": {
+            "metadata": {},
+            "type": "Integer",
+            "value": 35
+        },
+        "type": "T"
+    },
+    {
+        "id": "E3",
+        "temperature": {
+            "metadata": {},
+            "type": "Integer",
+            "value": 30
+        },
+        "type": "T"
+    }
+]
+
+
+07. GET entities with orderBy !servicePath
+==========================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -180,15 +255,6 @@ Content-Length: 325
             "metadata": {},
             "type": "Integer",
             "value": 35
-        },
-        "type": "T"
-    },
-    {
-        "id": "E2",
-        "temperature": {
-            "metadata": {},
-            "type": "Integer",
-            "value": 25
         },
         "type": "T"
     },
@@ -207,6 +273,15 @@ Content-Length: 325
             "metadata": {},
             "type": "Integer",
             "value": 40
+        },
+        "type": "T"
+    },
+    {
+        "id": "E2",
+        "temperature": {
+            "metadata": {},
+            "type": "Integer",
+            "value": 25
         },
         "type": "T"
     }
