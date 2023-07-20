@@ -27,7 +27,7 @@ alarm for notification queue overpassing a given threshold
 dbInit ${CB_DB_NAME} serv1
 dbInit ${CB_DB_NAME} serv2
 dbInit ${CB_DB_NAME} serv3
-brokerStart CB 0 IPv4 -multiservice -maxthreshold 100 -notificationMode threadpool:3:2,serv1:3:2,serv2:3:2,serv3:3:2
+brokerStart CB 0 IPv4 -multiservice -notifAlarmThreshold 90 -notificationMode threadpool:3:2,serv1:3:2,serv2:3:2,serv3:3:2
 accumulatorStart --pretty-print localhost $LISTENER_PORT
 
 --SHELL--

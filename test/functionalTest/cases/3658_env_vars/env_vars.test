@@ -138,6 +138,7 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-ngsiv1Autocast' (automatic cast for number, booleans and dates in NGSI]   ORION_NGSIV1_AUTOCAST              FALSE /FALSE/
                                [option '-mqttMaxAge' <max time (in minutes) that an unused MQTT connection is k]   ORION_MQTT_MAX_AGE                 60 /60/
                                [option '-logDeprecate' (log deprecation usages as warnings)]                       ORION_LOG_DEPRECATE                FALSE /FALSE/
+                               [option '-notifAlarmThreshold' <maximum threshold for notification queue alarms,]   ORION_NOTIF_ALARM_THRESHOLD        0 /0/
 
 
 

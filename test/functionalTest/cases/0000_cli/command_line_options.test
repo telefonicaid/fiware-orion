@@ -92,5 +92,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-ngsiv1Autocast' (automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations)]
                       [option '-mqttMaxAge' <max time (in minutes) that an unused MQTT connection is kept, default: 60>]
                       [option '-logDeprecate' (log deprecation usages as warnings)]
+                      [option '-notifAlarmThreshold' <maximum threshold for notification queue alarms, as a percentage of the maximum queue size, default 0 (meaning no queue alarms are used)>]
 
 --TEARDOWN--

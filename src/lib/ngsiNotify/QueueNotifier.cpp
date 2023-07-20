@@ -178,24 +178,6 @@ void QueueNotifier::sendNotifyContextRequest
 
   bool enqueued = sq->try_push(paramsP);
 
-  if (enqueued)
-  {
-
-    extern long int maxthreshold;
-    extern int notificationQueueSize;
-
-    std::string details = ("notification queue reached maximum threshold");
-
-    if (maxthreshold >= notificationQueueSize)
-    {
-      alarmMgr.notificationQueue(queueName.c_str(), details);
-    }
-    else
-    {
-      alarmMgr.notificationQueuesResets(queueName.c_str());
-    }
-  }
-
   if (!enqueued)
   {
     QueueStatistics::incReject(1);
@@ -203,6 +185,30 @@ void QueueNotifier::sendNotifyContextRequest
     delete paramsP;
 
     return;
+  }
+
+  extern long unsigned int notifAlarmThreshold;
+
+  if (notifAlarmThreshold != 0)
+  {
+    std::string details = ("notification queue reached maximum threshold");
+
+    if (notifAlarmThreshold > 0)
+    {
+      notifAlarmThreshold=queueSize(service)*notifAlarmThreshold/100;
+    }
+    if (notifAlarmThreshold > 100)
+    {
+      LM_X(1, ("Fatal Error (notifAlarmThreshol value is greater than 100%)"));
+    }
+    if (notifAlarmThreshold >= queueSize(service))
+    {
+      alarmMgr.notificationQueue(queueName.c_str(), details);
+    }
+    else
+    {
+      alarmMgr.notificationQueuesResets(queueName.c_str());
+    }
   }
 
   QueueStatistics::incIn(1);
