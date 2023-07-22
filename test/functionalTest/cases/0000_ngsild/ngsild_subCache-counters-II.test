@@ -175,7 +175,7 @@ Date: REGEX(.*)
 04. GET S1 - see timesSent == 6
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 359
+Content-Length: 437
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -188,6 +188,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -213,7 +214,7 @@ slept 5
 06. GET S1 - see timesSent == 6
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 359
+Content-Length: 437
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -226,6 +227,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -265,7 +267,7 @@ Date: REGEX(.*)
 08. GET S1 - see timesSent == 11
 ================================
 HTTP/1.1 200 OK
-Content-Length: 360
+Content-Length: 438
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -278,6 +280,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

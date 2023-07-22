@@ -81,6 +81,7 @@ orionldStart CB -experimental
 #
 #  15.1. Attempt to create a subscription with a THROTTLING that is not a Number
 #  15.2. Attempt to create a subscription with two THROTTLINGs
+#  15.3. Attempt to create a subscription with a THROTTLING == 0
 #
 #  16.1. Creation of a subscription with a STATUS field, just to make sure it is ignored
 #  16.2. Creation of a subscription with a CREATEDAT field, just to make sure it is ignored
@@ -544,15 +545,15 @@ Date: REGEX(.*)
 
 19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present
 ===========================================================================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 137
+HTTP/1.1 400 Bad Request
+Content-Length: 164
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Time-Interval for Subscriptions",
-    "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+    "detail": "Both 'timeInterval' and 'watchedAttributes' are present",
+    "title": "Inconsistent subscription",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

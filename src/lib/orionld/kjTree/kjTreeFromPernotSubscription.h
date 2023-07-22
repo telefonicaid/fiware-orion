@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMPERNOTSUBSCRIPTION_H_
+#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMPERNOTSUBSCRIPTION_H_
 
 /*
 *
@@ -25,18 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/pernot/PernotSubscription.h"                   // PernotSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PernotSubCache -
+// kjTreeFromPernotSubscription - in NGSI-LD API format
 //
-typedef struct PernotSubCache
-{
-  PernotSubscription* head;
-  PernotSubscription* tail;
-} PernotSubCache;
+extern KjNode* kjTreeFromPernotSubscription(PernotSubscription* cSubP, bool sysAttrs, bool contextInBody);
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMPERNOTSUBSCRIPTION_H_

@@ -222,7 +222,7 @@ HTTP/1.1 204 No Content
 07. GET S1 - see lastSuccess==now, lastFailure==never, errors==0, timesSent==10, status==active
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 361
+Content-Length: 439
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -236,6 +236,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -256,7 +257,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 08. GET S2 - see lastSuccess==never, lastFailure==now, timesSent==4, status==paused
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 450
+Content-Length: 528
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -270,6 +271,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:S2",
     "isActive": false,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "consecutiveErrors": 3,
         "endpoint": {

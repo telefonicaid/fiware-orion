@@ -237,7 +237,7 @@ bye
 03. GET the subscription from cache, without context - see long names
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 933
+Content-Length: 937
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -261,6 +261,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     },
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": false,
+    "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     "notification": {
         "attributes": [
             "http://example.org/P1",
@@ -295,7 +296,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "status": "ok"
     },
     "origin": "cache",
-    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "q": "(temp<18|temp>25);(humidity<20|humidity>80)",
     "status": "paused",
     "subscriptionName": "S1",
     "throttling": 5,
@@ -309,7 +310,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. GET the subscription from DB, without context - see long names
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 937
+Content-Length: 941
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -333,6 +334,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     },
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": false,
+    "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     "notification": {
         "attributes": [
             "http://example.org/P1",
@@ -367,7 +369,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "status": "ok"
     },
     "origin": "database",
-    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "q": "(temp<18|temp>25);(humidity<20|humidity>80)",
     "status": "paused",
     "subscriptionName": "S1",
     "throttling": 5,
@@ -380,78 +382,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 05. GET the subscription from cache, with testFullContext - see short names
 ===========================================================================
-HTTP/1.1 200 OK
-Content-Length: 857
-Content-Type: application/json
-Date: REGEX(.*)
-Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-
-{
-    "description": "Just a test ...",
-    "entities": [
-        {
-            "type": "T"
-        }
-    ],
-    "expiresAt": "2028-12-31T10:00:00.000Z",
-    "geoQ": {
-        "coordinates": [
-            1,
-            2
-        ],
-        "geometry": "Point",
-        "geoproperty": "location2",
-        "georel": "near;maxDistance==1"
-    },
-    "id": "urn:ngsi-ld:subs:S1",
-    "isActive": false,
-    "notification": {
-        "attributes": [
-            "P1",
-            "P2",
-            "A3"
-        ],
-        "endpoint": {
-            "accept": "application/ld+json",
-            "notifierInfo": [
-                {
-                    "key": "MQTT-Version",
-                    "value": "mqtt5.0"
-                },
-                {
-                    "key": "MQTT-QoS",
-                    "value": "2"
-                }
-            ],
-            "receiverInfo": [
-                {
-                    "key": "H1",
-                    "value": "header 1 value"
-                },
-                {
-                    "key": "H2",
-                    "value": "header 2 value"
-                }
-            ],
-            "uri": "mqtt://localhost:1883/entities"
-        },
-        "format": "keyValues",
-        "status": "ok"
-    },
-    "origin": "cache",
-    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
-    "status": "paused",
-    "subscriptionName": "S1",
-    "throttling": 5,
-    "type": "Subscription",
-    "watchedAttributes": [
-        "P2"
-    ]
-}
-
-
-06. GET the subscription from DB, with testFullContext - see short names
-========================================================================
 HTTP/1.1 200 OK
 Content-Length: 861
 Content-Type: application/json
@@ -477,6 +407,80 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.json
     },
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": false,
+    "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+    "notification": {
+        "attributes": [
+            "P1",
+            "P2",
+            "A3"
+        ],
+        "endpoint": {
+            "accept": "application/ld+json",
+            "notifierInfo": [
+                {
+                    "key": "MQTT-Version",
+                    "value": "mqtt5.0"
+                },
+                {
+                    "key": "MQTT-QoS",
+                    "value": "2"
+                }
+            ],
+            "receiverInfo": [
+                {
+                    "key": "H1",
+                    "value": "header 1 value"
+                },
+                {
+                    "key": "H2",
+                    "value": "header 2 value"
+                }
+            ],
+            "uri": "mqtt://localhost:1883/entities"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "(temp<18|temp>25);(humidity<20|humidity>80)",
+    "status": "paused",
+    "subscriptionName": "S1",
+    "throttling": 5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "P2"
+    ]
+}
+
+
+06. GET the subscription from DB, with testFullContext - see short names
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 865
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Just a test ...",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expiresAt": "2028-12-31T10:00:00.000Z",
+    "geoQ": {
+        "coordinates": [
+            1,
+            2
+        ],
+        "geometry": "Point",
+        "geoproperty": "location2",
+        "georel": "near;maxDistance==1"
+    },
+    "id": "urn:ngsi-ld:subs:S1",
+    "isActive": false,
+    "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     "notification": {
         "attributes": [
             "P1",
@@ -511,7 +515,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.json
         "status": "ok"
     },
     "origin": "database",
-    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "q": "(temp<18|temp>25);(humidity<20|humidity>80)",
     "status": "paused",
     "subscriptionName": "S1",
     "throttling": 5,
@@ -588,7 +592,7 @@ bye
 09. GET the subscription from cache
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 933
+Content-Length: 937
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -612,6 +616,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     },
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": false,
+    "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     "notification": {
         "attributes": [
             "http://example.org/P1",
@@ -646,7 +651,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "status": "ok"
     },
     "origin": "cache",
-    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "q": "(temp<18|temp>25);(humidity<20|humidity>80)",
     "status": "paused",
     "subscriptionName": "S1",
     "throttling": 5,
@@ -660,7 +665,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 10. GET the subscription from DB
 ================================
 HTTP/1.1 200 OK
-Content-Length: 937
+Content-Length: 941
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -684,6 +689,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     },
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": false,
+    "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     "notification": {
         "attributes": [
             "http://example.org/P1",
@@ -718,7 +724,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "status": "ok"
     },
     "origin": "database",
-    "q": "(https://uri.etsi.org/ngsi-ld/default-context/temp<18|temp>25);(https://uri.etsi.org/ngsi-ld/default-context/humidity<20|humidity>80)",
+    "q": "(temp<18|temp>25);(humidity<20|humidity>80)",
     "status": "paused",
     "subscriptionName": "S1",
     "throttling": 5,

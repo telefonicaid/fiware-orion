@@ -334,7 +334,7 @@ Ngsild-Attribute-Format: Normalized
 06. GET the subscription, from cache, to see showChanges=true
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 397
+Content-Length: 475
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -348,6 +348,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -369,7 +370,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 07. GET the subscription, from DB, to see showChanges=true
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 400
+Content-Length: 478
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -383,6 +384,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -408,7 +410,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 09. GET the subscription, from cache, to see showChanges=true
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 296
+Content-Length: 374
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -422,6 +424,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -440,7 +443,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 10. GET the subscription, from DB, to see showChanges=true
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 299
+Content-Length: 377
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -454,6 +457,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -558,7 +562,7 @@ bye
 15. GET the subscription, from cache, to see showChanges=false
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 456
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -572,6 +576,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -592,7 +597,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 16. GET the subscription, from DB, to see showChanges=false
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 381
+Content-Length: 459
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -606,6 +611,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -674,7 +680,7 @@ bye
 19. GET the subscription, from cache, to see showChanges=true
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 397
+Content-Length: 475
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -688,6 +694,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -709,7 +716,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 20. GET the subscription, from DB, to see showChanges=true
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 400
+Content-Length: 478
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -723,6 +730,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

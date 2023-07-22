@@ -257,11 +257,12 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     else if (strcmp(kNodeP->name, "timeInterval") == 0)
     {
       DUPLICATE_CHECK(timeIntervalP, "Subscription::timeInterval", kNodeP);
-      INTEGER_CHECK(timeIntervalP, "Subscription::timeInterval");
-      subP->timeInterval = timeIntervalP->value.i;
+      NUMBER_CHECK(timeIntervalP, "Subscription::timeInterval");
+      subP->timeInterval = (timeIntervalP->type == KjInt)? timeIntervalP->value.i : timeIntervalP->value.f;
+
       if (subP->timeInterval <= 0)
       {
-        orionldError(OrionldBadRequestData, "Invalid value for Subscription::timeInterval", "must be an integer value > 0", 400);
+        orionldError(OrionldBadRequestData, "Invalid value for Subscription::timeInterval", "must be a Number > 0", 400);
         return false;
       }
     }
@@ -363,7 +364,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
 
   if ((timeIntervalP != NULL) && (watchedAttributesPresent == true))
   {
-    orionldError(OrionldBadRequestData, "Both 'timeInterval' and 'watchedAttributes' present", NULL, 400);
+    orionldError(OrionldBadRequestData, "Inconsistent subscription", "Both 'timeInterval' and 'watchedAttributes' present", 400);
     return false;
   }
 

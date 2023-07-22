@@ -192,7 +192,7 @@ bye
 03. GET the subscription - from the sub-cache
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 351
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -205,6 +205,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -228,7 +229,7 @@ Slept 2.1 seconds
 05. GET the subscription - from the sub-cache
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 351
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -241,6 +242,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

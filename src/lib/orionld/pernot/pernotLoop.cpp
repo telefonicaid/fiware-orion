@@ -28,30 +28,11 @@
 
 #include "logMsg/logMsg.h"                                  // LM_x
 
-#include "orionld/common/orionldState.h"                    // orionldState
+#include "orionld/common/orionldState.h"                    // orionldState, pernotSubCache
 #include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
 #include "orionld/pernot/PernotSubCache.h"                  // PernotSubCache
 #include "orionld/pernot/pernotTreat.h"                     // pernotTreat
 #include "orionld/pernot/pernotLoop.h"                      // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pernotSubCache -
-//
-PernotSubCache pernotSubCache;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pernotSubCacheInit - move to pernot/pernotSubCacheInit.h/cpp
-//
-void pernotSubCacheInit(void)
-{
-  bzero(&pernotSubCache, sizeof(pernotSubCache));
-}
 
 
 

@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"                                     // LM_*
-
 extern "C"
 {
 #include "kbase/kMacros.h"                                     // K_FT
@@ -31,7 +29,10 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 #include "kjson/kjLookup.h"                                    // kjLookup
 #include "kjson/kjBuilder.h"                                   // kjString, kjChildAdd, ...
+#include "kjson/kjClone.h"                                     // kjClone
 }
+
+#include "logMsg/logMsg.h"                                     // LM_*
 
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "cache/subCache.h"                                    // subCacheItemLookup, CachedSubscription
@@ -45,6 +46,11 @@ extern "C"
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
 #include "orionld/mongoc/mongocSubscriptionExists.h"           // mongocSubscriptionExists
 #include "orionld/mongoc/mongocSubscriptionInsert.h"           // mongocSubscriptionInsert
+#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
+#include "orionld/pernot/pernotSubCacheAdd.h"                  // pernotSubCacheAdd
+#include "orionld/pernot/pernotSubCacheRemove.h"               // pernotSubCacheRemove
+#include "orionld/pernot/pernotSubCacheLookup.h"               // pernotSubCacheLookup
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
 #include "orionld/mqtt/mqttDisconnect.h"                       // mqttDisconnect
@@ -83,6 +89,7 @@ bool orionldPostSubscriptions(void)
   bool          qIsMq           = false;
   KjNode*       showChangesP    = NULL;
   KjNode*       sysAttrsP       = NULL;
+  double        timeInterval    = 0;
   RenderFormat  renderFormat    = RF_NORMALIZED;
 
   b = pCheckSubscription(subP,
@@ -102,6 +109,7 @@ bool orionldPostSubscriptions(void)
                          &mqtt,
                          &showChangesP,
                          &sysAttrsP,
+                         &timeInterval,
                          &renderFormat);
 
   if (qRenderedForDb != NULL)
@@ -116,18 +124,18 @@ bool orionldPostSubscriptions(void)
   }
 
   // Subscription id special treats
+  char subscriptionId[80];
   if (subIdP != NULL)
   {
     subId = subIdP->value.s;
-
-    // 'id' needs to be '_id' - mongo stuff ...
-    subIdP->name = (char*) "_id";  // dbModel ...
 
     //
     // If the subscription already exists, a "409 Conflict" is returned
     //
     char* detail = NULL;
-    if ((subCacheItemLookup(orionldState.tenantP->tenant, subId) != NULL) || (mongocSubscriptionExists(subId, &detail) == true))
+    if ((subCacheItemLookup(orionldState.tenantP->tenant, subId)   != NULL) ||
+        (pernotSubCacheLookup(orionldState.tenantP->tenant, subId) != NULL) ||
+        (mongocSubscriptionExists(subId, &detail)                  == true))
     {
       if (detail == NULL)
         orionldError(OrionldAlreadyExists, "Subscription already exists", subId, 409);
@@ -139,14 +147,15 @@ bool orionldPostSubscriptions(void)
 
       return false;
     }
+
+    strncpy(subscriptionId, subId, sizeof(subscriptionId) - 1);
   }
   else
   {
-    char subscriptionId[80];
     strncpy(subscriptionId, "urn:ngsi-ld:subscription:", sizeof(subscriptionId) - 1);
     uuidGenerate(&subscriptionId[25], sizeof(subscriptionId) - 25, false);
 
-    subIdP = kjString(orionldState.kjsonP, "_id", subscriptionId);
+    subIdP = kjString(orionldState.kjsonP, "id", subscriptionId);
   }
 
   // Add subId to the tree
@@ -206,6 +215,12 @@ bool orionldPostSubscriptions(void)
 
   if (mqtt == true)
   {
+    if (timeInterval != 0)
+    {
+      orionldError(OrionldBadRequestData, "Not Implemented", "Notifications in MQTT for Periodic Notification Subscription", 501);
+      return false;
+    }
+
     char*  detail = NULL;
     char*  uri    = kaStrdup(&orionldState.kalloc, uriP->value.s);  // Can't destroy uriP->value.s ... mqttParse is destructive!
 
@@ -250,17 +265,39 @@ bool orionldPostSubscriptions(void)
   }
 
   // sub to cache - BEFORE we change the tree to be according to the DB Model (as the DB model might change some day ...)
-  CachedSubscription* cSubP = subCacheApiSubscriptionInsert(subP,
-                                                            qTree,
-                                                            geoCoordinatesP,
-                                                            orionldState.contextP,
-                                                            orionldState.tenantP->tenant,
-                                                            showChangesP,
-                                                            sysAttrsP,
-                                                            renderFormat);
+  CachedSubscription* cSubP = NULL;
+  PernotSubscription* pSubP = NULL;
+
+  if (timeInterval == 0)
+  {
+    cSubP = subCacheApiSubscriptionInsert(subP,
+                                          qTree,
+                                          geoCoordinatesP,
+                                          orionldState.contextP,
+                                          orionldState.tenantP->tenant,
+                                          showChangesP,
+                                          sysAttrsP,
+                                          renderFormat);
+  }
+  else
+  {
+    // Add subscription to the pernot-cache
+    pSubP = pernotSubCacheAdd(subscriptionId,
+                              subP,
+                              endpointP,
+                              qTree,
+                              geoCoordinatesP,
+                              orionldState.contextP,
+                              orionldState.tenantP->tenant,
+                              showChangesP,
+                              sysAttrsP,
+                              renderFormat,
+                              timeInterval);
+  }
 
   // dbModel
   KjNode* dbSubscriptionP = subP;
+  subIdP->name = (char*) "_id";  // 'id' needs to be '_id' - mongo stuff ...
   dbModelFromApiSubscription(dbSubscriptionP, false);
 
   // sub to db - mongocSubscriptionInsert(subP);
@@ -271,7 +308,10 @@ bool orionldPostSubscriptions(void)
     if (mqttSubscription == true)
       mqttDisconnect(mqttHost, mqttPort, mqttUser, mqttPassword, mqttVersion);
 
-    subCacheItemRemove(cSubP);
+    if (cSubP != NULL)
+      subCacheItemRemove(cSubP);
+    else
+      pernotSubCacheRemove(pSubP);
 
     if (qTree != NULL)
       qRelease(qTree);
@@ -281,19 +321,27 @@ bool orionldPostSubscriptions(void)
 
   //
   // MQTT details of the cached subscription
+  // - For now, timeInterval cannot be done via MQTT
   //
-  bzero(&cSubP->httpInfo.mqtt, sizeof(cSubP->httpInfo.mqtt));
-  if (mqttSubscription == true)
+  if (timeInterval == 0)
   {
-    cSubP->httpInfo.mqtt.mqtts = mqtts;
-    cSubP->httpInfo.mqtt.port  = mqttPort;
-    cSubP->httpInfo.mqtt.qos   = mqttQoS;
+    bzero(&cSubP->httpInfo.mqtt, sizeof(cSubP->httpInfo.mqtt));
+    if (mqttSubscription == true)
+    {
+      cSubP->httpInfo.mqtt.mqtts = mqtts;
+      cSubP->httpInfo.mqtt.port  = mqttPort;
+      cSubP->httpInfo.mqtt.qos   = mqttQoS;
 
-    if (mqttHost     != NULL)  strncpy(cSubP->httpInfo.mqtt.host,     mqttHost,     sizeof(cSubP->httpInfo.mqtt.host)     - 1);
-    if (mqttUser     != NULL)  strncpy(cSubP->httpInfo.mqtt.username, mqttUser,     sizeof(cSubP->httpInfo.mqtt.username) - 1);
-    if (mqttPassword != NULL)  strncpy(cSubP->httpInfo.mqtt.password, mqttPassword, sizeof(cSubP->httpInfo.mqtt.password) - 1);
-    if (mqttVersion  != NULL)  strncpy(cSubP->httpInfo.mqtt.version,  mqttVersion,  sizeof(cSubP->httpInfo.mqtt.version)  - 1);
-    if (mqttTopic    != NULL)  strncpy(cSubP->httpInfo.mqtt.topic,    mqttTopic,    sizeof(cSubP->httpInfo.mqtt.topic)    - 1);
+      if (mqttHost     != NULL)  strncpy(cSubP->httpInfo.mqtt.host,     mqttHost,     sizeof(cSubP->httpInfo.mqtt.host)     - 1);
+      if (mqttUser     != NULL)  strncpy(cSubP->httpInfo.mqtt.username, mqttUser,     sizeof(cSubP->httpInfo.mqtt.username) - 1);
+      if (mqttPassword != NULL)  strncpy(cSubP->httpInfo.mqtt.password, mqttPassword, sizeof(cSubP->httpInfo.mqtt.password) - 1);
+      if (mqttVersion  != NULL)  strncpy(cSubP->httpInfo.mqtt.version,  mqttVersion,  sizeof(cSubP->httpInfo.mqtt.version)  - 1);
+      if (mqttTopic    != NULL)  strncpy(cSubP->httpInfo.mqtt.topic,    mqttTopic,    sizeof(cSubP->httpInfo.mqtt.topic)    - 1);
+    }
+  }
+  else if (mqttSubscription == true)
+  {
+    // This is already taken care of.
   }
 
   orionldState.httpStatusCode = 201;

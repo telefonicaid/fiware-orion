@@ -67,13 +67,19 @@ typedef struct PernotSubscription
   double                      lastFailureTime;
   double                      expiresAt;
 
+  // Counters
+  uint32_t                    dbNotificationAttempts;   // Total number of notification attempts, in DB
+  uint32_t                    notificationAttempts;     // Total number of notification attempts, in cache (to be added to dbCount)
+  uint32_t                    dbNotificationErrors;     // Total number of FAILED notification attempts, in DB
+  uint32_t                    notificationErrors;       // Total number of FAILED notification attempts, in cache (to be added to dbNotificationErrors)
+
   // Error handling
   uint32_t                    consecutiveErrors;
-  uint32_t                    timeInterval;             // In seconds (Subscription::timeInterval is an integer in seconds)
+  double                      timeInterval;             // In seconds
   uint32_t                    cooldown;
 
   CURL*                       curlHandle;
-  
+
   struct PernotSubscription*  next;
 } PernotSubscription;
 

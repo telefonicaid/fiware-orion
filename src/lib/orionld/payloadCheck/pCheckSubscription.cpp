@@ -114,6 +114,7 @@ bool pCheckSubscription
   bool*          mqttChangeP,
   KjNode**       showChangesP,
   KjNode**       sysAttrsP,
+  double*        timeInterval,
   RenderFormat*  renderFormatP
 )
 {
@@ -130,11 +131,13 @@ bool pCheckSubscription
   KjNode* qP                  = NULL;
   KjNode* geoqP               = NULL;
   KjNode* langP               = NULL;
+  KjNode* timeIntervalP       = NULL;
   double  expiresAt;
 
   *mqttChangeP  = NULL;
   *showChangesP = NULL;
   *sysAttrsP    = NULL;
+  *timeInterval = 0;
 
   if (idP != NULL)
   {
@@ -199,8 +202,11 @@ bool pCheckSubscription
     }
     else if (strcmp(subItemP->name, "timeInterval") == 0)
     {
-      orionldError(OrionldOperationNotSupported, "Not Implemented", "Time-Interval for Subscriptions", 501);
-      return false;
+      PCHECK_DUPLICATE(timeIntervalP, subItemP, 0, NULL, SubscriptionTimeIntervalPath, 400);
+      PCHECK_NUMBER(timeIntervalP, 0, NULL, SubscriptionTimeIntervalPath, 400);
+      PCHECK_NUMBER_GT(timeIntervalP, 0, "Non-supported timeInterval (must be greater than zero)", SubscriptionTimeIntervalPath, 400, 0);
+
+      *timeInterval = (timeIntervalP->type == KjInt)? timeIntervalP->value.i : timeIntervalP->value.f;
     }
     else if (strcmp(subItemP->name, "q") == 0)
     {
@@ -251,20 +257,7 @@ bool pCheckSubscription
     {
       PCHECK_DUPLICATE(throttlingP, subItemP, 0, NULL, SubscriptionThrottlingPath, 400);
       PCHECK_NUMBER(throttlingP, 0, NULL, SubscriptionThrottlingPath, 400);
-
-      //
-      // Can't be negative
-      //
-      if ((throttlingP->type == KjInt) && (throttlingP->value.i < 0))
-      {
-        orionldError(OrionldBadRequestData, "Negative Number not allowed in this position", SubscriptionThrottlingPath, 400);
-        return false;
-      }
-      else if ((throttlingP->type == KjFloat) && (throttlingP->value.f < 0))
-      {
-        orionldError(OrionldBadRequestData, "Negative Number not allowed in this position", SubscriptionThrottlingPath, 400);
-        return false;
-      }
+      PCHECK_NUMBER_GT(throttlingP, 0, "Negative Number not allowed in this position", SubscriptionThrottlingPath, 400, 0);
     }
     else if (strcmp(subItemP->name, "lang") == 0)
     {
@@ -281,9 +274,14 @@ bool pCheckSubscription
       orionldError(OrionldOperationNotSupported, "Not Implemented", SubscriptionScopePath, 501);
       return false;
     }
-    else if (strcmp(subItemP->name, "status")           == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
-    else if (strcmp(subItemP->name, "createdAt")        == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
-    else if (strcmp(subItemP->name, "modifiedAt")       == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
+    else if (strcmp(subItemP->name, "status")              == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
+    else if (strcmp(subItemP->name, "createdAt")           == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
+    else if (strcmp(subItemP->name, "modifiedAt")          == 0) { kjChildRemove(subP, subItemP); }  // Silently REMOVED
+    else if (strcmp(subItemP->name, "notificationTrigger") == 0)
+    {
+      orionldError(OrionldOperationNotSupported, "Not Implemented", subItemP->name, 501);
+      return false;
+    }
     else
     {
       orionldError(OrionldBadRequestData, "Unknown field for subscription", subItemP->name, 400);
@@ -307,10 +305,34 @@ bool pCheckSubscription
       return false;
     }
 
-    if ((entitiesP == NULL) && (watchedAttributesP == NULL))
+    if (*timeInterval != 0)
     {
-      orionldError(OrionldBadRequestData, "Mandatory field missing", "At least one of 'entities' and 'watchedAttributes' must be present" , 400);
-      return false;
+      if (entitiesP == NULL)
+      {
+        orionldError(OrionldBadRequestData, "Mandatory field missing", "'entities' is mandatory for timeInterval subscriptions" , 400);
+        return false;
+      }
+
+      // Make sure it is consistent
+      if (watchedAttributesP != NULL)
+      {
+        orionldError(OrionldBadRequestData, "Inconsistent subscription", "Both 'timeInterval' and 'watchedAttributes' are present", 400);
+        return false;
+      }
+
+      if (throttlingP != NULL)
+      {
+        orionldError(OrionldBadRequestData, "Inconsistent subscription", "Both 'timeInterval' and 'throttling' are present", 400);
+        return false;
+      }
+    }
+    else
+    {
+      if ((entitiesP == NULL) && (watchedAttributesP == NULL))
+      {
+        orionldError(OrionldBadRequestData, "Mandatory field missing", "At least one of 'entities' and 'watchedAttributes' must be present" , 400);
+        return false;
+      }
     }
   }
 

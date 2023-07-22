@@ -156,7 +156,7 @@ bye
 03. GET S1 - see q with %22
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 290
+Content-Length: 368
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -169,6 +169,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -187,7 +188,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. GET all subscriptions - see S1:q with %22
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 292
+Content-Length: 370
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -201,6 +202,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         ],
         "id": "urn:ngsi-ld:subscriptions:S1",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
         "notification": {
             "endpoint": {
                 "accept": "application/json",

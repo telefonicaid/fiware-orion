@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
 
 /*
 *
@@ -25,18 +25,21 @@
 *
 * Author: Ken Zangelin
 */
+#include "common/RenderFormat.h"                               // RenderFormat
+
+#include "orionld/common/orionldState.h"                       // pernotSubCache
+#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PernotSubCache -
+// pernotSubCacheRemove -
 //
-typedef struct PernotSubCache
-{
-  PernotSubscription* head;
-  PernotSubscription* tail;
-} PernotSubCache;
+extern bool pernotSubCacheRemove(PernotSubscription* pSubP);
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_

@@ -628,14 +628,14 @@ Date: REGEX(.*)
 
 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
 ===================================================================================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 144
+HTTP/1.1 400 Bad Request
+Content-Length: 160
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Subscription::timeInterval is not implemented",
-    "title": "Not Implemented",
+    "detail": "Both 'timeInterval' and 'watchedAttributes' present",
+    "title": "Inconsistent subscription",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

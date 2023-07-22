@@ -134,7 +134,7 @@ static bool notificationStatus(KjNode* dbLastSuccessP, KjNode* dbLastFailureP)
 //   "custom": false,
 //   "servicePath": "/#",
 //   "blacklist": false,
-//   "ldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+//   "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 // }
 //
 // An API Subscription looks like this:
@@ -181,9 +181,11 @@ KjNode* dbModelToApiSubscription
   KjNode**       contextNodePP,
   KjNode**       showChangesP,
   KjNode**       sysAttrsP,
-  RenderFormat*  renderFormatP
+  RenderFormat*  renderFormatP,
+  double*        timeIntervalP
 )
 {
+  LM_T(LmtSR, ("Here"));
   KjNode* dbSubIdP            = kjLookup(dbSubP, "_id");         DB_ITEM_NOT_FOUND(dbSubIdP, "id",          tenant);
   KjNode* dbNameP             = kjLookup(dbSubP, "name");
   KjNode* dbDescriptionP      = kjLookup(dbSubP, "description");
@@ -210,6 +212,7 @@ KjNode* dbModelToApiSubscription
   KjNode* dbSysAttrsP         = kjLookup(dbSubP, "sysAttrs");
   KjNode* dbCreatedAtP        = NULL;
   KjNode* dbModifiedAtP       = NULL;
+  KjNode* timeIntervalNodeP   = kjLookup(dbSubP, "timeInterval");
 
   if (orionldState.uriParamOptions.sysAttrs == true)
   {
@@ -277,7 +280,6 @@ KjNode* dbModelToApiSubscription
   if (dbDescriptionP != NULL)
     kjChildAdd(apiSubP, dbDescriptionP);
 
-
   //
   // "entities"
   //
@@ -287,39 +289,35 @@ KjNode* dbModelToApiSubscription
   //
   for (KjNode* entityP = dbEntitiesP->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
+    KjNode* idP            = kjLookup(entityP, "id");
     KjNode* isPatternP     = kjLookup(entityP, "isPattern");
-    KjNode* isTypePatternP = kjLookup(entityP, "isTypePattern");
     KjNode* typeP          = kjLookup(entityP, "type");
+    KjNode* isTypePatternP = kjLookup(entityP, "isTypePattern");
 
+    // There is no "Type Pattern" in NGSI-LD
+    kjChildRemove(entityP, isTypePatternP);
 
-    // bool ngsild  = (dbLdContextP != NULL);
-    // if (ngsild)
+    // There is no "isPattern" in NGSI-LD
+    kjChildRemove(entityP, isPatternP);
+
+    LM_T(LmtSR, ("entityId:   %s", idP->value.s));
+    LM_T(LmtSR, ("isPattern:  %s", isPatternP->value.s));
+    LM_T(LmtSR, ("type:       %s", typeP->value.s));
+
+    if (strcmp(isPatternP->value.s, "true") == 0)
     {
-      if (isTypePatternP != NULL)
-        kjChildRemove(entityP, isTypePatternP);
-
-      if (isPatternP != NULL)
-      {
-        if (strcmp(isPatternP->value.s, "true") == 0)
-        {
-          KjNode* idP = kjLookup(entityP, "id");
-          if (strcmp(idP->value.s, ".*") == 0)
-            kjChildRemove(entityP, idP);
-          else
-            idP->name = (char*) "idPattern";
-        }
-
-        kjChildRemove(entityP, isPatternP);
-
-        // type must be compacted
-        if (typeP != NULL)  // Can't really be NULL though ...
-        {
-          // But, for sub-cache we need the long names
-          if (forSubCache == false)
-            typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
-        }
-      }
+      if (strcmp(idP->value.s, ".*") == 0)
+        kjChildRemove(entityP, idP);
+      else
+        idP->name = (char*) "idPattern";
     }
+
+    kjChildRemove(entityP, isPatternP);
+
+    // type must be compacted
+    // However, for sub-cache we need the long names
+    if (forSubCache == false)
+      typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
   }
   kjChildAdd(apiSubP, dbEntitiesP);
 
@@ -337,6 +335,13 @@ KjNode* dbModelToApiSubscription
         attrNameNodeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrNameNodeP->value.s, NULL, NULL);
       }
     }
+  }
+
+  // timeInterval
+  if (timeIntervalNodeP != NULL)
+  {
+    kjChildAdd(apiSubP, timeIntervalNodeP);
+    *timeIntervalP = (timeIntervalNodeP->type == KjInt)? timeIntervalNodeP->value.i : timeIntervalNodeP->value.f;
   }
 
   // "q" for NGSI-LD
@@ -635,11 +640,12 @@ KjNode* dbModelToApiSubscription
     kjChildAdd(apiSubP, modifiedAtNodeP);
   }
 
-#if 0
-  // ldContext ... not yet implemented in the API SPEC for subscriptions to have their own @context
+  // jsonldContext
   if (dbLdContextP != NULL)
+  {
     kjChildAdd(apiSubP, dbLdContextP);
-#endif
+    dbLdContextP->name = (char*) "jsonldContext";
+  }
 
   // count - take sub-cache delta into consideration
   if (dbCountP != NULL)

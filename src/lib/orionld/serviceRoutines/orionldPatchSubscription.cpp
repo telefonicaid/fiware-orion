@@ -818,6 +818,7 @@ bool orionldPatchSubscription(void)
   KjNode*       notifierInfoP          = NULL;
   KjNode*       showChangesP           = NULL;
   KjNode*       sysAttrsP              = NULL;
+  double        timeInterval           = 0;
   RenderFormat  renderFormat           = RF_NORMALIZED;
   bool          r;
 
@@ -838,6 +839,7 @@ bool orionldPatchSubscription(void)
                          &mqttChange,
                          &showChangesP,
                          &sysAttrsP,
+                         &timeInterval,
                          &renderFormat);
   if (r == false)
   {
@@ -857,6 +859,17 @@ bool orionldPatchSubscription(void)
     if (qNodeP != NULL)
       qRelease(qNodeP);
     orionldError(OrionldResourceNotFound, "Subscription not found", subscriptionId, 404);
+    return false;
+  }
+
+  //
+  // If the subscription used to be "on-change", timeInterval cannot be set
+  //
+  if ((timeInterval != 0) && (kjLookup(dbSubscriptionP, "timeInterval") == NULL))
+  {
+    if (qNodeP != NULL)
+      qRelease(qNodeP);
+    orionldError(OrionldResourceNotFound, "Invalid modification (on-change to timeInterval subscription)", subscriptionId, 400);
     return false;
   }
 
@@ -908,7 +921,15 @@ bool orionldPatchSubscription(void)
   // modified.
   // ngsildSubscriptionPatch() performs that modification.
   //
-  CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+  CachedSubscription* cSubP;
+
+  if (timeInterval == 0)
+    cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+  else
+  {
+    // What do I do here?
+    // Create a copy of CachedSubscription with only the fields needed by ngsildSubscriptionPatch?
+  }
 
   if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP, qRenderedForDb) == false)
   {
@@ -964,8 +985,16 @@ bool orionldPatchSubscription(void)
   }
 
   // Modify the subscription in the subscription cache
-  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP, qNodeP, qRenderedForDb, showChangesP) == false)
-    LM_E(("Internal Error (unable to update the cached subscription '%s' after a PATCH)", subscriptionId));
+  if (timeInterval == 0)
+  {
+    if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP, qNodeP, qRenderedForDb, showChangesP) == false)
+      LM_E(("Internal Error (unable to update the cached subscription '%s' after a PATCH)", subscriptionId));
+  }
+  else
+  {
+    // Update the subscription in the pernot-cache
+    LM_X(1, ("Implement PATCH for pernot subscriptions!"));
+  }
 
   // All OK? 204 No Content
   orionldState.httpStatusCode = 204;

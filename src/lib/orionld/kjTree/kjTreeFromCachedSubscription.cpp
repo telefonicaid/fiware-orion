@@ -132,14 +132,21 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
       KjNode*     eObjectP = kjObject(orionldState.kjsonP, NULL);
       NULL_CHECK(eObjectP);
 
+      LM_T(LmtSR, ("Got an entity"));
       //
       // id/idPattern
       //
       // SPECIAL CASE:
       //  If it's a .* pattern, then it is omitted
       //
-      const char*  entityId   = eiP->entityId.c_str();
-      bool         noIdNeeded = (eiP->isPattern == true) && (strcmp(entityId, ".*") == 0);
+      const char*  entityId    = eiP->entityId.c_str();
+      const char*  entityType  = eiP->entityType.c_str();
+      bool         noIdNeeded  = (eiP->isPattern == true) && (strcmp(entityId, ".*") == 0);
+
+      LM_T(LmtSR, ("entityId:    %s", entityId));
+      LM_T(LmtSR, ("isPattern:   %s", (eiP->isPattern == true)? "true" : "false"));
+      LM_T(LmtSR, ("entityType:  %s", entityType));
+      LM_T(LmtSR, ("noIdNeeded:  %s", (noIdNeeded == false)? "FALSE" : "TRUE"));
 
       if ((noIdNeeded == false) && (*entityId != 0))
       {
@@ -499,6 +506,16 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   if (experimental == true)
   {
     nodeP = kjString(orionldState.kjsonP, "origin", "cache");
+    NULL_CHECK(nodeP);
+    kjChildAdd(sP, nodeP);
+  }
+
+  //
+  // jsonldCcontext
+  //
+  if (cSubP->ldContext != "")
+  {
+    nodeP = kjString(orionldState.kjsonP, "jsonldContext", cSubP->ldContext.c_str());
     NULL_CHECK(nodeP);
     kjChildAdd(sP, nodeP);
   }

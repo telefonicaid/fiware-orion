@@ -129,6 +129,7 @@ extern "C"
 #include "orionld/regCache/regCacheInit.h"                    // regCacheInit
 #include "orionld/regCache/regCacheCreate.h"                  // regCacheCreate
 #include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
+#include "orionld/pernot/pernotSubCacheInit.h"                // pernotSubCacheInit
 #include "orionld/pernot/pernotLoop.h"                        // pernotLoopStart
 
 #include "orionld/version.h"
@@ -1165,6 +1166,7 @@ int main(int argC, char* argV[])
   // Note that regCacheInit uses the tenantList, so orionldTenantInit must be called before regCacheInit
   //
   regCacheInit();
+  pernotSubCacheInit();
 
   orionldServiceInit(restServiceVV, 9);
 
@@ -1174,7 +1176,7 @@ int main(int argC, char* argV[])
     mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   }
 
-  // Initialize orion libs
+  // Initialize libs
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);

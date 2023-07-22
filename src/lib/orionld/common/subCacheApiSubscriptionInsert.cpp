@@ -227,20 +227,36 @@ CachedSubscription* subCacheApiSubscriptionInsert
   {
     for (KjNode* eSelectorP = entitiesP->value.firstChildP; eSelectorP != NULL; eSelectorP = eSelectorP->next)
     {
-      KjNode*       idP         = kjLookup(eSelectorP, "id");
-      KjNode*       idPatternP  = kjLookup(eSelectorP, "idPattern");
-      KjNode*       typeP       = kjLookup(eSelectorP, "type");
-      char*         id          = (idP        != NULL)? idP->value.s : (char*) "";
-      const char*   idPattern   = (idPatternP != NULL)? idPatternP->value.s : "";
-      const char*   type        = (typeP      != NULL)? typeP->value.s : "";
-      const char*   isPattern   = "false";
+      KjNode*       idP             = kjLookup(eSelectorP, "id");
+      KjNode*       idPatternP      = kjLookup(eSelectorP, "idPattern");
+      KjNode*       typeP           = kjLookup(eSelectorP, "type");
+      char*         id              = (idP            != NULL)? idP->value.s : NULL;
+      char*         idPattern       = (idPatternP     != NULL)? idPatternP->value.s : NULL;
+      char*         type            = (typeP          != NULL)? typeP->value.s : NULL;
+      char*         isPattern       = (char*) "false";
 
-      if (idP == NULL)
+      LM_T(LmtSR, ("id:           '%s'", id));
+      LM_T(LmtSR, ("idPattern:    '%s'", idPattern));
+      LM_T(LmtSR, ("type:         '%s'", type));
+
+      if ((idP == NULL) && (idPattern == NULL))
       {
-        id        = (char*) ((idPatternP != NULL)? idPattern : ".*");
+        id        = (char*) ".*";
         isPattern = (char*) "true";
       }
+      else
+      {
+        if ((idP != NULL) && (idPatternP != NULL))
+          idPatternP = NULL;
 
+        if (idPattern != NULL)
+        {
+          id = idPatternP->value.s;
+          isPattern = (char*) "true";
+        }
+      }
+
+      LM_T(LmtSR, ("Creating a new EntityInfo (id: '%s', idPattern: '%s', type: '%s')", id, idPattern, type));
       EntityInfo* eP = new EntityInfo(id, type, isPattern, false);
       cSubP->entityIdInfos.push_back(eP);
     }

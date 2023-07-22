@@ -32,7 +32,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState, dbName, mongoEntitiesCollectionP
+#include "orionld/common/orionldState.h"                         // orionldState, dbName
 
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection, releaseMongoConnection, ...
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldDelete.h"  // Own interface

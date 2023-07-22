@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHELOOKUP_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHELOOKUP_H_
 
 /*
 *
@@ -31,12 +31,12 @@
 
 // -----------------------------------------------------------------------------
 //
-// PernotSubCache -
+// pernotSubCacheLookup -
 //
-typedef struct PernotSubCache
-{
-  PernotSubscription* head;
-  PernotSubscription* tail;
-} PernotSubCache;
+extern PernotSubscription* pernotSubCacheLookup
+(
+  const char* subscriptionId,
+  const char* tenant
+);
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHELOOKUP_H_

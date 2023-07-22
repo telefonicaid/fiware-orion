@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
-
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -26,17 +23,15 @@
 * Author: Ken Zangelin
 */
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+#include "orionld/pernot/pernotSubCacheRemove.h"               // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PernotSubCache -
+// pernotSubCacheRemove -
 //
-typedef struct PernotSubCache
+bool pernotSubCacheRemove(PernotSubscription* pSubP)
 {
-  PernotSubscription* head;
-  PernotSubscription* tail;
-} PernotSubCache;
-
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+  return true;
+}

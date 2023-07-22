@@ -91,6 +91,11 @@ typedef enum TraceLevels
   LmtGeoJSON = 90,                     // GeoJSON ... everything (for now)
 
   //
+  // Pernot sub-cache
+  //
+  LmtPernot = 100,                     // Periodic Notification Subscription cache
+
+  //
   // Misc
   //
   LmtMongoc = 240,                     // Entire mongoc library

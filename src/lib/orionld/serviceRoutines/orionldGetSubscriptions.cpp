@@ -67,7 +67,7 @@ static bool tenantMatch(OrionldTenant* requestTenantP, const char* subscriptionT
 }
 
 
-extern void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP);
+extern void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP, PernotSubscription* pSubP);
 // -----------------------------------------------------------------------------
 //
 // orionldGetSubscriptionsFromDb -
@@ -113,6 +113,7 @@ static bool orionldGetSubscriptionsFromDb(void)
     KjNode*      showChangesP  = NULL;
     KjNode*      sysAttrsP     = NULL;
     RenderFormat renderFormat  = RF_NORMALIZED;
+    double       timeInterval  = 0;
     KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,
                                                           orionldState.tenantP->tenant,
                                                           false,
@@ -121,7 +122,8 @@ static bool orionldGetSubscriptionsFromDb(void)
                                                           &contextNodeP,
                                                           &showChangesP,
                                                           &sysAttrsP,
-                                                          &renderFormat);
+                                                          &renderFormat,
+                                                          &timeInterval);
 
     if (apiSubP == NULL)
     {
@@ -138,7 +140,7 @@ static bool orionldGetSubscriptionsFromDb(void)
         kjChildAdd(apiSubP, nodeP);
     }
 
-    orionldSubCounters(apiSubP, NULL);
+    orionldSubCounters(apiSubP, NULL, NULL);
 
     kjChildAdd(apiSubV, apiSubP);
   }
@@ -158,12 +160,7 @@ bool orionldGetSubscriptions(void)
     return legacyGetSubscriptions();
 
   if (orionldState.uriParamOptions.fromDb == true)
-  {
-    //
-    // GET Subscriptions with mongoc
-    //
     return orionldGetSubscriptionsFromDb();
-  }
 
   //
   // Not Legacy, not "From DB" - Getting the subscriptions from the subscription cache

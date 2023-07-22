@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // mongocPool
 #include "orionld/common/subCacheApiSubscriptionInsert.h"        // subCacheApiSubscriptionInsert
+#include "orionld/pernot/pernotSubCacheAdd.h"                    // pernotSubCacheAdd
 #include "orionld/dbModel/dbModelToApiSubscription.h"            // dbModelToApiSubscription
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
@@ -104,6 +105,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     KjNode*      showChangesP  = NULL;
     KjNode*      sysAttrsP     = NULL;
     RenderFormat renderFormat  = RF_NORMALIZED;
+    double       timeInterval  = 0;
     KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,
                                                           tenantP->tenant,
                                                           true,
@@ -112,7 +114,8 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
                                                           &contextNodeP,
                                                           &showChangesP,
                                                           &sysAttrsP,
-                                                          &renderFormat);
+                                                          &renderFormat,
+                                                          &timeInterval);
 
     if (apiSubP == NULL)
       continue;
@@ -121,7 +124,10 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     if (contextNodeP != NULL)
       contextP = orionldContextFromUrl(contextNodeP->value.s, NULL);
 
-    subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat);
+    if (timeInterval == 0)
+      subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat);
+    else
+      pernotSubCacheAdd(NULL, apiSubP, NULL, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat, timeInterval);
   }
 
   mongoc_client_pool_push(mongocPool, connectionP);

@@ -21,6 +21,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
+    pernotSubCacheInit.cpp
+    pernotSubCacheAdd.cpp
+    pernotSubCacheRemove.cpp
+    pernotSubCacheLookup.cpp
     pernotLoop.cpp
     pernotTreat.cpp
 )

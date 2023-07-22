@@ -37,8 +37,10 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup
+#include "orionld/pernot/pernotSubCacheLookup.h"                 // pernotSubCacheLookup
 #include "orionld/legacyDriver/legacyGetSubscription.h"          // legacyGetSubscription
 #include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
+#include "orionld/kjTree/kjTreeFromPernotSubscription.h"         // kjTreeFromPernotSubscription
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
 #include "orionld/dbModel/dbModelToApiSubscription.h"            // dbModelToApiSubscription
 #include "orionld/mongoc/mongocSubscriptionLookup.h"             // mongocSubscriptionLookup
@@ -101,9 +103,20 @@ static void subCounterSet(KjNode* apiSubP, const char* fieldName, int64_t valueI
 //
 // orionldSubCounters - FIXME: Own Module
 //
-void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP)
+void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP, PernotSubscription* pSubP)
 {
-  if (cSubP == NULL)
+  //
+  // Three options:
+  // 1. cSubP given
+  // 2. pSubP given
+  // 3, None of them (look up apiSubP::subscriptionId in both cashes)
+  //
+  double lastNotificationTime = -1;
+  double lastSuccess          = -1;
+  double lastFailure          = -1;
+  int    timesSent            = -1;
+
+  if ((cSubP == NULL) && (pSubP == NULL))
   {
     KjNode* subIdP = kjLookup(apiSubP, "id");
 
@@ -111,18 +124,36 @@ void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP)
       return;
 
     cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subIdP->value.s);
-    if (cSubP == NULL)
-      return;
+    pSubP = pernotSubCacheLookup(orionldState.tenantP->tenant, subIdP->value.s);
+    if ((cSubP == NULL) && (pSubP == NULL))
+      LM_RVE(("Can't find subscription '%s'", subIdP->value.s));
   }
 
-  KjNode* notificationNodeP = kjLookup(apiSubP, "notification");
+  if (cSubP != NULL)
+  {
+    lastNotificationTime = cSubP->lastNotificationTime;
+    lastSuccess          = cSubP->lastSuccess;
+    lastFailure          = cSubP->lastFailure;
+    timesSent            = cSubP->dbCount + cSubP->count;
+  }
+  else if (pSubP != NULL)
+  {
+    lastNotificationTime = pSubP->lastNotificationAttempt;
+    lastSuccess          = pSubP->lastSuccessTime;
+    lastFailure          = pSubP->lastFailureTime;
+    timesSent            = pSubP->dbNotificationAttempts + pSubP->notificationAttempts;
+  }
 
+  //
+  // Set the values
+  //
+  KjNode* notificationNodeP = kjLookup(apiSubP, "notification");
   if (notificationNodeP != NULL)
   {
-    subTimestampSet(notificationNodeP, "lastNotification", cSubP->lastNotificationTime);
-    subTimestampSet(notificationNodeP, "lastSuccess",      cSubP->lastSuccess);
-    subTimestampSet(notificationNodeP, "lastFailure",      cSubP->lastFailure);
-    subCounterSet(notificationNodeP,   "timesSent",        cSubP->dbCount + cSubP->count);
+    subTimestampSet(notificationNodeP, "lastNotification", lastNotificationTime);
+    subTimestampSet(notificationNodeP, "lastSuccess",      lastSuccess);
+    subTimestampSet(notificationNodeP, "lastFailure",      lastFailure);
+    subCounterSet(notificationNodeP,   "timesSent",        timesSent);
   }
 }
 
@@ -149,6 +180,7 @@ static bool orionldGetSubscriptionFromDb(void)
   KjNode*      showChangesP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
   KjNode*      sysAttrsP        = NULL;           // Not needed here, but dbModelToApiSubscription requires it
   RenderFormat renderFormat     = RF_NORMALIZED;  // Not needed here, but dbModelToApiSubscription requires it
+  double       timeInterval     = 0;
   KjNode*      apiSubP          = dbModelToApiSubscription(dbSubP,
                                                            orionldState.tenantP->tenant,
                                                            false,
@@ -157,7 +189,8 @@ static bool orionldGetSubscriptionFromDb(void)
                                                            &contextNodeP,
                                                            &showChangesP,
                                                            &sysAttrsP,
-                                                           &renderFormat);
+                                                           &renderFormat,
+                                                           &timeInterval);
 
   if (apiSubP == NULL)
   {
@@ -166,10 +199,18 @@ static bool orionldGetSubscriptionFromDb(void)
   }
 
   // Need to take counters and timestamps from sub-cache
-  CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, orionldState.wildcard[0]);
-
-  if (cSubP != NULL)
-    orionldSubCounters(apiSubP, cSubP);
+  if (timeInterval == 0)
+  {
+    CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, orionldState.wildcard[0]);
+    if (cSubP != NULL)
+      orionldSubCounters(apiSubP, cSubP, NULL);
+  }
+  else
+  {
+    PernotSubscription* pSubP = pernotSubCacheLookup(orionldState.wildcard[0], orionldState.tenantP->tenant);
+    if (pSubP != NULL)
+      orionldSubCounters(apiSubP, NULL, pSubP);
+  }
 
   orionldState.httpStatusCode = 200;
   orionldState.responseTree   = apiSubP;
@@ -200,12 +241,25 @@ bool orionldGetSubscription(void)
   }
 
   char*                 subscriptionId = orionldState.wildcard[0];
-  CachedSubscription*   cSubP          = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
 
+  // "Normal" (onchange) subscription?
+  CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
   if (cSubP != NULL)
   {
     orionldState.httpStatusCode = 200;
     orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+
+    return true;
+  }
+
+  // pernot subscription?
+  PernotSubscription* pSubP = pernotSubCacheLookup(subscriptionId, orionldState.tenantP->tenant);
+  if (pSubP != NULL)
+  {
+    kjTreeLog(pSubP->kjSubP, "pernot sub in cache", LmtSR);
+    orionldState.httpStatusCode = 200;
+    orionldState.responseTree   = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+    kjTreeLog(orionldState.responseTree, "pernot sub after kjTreeFromPernotSubscription", LmtSR);
 
     return true;
   }
