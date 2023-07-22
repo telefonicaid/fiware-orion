@@ -33,8 +33,9 @@ orionldStart CB -experimental
 # 01. Attempt to create a subscription with timeInterval AND watchedAttributes - see 400
 # 02. Attempt to create a subscription with timeInterval AND notificationTrigger - see 400
 # 03. Attempt to create a subscription with timeInterval as a String - see 400
-# 05. Attempt to create a subscription with duplicated timeInterval - see 400
-# 06. Create a subscription urn:S1 with timeInterval
+# 04. Attempt to create a subscription with duplicated timeInterval - see 400
+# 05. Create a subscription urn:S1 with timeInterval
+# 06. Attempt to PATCH a pernot subscription
 # 07. See urn:S1 in the database
 # 08. GET urn:S1 from cache
 # 09. GET urn:S1 from database
@@ -111,7 +112,7 @@ echo
 echo
 
 
-echo "05. Attempt to create a subscription with duplicated timeInterval - see 400"
+echo "04. Attempt to create a subscription with duplicated timeInterval - see 400"
 echo "==========================================================================="
 payload='{
   "id": "urn:S1",
@@ -134,7 +135,7 @@ echo
 echo
 
 
-echo "06. Create a subscription urn:S1 with timeInterval"
+echo "05. Create a subscription urn:S1 with timeInterval"
 echo "=================================================="
 payload='{
   "id": "urn:S1",
@@ -161,6 +162,17 @@ payload='{
   }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+
+echo "06. Attempt to PATCH a pernot subscription"
+echo "=========================================="
+payload='{
+  "description": "Test Subscription No 2"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1 --payload "$payload" -X PATCH
 echo
 echo
 
@@ -229,7 +241,7 @@ Date: REGEX(.*)
 }
 
 
-05. Attempt to create a subscription with duplicated timeInterval - see 400
+04. Attempt to create a subscription with duplicated timeInterval - see 400
 ===========================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 126
@@ -243,13 +255,27 @@ Date: REGEX(.*)
 }
 
 
-06. Create a subscription urn:S1 with timeInterval
+05. Create a subscription urn:S1 with timeInterval
 ==================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
 Location: /ngsi-ld/v1/subscriptions/urn:S1
 
+
+
+06. Attempt to PATCH a pernot subscription
+==========================================
+HTTP/1.1 501 Not Implemented
+Content-Length: 153
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Patching of periodic notification subscriptions",
+    "title": "Not Implemented",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
 
 
 07. See urn:S1 in the database

@@ -862,16 +862,49 @@ bool orionldPatchSubscription(void)
     return false;
   }
 
+  KjNode* dbTimeIntervalP = kjLookup(dbSubscriptionP, "timeInterval");
+  double  dbTimeInterval  = 0;
+
+  if (dbTimeIntervalP != NULL)
+    dbTimeInterval = (dbTimeIntervalP->type == KjInt)? dbTimeIntervalP->value.i : dbTimeIntervalP->value.f;
+
+  bool    subWasPernot    = (dbTimeInterval != 0);
+
   //
   // If the subscription used to be "on-change", timeInterval cannot be set
   //
-  if ((timeInterval != 0) && (kjLookup(dbSubscriptionP, "timeInterval") == NULL))
+  if (subWasPernot == false)
   {
-    if (qNodeP != NULL)
-      qRelease(qNodeP);
-    orionldError(OrionldResourceNotFound, "Invalid modification (on-change to timeInterval subscription)", subscriptionId, 400);
-    return false;
+    if (timeInterval != 0)
+    {
+      if (qNodeP != NULL)
+        qRelease(qNodeP);
+      orionldError(OrionldBadRequestData, "Invalid modification (on-change to timeInterval subscription)", subscriptionId, 400);
+      return false;
+    }
   }
+  else  // If the subscription used to be "pernot", watchedAttributes+throtttling cannot be set
+  {
+#if 0
+    //
+    // These checks really belong to pCheckSubscription() - just need to pass it the dbTimeInterval value
+    //
+    KjNode* watchedAttributesP = kjLookup(subTree, "watchedAttributes");
+    KjNode* throttlingP        = kjLookup(subTree, "throttling");
+
+    if (watchedAttributesP != NULL)
+      orionldError(OrionldBadRequestData, "Invalid modification (pernot subscription cannot have watchedAttributes", subscriptionId, 400);
+    if (throttlingP != NULL)
+      orionldError(OrionldBadRequestData, "Invalid modification (pernot subscription cannot have throttlingP", subscriptionId, 400);
+
+    if ((watchedAttributesP != NULL) || (throttlingP != NULL))
+      return false;
+#else
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Patching of periodic notification subscriptions", 501);
+    return false;
+#endif
+  }
+
 
   //
   // If the subscription used to be an MQTT subscription, the MQTT connection might need closing
@@ -927,8 +960,7 @@ bool orionldPatchSubscription(void)
     cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
   else
   {
-    // What do I do here?
-    // Create a copy of CachedSubscription with only the fields needed by ngsildSubscriptionPatch?
+    // Can't get here right now
   }
 
   if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP, qRenderedForDb) == false)
