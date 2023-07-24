@@ -4,7 +4,7 @@ SOURCE="telefonicaiot/fiware-orion"
 
 DOCKER_TARGET="fiware/$(basename $(git rev-parse --show-toplevel))"
 QUAY_TARGET="quay.io/fiware/$(basename $(git rev-parse --show-toplevel))"
-VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+VERSION=$(git describe --exclude 'FIWARE*' --tags $(git rev-list --tags --max-count=1))
 
 function clone {
    echo 'cloning from '"$1 $2"' to '"$3"
