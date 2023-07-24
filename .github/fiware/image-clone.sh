@@ -13,6 +13,7 @@ function clone {
    
    if ! [ -z "$4" ]; then
         echo 'pushing '"$1 $2"' to latest'
+        docker tag "$1":"$2" "$3":latest
         docker push -q "$3":latest
    fi
 }
