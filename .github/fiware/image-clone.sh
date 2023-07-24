@@ -6,22 +6,24 @@ DOCKER_TARGET="fiware/$(basename $(git rev-parse --show-toplevel))"
 QUAY_TARGET="quay.io/fiware/$(basename $(git rev-parse --show-toplevel))"
 VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
 
-docker pull --platform amd64 "$SOURCE":"$VERSION"
+function clone {
+   echo 'cloning from '"$1 $2"' to '"$3"
+   docker pull -q "$1":"$2"
+   docker tag "$1":"$2" "$3":"$2"
+   
+   if ! [ -z "$4" ]; then
+        echo 'pushing '"$1 $2"' to latest'
+        docker push -q "$3":latest
+   fi
+}
 
 for i in "$@" ; do
     if [[ $i == "docker" ]]; then
-        echo 'cloning from '"$SOURCE $VERSION"' to '"$DOCKER_TARGET"
-        docker tag "$SOURCE":"$VERSION" "$DOCKER_TARGET":"$VERSION"
-        docker tag "$SOURCE":"$VERSION" "$DOCKER_TARGET":latest
-        docker push -q "$DOCKER_TARGET":"$VERSION"
-        docker push -q "$DOCKER_TARGET":latest
+        clone "$SOURCE" "$VERSION" "$DOCKER_TARGET" true
     fi
     if [[ $i == "quay" ]]; then
-        echo 'cloning from '"$SOURCE" "$VERSION"' to '"$QUAY_TARGET"
-        docker tag "$SOURCE":"$VERSION" "$QUAY_TARGET":"$VERSION"
-        docker tag "$SOURCE":"$VERSION" "$QUAY_TARGET":latest
-        docker push -q "$QUAY_TARGET":"$VERSION"
-        docker push -q "$QUAY_TARGET":latest
+        clone "$SOURCE" "$VERSION" "$QUAY_TARGET" true
     fi
+    echo ""
 done
 
