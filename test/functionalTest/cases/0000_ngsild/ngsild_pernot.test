@@ -25,7 +25,7 @@ Pernot Subscription - periodic notifications
 
 --SHELL-INIT--
 dbInit CB
-orionldStart CB -experimental
+orionldStart CB -pernot -experimental
 
 --SHELL--
 
@@ -197,6 +197,9 @@ orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1?options=fromDb
 echo
 echo
 
+# To see traces from the pernot loop in t he logfile
+#sleep 4  
+
 
 --REGEXPECT--
 01. Attempt to create a subscription with timeInterval AND watchedAttributes - see 400
@@ -334,7 +337,7 @@ bye
 08. GET urn:S1 from cache
 =========================
 HTTP/1.1 200 OK
-Content-Length: 497
+Content-Length: 598
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -364,7 +367,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "uri": "http://127.0.0.1:9997/notify"
         },
         "format": "normalized",
-        "status": "ok"
+        "lastNotification": "202REGEX(.*)Z",
+        "lastSuccess": "202REGEX(.*)Z",
+        "status": "ok",
+        "timesSent": 1
     },
     "origin": "cache",
     "q": "(a>5;b<9)|a<4",
@@ -378,7 +384,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 09. GET urn:S1 from database
 ============================
 HTTP/1.1 200 OK
-Content-Length: 500
+Content-Length: 601
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -408,7 +414,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
             "uri": "http://127.0.0.1:9997/notify"
         },
         "format": "normalized",
-        "status": "ok"
+        "lastNotification": "202REGEX(.*)Z",
+        "lastSuccess": "202REGEX(.*)Z",
+        "status": "ok",
+        "timesSent": 1
     },
     "origin": "database",
     "q": "(a>5;b<9)|a<4",

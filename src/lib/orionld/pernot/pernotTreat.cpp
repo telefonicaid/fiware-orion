@@ -22,16 +22,73 @@
 *
 * Author: Ken Zangelin
 */
+#include <pthread.h>                                        // pthread_exit
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                   // KjNode
+}
+
+#include "logMsg/logMsg.h"                                  // LM_x
+
+#include "orionld/common/orionldState.h"                    // orionldState, pernotSubCache
 #include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
 #include "orionld/pernot/pernotTreat.h"                     // Own interface
+
+
+extern double currentTime(void);  // FIXME: Move to orionld/common
+// -----------------------------------------------------------------------------
+//
+// pernotTreat -
+//
+static void* pernotTreat(void* vP)
+{
+  PernotSubscription* subP = (PernotSubscription*) vP;
+  bool                ok   = true;
+  double              now  = currentTime();
+
+  // Build the query
+  LM_T(LmtPernot, ("Creating the query for pernot-subscription %s", subP->subscriptionId));
+
+  //
+  // Timestamps and Status
+  //
+  if (ok == true)
+  {
+    subP->lastSuccessTime   = now;
+    subP->consecutiveErrors = 0;
+  }
+  else
+  {
+    subP->lastFailureTime    = now;
+    subP->notificationErrors += 1;
+    subP->consecutiveErrors  += 1;
+
+    if (subP->consecutiveErrors >= 3)
+    {
+      subP->state = SubErroneous;
+      LM_W(("%s: 3 consecutive errors - setting the subscription in Error state", subP->subscriptionId));
+    }
+  }
+
+  subP->notificationAttempts += 1;
+
+  pthread_exit(0);
+  return NULL;
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotTreat -
+// pernotTreatStart -
 //
-bool pernotTreat(PernotSubscription* subP)
+void pernotTreatStart(PernotSubscription* subP)
 {
-  return false;
+  pthread_t tid;
+
+  LM_T(LmtPernot, ("Starting thread for one Periodic Notification Subscription (%s)", subP->subscriptionId));
+  pthread_create(&tid, NULL, pernotTreat, subP);
+
+  // It's OK to lose the thread ID ... I think ...
 }

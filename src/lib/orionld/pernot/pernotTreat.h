@@ -31,8 +31,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// pernotTreat -
+// pernotTreatStart -
 //
-extern bool pernotTreat(PernotSubscription* subP);
+extern void pernotTreatStart(PernotSubscription* subP);
 
 #endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTTREAT_H_

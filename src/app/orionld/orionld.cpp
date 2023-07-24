@@ -237,6 +237,7 @@ bool            ngsiv1Autocast;
 int             contextDownloadAttempts;
 int             contextDownloadTimeout;
 bool            troe;
+bool            pernot;
 bool            disableFileLog;
 bool            lmtmp;
 char            troeHost[256];
@@ -317,6 +318,7 @@ int             cSubCounters;
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define TROE_DESC              "enable TRoE - temporal representation of entities"
+#define PERNOT_DESC            "enable Pernot - Periodic Notifications"
 #define DISABLE_FILE_LOG       "disable logging into file"
 #define TMPTRACES_DESC         "disable traces"
 #define TROE_HOST_DESC         "host for troe database db server"
@@ -420,6 +422,7 @@ PaArgument paArgs[] =
   { "-ctxTimeout",            &contextDownloadTimeout,  "CONTEXT_DOWNLOAD_TIMEOUT",  PaInt,     PaOpt,  5000,            0,      20000,            CTX_TMO_DESC             },
   { "-ctxAttempts",           &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,     PaOpt,  3,               0,      100,              CTX_ATT_DESC             },
   { "-troe",                  &troe,                    "TROE",                      PaBool,    PaOpt,  false,           false,  true,             TROE_DESC                },
+  { "-pernot",                &pernot,                  "PERNOT",                    PaBool,    PaOpt,  false,           false,  true,             PERNOT_DESC              },
   { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC           },
   { "-socketService",         &socketService,           "SOCKET_SERVICE",            PaBool,    PaHid,  false,           false,  true,             SOCKET_SERVICE_DESC      },
   { "-troeHost",              troeHost,                 "TROE_HOST",                 PaString,  PaOpt,  _i "localhost",  PaNL,   PaNL,             TROE_HOST_DESC           },
@@ -1166,7 +1169,9 @@ int main(int argC, char* argV[])
   // Note that regCacheInit uses the tenantList, so orionldTenantInit must be called before regCacheInit
   //
   regCacheInit();
-  pernotSubCacheInit();
+
+  if (pernot == true)
+    pernotSubCacheInit();
 
   orionldServiceInit(restServiceVV, 9);
 
@@ -1319,7 +1324,8 @@ int main(int argC, char* argV[])
 
 
   // Start the thread for periodic notifications
-  pernotLoopStart();
+  if (pernot == true)
+    pernotLoopStart();
 
   if (socketService == true)
   {

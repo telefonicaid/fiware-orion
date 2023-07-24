@@ -25,6 +25,12 @@
 #include <string.h>                                         // strerror
 #include <sys/time.h>                                       // gettimeofday
 #include <pthread.h>                                        // pthread_create
+#include <unistd.h>                                         // usleep
+
+extern "C"
+{
+#include "kbase/kMacros.h"                                  // K_MIN
+}
 
 #include "logMsg/logMsg.h"                                  // LM_x
 
@@ -51,7 +57,7 @@ bool pernotSubInsert(void)
 //
 // currentTime -
 //
-static double currentTime(void)
+double currentTime(void)
 {
   // int gettimeofday(struct timeval *tv, struct timezone *tz);
   struct timeval tv;
@@ -59,7 +65,7 @@ static double currentTime(void)
   if (gettimeofday(&tv, NULL) != 0)
     LM_RE(0, ("gettimeofday error: %s", strerror(errno)));
 
-  return tv.tv_sec + tv.tv_usec / 1000000;
+  return tv.tv_sec + tv.tv_usec / 1000000.0;
 }
 
 
@@ -72,18 +78,28 @@ static void* pernotLoop(void* vP)
 {
   while (1)
   {
+    double minDiff;
+
+    minDiff = 1;  // Initialize with 1 second, which is the MAX sleep period
+
     for (PernotSubscription* subP = pernotSubCache.head; subP != NULL; subP = subP->next)
     {
       double now = currentTime();
 
       if (subP->state == SubPaused)
+      {
+        LM_T(LmtPernot, ("%s: Paused", subP->subscriptionId));
         continue;
+      }
 
-      if (subP->expiresAt <= now)
+      if ((subP->expiresAt > 0) && (subP->expiresAt <= now))
         subP->state = SubExpired;  // Should it be removed?
 
       if (subP->state == SubExpired)
+      {
+        LM_T(LmtPernot, ("%s: Expired", subP->subscriptionId));
         continue;
+      }
 
       if (subP->state == SubErroneous)
       {
@@ -91,30 +107,36 @@ static void* pernotLoop(void* vP)
         if (subP->lastFailureTime + subP->cooldown < now)
           subP->state = SubActive;
         else
+        {
+          LM_T(LmtPernot, ("%s: Erroneous", subP->subscriptionId));
           continue;
+        }
       }
 
-      if (subP->lastNotificationAttempt + subP->timeInterval < now)
+      double diffTime = subP->lastNotificationAttempt + subP->timeInterval - now;
+      // LM_T(LmtPernot, ("%s: lastNotificationAttempt: %f", subP->subscriptionId, subP->lastNotificationAttempt));
+      // LM_T(LmtPernot, ("%s: timeInterval:            %f", subP->subscriptionId, subP->timeInterval));
+      // LM_T(LmtPernot, ("%s: now:                     %f", subP->subscriptionId, now));
+      // LM_T(LmtPernot, ("%s: diffTime:                %f", subP->subscriptionId, diffTime));
+
+      if (diffTime <= 0)
       {
         subP->lastNotificationAttempt = now;  // Either it works or fails, the timestamp needs to be updated
-        if (pernotTreat(subP) == true)        // Just send the notification, don't await any response
-        {
-          subP->lastSuccessTime   = now;
-          subP->consecutiveErrors = 0;
-        }
-        else
-        {
-          subP->lastFailureTime    = now;
-          subP->consecutiveErrors += 1;
+        pernotTreatStart(subP);  // Query runs in a new thread
 
-          if (subP->consecutiveErrors >= 3)
-          {
-            subP->state = SubErroneous;
-          }
-        }
+        // Restart the min diff time
+        minDiff = 0;
+        break;
       }
+      else
+        minDiff = K_MIN(minDiff, diffTime);
     }
+
+    if (minDiff != 0)
+      usleep(minDiff * 1000000);
   }
+
+  return NULL;
 }
 
 
@@ -126,5 +148,6 @@ pthread_t pernotThreadID;
 //
 void pernotLoopStart(void)
 {
+  LM_T(LmtPernot, ("Starting thread for the Periodic Notification Loop"));
   pthread_create(&pernotThreadID, NULL, pernotLoop, NULL);
 }
