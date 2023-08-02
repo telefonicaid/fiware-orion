@@ -89,6 +89,13 @@ bool orionldPostTemporalEntities(void)
   char*    entityId;
   char*    entityType;
 
+  // Is TRoE on?
+  if (troe == false)
+  {
+    orionldError(OrionldResourceNotFound, "TRoE Not Enabled", orionldState.urlPath, 503);
+    return false;
+  }
+
   //
   // Check the entity id and type
   //

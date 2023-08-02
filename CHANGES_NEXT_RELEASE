@@ -1,1 +1,2 @@
 Fixed issues:
+#280  Protection for POST /temporal/entities against usage when troe is not enabled
