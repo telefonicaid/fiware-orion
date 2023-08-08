@@ -85,6 +85,7 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-localIp' <IP to receive new connections>]                                 ORION_LOCALIP                      '0.0.0.0' /'0.0.0.0'/
                                [option '-port' <port to receive new connections>]                                  ORION_PORT                         1 <= 1026 /1026/ <= 65535
                                [option '-pidpath' <pid file path>]                                                 ORION_PID_PATH                     '/tmp/contextBroker.pid' /'/tmp/contextBroker/
+                               [option '-dbURI' <complete URI for database connection>]                            ORION_MONGO_URI                    '' /''/
                                [option '-dbhost' <database host>]                                                  ORION_MONGO_HOST                   'localhost' /'localhost'/
                                [option '-rplSet' <replica set>]                                                    ORION_MONGO_REPLICA_SET            '' /''/
                                [option '-dbuser' <database user>]                                                  ORION_MONGO_USER                   '' /''/
