@@ -674,6 +674,8 @@ the subscriptions based in alteration type features (see [Subscription based in 
    * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
    * `entityDelete` if the update that triggers the notification was a entity delete operation
 
+* `servicePath` (type: `Text`): specifies the [service path](#service-path) to which the entity belongs.
+
 Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
 However, they cannot be used in resource URLs.
 
