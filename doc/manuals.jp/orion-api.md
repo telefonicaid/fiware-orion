@@ -647,6 +647,8 @@ Orion は階層スコープをサポートしているため、エンティテ�
         [`condition`](#subscriptionsubjectcondition) 内の `attrs` フィールドは無視されます (エンティティを削除する通常
         の方法、たとえば `DELETE /v2/entities/E` には属性が含まれないことに注意してください)
 
+-   `servicePath` (タイプ: `Text`): エンティティが属する[サービス・パス](#service-path)を指定します。
+
 通常の属性と同様に、`q` フィルタと `orderBy` (`alterationType` を除く) で使用できます。
 ただし、リソース URLs では使用できません。
 
