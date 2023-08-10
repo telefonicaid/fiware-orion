@@ -94,12 +94,12 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/name",
+		"https://uri.etsi.org/ngsi-ld/default-context/name",
 		"https://uri.etsi.org/ngsi-ld/default-context/locatedIn",
 		"https://uri.etsi.org/ngsi-ld/default-context/stocks"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -134,7 +134,7 @@ HTTP/1.1 200 OK
 Content-Length: 60
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
     {

@@ -273,7 +273,7 @@ MongoDB server version: REGEX(.*)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "Test subscription 01",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
 	"conditions" : [ ],
@@ -296,7 +296,7 @@ HTTP/1.1 200 OK
 Content-Length: 481
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "createdAt": "REGEX(.*\.\d\d\dZ)",
@@ -344,7 +344,7 @@ Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "data": [
@@ -378,7 +378,7 @@ HTTP/1.1 200 OK
 Content-Length: 582
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "createdAt": "REGEX(.*\.\d\d\dZ)",
@@ -426,7 +426,7 @@ HTTP/1.1 200 OK
 Content-Length: 595
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "createdAt": "REGEX(.*\.\d\d\dZ)",
@@ -479,7 +479,7 @@ HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "createdAt": "REGEX(.*\.\d\d\dZ)",

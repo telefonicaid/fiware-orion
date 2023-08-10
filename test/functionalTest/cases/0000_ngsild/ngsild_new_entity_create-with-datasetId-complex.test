@@ -106,11 +106,11 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/name",
+		"https://uri.etsi.org/ngsi-ld/default-context/name",
 		"https://uri.etsi.org/ngsi-ld/default-context/name3"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -129,7 +129,7 @@ MongoDB server version: REGEX(.*)
 	"modDate" : REGEX(.*),
 	"lastCorrelator" : "",
 	"@datasets" : {
-		"https://uri=etsi=org/ngsi-ld/name" : [
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : [
 			{
 				"type" : "Property",
 				"value" : "dataset urn:ngsi-ld/dataset:1",

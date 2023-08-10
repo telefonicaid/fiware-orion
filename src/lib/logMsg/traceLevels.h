@@ -87,6 +87,7 @@ typedef enum TraceLevels
   LmtContexts = 80,                    // Contexts
   LmtContextTree,                      // Context Tree
   LmtContextCache,                     // Context Cache
+  LmtCoreContext,                      // Core Context
 
   // GeoJSON
   LmtGeoJSON = 90,                     // GeoJSON ... everything (for now)

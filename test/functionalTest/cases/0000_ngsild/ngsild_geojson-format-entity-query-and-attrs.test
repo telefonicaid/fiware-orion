@@ -193,12 +193,12 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
 03. Retrieve E1 in geo+json format - no matching GeoProperty => geometry: null
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 294
+Content-Length: 299
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": null,
     "id": "urn:ngsi-ld:entities:E1",
     "properties": {
@@ -225,12 +225,12 @@ Date: REGEX(.*)
 04. Retrieve E2 in geo+json format - location is default GeoProperty, so => geometry: location-value
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 348
+Content-Length: 353
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             -3.691944,
@@ -263,12 +263,12 @@ Date: REGEX(.*)
 05. Retrieve E1 in geo+json format AND geometryProperty=P2 => geometry: P2-value
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 342
+Content-Length: 347
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             -3.691944,
@@ -301,12 +301,12 @@ Date: REGEX(.*)
 06. Retrieve E2 in geo+json format AND geometryProperty=P2 => geometry: null, as P2 doesn't exist
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 305
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": null,
     "id": "urn:ngsi-ld:entities:E2",
     "properties": {
@@ -333,12 +333,12 @@ Date: REGEX(.*)
 07. Retrieve E1 in geo+json format AND attrs=P1 => geometry: null (as geometryProperty==location by default), and properties=P1
 ===============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 210
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": null,
     "id": "urn:ngsi-ld:entities:E1",
     "properties": {
@@ -355,12 +355,12 @@ Date: REGEX(.*)
 08. Retrieve E2 in geo+json format AND attrs=P1 => geometry: location-value (as geometryProperty==location by default), and properties=P1
 =========================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 258
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             -3.691944,
@@ -383,12 +383,12 @@ Date: REGEX(.*)
 09. Retrieve E1 in geo+json format AND attrs=P1 AND geometryProperty=P2 => geometry: P2-value, and properties=P1
 ================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 258
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             -3.691944,
@@ -411,12 +411,12 @@ Date: REGEX(.*)
 10. Retrieve E1 in geo+json format AND attrs=P1,P2 AND geometryProperty=P2 => geometry: P2-value, and properties=P1,P2
 ======================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 342
+Content-Length: 347
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             -3.691944,
@@ -449,12 +449,12 @@ Date: REGEX(.*)
 11. Retrieve E2 in geo+json format AND attrs=P1 AND geometryProperty=P2 => geometry: null (as P2 doesn't exist), and properties=P1
 ==================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 205
+Content-Length: 210
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": null,
     "id": "urn:ngsi-ld:entities:E2",
     "properties": {
@@ -471,12 +471,12 @@ Date: REGEX(.*)
 12. Retrieve E2 in geo+json format AND attrs=P1 AND geometryProperty=location => geometry: location-value, and properties=P1
 ============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 258
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             -3.691944,
@@ -499,12 +499,12 @@ Date: REGEX(.*)
 13. Retrieve E2 in geo+json format AND attrs=P1,location => geometry: location-value, and properties=P1,location
 ================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 348
+Content-Length: 353
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             -3.691944,

@@ -141,19 +141,19 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
 03. Dump accumulator to see one notification - in GeoJSON format
 ================================================================
 POST http://REGEX(.*)/notify
-Content-Length: 565
+Content-Length: 570
 User-Agent: orionld/REGEX(.*)
 REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 Ngsild-Attribute-Format: Normalized
 
 {
     "data": {
         "features": [
             {
-                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
                 "geometry": {
                     "coordinates": [
                         1,
@@ -206,19 +206,19 @@ Date: REGEX(.*)
 05. Dump accumulator to see another GeoJSON format notification
 ===============================================================
 POST http://REGEX(.*)/notify
-Content-Length: 600
+Content-Length: 605
 User-Agent: orionld/REGEX(.*)
 REGEX(.*)
 Accept: application/json
 Content-Type: application/geo+json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 Ngsild-Attribute-Format: Normalized
 
 {
     "data": {
         "features": [
             {
-                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
                 "geometry": {
                     "coordinates": [
                         1,

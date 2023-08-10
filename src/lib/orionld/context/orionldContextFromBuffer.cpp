@@ -71,6 +71,7 @@ OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin,
     return NULL;
   }
 
+  LM_T(LmtCoreContext, ("Parsed the context buffer into a KjNode tree and looked up the @context member"));
   OrionldContext* contextP = orionldContextFromTree(url, origin, id, contextNodeP);
   return contextP;
 }

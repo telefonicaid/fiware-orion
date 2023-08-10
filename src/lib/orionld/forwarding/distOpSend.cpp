@@ -680,7 +680,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
         kjChildRemove(distOpP->requestBody, contextP);
 
       if (distOpP->regP->contextP == NULL)
-        contextP = kjString(orionldState.kjsonP, "@context", ORIONLD_CORE_CONTEXT_URL_V1_0);
+        contextP = kjString(orionldState.kjsonP, "@context", orionldCoreContextP->url);
       else
         contextP = kjString(orionldState.kjsonP, "@context", distOpP->regP->contextP->url);
 

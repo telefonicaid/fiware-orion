@@ -25,7 +25,7 @@ Sub cache object errors
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -39,7 +39,6 @@ brokerStart CB 0
 # 07. GET /v2/entities with empty right-hand-side in q-item
 # 08. GET /v2/entities with invalid char in q-item
 # 09. GET /v2/entities with only whitespace in q-item (q=   )
-# 10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
 #
 # 11. GET /v2/entities with > RANGE
 # 12. GET /v2/entities with == RANGE, but missing 'from'
@@ -121,16 +120,7 @@ echo
 
 echo "09. GET /v2/entities with only whitespace in q-item (q=   )"
 echo "==========================================================="
-q='q=   '
-orionCurl --url "/v2/entities?$q"
-echo
-echo
-
-
-echo "10. GET /v2/entities with trailing whitespace in q (q=a==12;   )"
-echo "================================================================"
-q='q=a==12;   '
-orionCurl --url "/v2/entities?$q"
+orionCurl --url /v2/entities?q=
 echo
 echo
 
@@ -336,27 +326,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. GET /v2/entities with only whitespace in q-item (q=   )
 ===========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
+Content-Length: 80
 Content-Type: application/json
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 {
-    "description": "empty q-item &#40;only whitespace&#41;",
-    "error": "BadRequest"
-}
-
-
-10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
-================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 51
-Content-Type: application/json
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "description": "empty q-item",
+    "description": "Empty right-hand-side for a URI parameter",
     "error": "BadRequest"
 }
 

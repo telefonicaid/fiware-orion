@@ -136,7 +136,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:ambient_temperature:335547901
 03. GET all contexts from the brokers context cache - see only 2
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 1021
+Content-Length: 1028
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -144,16 +144,16 @@ Date: REGEX(.*)
     {
         "createdAt": "REGEX(.*)",
         "hash-table": {
-            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
             "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
         },
         "id": "REGEX(.*)",
         "origin": "Downloaded",
         "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
     },
     {
         "createdAt": "REGEX(.*)",

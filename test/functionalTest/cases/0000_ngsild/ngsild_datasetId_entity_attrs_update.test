@@ -179,10 +179,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/name"
+		"https://uri.etsi.org/ngsi-ld/default-context/name"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -194,7 +194,7 @@ MongoDB server version: REGEX(.*)
 	"modDate" : REGEX(.*),
 	"lastCorrelator" : "",
 	"@datasets" : {
-		"https://uri=etsi=org/ngsi-ld/name" : [
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : [
 			{
 				"type" : "Property",
 				"value" : "dataset urn:ngsi-ld/dataset:1 - from step 01",
@@ -221,7 +221,7 @@ HTTP/1.1 200 OK
 Content-Length: 333
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "id": "urn:ngsi-ld:entities:E1",
@@ -264,10 +264,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/name"
+		"https://uri.etsi.org/ngsi-ld/default-context/name"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -279,7 +279,7 @@ MongoDB server version: REGEX(.*)
 	"modDate" : REGEX(.*),
 	"lastCorrelator" : "",
 	"@datasets" : {
-		"https://uri=etsi=org/ngsi-ld/name" : [
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : [
 			{
 				"type" : "Property",
 				"value" : "dataset urn:ngsi-ld/dataset:1 - from step 04",
@@ -313,7 +313,7 @@ HTTP/1.1 200 OK
 Content-Length: 444
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "id": "urn:ngsi-ld:entities:E1",
@@ -361,10 +361,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/name"
+		"https://uri.etsi.org/ngsi-ld/default-context/name"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"value" : "no dataset id - from step 07",
 			"type" : "Property",
 			"mdNames" : [ ],
@@ -376,7 +376,7 @@ MongoDB server version: REGEX(.*)
 	"modDate" : REGEX(.*),
 	"lastCorrelator" : "",
 	"@datasets" : {
-		"https://uri=etsi=org/ngsi-ld/name" : [
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : [
 			{
 				"type" : "Property",
 				"value" : "dataset urn:ngsi-ld/dataset:1 - from step 04",
@@ -417,7 +417,7 @@ HTTP/1.1 200 OK
 Content-Length: 555
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "id": "urn:ngsi-ld:entities:E1",

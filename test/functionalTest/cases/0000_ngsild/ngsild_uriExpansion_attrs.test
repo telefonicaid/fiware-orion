@@ -30,14 +30,15 @@ orionldStart CB
 --SHELL--
 
 #
-# As no @context is given, the default context will be used:
+# As no @context is given, the core context will be used:
 # https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld
 # {
 #   "@context": {
+#     "ngsi-ld": "https://uri.etsi.org/ngsi-ld/",
 #     ...
-#     "title": "http://uri.etsi.org/ngsi-ld/title",
+#     "title": "http://purl.org/dc/terms/title",
 #     "createdAt": {
-#       "@id": "http://uri.etsi.org/ngsi-ld/createdAt",
+#       "@id": "ngsi-ld:createdAt",
 #       "@type": "DateTime"
 #     },
 #     ...
@@ -101,10 +102,10 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/title"
+		"http://purl.org/dc/terms/title"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/title" : {
+		"http://purl=org/dc/terms/title" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

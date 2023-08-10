@@ -311,7 +311,7 @@ Date: REGEX(.*)
 ====================================================================
 #SORT_START
 POST REGEX(.*)/notify?subscriptionId=urn:S4
-Content-Length: 267
+Content-Length: 272
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -319,7 +319,7 @@ Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "id": "urn:E1",
@@ -333,7 +333,7 @@ Ngsild-Attribute-Format: Normalized
 }
 =======================================
 POST REGEX(.*)/notify?subscriptionId=urn:S2
-Content-Length: 267
+Content-Length: 272
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -341,7 +341,7 @@ Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "id": "urn:E1",
@@ -355,7 +355,7 @@ Ngsild-Attribute-Format: Normalized
 }
 =======================================
 POST REGEX(.*)/notify?subscriptionId=urn:S1
-Content-Length: 267
+Content-Length: 272
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -363,7 +363,7 @@ Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "id": "urn:E1",
@@ -390,7 +390,7 @@ Date: REGEX(.*)
 =============================================================
 #SORT_START
 POST REGEX(.*)/notify?subscriptionId=urn:S4
-Content-Length: 267
+Content-Length: 272
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -398,7 +398,7 @@ Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "id": "urn:E2",
@@ -412,7 +412,7 @@ Ngsild-Attribute-Format: Normalized
 }
 =======================================
 POST REGEX(.*)/notify?subscriptionId=urn:S2
-Content-Length: 267
+Content-Length: 272
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -420,7 +420,7 @@ Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "id": "urn:E2",
@@ -447,7 +447,7 @@ Date: REGEX(.*)
 ====================================================================
 #SORT_START
 POST REGEX(.*)/notify?subscriptionId=urn:S5
-Content-Length: 303
+Content-Length: 308
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -455,7 +455,7 @@ Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "P2": {
@@ -473,7 +473,7 @@ Ngsild-Attribute-Format: Normalized
 }
 =======================================
 POST REGEX(.*)/notify?subscriptionId=urn:S4
-Content-Length: 303
+Content-Length: 308
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -481,7 +481,7 @@ Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "P2": {
@@ -499,7 +499,7 @@ Ngsild-Attribute-Format: Normalized
 }
 =======================================
 POST REGEX(.*)/notify?subscriptionId=urn:S2
-Content-Length: 303
+Content-Length: 308
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -507,7 +507,7 @@ Content-Type: application/ld+json
 Ngsild-Attribute-Format: Normalized
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "P2": {

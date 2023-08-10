@@ -167,14 +167,14 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:City:Madrid
 02. GET the entity in GeoJSON format
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 524
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     -3.691944,
@@ -224,14 +224,14 @@ Date: REGEX(.*)
 03. GET the entity in GeoJSON format with keyValues
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 396
+Content-Length: 401
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     -3.691944,
@@ -272,7 +272,7 @@ HTTP/1.1 200 OK
 Content-Length: 446
 Content-Type: application/geo+json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "features": [
@@ -326,14 +326,14 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 05. Retrieve E1 in GeoJSON format with URI param geometryProperty=abc (abc doesn't exist => geometry: null)
 ===========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 471
+Content-Length: 476
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": null,
             "id": "urn:ngsi-ld:City:Madrid",
             "properties": {
@@ -377,14 +377,14 @@ Date: REGEX(.*)
 06. Retrieve E1 in GeoJSON format with URI param geometryProperty=location
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 524
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     -3.691944,
@@ -434,14 +434,14 @@ Date: REGEX(.*)
 07. Retrieve E1 in GeoJSON format with URI param geometryProperty=otherGeoProp
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 503
+Content-Length: 508
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     1,
@@ -491,14 +491,14 @@ Date: REGEX(.*)
 08. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty)
 ========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 471
+Content-Length: 476
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": null,
             "id": "urn:ngsi-ld:City:Madrid",
             "properties": {
@@ -542,14 +542,14 @@ Date: REGEX(.*)
 09. Retrieve E1 in GeoJSON format with URI param geometryProperty=P1 (not a GeoProperty) with key-values
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 348
+Content-Length: 353
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": null,
             "id": "urn:ngsi-ld:City:Madrid",
             "properties": {
@@ -584,7 +584,7 @@ HTTP/1.1 200 OK
 Content-Length: 42
 Content-Type: application/geo+json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "features": [],
@@ -595,14 +595,14 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 11. Retrieve Entity with geo+json, attrs (without location) and key-values
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 280
+Content-Length: 285
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     -3.691944,
@@ -626,14 +626,14 @@ Date: REGEX(.*)
 12. Retrieve Entity with geo+json, attrs (with location) and key-values
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 344
+Content-Length: 349
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     -3.691944,

@@ -132,7 +132,7 @@ HTTP/1.1 200 OK
 Content-Length: 423
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
@@ -168,7 +168,7 @@ HTTP/1.1 200 OK
 Content-Length: 423
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",

@@ -66,12 +66,12 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:V233
 02. GET the entity and see the DEFAULT context
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 142
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
   "id": "urn:ngsi-ld:Vehicle:V233",
   "type": "Vehicle"
 }

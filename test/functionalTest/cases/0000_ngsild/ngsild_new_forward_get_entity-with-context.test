@@ -245,7 +245,7 @@ HTTP/1.1 200 OK
 Content-Length: 241
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "http://example.org/P1": {
@@ -268,12 +268,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 08. GET E1 on CB, with Accept == application/ld+json
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 319
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "http://example.org/P1": {
         "type": "Property",
         "value": "P1 in CP1"
