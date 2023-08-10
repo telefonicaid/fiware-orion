@@ -1,1 +1,2 @@
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
+- Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
