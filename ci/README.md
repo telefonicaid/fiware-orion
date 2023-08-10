@@ -1,12 +1,12 @@
 ## Overview
 GitHub Actions is enabled in this repository so each pull request is checked before being allowed to merge.
-The system is based on `fiware/orion-ci:deb` which is built from master branch each time a new PR lands in master,
+The system is based on `telefonicaiot/fiware-orion:ci` which is built from master branch each time a new PR lands in master,
 providing a clean environment with all build dependencies onboard. The Dockerfile used to build this docker is available
 in the `ci/deb` directory.
 
-Note that `fiware/orion-ci:deb` is *not* rebuilt due to changes in the PR branch under test. Thus, if you are developing
+Note that `telefonicaiot/fiware-orion:ci` is *not* rebuilt due to changes in the PR branch under test. Thus, if you are developing
 a functionality that requires a new library or base system you need to do *first* a PR adding such library or base system
-to `ci/deb/build-dep.sh` and/or `Dockerfile`. Once that PR gets merged into master and `fiware/orion-ci:deb` gets rebuild
+to `ci/deb/build-dep.sh` and/or `Dockerfile`. Once that PR gets merged into master and `telefonicaiot/fiware-orion:ci` gets rebuild
 (checking progress in Dockerhub at: https://hub.docker.com/r/fiware/orion-ci/builds) your PR branch with the new 
 functionality is ready to be tested with GitHub Actions.
 
@@ -30,7 +30,7 @@ the following cheatsheet can be useful:
 To download the image:
 
 ```
-docker pull fiware/orion-ci:deb
+docker pull telefonicaiot/fiware-orion:ci
 ```
 
 To run the image in the same way that GitHub Actions does, for instance:
@@ -38,7 +38,7 @@ To run the image in the same way that GitHub Actions does, for instance:
 ```
 # Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
-docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion fiware/orion-ci:deb build -miqts functional
+docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci build -miqts functional
 ```
 
 To run the image using an interactive bash on it
@@ -46,7 +46,7 @@ To run the image using an interactive bash on it
 ```
 # Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
-docker run --network host -ti -v $(pwd):/opt/fiware-orion fiware/orion-ci:deb bash
+docker run --network host -ti -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci bash
 ```
 
 Once have a bash shell, you can do the same execution:

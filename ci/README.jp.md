@@ -1,13 +1,13 @@
 ## 概要
 このリポジトリでは GitHub Actions が有効になっているため、マージを許可する前に各プルリクエストがチェックされます。
-このシステムは、新しい PR がマスターに到達するたびにマスターブランチから構築される `fiware/orion-ci:deb` に基づいており、
+このシステムは、新しい PR がマスターに到達するたびにマスターブランチから構築される `telefonicaiot/fiware-orion:ci` に基づいており、
 すべてのビルド依存関係がオンボードにあるクリーンな環境を提供します。この Docker のビルドに使用される Dockerfile は、
 `ci/deb` ディレクトリにあります。
 
-テスト対象の PR ブランチが変更されたため、`fiware/orion-ci:deb` は再構築されないことに注意してください。したがって、
+テスト対象の PR ブランチが変更されたため、`telefonicaiot/fiware-orion:ci` は再構築されないことに注意してください。したがって、
 新しいライブラリまたはベースシステムを必要とする機能を開発している場合は、そのようなライブラリまたはベースシステムを
 `ci/deb/build-dep.sh` および/または `Dockerfile` に追加する PR を*最初に*実行する必要があります。その PR がマスターに
-マージされ、`fiware/orion-ci:deb` が再構築されると (Docker Hub の https://hub.docker.com/r/fiware/orion-ci/builds
+マージされ、`telefonicaiot/fiware-orion:ci` が再構築されると (Docker Hub の https://hub.docker.com/r/fiware/orion-ci/builds
 で進行状況を確認)、新しい機能は、GitHub アクションでテストする準備ができています。
 
 GitHub Actions チェックは段階に分かれており、 "サポートされているテスト" セクションで説明されています。
@@ -31,7 +31,7 @@ CI の現在のバージョンは以下をサポートします:
 イメージをダウンロードするには:
 
 ```
-docker pull fiware/orion-ci:deb
+docker pull telefonicaiot/fiware-orion:ci
 ```
 
 たとえば、GitHub Actions と同じ方法でイメージを実行するには、次のようにします:
@@ -39,7 +39,7 @@ docker pull fiware/orion-ci:deb
 ```
 # Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
-docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion fiware/orion-ci:deb build -miqts functional
+docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci build -miqts functional
 ```
 
 インタラクティブな bash を使用してイメージを実行するには:
@@ -47,7 +47,7 @@ docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/o
 ```
 # Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
-docker run --network host -ti -v $(pwd):/opt/fiware-orion fiware/orion-ci:deb bash
+docker run --network host -ti -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci bash
 ```
 
 bash シェルを起動したら、同様の実行を行うことができます:
