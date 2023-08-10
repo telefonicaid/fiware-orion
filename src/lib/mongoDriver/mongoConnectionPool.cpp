@@ -334,6 +334,11 @@ static std::string composeMongoUri
 
   if (strlen(dbURI) != 0)
   {
+    if (strlen(username) != 0 || strlen(authDb) != 0 || strlen(rplSet) != 0 || strlen(mechanism) != 0 || dbSSL || dbDisableRetryWrites || timeout > 0)
+    {
+        LM_X(1, ("Invalid Command Line Options: -dbURI cannot be combined with -dbhost, -rplSet, -dbTimeout, -dbuser, -dbAuthMech, -dbAuthDb, -dbSSL and -dbDisableRetryWrites"));
+    }
+
     const char* pwd = strstr(dbURI, "${PWD}");
     if (pwd != NULL)
     {
