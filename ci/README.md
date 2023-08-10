@@ -7,7 +7,7 @@ in the `ci/deb` directory.
 Note that `telefonicaiot/fiware-orion:ci` is *not* rebuilt due to changes in the PR branch under test. Thus, if you are developing
 a functionality that requires a new library or base system you need to do *first* a PR adding such library or base system
 to `ci/deb/build-dep.sh` and/or `Dockerfile`. Once that PR gets merged into master and `telefonicaiot/fiware-orion:ci` gets rebuild
-(checking progress in Dockerhub at: https://hub.docker.com/r/fiware/orion-ci/builds) your PR branch with the new 
+(checking progress in Dockerhub at: https://hub.docker.com/r/telefonicaiot/fiware-orion/builds) your PR branch with the new 
 functionality is ready to be tested with GitHub Actions.
 
 The GitHub Actions checks are divided into stages, which are described in "Supported tests" section.

@@ -7,7 +7,7 @@
 テスト対象の PR ブランチが変更されたため、`telefonicaiot/fiware-orion:ci` は再構築されないことに注意してください。したがって、
 新しいライブラリまたはベースシステムを必要とする機能を開発している場合は、そのようなライブラリまたはベースシステムを
 `ci/deb/build-dep.sh` および/または `Dockerfile` に追加する PR を*最初に*実行する必要があります。その PR がマスターに
-マージされ、`telefonicaiot/fiware-orion:ci` が再構築されると (Docker Hub の https://hub.docker.com/r/fiware/orion-ci/builds
+マージされ、`telefonicaiot/fiware-orion:ci` が再構築されると (Docker Hub の https://hub.docker.com/r/telefonicaiot/fiware-orion/builds
 で進行状況を確認)、新しい機能は、GitHub アクションでテストする準備ができています。
 
 GitHub Actions チェックは段階に分かれており、 "サポートされているテスト" セクションで説明されています。
