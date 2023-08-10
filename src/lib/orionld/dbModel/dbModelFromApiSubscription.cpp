@@ -34,7 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL_V1_0
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContextP
 #include "orionld/context/orionldContextSimplify.h"            // orionldContextSimplify
 #include "orionld/dbModel/dbModelFromApiKeyValues.h"           // dbModelFromApiKeyValues
 #include "orionld/dbModel/dbModelFromApiCoordinates.h"         // dbModelFromApiCoordinates
@@ -514,7 +514,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
       // For now, I'll just overwrite the context with the Core Context
       //
       orionldState.payloadContextNode->type    = KjString;
-      orionldState.payloadContextNode->value.s = (char*) ORIONLD_CORE_CONTEXT_URL_V1_0;
+      orionldState.payloadContextNode->value.s = orionldCoreContextP->url;
       LM_W(("Warning - the context is not a string - changing it for the Core Context (API Spec v1.6)"));
     }
 

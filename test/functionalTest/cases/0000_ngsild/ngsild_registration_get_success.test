@@ -176,7 +176,7 @@ HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 []
 
@@ -238,13 +238,13 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration
 03. GET  /ngsi-ld/v1/csourceRegistrations all data
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 18938
+Content-Length: 18988
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR1",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -343,7 +343,7 @@ Date: REGEX(.*)
     "P2": "String-1"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR10",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -442,7 +442,7 @@ Date: REGEX(.*)
     "P2": "String-10"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR2",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -541,7 +541,7 @@ Date: REGEX(.*)
     "P2": "String-2"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR3",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -640,7 +640,7 @@ Date: REGEX(.*)
     "P2": "String-3"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR4",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -739,7 +739,7 @@ Date: REGEX(.*)
     "P2": "String-4"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR5",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -838,7 +838,7 @@ Date: REGEX(.*)
     "P2": "String-5"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR6",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -937,7 +937,7 @@ Date: REGEX(.*)
     "P2": "String-6"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR7",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -1036,7 +1036,7 @@ Date: REGEX(.*)
     "P2": "String-7"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR8",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -1135,7 +1135,7 @@ Date: REGEX(.*)
     "P2": "String-8"
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:ContextSourceRegistration:CSR9",
     "type": "ContextSourceRegistration",
     "name": "reg_csr1a343",
@@ -3031,7 +3031,7 @@ HTTP/1.1 200 OK
 Content-Length: 1817
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
   {

@@ -46,6 +46,7 @@ Usage: orionld  [option '-U' (extended usage)]
                 [option '-logLevel' <initial log level (NONE, FATAL, ERROR, WARN, INFO, DEBUG)>]
                 [option '-logAppend' (append to log-file)]
                
+                [option '-coreContext' <Core context version (v1.0|v1.3|v1.4|v1.5|v1.6|v1.7) - v1.6 is default>]
                 [option '-fg' (don't start as daemon)]
                 [option '-localIp' <IP to receive new connections>]
                 [option '-port' <port to receive new connections>]

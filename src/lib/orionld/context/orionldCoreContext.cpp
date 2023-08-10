@@ -55,7 +55,8 @@ int orionldDefaultUrlLen;
 //
 // builtinCoreContext
 //
-const char* builtinCoreContext = "{ \"@context\": {"
+const char* builtinCoreContextUrl = ORIONLD_CORE_CONTEXT_URL_V1_0;
+const char* builtinCoreContext    = "{ \"@context\": {"
   "\"ngsi-ld\": \"https://uri.etsi.org/ngsi-ld/\","
   "\"id\": \"@id\","
   "\"type\": \"@type\","

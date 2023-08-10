@@ -133,7 +133,7 @@ MongoDB server version: REGEX(.*)
 	"attrNames" : [
 		"location",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity",
-		"https://uri.etsi.org/ngsi-ld/name"
+		"https://uri.etsi.org/ngsi-ld/default-context/name"
 	],
 	"attrs" : {
 		"location" : {
@@ -156,7 +156,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 50,
 			"mdNames" : [ ]
 		},
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -192,7 +192,7 @@ MongoDB server version: REGEX(.*)
 	"attrNames" : [
 		"location",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/maxCapacity",
-		"https://uri.etsi.org/ngsi-ld/name",
+		"https://uri.etsi.org/ngsi-ld/default-context/name",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/stocks",
 		"https://fiware.github.io/tutorials.Step-by-Step/schema/locatedIn"
 	],
@@ -217,7 +217,7 @@ MongoDB server version: REGEX(.*)
 			"value" : 50,
 			"mdNames" : [ ]
 		},
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/name" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
@@ -269,7 +269,7 @@ HTTP/1.1 200 OK
 Content-Length: 1053
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:Shelf:unit001",

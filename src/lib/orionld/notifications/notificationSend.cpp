@@ -763,7 +763,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   if ((addLinkHeader == true) && (ngsiv2 == false))  // Add Link header - but not if NGSIv2 Cross Notification
   {
     char         linkHeader[512];
-    const char*  link = (mAltP->subP->ldContext == "")? ORIONLD_CORE_CONTEXT_URL_V1_0 : mAltP->subP->ldContext.c_str();
+    const char*  link = (mAltP->subP->ldContext == "")? orionldCoreContextP->url : mAltP->subP->ldContext.c_str();
 
     snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n", link);
 

@@ -144,7 +144,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:E01
 ================================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 478
+Content-Length: 483
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: REGEX(.*)
@@ -155,7 +155,7 @@ Content-Type: application/geo+json
     "data": {
         "features": [
             {
-                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
                 "geometry": {
                     "coordinates": [
                         1,
@@ -200,7 +200,7 @@ Date: REGEX(.*)
 ===============================================================
 POST http://REGEX(.*)/notify
 Fiware-Servicepath: /
-Content-Length: 485
+Content-Length: 490
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: keyValues
 Host: REGEX(.*)
@@ -211,7 +211,7 @@ Content-Type: application/geo+json
     "data": {
         "features": [
             {
-                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+                "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
                 "geometry": {
                     "coordinates": [
                         1,

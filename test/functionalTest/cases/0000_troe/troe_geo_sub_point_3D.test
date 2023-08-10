@@ -133,7 +133,7 @@ Create,https://uri.etsi.org/ngsi-ld/default-context/A1,Number,urn:ngsi-ld:entiti
 04. See the sub-attributes in the temporal database
 ===================================================
 id,valuetype,entityid,unitcode,st_astext,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Point,GeoPoint,urn:ngsi-ld:entities:E1,,POINT Z (1 2 9),2021-01-08 13:15:17.456
+https://purl.org/geojson/vocab#Point,GeoPoint,urn:ngsi-ld:entities:E1,,POINT Z (1 2 9),2021-01-08 13:15:17.456
 
 
 05. GET the entity
@@ -142,7 +142,7 @@ HTTP/1.1 200 OK
 Content-Length: 223
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "A1": {
@@ -170,7 +170,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 06. GET the sub-attributes from TRoE using postgis
 ==================================================
 id,valuetype,entityid,unitcode,st_astext,observedat
-https://uri.etsi.org/ngsi-ld/default-context/Point,GeoPoint,urn:ngsi-ld:entities:E1,,POINT Z (1 2 9),2021-01-08 13:15:17.456
+https://purl.org/geojson/vocab#Point,GeoPoint,urn:ngsi-ld:entities:E1,,POINT Z (1 2 9),2021-01-08 13:15:17.456
 
 
 07. GET nothing from TRoE using postgis

@@ -65,7 +65,7 @@ char* orionldContextItemExpand
   OrionldContextItem**  contextItemPP
 )
 {
-  OrionldContextItem*  contextItemP;
+  OrionldContextItem*  contextItemP = NULL;
   char*                colonP;
 
   if (contextP == NULL)
@@ -75,7 +75,8 @@ char* orionldContextItemExpand
     return orionldContextPrefixExpand(contextP, shortName, colonP);
 
   // 1. Lookup in Core Context
-  contextItemP = orionldContextItemLookup(orionldCoreContextP, shortName, NULL);
+  if (orionldCoreContextP != NULL)
+    contextItemP = orionldContextItemLookup(orionldCoreContextP, shortName, NULL);
 
   // 2. Lookup in given context (unless it's the Core Context)
   if ((contextItemP == NULL) && (contextP != orionldCoreContextP))

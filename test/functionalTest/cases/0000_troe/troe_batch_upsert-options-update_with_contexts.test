@@ -125,7 +125,7 @@ HTTP/1.1 200 OK
 Content-Length: 741
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "description": {
@@ -169,7 +169,7 @@ Create,urn:ngsi-ld:entities:E1,https://ngsi-ld-tutorials.readthedocs.io/en/lates
 ======================================================================================================
 opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolean,ts
 Create,https://w3id.org/saref#humidity,Number,urn:ngsi-ld:entities:E1,f,P1,None,,32,,202REGEX(.*)
-Create,https://uri.etsi.org/ngsi-ld/description,String,urn:ngsi-ld:entities:E1,f,,None,Soil Humdity Sensor,,,202REGEX(.*)
+Create,http://purl.org/dc/terms/description,String,urn:ngsi-ld:entities:E1,f,,None,Soil Humdity Sensor,,,202REGEX(.*)
 Create,https://uri.fiware.org/ns/data-models#category,String,urn:ngsi-ld:entities:E1,f,,None,sensor,,,202REGEX(.*)
 Create,https://uri.fiware.org/ns/data-models#controlledProperty,String,urn:ngsi-ld:entities:E1,f,,None,humidity,,,202REGEX(.*)
 Create,https://uri.fiware.org/ns/data-models#supportedProtocol,String,urn:ngsi-ld:entities:E1,f,,None,ul20,,,202REGEX(.*)

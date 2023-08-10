@@ -49,31 +49,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// willBeSimplified -
-//
-bool willBeSimplified(KjNode* contextTreeP, int* itemsInArrayP)
-{
-  int  itemsInArray  = 0;
-  int  itemsToRemove = 0;
-
-  for (KjNode* itemP = contextTreeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
-  {
-    ++itemsInArray;
-    if ((itemP->type == KjString) && (strcmp(itemP->value.s, coreContextUrl) == 0))
-      ++itemsToRemove;
-  }
-
-  if (itemsInArray - itemsToRemove > 1)  // More than one item in array - must stay array
-    return false;
-
-  *itemsInArrayP = itemsInArray;
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldContextFromTree -
 //
 OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, KjNode* contextTreeP)
