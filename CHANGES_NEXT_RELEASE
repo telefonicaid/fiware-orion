@@ -1,2 +1,2 @@
-- Fix: alarm for notification queue overpassing a given threshold (#4113)
+- Add: alarm for notification queue overpassing a given threshold (new CLI `-notifAlarmThreshold` / env var `ORION_NOTIF_ALARM_THRESHOLD`) (#4113)
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)

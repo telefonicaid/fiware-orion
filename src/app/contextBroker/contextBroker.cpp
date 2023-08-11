@@ -206,7 +206,7 @@ unsigned long   fcMaxInterval;
 int             mqttMaxAge;
 
 bool            logDeprecate;
-long unsigned int notifAlarmThreshold;
+int             notifAlarmThreshold;
 
 
 
@@ -670,6 +670,15 @@ static void contextBrokerInit(void)
   else
   {
     pNotifier = new Notifier();
+  }
+
+  if (notifAlarmThreshold < 0)
+  {
+    LM_X(1, ("Fatal Error (notifAlarmThreshold negative value not allowed)"));
+  }
+  if (notifAlarmThreshold > 100)
+  {
+    LM_X(1, ("Fatal Error (notifAlarmThreshold value is greater than 100)"));
   }
 
   /* Set notifier object (singleton) */

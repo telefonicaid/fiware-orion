@@ -36,10 +36,12 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 01. Subscribe serv1 to the accumulator endpoint that never responses
 # 02. Subscribe serv2 to the accumulator endpoint that never responses
 # 03. Subscribe serv3 to the accumulator endpoint that never responses
-# 04. Create/update entity in serv1 3 times
-# 05. Create/update entity in serv2 4 times
-# 06. Create/update entity in serv3 5 times
-# 07. Grep log for notificationQueue alarm
+# 04. Subscribe serv4 to the accumulator endpoint that never responses
+# 05. Create/update entity in serv1 3 times
+# 06. Create/update entity in serv2 4 times
+# 07. Create/update entity in serv3 5 times
+# 08. Create/update entity in serv4 5 times (default queue)
+# 09. Grep log for notificationQueue alarm
 #
 
 
@@ -112,7 +114,30 @@ echo
 echo
 
 
-echo "04. Create/update entity in serv1 3 times"
+echo '04. Subscribe serv3 to the accumulator endpoint that never responses'
+echo '===================================================================='
+payload='{
+  "description": "serv4 subscriptions",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/waitForever"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant serv4
+echo
+echo
+
+
+echo "05. Create/update entity in serv1 3 times"
 echo "========================================="
 payload='{
   "id": "E",
@@ -131,7 +156,7 @@ echo
 echo
 
 
-echo "05. Create/update entity in serv2 4 times"
+echo "06. Create/update entity in serv2 4 times"
 echo "========================================="
 for i in {1..4}
 do
@@ -142,7 +167,7 @@ echo
 echo
 
 
-echo "06. Create/update entity in serv3 5 times"
+echo "07. Create/update entity in serv3 5 times"
 echo "========================================="
 for i in {1..5}
 do
@@ -153,7 +178,18 @@ echo
 echo
 
 
-echo "07. Grep log for notificationQueue alarm"
+echo "08. Create/update entity in serv4 5 times (default queue)"
+echo "========================================================="
+for i in {1..5}
+do
+   echo $i
+   orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload" --tenant serv4 > /dev/null
+done
+echo
+echo
+
+
+echo "09. Grep log for notificationQueue alarm"
 echo "========================================"
 egrep 'Raising alarm|Releasing alarm' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
@@ -194,14 +230,24 @@ Content-Length: 0
 
 
 
-04. Create/update entity in serv1 3 times
+04. Subscribe serv3 to the accumulator endpoint that never responses
+====================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+05. Create/update entity in serv1 3 times
 =========================================
 1
 2
 3
 
 
-05. Create/update entity in serv2 4 times
+06. Create/update entity in serv2 4 times
 =========================================
 1
 2
@@ -209,7 +255,7 @@ Content-Length: 0
 4
 
 
-06. Create/update entity in serv3 5 times
+07. Create/update entity in serv3 5 times
 =========================================
 1
 2
@@ -218,9 +264,25 @@ Content-Length: 0
 5
 
 
-07. Grep log for notificationQueue alarm
+08. Create/update entity in serv4 5 times (default queue)
+=========================================================
+1
+2
+3
+4
+5
+
+
+09. Grep log for notificationQueue alarm
 ========================================
 Raising alarm NotificationQueue serv1: notification queue reached maximum threshold
+Releasing alarm NotificationQueue serv1
+Raising alarm NotificationQueue serv2: notification queue reached maximum threshold
+Releasing alarm NotificationQueue serv2
+Raising alarm NotificationQueue serv3: notification queue reached maximum threshold
+Releasing alarm NotificationQueue serv3
+Raising alarm NotificationQueue default: notification queue reached maximum threshold
+Releasing alarm NotificationQueue default
 
 
 --TEARDOWN--

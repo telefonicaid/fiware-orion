@@ -618,7 +618,7 @@ bool AlarmManager::notificationQueue(const std::string& service, const std::stri
 {
   semTake();
 
-  std::map<std::string, int>::iterator iter = notificationQ.find(details);
+  std::map<std::string, int>::iterator iter = notificationQ.find(service);
 
   if (iter != notificationQ.end())
   {
@@ -640,7 +640,7 @@ bool AlarmManager::notificationQueue(const std::string& service, const std::stri
 
   ++notificationQueues;
 
-  notificationQ[details] = 1;
+  notificationQ[service] = 1;
   semGive();
 
   LM_W(("Raising alarm NotificationQueue %s: %s", service.c_str(), details.c_str()));
@@ -670,7 +670,7 @@ bool AlarmManager::notificationQueuesResets(const std::string& details)
   ++notificationQueues;
   semGive();
 
-  LM_W(("Releasing alarm NotificationQueue %s:", details.c_str()));
+  LM_W(("Releasing alarm NotificationQueue %s", details.c_str()));
 
   return true;
 }

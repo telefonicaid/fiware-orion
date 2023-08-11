@@ -187,23 +187,17 @@ void QueueNotifier::sendNotifyContextRequest
     return;
   }
 
-  extern long unsigned int notifAlarmThreshold;
+  extern int notifAlarmThreshold;
 
   if (notifAlarmThreshold != 0)
   {
     std::string details = ("notification queue reached maximum threshold");
 
-    if (notifAlarmThreshold > 0)
+    long unsigned int threshold = queueSize(service)*notifAlarmThreshold/100;
+
+    if (threshold >= queueSize(service))
     {
-      notifAlarmThreshold=queueSize(service)*notifAlarmThreshold/100;
-    }
-    if (notifAlarmThreshold > 100)
-    {
-      LM_X(1, ("Fatal Error (notifAlarmThreshol value is greater than 100%)"));
-    }
-    if (notifAlarmThreshold >= queueSize(service))
-    {
-      alarmMgr.notificationQueue(queueName.c_str(), details);
+      alarmMgr.notificationQueue(queueName.c_str(), details.c_str());
     }
     else
     {
