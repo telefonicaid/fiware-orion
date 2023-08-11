@@ -277,10 +277,7 @@ int             notifAlarmThreshold;
 #define NGSIV1_AUTOCAST_DESC   "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
 #define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
-<<<<<<< HEAD
 #define NOTIF_ALARM_THRESHOLD_DESC "maximum threshold for notification queue alarms, as a percentage of the maximum queue size, default 0 (meaning no queue alarms are used)"
-=======
->>>>>>> upstream/master
 
 
 
@@ -371,11 +368,8 @@ PaArgument paArgs[] =
 
   { "-logDeprecate",                &logDeprecate,          "LOG_DEPRECATE",            PaBool,   PaOpt, false,                           false, true,                  LOG_DEPRECATE_DESC           },
 
-<<<<<<< HEAD
   { "-notifAlarmThreshold",         &notifAlarmThreshold,   "NOTIF_ALARM_THRESHOLD",    PaInt,    PaOpt, 0,                               PaNL,  PaNL,                  NOTIF_ALARM_THRESHOLD_DESC   },
 
-=======
->>>>>>> upstream/master
   PA_END_OF_ARGS
 };
 
