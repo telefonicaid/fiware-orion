@@ -836,6 +836,11 @@ static std::string sortCriteria(const std::string& sortToken)
     return ENT_MODIFICATION_DATE;
   }
 
+  if (sortToken == SERVICE_PATH)
+  {
+    return std::string("_id.") + ENT_SERVICE_PATH;
+  }
+
   if (sortToken == ENT_ENTITY_ID)
   {
     return std::string("_id.") + ENT_ENTITY_ID;
@@ -1313,6 +1318,11 @@ void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType
     addIfNotPresentAttr(&cerP->entity, ALTERATION_TYPE, DEFAULT_ATTR_STRING_TYPE, alterationType);
   }
 
+  // servicePath
+  if (!cerP->entity.servicePath.empty())
+  {
+    addIfNotPresentAttr(&cerP->entity, SERVICE_PATH, DEFAULT_ATTR_STRING_TYPE, cerP->entity.servicePath);
+  }
 
   for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ix++)
   {

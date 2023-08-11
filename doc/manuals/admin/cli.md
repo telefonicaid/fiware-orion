@@ -185,7 +185,10 @@ The list of available options is the following:
     to the `-k` or `--insecure` parameteres of the curl command.
 -   **-mqttMaxAge**. Max time (in minutes) that an unused MQTT connection is kept. Default: 60
 -   **-logDeprecate**. Log deprecation usages as warnings. More information in [this section of the documentation](../deprecated.md#log-deprecation-warnings). Default is: false. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `deprecated` field
+<<<<<<< HEAD
 -   **-notifAlarmThreshold**. Maximum threshold for notification queue alarms, as a percentage of the maximum queue size, default 0 (meaning no queue alarms are used)
+=======
+>>>>>>> upstream/master
 
 ## Configuration using environment variables
 
@@ -264,4 +267,7 @@ Two facts have to be taken into account:
 |	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
 |       ORION_MQTT_MAX_AGE      |  mqttMaxAge  |
 |       ORION_LOG_DEPRECATE |  logDeprecate |
+<<<<<<< HEAD
 |       ORION_NOTIF_ALARM_THRESHOLD |  notifAlarmThreshold |
+=======
+>>>>>>> upstream/master
