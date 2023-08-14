@@ -49,8 +49,9 @@ The list of available options is the following:
 -   **-dbURI <uri>** : The URI to use the MongoDB.
     If the URI contains the string `${PWD}`, it will be replaced with the password
     specified in `-dbpwd` or the environment variable `ORION_MONGO_PASSWORD`.
-    This option cannot be combined with -dbhost, -rplSet, -dbTimeout, -dbuser,
-    -dbAuthMech, -dbAuthDb, -dbSSL and -dbDisableRetryWrites.
+    This option cannot be combined with `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`,
+    `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` (if you attempt to do that
+    Orion will exit with an error on startup).
 -   **-dbhost <host>**. The MongoDB host and port to use, e.g. `-dbhost
     localhost:12345`.
 -   **-rplSet <replicat_set>**. If used, Orion CB connnects to a
