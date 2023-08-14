@@ -347,6 +347,7 @@ static std::string composeMongoUri
         LM_X(1, ("Invalid Command Line Options: -dbURI is used with a password substitution, but no password (-dbpwd) is supplied"));
       }
 
+      // +6 is the length of the "${PWD}"
       uri = std::string(dbURI, pwd - dbURI) + passwd + (pwd + 6);
     }
     else
