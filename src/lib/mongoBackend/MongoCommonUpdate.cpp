@@ -316,7 +316,7 @@ static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, 
     return caP->valueType != orion::ValueTypeNull;
 
   default:
-    LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
+    LM_E(("Runtime Error (unknown attribute value type in DB: %d on attribute %s)", getFieldF(attr, ENT_ATTRS_VALUE).type(), caP->name.c_str()));
     return false;
   }
 }
@@ -442,7 +442,7 @@ static ChangeType mergeAttrInfo
       break;
 
     default:
-      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d on attribute %s)", getFieldF(attr, ENT_ATTRS_VALUE).type(), caP->name.c_str()));
     }
   }
 
