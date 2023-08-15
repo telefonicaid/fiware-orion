@@ -669,7 +669,7 @@ void ContextAttributeVector::applyUpdateOperators(void)
             break;
 
           default:
-            LM_E(("Runtime Error (unknown attribute type: %d)", upOp->valueType));
+            LM_E(("Runtime Error (unknown attribute type: %d on attribute %s)", upOp->valueType, vec[ix]->name.c_str()));
           }
 
           // Replace old compound value (with $push) with the new one ([])
@@ -705,7 +705,7 @@ void ContextAttributeVector::applyUpdateOperators(void)
             break;
 
           default:
-            LM_E(("Runtime Error (unknown attribute type: %d)", upOp->valueType));
+            LM_E(("Runtime Error (unknown attribute type: %d on attribute %s)", upOp->valueType, vec[ix]->name.c_str()));
           }
 
           // Replace old compound value (with $push) with the new one ([])
@@ -726,7 +726,7 @@ void ContextAttributeVector::applyUpdateOperators(void)
         }
         else
         {
-          LM_E(("Runtime Error (uknown operator: %s", op.c_str()));
+          LM_E(("Runtime Error (unknown operator: %s", op.c_str()));
         }
       }
     }
