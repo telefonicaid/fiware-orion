@@ -133,7 +133,7 @@ void ContextAttribute::bsonAppendAttrValue
       break;
 
     default:
-      LM_E(("Runtime Error (unknown attribute type: %d on attribute %s)", valueType, name.c_str()));
+      LM_E(("Runtime Error (unknown attribute value type: %d on attribute %s)", valueType, name.c_str()));
   }
 }
 
@@ -217,7 +217,7 @@ bool ContextAttribute::calculateOperator
       return false;
 
     default:
-      LM_E(("Runtime Error (unknown attribute type: %d on attribute %s)", valueType, name.c_str()));
+      LM_E(("Runtime Error (unknown attribute value type: %d on attribute %s)", valueType, name.c_str()));
       return false;
     }
 
@@ -247,7 +247,7 @@ bool ContextAttribute::calculateOperator
       return false;
 
     default:
-      LM_E(("Runtime Error (unknown attribute type: %d on attribute %s)", valueType, name.c_str()));
+      LM_E(("Runtime Error (unknown attribute value type: %d on attribute %s)", valueType, name.c_str()));
       return false;
     }
   }

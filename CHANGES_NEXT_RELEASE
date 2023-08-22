@@ -1,1 +1,2 @@
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
+- Fix improve error traces (#4387)
