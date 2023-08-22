@@ -568,6 +568,8 @@ void mongoSubCacheRefresh(const std::string& database)
   char*                          tenant      = tenantFromDb(database.c_str());
   char                           collectionPath[80];
 
+  LM_T(LmtLegacySubCacheRefresh, ("Refreshing sub-cache"));
+
   snprintf(collectionPath, sizeof(collectionPath), "%s.csubs", database.c_str());
 
   std::auto_ptr<DBClientCursor>  cursor;
@@ -780,6 +782,11 @@ void mongoSubCountersUpdate
     snprintf(collectionPath, sizeof(collectionPath), "%s-%s.csubs", dbName, tenant.c_str());
   else
     snprintf(collectionPath, sizeof(collectionPath), "%s.csubs", dbName);
+
+  LM_T(LmtLegacy, ("count:                %d", count));
+  LM_T(LmtLegacy, ("lastNotificationTime: %f", lastNotificationTime));
+  LM_T(LmtLegacy, ("lastFailure:          %f", lastFailure));
+  LM_T(LmtLegacy, ("lastSuccess:          %f", lastSuccess));
 
   if (count                 > 0)  mongoSubCountersUpdateCount(collectionPath, subId, count, ngsild);
   if (lastNotificationTime  > 0)  mongoSubCountersUpdateLastNotificationTime(collectionPath, subId, lastNotificationTime, ngsild);

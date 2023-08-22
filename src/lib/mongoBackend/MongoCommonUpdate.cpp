@@ -1314,10 +1314,18 @@ static bool addTriggeredSubscriptions_withCache
     aList.fill(cSubP->attributes);
 
     // Throttling
+    LM_T(LmtLegacySubMatch, ("Subscription:         %s", cSubP->subscriptionId));
+    LM_T(LmtLegacySubMatch, ("NOW:                  %f", orionldState.requestTime));
+    LM_T(LmtLegacySubMatch, ("lastNotificationTime: %f", cSubP->lastNotificationTime));
+    LM_T(LmtLegacySubMatch, ("DIFF:                 %f", orionldState.requestTime - cSubP->lastNotificationTime));
+    LM_T(LmtLegacySubMatch, ("throttling:           %f", cSubP->throttling));
+    LM_T(LmtLegacySubMatch, ("lastSuccess:          %f", cSubP->lastSuccess));
+    LM_T(LmtLegacySubMatch, ("lastFailure:          %f", cSubP->lastFailure));
     if ((cSubP->throttling != -1) && (cSubP->lastNotificationTime != 0))
     {
       if ((orionldState.requestTime - cSubP->lastNotificationTime) < cSubP->throttling)
       {
+        LM_T(LmtLegacySubMatch, ("No notification due to throttling (last: %f vs now: %f)", orionldState.requestTime, cSubP->lastNotificationTime));
         continue;
       }
     }

@@ -60,7 +60,7 @@ extern "C"
 * IMPORTANT NOTE:
 *   As this function is called outside of the "Request Threads", orionldState cannot be used!
 */
-bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
+bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP, bool refresh)
 {
   bson_t            mongoFilter;
   const bson_t*     mongoDocP;
@@ -86,6 +86,25 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     mongoc_client_pool_push(mongocPool, connectionP);
     mongoc_collection_destroy(subscriptionsP);
     LM_RE(false, ("Internal Error (mongoc_collection_find_with_opts ERROR)"));
+  }
+
+  if (refresh == true)
+  {
+    //
+    // Algorithm for "Delete subs that are no longer in DB":
+    //        1. Before the loop: Mark all subs in cache as "not in DB"
+    //        2. Inside the loop: When a sub is found in DB, mark it as "in DB"
+    //        3. After the loop:  Lookup all cached subs and remove thos "not in DB"
+    //
+
+    // Loop over the entire sub-cache and mark all subscriptions with inDB == false
+    char* tenantName = (tenantP != NULL)? tenantP->tenant : NULL;
+    for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
+    {
+      LM_T(LmtSubCacheSync, ("tenantName: '%s' (cSubP->tenant: '%s')", tenantName, cSubP->tenant));
+      if (tenantMatch(tenantName, cSubP->tenant) == true)
+        cSubP->inDB = false;
+    }
   }
 
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
@@ -121,7 +140,28 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     if (contextNodeP != NULL)
       contextP = orionldContextFromUrl(contextNodeP->value.s, NULL);
 
-    subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat);
+    CachedSubscription* cSubP = subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat);
+    cSubP->inDB = true;
+  }
+
+  if (refresh == true)
+  {
+    // Now loop over the entire sub-cache and remove those subscriptions with inDB == false;
+    CachedSubscription* cSubP = subCacheHeadGet();
+    CachedSubscription* next;
+
+    char* tenantName = (tenantP != NULL)? tenantP->tenant : NULL;
+    while (cSubP != NULL)
+    {
+      next = cSubP->next;
+
+      if ((cSubP->inDB == false) && (tenantMatch(tenantName, cSubP->tenant) == true))
+      {
+        subCacheItemRemove(cSubP);
+      }
+
+      cSubP = next;
+    }
   }
 
   mongoc_client_pool_push(mongocPool, connectionP);

@@ -45,6 +45,7 @@ int orionldServerConnect(char* ip, uint16_t portNo)
   struct hostent*     heP;
   struct sockaddr_in  server;
 
+  LM_T(LmtNotificationMsg, ("Connecting to IP: '%s'", ip));
   heP = gethostbyname(ip);
   if (heP == NULL)
   {

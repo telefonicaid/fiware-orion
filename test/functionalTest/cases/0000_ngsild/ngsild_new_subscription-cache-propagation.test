@@ -273,7 +273,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
                 "type": "T1"
             }
         ],
-        "id": "urn:ngsi-ld:subscriptions:S1",
+        "id": "urn:ngsi-ld:subscriptions:S2",
         "isActive": true,
         "notification": {
             "endpoint": {
@@ -293,7 +293,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
                 "type": "T1"
             }
         ],
-        "id": "urn:ngsi-ld:subscriptions:S2",
+        "id": "urn:ngsi-ld:subscriptions:S1",
         "isActive": true,
         "notification": {
             "endpoint": {

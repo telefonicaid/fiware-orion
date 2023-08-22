@@ -1,0 +1,780 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription sequence ONCHANGE
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 244 IPv4
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription on OfficeRoom/Room + temperature/ligthstatus
+# 02. Create an Entity OfficeRoom/Room + pressure/ligthstatus - get notification 1
+# 03. Update the Entity OfficeRoom/Room, changing temperature/ligthstatus attributes - get notification 2
+# 04. Modify the subscription, setting its 'throttling' to 6 seconds
+# 05. Sleep 8 secs to inhibit the throttling
+# 06. Update the Entity OfficeRoom/Room, changing pressure/ligthstatus attributes - get notification 3
+# 07. Update the Entity OfficeRoom/Room, changing pressure - no notification
+# 08. Sleep 8 secs to avoid throttling
+# 09. Update the Entity OfficeRoom/Room, changing temperature - get notification 4
+# 10. Update the Entity OfficeRoom/Room, changing pressure - no notification
+# 11. Delete the subscription
+# 12. Update the Entity OfficeRoom/Room, changingtemperature - no notification as no subscription exists
+# 13. Dump the accumulator, see 4 notifications
+#
+
+echo "01. Create a subscription on OfficeRoom/Room + temperature/ligthstatus"
+echo "======================================================================"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "OfficeRoom"
+        }
+    ],
+    "attributes": [
+        "temperature",
+        "ligthstatus"
+    ],
+    "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+    "duration": "PT1H",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "temperature",
+                "ligthstatus"
+            ]
+        }
+    ]
+}'
+orionCurl --url /v1/contextSubscriptions --payload "$payload"
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
+echo
+echo
+
+
+echo "02. Create an Entity OfficeRoom/Room + pressure/ligthstatus - get notification 1"
+echo "================================================================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+      {
+        "name": "pressure",
+        "type": "clima",
+        "value": "p2 - notification"
+      },
+      {
+        "name": "ligthstatus",
+        "type": "light",
+        "value": "L2 - notification"
+      }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "03. Update the Entity OfficeRoom/Room, changing temperature/ligthstatus attributes - get notification 2"
+echo "======================================================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": "t3 - notification"
+        },
+        {
+          "name": "ligthstatus",
+          "type": "light",
+          "value": "L3 - notification"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "04. Modify the subscription, setting its 'throttling' to 6 seconds"
+echo "=================================================================="
+payload='{
+    "subscriptionId": "'$SUB_ID'",
+    "duration": "P1Y",
+    "throttling": "PT6S"
+}'
+orionCurl --url /v1/contextSubscriptions/${SUB_ID} --payload "$payload" -X "PUT"
+echo
+echo
+
+
+echo "05. Sleep 8 secs to inhibit the throttling"
+echo "=========================================="
+sleep 8
+echo Slept 8 secs to bypass throttling
+echo
+echo
+
+
+echo "06. Update the Entity OfficeRoom/Room, changing pressure/ligthstatus attributes - get notification 3"
+echo "===================================================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "pressure",
+          "type": "clima",
+          "value": "p6 - notification"
+        },
+        {
+          "name": "ligthstatus",
+          "type": "light",
+          "value": "L6 - notification"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "07. Update the Entity OfficeRoom/Room, changing pressure - no notification"
+echo "=========================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "pressure",
+          "type": "clima",
+          "value": "p7"
+        },
+        {
+          "name": "ligthstatus",
+          "type": "light",
+          "value": "L7"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "08. Sleep 8 secs to avoid throttling"
+echo "===================================="
+sleep 8
+echo Slept 8 secs to bypass throttling
+echo
+echo
+
+
+echo "09. Update the Entity OfficeRoom/Room, changing temperature - get notification 4"
+echo "================================================================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": "t9 - notification"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "10. Update the Entity OfficeRoom/Room, changing pressure - no notification"
+echo "=========================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "pressure",
+          "type": "clima",
+          "value": "p10 - no notification"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "11. Delete the subscription"
+echo "==========================="
+orionCurl --url "/v1/contextSubscriptions/${SUB_ID}" -X "DELETE"
+echo
+echo
+
+
+echo "12. Update the Entity OfficeRoom/Room, changingtemperature - no notification as no subscription exists"
+echo "======================================================================================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": "t12 - no notification"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "13. Dump the accumulator, see 4 notifications"
+echo "============================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription on OfficeRoom/Room + temperature/ligthstatus
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 85
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "subscribeResponse": {
+        "duration": "PT1H",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. Create an Entity OfficeRoom/Room + pressure/ligthstatus - get notification 1
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Update the Entity OfficeRoom/Room, changing temperature/ligthstatus attributes - get notification 2
+=======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 257
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    },
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Modify the subscription, setting its 'throttling' to 6 seconds
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 104
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "subscribeResponse": {
+        "duration": "P1Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT6S"
+    }
+}
+
+
+05. Sleep 8 secs to inhibit the throttling
+==========================================
+Slept 8 secs to bypass throttling
+
+
+06. Update the Entity OfficeRoom/Room, changing pressure/ligthstatus attributes - get notification 3
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+07. Update the Entity OfficeRoom/Room, changing pressure - no notification
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    },
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+08. Sleep 8 secs to avoid throttling
+====================================
+Slept 8 secs to bypass throttling
+
+
+09. Update the Entity OfficeRoom/Room, changing temperature - get notification 4
+================================================================================
+HTTP/1.1 200 OK
+Content-Length: 208
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. Update the Entity OfficeRoom/Room, changing pressure - no notification
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 204
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "clima",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+11. Delete the subscription
+===========================
+HTTP/1.1 200 OK
+Content-Length: 93
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+12. Update the Entity OfficeRoom/Room, changingtemperature - no notification as no subscription exists
+======================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 208
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": ""
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+13. Dump the accumulator, see 4 notifications
+=============================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 293
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": "L2 - notification"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 360
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+#SORT_START
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": "L3 - notification"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "t3 - notification"
+                    }
+#SORT_END
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 360
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+#SORT_START
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": "L6 - notification"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "t3 - notification"
+                    }
+#SORT_END
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 345
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+#SORT_START
+                    {
+                        "name": "ligthstatus",
+                        "type": "light",
+                        "value": "L7"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "t9 - notification"
+                    }
+#SORT_END
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "originator": "localhost",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

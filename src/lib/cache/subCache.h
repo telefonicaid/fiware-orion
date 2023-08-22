@@ -191,7 +191,7 @@ extern int subCacheItemRemove(CachedSubscription* cSubP);
 *
 * subCacheRefresh -
 */
-extern void subCacheRefresh(void);
+extern void subCacheRefresh(bool refresh);
 
 
 
