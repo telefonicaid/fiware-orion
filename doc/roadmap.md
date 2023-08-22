@@ -32,12 +32,13 @@ Disclaimer:
 The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
+- MQTT Retain flag [#4388](https://github.com/telefonicaid/fiware-orion/issues/4388)
 - Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
 - Pattern/filter batch updates ([#2389](https://github.com/telefonicaid/fiware-orion/issues/2389))
 - Notification endpoint alias ([#3655](https://github.com/telefonicaid/fiware-orion/issues/3655))
 - Aggregation operations API ([#3816](https://github.com/telefonicaid/fiware-orion/issues/3816))
-- Rework commands and deprecate registration API
-- MQTT Retain flag
+- Rework commands (and deprecate registration API) ([4397](https://github.com/telefonicaid/fiware-orion/issues/4397))
+
 
 ## Medium term
 
@@ -46,19 +47,19 @@ typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
 - Advanced query language ([4395](https://github.com/telefonicaid/fiware-orion/issues/4395))
-- Signed entities
+- Signed entities ([4398](https://github.com/telefonicaid/fiware-orion/issues/4398))
 - Dynamic / high order attribute values (e.g. an attribute being a sum of two other attributes)
  supported by a Expressions Language - help wanted 
 ([#4004](https://github.com/telefonicaid/fiware-orion/issues/4004)),
 ([#3815](https://github.com/telefonicaid/fiware-orion/issues/3815))
 - Service provisioning API (pools, etc.) 
 (based in [#3843](https://github.com/telefonicaid/fiware-orion/issues/3843))
-- Remove registration API
-- Advanced subscription management ([4392](https://github.com/telefonicaid/fiware-orion/issues/4392))
-   - Custom ID subscription
-   - Query Subscrition by fields (endpoint, attributes...)
-   - Configurable statistics consolidation flag (to debug subscriptions) / Debug mode + last 10 subs status?
-   - Flag to disable metadata in subscriptions
+- Advanced subscription management
+   - Subscription debug mode (precise statistics consolidation, keep recent history of notifications sent, etc.) ([4399](https://github.com/telefonicaid/fiware-orion/issues/4399))
+   - Custom ID subscription ([4400](https://github.com/telefonicaid/fiware-orion/issues/4400))
+   - Query Subscrition by fields (endpoint, attributes...) ([4392](https://github.com/telefonicaid/fiware-orion/issues/4392))
+   - Flag to disable metadata in subscriptions ([4401](https://github.com/telefonicaid/fiware-orion/issues/4401))
+- Remove registration API ([4402](https://github.com/telefonicaid/fiware-orion/pull/4396))
 
 ## Long term
 
