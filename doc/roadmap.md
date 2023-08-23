@@ -17,7 +17,7 @@ any time.
 
 Disclaimer:
 
-* This section has been last updated in March 2022. Please take into account its 
+* This section has been last updated in August 2023. Please take into account its 
   content could be obsolete.
 * Note we develop this software in Agile way, so development plan is continuously 
   under review. Thus, this roadmap has to be understood as rough plan of features 
@@ -32,12 +32,12 @@ Disclaimer:
 The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
+- MQTT Retain flag [#4388](https://github.com/telefonicaid/fiware-orion/issues/4388)
 - Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
-- ~New subscripition modes (create only, update only, delete only and combinations)~ ([#1494](https://github.com/telefonicaid/fiware-orion/issues/1494)
 - Pattern/filter batch updates ([#2389](https://github.com/telefonicaid/fiware-orion/issues/2389))
 - Notification endpoint alias ([#3655](https://github.com/telefonicaid/fiware-orion/issues/3655))
 - Aggregation operations API ([#3816](https://github.com/telefonicaid/fiware-orion/issues/3816))
-- ~Custom notifications: simplifying sending JSON requests~ ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560))
+- Rework commands (and deprecate registration API) ([#4397](https://github.com/telefonicaid/fiware-orion/issues/4397))
 
 
 ## Medium term
@@ -46,16 +46,20 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
-
-- Advanced query language
-- Signed entities
+- Advanced query language ([#4395](https://github.com/telefonicaid/fiware-orion/issues/4395))
+- Signed entities ([#4398](https://github.com/telefonicaid/fiware-orion/issues/4398))
 - Dynamic / high order attribute values (e.g. an attribute being a sum of two other attributes)
  supported by a Expressions Language - help wanted 
 ([#4004](https://github.com/telefonicaid/fiware-orion/issues/4004)),
 ([#3815](https://github.com/telefonicaid/fiware-orion/issues/3815))
-- Rework commands
 - Service provisioning API (pools, etc.) 
 (based in [#3843](https://github.com/telefonicaid/fiware-orion/issues/3843))
+- Advanced subscription management
+   - Subscription debug mode (precise statistics consolidation, keep recent history of notifications sent, etc.) ([#4399](https://github.com/telefonicaid/fiware-orion/issues/4399))
+   - Custom ID subscription ([#4400](https://github.com/telefonicaid/fiware-orion/issues/4400))
+   - Query Subscrition by fields (endpoint, attributes...) ([#4392](https://github.com/telefonicaid/fiware-orion/issues/4392))
+   - Flag to disable metadata in subscriptions ([#4401](https://github.com/telefonicaid/fiware-orion/issues/4401))
+- Remove registration API ([#4402](https://github.com/telefonicaid/fiware-orion/pull/4402))
 
 ## Long term
 
@@ -71,6 +75,8 @@ you wish to get involved in the implementation or influence the roadmap
 
 The following list contains all features that were in the roadmap and have already been implemented.
 
+- Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560)) ([3.8.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.8.0))
+- New subscripition modes (create only, update only, delete only and combinations) ([#1494](https://github.com/telefonicaid/fiware-orion/issues/1494)) ([3.7.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.7.0))
 - Per sub/reg HTTP timeout ([#3842](https://github.com/telefonicaid/fiware-orion/issues/3842)) 
 ([3.3.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.3.0))
 - Attribute update operators (inc, push, etc.) ([#3814](https://github.com/telefonicaid/fiware-orion/issues/3814))
