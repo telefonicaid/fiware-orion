@@ -208,10 +208,11 @@ KjNode* dbModelToApiSubscription
   KjNode* dbLastFailureP      = kjLookup(dbSubP, "lastFailure");
   KjNode* dbShowChangesP      = kjLookup(dbSubP, "showChanges");
   KjNode* dbSysAttrsP         = kjLookup(dbSubP, "sysAttrs");
+  KjNode* dbLangP             = kjLookup(dbSubP, "lang");
   KjNode* dbCreatedAtP        = NULL;
   KjNode* dbModifiedAtP       = NULL;
 
-  if (orionldState.uriParamOptions.sysAttrs == true)
+  if ((orionldState.uriParamOptions.sysAttrs == true) || (forSubCache == true))
   {
     dbCreatedAtP  = kjLookup(dbSubP, "createdAt");   DB_ITEM_NOT_FOUND(dbSubIdP, "createdAt",   tenant);
     dbModifiedAtP = kjLookup(dbSubP, "modifiedAt");  DB_ITEM_NOT_FOUND(dbSubIdP, "modifiedAt",  tenant);
@@ -276,6 +277,10 @@ KjNode* dbModelToApiSubscription
   // description
   if (dbDescriptionP != NULL)
     kjChildAdd(apiSubP, dbDescriptionP);
+
+  // lang
+  if (dbLangP != NULL)
+    kjChildAdd(apiSubP, dbLangP);
 
 
   //
@@ -630,7 +635,10 @@ KjNode* dbModelToApiSubscription
       modifiedAtNodeP = kjString(orionldState.kjsonP, "modifiedAt", dateTime);
     }
     else
-      modifiedAtNodeP = kjFloat(orionldState.kjsonP, "modifiedAt", dbCreatedAtP->value.f);
+    {
+      LM_T(LmtSubCacheSync, ("modifiedAt from DB: %f", dbModifiedAtP->value.f));
+      modifiedAtNodeP = kjFloat(orionldState.kjsonP, "modifiedAt", dbModifiedAtP->value.f);
+    }
 
     kjChildAdd(apiSubP, modifiedAtNodeP);
   }

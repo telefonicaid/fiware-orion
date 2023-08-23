@@ -28,6 +28,8 @@
 
 extern "C"
 {
+#include "kbase/kTime.h"                                         // kTimeGet
+#include "kbase/kMacros.h"                                       // K_FT
 #include "kjson/KjNode.h"                                        // kjBufferCreate
 #include "kjson/kjLookup.h"                                      // kjLookup
 #include "kjson/kjRender.h"                                      // kjFastRender
@@ -53,21 +55,22 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// subCacheApiSubscriptionInsert -
+// subCacheItemFill -
 //
-CachedSubscription* subCacheApiSubscriptionInsert
+static CachedSubscription* subCacheItemFill
 (
-  KjNode*         apiSubscriptionP,
-  QNode*          qTree,
-  KjNode*         geoCoordinatesP,
-  OrionldContext* contextP,
-  const char*     tenant,
-  KjNode*         showChangesP,
-  KjNode*         sysAttrsP,
-  RenderFormat    renderFormat
+  CachedSubscription*  cSubP,
+  KjNode*              apiSubscriptionP,
+  QNode*               qTree,
+  KjNode*              geoCoordinatesP,
+  OrionldContext*      contextP,
+  const char*          tenant,
+  KjNode*              showChangesP,
+  KjNode*              sysAttrsP,
+  RenderFormat         renderFormat
 )
 {
-  CachedSubscription* cSubP = new CachedSubscription();
+  kjTreeLog(apiSubscriptionP, "apiSubscriptionP", LmtSR);
 
   cSubP->tenant              = (tenant == NULL || *tenant == 0)? NULL : strdup(tenant);
   cSubP->servicePath         = strdup("/#");
@@ -149,10 +152,7 @@ CachedSubscription* subCacheApiSubscriptionInsert
   if (isActiveP != NULL)
   {
     cSubP->isActive = isActiveP->value.b;
-    if (isActiveP->value.b == false)
-      cSubP->status = "inactive";
-    else
-      cSubP->status = "active";
+    cSubP->status   = (isActiveP->value.b == false)? "inactive" : "active";
   }
   else
   {
@@ -389,4 +389,116 @@ CachedSubscription* subCacheApiSubscriptionInsert
   subCacheItemInsert(cSubP);
 
   return cSubP;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// subCacheApiSubscriptionCreate -
+//
+static CachedSubscription* subCacheApiSubscriptionCreate
+(
+  KjNode*         apiSubscriptionP,
+  QNode*          qTree,
+  KjNode*         geoCoordinatesP,
+  OrionldContext* contextP,
+  const char*     tenant,
+  KjNode*         showChangesP,
+  KjNode*         sysAttrsP,
+  RenderFormat    renderFormat
+)
+{
+  CachedSubscription* cSubP = new CachedSubscription();
+
+  return subCacheItemFill(cSubP, apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// subCacheApiSubscriptionUpdate -
+//
+static CachedSubscription* subCacheApiSubscriptionUpdate
+(
+  CachedSubscription*  cSubP,
+  KjNode*              apiSubscriptionP,
+  QNode*               qTree,
+  KjNode*              geoCoordinatesP,
+  OrionldContext*      contextP,
+  const char*          tenant,
+  KjNode*              showChangesP,
+  KjNode*              sysAttrsP,
+  RenderFormat         renderFormat
+)
+{
+  LM_T(LmtSubCacheSync, ("Updating Cached Subscription (%p) from DB", cSubP));
+
+  kjTreeLog(apiSubscriptionP, "apiSubscription", LmtSubCacheSync);
+
+  KjNode* modifiedAtNode = kjLookup(apiSubscriptionP, "modifiedAt");
+  if (modifiedAtNode == NULL)
+  {
+    struct timespec now;
+    kTimeGet(&now);
+    cSubP->modifiedAt = now.tv_sec + now.tv_nsec / 1000000000.0;
+    LM_W(("Invalid subscription id DB - no 'modifiedAt' field"));
+  }
+  else
+  {
+    LM_T(LmtSubCacheSync, ("%s: modifiedAt in cache: %f", cSubP->subscriptionId, cSubP->modifiedAt));
+    LM_T(LmtSubCacheSync, ("%s: modifiedAt in DB:    %f", cSubP->subscriptionId, modifiedAtNode->value.f));
+
+    if (modifiedAtNode->value.f <= cSubP->modifiedAt)
+    {
+      LM_T(LmtSubCacheSync, ("%s: incoming is not newer - no change", cSubP->subscriptionId));
+      return cSubP;
+    }
+
+    cSubP->modifiedAt = modifiedAtNode->value.f;  // The new value is in the DB
+  }
+
+  cSubP->count      = 0;                        // Not sure ... count+dbCount ...
+
+  subCacheItemStrip(cSubP);
+  return subCacheItemFill(cSubP, apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// subCacheApiSubscriptionInsert -
+//
+CachedSubscription* subCacheApiSubscriptionInsert
+(
+  KjNode*         apiSubscriptionP,
+  QNode*          qTree,
+  KjNode*         geoCoordinatesP,
+  OrionldContext* contextP,
+  const char*     tenant,
+  KjNode*         showChangesP,
+  KjNode*         sysAttrsP,
+  RenderFormat    renderFormat
+)
+{
+  KjNode* subIdNodeP = kjLookup(apiSubscriptionP, "id");
+
+  if (subIdNodeP == NULL)
+    subIdNodeP = kjLookup(apiSubscriptionP, "_id");  // FIXME: always "id" !!!
+
+  if (subIdNodeP == NULL)
+  {
+    kjTreeLog(apiSubscriptionP, "apiSubscriptionP", LmtSubCacheSync);
+    LM_X(1, ("Subscription without id - exiting dur to bug"));
+  }
+
+  char* subId = subIdNodeP->value.s;
+
+  CachedSubscription* subP = subCacheItemLookup(tenant, subId);
+  if (subP == NULL)
+    return subCacheApiSubscriptionCreate(apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
+
+  return subCacheApiSubscriptionUpdate(subP, apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
 }

@@ -25,7 +25,7 @@ Subscription Cache Throttling and expiration
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 38,101 IPv4 -multiservice -subCacheIval 5
+brokerStart CB 43,245,246 IPv4 -multiservice -subCacheIval 5
 accumulatorStart --pretty-print
 
 --SHELL--
@@ -82,7 +82,9 @@ echo
 
 echo "03. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
-payload='{ "A": "03. notification lost by throttling" }'
+payload='{
+  "A": "03. notification lost by throttling"
+}'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
@@ -90,7 +92,9 @@ echo
 
 echo "04. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
-payload='{ "A": "04. notification lost by throttling" }'
+payload='{
+  "A": "04. notification lost by throttling"
+}'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
@@ -100,9 +104,9 @@ echo "05. Wait 8 secs so that the throttling of 8 secs is OK, a little less for 
 echo "======================================================================================================"
 if [ "$VALGRIND" == "" ]
 then
-  sleep 8
+  sleep 8.5
 else
-  sleep 7
+  sleep 7.5
 fi
 echo
 echo
@@ -110,7 +114,9 @@ echo
 
 echo "06. Modify entity s01 w/ attr A w/o tenant - notification NOT lost by throttling"
 echo "================================================================================"
-payload='{ "A": "06. Modification" }'
+payload='{
+  "A": "06. Modification"
+}'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo
@@ -118,7 +124,9 @@ echo
 
 echo "07. Modify entity s01 w/ attr A w/o tenant - notification lost by throttling"
 echo "============================================================================"
-payload='{ "A": "07. notification lost by throttling" }'
+payload='{
+  "A": "07. notification lost by throttling"
+}'
 orionCurl --url '/v2/entities/s01/attrs?options=keyValues' -X PUT --payload "$payload"
 echo
 echo

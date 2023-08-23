@@ -33,8 +33,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // LmtWatchedAttributes
 
-#include "cache/subCache.h"                                    // CachedSubscription, subCacheMatch, tenantMatch
 #include "common/globals.h"                                    // parse8601Time
+#include "common/sem.h"                                        // cacheSemTake, cacheSemGive
+#include "cache/subCache.h"                                    // CachedSubscription, subCacheMatch, tenantMatch
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/dotForEq.h"                           // dotForEq
@@ -1103,10 +1104,10 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
   // Loop over each alteration, and check ALL SUBSCRIPTIONS in the cache for that alteration
   // For each matching subscription, add the alterations into 'matchList'
   //
-  int ix = 0;
+  cacheSemTake(__FUNCTION__, "Looping over sub-cache");
+
   for (OrionldAlteration* altP = alterationList; altP != NULL; altP = altP->next)
   {
-    ++ix;
     for (CachedSubscription* subP = subCacheHeadGet(); subP != NULL; subP = subP->next)
     {
       if ((multitenancy == true) && (tenantMatch(subP->tenant, orionldState.tenantName) == false))
@@ -1179,6 +1180,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       matchList = attributeMatch(matchList, subP, altP, &matches);  // Each call adds to matchList AND matches
     }
   }
+  cacheSemGive(__FUNCTION__, "Looping over sub-cache");
 
   *matchesP = matches;
 

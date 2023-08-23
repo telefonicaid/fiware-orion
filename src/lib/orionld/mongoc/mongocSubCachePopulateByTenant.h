@@ -33,6 +33,6 @@
 //
 // mongocSubCachePopulateByTenant -
 //
-extern bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP);
+extern bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP, bool refresh);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCSUBCACHEPOPULATEBYTENANT_H_

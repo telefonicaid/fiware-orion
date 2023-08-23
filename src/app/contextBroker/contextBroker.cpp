@@ -958,7 +958,7 @@ int main(int argC, char* argV[])
     if (subCacheInterval == 0)
     {
       // Populate subscription cache from database
-      subCacheRefresh();
+      subCacheRefresh(false);
     }
     else
     {

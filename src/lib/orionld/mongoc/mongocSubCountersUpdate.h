@@ -35,6 +35,7 @@
 //
 extern void mongocSubCountersUpdate
 (
+  const char*          tenant,
   CachedSubscription*  cSubP,
   int                  deltaCount,
   double               lastNotificationTime,

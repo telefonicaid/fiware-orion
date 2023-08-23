@@ -1224,7 +1224,7 @@ int main(int argC, char* argV[])
     if (subCacheInterval == 0)
     {
       // Populate subscription cache from database
-      subCacheRefresh();
+      subCacheRefresh(false);
     }
     else
     {
@@ -1327,14 +1327,13 @@ int main(int argC, char* argV[])
 
   if (mongocOnly == true)
   {
-    LM_K(("  Mongo Driver:            mongoc driver"));
+    LM_K(("  Mongo Driver:            mongoc driver- ONLY (MongoDB C++ Legacy Driver is DISABLED)"));
     LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
-    LM_K(("  The MongoDB C++ Legacy Driver is DISABLED - registration requests don't work in this mode"));
   }
   else if (experimental  == true)
   {
-    LM_K(("  Mongo Driver:            mongoc driver"));
-    LM_K(("  MongoC Driver Version:   %s (for all requests but registrations)", MONGOC_VERSION_S));
+    LM_K(("  Mongo Driver:            mongoc driver for NGSI-LD requests, Legacy Mongo C++ Driver for NGSIv1&2"));
+    LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
   }
   else
     LM_K(("  Mongo Driver:            Legacy C++ Driver (deprecated by mongodb)"));

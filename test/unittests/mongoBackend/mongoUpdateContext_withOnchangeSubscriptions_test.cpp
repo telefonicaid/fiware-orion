@@ -289,7 +289,7 @@ static void prepareDatabase(bool useSubCache = true)
   {
     noCache = false;
     subCacheInit();
-    subCacheRefresh();
+    subCacheRefresh(true);
   }
 }
 
@@ -362,7 +362,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void)
 
     /* Given that preparation including csubs, we have to initialize the subscription cache */
     subCacheInit();
-    subCacheRefresh();
+    subCacheRefresh(true);
 }
 
 /* ****************************************************************************

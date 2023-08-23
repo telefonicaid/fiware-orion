@@ -62,6 +62,8 @@ typedef enum TraceLevels
   LmtSubCache = 50,                    // Subscription Cache
   LmtSubCacheMatch,                    // Subscription Cache Matches
   LmtSubCacheDebug,                    // Subscription Cache Debug
+  LmtSubCacheSync,                     // Subscription Cache Refresh
+  LmtSubCacheStats,                    // Errors and timestamps in sub-cache
 
   //
   // Registration Cache
@@ -100,6 +102,8 @@ typedef enum TraceLevels
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
   LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
+  LmtLegacySubMatch,                   // Old code - update/subscription match for subs/notifs
+  LmtLegacySubCacheRefresh,            // Old code - sub-cache-refresh
   LmtMqtt,                             // MQTT notifications
   LmtQ,                                // Query language
   LmtSql,                              // SQL command for TRoE

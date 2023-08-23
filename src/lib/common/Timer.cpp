@@ -26,6 +26,11 @@
 #include <errno.h>                   // errno
 #include <string.h>                  // strerror
 
+extern "C"
+{
+#include "kbase/kTime.h"                             // kTimeGet
+}
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -55,5 +60,11 @@ Timer::~Timer(void)
 */
 double Timer::getCurrentTime(void)
 {
-  return orionldState.requestTime;
+  struct timespec ts;
+
+  kTimeGet(&ts);
+
+  double now = ts.tv_sec + ts.tv_nsec / 1000000000.0;
+
+  return now;
 }
