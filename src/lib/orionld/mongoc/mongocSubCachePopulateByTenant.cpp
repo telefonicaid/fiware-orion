@@ -36,9 +36,9 @@ extern "C"
 #include "orionld/common/subCacheApiSubscriptionInsert.h"        // subCacheApiSubscriptionInsert
 #include "orionld/dbModel/dbModelToApiSubscription.h"            // dbModelToApiSubscription
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_RLOG
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocSubCachePopulateByTenant.h"       // Own interface
 
@@ -81,6 +81,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP, bool refresh)
   // Run the query
   //
   // semTake(&mongoSubscriptionsSem);
+  MONGOC_RLOG("Subscription for sub-cache", tenantP->mongoDbName, "subscriptions", &mongoFilter, LmtMongoc);
   if ((mongoCursorP = mongoc_collection_find_with_opts(subscriptionsP, &mongoFilter, NULL, NULL)) == NULL)
   {
     mongoc_client_pool_push(mongocPool, connectionP);

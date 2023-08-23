@@ -59,9 +59,17 @@ payload='{
       "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7",
       "accept": "application/json"
     }
-  }
+  },
+  "lang": "en"
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "01b. See Sub 1 in mongo"
+echo "======================="
+mongoCmd2 ftest "db.csubs.findOne()"
 echo
 echo
 
@@ -114,7 +122,29 @@ echo "==================="
 payload='{
   "description": "New description",
   "subscriptionName": "New name",
-  "isActive": false
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["P1", "R1"],
+  "q": "a>12",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [ 5,5 ],
+    "georel": "near;maxDistance==100"
+  },
+  "isActive": false,
+  "notification": {
+    "format": "concise",
+    "endpoint": {
+      "uri": "https://httpdump2.app2/dumps2",
+      "accept": "application/json"
+    }
+  },
+  "expiresAt": "2024-06-01T10:00:00.123Z",
+  "throttling": 5.5,
+  "lang": "es"
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1 -X PATCH --payload "$payload"
 echo
@@ -193,10 +223,52 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
 
 
 
+01b. See Sub 1 in mongo
+=======================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:S1",
+	"description" : "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/IndoorEnvironmentObserved",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"lang" : "en",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "keyValues",
+	"reference" : "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+}
+bye
+
+
 02. GET S1 from CB1
 ===================
 HTTP/1.1 200 OK
-Content-Length: 502
+Content-Length: 514
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -211,6 +283,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:Subscription:S1",
     "isActive": true,
+    "lang": "en",
     "modifiedAt": "202REGEX(.*)Z",
     "notification": {
         "endpoint": {
@@ -234,7 +307,7 @@ OK, slept 2.1 seconds
 04. GET S1 from CB2 - must be there
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 502
+Content-Length: 514
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -249,6 +322,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:Subscription:S1",
     "isActive": true,
+    "lang": "en",
     "modifiedAt": "202REGEX(.*)Z",
     "notification": {
         "endpoint": {
@@ -274,7 +348,7 @@ Date: REGEX(.*)
 06. GET Sub 1 from CB1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 466
+Content-Length: 598
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -284,24 +358,37 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
     "description": "New description",
     "entities": [
         {
-            "type": "IndoorEnvironmentObserved"
+            "type": "T"
         }
     ],
+    "expiresAt": "2024-06-01T10:00:00.123Z",
+    "geoQ": {
+        "coordinates": "5,5",
+        "geometry": "Point",
+        "georel": "near;maxDistance==100"
+    },
     "id": "urn:ngsi-ld:Subscription:S1",
     "isActive": false,
+    "lang": "es",
     "modifiedAt": "202REGEX(.*)Z",
     "notification": {
         "endpoint": {
             "accept": "application/json",
-            "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7"
+            "uri": "https://httpdump2.app2/dumps2"
         },
-        "format": "keyValues",
+        "format": "concise",
         "status": "ok"
     },
     "origin": "cache",
+    "q": "a>12",
     "status": "paused",
     "subscriptionName": "New name",
-    "type": "Subscription"
+    "throttling": 5.5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "P1",
+        "R1"
+    ]
 }
 
 
@@ -315,34 +402,40 @@ MongoDB server version: REGEX(.*)
 	"description" : "New description",
 	"entities" : [
 		{
-			"type" : "https://uri.etsi.org/ngsi-ld/default-context/IndoorEnvironmentObserved",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
 			"id" : ".*",
 			"isPattern" : "true",
 			"isTypePattern" : false
 		}
 	],
+	"lang" : "es",
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
-	"throttling" : 0,
+	"throttling" : 5.5,
 	"expression" : {
-		"geometry" : "",
-		"coords" : "",
-		"georel" : "",
 		"geoproperty" : "",
-		"q" : "",
-		"mq" : ""
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/a.value>12",
+		"mq" : "",
+		"geometry" : "point",
+		"coords" : "5,5",
+		"georel" : "near;maxDistance:100"
 	},
-	"format" : "keyValues",
-	"reference" : "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7",
+	"format" : "concise",
+	"reference" : "https://httpdump2.app2/dumps2",
 	"mimeType" : "application/json",
 	"attrs" : [ ],
-	"conditions" : [ ],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R1"
+	],
 	"status" : "inactive",
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-	"name" : "New name"
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/a.value>12",
+	"name" : "New name",
+	"expiration" : 1717236000.123
 }
 bye
 
@@ -355,7 +448,7 @@ OK, slept 2.1 seconds
 08. GET Sub 1 from CB2 - make sure it's identical in CB2
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 466
+Content-Length: 598
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -365,24 +458,40 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
     "description": "New description",
     "entities": [
         {
-            "type": "IndoorEnvironmentObserved"
+            "type": "T"
         }
     ],
+    "expiresAt": "2024-06-01T10:00:00.123Z",
+    "geoQ": {
+        "coordinates": [
+            5,
+            5
+        ],
+        "geometry": "Point",
+        "georel": "near;maxDistance==100"
+    },
     "id": "urn:ngsi-ld:Subscription:S1",
     "isActive": false,
+    "lang": "es",
     "modifiedAt": "202REGEX(.*)Z",
     "notification": {
         "endpoint": {
             "accept": "application/json",
-            "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7"
+            "uri": "https://httpdump2.app2/dumps2"
         },
-        "format": "keyValues",
+        "format": "concise",
         "status": "ok"
     },
     "origin": "cache",
+    "q": "a>12",
     "status": "paused",
     "subscriptionName": "New name",
-    "type": "Subscription"
+    "throttling": 5.5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "P1",
+        "R1"
+    ]
 }
 
 

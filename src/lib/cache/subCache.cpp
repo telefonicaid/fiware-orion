@@ -568,18 +568,12 @@ int subCacheMatch
 
 
 
-/* ****************************************************************************
-*
-* subCacheItemDestroy -
-*/
-void subCacheItemDestroy(CachedSubscription* cSubP)
+// -----------------------------------------------------------------------------
+//
+// subCacheItemStrip -
+//
+void subCacheItemStrip(CachedSubscription* cSubP)
 {
-  if (cSubP->subscriptionId != NULL)
-  {
-    free(cSubP->subscriptionId);
-    cSubP->subscriptionId = NULL;
-  }
-
   if (cSubP->description != NULL)
   {
     free(cSubP->description);
@@ -664,6 +658,23 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
       cSubP->httpInfo.notifierInfo[ix] = NULL;
     }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemDestroy -
+*/
+void subCacheItemDestroy(CachedSubscription* cSubP)
+{
+  if (cSubP->subscriptionId != NULL)
+  {
+    free(cSubP->subscriptionId);
+    cSubP->subscriptionId = NULL;
+  }
+
+  subCacheItemStrip(cSubP);
 
   cSubP->next = NULL;
 }

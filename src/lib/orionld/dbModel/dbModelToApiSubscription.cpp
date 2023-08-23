@@ -208,6 +208,7 @@ KjNode* dbModelToApiSubscription
   KjNode* dbLastFailureP      = kjLookup(dbSubP, "lastFailure");
   KjNode* dbShowChangesP      = kjLookup(dbSubP, "showChanges");
   KjNode* dbSysAttrsP         = kjLookup(dbSubP, "sysAttrs");
+  KjNode* dbLangP             = kjLookup(dbSubP, "lang");
   KjNode* dbCreatedAtP        = NULL;
   KjNode* dbModifiedAtP       = NULL;
 
@@ -276,6 +277,10 @@ KjNode* dbModelToApiSubscription
   // description
   if (dbDescriptionP != NULL)
     kjChildAdd(apiSubP, dbDescriptionP);
+
+  // lang
+  if (dbLangP != NULL)
+    kjChildAdd(apiSubP, dbLangP);
 
 
   //

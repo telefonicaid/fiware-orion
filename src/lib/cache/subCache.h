@@ -102,6 +102,14 @@ void subCacheDisable(void);
 
 
 
+// -----------------------------------------------------------------------------
+//
+// subCacheItemStrip -
+//
+extern void subCacheItemStrip(CachedSubscription* cSubP);
+
+
+
 /* ****************************************************************************
 *
 * subCacheItemDestroy -
