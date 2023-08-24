@@ -104,6 +104,7 @@ bool mongoMultitenant(void)
 */
 void mongoInit
 (
+  const char*  dbURI,
   const char*  dbHost,
   const char*  rplSet,
   std::string  dbName,
@@ -123,7 +124,8 @@ void mongoInit
   // Set the global multitenant variable
   multitenant = mtenant;
 
-  if (orion::mongoConnectionPoolInit(dbHost,
+  if (orion::mongoConnectionPoolInit(dbURI,
+                                     dbHost,
                                      dbName.c_str(),
                                      rplSet,
                                      user,

@@ -32,6 +32,9 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-ipv6** : broker を IPv6 専用モードで実行します。デフォルトでは、broker は IPv4 と IPv6 の両方で動作します。-ipv4 と同時に使用することはできません。
 -   **-multiservice** : マルチサービス/マルチテナントモードを有効にします。[マルチ・テナンシーのセクション](../orion-api.md#multi-tenancy)を参照してください
 -   **-db <db>** : 使用する MogoDB データベース、または (`-multiservice` を使用している場合) サービス単位/テナント単位のデータベースのプレフィックス ([マルチ・テナンシー](../orion-api.md#multi-tenancy)のセクションを参照してください) です。このフィールドは最大10文字までです
+-   **-dbURI <uri>** : 使用する MongoDB を URI で指定します。 
+    URI に文字列 `${PWD}` がある場合は `-dbpwd` または環境変数 `ORION_MONGO_PASSWORD` で指定したパスワードで置き換えられます。
+    このオプションは `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL`, `-dbDisableRetryWrites` と組み合わせできません。（組み合わせた場合、Orion は起動時にエラーで終了します）
 -   **-dbhost <host>** : 使用する MongoDB のホストとポートです。たとえば、`-dbhost localhost:12345` です
 -   **-rplSet <replicat_set>** : 指定すれば、Orion CB が MongoDB レプリカセット (スタンドアロン MongoDB インスタンスではなく) に接続されます。使用するレプリカセットの名前は、パラメータの値です。この場合、-dbhost パラメーターは、レプリカ・セットのシードとして使用されるホスト ("," で区切られた) のリストにすることができます
 -   **-dbTimeout <interval>** : レプリカセット (-rplSet) を使用する場合にのみ使用され、それ以外の場合は無視されます。レプリカセットへの接続のタイムアウトをミリ秒単位で指定します
@@ -139,6 +142,7 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_LOCALIP   |   localIp |
 |   ORION_PORT  |   port    |
 |   ORION_PID_PATH  |   pidpath |
+|	ORION_MONGO_URI	|	dbURI	|
 |   ORION_MONGO_HOST    |   dbhost  |
 |   ORION_MONGO_REPLICA_SET |   rplSet  |
 |   ORION_MONGO_USER    |   dbuser  |

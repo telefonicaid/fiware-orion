@@ -71,6 +71,7 @@ extern bool mongoMultitenant(void);
 */
 void mongoInit
 (
+  const char*  dbURI,
   const char*  dbHost,
   const char*  rplSet,
   std::string  dbName,

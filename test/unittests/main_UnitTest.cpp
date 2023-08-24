@@ -80,6 +80,7 @@ unsigned long logLineMaxSize        = 32 * 1024;
 
 bool          logDeprecate = false;
 
+char          dbURI[1024];
 char          dbHost[256];
 char          rplSet[64];
 char          dbName[64];
@@ -107,6 +108,7 @@ unsigned long   fcMaxInterval  = 0;
 */
 PaArgument paArgs[] =
 {
+  { "-dbURI",          dbURI,         "DB_URI",         PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbhost",         dbHost,        "DB_HOST",        PaString, PaOpt, (int64_t) "localhost",  PaNL, PaNL,  "" },
   { "-rplSet",         rplSet,        "RPL_SET",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
   { "-dbuser",         user,          "DB_USER",        PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
@@ -158,7 +160,7 @@ int main(int argC, char** argV)
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
   // Note that disableRetryTries, multitenancy and mutex time stats are disabled for unit test mongo init
-  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, false, dbTimeout, writeConcern, dbPoolSize, false);
+  mongoInit(dbURI, dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, false, dbTimeout, writeConcern, dbPoolSize, false);
   alarmMgr.init(false);
   logSummaryInit(&lsPeriod);
   // setupDatabase(); FIXME #3775: pending on mongo unit test re-enabling
