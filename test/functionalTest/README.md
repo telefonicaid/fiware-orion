@@ -50,10 +50,15 @@ You can use the following Dockerfile to build the accumulator:
 ```
 FROM debian:stable
 RUN apt-get update -y
-RUN apt-get install -y python3
-RUN apt-get install -y python3-pip
-RUN pip install Flask==2.0.2
-RUN pip install paho-mqtt==1.6.1
+RUN apt-get install -y python3 python3-venv python3-pip
+
+# Create a virtual environment
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+# Install required packages within the virtual environment
+RUN pip install Flask==2.0.2 paho-mqtt==1.6.1
+
 COPY . /app
 WORKDIR /app
 ENTRYPOINT [ "python3", "./accumulator-server.py"]
