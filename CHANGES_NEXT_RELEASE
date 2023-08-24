@@ -1,4 +1,4 @@
 - Add: servicePath field to builtin attributes (#2877)
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
 - Fix: improve error traces (#4387)
-- Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
+- Add: CLI parameter -dbURI / env var ORION_MONGO_URI (#3794)
