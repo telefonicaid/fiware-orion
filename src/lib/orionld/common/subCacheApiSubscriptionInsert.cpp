@@ -57,7 +57,7 @@ extern "C"
 //
 // subCacheItemFill -
 //
-static CachedSubscription* subCacheItemFill
+static void subCacheItemFill
 (
   CachedSubscription*  cSubP,
   KjNode*              apiSubscriptionP,
@@ -309,7 +309,8 @@ static CachedSubscription* subCacheItemFill
         if (mqttParse(url, &mqtts, &mqttUser, &mqttPassword, &mqttHost, &mqttPort, &mqttTopic, &detail) == false)
         {
           LM_E(("Internal Error (unable to parse mqtt URL)"));
-          return NULL;
+          cSubP->isActive = false;
+          return;
         }
 
         if (mqttUser     != NULL) strncpy(cSubP->httpInfo.mqtt.username, mqttUser,     sizeof(cSubP->httpInfo.mqtt.username) - 1);
@@ -385,10 +386,6 @@ static CachedSubscription* subCacheItemFill
 
   if (geoCoordinatesP != NULL)
     cSubP->geoCoordinatesP = kjClone(NULL, geoCoordinatesP);
-
-  subCacheItemInsert(cSubP);
-
-  return cSubP;
 }
 
 
@@ -411,7 +408,9 @@ static CachedSubscription* subCacheApiSubscriptionCreate
 {
   CachedSubscription* cSubP = new CachedSubscription();
 
-  return subCacheItemFill(cSubP, apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
+  subCacheItemFill(cSubP, apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
+  subCacheItemInsert(cSubP);
+  return cSubP;
 }
 
 
@@ -459,10 +458,12 @@ static CachedSubscription* subCacheApiSubscriptionUpdate
     cSubP->modifiedAt = modifiedAtNode->value.f;  // The new value is in the DB
   }
 
-  cSubP->count      = 0;                        // Not sure ... count+dbCount ...
+  cSubP->count = 0;
 
   subCacheItemStrip(cSubP);
-  return subCacheItemFill(cSubP, apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
+  subCacheItemFill(cSubP, apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
+
+  return cSubP;
 }
 
 
@@ -491,12 +492,12 @@ CachedSubscription* subCacheApiSubscriptionInsert
   if (subIdNodeP == NULL)
   {
     kjTreeLog(apiSubscriptionP, "apiSubscriptionP", LmtSubCacheSync);
-    LM_X(1, ("Subscription without id - exiting dur to bug"));
+    LM_X(1, ("Subscription without id - exiting due to bug"));
   }
 
-  char* subId = subIdNodeP->value.s;
+  char*               subId = subIdNodeP->value.s;
+  CachedSubscription* subP  = subCacheItemLookup(tenant, subId);
 
-  CachedSubscription* subP = subCacheItemLookup(tenant, subId);
   if (subP == NULL)
     return subCacheApiSubscriptionCreate(apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);
 
