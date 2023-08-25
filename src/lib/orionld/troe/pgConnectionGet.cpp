@@ -63,7 +63,7 @@ static char* wsTrim(char* s)
 //
 PgConnection* pgConnectionGet(const char* db)
 {
-  char* _db = (char*) db;
+  char* _db = (char*)db;
 
   //
   // Empty tenant => use default db name
@@ -99,6 +99,28 @@ PgConnection* pgConnectionGet(const char* db)
 
     if (cP->connectionP != NULL)
     {
+      // check if we are still connected
+      ConnStatusType pgStatus = PQstatus(cP->connectionP);
+      if (pgStatus != CONNECTION_OK)
+      {
+        LM_W(("Connection of item %d is lost, trying to re-connect...", ix));
+        // try to re-connect
+        PQreset(cP->connectionP);
+        // get status again
+        pgStatus = PQstatus(cP->connectionP);
+
+        // if still no connection
+        if (pgStatus != CONNECTION_OK)
+        {
+          // we free this pointer that it can be used in the next call of pgConnectionGet
+          free(poolP->connectionV[ix]);
+          poolP->connectionV[ix] = NULL;
+          LM_W(("Connection failed, pointer of item %d was re-set to NULL (%p)", ix, poolP->connectionV[ix]));
+          // this time no success finding a connection that is working, try in the next loop
+          continue;
+        }
+      }
+
       // Great - found a free and already connected item - let's use it !
       cP->busy = true;
 
@@ -123,7 +145,7 @@ PgConnection* pgConnectionGet(const char* db)
       // Pity doing this with the semaphore taken ...
       // But, there's no other choice as the slot must be marked as 'busy' before the sem can be released
       //
-      poolP->connectionV[ix] = (PgConnection*) calloc(1, sizeof(PgConnection));
+      poolP->connectionV[ix] = (PgConnection*)calloc(1, sizeof(PgConnection));
       if (poolP->connectionV[ix] == NULL)
       {
         sem_post(&poolP->poolSem);
@@ -163,8 +185,36 @@ PgConnection* pgConnectionGet(const char* db)
     cP->connectionP = pgConnect(_db);
     if (cP->connectionP == NULL)
     {
+      char* errMsg = PQerrorMessage(cP->connectionP);
       cP->busy = false;  // So the slot can be used again!
-      LM_RE(NULL, ("Database Error (unable to connect to postgres(%s))", _db));
+      LM_RE(NULL, ("Database Error (unable to connect to postgres(%s)): %s", _db, errMsg));
+    }
+    else
+    {
+      // check if we are connected
+      ConnStatusType pgStatus = PQstatus(cP->connectionP);
+      if (pgStatus != CONNECTION_OK)
+      {
+        sem_wait(&poolP->poolSem);
+        sem_wait(&poolP->queueSem);
+
+        // find the connection pointer in the pool and free it
+        for (int ix = 0; ix < poolP->items; ix++)
+        {
+          if (poolP->connectionV[ix] == cP)
+          {
+            free(poolP->connectionV[ix]);
+            poolP->connectionV[ix] = NULL;
+            break;
+          }
+        }
+        sem_post(&poolP->poolSem);
+        sem_post(&poolP->queueSem);
+
+        // get PG error message for log file
+        char* errMsg = PQerrorMessage(cP->connectionP);
+        LM_RE(NULL, ("Database Connection could not be established (%s): %s ", _db, errMsg));
+      }
     }
   }
 
