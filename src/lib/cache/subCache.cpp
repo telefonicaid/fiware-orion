@@ -574,6 +574,12 @@ int subCacheMatch
 //
 void subCacheItemStrip(CachedSubscription* cSubP)
 {
+  if (cSubP->subscriptionId != NULL)
+  {
+    free(cSubP->subscriptionId);
+    cSubP->subscriptionId = NULL;
+  }
+
   if (cSubP->description != NULL)
   {
     free(cSubP->description);
@@ -668,12 +674,6 @@ void subCacheItemStrip(CachedSubscription* cSubP)
 */
 void subCacheItemDestroy(CachedSubscription* cSubP)
 {
-  if (cSubP->subscriptionId != NULL)
-  {
-    free(cSubP->subscriptionId);
-    cSubP->subscriptionId = NULL;
-  }
-
   subCacheItemStrip(cSubP);
 
   cSubP->next = NULL;
@@ -746,9 +746,7 @@ CachedSubscription* subCacheItemLookup(const char* tenant, const char* subscript
   while (cSubP != NULL)
   {
     if ((tenantMatch(tenant, cSubP->tenant)) && (strcmp(subscriptionId, cSubP->subscriptionId) == 0))
-    {
       return cSubP;
-    }
 
     cSubP = cSubP->next;
   }

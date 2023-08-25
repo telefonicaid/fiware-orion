@@ -97,7 +97,7 @@ typedef enum TraceLevels
   //
   // Misc
   //
-  LmtMongoc = 240,                     // Entire mongoc library
+  LmtMongoc = 230,                     // Entire mongoc library
   LmtSR,                               // Service Routine (whatever it is doing)
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
@@ -109,6 +109,7 @@ typedef enum TraceLevels
   LmtSql,                              // SQL command for TRoE
   LmtPgPool,                           // Postgres Connection Pool
   LmtSocketService,                    // Socket Service
+
   LmtCurl    = 250,                    // CURL library
   LmtToDo,                             // To Do list
   LmtPatchEntity,                      // Real merge+patch
