@@ -25,7 +25,7 @@ Pernot Subscription - periodic notifications
 
 --SHELL-INIT--
 dbInit CB
-orionldStart CB -pernot -experimental
+orionldStart CB -pernot -experimental -subCacheFlushIval 3 
 
 --SHELL--
 
@@ -39,9 +39,11 @@ orionldStart CB -pernot -experimental
 # 07. See urn:S1 in the database
 # 08. GET urn:S1 from cache
 # 09. GET urn:S1 from database
-# 10. Restart broker
-# 11. GET urn:S1 from cache
-# 12. GET urn:S1 from database
+# 10. Sleep 3 secs to make sure the broker flushes the subs in cache to DB (counters and timestamps, as nothing else is changed)
+# 11. See urn:S1 in database - check "noMatch == 2"
+# 12. Restart broker
+# 13. GET urn:S1 from cache (noMatch==3 due to initial attempt after restart)
+# 14. GET urn:S1 from database
 #
 
 echo "01. Attempt to create a subscription with timeInterval AND watchedAttributes - see 400"
@@ -166,7 +168,6 @@ echo
 echo
 
 
-
 echo "06. Attempt to PATCH a pernot subscription"
 echo "=========================================="
 payload='{
@@ -197,8 +198,41 @@ orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1?options=fromDb
 echo
 echo
 
-# To see traces from the pernot loop in t he logfile
-#sleep 4  
+echo '10. Sleep 3 secs to make sure the broker flushes the subs in cache to DB (counters and timestamps)'
+echo '=================================================================================================='
+sleep 3
+echo
+echo
+
+
+echo '11. See urn:S1 in database - check "noMatch == 2"'
+echo '================================================='
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "12. Restart broker"
+echo "=================="
+brokerStop CB
+orionldStart CB -pernot -experimental
+echo "Broker restarted"
+echo
+echo
+
+
+echo "13. GET urn:S1 from cache (noMatch==3 due to initial attempt after restart)"
+echo "==========================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
+echo
+echo
+
+
+echo "14. GET urn:S1 from database"
+echo "============================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1?options=fromDb
+echo
+echo
 
 
 --REGEXPECT--
@@ -337,7 +371,7 @@ bye
 08. GET urn:S1 from cache
 =========================
 HTTP/1.1 200 OK
-Content-Length: 598
+Content-Length: 569
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -368,7 +402,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         },
         "format": "normalized",
         "lastNotification": "202REGEX(.*)Z",
-        "lastSuccess": "202REGEX(.*)Z",
+        "noMatch": 1,
         "status": "ok",
         "timesSent": 1
     },
@@ -384,7 +418,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 09. GET urn:S1 from database
 ============================
 HTTP/1.1 200 OK
-Content-Length: 601
+Content-Length: 572
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -415,9 +449,168 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         },
         "format": "normalized",
         "lastNotification": "202REGEX(.*)Z",
-        "lastSuccess": "202REGEX(.*)Z",
+        "noMatch": 1,
         "status": "ok",
         "timesSent": 1
+    },
+    "origin": "database",
+    "q": "(a>5;b<9)|a<4",
+    "status": "active",
+    "subscriptionName": "S1",
+    "timeInterval": 2,
+    "type": "Subscription"
+}
+
+
+10. Sleep 3 secs to make sure the broker flushes the subs in cache to DB (counters and timestamps)
+==================================================================================================
+
+
+11. See urn:S1 in database - check "noMatch == 2"
+=================================================
+MongoDB shell version v4.4.23
+connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
+MongoDB server version: 4.4.22
+{
+	"_id" : "urn:S1",
+	"description" : "Test Subscription No 1",
+	"name" : "S1",
+	"entities" : [
+		{
+			"id" : "urn:E1",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		},
+		{
+			"id" : "urn:E.*",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"ldQ" : "(https://uri=etsi=org/ngsi-ld/default-context/a.value>5;https://uri=etsi=org/ngsi-ld/default-context/b.value<9)|https://uri=etsi=org/ngsi-ld/default-context/a.value<4",
+	"timeInterval" : 2,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
+	},
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"lastNotification" : REGEX(.*),
+	"noMatch" : 2,
+	"count" : 2
+}
+bye
+
+
+12. Restart broker
+==================
+Broker restarted
+
+
+13. GET urn:S1 from cache (noMatch==3 due to initial attempt after restart)
+=========================
+HTTP/1.1 200 OK
+Content-Length: 705
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Test Subscription No 1",
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        },
+        {
+            "idPattern": "urn:E.*",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "notification": {
+        "attributes": [
+            "P1",
+            "P2"
+        ],
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "noMatch": 3,
+        "status": "ok",
+        "timesSent": 3
+    },
+    "origin": "cache",
+    "q": "(a>5;b<9)|a<4",
+    "status": "active",
+    "subscriptionName": "S1",
+    "timeInterval": 2,
+    "type": "Subscription"
+}
+
+
+14. GET urn:S1 from database
+============================
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "description": "Test Subscription No 1",
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        },
+        {
+            "idPattern": "urn:E.*",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "notification": {
+        "attributes": [
+            "P1",
+            "P2"
+        ],
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "noMatch": 3,
+        "status": "ok",
+        "timesSent": 3
     },
     "origin": "database",
     "q": "(a>5;b<9)|a<4",

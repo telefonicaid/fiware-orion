@@ -167,9 +167,9 @@ KjNode* kjTreeFromPernotSubscription(PernotSubscription* pSubP, bool sysAttrs, b
   kjChildAdd(notificationP, notificationStatusP);
 
   // 4. counters and timestamps
-  counterAdd(notificationP,   "timesSent",        pSubP->dbNotificationAttempts + pSubP->notificationAttempts);
-  counterAdd(notificationP,   "timesFailed",      pSubP->dbNotificationErrors + pSubP->notificationErrors);
-  timestampAdd(notificationP, "lastNotification", pSubP->lastNotificationAttempt);
+  counterAdd(notificationP,   "timesSent",        pSubP->notificationAttemptsDb + pSubP->notificationAttempts);
+  counterAdd(notificationP,   "timesFailed",      pSubP->notificationErrorsDb + pSubP->notificationErrors);
+  timestampAdd(notificationP, "lastNotification", pSubP->lastNotificationTime);
   timestampAdd(notificationP, "lastSuccess",      pSubP->lastSuccessTime);
   timestampAdd(notificationP, "lastFailure",      pSubP->lastFailureTime);
 
@@ -202,10 +202,12 @@ KjNode* kjTreeFromPernotSubscription(PernotSubscription* pSubP, bool sysAttrs, b
   KjNode* qP = kjLookup(sP, "q");
   if (qP != NULL)
   {
-    LM_T(LmtPernot, ("Found 'q' - fixing it", qP->value.s));
+    LM_T(LmtPernot, ("Found 'q' (%s)- fixing it", qP->value.s));
     dbModelValueStrip(qP);
+    LM_T(LmtPernot, ("'q' after dbModelValueStrip: '%s'", qP->value.s));
     qAliasCompact(qP, true);  // qAliasCompact uses orionldState.contextP - which is what we want
     qP->name = (char*) "q";
+    LM_T(LmtPernot, ("'q' final: '%s'", qP->value.s));
   }
   else
     LM_T(LmtPernot, ("No 'q'"));

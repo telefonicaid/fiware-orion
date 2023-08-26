@@ -609,7 +609,7 @@ Date: REGEX(.*)
 12. GET the subscription via REST - make sure lastFailure is present and has milliseconds
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 820
+Content-Length: 836
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -639,6 +639,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "lastNotification": "REGEX(.*\.\d\d\dZ)",
         "lastSuccess": "REGEX(.*\.\d\d\dZ)",
         "status": "failed",
+        "timesFailed": 1,
         "timesSent": 3
     },
     "origin": "cache",

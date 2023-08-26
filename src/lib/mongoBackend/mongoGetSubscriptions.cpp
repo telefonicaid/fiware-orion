@@ -177,12 +177,12 @@ static void extractNotification(Subscription* subP, const BSONObj* rP, OrionldTe
 
   ngsiv2::Notification* nP = &subP->notification;
 
-  subP->throttling      = rP->hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(rP, CSUB_THROTTLING)       : -1;
-  nP->lastNotification  = rP->hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(rP, CSUB_LASTNOTIFICATION) : -1;
-  nP->timesSent         = rP->hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(rP, CSUB_COUNT)           : 0;
-  nP->blacklist         = rP->hasField(CSUB_BLACKLIST)?        getBoolFieldF(rP, CSUB_BLACKLIST)                  : false;
-  nP->lastFailure       = rP->hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(rP, CSUB_LASTFAILURE)      : -1;
-  nP->lastSuccess       = rP->hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(rP, CSUB_LASTSUCCESS)      : -1;
+  subP->throttling      = rP->hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(rP, CSUB_THROTTLING, true)       : -1;
+  nP->lastNotification  = rP->hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(rP, CSUB_LASTNOTIFICATION, true) : -1;
+  nP->timesSent         = rP->hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(rP, CSUB_COUNT)                 : 0;
+  nP->blacklist         = rP->hasField(CSUB_BLACKLIST)?        getBoolFieldF(rP, CSUB_BLACKLIST)                        : false;
+  nP->lastFailure       = rP->hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(rP, CSUB_LASTFAILURE, true)      : -1;
+  nP->lastSuccess       = rP->hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(rP, CSUB_LASTSUCCESS, true)      : -1;
 
   // Attributes format
   subP->attrsFormat = rP->hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(rP, CSUB_FORMAT)) : RF_LEGACY;
@@ -222,7 +222,7 @@ static void extractNotification(Subscription* subP, const BSONObj* rP, OrionldTe
 */
 static void extractStatus(Subscription* s, const BSONObj& r)
 {
-  s->expires = r.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(&r, CSUB_EXPIRATION) : -1;
+  s->expires = r.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(&r, CSUB_EXPIRATION, true) : -1;
 
   //
   // Status

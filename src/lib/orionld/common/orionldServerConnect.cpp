@@ -39,7 +39,7 @@
 //
 // orionldServerConnect -
 //
-int orionldServerConnect(char* ip, uint16_t portNo)
+int orionldServerConnect(const char* ip, uint16_t portNo)
 {
   int                 fd;
   struct hostent*     heP;

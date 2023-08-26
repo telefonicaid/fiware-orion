@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPNOTIFY_H_
-#define SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPNOTIFY_H_
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSEND_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTSEND_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,28 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include <sys/uio.h>                                             // iovec
+extern "C"
+{
+#include "kjson/KjNode.h"                                   // KjNode
+}
 
-#include "cache/CachedSubscription.h"                            // CachedSubscription
-#include "orionld/pernot/PernotSubscription.h"                   // PernotSubscription
+#include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// httpNotify - send a notification over http
+// pernotSend -
 //
-extern int httpNotify
-(
-  CachedSubscription*  cSubP,
-  PernotSubscription*  pSubP,
-  const char*          subscriptionId,
-  const char*          ip,
-  unsigned short       port,
-  const	char* 	       path,
-  struct iovec*        ioVec,
-  int                  ioVecLen,
-  double               notificationTime
-);
+extern bool pernotSend(PernotSubscription* subP, KjNode* entityArray);
 
-#endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPNOTIFY_H_
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSEND_H_

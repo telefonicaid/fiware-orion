@@ -110,7 +110,6 @@ size_t            hostHeaderLen;
 PernotSubCache    pernotSubCache;
 
 
-
 //
 // Variables for Mongo C Driver
 //

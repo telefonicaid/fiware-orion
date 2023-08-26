@@ -187,7 +187,7 @@ echo
 
 echo "14. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5"
 echo "============================================================================"
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1?options=fromDb
 echo
 echo
 
@@ -225,7 +225,7 @@ echo
 
 echo "18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==7"
 echo "============================================================================"
-orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1?options=fromDb
 echo
 echo
 

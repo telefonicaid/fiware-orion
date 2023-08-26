@@ -688,7 +688,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
   /* 4. Add creation date */
   if (attr.hasField(ENT_ATTRS_CREATION_DATE))
   {
-    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldAsDoubleF(&attr, ENT_ATTRS_CREATION_DATE));
+    ab.append(ENT_ATTRS_CREATION_DATE, getNumberFieldAsDoubleF(&attr, ENT_ATTRS_CREATION_DATE, false));
   }
 
   /* Was it an actual update? */
@@ -774,7 +774,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldAsDoubleF(&attr, ENT_ATTRS_MODIFICATION_DATE));
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, getNumberFieldAsDoubleF(&attr, ENT_ATTRS_MODIFICATION_DATE, false));
     }
   }
 
@@ -1676,8 +1676,8 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      double            throttling         = getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING);
-      double            lastNotification   = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION);
+      double            throttling         = getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING, true);
+      double            lastNotification   = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION, true);
       const char*       renderFmt          = getStringFieldF(&sub, CSUB_FORMAT);
       const char*       renderFormatString = (renderFmt[0] == 0)? "legacy" : renderFmt;
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
@@ -3538,8 +3538,8 @@ static void updateEntity
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
-  notifyCerP->contextElement.entityId.creDate = getNumberFieldAsDoubleF(bobP, ENT_CREATION_DATE);
-  notifyCerP->contextElement.entityId.modDate = getNumberFieldAsDoubleF(bobP, ENT_MODIFICATION_DATE);
+  notifyCerP->contextElement.entityId.creDate = getNumberFieldAsDoubleF(bobP, ENT_CREATION_DATE, false);
+  notifyCerP->contextElement.entityId.modDate = getNumberFieldAsDoubleF(bobP, ENT_MODIFICATION_DATE, false);
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification

@@ -32,31 +32,9 @@
 
 // -----------------------------------------------------------------------------
 //
-// pernotSubCacheAdd -
-//
-PernotSubscription* pernotSubCacheAdd
-(
-  const char*      subscriptionId,
-  KjNode*          subP,
-  QNode*           qTree,
-  KjNode*          geoCoordinatesP,
-  OrionldContext*  contextP,
-  const char*      tenant,
-  KjNode*          showChangesP,
-  KjNode*          sysAttrsP,
-  RenderFormat     renderFormat
-)
-{
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // pernotSubCacheRemove -
 //
-bool pernotSubCacheRemove(PernotSubCache* pSubP)
+bool pernotSubCacheRemove(PernotSubscription* pSubP)
 {
   return true;
 }

@@ -51,6 +51,7 @@ extern "C"
 #include "orionld/types/OrionldTenant.h"                    // OrionldTenant
 #include "orionld/common/orionldState.h"                    // orionldState
 #include "orionld/common/tenantList.h"                      // tenantList
+#include "orionld/common/orionldTenantLookup.h"             // orionldTenantLookup
 #include "orionld/common/urlParse.h"                        // urlParse
 #include "orionld/q/qBuild.h"                               // qBuild
 #include "orionld/q/qRelease.h"                             // qRelease
@@ -872,6 +873,7 @@ bool subCacheItemInsert
   // First the non-complex values
   //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->tenantP               = orionldTenantLookup(tenant);
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -1396,7 +1398,16 @@ void subCacheSync(void)
     if (cssP != NULL)
     {
       if (experimental == true)
-        mongocSubCountersUpdate(cSubP, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->lastSuccess, false, cssP->ngsild);
+        mongocSubCountersUpdate(cSubP->tenantP,
+                                cSubP->subscriptionId,
+                                cssP->ngsild,
+                                cssP->count,
+                                0,  // failures - fix!
+                                0,  // noMatch - only for PerNot
+                                cssP->lastNotificationTime,
+                                cssP->lastSuccess,
+                                cssP->lastFailure,
+                                false);
       else
       {
         std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;  // Use char* !!!
@@ -1480,6 +1491,7 @@ void subCacheStart(void)
     LM_E(("Runtime Error (error creating thread: %d)", ret));
     return;
   }
+
   pthread_detach(tid);
 }
 

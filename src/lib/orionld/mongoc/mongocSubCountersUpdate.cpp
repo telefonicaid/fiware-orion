@@ -27,9 +27,11 @@
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "cache/subCache.h"                                      // CachedSubscription
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/mongoc/mongocSubCountersUpdate.h"              // Own interface
 
 
@@ -57,52 +59,66 @@
 //
 void mongocSubCountersUpdate
 (
-  CachedSubscription*  cSubP,
-  int                  deltaCount,
+  OrionldTenant*       tenantP,
+  const char*          subscriptionId,
+  bool                 ngsild,
+  int32_t              deltaAttempts,
+  int32_t              deltaFailures,
+  int32_t              deltaNoMatch,
   double               lastNotificationTime,
-  double               lastFailure,
   double               lastSuccess,
-  bool                 forcedToPause,
-  bool                 ngsild
+  double               lastFailure,
+  bool                 forcedToPause
 )
 {
-  OrionldTenant*        tenantP        = (cSubP->tenant == NULL)? &tenant0 : orionldTenantLookup(cSubP->tenant);
+  if (tenantP == NULL)
+    tenantP = &tenant0;
+
   mongoc_client_t*      connectionP    = mongoc_client_pool_pop(mongocPool);
   mongoc_collection_t*  subscriptionsP = mongoc_client_get_collection(connectionP, tenantP->mongoDbName, "csubs");
 
   bson_t  request;    // Entire request with count and timestamps to be updated
   bson_t  reply;
-  bson_t  count;
-  bson_t  max;
   bson_t  selector;
+  bson_t  max;
+  bson_t  inc;
 
   bson_init(&reply);
   bson_init(&selector);
-  bson_init(&count);
+  bson_init(&inc);
   bson_init(&max);
   bson_init(&request);
 
   // Selector - The _id is an OID if not NGSI-LD
-  if (cSubP->ldContext != "")
-    bson_append_utf8(&selector, "_id", 3, cSubP->subscriptionId, -1);
+  if (ngsild == true)
+    bson_append_utf8(&selector, "_id", 3, subscriptionId, -1);
   else
   {
     bson_oid_t oid;
-    bson_oid_init_from_string(&oid, cSubP->subscriptionId);
+    bson_oid_init_from_string(&oid, subscriptionId);
     bson_append_oid(&selector, "_id", 3, &oid);
   }
 
-  // Count
-  if (deltaCount > 0)
-    bson_append_int64(&count, "count", 5, deltaCount);
+  // Attempts (timesSent)
+  if (deltaAttempts > 0)
+    bson_append_int32(&inc, "count", 9, deltaAttempts);
+
+  // deltaFailures (timesFailed)
+  if (deltaFailures > 0)
+    bson_append_int32(&inc, "timesFailed", 11, deltaFailures);
+
+  // deltaNoMatch (noMatch)
+  if (deltaNoMatch > 0)
+    bson_append_int32(&inc, "noMatch", 7, deltaNoMatch);
+
+  if (deltaAttempts + deltaFailures + deltaNoMatch > 0)
+    bson_append_document(&request, "$inc", 4, &inc);
+
 
   // Timestamps
   if (lastNotificationTime > 0) bson_append_double(&max, "lastNotification", 16, lastNotificationTime);
   if (lastSuccess          > 0) bson_append_double(&max, "lastSuccess",      11, lastSuccess);
   if (lastFailure          > 0) bson_append_double(&max, "lastFailure",      11, lastFailure);
-
-  if (deltaCount > 0)
-    bson_append_document(&request, "$inc", 4, &count);
 
   if (forcedToPause == true)
   {
@@ -119,14 +135,14 @@ void mongocSubCountersUpdate
   bool          b = mongoc_collection_update_one(subscriptionsP, &selector, &request, NULL, &reply, &bError);
 
   if (b == false)
-    LM_E(("SUBC: mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", cSubP->subscriptionId, bError.domain, bError.code, bError.message));
+    LM_E(("SUBC: mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", subscriptionId, bError.domain, bError.code, bError.message));
 
   mongoc_client_pool_push(mongocPool, connectionP);
   mongoc_collection_destroy(subscriptionsP);
 
   bson_destroy(&reply);
   bson_destroy(&selector);
-  bson_destroy(&count);
+  bson_destroy(&inc);
   bson_destroy(&max);
   bson_destroy(&request);
 }

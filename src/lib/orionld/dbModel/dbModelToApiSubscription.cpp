@@ -185,7 +185,6 @@ KjNode* dbModelToApiSubscription
   double*        timeIntervalP
 )
 {
-  LM_T(LmtSR, ("Here"));
   KjNode* dbSubIdP            = kjLookup(dbSubP, "_id");         DB_ITEM_NOT_FOUND(dbSubIdP, "id",          tenant);
   KjNode* dbNameP             = kjLookup(dbSubP, "name");
   KjNode* dbDescriptionP      = kjLookup(dbSubP, "description");
@@ -205,6 +204,8 @@ KjNode* dbModelToApiSubscription
   KjNode* dbExpirationP       = kjLookup(dbSubP, "expiration");
   KjNode* dbLdContextP        = kjLookup(dbSubP, "ldContext");
   KjNode* dbCountP            = kjLookup(dbSubP, "count");
+  KjNode* timesFailedP        = kjLookup(dbSubP, "timesFailed");
+  KjNode* noMatchP            = kjLookup(dbSubP, "noMatch");
   KjNode* dbLastNotificationP = kjLookup(dbSubP, "lastNotification");
   KjNode* dbLastSuccessP      = kjLookup(dbSubP, "lastSuccess");
   KjNode* dbLastFailureP      = kjLookup(dbSubP, "lastFailure");
@@ -489,7 +490,37 @@ KjNode* dbModelToApiSubscription
 
   kjChildAdd(notificationP, nStatusNodeP);
 
+  // lastNotification
+  if (dbLastNotificationP != NULL)
+    kjChildAdd(notificationP, dbLastNotificationP);
 
+  // lastSuccess
+  if (dbLastSuccessP != NULL)
+    kjChildAdd(notificationP, dbLastSuccessP);
+
+  // lastFailure
+  if (dbLastFailureP != NULL)
+    kjChildAdd(notificationP, dbLastFailureP);
+
+  // timesSent
+  if (dbCountP != NULL)
+  {
+    dbCountP->name = (char*) "timesSent";
+    kjChildAdd(notificationP, dbCountP);
+  }
+
+  // timesFailed
+  if (timesFailedP != NULL)
+    kjChildAdd(notificationP, timesFailedP);
+
+  // noMatch
+  if (noMatchP != NULL)
+    kjChildAdd(notificationP, noMatchP);
+
+  // Add "notification" to top level
+  kjChildAdd(apiSubP, notificationP);
+
+  
   if (dbReferenceP != NULL)
   {
     kjChildAdd(endpointP, dbReferenceP);
@@ -502,7 +533,6 @@ KjNode* dbModelToApiSubscription
     dbMimeTypeP->name = (char*) "accept";
   }
 
-  kjChildAdd(apiSubP, notificationP);
 
 
   //
@@ -647,21 +677,6 @@ KjNode* dbModelToApiSubscription
     dbLdContextP->name = (char*) "jsonldContext";
   }
 
-  // count - take sub-cache delta into consideration
-  if (dbCountP != NULL)
-    kjChildAdd(apiSubP, dbCountP);
-
-  // lastNotification - take from sub-cache
-  if (dbLastNotificationP != NULL)
-    kjChildAdd(apiSubP, dbLastNotificationP);
-
-  // lastSuccess - take from sub-cache
-  if (dbLastSuccessP != NULL)
-    kjChildAdd(apiSubP, dbLastSuccessP);
-
-  // lastFailure - take from sub-cache
-  if (dbLastFailureP != NULL)
-    kjChildAdd(apiSubP, dbLastFailureP);
 
   if (qNodePP != NULL)  // FIXME: This is more than a bit weird ...
     *qNodePP = NULL;

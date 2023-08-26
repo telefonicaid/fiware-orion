@@ -35,21 +35,11 @@ extern "C"
 #include "logMsg/logMsg.h"                                  // LM_x
 
 #include "orionld/common/orionldState.h"                    // orionldState, pernotSubCache
+#include "orionld/mongoc/mongocSubCountersUpdate.h"         // mongocSubCountersUpdate
 #include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
 #include "orionld/pernot/PernotSubCache.h"                  // PernotSubCache
 #include "orionld/pernot/pernotTreat.h"                     // pernotTreat
 #include "orionld/pernot/pernotLoop.h"                      // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pernotSubInsert - move to pernot/pernotSubInsert.h/cpp
-//
-bool pernotSubInsert(void)
-{
-  return true;
-}
 
 
 
@@ -72,23 +62,75 @@ double currentTime(void)
 
 // -----------------------------------------------------------------------------
 //
+// pernotSubCacheFlushToDb -
+//
+void pernotSubCacheFlushToDb(void)
+{
+  for (PernotSubscription* subP = pernotSubCache.head; subP != NULL; subP = subP->next)
+  {
+    if (subP->dirty == false)
+      continue;
+
+    LM_T(LmtPernotFlush, ("%s: flushing to db (noMatch=%d, notificationAttempts=%d)", subP->subscriptionId, subP->noMatch, subP->notificationAttempts));
+    mongocSubCountersUpdate(subP->tenantP,
+                            subP->subscriptionId,
+                            true,
+                            subP->notificationAttempts,
+                            subP->notificationErrors,
+                            subP->noMatch,
+                            subP->lastNotificationTime,
+                            subP->lastSuccessTime,
+                            subP->lastFailureTime,
+                            false);
+
+    // Reset counters
+    subP->dirty                   = 0;
+    subP->notificationAttemptsDb += subP->notificationAttempts;
+    subP->notificationAttempts    = 0;
+    subP->notificationErrorsDb   += subP->notificationErrors;
+    subP->notificationErrors      = 0;
+    subP->noMatchDb              += subP->noMatch;
+    subP->noMatch                 = 0;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pernotSubCacheRefresh -
+//
+void pernotSubCacheRefresh(void)
+{
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pernotLoop -
 //
 static void* pernotLoop(void* vP)
 {
+  double       nextFlushAt             = currentTime() + subCacheFlushInterval;
+  double       nextCacheRefreshAt      = currentTime() + subCacheInterval;
+  double       now                     = 0;
+
   while (1)
   {
-    double minDiff;
-
-    minDiff = 1;  // Initialize with 1 second, which is the MAX sleep period
-
     for (PernotSubscription* subP = pernotSubCache.head; subP != NULL; subP = subP->next)
     {
-      double now = currentTime();
+      now = currentTime();
 
       if (subP->state == SubPaused)
       {
-        LM_T(LmtPernot, ("%s: Paused", subP->subscriptionId));
+        LM_T(LmtPernotLoop, ("%s: Paused", subP->subscriptionId));
+        continue;
+      }
+
+      if (subP->isActive == false)
+      {
+        LM_T(LmtPernotLoop, ("%s: Inactive", subP->subscriptionId));
         continue;
       }
 
@@ -97,7 +139,7 @@ static void* pernotLoop(void* vP)
 
       if (subP->state == SubExpired)
       {
-        LM_T(LmtPernot, ("%s: Expired", subP->subscriptionId));
+        LM_T(LmtPernotLoop, ("%s: Expired", subP->subscriptionId));
         continue;
       }
 
@@ -108,34 +150,47 @@ static void* pernotLoop(void* vP)
           subP->state = SubActive;
         else
         {
-          LM_T(LmtPernot, ("%s: Erroneous", subP->subscriptionId));
+          LM_T(LmtPernotLoop, ("%s: Erroneous", subP->subscriptionId));
           continue;
         }
       }
 
-      double diffTime = subP->lastNotificationAttempt + subP->timeInterval - now;
-      // LM_T(LmtPernot, ("%s: lastNotificationAttempt: %f", subP->subscriptionId, subP->lastNotificationAttempt));
-      // LM_T(LmtPernot, ("%s: timeInterval:            %f", subP->subscriptionId, subP->timeInterval));
-      // LM_T(LmtPernot, ("%s: now:                     %f", subP->subscriptionId, now));
-      // LM_T(LmtPernot, ("%s: diffTime:                %f", subP->subscriptionId, diffTime));
+      double diffTime = subP->lastNotificationTime + subP->timeInterval - now;
+      LM_T(LmtPernotLoop, ("%s: lastNotificationTime:    %f", subP->subscriptionId, subP->lastNotificationTime));
+      LM_T(LmtPernotLoop, ("%s: now:                     %f", subP->subscriptionId, now));
+      LM_T(LmtPernotLoop, ("%s: diffTime:                %f", subP->subscriptionId, diffTime));
+      LM_T(LmtPernotLoop, ("%s: noMatch:                 %d", subP->subscriptionId, subP->noMatch));
+      LM_T(LmtPernotLoop, ("%s: noMatchDb:               %d", subP->subscriptionId, subP->noMatchDb));
+      LM_T(LmtPernotLoop, ("%s: notificationAttempts:    %d", subP->subscriptionId, subP->notificationAttempts));
+      LM_T(LmtPernotLoop, ("%s: notificationAttemptsDb:  %d", subP->subscriptionId, subP->notificationAttemptsDb));
 
       if (diffTime <= 0)
       {
-        subP->lastNotificationAttempt = now;  // Either it works or fails, the timestamp needs to be updated
-        pernotTreatStart(subP);  // Query runs in a new thread
-
-        // Restart the min diff time
-        minDiff = 0;
-        break;
+        LM_T(LmtPernotLoop, ("%s: ---------- Sending notification at %f", subP->subscriptionId, now));
+        subP->lastNotificationTime = now;  // Either it works or fails, the timestamp needs to be updated (it's part of the loop)
+        pernotTreatStart(subP);            // Query runs in a new thread, loop continues
       }
-      else
-        minDiff = K_MIN(minDiff, diffTime);
     }
 
-    if (minDiff != 0)
-      usleep(minDiff * 1000000);
+    if ((subCacheFlushInterval > 0) && (now > nextFlushAt))
+    {
+      LM_T(LmtPernotLoop, ("Flushing Pernot SubCache contents to DB"));
+      pernotSubCacheFlushToDb();
+      nextFlushAt += subCacheFlushInterval;
+    }
+    else if ((subCacheInterval > 0) && (now > nextCacheRefreshAt))
+    {
+      LM_T(LmtPernotLoop, ("Refreshing Pernot SubCache contents from DB"));
+      pernotSubCacheRefresh();
+      nextCacheRefreshAt  += subCacheInterval;
+    }
+    else
+    {
+      // LM_T(LmtPernotLoop, ("Sleeping 50ms"));
+      usleep(50000);  // We always end up here if there are no subscriptions in the cache
+    }
   }
-
+  LM_T(LmtPernotLoop, ("End of loop"));
   return NULL;
 }
 

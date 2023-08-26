@@ -124,7 +124,7 @@ NGSILD-Tenant: captn
 03. GET subscription - see failure
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 826
+Content-Length: 842
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -156,6 +156,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "lastFailure": "202REGEX(.*)Z",
         "lastNotification": "202REGEX(.*)Z",
         "status": "failed",
+        "timesFailed": 1,
         "timesSent": 1
     },
     "origin": "cache",

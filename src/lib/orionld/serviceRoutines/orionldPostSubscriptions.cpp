@@ -113,7 +113,7 @@ bool orionldPostSubscriptions(void)
                          &renderFormat);
 
   if (qRenderedForDb != NULL)
-    LM_T(LmtSR, ("qRenderedForDb: '%s'", qRenderedForDb));
+    LM_T(LmtQ, ("qRenderedForDb: '%s'", qRenderedForDb));
 
   if (b == false)
   {
@@ -288,11 +288,15 @@ bool orionldPostSubscriptions(void)
                               qTree,
                               geoCoordinatesP,
                               orionldState.contextP,
-                              orionldState.tenantP->tenant,
+                              orionldState.tenantP,
                               showChangesP,
                               sysAttrsP,
                               renderFormat,
                               timeInterval);
+
+    // Signal that there's a new Pernot subscription in the cache
+    // ++pernotSubCache.newSubs;
+    // LM_T(LmtPernotLoop, ("pernotSubCache.newSubs == %d", pernotSubCache.newSubs));
   }
 
   // dbModel

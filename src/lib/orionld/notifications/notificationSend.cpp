@@ -66,19 +66,19 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// Fixed value headers
+// Fixed value headers - mocve to separate file - also used in pernot/pernotSend.cpp
 //
-static const char* contentTypeHeaderJson    = (char*) "Content-Type: application/json\r\n";
-static const char* contentTypeHeaderJsonLd  = (char*) "Content-Type: application/ld+json\r\n";
-static const char* contentTypeHeaderGeoJson = (char*) "Content-Type: application/geo+json\r\n";
-static const char* acceptHeader             = (char*) "Accept: application/json\r\n";
+const char* contentTypeHeaderJson    = (char*) "Content-Type: application/json\r\n";
+const char* contentTypeHeaderJsonLd  = (char*) "Content-Type: application/ld+json\r\n";
+const char* contentTypeHeaderGeoJson = (char*) "Content-Type: application/geo+json\r\n";
+const char* acceptHeader             = (char*) "Accept: application/json\r\n";
 
-static const char* normalizedHeader         = (char*) "Ngsild-Attribute-Format: Normalized\r\n";
-static const char* conciseHeader            = (char*) "Ngsild-Attribute-Format: Concise\r\n";
-static const char* simplifiedHeader         = (char*) "Ngsild-Attribute-Format: Simplified\r\n";
+const char* normalizedHeader         = (char*) "Ngsild-Attribute-Format: Normalized\r\n";
+const char* conciseHeader            = (char*) "Ngsild-Attribute-Format: Concise\r\n";
+const char* simplifiedHeader         = (char*) "Ngsild-Attribute-Format: Simplified\r\n";
 
-static const char* normalizedHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: normalized\r\n";
-static const char* keyValuesHeaderNgsiV2    = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
+const char* normalizedHeaderNgsiV2   = (char*) "Ngsiv2-Attrsformat: normalized\r\n";
+const char* keyValuesHeaderNgsiV2    = (char*) "Ngsiv2-Attrsformat: keyValues\r\n";
 
 char    userAgentHeader[64];     // "User-Agent: orionld/" + ORIONLD_VERSION + \r\n" - initialized in orionldServiceInit()
 size_t  userAgentHeaderLen = 0;  // Set in orionldServiceInit()
@@ -495,7 +495,7 @@ static KjNode* attributeFilter(KjNode* apiEntityP, OrionldAlterationMatch* mAltP
 //
 // notificationTreeForNgsiV2 -
 //
-KjNode* notificationTreeForNgsiV2(OrionldAlterationMatch* matchP)
+static KjNode* notificationTreeForNgsiV2(OrionldAlterationMatch* matchP)
 {
   CachedSubscription* subP                 = matchP->subP;
   KjNode*             notificationP        = kjObject(orionldState.kjsonP, NULL);
@@ -509,7 +509,7 @@ KjNode* notificationTreeForNgsiV2(OrionldAlterationMatch* matchP)
   //
   KjNode* apiEntityP = matchP->altP->finalApiEntityP;  // This is not correct - can be more than one entity
 
-  if (matchP->subP->attributes.size() > 0)
+  if (subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, matchP);
 
   if ((subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
@@ -533,7 +533,7 @@ KjNode* notificationTreeForNgsiV2(OrionldAlterationMatch* matchP)
 //
 // notificationTree -
 //
-KjNode* notificationTree(OrionldAlterationMatch* matchList)
+static KjNode* notificationTree(OrionldAlterationMatch* matchList)
 {
   CachedSubscription* subP          = matchList->subP;
   KjNode*             notificationP = kjObject(orionldState.kjsonP, NULL);
@@ -611,6 +611,19 @@ KjNode* notificationTree(OrionldAlterationMatch* matchList)
 //   void  *iov_base;    /* Starting address */
 //   size_t iov_len;     /* Number of bytes to transfer */
 // };
+//
+// To adapt notificationSend to pernot, I need:
+// - mAltP->subP->renderFormat   (easy)
+// - mAltP->subP->subscriptionId (notificationTreeForNgsiV2 - easy)
+// - finalApiEntityP             (notificationTreeForNgsiV2 - easy - that's the output of the query for Pernot)
+// - subP->attributes            (notificationTreeForNgsiV2 - easy)
+// - subP->contextP              (notificationTreeForNgsiV2 - easy)
+// - finalApiEntityWithSysAttrsP (notificationTree - no probs, must add sysAttrs to the query if Pern ot sub has sysAttrs set)
+// - subP->httpInfo.mimeType     (notificationTree - easy)
+// - subP->ldContext             (notificationSend)
+// - subP->httpInfo.notifierInfo (notificationSend)
+// - mAltP->subP->rest
+//
 //
 int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** curlHandlePP)
 {
@@ -879,7 +892,16 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   //
   // The message is ready - just need to be sent
   //
-  if      (mAltP->subP->protocol == HTTP)    return httpNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
+  if (mAltP->subP->protocol == HTTP)
+    return httpNotify(mAltP->subP,
+                      NULL,
+                      mAltP->subP->subscriptionId,
+                      mAltP->subP->ip,
+                      mAltP->subP->port,
+                      mAltP->subP->rest,
+                      ioVec,
+                      ioVecLen,
+                      timestamp);
   else if (mAltP->subP->protocol == HTTPS)   return httpsNotify(mAltP->subP, ioVec, ioVecLen, timestamp, curlHandlePP);
   else if (mAltP->subP->protocol == MQTT)    return mqttNotify(mAltP->subP,  ioVec, ioVecLen, timestamp);
 

@@ -253,7 +253,7 @@ bool mongoSetDataProvided(ngsiv2::Registration* regP, const mongo::BSONObj* rP, 
 */
 void mongoSetExpires(ngsiv2::Registration* regP, const mongo::BSONObj& r)
 {
-  regP->expires = (r.hasField(REG_EXPIRATION))? getNumberFieldAsDoubleF(&r, REG_EXPIRATION) : -1;
+  regP->expires = (r.hasField(REG_EXPIRATION))? getNumberFieldAsDoubleF(&r, REG_EXPIRATION, true) : -1;
 }
 
 

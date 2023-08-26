@@ -32,9 +32,9 @@ extern "C"
 
 #include "common/RenderFormat.h"                               // RenderFormat
 
-#include "orionld/common/orionldState.h"                       // pernotSubCache
-#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 #include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
@@ -53,7 +53,7 @@ extern PernotSubscription* pernotSubCacheAdd
   QNode*           qTree,
   KjNode*          geoCoordinatesP,
   OrionldContext*  contextP,
-  const char*      tenant,
+  OrionldTenant*   tenantP,
   KjNode*          showChangesP,
   KjNode*          sysAttrsP,
   RenderFormat     renderFormat,

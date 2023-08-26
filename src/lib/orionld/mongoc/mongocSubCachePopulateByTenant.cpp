@@ -106,6 +106,8 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     KjNode*      sysAttrsP     = NULL;
     RenderFormat renderFormat  = RF_NORMALIZED;
     double       timeInterval  = 0;
+
+    kjTreeLog(dbSubP, "dbSubP", LmtPernot);
     KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,
                                                           tenantP->tenant,
                                                           true,
@@ -120,6 +122,8 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     if (apiSubP == NULL)
       continue;
 
+    kjTreeLog(apiSubP, "apiSubP", LmtPernot);
+
     OrionldContext* contextP = NULL;
     if (contextNodeP != NULL)
       contextP = orionldContextFromUrl(contextNodeP->value.s, NULL);
@@ -127,7 +131,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP)
     if (timeInterval == 0)
       subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat);
     else
-      pernotSubCacheAdd(NULL, apiSubP, NULL, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat, timeInterval);
+      pernotSubCacheAdd(NULL, apiSubP, NULL, qTree, coordinatesP, contextP, tenantP, showChangesP, sysAttrsP, renderFormat, timeInterval);
   }
 
   mongoc_client_pool_push(mongocPool, connectionP);

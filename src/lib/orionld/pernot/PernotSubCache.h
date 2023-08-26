@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <semaphore.h>                                         // sem_t
+
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 
 
@@ -37,6 +39,7 @@ typedef struct PernotSubCache
 {
   PernotSubscription* head;
   PernotSubscription* tail;
+  int                 newSubs;
 } PernotSubCache;
 
 #endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_

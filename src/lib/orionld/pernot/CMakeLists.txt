@@ -27,6 +27,7 @@ SET (SOURCES
     pernotSubCacheLookup.cpp
     pernotLoop.cpp
     pernotTreat.cpp
+    pernotSend.cpp
 )
 
 # Include directories

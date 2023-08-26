@@ -26,6 +26,7 @@
 
 extern "C"
 {
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjString, kjInteger, kjChildAdd
 #include "kjson/kjLookup.h"                                      // kjLookup
@@ -69,9 +70,8 @@ static void subTimestampSet(KjNode* apiSubP, const char* fieldName, double value
   }
   else
   {
-    // We have to assume the current timestamp has a char buffer that is of sufficient length.
-    // We actually know that, as the string was initially created as a timestamp
-    strncpy(timestampNodeP->value.s, dateTime, 64);
+    timestampNodeP->type    = KjString;
+    timestampNodeP->value.s = kaStrdup(&orionldState.kalloc, dateTime);
   }
 }
 
@@ -111,10 +111,16 @@ void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP, PernotSubscr
   // 2. pSubP given
   // 3, None of them (look up apiSubP::subscriptionId in both cashes)
   //
-  double lastNotificationTime = -1;
-  double lastSuccess          = -1;
-  double lastFailure          = -1;
-  int    timesSent            = -1;
+  double lastNotificationTime = 0;
+  double lastSuccess          = 0;
+  double lastFailure          = 0;
+  int    timesSent            = 0;
+  int    timesFailed          = 0;
+  int    noMatch              = 0;
+  KjNode* notificationP       = kjLookup(apiSubP, "notification");
+  
+  if (notificationP == NULL)
+    LM_RVE(("API Subscription without a notification field !!!"));
 
   if ((cSubP == NULL) && (pSubP == NULL))
   {
@@ -129,20 +135,76 @@ void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP, PernotSubscr
       LM_RVE(("Can't find subscription '%s'", subIdP->value.s));
   }
 
+  //
+  // Get timestamps/counters from db
+  //
+  KjNode* tsP;
+
+  // lastNotificationTime
+  tsP = kjLookup(notificationP, "lastNotification");
+  if (tsP != NULL)
+    lastNotificationTime = tsP->value.f;
+
+  // lastSuccess
+  tsP = kjLookup(notificationP, "lastSuccess");
+  if (tsP != NULL)
+    lastSuccess = tsP->value.f;
+  
+  // lastFailure
+  tsP = kjLookup(notificationP, "lastFailure");
+  if (tsP != NULL)
+    lastFailure = tsP->value.f;
+
+  // timesSent
+  tsP = kjLookup(notificationP, "count");
+  if (tsP != NULL)
+    timesSent = tsP->value.i;
+
+  // timesFailed
+  tsP = kjLookup(notificationP, "timesFailed");
+  if (tsP != NULL)
+    timesFailed = tsP->value.i;
+
+  // noMatch
+  tsP = kjLookup(notificationP, "noMatch");
+  if (tsP != NULL)
+    noMatch = tsP->value.i;
+
+  LM_T(LmtSR, ("DB lastNotificationTime: %f", lastNotificationTime));
+  LM_T(LmtSR, ("DB lastSuccess:          %f", lastSuccess));
+  LM_T(LmtSR, ("DB lastFailure:          %f", lastFailure));
+  LM_T(LmtSR, ("DB timesSent:            %d", timesSent));
+  LM_T(LmtSR, ("DB timesFailed:          %d", timesFailed));
+  LM_T(LmtSR, ("DB noMatch:              %d", noMatch));
+
+  // Overwrite timestamps/counters from cache
   if (cSubP != NULL)
   {
-    lastNotificationTime = cSubP->lastNotificationTime;
-    lastSuccess          = cSubP->lastSuccess;
-    lastFailure          = cSubP->lastFailure;
-    timesSent            = cSubP->dbCount + cSubP->count;
+    if (cSubP->lastNotificationTime > 0)  lastNotificationTime = cSubP->lastNotificationTime;
+    if (cSubP->lastSuccess          > 0)  lastSuccess          = cSubP->lastSuccess;
+    if (cSubP->lastFailure          > 0)  lastFailure          = cSubP->lastFailure;
+
+    timesSent   += cSubP->count;
+    timesFailed += cSubP->failures;
+    noMatch      = 0;
   }
   else if (pSubP != NULL)
   {
-    lastNotificationTime = pSubP->lastNotificationAttempt;
-    lastSuccess          = pSubP->lastSuccessTime;
-    lastFailure          = pSubP->lastFailureTime;
-    timesSent            = pSubP->dbNotificationAttempts + pSubP->notificationAttempts;
+    if (pSubP->lastNotificationTime > 0)  lastNotificationTime = pSubP->lastNotificationTime;
+    if (pSubP->lastSuccessTime      > 0)  lastSuccess          = pSubP->lastSuccessTime;
+    if (pSubP->lastFailureTime      > 0)  lastFailure          = pSubP->lastFailureTime;
+
+    timesSent   += pSubP->notificationAttempts;
+    timesFailed += pSubP->notificationErrors;
+    noMatch     += pSubP->noMatch;
   }
+    
+  LM_T(LmtSR, ("lastNotificationTime: %f", lastNotificationTime));
+  LM_T(LmtSR, ("lastSuccess:          %f", lastSuccess));
+  LM_T(LmtSR, ("lastFailure:          %f", lastFailure));
+  LM_T(LmtSR, ("timesSent:            %d", timesSent));
+  LM_T(LmtSR, ("timesFailed:          %d", timesFailed));
+  LM_T(LmtSR, ("noMatch:              %d", noMatch));
 
   //
   // Set the values
@@ -154,6 +216,8 @@ void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP, PernotSubscr
     subTimestampSet(notificationNodeP, "lastSuccess",      lastSuccess);
     subTimestampSet(notificationNodeP, "lastFailure",      lastFailure);
     subCounterSet(notificationNodeP,   "timesSent",        timesSent);
+    subCounterSet(notificationNodeP,   "timesFailed",      timesFailed);
+    subCounterSet(notificationNodeP,   "noMatch",          noMatch);
   }
 }
 
@@ -248,7 +312,7 @@ bool orionldGetSubscription(void)
   {
     orionldState.httpStatusCode = 200;
     orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
-
+    orionldSubCounters(orionldState.responseTree, cSubP, NULL);
     return true;
   }
 
@@ -260,6 +324,8 @@ bool orionldGetSubscription(void)
     orionldState.httpStatusCode = 200;
     orionldState.responseTree   = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
     kjTreeLog(orionldState.responseTree, "pernot sub after kjTreeFromPernotSubscription", LmtSR);
+    orionldSubCounters(orionldState.responseTree, NULL, pSubP);
+    kjTreeLog(orionldState.responseTree, "pernot sub after orionldSubCounters", LmtSR);
 
     return true;
   }

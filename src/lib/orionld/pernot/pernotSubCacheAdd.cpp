@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdlib.h>                                            // malloc
+#include <semaphore.h>                                         // sem_post
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                      // KjNode
@@ -34,11 +37,89 @@ extern "C"
 
 #include "common/RenderFormat.h"                               // RenderFormat
 
-#include "orionld/common/orionldState.h"                       // pernotSubCache
+#include "orionld/common/orionldState.h"                       // orionldState, pernotSubCache
+#include "orionld/common/urlParse.h"                           // urlParse
+#include "orionld/types/Protocol.h"                            // Protocol, protocolFromString
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/kjTree/kjChildCount.h"                       // kjChildCount
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 #include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
+
+
+
+// -----------------------------------------------------------------------------
+//
+// receiverInfo -
+//
+// As there is no incoming info for the HTTP headers of Pernot subscriptions, we can
+// safely create the entire string of 'key: value' for all the headers.
+//
+static void receiverInfo(PernotSubscription* pSubP, KjNode* endpointP)
+{
+  KjNode* receiverInfoP = kjLookup(endpointP, "receiverInfo");
+
+  pSubP->headers.items = 0;
+
+  if (receiverInfoP != NULL)
+  {
+    pSubP->headers.items = kjChildCount(receiverInfoP);
+    pSubP->headers.array = (char**) malloc(pSubP->headers.items * sizeof(char*));
+
+    int ix = 0;
+    for (KjNode* kvPairP = receiverInfoP->value.firstChildP; kvPairP != NULL; kvPairP = kvPairP->next)
+    {
+      KjNode* keyP   = kjLookup(kvPairP, "key");
+      KjNode* valueP = kjLookup(kvPairP, "value");
+      int     sLen   = strlen(keyP->value.s) + strlen(valueP->value.s) + 4;
+      char*   s      = (char*) malloc(sLen);
+        
+      snprintf(s, sLen - 1, "%s:%s\r\n", keyP->value.s, valueP->value.s);
+      pSubP->headers.array[ix] = s;
+      ++ix;
+    } 
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// counterFromDb -
+//
+static void counterFromDb(KjNode* subP, uint32_t* counterP, const char* fieldName)
+{
+  LM_T(LmtPernot, ("Getting counter '%s' from db", fieldName));
+  KjNode* counterNodeP = kjLookup(subP, fieldName);
+
+  if (counterNodeP != NULL)
+  {
+    LM_T(LmtPernot, ("Found counter '%s' in db: %d", fieldName, counterNodeP->value.i));
+    *counterP = counterNodeP->value.i;
+  }
+  else
+    *counterP = 0;    
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// timestampFromDb -
+//
+static void timestampFromDb(KjNode* apiSubP, double* tsP, const char* fieldName)
+{
+  KjNode* tsNodeP = kjLookup(apiSubP, fieldName);
+  if (tsNodeP != NULL)
+  {
+    // Need to remove it from apiSubP and save it in cache
+    kjChildRemove(apiSubP, tsNodeP);
+    *tsP = tsNodeP->value.f;
+  }
+  else
+    *tsP = 0;
+}
 
 
 
@@ -54,7 +135,7 @@ PernotSubscription* pernotSubCacheAdd
   QNode*           qTree,
   KjNode*          geoCoordinatesP,
   OrionldContext*  contextP,
-  const char*      tenant,
+  OrionldTenant*   tenantP,
   KjNode*          showChangesP,
   KjNode*          sysAttrsP,
   RenderFormat     renderFormat,
@@ -62,6 +143,9 @@ PernotSubscription* pernotSubCacheAdd
 )
 {
   PernotSubscription* pSubP = (PernotSubscription*) malloc(sizeof(PernotSubscription));
+  bzero(pSubP, sizeof(PernotSubscription));
+
+  kjTreeLog(apiSubP, "API Subscription from DB", LmtPernot);
 
   if (subscriptionId == NULL)
   {
@@ -76,26 +160,63 @@ PernotSubscription* pernotSubCacheAdd
   pSubP->subscriptionId = strdup(subscriptionId);
   pSubP->timeInterval   = timeInterval;
   pSubP->kjSubP         = kjClone(NULL, apiSubP);
+  pSubP->tenantP        = tenantP;
+  pSubP->renderFormat   = renderFormat;
+  pSubP->sysAttrs       = (sysAttrsP == NULL)? false : sysAttrsP->value.b;
+  pSubP->ngsiv2         = (renderFormat >= RF_CROSS_APIS_NORMALIZED);
+  pSubP->context        = (contextP == NULL)? NULL : contextP->url;
+  pSubP->isActive       = true;  // Active by default, then we'll see ...
+
+  // notification
+  KjNode* notificationP = kjLookup(pSubP->kjSubP, "notification");
+
+  // notification::endpoint
+  if (endpointP == NULL)
+    endpointP = kjLookup(notificationP, "endpoint");
+  
+  // URL
+  KjNode* uriP = kjLookup(endpointP, "uri");
+  strncpy(pSubP->url, uriP->value.s, sizeof(pSubP->url) - 1);
+  urlParse(pSubP->url, &pSubP->protocolString, &pSubP->ip, &pSubP->port, &pSubP->rest);
+  pSubP->protocol = protocolFromString(pSubP->protocolString);
 
   kjTreeLog(pSubP->kjSubP, "Initial Pernot Subscription", LmtPernot);
 
-  if (tenant != NULL)
-    strncpy(pSubP->tenant, tenant, sizeof(pSubP->tenant) - 1);
+  // Mime Type for notifications
+  KjNode*  acceptP  = kjLookup(endpointP, "accept");
+  pSubP->mimeType = JSON;  // Default setting
+  if (acceptP != NULL)
+  {
+    if      (strcmp(acceptP->value.s, "application/json")     == 0) pSubP->mimeType = JSON;
+    else if (strcmp(acceptP->value.s, "application/ld+json")  == 0) pSubP->mimeType = JSONLD;
+    else if (strcmp(acceptP->value.s, "application/geo+json") == 0) pSubP->mimeType = GEOJSON;
+  }
+
+  // HTTP headers from receiverInfo
+  receiverInfo(pSubP, endpointP);
 
   // State - check also expiresAt+status
   KjNode* isActiveNodeP = kjLookup(apiSubP, "isActive");
   if (isActiveNodeP != NULL)
     pSubP->state = (isActiveNodeP->value.b == true)? SubActive : SubPaused;
+  else
+    pSubP->state = SubActive;
 
-  pSubP->lastNotificationAttempt = 0;  // FIXME: get info from apiSubP
-  pSubP->lastSuccessTime         = 0;  // FIXME: get info from apiSubP
-  pSubP->lastFailureTime         = 0;  // FIXME: get info from apiSubP
-  pSubP->expiresAt               = 0;  // FIXME: get info from apiSubP
-  pSubP->dbNotificationAttempts  = 0;  // FIXME: get info from apiSubP
-  pSubP->notificationAttempts    = 0;
-  pSubP->dbNotificationErrors    = 0;  // FIXME: get info from apiSubP
-  pSubP->notificationErrors      = 0;
-  pSubP->consecutiveErrors       = 0;  // FIXME: get info from apiSubP
+  // Counters
+  counterFromDb(apiSubP, &pSubP->notificationAttemptsDb, "count");
+  counterFromDb(apiSubP, &pSubP->notificationErrorsDb,   "timesFailed");
+  counterFromDb(apiSubP, &pSubP->noMatchDb,              "noMatch");
+
+  pSubP->notificationAttempts    = 0;  // cached - added to notificationAttemptsDb
+  pSubP->notificationErrors      = 0;  // cached - added to notificationErrorsDb
+  pSubP->noMatch                 = 0;  // cached - added to noMatchDb
+  pSubP->consecutiveErrors       = 0;  // only cached, not saved in DB
+
+  // Timestamps
+  timestampFromDb(apiSubP, &pSubP->lastNotificationTime, "lastNotification");
+  timestampFromDb(apiSubP, &pSubP->lastSuccessTime,      "lastSuccess");
+  timestampFromDb(apiSubP, &pSubP->lastFailureTime,      "lastFailure");
+
   pSubP->cooldown                = 0;  // FIXME: get info from apiSubP
   pSubP->curlHandle              = NULL;
 
@@ -104,6 +225,7 @@ PernotSubscription* pernotSubCacheAdd
   //
   pSubP->next = NULL;
 
+  // Take semaphore ...
   if (pernotSubCache.head == NULL)
   {
     pernotSubCache.head = pSubP;
@@ -154,9 +276,6 @@ PernotSubscription* pernotSubCacheAdd
   KjNode* originP = kjString(NULL, "origin", "cache");
   kjChildAdd(pSubP->kjSubP, originP);
 
-  // notification
-  KjNode* notificationP = kjLookup(pSubP->kjSubP, "notification");
-
   // notification::format
   KjNode* formatP = kjLookup(notificationP, "format");
   if (formatP == NULL)
@@ -165,12 +284,7 @@ PernotSubscription* pernotSubCacheAdd
     kjChildAdd(notificationP, formatP);
   }
 
-  // notification::endpoint
-  if (endpointP == NULL)
-    endpointP = kjLookup(notificationP, "endpoint");
-  
   // notification::endpoint::accept
-  KjNode* acceptP = kjLookup(endpointP, "accept");
   if (acceptP == NULL)
   {
     acceptP = kjString(NULL, "accept", "application/json");
@@ -178,6 +292,12 @@ PernotSubscription* pernotSubCacheAdd
   }
 
   kjTreeLog(pSubP->kjSubP, "Pernot Subscription in Cache", LmtPernot);
+
+  //
+  // Caching stuff from the KjNode tree
+  //
+  KjNode* langP = kjLookup(pSubP->kjSubP, "lang");
+  pSubP->lang = (langP != NULL)? langP->value.s : NULL;
 
   return NULL;
 }

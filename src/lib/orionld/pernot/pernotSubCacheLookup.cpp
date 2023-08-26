@@ -41,7 +41,7 @@ PernotSubscription* pernotSubCacheLookup
 {
   for (PernotSubscription* pSubP = pernotSubCache.head; pSubP != NULL; pSubP = pSubP->next)
   {
-    if ((strcmp(pSubP->subscriptionId, subscriptionId) == 0) && (strcmp(pSubP->tenant, tenant) == 0))
+    if ((strcmp(pSubP->subscriptionId, subscriptionId) == 0) && (strcmp(pSubP->tenantP->tenant, tenant) == 0))
       return pSubP;
   }
 

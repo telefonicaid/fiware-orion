@@ -566,6 +566,8 @@ extern char              dbURI[];                  // From orionld.cpp
 extern bool              multitenancy;             // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
+extern int               subCacheInterval;         // From orionld.cpp
+extern int               subCacheFlushInterval;    // From orionld.cpp
 extern bool              troe;                     // From orionld.cpp
 extern char              troeHost[256];            // From orionld.cpp
 extern unsigned short    troePort;                 // From orionld.cpp
@@ -593,7 +595,7 @@ extern char              hostHeaderNoLF[128];      // move to orionld.cpp?
 extern size_t            hostHeaderLen;            // move to orionld.cpp?
 extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
-extern int               cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
+extern uint32_t          cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 extern PernotSubCache    pernotSubCache;
 extern char              localIpAndPort[135];      // Local address for X-Forwarded-For (from orionld.cpp)
 extern unsigned long long  inReqPayloadMaxSize;

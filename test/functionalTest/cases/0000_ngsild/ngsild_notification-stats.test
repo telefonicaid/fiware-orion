@@ -371,7 +371,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 10. GET S3, see one failure (lastFailure + timesSent: 1, consecutiveErrors: 1)
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 625
+Content-Length: 641
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -398,6 +398,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "lastFailure": "202REGEX(.*)Z",
         "lastNotification": "202REGEX(.*)Z",
         "status": "failed",
+        "timesFailed": 1,
         "timesSent": 1
     },
     "origin": "cache",
@@ -410,7 +411,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 11. GET S4, see one failure (lastFailure + timesSent: 1, consecutiveErrors: 1)
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 631
+Content-Length: 647
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -437,6 +438,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "lastFailure": "202REGEX(.*)Z",
         "lastNotification": "202REGEX(.*)Z",
         "status": "failed",
+        "timesFailed": 1,
         "timesSent": 1
     },
     "origin": "cache",

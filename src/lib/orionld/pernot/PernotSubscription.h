@@ -33,6 +33,12 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
+#include "common/RenderFormat.h"                               // RenderFormat
+#include "common/MimeType.h"                                   // MimeType
+
+#include "orionld/types/Protocol.h"                            // Protocol
+#include "orionld/types/StringArray.h"                         // StringArray
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 
 
 
@@ -58,25 +64,51 @@ typedef struct PernotSubscription
 {
   char*                       subscriptionId;
   PernotState                 state;
-  char                        tenant[64];
+  double                      timeInterval;             // In seconds
   KjNode*                     kjSubP;                   // OR, I split the entire tree into binary fields inside PernotSubscription ...
+  OrionldTenant*              tenantP;
+
+  // Cached from KjSubP
+  char*                       lang;
+  char*                       context;
+  bool                        isActive;
 
   // Timestamps
-  double                      lastNotificationAttempt;  // In seconds
+  double                      lastNotificationTime;     // In seconds
   double                      lastSuccessTime;
   double                      lastFailureTime;
   double                      expiresAt;
 
   // Counters
-  uint32_t                    dbNotificationAttempts;   // Total number of notification attempts, in DB
+  uint32_t                    notificationAttemptsDb;   // Total number of notification attempts, in DB
   uint32_t                    notificationAttempts;     // Total number of notification attempts, in cache (to be added to dbCount)
-  uint32_t                    dbNotificationErrors;     // Total number of FAILED notification attempts, in DB
+  uint32_t                    notificationErrorsDb;     // Total number of FAILED notification attempts, in DB
   uint32_t                    notificationErrors;       // Total number of FAILED notification attempts, in cache (to be added to dbNotificationErrors)
+  uint32_t                    noMatchDb;                // Total number of attempts without any matching results of the entities query, in DB
+  uint32_t                    noMatch;                  // Total number of attempts without any matching results of the entities query, in cache (added to dbNoMatch)
+  uint32_t                    dirty;                    // Counter of number of cache counters/timestamps updates since last flush to DB
 
-  // Error handling
+  // URL
+  char                        url[512];                 // parsed and destroyed - can't be used (protocolString, ip, and rest points inside this buffer)
+  char*                       protocolString;           // pointing to 'protocol' part of 'url'
+  char*                       ip;                       // pointing to 'ip' part of 'url'
+  unsigned short              port;                     // port, as parsed from 'url'
+  char*                       rest;                     // pointing to 'rest' part of 'url'
+  Protocol                    protocol;
+  
+  // HTTP headers for the notification
+  StringArray                 headers;
+
+  // Notification Format/Details
+  bool                        ngsiv2;
+  bool                        sysAttrs;
+  RenderFormat                renderFormat;
+  MimeType                    mimeType;
+
+  // Errors
   uint32_t                    consecutiveErrors;
-  double                      timeInterval;             // In seconds
   uint32_t                    cooldown;
+  char*                       lastErrorReason;
 
   CURL*                       curlHandle;
 
