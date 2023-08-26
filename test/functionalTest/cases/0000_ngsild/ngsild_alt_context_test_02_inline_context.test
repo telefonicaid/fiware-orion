@@ -32,17 +32,17 @@ orionldStart CB
 #
 # The idea of this test is to make sure the expansions are done from the correct context.
 # An entity is created with a simple inline key-values context, containing:
-#   - 'name'  (that also is part of the Core Context
-#   - 'name2' (that only exists in the inline context
+#   - 'avg'   (that also is part of the Core Context)
+#   - 'avg2' (that only exists in the inline context)
 #
 # The entity has three attributes:
-#   - 'name'  - that should be expanded according to the Core Context as it overrides the inline context.
-#   - 'name2' - that should be expanded according to the inline context as it figures there but not in the Core Context.
-#   - 'name3' - that should be expanded according to the Default URL as name3 doesn't exist in any of the contexts of the request.
+#   - 'avg'  - that should be expanded according to the Core Context as it overrides the inline context.
+#   - 'avg2' - that should be expanded according to the inline context as it figures there but not in the Core Context.
+#   - 'avg3' - that should be expanded according to the Default URL as avg3 doesn't exist in any of the contexts of the request.
 #
-# After creation, we look at the mongo content and make sure all three long names for name, name2, and name3 are correct
-# The third part is to GET the entity, without any context (i.e. the Core Context) and we should see name (expanded by Core context)
-# and 'name3' (expanded by Default URL) as short names, while 'name2' should come back as longname as 'name2' would need the inline context of the creation
+# After creation, we look at the mongo content and make sure all three long names for avg, avg2, and avg3 are correct
+# The third part is to GET the entity, without any context (i.e. the Core Context) and we should see avg (expanded by Core context)
+# and 'avg3' (expanded by Default URL) as short names, while 'avg2' should come back as longname as 'avg2' would need the inline context of the creation
 # in order to be compacted.
 #
 # The fourth and last part is to issue another GET but this time using the inline context of the creation (Step 01).
@@ -57,8 +57,8 @@ orionldStart CB
 #   "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
 #   {
 #     "A": "http://from.inline.context2/types/A",
-#     "name": "http://from.inline.context2/attributes/name",
-#     "name2": "http://from.inline.context2/attributes/name2"
+#     "avg": "http://from.inline.context2/attributes/avg",
+#     "avg2": "http://from.inline.context2/attributes/avg2"
 #   }
 # ]
 #
@@ -79,26 +79,26 @@ orionldStart CB
 #
 # Thus, E3 will have the following attributes:
 # 
-#   - 'name'  - that should be expanded according to the Core Context as it overrides the inline context.
-#   - 'name2' - that should be expanded according to the inline context as it figures there but not in the Core Context.
-#   - 'name3' - that should be expanded according to the Default URL as name3 doesn't exist in any of the contexts of the request.
+#   - 'avg'  - that should be expanded according to the Core Context as it overrides the inline context.
+#   - 'avg2' - that should be expanded according to the inline context as it figures there but not in the Core Context.
+#   - 'avg3' - that should be expanded according to the Default URL as avg3 doesn't exist in any of the contexts of the request.
 #   - 'P1'    - that should be expanded according to the context "NGSI-LD_TestSuite/ldContext/testContext.jsonld": http://example.org/P1
 #
 # After creation, we see the mongo content and this time we do three GET requests:
-# - without context                                   - see name and name3 compacted 
-# - with the context of Step 01                       - See name, name2, and name3 compacted. Not P1
-# - with the creation context of Step 9 (creating E3) - see all four attribute names compacted
+# - without context                                   - see avg and avg3 compacted 
+# - with the context of Step 01                       - See avg, avg2, and avg3 compacted. Not P1
+# - with the creation context of Step 9 (creating E3) - see all four attribute avgs compacted
 #
 # ======================================================================================================================================
 #
 # 01. Create entity E1 with a simple key-value inline context
-# 02. See E1 in mongo - name expanded by Core Context, name2 by inline context, name3 by Default URL
-# 03. Get E1 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1
+# 02. See E1 in mongo - avg expanded by Core Context, avg2 by inline context, avg3 by Default URL
+# 03. Get E1 with only Core Context - see avg and avg3 compacted, avg2 as long avg from the inline context in step 1
 # 04. Get E1 with the context of the entity creation in Step 01 - see all three attributes in compact form
 #
 # 05. Create entity E2 with a context that is an array of a string and an inline context (same as in Step 01)
 # 06. See E2 in mongo
-# 07. Get E2 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1
+# 07. Get E2 with only Core Context - see avg and avg3 compacted, avg2 as long name from the inline context in step 1
 # 08. Get E2 with the context of the entity creation in Step 05 - see all three attributes in compact form
 #
 
@@ -107,22 +107,22 @@ echo "==========================================================="
 payload='{
   "id": "http://a.b.c/entity/E1",
   "type": "A",
-  "name": {
+  "avg": {
     "type": "Property",
     "value": "John 2"
   },
-  "name2": {
+  "avg2": {
     "type": "Property",
-    "value": "name2 is part of the inline context"
+    "value": "avg2 is part of the inline context"
   },
-  "name3": {
+  "avg3": {
     "type": "Property",
-    "value": "name3 is not in any context - default URL from @vocab"
+    "value": "avg3 is not in any context - default URL from @vocab"
   },  
   "@context": {
     "A": "http://from.inline.context/types/A",
-    "name": "http://from.inline.context/attributes/name",
-    "name2": "http://from.inline.context/attributes/name2"
+    "avg": "http://from.inline.context/attributes/avg",
+    "avg2": "http://from.inline.context/attributes/avg2"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
@@ -138,8 +138,8 @@ echo
 echo
 
 
-echo "03. Get E1 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1"
-echo "======================================================================================================================"
+echo "03. Get E1 with only Core Context - see avg and avg3 compacted, avg2 as long name from the inline context in step 1"
+echo "==================================================================================================================="
 orionCurl --url '/ngsi-ld/v1/entities/http://a.b.c/entity/E1?prettyPrint=yes&spaces=2'
 echo
 echo
@@ -150,24 +150,24 @@ echo "==========================================================================
 payload='{
   "id": "http://a.b.c/entity/E2",
   "type": "A",
-  "name": {
+  "avg": {
     "type": "Property",
-    "value": "name is part of the Core context"
+    "value": "avg is part of the Core context"
   },
-  "name2": {
+  "avg2": {
     "type": "Property",
-    "value": "name2 is part of the inline context"
+    "value": "avg2 is part of the inline context"
   },
-  "name3": {
+  "avg3": {
     "type": "Property",
-    "value": "name3 is not in any context - default URL from @vocab"
+    "value": "avg3 is not in any context - default URL from @vocab"
   },  
   "@context": [
     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     {
       "A": "http://from.inline.context2/types/A",
-      "name": "http://from.inline.context2/attributes/name",
-      "name2": "http://from.inline.context2/attributes/name2"
+      "avg": "http://from.inline.context2/attributes/avg",
+      "avg2": "http://from.inline.context2/attributes/avg2"
     }
   ]
 }'
@@ -205,30 +205,30 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/name",
-		"http://from.inline.context/attributes/name2",
-		"https://uri.etsi.org/ngsi-ld/default-context/name3"
+		"https://uri.etsi.org/ngsi-ld/avg",
+		"http://from.inline.context/attributes/avg2",
+		"https://uri.etsi.org/ngsi-ld/default-context/avg3"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/avg" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
 			"value" : "John 2",
 			"mdNames" : [ ]
 		},
-		"http://from=inline=context/attributes/name2" : {
+		"http://from=inline=context/attributes/avg2" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "name2 is part of the inline context",
+			"value" : "avg2 is part of the inline context",
 			"mdNames" : [ ]
 		},
-		"https://uri=etsi=org/ngsi-ld/default-context/name3" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/avg3" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "name3 is not in any context - default URL from @vocab",
+			"value" : "avg3 is not in any context - default URL from @vocab",
 			"mdNames" : [ ]
 		}
 	},
@@ -239,28 +239,28 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-03. Get E1 with only Core Context - see name and name3 compacted, name2 as long name from the inline context in step 1
-======================================================================================================================
+03. Get E1 with only Core Context - see avg and avg3 compacted, avg2 as long name from the inline context in step 1
+===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 390
+Content-Length: 385
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
-    "http://from.inline.context/attributes/name2": {
-        "type": "Property",
-        "value": "name2 is part of the inline context"
-    },
-    "id": "http://a.b.c/entity/E1",
-    "name": {
+    "avg": {
         "type": "Property",
         "value": "John 2"
     },
-    "name3": {
+    "avg3": {
         "type": "Property",
-        "value": "name3 is not in any context - default URL from @vocab"
+        "value": "avg3 is not in any context - default URL from @vocab"
     },
+    "http://from.inline.context/attributes/avg2": {
+        "type": "Property",
+        "value": "avg2 is part of the inline context"
+    },
+    "id": "http://a.b.c/entity/E1",
     "type": "http://from.inline.context/types/A"
 }
 
@@ -286,30 +286,30 @@ MongoDB server version: REGEX(.*)
 		"servicePath" : "/"
 	},
 	"attrNames" : [
-		"https://uri.etsi.org/ngsi-ld/name",
-		"http://from.inline.context2/attributes/name2",
-		"https://uri.etsi.org/ngsi-ld/default-context/name3"
+		"https://uri.etsi.org/ngsi-ld/avg",
+		"http://from.inline.context2/attributes/avg2",
+		"https://uri.etsi.org/ngsi-ld/default-context/avg3"
 	],
 	"attrs" : {
-		"https://uri=etsi=org/ngsi-ld/name" : {
+		"https://uri=etsi=org/ngsi-ld/avg" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "name is part of the Core context",
+			"value" : "avg is part of the Core context",
 			"mdNames" : [ ]
 		},
-		"http://from=inline=context2/attributes/name2" : {
+		"http://from=inline=context2/attributes/avg2" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "name2 is part of the inline context",
+			"value" : "avg2 is part of the inline context",
 			"mdNames" : [ ]
 		},
-		"https://uri=etsi=org/ngsi-ld/default-context/name3" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/avg3" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),
-			"value" : "name3 is not in any context - default URL from @vocab",
+			"value" : "avg3 is not in any context - default URL from @vocab",
 			"mdNames" : [ ]
 		}
 	},

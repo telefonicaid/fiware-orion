@@ -36,6 +36,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_WLOG
 #include "orionld/mongoc/mongocSubscriptionInsert.h"             // Own interface
 
 
@@ -61,6 +62,7 @@ bool mongocSubscriptionInsert(KjNode* dbSubscriptionP, const char* subscriptionI
 
   mongocKjTreeToBson(dbSubscriptionP, &document);
 
+  MONGOC_WLOG("Inserting a Subscription", orionldState.tenantP->mongoDbName, "csubs", NULL, &document, LmtMongoc);
   bool b = mongoc_collection_insert_one(orionldState.mongoc.subscriptionsP, &document, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
   {

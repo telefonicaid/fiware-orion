@@ -116,7 +116,7 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription*
   KjNode* fragmentP = patchTree->value.firstChildP;
   KjNode* next;
 
-  LM_T(LmtSR, ("expressionP at %p", expressionP));
+  cSubP->modifiedAt = orionldState.requestTime;
 
   while (fragmentP != NULL)
   {
@@ -148,11 +148,13 @@ static bool ngsildSubscriptionPatch(KjNode* dbSubscriptionP, CachedSubscription*
       {
         if (strcmp(fragmentP->value.s, "active") == 0)
         {
+          LM_T(LmtSR, ("Setting subscription to ACTIVE in cache"));
           cSubP->isActive = true;
           cSubP->status   = "active";
         }
         else
         {
+          LM_T(LmtSR, ("Setting subscription to INACTIVE/PAUSED in cache"));
           cSubP->isActive = false;
           cSubP->status   = "paused";
         }
@@ -613,6 +615,7 @@ static bool subCacheItemUpdate
   {
     if (cSubP->qP != NULL)
       qRelease(cSubP->qP);
+
     cSubP->qP = qNodeP;
   }
 
@@ -660,11 +663,13 @@ static bool subCacheItemUpdate
     {
       if (itemP->value.b == true)
       {
+        LM_T(LmtSR, ("Setting subscription to ACTIVE in cache"));
         cSubP->isActive = true;
         cSubP->status   = "active";
       }
       else
       {
+        LM_T(LmtSR, ("Setting subscription to INACTIVE/PAUSED in cache"));
         cSubP->isActive = false;
         cSubP->status   = "paused";
       }
@@ -976,12 +981,16 @@ bool orionldPatchSubscription(void)
   KjNode* modifiedAtP = kjLookup(dbSubscriptionP, "modifiedAt");
 
   if (modifiedAtP != NULL)
+  {
+    LM_T(LmtSR, ("%s: Old modifiedAt: %f", subscriptionId, modifiedAtP->value.f));
     modifiedAtP->value.f = orionldState.requestTime;
+  }
   else
   {
     modifiedAtP = kjFloat(orionldState.kjsonP, "modifiedAt", orionldState.requestTime);
     kjChildAdd(dbSubscriptionP, modifiedAtP);
   }
+  LM_T(LmtSR, ("%s: New modifiedAt: %f", subscriptionId, orionldState.requestTime));
 
   // Connect to MQTT broker, if needed
   if ((newIsMqtt == true) && (mqttChange == true))

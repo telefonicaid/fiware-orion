@@ -38,7 +38,14 @@ extern "C"
 //
 // ORIONLD_CORE_CONTEXT_URL -
 //
-#define ORIONLD_CORE_CONTEXT_URL_V1_0  (char*) "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+#define ORIONLD_CORE_CONTEXT_URL_V1_BASE    (char*) "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context"
+#define ORIONLD_CORE_CONTEXT_URL_V1_0       (char*) "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+#define ORIONLD_CORE_CONTEXT_URL_V1_3       (char*) "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.3.jsonld"
+#define ORIONLD_CORE_CONTEXT_URL_V1_4       (char*) "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.4.jsonld"
+#define ORIONLD_CORE_CONTEXT_URL_V1_5       (char*) "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld"
+#define ORIONLD_CORE_CONTEXT_URL_V1_6       (char*) "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+#define ORIONLD_CORE_CONTEXT_URL_V1_7       (char*) "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.7.jsonld"
+#define ORIONLD_CORE_CONTEXT_URL_DEFAULT    (char*) "v1.6"
 
 
 
@@ -63,5 +70,15 @@ extern char* orionldDefaultUrl;
 // orionldDefaultUrlLen -
 //
 extern int orionldDefaultUrlLen;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// builtinCoreContext -
+//
+extern const char* builtinCoreContextUrl;
+extern const char* builtinCoreContext;
+
 
 #endif  // SRC_LIB_ORIONLD_CONTEXT_ORIONLDCORECONTEXT_H_

@@ -132,14 +132,14 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E2
 03. Query entities in GeoJSON format
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 832
+Content-Length: 842
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     -3.691944,
@@ -172,7 +172,7 @@ Date: REGEX(.*)
             "type": "Feature"
         },
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     3.691944,
@@ -212,14 +212,14 @@ Date: REGEX(.*)
 04. Query entities in GeoJSON format with keyValues
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 648
+Content-Length: 658
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     -3.691944,
@@ -243,7 +243,7 @@ Date: REGEX(.*)
             "type": "Feature"
         },
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     3.691944,
@@ -277,7 +277,7 @@ HTTP/1.1 200 OK
 Content-Length: 686
 Content-Type: application/geo+json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "features": [

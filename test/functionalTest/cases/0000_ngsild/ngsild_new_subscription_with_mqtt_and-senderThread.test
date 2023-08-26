@@ -208,7 +208,7 @@ Notifications: 1
     "Accept": "application/json",
     "Content-Type": "application/json",
     "Host": "REGEX(.*)",
-    "Link": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "Link": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "Ngsild-Attribute-Format": "Simplified",
     "User-Agent": "orionld/REGEX(.*)"
   }

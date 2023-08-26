@@ -32,6 +32,7 @@
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_WLOG
 #include "orionld/mongoc/mongocSubCountersUpdate.h"              // Own interface
 
 
@@ -76,12 +77,11 @@ void mongocSubCountersUpdate
 
   mongoc_client_t*      connectionP    = mongoc_client_pool_pop(mongocPool);
   mongoc_collection_t*  subscriptionsP = mongoc_client_get_collection(connectionP, tenantP->mongoDbName, "csubs");
-
-  bson_t  request;    // Entire request with count and timestamps to be updated
-  bson_t  reply;
-  bson_t  selector;
-  bson_t  max;
-  bson_t  inc;
+  bson_t                request;         // Entire request with count and timestamps to be updated
+  bson_t                reply;
+  bson_t                max;
+  bson_t                selector;
+  bson_t                inc;
 
   bson_init(&reply);
   bson_init(&selector);
@@ -101,7 +101,7 @@ void mongocSubCountersUpdate
 
   // Attempts (timesSent)
   if (deltaAttempts > 0)
-    bson_append_int32(&inc, "count", 9, deltaAttempts);
+    bson_append_int32(&inc, "count", 5, deltaAttempts);
 
   // deltaFailures (timesFailed)
   if (deltaFailures > 0)
@@ -120,6 +120,15 @@ void mongocSubCountersUpdate
   if (lastSuccess          > 0) bson_append_double(&max, "lastSuccess",      11, lastSuccess);
   if (lastFailure          > 0) bson_append_double(&max, "lastFailure",      11, lastFailure);
 
+
+  LM_T(LmtNotificationStats, ("%s: lastNotificationTime: %f", subscriptionId, lastNotificationTime));
+  LM_T(LmtNotificationStats, ("%s: lastSuccess:          %f", subscriptionId, lastSuccess));
+  LM_T(LmtNotificationStats, ("%s: lastFailure:          %f", subscriptionId, lastFailure));
+  LM_T(LmtNotificationStats, ("%s: deltaAttempts:        %d", subscriptionId, deltaAttempts));
+  LM_T(LmtNotificationStats, ("%s: deltaFailures:        %d", subscriptionId, deltaFailures));
+  LM_T(LmtNotificationStats, ("%s: deltaNoMatch:         %d", subscriptionId, deltaNoMatch));
+  LM_T(LmtNotificationStats, ("%s: forcedToPause:        %s", subscriptionId, (forcedToPause == true)? "TRUE" : "FALSE"));
+
   if (forcedToPause == true)
   {
     bson_t status;
@@ -131,11 +140,14 @@ void mongocSubCountersUpdate
 
   bson_append_document(&request, "$max", 4, &max);
 
+  MONGOC_WLOG("Updating Sub-Counters", tenantP->mongoDbName, "csubs", &selector, &request, LmtMongoc);
   bson_error_t  bError;
   bool          b = mongoc_collection_update_one(subscriptionsP, &selector, &request, NULL, &reply, &bError);
 
   if (b == false)
-    LM_E(("SUBC: mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", subscriptionId, bError.domain, bError.code, bError.message));
+    LM_E(("mongoc error updating subscription counters/timestamps for '%s': [%d.%d]: %s", subscriptionId, bError.domain, bError.code, bError.message));
+  else
+    LM_T(LmtNotificationStats, ("%s: Successfully updated sub-counters/timestamps", subscriptionId));
 
   mongoc_client_pool_push(mongocPool, connectionP);
   mongoc_collection_destroy(subscriptionsP);

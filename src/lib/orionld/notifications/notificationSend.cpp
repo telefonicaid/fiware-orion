@@ -733,6 +733,11 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   if (headers > 50)
     LM_X(1, ("Too many HTTP headers (>50) for a Notification - to support that many, the broker needs a SW update and to be recompiled"));
 
+  char          hostHeader[256];
+  size_t        hostHeaderLen;
+
+  hostHeaderLen = snprintf(hostHeader, sizeof(hostHeader), "Host: %s\r\n", mAltP->subP->ip);
+
   int           ioVecLen   = headers + 3;  // Request line + X headers + empty line + payload body
   int           headerIx   = 7;
   struct iovec  ioVec[53]  = {
@@ -771,7 +776,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   if ((addLinkHeader == true) && (ngsiv2 == false))  // Add Link header - but not if NGSIv2 Cross Notification
   {
     char         linkHeader[512];
-    const char*  link = (mAltP->subP->ldContext == "")? ORIONLD_CORE_CONTEXT_URL_V1_0 : mAltP->subP->ldContext.c_str();
+    const char*  link = (mAltP->subP->ldContext == "")? orionldCoreContextP->url : mAltP->subP->ldContext.c_str();
 
     snprintf(linkHeader, sizeof(linkHeader), "Link: <%s>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"\r\n", link);
 

@@ -36,7 +36,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // dbHost, coreContextUrl, builtinCoreContext
 #include "orionld/mongoc/mongocContextCacheGet.h"                // mongocContextCacheGet
-#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP, builtinCoreContextUrl, builtinCoreContext
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
@@ -120,6 +120,7 @@ void orionldContextCacheInit(void)
   //
 
   // 1. Find the Core Context
+  LM_T(LmtCoreContext, ("Trying to find the core context (%s)", coreContextUrl));
   if (contextArray != NULL)
   {
     KjNode* contextNodeP = contextArray->value.firstChildP;
@@ -151,9 +152,10 @@ void orionldContextCacheInit(void)
     }
   }
 
-  // Still no core context? - download it
+  // Still no core context? - try to download it
   if (orionldCoreContextP == NULL)
   {
+    LM_T(LmtCoreContext, ("Still no core context - trying to download it (%s)", coreContextUrl));
     orionldCoreContextP = orionldContextFromUrl(coreContextUrl, NULL);
     if (orionldCoreContextP == NULL)
       LM_W(("Unable to download the core context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
@@ -162,7 +164,7 @@ void orionldContextCacheInit(void)
   // Still no core context? - use the default core context, meant for airgapped setups
   if (orionldCoreContextP == NULL)
   {
-    LM_T(LmtContextCache, ("No network?  Getting the core context from builtin"));
+    LM_T(LmtCoreContext, ("Still no core context - no network?  Getting the core context from builtin"));
 
     //
     // The builtin core context is a string in a read-only segment.
@@ -175,13 +177,13 @@ void orionldContextCacheInit(void)
       LM_X(1, ("Out of memory trying to allocate %d bytes for the built-in Core Context"));
 
     memcpy(buf, builtinCoreContext, bufLen + 1);
-    orionldCoreContextP = orionldContextFromBuffer(coreContextUrl, OrionldContextBuiltinCoreContext, coreContextUrl, buf);
+    orionldCoreContextP = orionldContextFromBuffer(coreContextUrl, OrionldContextBuiltinCoreContext, (char*) builtinCoreContextUrl, buf);
     free(buf);
     LM_T(LmtContextCache, ("Core Context at %p", orionldCoreContextP));
     if (orionldCoreContextP == NULL)
       LM_X(1, ("Unable to create the core context from in-compiled default core context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
+    LM_W(("Falling back to Built-in Core Context (hard-coded copy of %s)", builtinCoreContextUrl));
   }
-  LM_T(LmtContextCache, ("Core Context at %p", orionldCoreContextP));
 
   if (contextArray == NULL)
     return;

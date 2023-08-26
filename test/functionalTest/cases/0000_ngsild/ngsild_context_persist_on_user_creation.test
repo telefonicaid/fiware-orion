@@ -98,7 +98,7 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "REGEX(.*)",
-	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"parent" : null,
 	"origin" : "Downloaded",
 	"createdAt" : REGEX(.*)
@@ -121,7 +121,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 [
-    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "REGEX(.*)"
 ]
 
@@ -138,7 +138,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 [
-    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "REGEX(.*)"
 ]
 

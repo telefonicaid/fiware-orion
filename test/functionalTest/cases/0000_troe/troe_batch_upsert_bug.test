@@ -168,7 +168,7 @@ MongoDB server version: REGEX(.*)
 		"https://w3id.org/saref#fillingLevel",
 		"https://uri.etsi.org/ngsi-ld/default-context/controllingAsset",
 		"https://uri.fiware.org/ns/data-models#supportedProtocol",
-		"https://uri.etsi.org/ngsi-ld/description",
+		"http://purl.org/dc/terms/description",
 		"https://uri.fiware.org/ns/data-models#category",
 		"https://uri.fiware.org/ns/data-models#controlledProperty",
 		"https://uri.etsi.org/ngsi-ld/default-context/add_status",
@@ -208,7 +208,7 @@ MongoDB server version: REGEX(.*)
 			"value" : "ul20",
 			"mdNames" : [ ]
 		},
-		"https://uri=etsi=org/ngsi-ld/description" : {
+		"http://purl=org/dc/terms/description" : {
 			"type" : "Property",
 			"creDate" : REGEX(.*),
 			"modDate" : REGEX(.*),

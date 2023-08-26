@@ -111,16 +111,16 @@ Date: REGEX(.*)
     {
         "createdAt": "REGEX(.*)",
         "hash-table": {
-            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
             "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
         },
         "id": "REGEX(.*)",
         "origin": "Downloaded",
         "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
     },
     {
         "createdAt": "REGEX(.*)",
@@ -177,7 +177,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 [
-    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
     "http://REGEX(.*)",
     "http://REGEX(.*)"
@@ -194,12 +194,12 @@ Date: REGEX(.*)
 05. GET all contexts - see 2 contexts - the core and the downloaded context - the other two have disappeared
 ============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 138
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
 ]
 
@@ -211,7 +211,7 @@ connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 {
 	"_id" : "REGEX(.*)",
-	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"parent" : null,
 	"origin" : "Downloaded",
 	"createdAt" : REGEX(.*)

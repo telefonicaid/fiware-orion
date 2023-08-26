@@ -121,6 +121,7 @@ extern "C"
 #include "orionld/prometheus/promInit.h"                      // promInit
 #include "orionld/mongoc/mongocInit.h"                        // mongocInit
 #include "orionld/mongoc/mongocServerVersionGet.h"            // mongocServerVersionGet
+#include "orionld/context/orionldCoreContext.h"               // ORIONLD_CORE_CONTEXT_URL_*
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
@@ -256,6 +257,7 @@ bool            experimental = false;
 bool            mongocOnly   = false;
 bool            debugCurl    = false;
 uint32_t        cSubCounters;
+char            coreContextVersion[64];
 
 
 
@@ -344,6 +346,7 @@ uint32_t        cSubCounters;
 #define DBURI_DESC             "complete URI for database connection"
 #define DEBUG_CURL_DESC        "turn on debugging of libcurl - to the broker's logfile"
 #define CSUBCOUNTERS_DESC      "number of subscription counter updates before flush from sub-cache to DB (0: never, 1: always)"
+#define CORE_CONTEXT_DESC      "Core context version (v1.0|v1.3|v1.4|v1.5|v1.6|v1.7) - v1.6 is default"
 
 
 
@@ -366,6 +369,8 @@ uint32_t        cSubCounters;
 */
 PaArgument paArgs[] =
 {
+  { "-coreContext",           coreContextVersion,       "CORE_CONTEXT",              PaString,  PaOpt,  _i ORIONLD_CORE_CONTEXT_URL_DEFAULT, PaNL, PaNL, CORE_CONTEXT_DESC },
+
   { "-noswap",                &noswap,                  "NOSWAP",                    PaBool,    PaHid,  false,           false,  true,             NOSWAP_DESC              },
   { "-fg",                    &fg,                      "FOREGROUND",                PaBool,    PaOpt,  false,           false,  true,             FG_DESC                  },
   { "-localIp",               bindAddress,              "LOCALIP",                   PaString,  PaOpt,  IP_ALL,          PaNL,   PaNL,             LOCALIP_DESC             },
@@ -791,6 +796,7 @@ static void versionInfo(void)
   LM_K(("-----------------------------------------"));
   LM_K(("orionld version:    %s", orionldVersion));
   LM_K(("based on orion:     %s", ORION_VERSION));
+  LM_K(("core @context:      %s", coreContextUrl));
   LM_K(("git hash:           %s", GIT_HASH));
   LM_K(("build branch:       %s", ORIONLD_BRANCH));
   LM_K(("compiled by:        %s", COMPILED_BY));
@@ -888,6 +894,24 @@ void regCachePresent(void)
   }
 }
 #endif
+
+
+
+// -----------------------------------------------------------------------------
+//
+// coreContextUrlSetup -
+//
+static char* coreContextUrlSetup(const char* version)
+{
+  if      (strcmp(version, "v1.0") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_0;
+  else if (strcmp(version, "v1.3") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_3;
+  else if (strcmp(version, "v1.4") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_4;
+  else if (strcmp(version, "v1.5") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_5;
+  else if (strcmp(version, "v1.6") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_6;
+  else if (strcmp(version, "v1.7") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_7;
+
+  return NULL;
+}
 
 
 
@@ -1017,6 +1041,11 @@ int main(int argC, char* argV[])
     strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel) - 1);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
+
+  coreContextUrl = coreContextUrlSetup(coreContextVersion);
+  if (coreContextUrl == NULL)
+    LM_X(1, ("Invalid version for the Core Context: %s (valid: v1.0|v1.3|v1.4|v1.5|v1.6|v1.7)", coreContextVersion));
+
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
 #if 0
@@ -1086,7 +1115,6 @@ int main(int argC, char* argV[])
   }
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum);
-
   LM_I(("Orion Context Broker is running"));
 
   versionInfo();
@@ -1207,7 +1235,7 @@ int main(int argC, char* argV[])
     if (subCacheInterval == 0)
     {
       // Populate subscription cache from database
-      subCacheRefresh();
+      subCacheRefresh(false);
     }
     else
     {
@@ -1310,14 +1338,13 @@ int main(int argC, char* argV[])
 
   if (mongocOnly == true)
   {
-    LM_K(("  Mongo Driver:            mongoc driver"));
+    LM_K(("  Mongo Driver:            mongoc driver- ONLY (MongoDB C++ Legacy Driver is DISABLED)"));
     LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
-    LM_K(("  The MongoDB C++ Legacy Driver is DISABLED - registration requests don't work in this mode"));
   }
   else if (experimental  == true)
   {
-    LM_K(("  Mongo Driver:            mongoc driver"));
-    LM_K(("  MongoC Driver Version:   %s (for all requests but registrations)", MONGOC_VERSION_S));
+    LM_K(("  Mongo Driver:            mongoc driver for NGSI-LD requests, Legacy Mongo C++ Driver for NGSIv1&2"));
+    LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
   }
   else
     LM_K(("  Mongo Driver:            Legacy C++ Driver (deprecated by mongodb)"));

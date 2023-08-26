@@ -104,6 +104,22 @@ static size_t responseHeaderDebug(char* buffer, size_t size, size_t nitems, void
 
 // -----------------------------------------------------------------------------
 //
+// notificationResponseBody -
+//
+static int notificationResponseBody(void* chunk, size_t size, size_t members, void* userP)
+{
+  size_t chunkLen = members;
+  char*  chunkP   = (char*) chunk;
+
+  LM_T(LmtNotificationBody, ("Got a chunk of notification response (%d bytes): %s", chunkLen, chunkP));
+
+  return chunkLen;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // httpsNotify -
 //
 int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double timestamp, CURL** curlHandlePP)
@@ -148,7 +164,6 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
   curl_easy_setopt(curlHandleP, CURLOPT_URL, url);
   curl_easy_setopt(curlHandleP, CURLOPT_CUSTOMREQUEST, "POST");
   curl_easy_setopt(curlHandleP, CURLOPT_TIMEOUT_MS, 5000);                     // Timeout - hard-coded to 5 seconds for now ...
-  curl_easy_setopt(curlHandleP, CURLOPT_FAILONERROR, true);                    // Fail On Error - to detect 404 etc.
   curl_easy_setopt(curlHandleP, CURLOPT_FOLLOWLOCATION, 1L);                   // Follow redirections
 
   // SSL options
@@ -165,6 +180,7 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
     char header[256];
     strcpy(header, (char*) ioVec[ix].iov_base);
     header[ioVec[ix].iov_len - 2] = 0;
+
     LM_T(LmtNotificationHeaders, ("%s: Notification Request Header: '%s'", cSubP->subscriptionId, header));
     headers = curl_slist_append(headers, header);
   }
@@ -188,17 +204,16 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
     curl_easy_setopt(curlHandleP, CURLOPT_DEBUGFUNCTION, curlDebug);
   }
 
-  // Debugging Incoming HTTP Headers?
+  // Debug Incoming HTTP Headers?
   if (lmTraceIsSet(LmtNotificationHeaders) == true)
   {
     curl_easy_setopt(curlHandleP, CURLOPT_HEADERDATA,     cSubP->subscriptionId);
     curl_easy_setopt(curlHandleP, CURLOPT_HEADERFUNCTION, responseHeaderDebug);   // Callback for received headers
   }
 
-  //
-  // FIXME: Use curl_easy_setopt(CURLOPT_WRITEFUNCTION+CURLOPT_WRITEDATA) for debugging the response payload body
-  //        See distOpSend.cpp and do the same here (reuse responseSave() and the struct HttpResponse
-  //
+  // Debug Incoming HTTP Body?
+  if (lmTraceIsSet(LmtNotificationBody) == true)
+    curl_easy_setopt(curlHandleP, CURLOPT_WRITEFUNCTION, notificationResponseBody);  // Callback for reading the response body
 
   // Add easy handler to the multi handler
   curl_multi_add_handle(orionldState.multiP, curlHandleP);

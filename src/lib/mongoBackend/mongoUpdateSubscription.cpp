@@ -964,6 +964,10 @@ std::string mongoUpdateSubscription
   lastFailure = setLastFailure(subOrig, subCacheP, &b);
   lastSuccess = setLastSuccess(subOrig, subCacheP, &b);
 
+  LM_T(LmtLegacy, ("lastNotificationTime: %f", lastNotification));
+  LM_T(LmtLegacy, ("lastFailure:          %f", lastFailure));
+  LM_T(LmtLegacy, ("lastSuccess:          %f", lastSuccess));
+
   setExpression(subUp, subOrig, &b);
   setFormat(subUp, subOrig, &b);
 

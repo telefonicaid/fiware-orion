@@ -70,7 +70,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v1.2.0"
+#define ORIONLD_VERSION "post-v1.3.0"
 
 
 
@@ -590,9 +590,6 @@ extern int               maxAge;                   // From orionld.cpp (CORS)
 extern char              userAgentHeader[64];      // From notificationSend.cpp - move to orionld.cpp?
 extern size_t            userAgentHeaderLen;       // From notificationSend.cpp - move to orionld.cpp?
 extern char              userAgentHeaderNoLF[64];  // move to orionld.cpp?
-extern char              hostHeader[128];          // move to orionld.cpp?
-extern char              hostHeaderNoLF[128];      // move to orionld.cpp?
-extern size_t            hostHeaderLen;            // move to orionld.cpp?
 extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
 extern uint32_t          cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB

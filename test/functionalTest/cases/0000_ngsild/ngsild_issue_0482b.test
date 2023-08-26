@@ -31,7 +31,7 @@ orionldStart CB
 
 #
 # 01. Create an Entity urn:ngsi-ld:ApiService:RequestUUID01a-100 with ... a HUGE attr response-Flixbus
-# 02. Create an	Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute
+# 02. Create an Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute
 # 03. Retrieve the entity urn:ngsi-ld:ApiService:RequestUUID01a-100 - make sure it's OK
 # 04. QUERY Entities - see both of them
 #
@@ -58,7 +58,7 @@ payload='{
     "type": "Property",
     "value": "bettermobility"
   },
-  "expiresAt": {
+  "expiresAt2": {
     "type": "Property",
     "value": "2020-09-01T12:00:00.000Z"
   },
@@ -1238,7 +1238,7 @@ echo
 echo
 
 
-echo "02. Create an	Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute"
+echo "02. Create an Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute"
 echo "==========================================================================================="
 payload='{
   "id": "urn:ngsi-ld:ApiService:RequestUUID01a-101",
@@ -1260,7 +1260,7 @@ payload='{
     "type": "Property",
     "value": "bettermobility"
   },
-  "expiresAt": {
+  "expiresAt2": {
     "type": "Property",
     "value": "2020-09-01T12:00:00.000Z"
   },
@@ -2659,7 +2659,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:ApiService:RequestUUID01a-100
 
 
 
-02. Create an	Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute
+02. Create an Entity urn:ngsi-ld:ApiService:RequestUUID01a-101 with ... same huge attribute
 ===========================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -2671,10 +2671,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:ApiService:RequestUUID01a-101
 03. Retrieve the entity urn:ngsi-ld:ApiService:RequestUUID01a-100 - make sure it's OK
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 26789
+Content-Length: 26790
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:ApiService:RequestUUID01a-100",
@@ -2696,7 +2696,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     "type": "Property",
     "value": "bettermobility"
   },
-  "expiresAt": {
+  "expiresAt2": {
     "type": "Property",
     "value": "2020-09-01T12:00:00.000Z"
   },
@@ -3877,10 +3877,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. QUERY Entities - see both of them
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 63115
+Content-Length: 63117
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
   {
@@ -3890,7 +3890,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       "type": "Property",
       "value": "https://www.bettermobility.de/"
     },
-    "expiresAt": {
+    "expiresAt2": {
       "type": "Property",
       "value": "2020-09-01T12:00:00.000Z"
     },
@@ -5085,7 +5085,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       "type": "Property",
       "value": "https://www.bettermobility.de/"
     },
-    "expiresAt": {
+    "expiresAt2": {
       "type": "Property",
       "value": "2020-09-01T12:00:00.000Z"
     },

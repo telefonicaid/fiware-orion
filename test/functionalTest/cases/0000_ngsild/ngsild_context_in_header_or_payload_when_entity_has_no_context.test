@@ -101,7 +101,7 @@ HTTP/1.1 200 OK
 Content-Length: 284
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
   {
@@ -124,13 +124,13 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 03. GET all entities using application/ld+json - see context in payload
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 363
+Content-Length: 368
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
     "type": "T",
     "P1": {
@@ -153,7 +153,7 @@ HTTP/1.1 200 OK
 Content-Length: 254
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
@@ -174,12 +174,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 05. GET the entity using application/ld+json - see context in payload
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 331
+Content-Length: 336
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
   "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
   "type": "T",
   "P1": {

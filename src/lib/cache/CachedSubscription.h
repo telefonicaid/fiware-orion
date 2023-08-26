@@ -132,6 +132,7 @@ struct CachedSubscription
   double                      modifiedAt;
 
   struct CachedSubscription*  next;
+  bool                        inDB;                  // Used by mongocSubCachePopulateByTenant to find subs that have been removed
 };
 
 #endif  // SRC_LIB_CACHE_CACHEDSUBSCRIPTION_H_

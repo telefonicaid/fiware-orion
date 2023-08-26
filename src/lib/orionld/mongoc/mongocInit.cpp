@@ -57,7 +57,7 @@ static void mongocLog
   else if (level == MONGOC_LOG_LEVEL_WARNING)
     LM_W(("MONGOC[%s]: %s", domain, msg));
   else if (level == MONGOC_LOG_LEVEL_MESSAGE)
-    LM_M(("MONGOC[%s]: %s", domain, msg));
+    LM_M(("MONGOC[%s]: %s", domain, msg));  // This LM_M is OK
   else if (level == MONGOC_LOG_LEVEL_INFO)
     LM_I(("MONGOC[%s]: %s", domain, msg));
   else if ((level == MONGOC_LOG_LEVEL_DEBUG) || (level ==  MONGOC_LOG_LEVEL_TRACE))

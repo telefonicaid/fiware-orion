@@ -130,12 +130,12 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 02. Get all contexts
 ====================
 HTTP/1.1 200 OK
-Content-Length: 215
+Content-Length: 220
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
-    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
     "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 ]
@@ -144,7 +144,7 @@ Date: REGEX(.*)
 03. Get all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 1238
+Content-Length: 1245
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -152,16 +152,16 @@ Date: REGEX(.*)
     {
         "createdAt": "REGEX(.*)",
         "hash-table": {
-            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
             "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
         },
         "id": "REGEX(.*)",
         "origin": "Downloaded",
         "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
     },
     {
         "createdAt": "REGEX(.*)",

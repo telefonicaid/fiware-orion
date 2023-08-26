@@ -38,6 +38,11 @@
 #include "orionld/context/orionldContextFromUrl.h"               // Own interface
 
 
+
+// -----------------------------------------------------------------------------
+//
+// StringListItem -
+//
 typedef struct StringListItem
 {
   char                    name[256];
@@ -250,6 +255,7 @@ OrionldContext* orionldContextFromUrl(char* url, char* id)
   if (buffer == NULL)
     return NULL;
 
+  LM_T(LmtCoreContext, ("Downloaded the conext '%s'", url));
   contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, id, buffer);
   if (contextP == NULL)
   {

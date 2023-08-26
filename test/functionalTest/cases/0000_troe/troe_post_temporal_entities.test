@@ -27,7 +27,7 @@ Simple test of creation of a Temporal Entity, using POST /temporal/entities, wit
 export BROKER=orionld
 dbInit CB
 pgInit $CB_DB_NAME
-brokerStart CB 100 IPv4 -troe
+orionldStart CB -troe
 
 --SHELL--
 

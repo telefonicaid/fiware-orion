@@ -63,6 +63,7 @@ typedef enum TraceLevels
   LmtSubCacheMatch,                    // Subscription Cache Matches
   LmtSubCacheDebug,                    // Subscription Cache Debug
   LmtSubCacheStats,                    // Subscription Cache Counters and Timestamps
+  LmtSubCacheSync,                     // Subscription Cache Refresh
 
   //
   // Registration Cache
@@ -79,6 +80,7 @@ typedef enum TraceLevels
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
+  LmtDistOpRequestHeaders,             // HTTP headers of request of distributed requests
   LmtDistOpList,                       // Linked list of DistOps
 
   //
@@ -87,6 +89,7 @@ typedef enum TraceLevels
   LmtContexts = 80,                    // Contexts
   LmtContextTree,                      // Context Tree
   LmtContextCache,                     // Context Cache
+  LmtCoreContext,                      // Core Context
 
   // GeoJSON
   LmtGeoJSON = 90,                     // GeoJSON ... everything (for now)
@@ -100,16 +103,19 @@ typedef enum TraceLevels
   //
   // Misc
   //
-  LmtMongoc = 240,                     // Entire mongoc library
+  LmtMongoc = 230,                     // Entire mongoc library
   LmtSR,                               // Service Routine (whatever it is doing)
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
   LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
+  LmtLegacySubMatch,                   // Old code - update/subscription match for subs/notifs
+  LmtLegacySubCacheRefresh,            // Old code - sub-cache-refresh
   LmtMqtt,                             // MQTT notifications
   LmtQ,                                // Query language
   LmtSql,                              // SQL command for TRoE
   LmtPgPool,                           // Postgres Connection Pool
   LmtSocketService,                    // Socket Service
+
   LmtCurl    = 250,                    // CURL library
   LmtToDo,                             // To Do list
   LmtPatchEntity,                      // Real merge+patch
