@@ -1,5 +1,1 @@
 Fixed issues:
-#280   Protection for POST /temporal/entities against usage when troe is not enabled
-#280   Support for different core contexts via CLI parameter -coreContext <v1.0|v1.3|v1.4|v1.5|v1.6|v1.7> (v1.6 is default)
-#280   Re-implemented the propagation of subscription between brokers in HA (sub-cache synchronization)
-#1412  Bug in the size of the postgres connection pool (a hardcoded size of 10 connection, instead of using the variable tied to the CLI option -troePoolSize, meant for this)

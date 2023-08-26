@@ -17,7 +17,7 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information 
 Issues on this projects can be reported as [github issues](https://github.com/FIWARE/context.Orion-LD/issues),
 while questions are preferred on Stackoverflow, using the tag `fiware-orion`.
 
-> The latest release of Orion-LD is [1.2.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.2.0) from May 2023
+> The latest release of Orion-LD is [1.4.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.4.0) from August 2023
 
 Orion-LD is a Context Broker and [CEF](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/CEF+Digital+Home)
 [building block](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/What+is+a+building+Block) for context data
@@ -93,14 +93,14 @@ Every merged pull request results in a new non-changing tag in dockerhub.
 
 Please note that for production and/or performance implementations, there is a thorough guide for that right [here](https://github.com/FIWARE/load-tests)
 
-If you instead want to use a more stable image, the latest release (as of May 2023) is
-[1.2.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.2.0)
+If you instead want to use a more stable image, the latest release (as of August 2023) is
+[1.4.0](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.4.0)
 
 ```console
-docker run quay.io/fiware/orion-ld:1.1.1
+docker run quay.io/fiware/orion-ld:1.4.0
 ```
 
-Please check [quay.io](https://quay.io/repository/fiware/orion-ld?tab=tags) for newer releases.
+Please check [quay.io](https://quay.io/repository/fiware/orion-ld?tab=tags) for other releases.
 
 ## Documentation:
 -   [Guide to NGSI-LD entities and attributes](doc/manuals-ld/entities-and-attributes.md)
