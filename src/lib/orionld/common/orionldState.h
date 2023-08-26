@@ -70,7 +70,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v1.3.0"
+#define ORIONLD_VERSION "post-v1.4.0"
 
 
 
