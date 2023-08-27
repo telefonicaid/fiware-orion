@@ -260,7 +260,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
 03. GET S1, see lastSuccess, lastNotification, and timesSent==1
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 447
+Content-Length: 452
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -273,7 +273,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
-    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -361,7 +361,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E4
 08. GET S1, see lastSuccess, lastNotification, and timesSent==4
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 447
+Content-Length: 452
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -374,7 +374,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
-    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -408,7 +408,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E5
 11. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 575
+Content-Length: 580
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -421,7 +421,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
-    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "consecutiveErrors": 1,
         "endpoint": {
@@ -478,10 +478,11 @@ MongoDB server version: REGEX(.*)
 	"servicePath" : "/#",
 	"blacklist" : false,
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-	"count" : NumberLong(5),
+	"count" : 5,
 	"lastFailure" : REGEX(.*),
 	"lastNotification" : REGEX(.*),
 	"lastSuccess" : REGEX(.*)
+	"timesFailed" : 1
 }
 bye
 
@@ -493,7 +494,7 @@ bye
 14. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 488
+Content-Length: 493
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -506,7 +507,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
-    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -551,7 +552,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E7
 18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==7
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 549
+Content-Length: 570
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -564,7 +565,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
-    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -576,6 +577,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "lastNotification": "202REGEX(.*)",
         "lastSuccess": "202REGEX(.*)",
         "status": "ok",
+        "timesFailed": 1,
         "timesSent": 7
     },
     "origin": "cache",

@@ -176,7 +176,7 @@ Location: /ngsi-ld/v1/entities/REGEX(.*)
 04. GET subscriptions
 =====================
 HTTP/1.1 200 OK
-Content-Length: 397
+Content-Length: 402
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -190,7 +190,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscription:REGEX(.*)",
         "isActive": true,
-        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
         "notification": {
             "endpoint": {
                 "accept": "application/json",
@@ -253,7 +253,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 07. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 395
+Content-Length: 400
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -266,7 +266,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:subscription:REGEX(.*)",
     "isActive": true,
-    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

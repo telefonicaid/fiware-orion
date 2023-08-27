@@ -578,7 +578,7 @@ bye
 03. GET subscription from the broker
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 913
+Content-Length: 918
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -625,7 +625,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -640,7 +640,7 @@ Date: REGEX(.*)
 05. GET subscription and see the new 'subscriptionName'
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 900
+Content-Length: 905
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -687,7 +687,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -702,7 +702,7 @@ Date: REGEX(.*)
 07. GET subscription and see the new 'description'
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 879
+Content-Length: 884
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -749,7 +749,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -820,7 +820,7 @@ bye
 10. GET subscription and see the new 'entities'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 880
+Content-Length: 885
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -869,7 +869,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -940,7 +940,7 @@ bye
 13. GET subscription and see the new 'watchedAttributes'
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 880
+Content-Length: 885
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -989,7 +989,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1074,7 +1074,7 @@ bye
 17. GET subscription and see the new 'q'
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 889
+Content-Length: 894
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1123,7 +1123,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1194,7 +1194,7 @@ bye
 20. GET subscription and see the new 'geoQ'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 868
+Content-Length: 873
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1240,7 +1240,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1311,7 +1311,7 @@ bye
 25. GET subscription and see the new 'isActive'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 869
+Content-Length: 874
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1357,7 +1357,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1428,7 +1428,7 @@ bye
 28. GET subscription and see the new 'notification'
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 868
+Content-Length: 873
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1474,7 +1474,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1489,7 +1489,7 @@ Date: REGEX(.*)
 30. GET subscription and see the new 'expiresAt'
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 868
+Content-Length: 873
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1535,7 +1535,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2026-04-01T12:34:56.000Z",
   "throttling": 5,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1550,7 +1550,7 @@ Date: REGEX(.*)
 32. GET subscription and see the new 'throttling'
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 869
+Content-Length: 874
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1596,7 +1596,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2026-04-01T12:34:56.000Z",
   "throttling": 12,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1667,7 +1667,7 @@ Date: REGEX(.*)
 35. GET subscription and see all the fields
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 934
+Content-Length: 939
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1715,7 +1715,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:34:34.000Z",
   "throttling": 34,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1845,7 +1845,7 @@ bye
 39. GET subscription and see A=1 in receiverInfo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1032
+Content-Length: 1037
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1899,7 +1899,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:34:34.000Z",
   "throttling": 34,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1914,7 +1914,7 @@ Date: REGEX(.*)
 41. GET subscription and see A=2 in receiverInfo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 1032
+Content-Length: 1037
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -1968,7 +1968,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "expiresAt": "2028-12-31T10:34:34.000Z",
   "throttling": 34,
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 

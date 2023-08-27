@@ -235,7 +235,7 @@ bye
 03. GET the subscription and see the Q-filter
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 486
+Content-Length: 491
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -260,7 +260,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "status": "ok"
   },
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -366,7 +366,7 @@ bye
 09. GET the subscription and see the Q-filter
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 496
+Content-Length: 501
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -391,7 +391,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "status": "ok"
   },
   "origin": "cache",
-  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
