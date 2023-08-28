@@ -2576,11 +2576,11 @@ GET /v2/entities?orderBy=colour&limit=3&offset=0
 GET /v2/entities?orderBy=colour&limit=3&offset=3
 ```
 
-The same sequence of result is not guaranteed among queries, so in the first query the sequence could be `E1, E2, E3, E4` (so
+The same sequence of results is not guaranteed among queries, so in the first query the sequence could be `E1, E2, E3, E4` (so
 client would get `E1, E2, E3`) but in the second query it could be (`E1, E2, E4, E3`) so the client will get `E3` again
 (instead of the expected `E4`).
 
-Another similar (more complex case) is described in [this issue illustrates](https://github.com/telefonicaid/fiware-orion/issues/4394)).
+Another similar (more complex case) is described in [this issue](https://github.com/telefonicaid/fiware-orion/issues/4394)).
 
 The solution is to add an attribute to `orderBy` to guarantee that ties doesn't occur. In this sense, `dateCreated` [builtin attributes](#builtin-attributes) is a very good candidate, so the above queries could be adapted the following way:
 
