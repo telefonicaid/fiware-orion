@@ -434,7 +434,7 @@ MongoDB server version: REGEX(.*)
 	"servicePath" : "/#",
 	"blacklist" : false,
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-	"count" : NumberLong(5),
+	"count" : 5,
 	"lastNotification" : REGEX(.*),
 	"lastSuccess" : REGEX(.*)
 }

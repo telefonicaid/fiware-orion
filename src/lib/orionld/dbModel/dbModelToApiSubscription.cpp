@@ -510,8 +510,22 @@ KjNode* dbModelToApiSubscription
   // timesSent
   if (dbCountP != NULL)
   {
-    dbCountP->name = (char*) "timesSent";
+    int timesSent = 0;
+
+    if (dbCountP->type == KjInt)
+      timesSent = dbCountP->value.i;
+    else if (dbCountP->type == KjObject)
+      LM_W(("Subscription::count: find the integer inside the object!"));
+
+    //
+    // Transform to KjInt named "timesSent"
+    //
+    dbCountP->name    = (char*) "timesSent";
+    dbCountP->type    = KjInt;
+    dbCountP->value.i = timesSent;
+
     kjChildAdd(notificationP, dbCountP);
+    LM_T(LmtSubCacheStats, ("count/timesSent: %d", timesSent));
   }
 
   // timesFailed

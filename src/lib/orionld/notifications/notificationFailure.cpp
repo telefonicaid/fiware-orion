@@ -75,21 +75,22 @@ void notificationFailure(CachedSubscription* subP, const char* errorReason, doub
   //
   if (((cSubCounters != 0) && (subP->dirty >= cSubCounters)) || (forcedToPause == true))
   {
-    LM_T(LmtNotificationStats, ("%s: Calling mongocSubCountersUpdate", subP->subscriptionId));
-
-    mongocSubCountersUpdate(subP->tenantP, subP->subscriptionId, (subP->ldContext != ""), subP->count, subP->failures, 0, subP->lastNotificationTime, subP->lastSuccess, subP->lastFailure, forcedToPause);
+    mongocSubCountersUpdate(subP->tenantP,
+                            subP->subscriptionId,
+                            (subP->ldContext != ""),
+                            subP->count,
+                            subP->failures,
+                            0,
+                            subP->lastNotificationTime,
+                            subP->lastSuccess,
+                            subP->lastFailure,
+                            forcedToPause);
     subP->dirty       = 0;
     subP->dbCount    += subP->count;
     subP->count       = 0;
     subP->dbFailures += subP->failures;
     subP->failures    = 0;
   }
-  else
-    LM_T(LmtNotificationStats, ("%s: Not calling mongocSubCountersUpdate (cSubCounters: %d, dirty: %d, forcedToPause: %s)",
-                                subP->subscriptionId,
-                                cSubCounters,
-                                subP->dirty,
-                                (forcedToPause == true)? "true" : "false"));
 }
 
 

@@ -156,7 +156,6 @@ orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
 echo
 echo
 
-
 echo "15. See the subscription in the database"
 echo "========================================"
 mongoCmd2 ftest "db.csubs.findOne()"
@@ -382,7 +381,7 @@ MongoDB server version: REGEX(.*)
 	"servicePath" : "/#",
 	"blacklist" : false,
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-	"count" : 2,
+	"count" : 1,
 	"lastNotification" : REGEX(.*),
 	"noMatch" : 1
 }

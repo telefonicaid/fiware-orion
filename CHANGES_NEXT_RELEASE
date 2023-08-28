@@ -1,1 +1,2 @@
 Fixed issues:
+  * #280  Implemented Periodic Notifications (subscriptions with a 'timeInterval')

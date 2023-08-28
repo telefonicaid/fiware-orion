@@ -470,7 +470,8 @@ MongoDB server version: REGEX(.*)
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"count" : 1,
 	"lastFailure" : REGEX(.*),
-	"lastNotification" : REGEX(.*)
+	"lastNotification" : REGEX(.*),
+	"timesFailed" : 1
 }
 bye
 

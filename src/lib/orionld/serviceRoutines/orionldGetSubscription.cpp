@@ -55,8 +55,13 @@ extern "C"
 //
 static void subTimestampSet(KjNode* apiSubP, const char* fieldName, double valueInSubCache)
 {
-  if (valueInSubCache <= 0)
+  if (valueInSubCache <= 0.1)
+  {
+    KjNode* timestampNodeP = kjLookup(apiSubP, fieldName);
+    if (timestampNodeP != NULL)
+      kjChildRemove(apiSubP, timestampNodeP);
     return;
+  }
 
   KjNode* timestampNodeP = kjLookup(apiSubP, fieldName);
 
@@ -103,22 +108,15 @@ static void subCounterSet(KjNode* apiSubP, const char* fieldName, int64_t valueI
 //
 // orionldSubCounters - FIXME: Own Module
 //
+// Three options:
+//   1. cSubP given
+//   2. pSubP given
+//   3, None of them (look up apiSubP::subscriptionId in both cashes)
+//
 void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP, PernotSubscription* pSubP)
 {
-  //
-  // Three options:
-  // 1. cSubP given
-  // 2. pSubP given
-  // 3, None of them (look up apiSubP::subscriptionId in both cashes)
-  //
-  double lastNotificationTime = 0;
-  double lastSuccess          = 0;
-  double lastFailure          = 0;
-  int    timesSent            = 0;
-  int    timesFailed          = 0;
-  int    noMatch              = 0;
-  KjNode* notificationP       = kjLookup(apiSubP, "notification");
-  
+  KjNode* notificationP = kjLookup(apiSubP, "notification");
+
   if (notificationP == NULL)
     LM_RVE(("API Subscription without a notification field !!!"));
 
@@ -130,95 +128,42 @@ void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP, PernotSubscr
       return;
 
     cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subIdP->value.s);
-    pSubP = pernotSubCacheLookup(orionldState.tenantP->tenant, subIdP->value.s);
-    if ((cSubP == NULL) && (pSubP == NULL))
-      LM_RVE(("Can't find subscription '%s'", subIdP->value.s));
+
+    if (cSubP == NULL)
+    {
+      pSubP = pernotSubCacheLookup(orionldState.tenantP->tenant, subIdP->value.s);
+      if (pSubP == NULL)
+        LM_RVE(("Can't find subscription '%s' in any subscription cache", subIdP->value.s));
+    }
   }
 
-  //
-  // Get timestamps/counters from db
-  //
-  KjNode* tsP;
+  double  lastNotificationTime = (cSubP != NULL)? cSubP->lastNotificationTime : pSubP->lastNotificationTime;
+  double  lastSuccess          = (cSubP != NULL)? cSubP->lastSuccess          : pSubP->lastSuccessTime;
+  double  lastFailure          = (cSubP != NULL)? cSubP->lastFailure          : pSubP->lastFailureTime;
+  int     timesSent            = 0;
+  int     timesFailed          = 0;
+  int     noMatch              = 0;
 
-  // lastNotificationTime
-  tsP = kjLookup(notificationP, "lastNotification");
-  if (tsP != NULL)
-    lastNotificationTime = tsP->value.f;
-
-  // lastSuccess
-  tsP = kjLookup(notificationP, "lastSuccess");
-  if (tsP != NULL)
-    lastSuccess = tsP->value.f;
-  
-  // lastFailure
-  tsP = kjLookup(notificationP, "lastFailure");
-  if (tsP != NULL)
-    lastFailure = tsP->value.f;
-
-  // timesSent
-  tsP = kjLookup(notificationP, "count");
-  if (tsP != NULL)
-    timesSent = tsP->value.i;
-
-  // timesFailed
-  tsP = kjLookup(notificationP, "timesFailed");
-  if (tsP != NULL)
-    timesFailed = tsP->value.i;
-
-  // noMatch
-  tsP = kjLookup(notificationP, "noMatch");
-  if (tsP != NULL)
-    noMatch = tsP->value.i;
-
-  LM_T(LmtSR, ("DB lastNotificationTime: %f", lastNotificationTime));
-  LM_T(LmtSR, ("DB lastSuccess:          %f", lastSuccess));
-  LM_T(LmtSR, ("DB lastFailure:          %f", lastFailure));
-  LM_T(LmtSR, ("DB timesSent:            %d", timesSent));
-  LM_T(LmtSR, ("DB timesFailed:          %d", timesFailed));
-  LM_T(LmtSR, ("DB noMatch:              %d", noMatch));
-
-  // Overwrite timestamps/counters from cache
   if (cSubP != NULL)
   {
-    if (cSubP->lastNotificationTime > 0)  lastNotificationTime = cSubP->lastNotificationTime;
-    if (cSubP->lastSuccess          > 0)  lastSuccess          = cSubP->lastSuccess;
-    if (cSubP->lastFailure          > 0)  lastFailure          = cSubP->lastFailure;
-
-    timesSent   += cSubP->count;
-    timesFailed += cSubP->failures;
-    noMatch      = 0;
+    timesSent   = cSubP->dbCount    + cSubP->count;
+    timesFailed = cSubP->dbFailures + cSubP->failures;
   }
-  else if (pSubP != NULL)
+  else
   {
-    if (pSubP->lastNotificationTime > 0)  lastNotificationTime = pSubP->lastNotificationTime;
-    if (pSubP->lastSuccessTime      > 0)  lastSuccess          = pSubP->lastSuccessTime;
-    if (pSubP->lastFailureTime      > 0)  lastFailure          = pSubP->lastFailureTime;
-
-    timesSent   += pSubP->notificationAttempts;
-    timesFailed += pSubP->notificationErrors;
-    noMatch     += pSubP->noMatch;
+    timesSent   = pSubP->notificationAttempts + pSubP->notificationAttemptsDb;
+    timesFailed = pSubP->notificationErrors   + pSubP->notificationErrorsDb;
+    noMatch     = pSubP->noMatch              + pSubP->noMatchDb;
   }
-    
-  LM_T(LmtSR, ("lastNotificationTime: %f", lastNotificationTime));
-  LM_T(LmtSR, ("lastSuccess:          %f", lastSuccess));
-  LM_T(LmtSR, ("lastFailure:          %f", lastFailure));
-  LM_T(LmtSR, ("timesSent:            %d", timesSent));
-  LM_T(LmtSR, ("timesFailed:          %d", timesFailed));
-  LM_T(LmtSR, ("noMatch:              %d", noMatch));
-
   //
   // Set the values
   //
-  KjNode* notificationNodeP = kjLookup(apiSubP, "notification");
-  if (notificationNodeP != NULL)
-  {
-    subTimestampSet(notificationNodeP, "lastNotification", lastNotificationTime);
-    subTimestampSet(notificationNodeP, "lastSuccess",      lastSuccess);
-    subTimestampSet(notificationNodeP, "lastFailure",      lastFailure);
-    subCounterSet(notificationNodeP,   "timesSent",        timesSent);
-    subCounterSet(notificationNodeP,   "timesFailed",      timesFailed);
-    subCounterSet(notificationNodeP,   "noMatch",          noMatch);
-  }
+  subTimestampSet(notificationP, "lastNotification", lastNotificationTime);
+  subTimestampSet(notificationP, "lastSuccess",      lastSuccess);
+  subTimestampSet(notificationP, "lastFailure",      lastFailure);
+  subCounterSet(notificationP,   "timesSent",        timesSent);
+  subCounterSet(notificationP,   "timesFailed",      timesFailed);
+  subCounterSet(notificationP,   "noMatch",          noMatch);
 }
 
 
@@ -238,7 +183,8 @@ static bool orionldGetSubscriptionFromDb(void)
     orionldError(OrionldResourceNotFound, "Subscription Not Found", orionldState.wildcard[0], 404);
     return false;
   }
-
+  kjTreeLog(dbSubP, "DB Sub", LmtSubCacheStats);
+  
   KjNode*      coordinatesNodeP = NULL;           // Not needed here, but dbModelToApiSubscription requires it
   KjNode*      contextNodeP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
   KjNode*      showChangesP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
@@ -304,15 +250,17 @@ bool orionldGetSubscription(void)
     return orionldGetSubscriptionFromDb();
   }
 
-  char*                 subscriptionId = orionldState.wildcard[0];
+  char* subscriptionId = orionldState.wildcard[0];
 
   // "Normal" (onchange) subscription?
   CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
   if (cSubP != NULL)
   {
     orionldState.httpStatusCode = 200;
+
     orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
     orionldSubCounters(orionldState.responseTree, cSubP, NULL);
+
     return true;
   }
 
@@ -320,12 +268,10 @@ bool orionldGetSubscription(void)
   PernotSubscription* pSubP = pernotSubCacheLookup(subscriptionId, orionldState.tenantP->tenant);
   if (pSubP != NULL)
   {
-    kjTreeLog(pSubP->kjSubP, "pernot sub in cache", LmtSR);
     orionldState.httpStatusCode = 200;
+
     orionldState.responseTree   = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
-    kjTreeLog(orionldState.responseTree, "pernot sub after kjTreeFromPernotSubscription", LmtSR);
     orionldSubCounters(orionldState.responseTree, NULL, pSubP);
-    kjTreeLog(orionldState.responseTree, "pernot sub after orionldSubCounters", LmtSR);
 
     return true;
   }

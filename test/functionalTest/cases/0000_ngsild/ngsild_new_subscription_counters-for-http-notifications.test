@@ -400,7 +400,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E5
 11. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 581
+Content-Length: 597
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -426,6 +426,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "lastNotification": "202REGEX(.*)",
         "lastSuccess": "202REGEX(.*)",
         "status": "failed",
+        "timesFailed": 1,
         "timesSent": 5
     },
     "origin": "cache",
@@ -486,7 +487,7 @@ bye
 14. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 511
+Content-Length: 508
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -545,7 +546,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E7
 18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==7
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 555
+Content-Length: 571
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -570,6 +571,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "lastNotification": "202REGEX(.*)",
         "lastSuccess": "202REGEX(.*)",
         "status": "ok",
+        "timesFailed": 2,
         "timesSent": 7
     },
     "origin": "cache",

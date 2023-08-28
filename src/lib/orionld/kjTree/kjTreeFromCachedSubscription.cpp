@@ -384,6 +384,9 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   if (cSubP->count + cSubP->dbCount > 0)
   {
+    LM_T(LmtSubCacheStats, ("count:   %d", cSubP->count));
+    LM_T(LmtSubCacheStats, ("dbCount: %d", cSubP->dbCount));
+
     nodeP = kjInteger(orionldState.kjsonP, "timesSent", cSubP->count + cSubP->dbCount);
     NULL_CHECK(nodeP);
     kjChildAdd(notificationNodeP, nodeP);
@@ -392,7 +395,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // notification::lastNotification
   //
-  if (cSubP->lastNotificationTime > 0)
+  if (cSubP->lastNotificationTime > 0.1)
   {
     numberToDate(cSubP->lastNotificationTime, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastNotification", dateTime);
@@ -403,7 +406,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // notification::lastFailure
   //
-  if (cSubP->lastFailure > 0)
+  if (cSubP->lastFailure > 0.1)
   {
     numberToDate(cSubP->lastFailure, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastFailure", dateTime);
@@ -414,7 +417,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // notification::lastSuccess
   //
-  if (cSubP->lastSuccess > 0)
+  if (cSubP->lastSuccess > 0.1)
   {
     numberToDate(cSubP->lastSuccess, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastSuccess", dateTime);

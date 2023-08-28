@@ -257,7 +257,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 08. GET S2 - see lastSuccess==never, lastFailure==now, timesSent==4, status==paused
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 533
+Content-Length: 549
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -283,6 +283,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "lastFailure": "202REGEX(.*)",
         "lastNotification": "202REGEX(.*)",
         "status": "failed",
+        "timesFailed": 3,
         "timesSent": 3
     },
     "origin": "cache",

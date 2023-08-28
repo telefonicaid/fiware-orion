@@ -639,6 +639,35 @@ static void mongoSubCountersUpdateCount
 
 /* ****************************************************************************
 *
+* mongoSubCountersUpdateFailures -
+*/
+static void mongoSubCountersUpdateFailures
+(
+  const std::string&  collection,
+  const std::string&  subId,
+  long long           failures,
+  bool                ngsild
+)
+{
+  BSONObj      condition;
+  BSONObj      update;
+  std::string  err;
+
+  if (ngsild == true)
+    condition = BSON("_id"  << subId);
+  else
+    condition = BSON("_id"  << OID(subId));
+
+  update = BSON("$inc" << BSON(CSUB_FAILURES << failures));
+
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
+    LM_E(("Internal Error (error updating 'failures' for a subscription)"));
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCountersUpdateLastNotificationTime -
 */
 static void mongoSubCountersUpdateLastNotificationTime
@@ -764,6 +793,7 @@ void mongoSubCountersUpdate
   const std::string& tenant,
   const std::string& subId,
   long long          count,
+  long long          failures,
   double             lastNotificationTime,
   double             lastFailure,
   double             lastSuccess,
@@ -789,6 +819,7 @@ void mongoSubCountersUpdate
   LM_T(LmtSubCacheStats, ("lastSuccess:          %f", lastSuccess));
 
   if (count                 > 0)  mongoSubCountersUpdateCount(collectionPath, subId, count, ngsild);
+  if (failures              > 0)  mongoSubCountersUpdateFailures(collectionPath, subId, failures, ngsild);
   if (lastNotificationTime  > 0)  mongoSubCountersUpdateLastNotificationTime(collectionPath, subId, lastNotificationTime, ngsild);
   if (lastFailure           > 0)  mongoSubCountersUpdateLastFailure(collectionPath, subId, lastFailure, ngsild);
   if (lastSuccess           > 0)  mongoSubCountersUpdateLastSuccess(collectionPath, subId, lastSuccess, ngsild);

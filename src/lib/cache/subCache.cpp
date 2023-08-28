@@ -891,7 +891,10 @@ bool subCacheItemInsert
   cSubP->lastSuccess           = lastNotificationSuccessTime;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
+  cSubP->dbCount               = 0;
   cSubP->count                 = 0;
+  cSubP->failures              = 0;
+  cSubP->dbFailures            = 0;
   cSubP->status                = status;
   cSubP->url                   = NULL;
   cSubP->ip                    = NULL;
@@ -1277,6 +1280,7 @@ typedef struct CachedSubSaved
 {
   double   lastNotificationTime;
   int64_t  count;
+  int64_t  failures;
   double   lastFailure;
   double   lastSuccess;
   bool     ngsild;
@@ -1340,6 +1344,7 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;       // This count is later pushed ($inc) to DB - needs to go to cache as well
+    cssP->failures             = cSubP->failures;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
     cssP->ngsild               = (cSubP->ldContext != "")? true : false;
@@ -1407,7 +1412,7 @@ void subCacheSync(void)
                                 cSubP->subscriptionId,
                                 cssP->ngsild,
                                 cssP->count,
-                                0,  // FIXME: failures - fix!
+                                cssP->failures,
                                 0,  // noMatch - not here - only for PerNot
                                 cssP->lastNotificationTime,
                                 cssP->lastSuccess,
@@ -1418,6 +1423,7 @@ void subCacheSync(void)
         mongoSubCountersUpdate(tenant,
                                cSubP->subscriptionId,
                                cssP->count,
+                               cssP->failures,
                                cssP->lastNotificationTime,
                                cssP->lastFailure,
                                cssP->lastSuccess,
@@ -1430,8 +1436,10 @@ void subCacheSync(void)
       if (cssP->lastNotificationTime != 0) cSubP->lastNotificationTime  = cssP->lastNotificationTime;
 
       // Here the delta (just $inc'ed to DB) is also inc'ed to subCache
-      cSubP->dbCount += cssP->count;
-      cSubP->count    = 0;
+      cSubP->dbCount    += cssP->count;
+      cSubP->count       = 0;
+      cSubP->dbFailures += cssP->failures;
+      cSubP->failures    = 0;
     }
 
     cSubP = cSubP->next;
@@ -1528,9 +1536,9 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
 
     if (errors == 0)
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, kNow, -1, kNow, ngsild);  // lastFailure == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, kNow, -1, kNow, ngsild);  // lastFailure == -1
     else
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, kNow, kNow, -1, ngsild);  // lastSuccess == -1, count == 0
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, kNow, kNow, -1, ngsild);  // lastSuccess == -1, count == 0
 
     return;
   }

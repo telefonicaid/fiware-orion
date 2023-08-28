@@ -64,6 +64,7 @@ typedef enum TraceLevels
   LmtSubCacheDebug,                    // Subscription Cache Debug
   LmtSubCacheStats,                    // Subscription Cache Counters and Timestamps
   LmtSubCacheSync,                     // Subscription Cache Refresh
+  LmtSubCacheFlush,                    // Subscription Cache Flush
 
   //
   // Registration Cache
@@ -100,6 +101,7 @@ typedef enum TraceLevels
   LmtPernot = 100,                     // Periodic Notification Subscription cache
   LmtPernotLoop,                       // Pernot loop, when each sub is triggered in time
   LmtPernotFlush = 102,                // Pernot flush to DB
+
   //
   // Misc
   //

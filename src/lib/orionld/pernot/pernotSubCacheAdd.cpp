@@ -99,7 +99,10 @@ static void counterFromDb(KjNode* subP, uint32_t* counterP, const char* fieldNam
     *counterP = counterNodeP->value.i;
   }
   else
-    *counterP = 0;    
+  {
+    *counterP = 0;
+    LM_T(LmtPernot, ("Counter '%s' NOT found in db", fieldName));
+  }
 }
 
 
@@ -145,8 +148,6 @@ PernotSubscription* pernotSubCacheAdd
   PernotSubscription* pSubP = (PernotSubscription*) malloc(sizeof(PernotSubscription));
   bzero(pSubP, sizeof(PernotSubscription));
 
-  kjTreeLog(apiSubP, "API Subscription from DB", LmtPernot);
-
   if (subscriptionId == NULL)
   {
     KjNode* idP = kjLookup(apiSubP, "id");
@@ -180,8 +181,6 @@ PernotSubscription* pernotSubCacheAdd
   urlParse(pSubP->url, &pSubP->protocolString, &pSubP->ip, &pSubP->port, &pSubP->rest);
   pSubP->protocol = protocolFromString(pSubP->protocolString);
 
-  kjTreeLog(pSubP->kjSubP, "Initial Pernot Subscription", LmtPernot);
-
   // Mime Type for notifications
   KjNode*  acceptP  = kjLookup(endpointP, "accept");
   pSubP->mimeType = JSON;  // Default setting
@@ -203,9 +202,9 @@ PernotSubscription* pernotSubCacheAdd
     pSubP->state = SubActive;
 
   // Counters
-  counterFromDb(apiSubP, &pSubP->notificationAttemptsDb, "count");
-  counterFromDb(apiSubP, &pSubP->notificationErrorsDb,   "timesFailed");
-  counterFromDb(apiSubP, &pSubP->noMatchDb,              "noMatch");
+  counterFromDb(notificationP, &pSubP->notificationAttemptsDb, "timesSent");
+  counterFromDb(notificationP, &pSubP->notificationErrorsDb,   "timesFailed");
+  counterFromDb(notificationP, &pSubP->noMatchDb,              "noMatch");
 
   pSubP->notificationAttempts    = 0;  // cached - added to notificationAttemptsDb
   pSubP->notificationErrors      = 0;  // cached - added to notificationErrorsDb
@@ -290,8 +289,6 @@ PernotSubscription* pernotSubCacheAdd
     acceptP = kjString(NULL, "accept", "application/json");
     kjChildAdd(endpointP, acceptP);
   }
-
-  kjTreeLog(pSubP->kjSubP, "Pernot Subscription in Cache", LmtPernot);
 
   //
   // Caching stuff from the KjNode tree
