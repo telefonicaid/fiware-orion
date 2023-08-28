@@ -78,6 +78,7 @@
     - [変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)](#subscriptions-based-in-alteration-type)
     - [ページネーション (Pagination)](#pagination)
         - [結果の順序付け (Ordering Results)](#ordering-results)
+        - [同値 (Ties)](#ties)
 - [API ルート (API Routes)](#api-routes)
     - [エンティティの操作 (Entities Operations)](#entities-operations)
         - [エンティティのリスト (Entities List)](#entities-list)
@@ -2532,6 +2533,48 @@ GET /v2/entities?orderBy=temperature,!humidity
 4. Object
 5. Array
 6. Boolean
+
+<a name="ties"></a>
+
+### 同値 (Ties)
+
+同値 (ties) の場合、Orion は `orderBy` を使用した同じクエリが同じ結果シーケンスをもたらすことを保証しないことに
+注意してください。つまり、同じクエリが繰り返されると、関連付けられた結果が異なる相対順序で返される可能性があります。
+これは、MongoDB (Orion によって使用される基礎となる DB) が実装する動作と同じです
+([この MongoDB ドキュメント](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/) を参照)
+
+これはページネーションの場合に問題となる可能性があることに注意してください。次の例で説明してみましょう。
+4つのエンティティ (E1～E4) があるとします:
+
+* E1, 属性 `colour` を `blue` に設定
+* E2, 属性 `colour` を `blue` に設定
+* E3, 属性 `colour` を `red` に設定
+* E4, 属性 `colour` を `red` に設定
+
+`GET /v2/entities?orderBy=colour` の最初の実行では `E1, E2, E3, E4` が返される可能性がありますが、クエリの2回目の実行では
+`E2, E1, E4, E3` が返され、3回目の実行では `E1, E2, E4, E3` などが返される可能性があります。
+
+次のような典型的なページ分割された一連のクエリを考えてみましょう:
+
+```
+GET /v2/entities?orderBy=colour&limit=3&offset=0
+GET /v2/entities?orderBy=colour&limit=3&offset=3
+```
+
+クエリ間で同じ結果の順序が保証されていないため、最初のクエリでは順序が `E1, E2, E3, E4` になる可能性があります (したがって、
+クライアントは `E1, E2, E3` を取得します)。2回目のクエリでは、シーケンスが (`E1、E2、E4、E3`) のようになる可能性があります。
+したがって、クライアントは (予期された `E4` ではなく) 再び `E3` を取得します。
+
+別の同様の (より複雑なケース) については、[この issue](https://github.com/telefonicaid/fiware-orion/issues/4394)
+で説明しています。
+
+解決策は、別の属性を `orderBy` に追加して、同値が発生しないことを保証することです。この意味で、`dateCreated`
+[組み込み属性](#builtin-attributes) は非常に良い候補であるため、上記のクエリは次のように適応できます:
+
+```
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=0
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=3
+```
 
 <a name="api-routes"></a>
 
