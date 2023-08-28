@@ -2569,7 +2569,7 @@ Note this may be problematic in the case of pagination. Let's illustrate with th
 A first execution of `GET /v2/entities?orderBy=colour` could return `E1, E2, E3, E4` but a second execution of the query
 could `E2, E1, E4, E3`, a third execution could return `E1, E2, E4, E3`, etc.
 
-Let's consider a typical paginated sequence of querys like this:
+Let's consider a typical paginated sequence of queries like this:
 
 ```
 GET /v2/entities?orderBy=colour&limit=3&offset=0
