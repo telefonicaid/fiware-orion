@@ -468,9 +468,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 11. See urn:S1 in database - check "noMatch == 2"
 =================================================
-MongoDB shell version v4.4.23
-connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
-MongoDB server version: 4.4.22
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
 {
 	"_id" : "urn:S1",
 	"description" : "Test Subscription No 1",

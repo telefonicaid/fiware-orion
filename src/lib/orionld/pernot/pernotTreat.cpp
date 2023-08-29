@@ -114,10 +114,6 @@ static void* pernotTreat(void* vP)
   orionldState.kjsonP = kjBufferCreate(&kjson, &kalloc);
   
   LM_T(LmtPernot, ("Creating the query for pernot-subscription %s", subP->subscriptionId));
-  KjNode*          eSelector  = NULL;  // should be created when sub added to cache
-  KjNode*          attrsArray = NULL;  // should be created when sub added to cache
-  QNode*           qTree      = NULL;  // should be created when sub added to cache
-  OrionldGeoInfo*  geoInfoP   = NULL;  // should be created when sub added to cache
   int64_t          count      = 0;
   KjNode*          dbEntityArray;
   KjNode*          apiEntityArray;
@@ -127,8 +123,10 @@ static void* pernotTreat(void* vP)
   orionldState.uriParams.count  = true;
   orionldState.tenantP          = subP->tenantP;
 
-  LM_T(LmtPernot, ("Calling mongocEntitiesQuery2"));
-  dbEntityArray = mongocEntitiesQuery2(eSelector, attrsArray, qTree, geoInfoP, subP->lang, &count);
+  kjTreeLog(subP->eSelector,     "eSelector",     LmtPernotQuery);
+  kjTreeLog(subP->attrsSelector, "attrsSelector", LmtPernotQuery);
+
+  dbEntityArray = mongocEntitiesQuery2(subP->eSelector, subP->attrsSelector, NULL, NULL, subP->lang, &count);
 
   LM_T(LmtPernot, ("mongocEntitiesQuery2 gave a count of %d", count));
 
@@ -155,7 +153,7 @@ static void* pernotTreat(void* vP)
       {
         orionldState.uriParams.offset = entitiesSent;
 
-        dbEntityArray  = mongocEntitiesQuery2(eSelector, attrsArray, qTree, geoInfoP, subP->lang, NULL);
+        dbEntityArray  = mongocEntitiesQuery2(subP->eSelector, subP->attrsSelector, NULL, NULL, subP->lang, NULL);
         apiEntityArray = dbModelToApiEntities(dbEntityArray, subP->sysAttrs, subP->renderFormat, subP->lang);
 
         if (pernotSend(subP, apiEntityArray) == false)

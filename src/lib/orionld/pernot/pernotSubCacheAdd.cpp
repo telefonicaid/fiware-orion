@@ -168,8 +168,13 @@ PernotSubscription* pernotSubCacheAdd
   pSubP->context        = (contextP == NULL)? NULL : contextP->url;
   pSubP->isActive       = true;  // Active by default, then we'll see ...
 
-  // notification
   KjNode* notificationP = kjLookup(pSubP->kjSubP, "notification");
+
+  // Query parameters
+  pSubP->eSelector      = kjLookup(pSubP->kjSubP, "entities");
+  pSubP->attrsSelector  = kjLookup(notificationP, "attributes");
+  pSubP->qTreeSelector  = qTree;  // I probably need to clone this ...
+
 
   // notification::endpoint
   if (endpointP == NULL)

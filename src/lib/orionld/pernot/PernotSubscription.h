@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/types/Protocol.h"                            // Protocol
 #include "orionld/types/StringArray.h"                         // StringArray
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+#include "orionld/q/QNode.h"                                   // QNode
 
 
 
@@ -78,6 +79,11 @@ typedef struct PernotSubscription
   double                      lastSuccessTime;
   double                      lastFailureTime;
   double                      expiresAt;
+
+  // For the Query
+  KjNode*                     eSelector;
+  KjNode*                     attrsSelector;
+  QNode*                      qTreeSelector;
 
   // Counters
   uint32_t                    notificationAttemptsDb;   // Total number of notification attempts, in DB
