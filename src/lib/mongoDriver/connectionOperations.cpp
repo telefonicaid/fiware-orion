@@ -152,12 +152,14 @@ bool orion::collectionRangedQuery
   // Getting low level driver object
   bson_t*  q  = _q.get();
   bson_t*  qc = _countQuery.get();
+  bson_t*  sort = _sort.get();
 
   char* bsonStr = bson_as_relaxed_extended_json(q, NULL);
   char* bsonStrCount = bson_as_relaxed_extended_json(qc, NULL);
+  char* bsonStrSort = bson_as_relaxed_extended_json(sort, NULL);
 
-  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d, query='%s', count='%s'",
-                  ns.c_str(), limit, offset, bsonStr, bsonStrCount));
+  LM_T(LmtMongo, ("query() in '%s' collection limit=%d, offset=%d, query='%s', count='%s', sort='%s'",
+                  ns.c_str(), limit, offset, bsonStr, bsonStrCount, bsonStrSort));
   mongoc_collection_t *collection = mongoc_client_get_collection(connection, db.c_str(), col.c_str());
 
   // First, set countP (if used). In the case of error, we return early and the actual query doesn't take place
@@ -172,7 +174,7 @@ bool orion::collectionRangedQuery
     else
     {
       std::string msg = std::string("collection: ") + ns.c_str() +
-        " - count_documents(): " + bsonStrCount +
+        " - count_documents: " + bsonStrCount +
         " - exception: " + error.message;
 
       *err = "Database Error (" + msg + ")";
@@ -181,6 +183,7 @@ bool orion::collectionRangedQuery
       mongoc_collection_destroy(collection);
       bson_free(bsonStr);
       bson_free(bsonStrCount);
+      bson_free(bsonStrSort);
 
       return false;
     }
@@ -188,7 +191,7 @@ bool orion::collectionRangedQuery
 
   // Build the options document
   bson_t* opt = bson_new();
-  BSON_APPEND_DOCUMENT(opt, "sort", _sort.get());
+  BSON_APPEND_DOCUMENT(opt, "sort", sort);
   BSON_APPEND_INT32(opt, "limit", limit);
   BSON_APPEND_INT32(opt, "skip", offset);
 
@@ -204,7 +207,8 @@ bool orion::collectionRangedQuery
   if (mongoc_cursor_error(c, &error))
   {
     std::string msg = std::string("collection: ") + ns +
-      " - query(): " + bsonStr +
+      " - query: " + bsonStr +
+      " - opt: " + bsonOptStr +
       " - exception: " + error.message;
 
     *err = "Database Error (" + msg + ")";
@@ -224,6 +228,7 @@ bool orion::collectionRangedQuery
 
   bson_free(bsonStr);
   bson_free(bsonStrCount);
+  bson_free(bsonStrSort);
   bson_free(bsonOptStr);
 
   return r;
