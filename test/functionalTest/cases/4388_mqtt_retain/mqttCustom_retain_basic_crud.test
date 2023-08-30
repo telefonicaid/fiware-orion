@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Basic CRUD for subscriptions retain field
+Basic CRUD for subscriptions retain field (mqttCustom variant)
 
 --SHELL-INIT--
 dbInit CB
