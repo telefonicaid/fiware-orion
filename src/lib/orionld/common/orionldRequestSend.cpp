@@ -44,6 +44,8 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
   OrionldResponseBuffer*  rBufP        = (OrionldResponseBuffer*) userP;
   int                     xtraBytes    = 512;
 
+  LM_T(LmtCurl, ("CURL: got %d bytes of payload body: %s", bytesToCopy, contents));
+
   if (bytesToCopy + rBufP->used >= rBufP->size)
   {
     if (rBufP->buf == rBufP->internalBuffer)
