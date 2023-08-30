@@ -316,34 +316,30 @@ OrionldContext* orionldContextFromUrl(char* url, char* id)
 
   LM_T(LmtContextDownload, ("Downloading the context '%s' and adding it to the context cache", url));
   char* buffer = orionldContextDownload(url);  // orionldContextDownload fills in ProblemDetails
-  if (buffer == NULL)
-    return NULL;
 
-  LM_T(LmtCoreContext, ("Downloaded the context '%s'", url));
-  contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, id, buffer);
-  if (contextP == NULL)
+  if (buffer != NULL)  // All OK
   {
-    //
-    // Uncomfortable problem here ...
-    // The downloaded @context is erroneous and cannot be used.
-    // The response to the request indicates this fact, but, if the client
-    // insists on trying to use the context (without fixing it), the broker will download it over and over again.
-    // Still, I believe this is the best solution.
-    //
-    LM_E(("Context Error (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
-    contextDownloadListRemove(url);
-    return NULL;  // Parse Error?
+    LM_T(LmtCoreContext, ("Downloaded the context '%s'", url));
+    contextP = orionldContextFromBuffer(url, OrionldContextDownloaded, id, buffer);
+    if (contextP == NULL)
+      LM_E(("Context Error (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
   }
+  else
+    LM_E(("Context Error (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
 
-  contextP->origin    = OrionldContextDownloaded;
-  contextP->createdAt = orionldState.requestTime;
-  contextP->usedAt    = orionldState.requestTime;
+  if (contextP != NULL)
+  {
+    contextP->origin    = OrionldContextDownloaded;
+    contextP->createdAt = orionldState.requestTime;
+    contextP->usedAt    = orionldState.requestTime;
+
+    orionldContextCachePersist(contextP);
+  }
 
   // Remove the 'url' from the contextDownloadList and persist it to DB
   sem_wait(&contextDownloadListSem);
   contextDownloadListRemove(url);
   sem_post(&contextDownloadListSem);
-  orionldContextCachePersist(contextP);
 
   return contextP;
 }
