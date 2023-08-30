@@ -114,7 +114,7 @@ bool kjAttributesWithTypeExtract(KjNode* kjTree, KjNode* entityP)
 // Example broker response payload body for GET /types/{typeName}:
 // {
 //   "id": <FQN of the type>,
-//   "type": "EntityTypeInformation",
+//   "type": "EntityTypeInfo",
 //   "typeName": <shortname>,           // Mandatory! (will try to change that - only if shortName found)
 //   "entityCount": 27,                 // Number of entities with this type
 //   "attributeDetails": [              // Array of Attribute - See GET /attributes?details=true

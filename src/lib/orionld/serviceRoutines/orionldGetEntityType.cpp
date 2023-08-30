@@ -178,7 +178,7 @@ bool orionldGetEntityType(void)
   // The output object looks like this:
   // {
   //   "id": <FQN of the type>,
-  //   "type": "EntityTypeInformation",
+  //   "type": "EntityTypeInfo",
   //   "typeName": <shortname>,           // Mandatory! (will try to change that - only if shortName found)
   //   "entityCount": 27,                 // Number of entities with this type
   //   "attributeDetails": [              // Array of Attribute - See GET /attributes?details=true
@@ -197,7 +197,7 @@ bool orionldGetEntityType(void)
   orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
   KjNode* idNodeP               = kjString(orionldState.kjsonP, "id", typeExpanded);
-  KjNode* typeNodeP             = kjString(orionldState.kjsonP, "type", "EntityTypeInformation");
+  KjNode* typeNodeP             = kjString(orionldState.kjsonP, "type", "EntityTypeInfo");
   KjNode* typeNameNodeP         = kjString(orionldState.kjsonP, "typeName", typeAlias);
   KjNode* entityCountNodeP      = kjInteger(orionldState.kjsonP, "entityCount", entities);
   KjNode* attributeDetailsNodeP = kjArray(orionldState.kjsonP, "attributeDetails");
