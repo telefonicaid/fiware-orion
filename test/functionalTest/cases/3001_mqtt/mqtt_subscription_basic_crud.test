@@ -124,7 +124,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 728
+Content-Length: 758
 
 [
     {
@@ -138,6 +138,7 @@ Content-Length: 728
             "covered": false,
             "mqtt": {
                 "qos": 0,
+                "retain": false,
                 "topic": "/orion/notif",
                 "url": "mqtt://localhost:1883"
             },
@@ -168,6 +169,7 @@ Content-Length: 728
             "covered": false,
             "mqtt": {
                 "qos": 2,
+                "retain": false,
                 "topic": "/orion/notif",
                 "url": "mqtt://localhost:1883"
             },

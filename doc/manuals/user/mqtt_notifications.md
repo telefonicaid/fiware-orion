@@ -90,3 +90,11 @@ To publish using TLS (not yet supported by Orion, pending on [this issue](https:
 mosquitto_pub -d --insecure --cafile file.pem -h <host> -p 1883 -u <username> -P <password> -t '/topic' -m 'payload'
 ```
 
+
+To clear all mosquitto broker retained messages:
+
+```
+sudo service mosquitto stop
+sudo rm /var/lib/mosquitto/mosquitto.db
+sudo systemctl start mosquitto.service
+```

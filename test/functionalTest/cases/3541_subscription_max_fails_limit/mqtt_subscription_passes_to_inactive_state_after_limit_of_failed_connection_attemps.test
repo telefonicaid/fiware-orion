@@ -278,7 +278,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 415
+Content-Length: 430
 
 {
     "description": "A subscription to get info about Room1",
@@ -292,6 +292,7 @@ Content-Length: 415
         "maxFailsLimit": 5,
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
@@ -329,7 +330,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 533
+Content-Length: 548
 
 {
     "description": "A subscription to get info about Room1",
@@ -346,6 +347,7 @@ Content-Length: 533
         "maxFailsLimit": 5,
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
@@ -384,7 +386,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 533
+Content-Length: 548
 
 {
     "description": "A subscription to get info about Room1",
@@ -401,6 +403,7 @@ Content-Length: 533
         "maxFailsLimit": 5,
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
@@ -439,7 +442,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 533
+Content-Length: 548
 
 {
     "description": "A subscription to get info about Room1",
@@ -456,6 +459,7 @@ Content-Length: 533
         "maxFailsLimit": 5,
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
@@ -494,7 +498,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 533
+Content-Length: 548
 
 {
     "description": "A subscription to get info about Room1",
@@ -511,6 +515,7 @@ Content-Length: 533
         "maxFailsLimit": 5,
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
@@ -549,7 +554,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 533
+Content-Length: 548
 
 {
     "description": "A subscription to get info about Room1",
@@ -566,6 +571,7 @@ Content-Length: 533
         "maxFailsLimit": 5,
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
@@ -604,7 +610,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 535
+Content-Length: 550
 
 {
     "description": "A subscription to get info about Room1",
@@ -621,6 +627,7 @@ Content-Length: 535
         "maxFailsLimit": 5,
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
