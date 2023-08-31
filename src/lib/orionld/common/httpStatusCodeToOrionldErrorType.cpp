@@ -43,12 +43,12 @@ OrionldResponseErrorType httpStatusCodeToOrionldErrorType(int httpStatusCode)
   case 400: return OrionldBadRequestData;
   case 403: return OrionldOperationNotSupported;
   case 404: return OrionldResourceNotFound;
-  case 405: return OrionldInvalidRequest;
-  case 406: return OrionldInvalidRequest;
+  case 405: return OrionldBadRequestData;
+  case 406: return OrionldBadRequestData;
   case 409: return OrionldAlreadyExists;
-  case 411: return OrionldInvalidRequest;
-  case 413: return OrionldInvalidRequest;
-  case 415: return OrionldInvalidRequest;
+  case 411: return OrionldBadRequestData;
+  case 413: return OrionldBadRequestData;
+  case 415: return OrionldBadRequestData;
   case 422: return OrionldOperationNotSupported;
   case 470: return OrionldResourceNotFound;
   case 471: return OrionldBadRequestData;
@@ -56,7 +56,7 @@ OrionldResponseErrorType httpStatusCodeToOrionldErrorType(int httpStatusCode)
   case 473: return OrionldBadRequestData;
   case 480: return OrionldBadRequestData;
   case 481: return OrionldBadRequestData;
-  case 482: return OrionldInvalidRequest;
+  case 482: return OrionldBadRequestData;
   case 500: return OrionldInternalError;
   case 501: return OrionldOperationNotSupported;
   case 503: return OrionldInternalError;

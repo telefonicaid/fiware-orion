@@ -51,7 +51,7 @@ Date: REGEX(.*)
 {
     "detail": "The payload data must be either a JSON Array or a JSON Object",
     "title": "Invalid Payload",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
