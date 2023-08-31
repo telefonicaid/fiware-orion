@@ -192,7 +192,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 851
+Content-Length: 881
 
 [
     {
@@ -211,6 +211,7 @@ Content-Length: 851
                     "F": "ns:${object}"
                 },
                 "qos": 0,
+                "retain": false,
                 "topic": "topic1",
                 "url": "mqtt://localhost:1883"
             },
@@ -246,6 +247,7 @@ Content-Length: 851
                     "ns:${object}"
                 ],
                 "qos": 0,
+                "retain": false,
                 "topic": "topic1",
                 "url": "mqtt://localhost:1883"
             },

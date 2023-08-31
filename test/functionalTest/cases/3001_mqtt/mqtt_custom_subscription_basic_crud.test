@@ -282,7 +282,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2338
+Content-Length: 2428
 
 [
     {
@@ -297,6 +297,7 @@ Content-Length: 2338
             "mqttCustom": {
                 "payload": "temperature:${temperature}",
                 "qos": 0,
+                "retain": false,
                 "topic": "/orion/${dest}",
                 "url": "mqtt://localhost:1883"
             },
@@ -328,6 +329,7 @@ Content-Length: 2338
             "mqttCustom": {
                 "payload": "temperature:${temperature}",
                 "qos": 2,
+                "retain": false,
                 "topic": "/orion/${dest}",
                 "url": "mqtt://localhost:1883"
             },
@@ -358,6 +360,7 @@ Content-Length: 2338
             "covered": false,
             "mqttCustom": {
                 "qos": 0,
+                "retain": false,
                 "topic": "/orion/${dest}",
                 "url": "mqtt://localhost:1883"
             },
@@ -388,6 +391,7 @@ Content-Length: 2338
             "covered": false,
             "mqttCustom": {
                 "qos": 2,
+                "retain": false,
                 "topic": "/orion/${dest}",
                 "url": "mqtt://localhost:1883"
             },
@@ -419,6 +423,7 @@ Content-Length: 2338
             "mqttCustom": {
                 "payload": null,
                 "qos": 0,
+                "retain": false,
                 "topic": "/orion/${dest}",
                 "url": "mqtt://localhost:1883"
             },
@@ -450,6 +455,7 @@ Content-Length: 2338
             "mqttCustom": {
                 "payload": null,
                 "qos": 2,
+                "retain": false,
                 "topic": "/orion/${dest}",
                 "url": "mqtt://localhost:1883"
             },

@@ -193,7 +193,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 467
+Content-Length: 482
 
 [
     {
@@ -208,6 +208,7 @@ Content-Length: 467
             "mqtt": {
                 "passwd": "*****",
                 "qos": 0,
+                "retain": false,
                 "topic": "sub1",
                 "url": "mqtt://mqtt.flespi.io:1883",
                 "user": "user"
@@ -247,7 +248,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 467
+Content-Length: 482
 
 [
     {
@@ -262,6 +263,7 @@ Content-Length: 467
             "mqtt": {
                 "passwd": "*****",
                 "qos": 0,
+                "retain": false,
                 "topic": "sub1",
                 "url": "mqtt://mqtt.flespi.io:1883",
                 "user": "user"
@@ -309,7 +311,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 551
+Content-Length: 566
 
 [
     {
@@ -324,6 +326,7 @@ Content-Length: 551
             "mqtt": {
                 "passwd": "*****",
                 "qos": 0,
+                "retain": false,
                 "topic": "sub1",
                 "url": "mqtt://mqtt.flespi.io:1883",
                 "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ"

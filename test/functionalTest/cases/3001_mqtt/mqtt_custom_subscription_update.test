@@ -204,7 +204,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 374
+Content-Length: 389
 
 {
     "description": "Original sub",
@@ -216,6 +216,7 @@ Content-Length: 374
         "mqttCustom": {
             "payload": "t:${t}",
             "qos": 2,
+            "retain": false,
             "topic": "/orion/${d}",
             "url": "mqtt://localhost:1883"
         },
@@ -251,7 +252,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 374
+Content-Length: 389
 
 {
     "description": "Modified sub",
@@ -263,6 +264,7 @@ Content-Length: 374
         "mqttCustom": {
             "payload": "t:${t}",
             "qos": 2,
+            "retain": false,
             "topic": "/orion/${d}",
             "url": "mqtt://localhost:1883"
         },
@@ -298,7 +300,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 367
+Content-Length: 382
 
 {
     "description": "Modified sub",
@@ -310,6 +312,7 @@ Content-Length: 367
         "mqttCustom": {
             "payload": null,
             "qos": 0,
+            "retain": false,
             "topic": "/cb/${d}",
             "url": "mqtt://localhost:1884"
         },
@@ -389,7 +392,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 357
+Content-Length: 372
 
 {
     "description": "Modified sub",
@@ -400,6 +403,7 @@ Content-Length: 357
         "covered": false,
         "mqttCustom": {
             "qos": 1,
+            "retain": false,
             "topic": "/orionbk/${d}",
             "url": "mqtt://localhost:1885"
         },
@@ -435,7 +439,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 344
+Content-Length: 359
 
 {
     "description": "Modified sub",
@@ -446,6 +450,7 @@ Content-Length: 344
         "covered": false,
         "mqtt": {
             "qos": 2,
+            "retain": false,
             "topic": "/orion",
             "url": "mqtt://localhost:1887"
         },

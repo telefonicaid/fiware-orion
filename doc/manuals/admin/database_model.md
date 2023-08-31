@@ -283,8 +283,9 @@ Fields:
     is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications, either HTTP or MQTT
--   **mqttTopic**: MQTT topic (only in MQTT notifications)
--   **mqttQoS**: MQTT QoS value (only in MQTT notifications)
+-   **topic**: MQTT topic (only in MQTT notifications)
+-   **qos**: MQTT QoS value (only in MQTT notifications)
+-   **retain**: MQTT retain value (only in MQTT notifications)
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type**, **isPattern** and **isTypePattern**. Note that,
     due to legacy reasons, **isPattern** may be `"true"` or `"false"` (text) while

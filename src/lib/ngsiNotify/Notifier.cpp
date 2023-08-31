@@ -531,6 +531,7 @@ static SenderThreadParams* buildSenderParamsCustom
   paramsP->registration     = false;
   paramsP->subscriptionId   = subscriptionId.get();
   paramsP->qos              = notification.mqttInfo.qos;     // unspecified in case of HTTP notifications
+  paramsP->retain           = notification.mqttInfo.retain;  // unspecified in case of HTTP notifications
   paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
   paramsP->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
   paramsP->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
@@ -714,6 +715,7 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->subscriptionId   = ncr.subscriptionId.get();
     paramsP->registration     = false;
     paramsP->qos              = notification.mqttInfo.qos; // unspecified in case of HTTP notifications
+    paramsP->retain           = notification.mqttInfo.retain; // unspecified in case of HTTP notifications
     paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
     paramsP->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
     paramsP->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
