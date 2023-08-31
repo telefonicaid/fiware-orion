@@ -44,11 +44,12 @@ echo "==========================================================================
 #
 # Test also:
 #  q
+#  geoQ
 #  expiresAt
 #  lang
 #  jsonldContext
 #  notification::format == keyValues/concise
-#  sysAttrs?
+#  notification::sysAttrs
 #  
 payload='{
   "id": "urn:S1",
@@ -58,6 +59,7 @@ payload='{
       "type": "T"
     }
   ],
+  "q": "P3==1",
   "timeInterval": 2,
   "notification": {
     "endpoint": {
@@ -91,7 +93,8 @@ payload='{
   "id": "urn:E2",
   "type": "T",
   "P1": 2,
-  "P2": 2
+  "P2": 2,
+  "P3": 2
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
 echo

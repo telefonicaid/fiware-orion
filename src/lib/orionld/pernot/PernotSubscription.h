@@ -83,7 +83,7 @@ typedef struct PernotSubscription
   // For the Query
   KjNode*                     eSelector;
   KjNode*                     attrsSelector;
-  QNode*                      qTreeSelector;
+  QNode*                      qSelector;
 
   // Counters
   uint32_t                    notificationAttemptsDb;   // Total number of notification attempts, in DB

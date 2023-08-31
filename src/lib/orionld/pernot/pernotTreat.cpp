@@ -125,8 +125,9 @@ static void* pernotTreat(void* vP)
 
   kjTreeLog(subP->eSelector,     "eSelector",     LmtPernotQuery);
   kjTreeLog(subP->attrsSelector, "attrsSelector", LmtPernotQuery);
+  LM_T(LmtPernotQuery, ("qSelector at %p", subP->qSelector));
 
-  dbEntityArray = mongocEntitiesQuery2(subP->eSelector, subP->attrsSelector, NULL, NULL, subP->lang, &count);
+  dbEntityArray = mongocEntitiesQuery2(subP->eSelector, subP->attrsSelector, subP->qSelector, NULL, subP->lang, &count);
 
   LM_T(LmtPernot, ("mongocEntitiesQuery2 gave a count of %d", count));
 
@@ -153,7 +154,7 @@ static void* pernotTreat(void* vP)
       {
         orionldState.uriParams.offset = entitiesSent;
 
-        dbEntityArray  = mongocEntitiesQuery2(subP->eSelector, subP->attrsSelector, NULL, NULL, subP->lang, NULL);
+        dbEntityArray  = mongocEntitiesQuery2(subP->eSelector, subP->attrsSelector, subP->qSelector, NULL, subP->lang, NULL);
         apiEntityArray = dbModelToApiEntities(dbEntityArray, subP->sysAttrs, subP->renderFormat, subP->lang);
 
         if (pernotSend(subP, apiEntityArray) == false)

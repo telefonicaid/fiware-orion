@@ -173,7 +173,7 @@ PernotSubscription* pernotSubCacheAdd
   // Query parameters
   pSubP->eSelector      = kjLookup(pSubP->kjSubP, "entities");
   pSubP->attrsSelector  = kjLookup(notificationP, "attributes");
-  pSubP->qTreeSelector  = qTree;  // I probably need to clone this ...
+  pSubP->qSelector      = qTree;  // I probably need to clone this ...
 
 
   // notification::endpoint
