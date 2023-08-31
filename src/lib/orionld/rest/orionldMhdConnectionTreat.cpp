@@ -216,14 +216,14 @@ static bool payloadEmptyCheck(void)
   // No payload?
   if (orionldState.in.payload == NULL)
   {
-    orionldError(OrionldInvalidRequest, "payload missing", NULL, 400);
+    orionldError(OrionldBadRequestData, "payload missing", NULL, 400);
     return false;
   }
 
   // Empty payload?
   if (orionldState.in.payload[0] == 0)
   {
-    orionldError(OrionldInvalidRequest, "payload missing", NULL, 400);
+    orionldError(OrionldBadRequestData, "payload missing", NULL, 400);
     return false;
   }
 
@@ -262,7 +262,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
   {
-    orionldError(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object", 400);
+    orionldError(OrionldBadRequestData, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object", 400);
     return false;
   }
 
@@ -271,7 +271,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldError(OrionldInvalidRequest, "Invalid Payload Body", "Empty Object", 400);
+    orionldError(OrionldBadRequestData, "Invalid Payload Body", "Empty Object", 400);
     return false;
   }
 
@@ -280,7 +280,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldError(OrionldInvalidRequest, "Invalid Payload Body", "Empty Array", 400);
+    orionldError(OrionldBadRequestData, "Invalid Payload Body", "Empty Array", 400);
     return false;
   }
 

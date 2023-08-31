@@ -591,7 +591,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest",
+  "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData",
   "title": "Invalid Payload Body",
   "detail": "Empty Array"
 }

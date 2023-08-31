@@ -600,7 +600,7 @@ static bool geoOverlapsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 //
 static bool geoContainsFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
 {
-  orionldError(OrionldInvalidRequest,  "Not Implemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
+  orionldError(OrionldOperationNotSupported,  "Not Implemented", "georel 'contains' is not supported by mongodb and thus also not by Orion-LD", 501);
   return false;
 }
 
