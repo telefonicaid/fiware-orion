@@ -637,7 +637,7 @@ Date: REGEX(.*)
 {
     "detail": "Empty Array",
     "title": "Invalid Payload Body",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

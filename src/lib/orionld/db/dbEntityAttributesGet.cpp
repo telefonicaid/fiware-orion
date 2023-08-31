@@ -61,12 +61,12 @@ static KjNode* getEntityAttributesResponse(KjNode* sortedArrayP)
 {
   char entityAttributesId[128];
 
-  strncpy(entityAttributesId, "urn:ngsi-ld:EntityAttributeList:", sizeof(entityAttributesId) - 1);
-  uuidGenerate(&entityAttributesId[32], sizeof(entityAttributesId) - 32, false);
+  strncpy(entityAttributesId, "urn:ngsi-ld:AttributeList:", sizeof(entityAttributesId) - 1);
+  uuidGenerate(&entityAttributesId[26], sizeof(entityAttributesId) - 26, false);
 
   KjNode* attributeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
   KjNode* idNodeP                = kjString(orionldState.kjsonP, "id", entityAttributesId);
-  KjNode* typeNodeP              = kjString(orionldState.kjsonP, "type", "EntityAttributeList");
+  KjNode* typeNodeP              = kjString(orionldState.kjsonP, "type", "AttributeList");
 
   kjChildAdd(attributeNodeResponseP, idNodeP);
   kjChildAdd(attributeNodeResponseP, typeNodeP);

@@ -236,14 +236,14 @@ echo
 01. GET Entity Attributes - see empty array
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 139
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
-  "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
-  "type": "EntityAttributeList",
+  "id": "urn:ngsi-ld:AttributeList:REGEX(.*)",
+  "type": "AttributeList",
   "attributeList": []
 }
 
@@ -261,7 +261,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E0
 03. GET Entity Attributes - see three attributes
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 139
+Content-Length: 127
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -272,8 +272,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "P2",
         "R1"
     ],
-    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
-    "type": "EntityAttributeList"
+    "id": "urn:ngsi-ld:AttributeList:REGEX(.*)",
+    "type": "AttributeList"
 }
 
 
@@ -289,7 +289,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
 05. GET Entity Attributes - see four attributes (P1, P2, P3, and R1)
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 144
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -301,8 +301,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "P3",
         "R1"
     ],
-    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
-    "type": "EntityAttributeList"
+    "id": "urn:ngsi-ld:AttributeList:REGEX(.*)",
+    "type": "AttributeList"
 }
 
 
@@ -318,7 +318,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:1
 07. GET Entity Attributes - see four attributes (P1, P2, P3, and R1)
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 144
+Content-Length: 132
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -330,8 +330,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "P3",
         "R1"
     ],
-    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
-    "type": "EntityAttributeList"
+    "id": "urn:ngsi-ld:AttributeList:REGEX(.*)",
+    "type": "AttributeList"
 }
 
 
@@ -347,7 +347,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:2
 09. GET Entity Attributes - see six attributes (P1-P4, and R1-R2)
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 154
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -361,8 +361,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "R1",
         "R2"
     ],
-    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
-    "type": "EntityAttributeList"
+    "id": "urn:ngsi-ld:AttributeList:REGEX(.*)",
+    "type": "AttributeList"
 }
 
 
@@ -378,7 +378,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:reg:3
 11. GET Entity Attributes - see ten attributes (P1-P5, and R1-R5)
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 174
+Content-Length: 162
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -396,8 +396,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "R4",
         "R5"
     ],
-    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
-    "type": "EntityAttributeList"
+    "id": "urn:ngsi-ld:AttributeList:REGEX(.*)",
+    "type": "AttributeList"
 }
 
 
@@ -420,7 +420,7 @@ Date: REGEX(.*)
 13. GET Entity Attributes - see only P4 and R2 from R2
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 134
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -430,15 +430,15 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "P4",
         "R2"
     ],
-    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
-    "type": "EntityAttributeList"
+    "id": "urn:ngsi-ld:AttributeList:REGEX(.*)",
+    "type": "AttributeList"
 }
 
 
 14. Same same, but Accept: application/ld+json
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 212
+Content-Length: 200
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -448,8 +448,8 @@ Date: REGEX(.*)
         "P4",
         "R2"
     ],
-    "id": "urn:ngsi-ld:EntityAttributeList:REGEX(.*)",
-    "type": "EntityAttributeList"
+    "id": "urn:ngsi-ld:AttributeList:REGEX(.*)",
+    "type": "AttributeList"
 }
 
 

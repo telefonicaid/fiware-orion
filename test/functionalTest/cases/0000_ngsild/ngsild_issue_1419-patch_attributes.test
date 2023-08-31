@@ -1,0 +1,159 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Patching attributes for an entity using different contexts => different longnames for same shortname
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity urn:ngsi-ld:Vehicle:4577314217839414 as in issue #1419
+# 02. PATCH the speed attribute using PATCH /entities/*/attrs as in issue #1419
+# 03. Health check, as the issue #1419 indicates the broker crashes during the PATCH 
+#
+
+echo "01. Create an entity urn:ngsi-ld:Vehicle:4577314217839414 as in issue #1419"
+echo "==========================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:4577314217839414",
+  "type": "Vehicle",
+  "brandName": {
+    "type": "Property",
+    "value": "Mercedes"
+  },
+  "isParked": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+    "observedAt": "2017-07-29T12:00:04Z",
+    "providedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:Bob"
+    },
+    "datasetId": "urn:ngsi-ld:Relationship:parked12345"
+  },
+  "speed": [
+    {
+      "type": "Property",
+      "value": 55,
+      "source": {
+        "type": "Property",
+        "value": "Speedometer"
+      }
+    },
+    {
+      "type": "Property",
+      "value": 54.5,
+      "source": {
+        "type": "Property",
+        "value": "GPS"
+      },
+      "datasetId": "urn:ngsi-ld:Property:gpsBxyz123-speed"
+    }
+  ],
+  "@context": [
+    "https://forge.etsi.org/rep/cim/ngsi-ld-test-suite/-/raw/develop/resources/jsonld-contexts/ngsi-ld-test-suite-compound.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --in application/ld+json
+echo
+echo
+
+
+echo "02. PATCH the speed attribute using PATCH /entities/*/attrs as in issue #1419"
+echo "============================================================================="
+payload='{
+  "speed": {
+    "type": "Property",
+    "value": 99,
+    "source": {
+    "type": "Property",
+    "value": "Speedometer"
+    }
+  },
+  "@context": [
+    "https://forge.etsi.org/rep/cim/ngsi-ld-test-suite/-/raw/develop/resources/jsonld-contexts/ngsi-ld-test-suite-compound.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:4577314217839414/attrs -X PATCH --payload "$payload" --in application/ld+json
+echo
+echo
+
+
+echo "03. Health check, as the issue #1419 indicates the broker crashes during the PATCH"
+echo "=================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?local=true
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:ngsi-ld:Vehicle:4577314217839414 as in issue #1419
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:4577314217839414
+
+
+
+02. PATCH the speed attribute using PATCH /entities/*/attrs as in issue #1419
+=============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. Health check, as the issue #1419 indicates the broker crashes during the PATCH
+==================================================================================
+HTTP/1.1 200 OK
+Content-Length: 345
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "https://ngsi-ld-test-suite/context#brandName": {
+            "type": "Property",
+            "value": "Mercedes"
+        },
+        "https://ngsi-ld-test-suite/context#speed": {
+            "https://ngsi-ld-test-suite/context#source": {
+                "type": "Property",
+                "value": "Speedometer"
+            },
+            "type": "Property",
+            "value": 99
+        },
+        "id": "urn:ngsi-ld:Vehicle:4577314217839414",
+        "type": "https://ngsi-ld-test-suite/context#Vehicle"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB

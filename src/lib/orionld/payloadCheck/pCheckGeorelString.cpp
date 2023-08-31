@@ -63,7 +63,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
   {
     if (geoInfoP->geometry != GeoPoint)
     {
-      orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be 'Point' for georel 'near'", 400);
+      orionldError(OrionldBadRequestData,  "Invalid Geo-Spatial filter", "Geometry must be 'Point' for georel 'near'", 400);
       return false;
     }
   }
@@ -71,7 +71,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
   {
     if ((geoInfoP->geometry != GeoPolygon) && (geoInfoP->geometry != GeoMultiPolygon))
     {
-      orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "Geometry must be either 'Polygon' or 'MultiPolygon' for georel 'within'", 400);
+      orionldError(OrionldBadRequestData,  "Invalid Geo-Spatial filter", "Geometry must be either 'Polygon' or 'MultiPolygon' for georel 'within'", 400);
       return false;
     }
     geoInfoP->georel = GeorelWithin;
@@ -105,7 +105,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
   }
   else
   {
-    orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter - invalid 'georel'", georel, 400);
+    orionldError(OrionldBadRequestData,  "Invalid Geo-Spatial filter - invalid 'georel'", georel, 400);
     return false;
   }
 
@@ -126,7 +126,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
 
       if (strcmp(grel, "near") != 0)
       {
-        orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "invalid geo-relation for Point", 400);
+        orionldError(OrionldBadRequestData,  "Invalid Geo-Spatial filter", "invalid geo-relation for Point", 400);
         return false;
       }
       geoInfoP->georel = GeorelNear;
@@ -138,7 +138,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
 
       if (distance == NULL)
       {
-        orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
+        orionldError(OrionldBadRequestData,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
         return false;
       }
       *distance = 0;
@@ -151,7 +151,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
         max = false;
       else
       {
-        orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
+        orionldError(OrionldBadRequestData,  "Invalid Geo-Spatial filter", "no distance for georel 'near' for Point", 400);
         return false;
       }
 
@@ -163,7 +163,7 @@ bool pCheckGeorelString(const char* georel, OrionldGeoInfo* geoInfoP)
       {
         if ((*distance < '0') || (*distance > '9'))
         {
-          orionldError(OrionldInvalidRequest,  "Invalid Geo-Spatial filter", "invalid number for distance for georel 'near' for Point", 400);
+          orionldError(OrionldBadRequestData,  "Invalid Geo-Spatial filter", "invalid number for distance for georel 'near' for Point", 400);
           return false;
         }
         ++distance;
