@@ -1,0 +1,163 @@
+# Copyright 2021 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Delete AND RELOAD a @context from the context cache 
+
+--SHELL-INIT--
+dbInit CB
+dbDrop orionld
+dbDrop CB
+orionldStart CB
+cServerCurl --url /jsonldContexts/badArray --verb DELETE
+
+--SHELL--
+
+#
+# 01. Create an "invalid" context in the context server, an array with the core context and a URL that points to nowhere
+# 02. Attempt to create an entity using the context from step 01 - only to see it fail with 503
+# 03. GET all entities, make sure there are NONE
+# 04. Query the context cache for all contexts, see core context only - the others failed!
+# 05. Another attempt to create an entity using the context from step 01 - only to see it fail with 503 again
+#
+
+echo '01. Create an "invalid" context in the context server, an array with the core context and a URL that points to nowhere'
+echo '======================================================================================================================'
+payload='{
+  "@context": [
+    "https://uri.etsi.org/ngsi-ld/v9/nada.jsonld",
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+  ]
+}'
+cServerCurl --url /jsonldContexts/badArray --payload "$payload" --verb POST
+echo
+echo
+
+
+echo '02. Attempt to create an entity using the context from step 01 - only to see it fail with 504'
+echo '============================================================================================='
+payload='{
+  "id": "urn:ngsi-ld:entities:E1",
+  "type": "T",
+  "A3": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <http://localhost:7080/jsonldContexts/badArray>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+echo '03. GET all entities, make sure there are NONE'
+echo '=============================================='
+orionCurl --url /ngsi-ld/v1/entities?local=true
+echo
+echo
+
+
+echo '04. Query the context cache for all contexts, see core context only - the others failed!'
+echo '========================================================================================'
+orionCurl --url /ngsi-ld/v1/jsonldContexts
+echo
+echo
+
+
+echo '05. Another attempt to create an entity using the context from step 01 - only to see it fail with 503 again'
+echo '==========================================================================================================='
+payload='{
+  "id": "urn:ngsi-ld:entities:E2",
+  "type": "T",
+  "A3": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" -H 'Link: <http://localhost:7080/jsonldContexts/badArray>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an "invalid" context in the context server, an array with the core context and a URL that points to nowhere
+======================================================================================================================
+HTTP/1.1 201 Created
+Location: http://localhost:8080/jsonldContexts/badArray
+Date: REGEX(.*)
+connection: keep-alive
+transfer-encoding: chunked
+
+
+
+02. Attempt to create an entity using the context from step 01 - only to see it fail with 504
+=============================================================================================
+HTTP/1.1 503 Service Unavailable
+Content-Length: 160
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/v9/nada.jsonld",
+    "title": "Unable to download context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
+}
+
+
+03. GET all entities, make sure there are NONE
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+04. Query the context cache for all contexts, see core context only - the others failed!
+========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+]
+
+
+05. Another attempt to create an entity using the context from step 01 - only to see it fail with 503 again
+===========================================================================================================
+HTTP/1.1 503 Service Unavailable
+Content-Length: 160
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/v9/nada.jsonld",
+    "title": "Unable to download context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/LdContextNotAvailable"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

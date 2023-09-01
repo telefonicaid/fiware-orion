@@ -454,7 +454,7 @@ static bool linkGet(const char* link)
 
   orionldState.contextP = orionldContextFromUrl(url, NULL);
   if (orionldState.contextP == NULL)
-    return false;
+    LM_RE(false, ("orionldContextFromUrl returned NULL - no context!"));
 
   orionldState.link = orionldState.contextP->url;
 
@@ -1054,7 +1054,10 @@ MHD_Result orionldMhdConnectionTreat(void)
         goto respond;
 
       if (linkGet(link) == false)  // Lookup/Download if necessary
+      {
+        LM_W(("linkGet failed, going to 'respond'"));
         goto respond;
+      }
     }
 
     //
@@ -1111,7 +1114,9 @@ MHD_Result orionldMhdConnectionTreat(void)
  serviceRoutine:
   if (orionldState.requestTree != NULL)
     kjTreeLog(orionldState.requestTree, "Request Payload Body", LmtRequest);
+
   serviceRoutineResult = orionldState.serviceP->serviceRoutine();
+
   PERFORMANCE(serviceRoutineEnd);
   if (orionldState.in.performance == true)
     performanceHeader();
