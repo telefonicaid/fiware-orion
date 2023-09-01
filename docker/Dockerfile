@@ -19,9 +19,6 @@
 # iot_support at tid dot es
 #
 
-# FIXME the change from mongoc driver 1.23.1 to 1.24.1 (PR https://github.com/telefonicaid/fiware-orion/pull/4415)
-# has not been actually tested. Remove this FIXME mark after succesfull test
-
 ARG  IMAGE_TAG=11.6-slim
 FROM debian:${IMAGE_TAG}
 
