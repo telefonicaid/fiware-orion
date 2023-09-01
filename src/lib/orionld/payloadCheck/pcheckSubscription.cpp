@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // STRING_CHECK, ...
 #include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_EXPIRESAT_IN_FUTURE
 #include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload, e.g. subscriptionNotification = Subscription::notification"
 #include "orionld/payloadCheck/pcheckGeoQ.h"                     // pcheckGeoQ
 #include "orionld/payloadCheck/pcheckEntityInfoArray.h"          // pcheckEntityInfoArray
@@ -189,6 +190,7 @@ bool pcheckSubscription
       STRING_CHECK(nodeP, nodeP->name);
       EMPTY_STRING_CHECK(nodeP, nodeP->name);
       DATETIME_CHECK(expiresP->value.s, dateTime, nodeP->name);
+      PCHECK_EXPIRESAT_IN_FUTURE(0, "Invalid Subscription", "/expiresAt/ in the past", 400, dateTime, orionldState.requestTime);
     }
     else if (strcmp(nodeP->name, "lang") == 0)
     {

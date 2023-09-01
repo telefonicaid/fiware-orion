@@ -254,6 +254,7 @@ bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const 
       STRING_CHECK(nodeP, nodeP->name);
       EMPTY_STRING_CHECK(nodeP, nodeP->name);
       DATETIME_CHECK(expiresP->value.s, dateTime, nodeP->name);
+      PCHECK_EXPIRESAT_IN_FUTURE(0, "Invalid Registration", "/expiresAt/ in the past", 400, dateTime, orionldState.requestTime);
       nodeP->name = (char*) "expiresAt";
     }
     else if (strcmp(nodeP->name, "endpoint") == 0)

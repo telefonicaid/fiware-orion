@@ -37,7 +37,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECKx()
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
-#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI, PCHECK_EXPIRESAT_IN_FUTURE
 #include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload
 #include "orionld/q/qRender.h"                                   // qRender
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
@@ -48,6 +48,10 @@ extern "C"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// oldTreatmentForQ -
+//
 bool oldTreatmentForQ(ngsiv2::Subscription* subP, char* q)
 {
   bool  qWithOr = false;
@@ -306,6 +310,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
       DUPLICATE_CHECK(expiresP, "Subscription::expiresAt", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::expiresAt");
       DATETIME_CHECK(expiresP, subP->expires, "Subscription::expiresAt");
+      PCHECK_EXPIRESAT_IN_FUTURE(0, "Invalid Subscription", "/expiresAt/ in the past", 400, subP->expires, orionldState.requestTime);
     }
     else if (strcmp(kNodeP->name, "throttling") == 0)
     {

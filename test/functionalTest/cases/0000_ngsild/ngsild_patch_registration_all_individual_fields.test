@@ -297,7 +297,7 @@ echo
 echo "21. PATCH the registration with a new expires"
 echo "============================================="
 payload='{
-  "expiresAt": "2021-12-31T18:19:20.210Z"
+  "expiresAt": "2032-12-31T18:19:20.210Z"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
 echo
@@ -1255,7 +1255,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2032-12-31T18:19:20.210Z",
   "endpoint": "http://my.csource.org:1026",
   "information": [
     {
@@ -1327,7 +1327,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2032-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1399,7 +1399,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2032-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {
@@ -1478,7 +1478,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   "type": "ContextSourceRegistration",
   "name": "New Name",
   "description": "New Description",
-  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2032-12-31T18:19:20.210Z",
   "endpoint": "http://localhost:1026/go",
   "information": [
     {

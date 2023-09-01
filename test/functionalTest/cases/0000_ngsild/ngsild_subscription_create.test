@@ -55,6 +55,8 @@ orionldStart CB
 # 11. Create the subscription from https://github.com/FIWARE/context.Orion-LD/issues/895
 # 12. See the subscription in mongo
 #
+# 13. Attempt to create a subscription with an expiresAt in the past
+#
 
 
 echo "01. POST /ngsi-ld/v1/subscriptions, with a sub-id"
@@ -397,6 +399,31 @@ echo
 echo "12. See the subscription in mongo"
 echo "================================="
 mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:11"})'
+echo
+echo
+
+
+echo "13. Attempt to create a subscription with an expiresAt in the past"
+echo "=================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:13",
+  "description": "test0001",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person"
+    }
+  ],
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://tutorial:3000/subscription/test0001",
+      "accept": "application/json"
+    }
+  },
+  "expiresAt": "2023-09-01T10:00:00.000Z"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
 echo
 echo
 
@@ -745,6 +772,20 @@ MongoDB server REGEX(.*)
 	"format" : "normalized"
 }
 bye
+
+
+13. Attempt to create a subscription with an expiresAt in the past
+==================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/expiresAt/ in the past",
+    "title": "Invalid Subscription",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
 
 
 --TEARDOWN--
