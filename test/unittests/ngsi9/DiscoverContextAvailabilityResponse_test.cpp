@@ -117,7 +117,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   rendered = dcarP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   dcarP->release();  // ... otherwise the 500 remains and "pollutes" next tests
-  free(dcarP);
+  delete dcarP;
 
 
   // 2. One contextRegistrationResponse - errorCode inside ContextRegistrationResponse - only providingApplication in ContextRegistration
@@ -343,7 +343,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   rendered = dcarP->toJsonV1();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
-  free(dcarP);
+  delete dcarP;
 
   utExit();
 }
