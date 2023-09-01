@@ -19,6 +19,9 @@
 # iot_support at tid dot es
 #
 
+# FIXME the change from mongoc driver 1.23.1 to 1.24.1 (PR https://github.com/telefonicaid/fiware-orion/pull/4415)
+# has not been actually tested. Remove this FIXME mark after succesfull test
+
 ARG  IMAGE_TAG=11.6-slim
 FROM debian:${IMAGE_TAG}
 
@@ -80,9 +83,9 @@ RUN \
     ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
-    curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz && \
-    tar xfvz mongo-c-driver-1.23.1.tar.gz && \
-    cd mongo-c-driver-1.23.1 && \
+    curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz && \
+    tar xfvz mongo-c-driver-1.24.3.tar.gz && \
+    cd mongo-c-driver-1.24.3 && \
     mkdir cmake-build && \
     cd cmake-build && \
     # Different from ci/deb/build-dep.sh and build from source documentation, we add here also
@@ -120,8 +123,8 @@ RUN \
            /opt/libmicrohttpd-0.9.76 \
            /opt/mosquitto-2.0.15.tar.gz \
            /opt/mosquitto-2.0.15 \
-           /opt/mongo-c-driver-1.23.1.tar.gz \
-           /opt/mongo-c-driver-1.23.1 \
+           /opt/mongo-c-driver-1.24.3.tar.gz \
+           /opt/mongo-c-driver-1.24.3 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
            /opt/rapidjson-1.1.0 \

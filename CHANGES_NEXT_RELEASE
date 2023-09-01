@@ -4,3 +4,4 @@
 - Fix: improve error traces (#4387)
 - Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
 - Fix: improve logs in MongoDB query logic
+- Hardening: upgrade libmongoc dependency from 1.23.1 to 1.24.3
