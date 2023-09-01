@@ -220,8 +220,8 @@ SET (BOOST_MT
 
 # See http://mongoc.org/libmongoc/current/tutorial.html#cmake
 # This find_package() command provides the mongo::mongoc_static used in
-# SET for common static libs. We use 1.23.1 as reference version.
-find_package (mongoc-1.0 1.23.1 EXACT)
+# SET for common static libs. We use 1.24.1 as reference version.
+find_package (mongoc-1.0 1.24.1 EXACT)
 
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
