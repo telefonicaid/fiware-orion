@@ -226,6 +226,7 @@ orionldStart CB -experimental
 # 116. Attempt to create a registration with an 'expiresAt' that is not a string - see failure
 # 117. Attempt to create a registration with an 'expiresAt' that is an empty string - see failure
 # 118. Attempt to create a registration with an 'expiresAt' that is not a valid DateTime - see failure
+# 118. Attempt to create a registration with an 'expiresAt' that is in the past - see failure
 # 119. Attempt to create a registration with a duplicated 'expiresAt' - see failure
 #
 # 120. Attempt to create a registration without 'endpoint' - see failure
@@ -1878,14 +1879,27 @@ echo
 echo
 
 
+echo "118. Attempt to create a registration with an 'expiresAt' that is in the past - see failure"
+echo "==========================================================================================="
+payload='{
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://a.b.c:1234/abc",
+  "information": [ { "propertyNames": [ "P1" ] } ],
+  "expiresAt": "2023-09-01T10:00:00.000Z"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
 echo "119. Attempt to create a registration with a duplicated 'expiresAt' - see failure"
 echo "================================================================================="
 payload='{
   "type": "ContextSourceRegistration",
   "endpoint": "http://a.b.c:1234/abc",
   "information": [ { "propertyNames": [ "P1" ] } ],
-  "expiresAt": "2022-10-02T18:00:00Z",
-  "expiresAt": "2022-10-02T18:00:00Z"
+  "expiresAt": "2032-10-02T18:00:00Z",
+  "expiresAt": "2032-10-02T18:00:00Z"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
@@ -4462,6 +4476,20 @@ Date: REGEX(.*)
 {
     "detail": "expiresAt",
     "title": "Invalid DateTime value",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+118. Attempt to create a registration with an 'expiresAt' that is in the past - see failure
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/expiresAt/ in the past",
+    "title": "Invalid Registration",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
