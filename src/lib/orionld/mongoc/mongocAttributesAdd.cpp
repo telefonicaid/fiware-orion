@@ -37,8 +37,8 @@ extern "C"
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocWriteLog.h"                       // mongocWriteLog
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
+#include "orionld/mongoc/mongocIndexString.h"                    // mongocIndexString
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // Own interface
-
 
 
 
@@ -92,9 +92,14 @@ bool mongocAttributesAdd
     bson_append_document_begin(&push, "attrNames", 9,  &eachBson);
     bson_append_array_begin(&eachBson, "$each", 5, &commaArrayBson);
 
+    int ix = 0;
     for (KjNode* attrNameP = newDbAttrNamesV->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
     {
-      bson_append_utf8(&commaArrayBson, "0", 1, attrNameP->value.s, -1);  // Always index "0" ... seems to work !
+      char buf[16];
+      int  bufLen = mongocIndexString(ix, buf);
+
+      bson_append_utf8(&commaArrayBson, buf, bufLen, attrNameP->value.s, -1);
+      ++ix;
     }
 
     bson_append_array_end(&eachBson, &commaArrayBson);
