@@ -71,6 +71,7 @@ SET (SOURCES
     mongocAuxAttributesFilter.cpp
     mongocWriteLog.cpp
     mongocAttributeReplace.cpp
+    mongocIndexString.cpp
 )
 
 # Include directories
