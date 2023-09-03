@@ -59,7 +59,7 @@ payload='{
       "type": "T"
     }
   ],
-  "q": "P3==1",
+  "q": "P3==1|P3==2",
   "timeInterval": 2,
   "notification": {
     "endpoint": {

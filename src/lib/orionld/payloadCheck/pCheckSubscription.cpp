@@ -27,6 +27,7 @@ extern "C"
 #include "kbase/kMacros.h"                                       // K_FT
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
@@ -164,6 +165,27 @@ bool pCheckSubscription
     }
   }
 
+  //
+  // First we need to know whether it is a n ormal subscription or a periodic notification subscription (timeInterval)
+  //
+  bool pernot = false;
+
+  KjNode* timeIntervalNodeP = kjLookup(subP, "timeInterval");
+  if (timeIntervalNodeP != NULL)
+  {
+    PCHECK_NUMBER(timeIntervalNodeP, 0, NULL, SubscriptionTimeIntervalPath, 400);
+    PCHECK_NUMBER_GT(timeIntervalNodeP, 0, "Non-supported timeInterval (must be greater than zero)", SubscriptionTimeIntervalPath, 400, 0);
+
+    pernot = true;
+    *timeInterval = (timeIntervalNodeP->type == KjInt)? timeIntervalNodeP->value.i : timeIntervalNodeP->value.f;
+  }
+  else
+    *timeInterval = 0;
+
+
+  //
+  // Now loop over the entiry payload
+  //
   KjNode* subItemP = subP->value.firstChildP;
   KjNode* next;
   while (subItemP != NULL)
@@ -201,19 +223,13 @@ bool pCheckSubscription
         return false;
     }
     else if (strcmp(subItemP->name, "timeInterval") == 0)
-    {
       PCHECK_DUPLICATE(timeIntervalP, subItemP, 0, NULL, SubscriptionTimeIntervalPath, 400);
-      PCHECK_NUMBER(timeIntervalP, 0, NULL, SubscriptionTimeIntervalPath, 400);
-      PCHECK_NUMBER_GT(timeIntervalP, 0, "Non-supported timeInterval (must be greater than zero)", SubscriptionTimeIntervalPath, 400, 0);
-
-      *timeInterval = (timeIntervalP->type == KjInt)? timeIntervalP->value.i : timeIntervalP->value.f;
-    }
     else if (strcmp(subItemP->name, "q") == 0)
     {
       PCHECK_DUPLICATE(qP, subItemP, 0, NULL, SubscriptionQPath, 400);
       PCHECK_STRING(qP, 0, NULL, SubscriptionQPath, 400);
 
-      *qTreeP = qBuild(qP->value.s, qRenderedForDbP, qValidForV2P, qIsMqP, true);  // 5th parameter: qToDbModel == true
+      *qTreeP = qBuild(qP->value.s, qRenderedForDbP, qValidForV2P, qIsMqP, true, pernot);  // 5th parameter: qToDbModel == true
       *qNodeP = qP;
 
       if (*qTreeP == NULL)

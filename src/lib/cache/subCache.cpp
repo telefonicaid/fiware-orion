@@ -958,7 +958,7 @@ bool subCacheItemInsert
       // FIXME: Instead of calling qBuild here, I should pass the pointer from pCheckSubscription
       if (cSubP->qP != NULL)
         qRelease(cSubP->qP);
-      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true);  // cSubP->qText needs real allocation
+      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true, false);  // cSubP->qText needs real allocation
 
       if (cSubP->qText != NULL)
         cSubP->qText = strdup(cSubP->qText);

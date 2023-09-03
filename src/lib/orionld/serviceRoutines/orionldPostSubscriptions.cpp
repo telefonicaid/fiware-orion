@@ -282,6 +282,9 @@ bool orionldPostSubscriptions(void)
   else
   {
     // Add subscription to the pernot-cache
+    LM_T(LmtPernot, ("qRenderedForDb: '%s'", qRenderedForDb));
+    if (qTree != NULL)
+      qPresent(qTree, "Pernot", "Q for pernot subscription", LmtPernot);
     pSubP = pernotSubCacheAdd(subscriptionId,
                               subP,
                               endpointP,

@@ -1157,7 +1157,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       // Only done if its an NGSI-LD operation AND if it's an NGSI-LD Subscription (ldContext has a value != "")
       //
       if ((subP->qP == NULL) && (subP->ldContext != "") && (subP->qText != NULL))
-        subP->qP = qBuild(subP->qText, NULL, NULL, NULL, false);
+        subP->qP = qBuild(subP->qText, NULL, NULL, NULL, false, false);
 
       if (subP->qP != NULL)
       {

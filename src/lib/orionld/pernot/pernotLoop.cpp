@@ -156,13 +156,13 @@ static void* pernotLoop(void* vP)
       }
 
       double diffTime = subP->lastNotificationTime + subP->timeInterval - now;
-      LM_T(LmtPernotLoop, ("%s: lastNotificationTime:    %f", subP->subscriptionId, subP->lastNotificationTime));
-      LM_T(LmtPernotLoop, ("%s: now:                     %f", subP->subscriptionId, now));
-      LM_T(LmtPernotLoop, ("%s: diffTime:                %f", subP->subscriptionId, diffTime));
-      LM_T(LmtPernotLoop, ("%s: noMatch:                 %d", subP->subscriptionId, subP->noMatch));
-      LM_T(LmtPernotLoop, ("%s: noMatchDb:               %d", subP->subscriptionId, subP->noMatchDb));
-      LM_T(LmtPernotLoop, ("%s: notificationAttempts:    %d", subP->subscriptionId, subP->notificationAttempts));
-      LM_T(LmtPernotLoop, ("%s: notificationAttemptsDb:  %d", subP->subscriptionId, subP->notificationAttemptsDb));
+      LM_T(LmtPernotLoopTimes, ("%s: lastNotificationTime:    %f", subP->subscriptionId, subP->lastNotificationTime));
+      LM_T(LmtPernotLoopTimes, ("%s: now:                     %f", subP->subscriptionId, now));
+      LM_T(LmtPernotLoopTimes, ("%s: diffTime:                %f", subP->subscriptionId, diffTime));
+      LM_T(LmtPernotLoopTimes, ("%s: noMatch:                 %d", subP->subscriptionId, subP->noMatch));
+      LM_T(LmtPernotLoopTimes, ("%s: noMatchDb:               %d", subP->subscriptionId, subP->noMatchDb));
+      LM_T(LmtPernotLoopTimes, ("%s: notificationAttempts:    %d", subP->subscriptionId, subP->notificationAttempts));
+      LM_T(LmtPernotLoopTimes, ("%s: notificationAttemptsDb:  %d", subP->subscriptionId, subP->notificationAttemptsDb));
 
       if (diffTime <= 0)
       {

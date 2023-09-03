@@ -101,6 +101,7 @@ typedef enum TraceLevels
   //
   LmtPernot = 100,                     // Periodic Notification Subscription cache
   LmtPernotLoop,                       // Pernot loop, when each sub is triggered in time
+  LmtPernotLoopTimes,                  // Pernot loop, details on timestamps
   LmtPernotFlush,                      // Pernot flush to DB
   LmtPernotQuery,                      // Pernot query
 

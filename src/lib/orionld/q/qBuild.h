@@ -55,6 +55,6 @@
 //   v2ValidP   output parameter indicating whether the q string id valid for NGSIv2
 //   isMdP      output parameter indicating whether the q para meter corresponds to 'mq' in NGSIv2
 //
-extern QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMdP, bool qToDbModel);
+extern QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMdP, bool qToDbModel, bool pernot);
 
 #endif  // SRC_LIB_ORIONLD_Q_QBUILD_H_
