@@ -1,6 +1,8 @@
 Fixed issues:
-  * #280   Implemented Periodic Notifications (subscriptions with a 'timeInterval')
-  * #1419  Fixed a bug in the cleanup of the "URL being downloaded list" - not being cleaned up in case of an error
-  * #280   Added extensive logging for downloading of contexts
-  * #280   Fixed two erroneous type values in the response payload body (EntityTypeInformation => EntityTypeInfo and EntityAttributeList => AttributeList)
-  * #280   Changed all error codes from InvalidRequest to BadRequestData, except for JSON Parse Error that is still an InvalidRequest
+  * #1419 - Fixed a bug in the cleanup of the "URL being downloaded list" - not being cleaned up in case of an error
+  * #280  - Added extensive logging for downloading of contexts
+  * #280  - Fixed two erroneous type values in the response payload body (EntityTypeInformation => EntityTypeInfo and EntityAttributeList => AttributeList)
+  * #280  - Changed all error codes from InvalidRequest to BadRequestData, except for JSON Parse Error that is still an InvalidRequest
+  * #280  - Giving errors for expiresAt in the past (for registrations and subscriptions)
+  * #280  - Fixed a bug in error detection of downloading errors in arrays of contexts, at lower nesting levels
+  * #280  - Implemented Periodic Notifications (subscriptions with a 'timeInterval')

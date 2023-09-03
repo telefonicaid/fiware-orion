@@ -294,6 +294,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
       DUPLICATE_CHECK(expiresP, "Registration::expiresAt", kNodeP);
       STRING_CHECK(kNodeP, "Registration::expiresAt");
       DATETIME_CHECK(expiresP->value.s, regP->expires, "Registration::expiresAt");
+      PCHECK_EXPIRESAT_IN_FUTURE(0, "Invalid Registration", "/expiresAt/ in the past", 400, regP->expires, orionldState.requestTime);
     }
     else if (strcmp(kNodeP->name, "endpoint") == 0)
     {

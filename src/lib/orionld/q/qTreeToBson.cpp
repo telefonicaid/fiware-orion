@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/mongoc/mongocIndexString.h"                  // mongocIndexString
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/q/qTreeToBson.h"                             // Own interface
@@ -47,14 +48,18 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
     bson_init(&orArrayBson);
     bson_append_array_begin(bsonP, "$or", 3, &orArrayBson);
 
+    int ix = 0;
     for (QNode* qNodeP = treeP->value.children; qNodeP != NULL; qNodeP = qNodeP->next)
     {
       bson_t orItemBson;
+      char   buf[16];
+      int    bufLen = mongocIndexString(ix, buf);
 
-      bson_append_document_begin(&orArrayBson, "0", 1, &orItemBson);
+      bson_append_document_begin(&orArrayBson, buf, bufLen, &orItemBson);
       if (qTreeToBson(qNodeP, &orItemBson, titleP, detailsP) == false)
         return false;
       bson_append_document_end(&orArrayBson, &orItemBson);
+      ++ix;
     }
     bson_append_array_end(bsonP, &orArrayBson);
     bson_destroy(&orArrayBson);
@@ -181,14 +186,18 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
 
       bson_append_array_begin(&inBson, "$in", -1, &commaArrayBson);
 
+      int ix = 0;
       for (QNode* valueNodeP = rightP->value.children; valueNodeP != NULL; valueNodeP = valueNodeP->next)
       {
+        char buf[16];
+        int  bufLen = mongocIndexString(ix, buf);
+
         if (valueNodeP->type == QNodeIntegerValue)
-          bson_append_int32(&commaArrayBson, "0", 1, valueNodeP->value.i);
+          bson_append_int32(&commaArrayBson, buf, bufLen, valueNodeP->value.i);
         else if (valueNodeP->type == QNodeFloatValue)
-          bson_append_double(&commaArrayBson, "0", 1, valueNodeP->value.f);
+          bson_append_double(&commaArrayBson, buf, bufLen, valueNodeP->value.f);
         else if (valueNodeP->type == QNodeStringValue)
-          bson_append_utf8(&commaArrayBson, "0", 1, valueNodeP->value.s, -1);
+          bson_append_utf8(&commaArrayBson, buf, bufLen, valueNodeP->value.s, -1);
       }
       bson_append_array_end(&inBson, &commaArrayBson);
       bson_append_document_end(bsonP, &inBson);
@@ -295,11 +304,17 @@ bool qTreeToBson(QNode* treeP, bson_t* bsonP, char** titleP, char** detailsP)
 
       bson_append_array_begin(&inBson, "$in", -1, &commaArrayBson);
 
+      int ix = 0;
       for (QNode* valueNodeP = rightP->value.children; valueNodeP != NULL; valueNodeP = valueNodeP->next)
       {
-        if      (valueNodeP->type == QNodeIntegerValue)  bson_append_int32(&commaArrayBson, "0", 1, valueNodeP->value.i);
-        else if (valueNodeP->type == QNodeFloatValue)    bson_append_double(&commaArrayBson, "0", 1, valueNodeP->value.f);
-        else if (valueNodeP->type == QNodeStringValue)   bson_append_utf8(&commaArrayBson, "0", 1, valueNodeP->value.s, -1);
+        char buf[16];
+        int  bufLen = mongocIndexString(ix, buf);
+
+        if      (valueNodeP->type == QNodeIntegerValue)  bson_append_int32(&commaArrayBson,  buf, bufLen, valueNodeP->value.i);
+        else if (valueNodeP->type == QNodeFloatValue)    bson_append_double(&commaArrayBson, buf, bufLen, valueNodeP->value.f);
+        else if (valueNodeP->type == QNodeStringValue)   bson_append_utf8(&commaArrayBson,   buf, bufLen, valueNodeP->value.s, -1);
+
+        ++ix;
       }
       bson_append_array_end(&inBson, &commaArrayBson);
       bson_append_document(&notBson, "$not", 4, &inBson);

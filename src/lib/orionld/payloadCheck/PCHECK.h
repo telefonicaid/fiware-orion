@@ -353,6 +353,25 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// PCHECK_EXPIRESAT_IN_FUTURE
+//
+#define PCHECK_EXPIRESAT_IN_FUTURE(_type, _title, detail, status, expiresAt, now)            \
+do                                                                                           \
+{                                                                                            \
+  int         type  = (_type  ==    0)? OrionldBadRequestData   : _type;                     \
+  const char* title = (_title == NULL)? "expiresAt in the past" : _title;                    \
+                                                                                             \
+  if (expiresAt < now)                                                                       \
+  {                                                                                          \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // PCHECK_SPECIAL_ATTRIBUTE
 //
 #define PCHECK_SPECIAL_ATTRIBUTE(attrP, isAttribute, attrTypeFromDb)            \

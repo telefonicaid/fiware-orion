@@ -152,6 +152,9 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
         contextP->context.array.items     = 1;
         contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, 1 * sizeof(OrionldContext*));
         contextP->context.array.vector[0] = orionldContextFromUrl(contextTreeP->value.s, NULL);
+
+        if (contextP->context.array.vector[0] == NULL)
+          LM_RE(NULL, ("Context Error from orionldContextFromUrl"));
       }
 
       if (contextP != NULL)

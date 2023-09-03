@@ -252,6 +252,7 @@ bool pCheckSubscription
       PCHECK_STRING(subItemP, 0, NULL, SubscriptionExpiresAtPath, 400);
       PCHECK_DUPLICATE(expiresAtP, subItemP, 0, NULL, SubscriptionExpiresAtPath, 400);
       PCHECK_ISO8601(expiresAt, expiresAtP->value.s, 0, NULL, SubscriptionExpiresAtPath, 400);
+      PCHECK_EXPIRESAT_IN_FUTURE(0, "Invalid Subscription", "/expiresAt/ in the past", 400, expiresAt, orionldState.requestTime);
     }
     else if (strcmp(subItemP->name, "throttling") == 0)
     {
