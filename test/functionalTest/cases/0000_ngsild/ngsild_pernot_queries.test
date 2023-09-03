@@ -43,13 +43,10 @@ echo "01. Create a pernot subscription on entity type T only and with a time int
 echo "============================================================================================"
 #
 # Test also:
-#  q
 #  geoQ
 #  expiresAt
 #  lang
 #  jsonldContext
-#  notification::format == keyValues/concise
-#  notification::sysAttrs
 #  
 payload='{
   "id": "urn:S1",
@@ -65,7 +62,9 @@ payload='{
     "endpoint": {
       "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
     },
-    "attributes": [ "P1", "P2" ]
+    "attributes": [ "P1", "P2" ],
+    "sysAttrs": false,
+    "format": "normalized"
   }
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
