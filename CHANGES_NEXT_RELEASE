@@ -5,3 +5,4 @@ Fixed issues:
   * #280  - Changed all error codes from InvalidRequest to BadRequestData, except for JSON Parse Error that is still an InvalidRequest
   * #280  - Giving errors for expiresAt in the past (for registrations and subscriptions)
   * #280  - Fixed a bug in error detection of downloading errors in arrays of contexts, at lower nesting levels
+  * #280  - Better 501 handling of temporal operations
