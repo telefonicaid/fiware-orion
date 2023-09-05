@@ -117,6 +117,8 @@ void mongocKjTreeToBson(KjNode* treeP, bson_t* bsonP)
   {
     LM_T(LmtMongoc, ("Calling kjTreeToBson for '%s' of '%s'", itemP->name, treeP->name));
     kjTreeToBson(itemP, bsonP, inArray, arrayIx);
-    ++arrayIx;
+
+    if (inArray == true)
+      ++arrayIx;
   }
 }
