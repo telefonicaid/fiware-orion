@@ -266,7 +266,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 371
+Content-Length: 386
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -283,6 +283,7 @@ Content-Length: 371
                 "id": "E1"
             },
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -318,7 +319,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 336
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -329,6 +330,7 @@ Content-Length: 336
         "mqttCustom": {
             "payload": "foo",
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -364,7 +366,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 376
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -380,6 +382,7 @@ Content-Length: 361
                 }
             },
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -415,7 +418,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 351
+Content-Length: 366
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -429,6 +432,7 @@ Content-Length: 351
                 "type": "T3"
             },
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -464,7 +468,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 336
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -475,6 +479,7 @@ Content-Length: 336
         "mqttCustom": {
             "payload": "bar",
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -512,7 +517,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 336
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -523,6 +528,7 @@ Content-Length: 336
         "mqttCustom": {
             "payload": "zzz",
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -558,7 +564,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 373
+Content-Length: 388
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -575,6 +581,7 @@ Content-Length: 373
                 "type": "T4"
             },
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },

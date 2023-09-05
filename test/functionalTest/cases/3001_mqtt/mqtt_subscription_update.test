@@ -177,7 +177,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 344
+Content-Length: 359
 
 {
     "description": "Original sub",
@@ -188,6 +188,7 @@ Content-Length: 344
         "covered": false,
         "mqtt": {
             "qos": 2,
+            "retain": false,
             "topic": "/orion",
             "url": "mqtt://localhost:1883"
         },
@@ -223,7 +224,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 344
+Content-Length: 359
 
 {
     "description": "Modified sub",
@@ -234,6 +235,7 @@ Content-Length: 344
         "covered": false,
         "mqtt": {
             "qos": 2,
+            "retain": false,
             "topic": "/orion",
             "url": "mqtt://localhost:1883"
         },
@@ -269,7 +271,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 341
+Content-Length: 356
 
 {
     "description": "Modified sub",
@@ -280,6 +282,7 @@ Content-Length: 341
         "covered": false,
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "/cb",
             "url": "mqtt://localhost:1884"
         },
@@ -359,7 +362,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 346
+Content-Length: 361
 
 {
     "description": "Modified sub",
@@ -370,6 +373,7 @@ Content-Length: 346
         "covered": false,
         "mqtt": {
             "qos": 1,
+            "retain": false,
             "topic": "/orionbk",
             "url": "mqtt://localhost:1885"
         },

@@ -69,8 +69,8 @@ echo "INSTALL: python special dependencies" \
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
 # see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
 echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
-&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz | tar xzC /opt/ \
-&& cd /opt/mongo-c-driver-1.23.1 \
+&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz | tar xzC /opt/ \
+&& cd /opt/mongo-c-driver-1.24.3 \
 && mkdir cmake-build \
 && cd cmake-build \
 && cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
@@ -109,7 +109,7 @@ echo "INSTALL: mosquitto" \
 ldconfig
 
 apt-get -y clean \
-&& rm -Rf /opt/mongo-c-driver-1.23.1 \
+&& rm -Rf /opt/mongo-c-driver-1.24.3 \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-0.9.76 \
 && rm -Rf /opt/mosquitto-2.0.15 \

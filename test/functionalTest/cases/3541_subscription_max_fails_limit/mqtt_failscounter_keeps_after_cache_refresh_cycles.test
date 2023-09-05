@@ -136,7 +136,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 430
+Content-Length: 445
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -149,6 +149,7 @@ Content-Length: 430
         "lastNotification": "REGEX(.*)",
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
@@ -177,7 +178,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 430
+Content-Length: 445
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -190,6 +191,7 @@ Content-Length: 430
         "lastNotification": "REGEX(.*)",
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },
@@ -218,7 +220,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 430
+Content-Length: 445
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -231,6 +233,7 @@ Content-Length: 430
         "lastNotification": "REGEX(.*)",
         "mqtt": {
             "qos": 0,
+            "retain": false,
             "topic": "test",
             "url": "mqtt://localhost:REGEX(\d+)"
         },

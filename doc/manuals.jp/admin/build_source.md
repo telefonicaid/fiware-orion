@@ -12,7 +12,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 * openssl: 1.1.1n
 * libuuid: 2.36.1
 * libmosquitto: 2.0.15 (ソースから)
-* Mongo C driver: 1.23.1 (ソースから)
+* Mongo C driver: 1.24.3 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
 * gtest (`make unit_test` ビルディング・ターゲットのみ) : 1.5 (ソースから)
 * gmock (`make unit_test` ビルディング・ターゲットのみ) : 1.5 (ソースから)
@@ -29,9 +29,9 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから Mongo Driver をインストールします
 
-        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz
-        tar xfvz mongo-c-driver-1.23.1.tar.gz
-        cd mongo-c-driver-1.23.1
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz
+        tar xfvz mongo-c-driver-1.24.3.tar.gz
+        cd mongo-c-driver-1.24.3
         mkdir cmake-build
         cd cmake-build
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..

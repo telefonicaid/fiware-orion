@@ -1,3 +1,8 @@
 - Add: alarm for notification queue overpassing a given threshold (new CLI `-notifAlarmThreshold` / env var `ORION_NOTIF_ALARM_THRESHOLD`) (#4113)
 - Add: servicePath field to builtin attributes (#2877)
+- Add: notification.mqtt.retain and notification.mqttCustom.retain flag for MQTT retain in notifications (#4388)
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
+- Fix: improve error traces (#4387)
+- Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
+- Fix: improve logs in MongoDB query logic
+- Hardening: upgrade libmongoc dependency from 1.23.1 to 1.24.3

@@ -68,6 +68,7 @@ std::string MqttInfo::toJson()
   jh.addString("url", this->url);
   jh.addString("topic", this->topic);
   jh.addNumber("qos", (long long) this->qos);
+  jh.addBool("retain", this->retain);
 
   if (providedAuth)
   {
@@ -117,6 +118,7 @@ void MqttInfo::fill(const orion::BSONObj& bo)
   this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
   this->topic  = bo.hasField(CSUB_MQTTTOPIC)? getStringFieldF(bo, CSUB_MQTTTOPIC) : "";
   this->qos    = bo.hasField(CSUB_MQTTQOS)?   getIntFieldF(bo, CSUB_MQTTQOS)      : 0;
+  this->retain = bo.hasField(CSUB_MQTTRETAIN)? getBoolFieldF(bo, CSUB_MQTTRETAIN) : false;
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo, CSUB_CUSTOM)      : false;
 
   // both user and passwd have to be used at the same time
@@ -228,6 +230,7 @@ void MqttInfo::fill(const MqttInfo& _mqttInfo)
   this->url            = _mqttInfo.url;
   this->topic          = _mqttInfo.topic;
   this->qos            = _mqttInfo.qos;
+  this->retain         = _mqttInfo.retain;
   this->custom         = _mqttInfo.custom;
   this->payload        = _mqttInfo.payload;
   this->payloadType    = _mqttInfo.payloadType;

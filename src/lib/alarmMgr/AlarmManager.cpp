@@ -631,7 +631,7 @@ bool AlarmManager::notificationQueue(const std::string& service, const std::stri
     else
     {
       // even if repeat alarms is off, this is a relevant event in debug level
-      LM_T(LmtCPrForwardRequestPayload, ("Repeated NotificationQueue %s: %s", service.c_str(), details.c_str()));
+      LM_T(LmtNotifierQueue, ("Repeated NotificationQueue %s: %s", service.c_str(), details.c_str()));
     }
 
     semGive();
@@ -656,21 +656,21 @@ bool AlarmManager::notificationQueue(const std::string& service, const std::stri
 *
 * Returns false if no effective alarm transition occurs, otherwise, true is returned.
 */
-bool AlarmManager::notificationQueuesResets(const std::string& details)
+bool AlarmManager::notificationQueueReset(const std::string& service)
 {
   semTake();
 
-  if (notificationQ.find(details) == notificationQ.end())  // Doesn't exist
+  if (notificationQ.find(service) == notificationQ.end())  // Doesn't exist
   {
     semGive();
     return false;
   }
 
-  notificationQ.erase(details);
-  ++notificationQueues;
+  notificationQ.erase(service);
+  ++notificationQueueResets;
   semGive();
 
-  LM_W(("Releasing alarm NotificationQueue %s", details.c_str()));
+  LM_W(("Releasing alarm NotificationQueue %s", service.c_str()));
 
   return true;
 }

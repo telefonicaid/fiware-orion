@@ -199,10 +199,10 @@ void QueueNotifier::sendNotifyContextRequest
     {
       alarmMgr.notificationQueue(queueName.c_str(), details.c_str());
     }
-    else
-    {
-      alarmMgr.notificationQueuesResets(queueName.c_str());
-    }
+  }
+  else
+  {
+    alarmMgr.notificationQueueReset(queueName.c_str());
   }
 
   QueueStatistics::incIn(1);

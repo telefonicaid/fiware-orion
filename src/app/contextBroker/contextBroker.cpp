@@ -148,6 +148,7 @@ char            authMech[64];
 char            authDb[64];
 bool            dbSSL;
 bool            dbDisableRetryWrites;
+char            dbURI[1024];
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -278,6 +279,7 @@ int             notifAlarmThreshold;
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
 #define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
 #define NOTIF_ALARM_THRESHOLD_DESC "maximum threshold for notification queue alarms, as a percentage of the maximum queue size, default 0 (meaning no queue alarms are used)"
+#define DBURI_DESC             "complete URI for database connection"
 
 
 
@@ -297,6 +299,7 @@ PaArgument paArgs[] =
   { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            1,    65535,                  PORT_DESC                    },
   { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,                  PIDPATH_DESC                 },
 
+  { "-dbURI",                       dbURI,                  "MONGO_URI",                PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBURI_DESC                   },
   { "-dbhost",                      dbHost,                 "MONGO_HOST",               PaString, PaOpt, LOCALHOST,                       PaNL,  PaNL,                  DBHOST_DESC                  },
   { "-rplSet",                      rplSet,                 "MONGO_REPLICA_SET",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  RPLSET_DESC                  },
   { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBUSER_DESC                  },
@@ -1224,7 +1227,7 @@ int main(int argC, char* argV[])
   alarmMgr.init(relogAlarms);
   mqttMgr.init(mqttTimeout);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  mongoInit(dbURI, dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 

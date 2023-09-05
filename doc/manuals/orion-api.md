@@ -78,6 +78,7 @@
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
     - [Pagination](#pagination)
       - [Ordering Results](#ordering-results)
+      - [Ties](#ties)
 - [API Routes](#api-routes)
     - [Entities Operations](#entities-operations)
         - [Entities List](#entities-list)
@@ -2552,6 +2553,42 @@ From lowest to highest:
 5. Array
 6. Boolean
 
+### Ties
+
+Note that in the cases of ties, Orion doesn't guarantee that the same query using `orderBy` will result in the same
+results sequence. In other words, the tied results could be returned in different relative order when the same query is
+repeated. This is the same behaviour that MongoDB (the underlying DB used by Orion) implements (see [this MongoDB documentation](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/).
+
+Note this may be problematic in the case of pagination. Let's illustrate with the following example. Consider we have four entities (E1 to E4)
+
+* E1, with attribute `colour` set to `blue`
+* E2, with attribute `colour` set to `blue`
+* E3, with attribute `colour` set to `red`
+* E4, with attribute `colour` set to `red`
+
+A first execution of `GET /v2/entities?orderBy=colour` could return `E1, E2, E3, E4` but a second execution of the query
+could `E2, E1, E4, E3`, a third execution could return `E1, E2, E4, E3`, etc.
+
+Let's consider a typical paginated sequence of queries like this:
+
+```
+GET /v2/entities?orderBy=colour&limit=3&offset=0
+GET /v2/entities?orderBy=colour&limit=3&offset=3
+```
+
+The same sequence of results is not guaranteed among queries, so in the first query the sequence could be `E1, E2, E3, E4` (so
+client would get `E1, E2, E3`) but in the second query it could be (`E1, E2, E4, E3`) so the client will get `E3` again
+(instead of the expected `E4`).
+
+Another similar (more complex case) is described in [this issue](https://github.com/telefonicaid/fiware-orion/issues/4394)).
+
+The solution is to add an attribute to `orderBy` to guarantee that ties doesn't occur. In this sense, `dateCreated` [builtin attributes](#builtin-attributes) is a very good candidate, so the above queries could be adapted the following way:
+
+```
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=0
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=3
+```
+
 # API Routes
 
 ## Entities Operations
@@ -3676,6 +3713,7 @@ A `mqtt` object contains the following subfields:
 | `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
 | `topic`   |          | string | Represent the MQTT topic to use                                                                                                            |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `retain`  | ✓        | boolean | MQTT retain value to use in the notifications associated to the subscription (`true` or `false`). If omitted then retain `false` is used. |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
 | `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 
@@ -3709,6 +3747,7 @@ A `mqttCustom` object contains the following subfields.
 | `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
 | `topic`   |          | string | Represent the MQTT topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `retain`  | ✓        | boolean | MQTT retain value to use in the notifications associated to the subscription (`true` or `false`). If omitted then retain `false` is used. |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
 | `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 | `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |

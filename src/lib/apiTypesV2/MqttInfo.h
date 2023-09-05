@@ -44,6 +44,7 @@ struct MqttInfo
   std::string   url;
   std::string   topic;
   unsigned int  qos;  // 0, 1 or 2
+  bool          retain;
 
   bool                       custom;
   std::string                payload;  // either payload, json or ngsi is used (depending on payloadType)

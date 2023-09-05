@@ -84,8 +84,8 @@ class AlarmManager
   bool notificationError(const std::string& url, const std::string& details);
   bool notificationErrorReset(const std::string& url);
 
-  bool notificationQueuesResets(const std::string& details);
-  bool notificationQueue(const std::string& url, const std::string& details);
+  bool notificationQueueReset(const std::string& service);
+  bool notificationQueue(const std::string& service, const std::string& details);
 
   bool forwardingError(const std::string& url, const std::string& details);
   bool forwardingErrorReset(const std::string& url);
