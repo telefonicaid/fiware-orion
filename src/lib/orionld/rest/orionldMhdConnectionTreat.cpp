@@ -940,6 +940,21 @@ MHD_Result orionldMhdConnectionTreat(void)
 
   promCounterIncrease(promNgsildRequests);
 
+  if (orionldState.serviceP == NULL)
+    goto respond;
+
+  if (orionldState.serviceP->mintaka == true)
+  {
+    serviceRoutineResult = orionldState.serviceP->serviceRoutine();
+    goto respond;
+  }
+
+  if (orionldState.serviceP->notImplemented == true)
+  {
+    serviceRoutineResult = orionldState.serviceP->serviceRoutine();
+    goto respond;
+  }
+
   // If OPTIONS verb, we skip all checks, go straight to the service routine
   if (orionldState.verb == OPTIONS)
     goto serviceRoutine;

@@ -73,12 +73,22 @@
 #include "orionld/serviceRoutines/orionldGetEntityType.h"            // orionldGetEntityType
 #include "orionld/serviceRoutines/orionldGetEntityAttributes.h"      // orionldGetEntityAttributes
 #include "orionld/serviceRoutines/orionldGetEntityAttribute.h"       // orionldGetEntityAttribute
-#include "orionld/serviceRoutines/orionldPostTemporalEntities.h"     // orionldPostTemporalEntities
+
 #include "orionld/serviceRoutines/orionldGetContexts.h"              // orionldGetContexts
 #include "orionld/serviceRoutines/orionldGetContext.h"               // orionldGetContext
 #include "orionld/serviceRoutines/orionldPostContexts.h"             // orionldPostContexts
 #include "orionld/serviceRoutines/orionldDeleteContext.h"            // orionldDeleteContext
 #include "orionld/serviceRoutines/orionldPostNotify.h"               // orionldPostNotify
+
+#include "orionld/serviceRoutines/orionldGetTemporalEntities.h"              // orionldGetTemporalEntities
+#include "orionld/serviceRoutines/orionldGetTemporalEntity.h"                // orionldGetTemporalEntity
+#include "orionld/serviceRoutines/orionldPostTemporalQuery.h"                // orionldPostTemporalQuery
+#include "orionld/serviceRoutines/orionldPostTemporalEntities.h"             // orionldPostTemporalEntities
+#include "orionld/serviceRoutines/orionldDeleteTemporalAttribute.h"          // orionldDeleteTemporalAttribute
+#include "orionld/serviceRoutines/orionldDeleteTemporalAttributeInstance.h"  // orionldDeleteTemporalAttributeInstance
+#include "orionld/serviceRoutines/orionldDeleteTemporalEntity.h"             // orionldDeleteTemporalEntity
+#include "orionld/serviceRoutines/orionldPatchTemporalAttributeInstance.h"   // orionldPatchTemporalAttributeInstance
+#include "orionld/serviceRoutines/orionldPostTemporalAttributes.h"           // orionldPostTemporalAttributes
 
 #include "orionld/troe/troePostEntities.h"                           // troePostEntities
 #include "orionld/troe/troePostBatchDelete.h"                        // troePostBatchDelete
@@ -403,6 +413,24 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_EXPAND_TYPE;
   }
+  else if (serviceP->serviceRoutine == orionldGetTemporalEntities)
+    serviceP->mintaka = true;
+  else if (serviceP->serviceRoutine == orionldGetTemporalEntity)
+    serviceP->mintaka = true;
+  else if (serviceP->serviceRoutine == orionldPostTemporalQuery)
+    serviceP->mintaka = true;
+  else if (serviceP->serviceRoutine == orionldDeleteTemporalAttribute)
+    serviceP->notImplemented = true;
+  else if (serviceP->serviceRoutine == orionldDeleteTemporalAttributeInstance)
+    serviceP->notImplemented = true;
+  else if (serviceP->serviceRoutine == orionldDeleteTemporalEntity)
+    serviceP->notImplemented = true;
+  else if (serviceP->serviceRoutine == orionldPatchTemporalAttributeInstance)
+    serviceP->notImplemented = true;
+  else if (serviceP->serviceRoutine == orionldPostTemporalAttributes)
+    serviceP->notImplemented = true;
+
+
   else if (serviceP->serviceRoutine == orionldGetVersion)
   {
     serviceP->options  = 0;  // Tenant is Ignored
