@@ -91,9 +91,13 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
 {
   for (int ix = 0; ix < eItems; ++ix)
   {
-    EntityInfo* eiP = subP->entityIdInfos[ix];
+    EntityInfo* eiP   = subP->entityIdInfos[ix];
+    const char* eType = eiP->entityType.c_str();
 
-    if (strcmp(entityType, eiP->entityType.c_str()) == 0)
+    if (strcmp(entityType, eType) == 0)
+      return true;
+
+    if ((eType[0] == '*') && (eType[1] == 0))
       return true;
   }
 
