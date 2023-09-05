@@ -914,7 +914,8 @@ function testDisabled
   dIx=0
   while [ $dIx -lt  ${#DISABLED[@]} ]
   do
-    if [ test/functionalTest/cases/$testcase == ${DISABLED[$dIx]} ]
+    # Comparison is done based in filename, skipping the path (see https://stackdiary.com/tutorials/bash-get-filename-from-path/)
+    if [ "${testcase##*/}" == "${DISABLED[$dIx]##*/}" ]
     then
       echo "Disabled"
 
