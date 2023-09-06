@@ -240,7 +240,7 @@ KjNode* dbModelToApiSubscription
 
   // sysAttrs
   if ((dbSysAttrsP != NULL) && (sysAttrsP != NULL))
-    *sysAttrsP = dbShowChangesP;
+    *sysAttrsP = dbSysAttrsP;
 
   //
   // If dbSubIdP is a JSON Object, it's an NGSIv2 subscription and its "id" looks like this:
