@@ -632,7 +632,7 @@ function fileCreation()
   then
     TEST_REGEXPECT=${pathWithoutExt}.regexpect
     vMsg "Creating $TEST_REGEXPECT at $PWD"
-    sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" > $TEST_REGEXPECT
+    sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" | sed '/^#/d' > $TEST_REGEXPECT
   else
     exitFunction 5 "--REGEXPECT-- part is missing" $path "($path)" "" DIE
   fi

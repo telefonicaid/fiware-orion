@@ -119,20 +119,23 @@ echo
 echo
 
 
-echo "09. GET /v2/entities with only whitespace in q-item (q=   )"
-echo "==========================================================="
-q='q=   '
-orionCurl --url "/v2/entities?$q"
-echo
-echo
-
-
-echo "10. GET /v2/entities with trailing whitespace in q (q=a==12;   )"
-echo "================================================================"
-q='q=a==12;   '
-orionCurl --url "/v2/entities?$q"
-echo
-echo
+# FIXME: curl has changed its behaviour from Debian 11 to Debian 12 (see https://stackoverflow.com/q/77045755/1485926)
+# and now it is not a valid tool to test malformed URLs. Thus, we are commenting this fields while we look for
+# another tool or avoid curl to work in the old way
+#echo "09. GET /v2/entities with only whitespace in q-item (q=   )"
+#echo "==========================================================="
+#q='q=   '
+#orionCurl --url "/v2/entities?$q"
+#echo
+#echo
+#
+#
+#echo "10. GET /v2/entities with trailing whitespace in q (q=a==12;   )"
+#echo "================================================================"
+#q='q=a==12;   '
+#orionCurl --url "/v2/entities?$q"
+#echo
+#echo
 
 
 echo "11. GET /v2/entities with > RANGE"
@@ -333,34 +336,34 @@ Content-Length: 79
 }
 
 
-09. GET /v2/entities with only whitespace in q-item (q=   )
-===========================================================
-HTTP/1.1 400 Bad Request
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 77
-
-{
-    "description": "empty q-item &#40;only whitespace&#41;",
-    "error": "BadRequest"
-}
-
-
-10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
-================================================================
-HTTP/1.1 400 Bad Request
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 51
-
-{
-    "description": "empty q-item",
-    "error": "BadRequest"
-}
-
-
+#09. GET /v2/entities with only whitespace in q-item (q=   )
+#===========================================================
+#HTTP/1.1 400 Bad Request
+#Date: REGEX(.*)
+#Fiware-Correlator: REGEX([0-9a-f\-]{36})
+#Content-Type: application/json
+#Content-Length: 77
+#
+#{
+#    "description": "empty q-item &#40;only whitespace&#41;",
+#    "error": "BadRequest"
+#}
+#
+#
+#10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
+#================================================================
+#HTTP/1.1 400 Bad Request
+#Date: REGEX(.*)
+#Fiware-Correlator: REGEX([0-9a-f\-]{36})
+#Content-Type: application/json
+#Content-Length: 51
+#
+#{
+#    "description": "empty q-item",
+#    "error": "BadRequest"
+#}
+#
+#
 11. GET /v2/entities with > RANGE
 =================================
 HTTP/1.1 400 Bad Request
