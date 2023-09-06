@@ -98,7 +98,7 @@ Orion Context Broker には、次の手順に従って実行できる一連の�
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        # Adjust /path/to/fiware-orion in the next line accordingly to where you local copy of fiware-orion repo is in your system
+        # システム内の fiware-orion リポジトリのローカル・コピーの場所に応じて、次の行の /path/to/fiware-orion を調整します。
         patch -p1 gtest/scripts/fuse_gtest_files.py < /path/to/fiware-orion/test/unittests/fuse_gtest_files.py.patch
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
@@ -106,7 +106,13 @@ Orion Context Broker には、次の手順に従って実行できる一連の�
 
 aarch64 アーキテクチャの場合、apt-get を使用して libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
 
-* MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。詳細については、[MongoDB の公式ドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 4.4 です (以前のバージョンで動作する可能性がありますが、お勧めしません)。
+* MongoDB をインストールします (テストはローカル・ホストで実行されている mongod に依存します)。詳細については、[MongoDB の公式ドキュメント](hhttps://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) を確認してください。推奨バージョンは 4.4 です (以前のバージョンでも動作する可能性がありますが、お勧めしません)。
+    * mongo レガシー・シェル (`mongo` コマンド) は MongoDB 5 で非推奨となり、MongoDB 6 では新しいシェル (`mongosh` コマンド) が優先されて削除されたことに注意してください。一部の機能テスト (ftest) は、`mongosh` ではなく `mongo` を使用しているため、MongoDB 6 以降を使用している場合、これが原因で失敗します。
+    * Debian 12 は libssl3 に移行しましたが、一部の MongoDB バージョンでは libssl1 が必要な場合があります。`Depends: libssl1.1 (>= 1.1.1) but it is not installable` エラーが発生した場合は、次のことをテストできます ([こちら](https://askubuntu.com/a/1421959) を参照))
+
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+        rm libssl1.1_1.1.1f-1ubuntu2_amd64.deb     # optional, for cleanness
 
 * ユニット・テストを実行します
 
@@ -114,8 +120,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
 * 機能テストと valgrind テストに必要な追加のツールをインストールします:
 
-        sudo apt-get install curl nc valgrind bc python3 python3-pip
-        sudo pip3 install virtualenv
+        sudo apt-get install curl netcat-traditional valgrind bc python3 python3-pip mosquitto
 
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、他のプログラムと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、必要な Python パッケージを使用して virtualenv 環境を作成します。
 
@@ -139,7 +144,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
 * lcov ツールをインストールします
 
-        sudo apt-get install lcov
+        sudo apt-get install lcov xsltproc
 
 * まず、unit_test と functional_test の成功パスを実行して、すべてが正常であることを確認します (上記参照)
 
