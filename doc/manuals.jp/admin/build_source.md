@@ -1,6 +1,6 @@
 # ソースからのビルド
 
-Orion Context Broker のリファレンス配布は Debian 11 です。これは、broker を他のディストリビューションに組み込むことができないことを意味しません (実際には可能です)。このセクションでは、他のディストリビューションをビルドする方法についても説明しています。Debian を使用していない人に役立つかもしれません。ただし、"公式にサポートされている" 唯一の手順は Debian 11 用の手順です。他のものは "現状のまま" 提供され、随時時代遅れになる可能性があります。
+Orion Context Broker のリファレンス配布は Debian 12 です。これは、broker を他のディストリビューションに組み込むことができないことを意味しません (実際には可能です)。このセクションでは、他のディストリビューションをビルドする方法についても説明しています。Debian を使用していない人に役立つかもしれません。ただし、"公式にサポートされている" 唯一の手順は Debian 12 用の手順です。他のものは "現状のまま" 提供され、随時時代遅れになる可能性があります。
 
 ## Debian 11 (正式サポート)
 
@@ -8,9 +8,9 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * boost: 1.74
 * libmicrohttpd: 0.9.76 (ソースから)
-* libcurl: 7.74.0
-* openssl: 1.1.1n
-* libuuid: 2.36.1
+* libcurl: 7.88.1
+* openssl: 3.0.9
+* libuuid: 2.38.1
 * libmosquitto: 2.0.15 (ソースから)
 * Mongo C driver: 1.24.3 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
@@ -94,12 +94,12 @@ Orion Context Broker には、次の手順に従って実行できる一連の�
 
 * ソースから GoogleTest/Mock をインストールします。以前の URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、Google は2016年8月下旬にそのパッケージを削除し、機能しなくなりました。
 
-        sudo apt-get install python2
         wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on Debian 11
+        # Adjust /path/to/fiware-orion in the next line accordingly to where you local copy of fiware-orion repo is in your system
+        patch -p1 gtest/scripts/fuse_gtest_files.py < /path/to/fiware-orion/test/unittests/fuse_gtest_files.py.patch
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
@@ -123,9 +123,9 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        virtualenv /opt/ft_env --python=/usr/bin/python3
+        python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.10.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
 
 * この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
