@@ -19,7 +19,7 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=11.6-slim
+ARG  IMAGE_TAG=12.1-slim
 FROM debian:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -146,8 +146,7 @@ RUN \
     apt-get -y autoremove --purge && \
     # The above apt removal erases some dependencies needed by contextBroker. So we reinstall it
     apt-get -y install \
-        libicu67 \
-        libcurl4 \
+        libicu72 \
         libboost-thread1.74.0 && \
     # Don't need old log files inside docker images
     rm -f /var/log/*log

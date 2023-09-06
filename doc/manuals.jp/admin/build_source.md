@@ -1,16 +1,16 @@
 # ソースからのビルド
 
-Orion Context Broker のリファレンス配布は Debian 11 です。これは、broker を他のディストリビューションに組み込むことができないことを意味しません (実際には可能です)。このセクションでは、他のディストリビューションをビルドする方法についても説明しています。Debian を使用していない人に役立つかもしれません。ただし、"公式にサポートされている" 唯一の手順は Debian 11 用の手順です。他のものは "現状のまま" 提供され、随時時代遅れになる可能性があります。
+Orion Context Broker のリファレンス配布は Debian 12 です。これは、broker を他のディストリビューションに組み込むことができないことを意味しません (実際には可能です)。このセクションでは、他のディストリビューションをビルドする方法についても説明しています。Debian を使用していない人に役立つかもしれません。ただし、"公式にサポートされている" 唯一の手順は Debian 12 用の手順です。他のものは "現状のまま" 提供され、随時時代遅れになる可能性があります。
 
-## Debian 11 (正式サポート)
+## Debian 12 (正式サポート)
 
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
 
 * boost: 1.74
 * libmicrohttpd: 0.9.76 (ソースから)
-* libcurl: 7.74.0
-* openssl: 1.1.1n
-* libuuid: 2.36.1
+* libcurl: 7.88.1
+* openssl: 3.0.9
+* libuuid: 2.38.1
 * libmosquitto: 2.0.15 (ソースから)
 * Mongo C driver: 1.24.3 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
@@ -94,19 +94,25 @@ Orion Context Broker には、次の手順に従って実行できる一連の�
 
 * ソースから GoogleTest/Mock をインストールします。以前の URL は http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 でしたが、Google は2016年8月下旬にそのパッケージを削除し、機能しなくなりました。
 
-        sudo apt-get install python2
         wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on Debian 11
+        # システム内の fiware-orion リポジトリのローカル・コピーの場所に応じて、次の行の /path/to/fiware-orion を調整します。
+        patch -p1 gtest/scripts/fuse_gtest_files.py < /path/to/fiware-orion/test/unittests/fuse_gtest_files.py.patch
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
 aarch64 アーキテクチャの場合、apt-get を使用して libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
 
-* MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。詳細については、[MongoDB の公式ドキュメント](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)を確認してください。推奨バージョンは 4.4 です (以前のバージョンで動作する可能性がありますが、お勧めしません)。
+* MongoDB をインストールします (テストはローカル・ホストで実行されている mongod に依存します)。詳細については、[MongoDB の公式ドキュメント](hhttps://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) を確認してください。推奨バージョンは 4.4 です (以前のバージョンでも動作する可能性がありますが、お勧めしません)。
+    * mongo レガシー・シェル (`mongo` コマンド) は MongoDB 5 で非推奨となり、MongoDB 6 では新しいシェル (`mongosh` コマンド) が優先されて削除されたことに注意してください。一部の機能テスト (ftest) は、`mongosh` ではなく `mongo` を使用しているため、MongoDB 6 以降を使用している場合、これが原因で失敗します。
+    * Debian 12 は libssl3 に移行しましたが、一部の MongoDB バージョンでは libssl1 が必要な場合があります。`Depends: libssl1.1 (>= 1.1.1) but it is not installable` エラーが発生した場合は、次のことをテストできます ([こちら](https://askubuntu.com/a/1421959) を参照))
+
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+        rm libssl1.1_1.1.1f-1ubuntu2_amd64.deb     # optional, for cleanness
 
 * ユニット・テストを実行します
 
@@ -114,8 +120,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
 * 機能テストと valgrind テストに必要な追加のツールをインストールします:
 
-        sudo apt-get install curl nc valgrind bc python3 python3-pip
-        sudo pip3 install virtualenv
+        sudo apt-get install curl netcat-traditional valgrind bc python3 python3-pip mosquitto
 
 * テスト・ハーネスのための環境を準備します。基本的には、`accumulator-server.py` スクリプトをコントロールの下にあるパスにインストールしなければならず、`~/bin` が推奨です。また、`/usr/bin` のようなシステム・ディレクトリにインストールすることもできますが、他のプログラムと衝突する可能性がありますので、お勧めしません。さらに、ハーネス・スクリプト (`scripts/testEnv.sh` ファイル参照) で使用されるいくつかの環境変数を設定し、必要な Python パッケージを使用して virtualenv 環境を作成します。
 
@@ -123,9 +128,9 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        virtualenv /opt/ft_env --python=/usr/bin/python3
+        python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.10.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
 
 * この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
@@ -139,7 +144,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
 * lcov ツールをインストールします
 
-        sudo apt-get install lcov
+        sudo apt-get install lcov xsltproc
 
 * まず、unit_test と functional_test の成功パスを実行して、すべてが正常であることを確認します (上記参照)
 

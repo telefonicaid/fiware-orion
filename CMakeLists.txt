@@ -171,6 +171,12 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 #    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable")
 #endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+# Enables some some #ifdef in the code for compiling in old system
+# FIXME: cleanup OLD_SSL_VERSION_FORMAT stuff after consolidating the change to Debian 12+
+IF(${DISTRO} MATCHES "Debian_11.*")
+  ADD_DEFINITIONS(-DOLD_SSL_VERSION_FORMAT)
+ENDIF()
+
 #
 # Libraries
 #

@@ -26,7 +26,7 @@ Custom notification MQTT with NGSI payload mapping attribute constant compound v
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
+accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "topic1"
 
 --SHELL--
 

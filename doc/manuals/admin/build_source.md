@@ -1,16 +1,16 @@
 # Building from sources
 
-Orion Context Broker reference distribution is Debian 11. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use Debian. However, note that the only "officially supported" procedure is the one for Debian 11; the others are provided "as is" and can get obsolete from time to time.
+Orion Context Broker reference distribution is Debian 12. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use Debian. However, note that the only "officially supported" procedure is the one for Debian 12; the others are provided "as is" and can get obsolete from time to time.
 
-## Debian 11 (officially supported)
+## Debian 12 (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.74
 * libmicrohttpd: 0.9.76 (from source)
-* libcurl: 7.74.0
-* openssl: 1.1.1n
-* libuuid: 2.36.1
+* libcurl: 7.88.1
+* openssl: 3.0.9
+* libuuid: 2.38.1
 * libmosquitto: 2.0.15 (from source)
 * Mongo C driver: 1.24.3 (from source)
 * rapidjson: 1.1.0 (from source)
@@ -93,19 +93,25 @@ The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tes
 
 * Install Google Test/Mock from sources. Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
-        sudo apt-get install python2
         wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
-        sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py  # little hack to make installation to work on Debian 11
+        # Adjust /path/to/fiware-orion in the next line accordingly to where you local copy of fiware-orion repo is in your system
+        patch -p1 gtest/scripts/fuse_gtest_files.py < /path/to/fiware-orion/ci/deb/fuse_gtest_files.py.patch
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
 In the case of the aarch64 architecture, install libxslt using apt-get, and run `./configure` with `--build=arm-linux` option.
 
-* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/) for details. Recommended version is 4.4 (it may work with previous versions, but we don't recommend it).
+* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](hhttps://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) for details. Recommended version is 4.4 (it may work with previous versions, but we don't recommend it).
+    * Note that mongo legacy shell (the `mongo` command) has been deprecated in MongoDB 5 and removed in MongoDB 6 in favour of the new shell (`mongosh` command). Some functional tests (ftest) will fail due to this if you use MongoDB 6 or beyond, as they are suited to use `mongo` and not `mongosh`.
+    * Debian 12 has stepped to libssl3 but some MongoDB versions may require libssl1. In the case you get a `Depends: libssl1.1 (>= 1.1.1) but it is not installable` error, you can test the following (reference [here](https://askubuntu.com/a/1421959))
+
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+        rm libssl1.1_1.1.1f-1ubuntu2_amd64.deb     # optional, for cleanness
 
 * Run unit test
 
@@ -113,8 +119,7 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
 
 * Install additional required tools for functional and valgrind tests:
 
-        sudo apt-get install curl nc valgrind bc python3 python3-pip
-        sudo pip3 install virtualenv
+        sudo apt-get install curl netcat-traditional valgrind bc python3 python3-pip mosquitto
 
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an other programs, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment with the required Python packages.
 
@@ -122,9 +127,9 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
         export PATH=~/bin:$PATH
         make install_scripts INSTALL_DIR=~
         . scripts/testEnv.sh
-        virtualenv /opt/ft_env --python=/usr/bin/python3
+        python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.10.1
+        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
 
 * Run test harness in this environment (it takes some time, please be patient).
 
@@ -138,7 +143,7 @@ You can generate coverage reports for the Orion Context Broker using the followi
 
 * Install the lcov tool
 
-        sudo apt-get install lcov
+        sudo apt-get install lcov xsltproc
 
 * Do first a successful pass for unit_test and functional_test, to check that everything is ok (see above)
 
