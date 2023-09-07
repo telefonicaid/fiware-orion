@@ -366,7 +366,7 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
 *
 * MqttConnectionManager::sendMqttNotification -
 */
-bool MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos)
+bool MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, bool retain)
 {
   std::string endpoint = getEndpoint(host, port);
 
@@ -394,7 +394,7 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
   int id;
 
   bool retval;
-  int resultCode = mosquitto_publish(mosq, &id, topic.c_str(), (int) strlen(msg), msg, qos, false);
+  int resultCode = mosquitto_publish(mosq, &id, topic.c_str(), (int) strlen(msg), msg, qos, retain);
   if (resultCode != MOSQ_ERR_SUCCESS)
   {
     retval = false;

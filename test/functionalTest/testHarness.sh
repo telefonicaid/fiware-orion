@@ -632,7 +632,7 @@ function fileCreation()
   then
     TEST_REGEXPECT=${pathWithoutExt}.regexpect
     vMsg "Creating $TEST_REGEXPECT at $PWD"
-    sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" > $TEST_REGEXPECT
+    sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" | sed '/^##/d' > $TEST_REGEXPECT
   else
     exitFunction 5 "--REGEXPECT-- part is missing" $path "($path)" "" DIE
   fi
@@ -914,7 +914,8 @@ function testDisabled
   dIx=0
   while [ $dIx -lt  ${#DISABLED[@]} ]
   do
-    if [ test/functionalTest/cases/$testcase == ${DISABLED[$dIx]} ]
+    # Comparison is done based in filename, skipping the path (see https://stackdiary.com/tutorials/bash-get-filename-from-path/)
+    if [ "${testcase##*/}" == "${DISABLED[$dIx]##*/}" ]
     then
       echo "Disabled"
 

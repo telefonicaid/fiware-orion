@@ -1,0 +1,158 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entities V2 options=count (multitenant variant)
+
+--SHELL-INIT--
+dbInit CB s1
+dbInit CB s2
+brokerStart CB 0 IPv4 -multiservice
+
+--SHELL--
+
+#
+# 01. POST /v2/entities (E1) in s1 /A
+# 02. POST /v2/entities (E2) in s1 /B
+# 03. POST /v2/entities (E3) in s2 /A
+# 04. POST /v2/entities (E4) in s2 /B
+# 05. GET /v2/entities?limit=0&options=count in s1 /A, get fiware-total-count 1
+#
+
+
+echo "01. POST /v2/entities (E1) in s1 /A"
+echo "==================================="
+payload='{
+
+      "id":   "E1",
+      "type": "Car",
+      "model" : {
+           "type": "myString",
+           "value" : "Klasse C"
+        }
+}'
+orionCurl --url /v2/entities --payload "$payload" --tenant s1 --servicePath /A
+echo
+echo
+
+
+echo "02. POST /v2/entities (E2) in s1 /B"
+echo "==================================="
+payload='{
+
+      "id":   "E2",
+      "type": "Car"
+}'
+orionCurl --url /v2/entities --payload "$payload" --tenant s1 --servicePath /B
+echo
+echo
+
+
+echo "03. POST /v2/entities (E3) in s2 /A"
+echo "==================================="
+payload='{
+
+      "id":   "E3",
+      "type": "Car"
+}'
+orionCurl --url /v2/entities --payload "$payload" --tenant s2 --servicePath /A
+echo
+echo
+
+
+echo "04. POST /v2/entities (E4) in s2 /B"
+echo "==================================="
+payload='{
+
+      "id":   "E4",
+      "type": "Car"
+}'
+orionCurl --url /v2/entities --payload "$payload" --tenant s2 --servicePath /B
+echo
+echo
+
+
+echo "05. GET /v2/entities?limit=0&options=count in s1 /A, get fiware-total-count 1"
+echo "============================================================================="
+orionCurl --url '/v2/entities?limit=0&options=count' --tenant s1 --servicePath /A
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities (E1) in s1 /A
+===================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Car
+Content-Length: 0
+
+
+
+02. POST /v2/entities (E2) in s1 /B
+===================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Car
+Content-Length: 0
+
+
+
+03. POST /v2/entities (E3) in s2 /A
+===================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Car
+Content-Length: 0
+
+
+
+04. POST /v2/entities (E4) in s2 /B
+===================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=Car
+Content-Length: 0
+
+
+
+05. GET /v2/entities?limit=0&options=count in s1 /A, get fiware-total-count 1
+=============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 1
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB s1
+dbDrop CB s2
+

@@ -245,7 +245,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 494
+Content-Length: 509
 
 [
     {
@@ -260,6 +260,7 @@ Content-Length: 494
             "mqttCustom": {
                 "payload": "{ %22A%22: %22${A}%22 }",
                 "qos": 0,
+                "retain": false,
                 "topic": "sub/${id}",
                 "url": "mqtt://localhost:1883"
             },

@@ -223,7 +223,7 @@ Content-Length: 2
 
 03. Dump the accumulator, see the forwarded query
 =================================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+POST http://localhost:REGEX(\d+)/v2/op/query?limit=20&offset=0&options=count
 Fiware-Servicepath: /
 Content-Length: 60
 User-Agent: REGEX(.*)
@@ -269,7 +269,7 @@ Content-Length: 2
 
 06. Dump the accumulator, see the forwarded query
 =================================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+POST http://localhost:REGEX(\d+)/v2/op/query?limit=20&offset=0&options=count
 Fiware-Servicepath: /
 Content-Length: 56
 User-Agent: REGEX(.*)
@@ -313,7 +313,7 @@ Content-Length: 2
 
 09. Dump the accumulator, see the forwarded query
 =================================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+POST http://localhost:REGEX(\d+)/v2/op/query?limit=20&offset=0&options=count
 Fiware-Servicepath: /
 Content-Length: 53
 User-Agent: REGEX(.*)
@@ -359,7 +359,7 @@ Content-Length: 2
 
 12. Dump the accumulator, see the forwarded query
 =================================================
-POST http://localhost:9997/v2/op/query
+POST http://localhost:9997/v2/op/query?limit=20&offset=0&options=count
 Fiware-Servicepath: /
 Content-Length: 49
 User-Agent: REGEX(.*)

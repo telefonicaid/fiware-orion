@@ -317,7 +317,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 351
+Content-Length: 366
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -328,6 +328,7 @@ Content-Length: 351
         "mqttCustom": {
             "passwd": "*****",
             "qos": 0,
+            "retain": false,
             "topic": "/orion",
             "url": "mqtt://localhost:1883",
             "user": "user1"
@@ -370,7 +371,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 352
+Content-Length: 367
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -381,6 +382,7 @@ Content-Length: 352
         "mqttCustom": {
             "passwd": "*****",
             "qos": 0,
+            "retain": false,
             "topic": "/orion",
             "url": "mqtt://localhost:1883",
             "user": "user10"
@@ -423,7 +425,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 319
+Content-Length: 334
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -433,6 +435,7 @@ Content-Length: 319
         "covered": false,
         "mqttCustom": {
             "qos": 0,
+            "retain": false,
             "topic": "/orion",
             "url": "mqtt://localhost:1883"
         },
@@ -474,7 +477,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 351
+Content-Length: 366
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -485,6 +488,7 @@ Content-Length: 351
         "mqttCustom": {
             "passwd": "*****",
             "qos": 0,
+            "retain": false,
             "topic": "/orion",
             "url": "mqtt://localhost:1883",
             "user": "user1"

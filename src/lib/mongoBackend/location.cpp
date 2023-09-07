@@ -324,6 +324,11 @@ static bool getGeoJson
     // This corresponds to the legacy way in NGSIv1 based in metadata
     // The block is the same that for GEO_POINT but it is clearer if we keep it separated
 
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of metadata location %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
+    }
+
     double  aLat;
     double  aLong;
 
@@ -341,6 +346,11 @@ static bool getGeoJson
     geoJson->append("coordinates", ba.arr());
 
     return true;
+  }
+
+  if ((logDeprecate) && ((caP->type == GEO_POINT) || (caP->type == GEO_LINE) || (caP->type == GEO_BOX) || (caP->type == GEO_POLYGON)))
+  {
+    LM_W(("Deprecated usage of %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
   }
 
   if (caP->type == GEO_POINT)
@@ -391,6 +401,7 @@ static bool getGeoJson
     else
     {
       // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
+      // FIXME P7: boolean return value should be managed?
       caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "", true, apiVersion == V1);
       geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
     }

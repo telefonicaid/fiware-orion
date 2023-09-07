@@ -286,12 +286,14 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     b->append(CSUB_REFERENCE, sub.notification.mqttInfo.url);
     b->append(CSUB_MQTTTOPIC, sub.notification.mqttInfo.topic);
     b->append(CSUB_MQTTQOS,   (int) sub.notification.mqttInfo.qos);
+    b->append(CSUB_MQTTRETAIN, sub.notification.mqttInfo.retain);
     b->append(CSUB_CUSTOM,    sub.notification.mqttInfo.custom);
 
-    LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.mqttInfo.url.c_str()));
-    LM_T(LmtMongo, ("Subscription mqttTopic: %s", sub.notification.mqttInfo.topic.c_str()));
-    LM_T(LmtMongo, ("Subscription mqttQos:   %d", sub.notification.mqttInfo.qos));
-    LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.mqttInfo.custom? "true" : "false"));
+    LM_T(LmtMongo, ("Subscription reference:  %s", sub.notification.mqttInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription mqttTopic:  %s", sub.notification.mqttInfo.topic.c_str()));
+    LM_T(LmtMongo, ("Subscription mqttQos:    %d", sub.notification.mqttInfo.qos));
+    LM_T(LmtMongo, ("Subscription mqttRetain: %s", sub.notification.mqttInfo.retain? "true": "false"));
+    LM_T(LmtMongo, ("Subscription custom:     %s", sub.notification.mqttInfo.custom? "true" : "false"));
 
     if (sub.notification.mqttInfo.providedAuth)
     {

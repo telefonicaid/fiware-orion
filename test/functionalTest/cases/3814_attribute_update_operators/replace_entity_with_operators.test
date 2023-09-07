@@ -30,14 +30,10 @@ brokerStart CB
 --SHELL--
 
 #
-# This test would be modified in the case the limitation described
-# at https://fiware-orion.readthedocs.io/en/master/user/update_operators/index.html#create-or-replace-entities
-# gets solved at the some time
-#
 # 01. Create entity E with A=1, B=2
 # 02. Get entity E, see A=1, B=2
 # 03. Replace entity E with B={$inc:3}, C=3
-# 04. Get entity E, see B={$inc:3}, C=3
+# 04. Get entity E, see B=3, C=3
 #
 
 
@@ -91,8 +87,8 @@ echo
 echo
 
 
-echo '04. Get entity E, see B={$inc:3}, C=3'
-echo '====================================='
+echo '04. Get entity E, see B=3, C=3'
+echo '=============================='
 orionCurl --url /v2/entities/E
 echo
 echo
@@ -141,21 +137,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Get entity E, see B={$inc:3}, C=3
-=====================================
+04. Get entity E, see B=3, C=3
+==============================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 122
+Content-Length: 113
 
 {
     "B": {
         "metadata": {},
         "type": "Number",
-        "value": {
-            "$inc": 3
-        }
+        "value": 3
     },
     "C": {
         "metadata": {},

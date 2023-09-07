@@ -89,7 +89,7 @@ Fields:
 
 Regarding `location.coords` in can use several formats:
 
-* Representing a point (the one used by geo:point):
+* Representing a point:
 
 ```
 {
@@ -98,7 +98,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a line (the one used by geo:line):
+* Representing a line:
 
 ```
 {
@@ -107,7 +107,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a polygon (the one used by geo:box and geo:polygon):
+* Representing a polygon:
 
 ```
 {
@@ -123,10 +123,10 @@ Regarding `location.coords` in can use several formats:
   "fixed" cases.
 
 Note that coordinate pairs use the longitude-latitude order, which is opposite to the order used
-in the [Simple Location Format](../orion-api.md#simple-location-format). This is due to the internal
+in the [Geographical Queries](../orion-api.md#geographica-queries). This is due to the internal
 [MongoDB geolocation implementation](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
 (which is based in GeoJSON) uses longitude-latitude order. However, other systems closer
-to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the API.
+to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the Geographical Queries API.
 
 Example document:
 
@@ -283,8 +283,9 @@ Fields:
     is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications, either HTTP or MQTT
--   **mqttTopic**: MQTT topic (only in MQTT notifications)
--   **mqttQoS**: MQTT QoS value (only in MQTT notifications)
+-   **topic**: MQTT topic (only in MQTT notifications)
+-   **qos**: MQTT QoS value (only in MQTT notifications)
+-   **retain**: MQTT retain value (only in MQTT notifications)
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type**, **isPattern** and **isTypePattern**. Note that,
     due to legacy reasons, **isPattern** may be `"true"` or `"false"` (text) while

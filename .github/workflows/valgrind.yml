@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-   TEST_IMAGE_NAME: fiware/orion-ci:deb
+   TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
 
 jobs:
   valgrind:

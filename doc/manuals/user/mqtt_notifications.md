@@ -30,6 +30,8 @@ The following elements can be used within `mqtt`:
 * `topic` to specify the MQTT topic to use
 * `qos`: to specify the MQTT QoS value to use in the notifications associated to the subscription
   (0, 1 or 2). This is an optional field, if omitted then QoS 0 is used.
+* `retain`: to specify the MQTT retain value to use in the notifications associated to the subscription
+  (`true` or `false`). This is an optional field, if omitted then retain `false` is used.
 * `user` and `passwd`: optional fields, to be used in the case MQTT broker needs user/password based
   authentication. If used, both fields have to be used together. Note that for security reasons,
   the password is always offuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`).
@@ -52,7 +54,7 @@ in MQTT subscriptions work the same as in HTTP subscriptions, taking into accoun
 * `mqttCustom` is used instead of `httpCustom`
 * The same fields used in `mqtt` can be used in `mqttCustom`.
 * `headers`, `qs` and `method`cannot be used, as they doesn’t have equivalence in MQTT
-* Macro replacement is performed in `topic` and `payload` fields. `url`, `qos`, `user` and `passwd` are fixed values
+* Macro replacement is performed in `topic` and `payload` fields. `url`, `qos`, `retain`, `user` and `passwd` are fixed values
 
 ## Connection management
 
@@ -88,3 +90,11 @@ To publish using TLS (not yet supported by Orion, pending on [this issue](https:
 mosquitto_pub -d --insecure --cafile file.pem -h <host> -p 1883 -u <username> -P <password> -t '/topic' -m 'payload'
 ```
 
+
+To clear all mosquitto broker retained messages:
+
+```
+sudo service mosquitto stop
+sudo rm /var/lib/mosquitto/mosquitto.db
+sudo systemctl start mosquitto.service
+```

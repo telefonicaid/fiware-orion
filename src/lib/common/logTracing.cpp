@@ -29,6 +29,19 @@
 
 #include "logMsg/logMsg.h"
 
+
+
+/* ****************************************************************************
+*
+* isNgsiV1Url
+*/
+inline bool isNgsiV1Url(const char* url)
+{
+  return (strstr(url, "v1") || strcasestr(url, "ngsi10") || strcasestr(url, "ngsi9"));
+}
+
+
+
 /* ****************************************************************************
 *
 * logInfoNotification - rc as int
@@ -95,7 +108,13 @@ void logInfoRequestWithoutPayload
 )
 {
   LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
+
+  if (logDeprecate && isNgsiV1Url(url))
+  {
+    LM_W(("Deprecated NGSIv1 request received: %s %s, response code: %d", verb, url, rc));
+  }
 }
+
 
 
 /* ****************************************************************************
@@ -146,6 +165,11 @@ void logInfoRequestWithPayload
   }
 
   LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
+
+  if (logDeprecate && isNgsiV1Url(url))
+  {
+    LM_W(("Deprecated NGSIv1 request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
+  }
 
   if (cleanAfterUse)
   {

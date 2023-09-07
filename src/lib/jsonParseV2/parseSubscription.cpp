@@ -651,6 +651,31 @@ static std::string parseMqttQoS(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
 
 /* ****************************************************************************
 *
+* parseMqttRetain -
+*/
+static std::string parseMqttRetain(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<bool> retainOpt = getBoolOpt(mqtt, "retain");
+  if (!retainOpt.ok())
+  {
+    return badInput(ciP, retainOpt.error);
+  }
+  if (retainOpt.given)
+  {
+    subsP->notification.mqttInfo.retain = retainOpt.value;
+  }
+  else
+  {
+    subsP->notification.mqttInfo.retain = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseMqttTopic -
 */
 static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
@@ -1035,6 +1060,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // retain
+    r = parseMqttRetain(ciP, subsP, mqtt);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     // topic
     r = parseMqttTopic(ciP, subsP, mqtt);
     if (!r.empty())
@@ -1071,6 +1103,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // qos (same as in not custom mqtt)
     r = parseMqttQoS(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // retain
+    r = parseMqttRetain(ciP, subsP, mqttCustom);
     if (!r.empty())
     {
       return r;

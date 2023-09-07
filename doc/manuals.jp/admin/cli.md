@@ -32,6 +32,9 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-ipv6** : broker を IPv6 専用モードで実行します。デフォルトでは、broker は IPv4 と IPv6 の両方で動作します。-ipv4 と同時に使用することはできません。
 -   **-multiservice** : マルチサービス/マルチテナントモードを有効にします。[マルチ・テナンシーのセクション](../orion-api.md#multi-tenancy)を参照してください
 -   **-db <db>** : 使用する MogoDB データベース、または (`-multiservice` を使用している場合) サービス単位/テナント単位のデータベースのプレフィックス ([マルチ・テナンシー](../orion-api.md#multi-tenancy)のセクションを参照してください) です。このフィールドは最大10文字までです
+-   **-dbURI <uri>** : 使用する MongoDB を URI で指定します。 
+    URI に文字列 `${PWD}` がある場合は `-dbpwd` または環境変数 `ORION_MONGO_PASSWORD` で指定したパスワードで置き換えられます。
+    このオプションは `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL`, `-dbDisableRetryWrites` と組み合わせできません。（組み合わせた場合、Orion は起動時にエラーで終了します）
 -   **-dbhost <host>** : 使用する MongoDB のホストとポートです。たとえば、`-dbhost localhost:12345` です
 -   **-rplSet <replicat_set>** : 指定すれば、Orion CB が MongoDB レプリカセット (スタンドアロン MongoDB インスタンスではなく) に接続されます。使用するレプリカセットの名前は、パラメータの値です。この場合、-dbhost パラメーターは、レプリカ・セットのシードとして使用されるホスト ("," で区切られた) のリストにすることができます
 -   **-dbTimeout <interval>** : レプリカセット (-rplSet) を使用する場合にのみ使用され、それ以外の場合は無視されます。レプリカセットへの接続のタイムアウトをミリ秒単位で指定します
@@ -107,8 +110,12 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-logLineMaxSize** : ログ行の最大長 (超過すると、Orion は `LINE TOO LONG` をログ・トレースとして出力します)。最小許容値:100バイト。デフォルト値:32キロバイト。Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) の `lineMaxSize` フィールドで変更できます
 -   **-logInfoPayloadMaxSize** : リクエストおよび/またはレスポンス・ペイロードを出力する INFO レベルのログ・トレースの場合、これはそれらのペイロードに許可される最大サイズです。ペイロード・サイズがこの設定より大きい場合、最初の `-logInfoPayloadMaxSize` バイトのみが含まれます (そして、`(...)` の形式の省略記号がトレースに表示されます)。デフォルト値：5キロバイト。Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) で `infoPayloadMaxSize` フィールドを使用して変更できます。
 -   **-disableMetrics** : 'metrics' 機能をオフにします。メトリックの収集は、システムコールやセマフォが関与するため、少しコストがかかります。メトリックオーバーヘッドなしで broker を起動するには、このパラメータを使用します
+-   **-disableNgsiv1** : NGSIv1 操作をオフにします。 API エンドポイントのみが無効になることに注意してください。
+    [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) を使用する通知や、
+    [`"legacyForwarding": true`](../orion-api.md#registrationprovider) を使用するレジストレーションに対応するリクエスト転送は機能します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
 -   **-mqttMaxAge** : 未使用の MQTT 接続が保持される最大時間 (分単位)。デフォルト値: 60
+-   **-logDeprecate** : 非推奨の使用法を警告として記録します。詳細については、[ドキュメントのこのセクション](../deprecated.md#log-deprecation-warnings) を参照してください。デフォルトは false です。これは、Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) を使用して `deprecated` フィールドを使用して変更できます
 
 ## 環境変数を使用した設定
 
@@ -135,6 +142,7 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_LOCALIP   |   localIp |
 |   ORION_PORT  |   port    |
 |   ORION_PID_PATH  |   pidpath |
+|	ORION_MONGO_URI	|	dbURI	|
 |   ORION_MONGO_HOST    |   dbhost  |
 |   ORION_MONGO_REPLICA_SET |   rplSet  |
 |   ORION_MONGO_USER    |   dbuser  |
@@ -182,6 +190,7 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_LOG_LINE_MAX_SIZE |   logLineMaxSize  |
 |   ORION_LOG_INFO_PAYLOAD_MAX_SIZE | logInfoPayloadMaxSize |
 |   ORION_DISABLE_METRICS   |   disableMetrics  |
+|   ORION_DISABLE_NGSIV1    |   disableNgsiv1   |
 |   ORION_INSECURE_NOTIF    |   insecureNotif   |
 |   ORION_NGSIV1_AUTOCAST   |   ngsiv1Autocast  |
 |   ORION_MQTT_MAX_AGE      |  mqttMaxAge  |

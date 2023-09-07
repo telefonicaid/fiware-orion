@@ -25,15 +25,14 @@
 # Install security updates
 apt-get -y update
 apt-get -y upgrade
-# FIXME: python2 required by an installation script in GMock. Sad but true :(
 # Install dependencies
 apt-get -y install \
   curl \
   gnupg \
-  python2 \
   python3 \
   python3-pip \
-  netcat \
+  python3-venv \
+  netcat-traditional \
   bc \
   valgrind \
   cmake \
@@ -50,7 +49,11 @@ apt-get -y install \
   libsasl2-dev \
   libgcrypt-dev
 
+## FIXME: check note in build_source.md about the libssl1 installation hack. It will be no longer needed from MongoDB 6.0 on
 echo "INSTALL: MongoDB shell" \
+&& curl -L http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb --output libssl1.1_1.1.1f-1ubuntu2_amd64.deb \
+&& dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb \
+&& rm libssl1.1_1.1.1f-1ubuntu2_amd64.deb \
 && curl -L https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add - \
 && echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list \
 && apt-get -y update \
@@ -58,19 +61,18 @@ echo "INSTALL: MongoDB shell" \
 
 echo "INSTALL: python special dependencies" \
 && cd /opt \
-&& pip3 install virtualenv \
-&& virtualenv /opt/ft_env --python=/usr/bin/python3 \
+&& python3 -m venv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==2.0.2 \
 && pip install paho-mqtt==1.6.1 \
-&& pip install amqtt==0.10.1 \
+&& pip install amqtt==0.11.0b1 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
 # see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
-echo "INSTALL: mongodb c driver (required by mongo c++ driver)" \
-&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz | tar xzC /opt/ \
-&& cd /opt/mongo-c-driver-1.23.1 \
+echo "INSTALL: mongodb c driver" \
+&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz | tar xzC /opt/ \
+&& cd /opt/mongo-c-driver-1.24.3 \
 && mkdir cmake-build \
 && cd cmake-build \
 && cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
@@ -88,11 +90,10 @@ echo "INSTALL: libmicrohttpd" \
 && make \
 && make install
 
-# FIXME: if sometimes python2 goes away the fuse_gtest_files.py would need to be migrated to python3
 echo "INSTALL: gmock" \
 && curl -L https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2 | tar xjC /opt/ \
 && cd /opt/gmock-1.5.0 \
-&& sed -i 's/env python/env python2/' gtest/scripts/fuse_gtest_files.py \
+&& patch -p1 gtest/scripts/fuse_gtest_files.py < /opt/archive/fuse_gtest_files.py.patch \
 && ./configure \
 && make \
 && make install
@@ -109,7 +110,7 @@ echo "INSTALL: mosquitto" \
 ldconfig
 
 apt-get -y clean \
-&& rm -Rf /opt/mongo-c-driver-1.23.1 \
+&& rm -Rf /opt/mongo-c-driver-1.24.3 \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-0.9.76 \
 && rm -Rf /opt/mosquitto-2.0.15 \

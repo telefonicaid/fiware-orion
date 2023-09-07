@@ -129,7 +129,7 @@ def ignore(root, file):
         return True
 
     # Apib files have an "inline" license, so they are ignored
-    extensions_to_ignore = [ 'apib', 'md' ]
+    extensions_to_ignore = [ 'apib', 'md', 'patch']
     if os.path.splitext(file)[1][1:] in extensions_to_ignore:
         return True
 

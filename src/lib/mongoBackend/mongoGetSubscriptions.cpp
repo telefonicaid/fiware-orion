@@ -339,6 +339,7 @@ void mongoListSubscriptions
                                     composeDatabaseName(tenant),
                                     COL_CSUBS,
                                     q,
+                                    q,
                                     sortBy.obj(),
                                     limit,
                                     offset,

@@ -71,6 +71,7 @@ extern bool mongoMultitenant(void);
 */
 void mongoInit
 (
+  const char*  dbURI,
   const char*  dbHost,
   const char*  rplSet,
   std::string  dbName,
@@ -214,7 +215,7 @@ extern bool includedAttribute(const std::string& attrName, const StringList& att
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsasge = false);
+extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP);
 
 
 
