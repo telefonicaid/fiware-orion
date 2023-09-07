@@ -95,6 +95,7 @@
 #define DATE_MODIFIED   "dateModified"
 #define DATE_EXPIRES    "dateExpires"
 #define ALTERATION_TYPE "alterationType"
+#define SERVICE_PATH    "servicePath"
 #define ALL_ATTRS       "*"
 
 
@@ -233,6 +234,7 @@ extern unsigned long      fcStepDelay;
 extern unsigned long      fcMaxInterval;
 
 extern unsigned long      logInfoPayloadMaxSize;
+extern bool               logDeprecate;
 
 
 /* ****************************************************************************

@@ -88,7 +88,12 @@ std::string libVersions(void)
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
   total += mosq    + "\"" + mosqVersion + "\"" + ",\n";
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
+#ifdef OLD_SSL_VERSION_FORMAT
+  // Needed by openssl 1.1.1n in Debian 11 and before
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
+#else
+  total += ssl     + "\"" + OPENSSL_FULL_VERSION_STR  "\"" + ",\n";
+#endif
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
   total += mongo   + "\"" + MONGOC_VERSION_S "\"" + ",\n";
   total += bson    + "\"" + BSON_VERSION_S "\"" + "\n";

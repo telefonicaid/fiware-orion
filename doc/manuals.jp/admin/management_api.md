@@ -10,6 +10,7 @@ Orion Context Broker は、NGSI インターフェースの他に、ログ設定
 curl -X PUT <host>:<port>/admin/log?level=<NONE|FATAL|ERROR|WARN|INFO|DEBUG>
 curl -X PUT <host>:<port>/admin/log?infoPayloadMaxSize=<logPayloadSizeValue>
 curl -X PUT <host>:<port>/admin/log?lineMaxSize=<logLineSizeValue>
+curl -X PUT <host>:<port>/admin/log?deprecate=true|false
 ```
 
 ログ設定を取得するには :
@@ -24,7 +25,8 @@ curl <host>:<port>:/admin/log
 {
     "infoPayloadMaxSize": 5120,
     "level": "DEBUG",
-    "lineMaxSize": 32768
+    "lineMaxSize": 32768,
+    "deprecate": false
 }
 ```
 

@@ -234,6 +234,7 @@ ftd: functional_test_debug
 test: unit_test functional_test
 
 coverage: install_coverage
+	# FIXME #4418: the functional test part of this target is not working properly. Check issue for details.
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
@@ -291,6 +292,7 @@ coverage_unit_test: build_unit_test
 	genhtml -o coverage coverage/broker.info
 
 coverage_functional_test: install_coverage
+	# FIXME #4418: this target is not working properly. Check issue for details.
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage

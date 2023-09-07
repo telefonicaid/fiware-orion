@@ -160,3 +160,20 @@ Some additional comments:
     forwarding to CPrs. In this case, the query is evaluated using exclusively CB local context information. Note that
     in forwarding `skipForwarding` has no effect (if you want an update to be interpreted locally to the CB just
     use an update request with append/creation semantics).
+
+## Pagination with Context Providers
+
+The [pagination](../orion-api.md#pagination) functionality in entity queries (`GET /v2/entities`) also works with Context Providers. The
+`limit` and `offset` parameters are applied to entities ordered as follow:
+
+* First, entities stored in Context Broker itself.
+* Next, entities stored in Context Providers, ordered by registration time (i.e. the entities from the Context Provider with lesser
+  registration time are ordered before the entities of the Context Provider with greater registration time).
+
+Please have a look to [this test case](../../test/functionalTest/cases/4149_pagination_for_request_forwarding/pagination_for_request_forwarding.test) for a detailed example on how this works.
+
+Some additional considerations:
+
+* The count returned in `fiware-total-count` header includes the sum of entities stored in Context Broker and in the Context Providers
+* Note that `orderBy` doesn't work in this case.
+* It only works with NGSIv2 based Context Providers (NGSIv1 CPrs are deprecated)

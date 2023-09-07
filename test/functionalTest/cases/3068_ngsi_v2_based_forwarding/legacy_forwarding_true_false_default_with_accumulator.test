@@ -96,7 +96,7 @@ Content-Length: 2
 
 03. Dump and reset the accumulator, see the forwarded query in NGSIv2 format
 ============================================================================
-POST http://localhost:REGEX(\d+)/v2/op/query
+POST http://localhost:REGEX(\d+)/v2/op/query?limit=20&offset=0&options=count
 Fiware-Servicepath: /
 Content-Length: 37
 User-Agent: REGEX(.*)

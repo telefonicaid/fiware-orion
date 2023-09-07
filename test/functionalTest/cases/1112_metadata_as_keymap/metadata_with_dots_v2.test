@@ -114,7 +114,7 @@ Content-Length: 139
 
 03. Check the '=' in DB
 =======================
-{ "attrs" : { "A" : { "type" : "T", "creDate" : REGEX(.*), "value" : "foo", "md" : { "m=x" : { "type" : "string", "value" : "black" }, "m=y" : { "type" : "double", "value" : 5 } }, "mdNames" : [ "m.x", "m.y" ] } } }
+{ "attrs" : { "A" : { "value" : "foo", "type" : "T", "creDate" : REGEX(.*), "md" : { "m=x" : { "type" : "string", "value" : "black" }, "m=y" : { "type" : "double", "value" : 5 } }, "mdNames" : [ "m.x", "m.y" ] } } }
 
 
 --TEARDOWN--

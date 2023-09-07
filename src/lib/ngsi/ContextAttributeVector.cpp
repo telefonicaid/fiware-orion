@@ -389,7 +389,7 @@ void ContextAttributeVector::fill
         break;
 
       default:
-        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d on attribute %s)", getFieldF(attr, ENT_ATTRS_VALUE).type(), ca.name.c_str()));
       }
     }
 
@@ -536,6 +536,7 @@ void ContextAttributeVector::toBson
       bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
     }
 
+    // FIXME P7: boolean return value should be managed?
     this->vec[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
 
     std::string effectiveName = dbEncode(this->vec[ix]->name);
@@ -558,5 +559,176 @@ void ContextAttributeVector::toBson
 
     attrsToAdd->append(effectiveName, bsonAttr.obj());
     attrNamesToAdd->append(this->vec[ix]->name);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextAttributeVector::applyUpdateOperators -
+*/
+void ContextAttributeVector::applyUpdateOperators(void)
+{
+  std::vector<std::string> toErase;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->compoundValueP != NULL)
+    {
+      if ((vec[ix]->compoundValueP->valueType == orion::ValueTypeObject) && (vec[ix]->compoundValueP->childV.size() > 0) && (isUpdateOperator(vec[ix]->compoundValueP->childV[0]->name)))
+      {
+        orion::CompoundValueNode* upOp = vec[ix]->compoundValueP->childV[0];
+        std::string op = upOp->name;
+        if (op == "$inc")
+        {
+          vec[ix]->valueType = orion::ValueTypeNumber;
+          vec[ix]->numberValue = upOp->numberValue;
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else if (op == "$min")
+        {
+          vec[ix]->valueType = orion::ValueTypeNumber;
+          if (upOp->numberValue > 0)
+          {
+            vec[ix]->numberValue = 0;
+          }
+          else
+          {
+            vec[ix]->numberValue = upOp->numberValue;
+          }
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else if (op == "$max")
+        {
+          vec[ix]->valueType = orion::ValueTypeNumber;
+          if (upOp->numberValue > 0)
+          {
+            vec[ix]->numberValue = upOp->numberValue;
+          }
+          else
+          {
+            vec[ix]->numberValue = 0;
+          }
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else if (op == "$mul")
+        {
+          vec[ix]->valueType = orion::ValueTypeNumber;
+          vec[ix]->numberValue = 0;
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else if ((op == "$push") || (op == "$addToSet"))
+        {
+          orion::CompoundValueNode* v = new orion::CompoundValueNode(orion::ValueTypeVector);
+          orion::CompoundValueNode* inner;
+          vec[ix]->valueType = orion::ValueTypeVector;
+
+          switch (upOp->valueType)
+          {
+          case orion::ValueTypeString:
+            v->add(orion::ValueTypeString, "", upOp->stringValue);
+            break;
+
+          case orion::ValueTypeNumber:
+            v->add(orion::ValueTypeNumber, "", upOp->numberValue);
+            break;
+
+          case orion::ValueTypeBoolean:
+            v->add(orion::ValueTypeBoolean, "", upOp->boolValue);
+            break;
+
+          case orion::ValueTypeNull:
+            v->add(orion::ValueTypeNull, "", "");
+            break;
+
+          case orion::ValueTypeVector:
+            inner = new orion::CompoundValueNode(orion::ValueTypeVector);
+            for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
+            {
+              inner->add(upOp->childV[jx]->clone());
+            }
+            v->add(inner);
+            break;
+
+          case orion::ValueTypeObject:
+            inner = new orion::CompoundValueNode(orion::ValueTypeObject);
+            for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
+            {
+              inner->add(upOp->childV[jx]->clone());
+            }
+            v->add(inner);
+            break;
+
+          case orion::ValueTypeNotGiven:
+            LM_E(("Runtime Error (value not given in compound value)"));
+            break;
+
+          default:
+            LM_E(("Runtime Error (unknown attribute value type: %d on attribute %s)", upOp->valueType, vec[ix]->name.c_str()));
+          }
+
+          // Replace old compound value (with $push) with the new one ([])
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = v;
+        }
+        else if (op == "$set")
+        {
+          orion::CompoundValueNode* o = new orion::CompoundValueNode(orion::ValueTypeObject);
+          //orion::CompoundValueNode* inner;
+          vec[ix]->valueType = orion::ValueTypeObject;
+
+          switch (upOp->valueType)
+          {
+          case orion::ValueTypeString:
+          case orion::ValueTypeNumber:
+          case orion::ValueTypeBoolean:
+          case orion::ValueTypeNull:
+          case orion::ValueTypeVector:
+            // Nothing to do in the case of inconsisent $set, e.g. {$set: 1}
+            // FIXME P4: this could be detected at parsing stage and deal with it as Bad Input, but it is harder...
+            break;
+
+          case orion::ValueTypeObject:
+            for (unsigned int jx = 0; jx < upOp->childV.size(); jx++)
+            {
+              o->add(upOp->childV[jx]->clone());
+            }
+            break;
+
+          case orion::ValueTypeNotGiven:
+            LM_E(("Runtime Error (value not given in compound value)"));
+            break;
+
+          default:
+            LM_E(("Runtime Error (unknown attribute value type: %d on attribute %s)", upOp->valueType, vec[ix]->name.c_str()));
+          }
+
+          // Replace old compound value (with $push) with the new one ([])
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = o;
+
+        }
+        else if ((op == "$unset") || (op == "$pull") || (op == "$pullAll"))
+        {
+          // FIXME P5: we are forcing shadowed semantics here. It could be a problem if the attribute used in the update
+          // triggering the notification (eg. A: {$unset: 1}) is also in the notifications.attrs list (note that shadowed
+          // was designed for built-in attributes, and they are included if splicitelly included in notifications.attr).
+          // However, this case would be *very rare* and the alternative (to keep track of items in vec[] to be removed
+          // at the end of 'for' processing) would be much more complex
+          vec[ix]->shadowed = true;
+          delete vec[ix]->compoundValueP;
+          vec[ix]->compoundValueP = NULL;
+        }
+        else
+        {
+          LM_E(("Runtime Error (unknown operator: %s", op.c_str()));
+        }
+      }
+    }
   }
 }

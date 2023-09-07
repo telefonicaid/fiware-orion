@@ -1047,6 +1047,11 @@ function valgrindSleep()
 # --quiet, but we need to get rid of some preamble lines about mongo version and
 # connection information and a final 'bye' line
 #
+# NOTE: this will no longer work with new mongosh shell. Note that legacy shell
+# (the 'mongo' command) has been deprecated in MongoDB 5.0 and removed in MongoDB 6.0.
+# This function (and many .test using mongoCmd) would need fixing after stepping to
+# MongoDB 6.0
+#
 function mongoCmd()
 {
   host="${CB_DATABASE_HOST}"

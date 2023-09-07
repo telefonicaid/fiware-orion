@@ -31,7 +31,6 @@
     - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
     - [Datetime support](#datetime-support)
     - [Geospatial properties of entities](#geospatial-properties-of-entities)
-        - [Simple Location Format](#simple-location-format)
         - [GeoJSON](#geojson)
     - [Simple Query Language](#simple-query-language)
     - [Geographical Queries](#geographical-queries)
@@ -50,8 +49,7 @@
            - [`$unset`](#unset)
            - [Combining `$set` and `$unset`](#combining-set-and-unset)
         - [How Orion deals with operators](#how-orion-deals-with-operators)
-        - [Current limitations](#current-limitations)
-           - [Create or replace entities](#create-or-replace-entities)
+        - [Usage in create or replace entity operations](#usage-in-create-or-replace-entity-operations)
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
     - [Metadata update semantics](#metadata-update-semantics)
       - [`overrideMetadata` option](#overridemetadata-option)
@@ -80,6 +78,7 @@
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
     - [Pagination](#pagination)
       - [Ordering Results](#ordering-results)
+      - [Ties](#ties)
 - [API Routes](#api-routes)
     - [Entities Operations](#entities-operations)
         - [Entities List](#entities-list)
@@ -629,7 +628,7 @@ meaning:
   operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
   check the section [Datetime support](#datetime-support) of this documentation.
 
-* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
+* `geo:json`. It has special semantics
   related with entity location. Attributes with `null` value will not be taken into account in
   geo-queries and they doesn't count towards the limit of one geospatial attribute per entity.
   See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
@@ -676,6 +675,8 @@ the subscriptions based in alteration type features (see [Subscription based in 
    * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
    * `entityDelete` if the update that triggers the notification was a entity delete operation
 
+* `servicePath` (type: `Text`): specifies the [service path](#service-path) to which the entity belongs.
+
 Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
 However, they cannot be used in resource URLs.
 
@@ -694,7 +695,7 @@ semantics associated to the attribute type. Note that Orion ignored attribute ty
 this metadata is not needed most of the cases, but there are two cases in which attribute
 type has an special semantic for Orion:
    * `DateTime`
-   * Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+   * `geo:json`
 
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
@@ -862,10 +863,7 @@ The geospatial properties of a context entity can be represented by means of reg
 context attributes.
 The provision of geospatial properties enables the resolution of geographical queries.
 
-Two different syntaxes are supported by Orion:
-
-* *Simple Location Format*. It is meant as a very lightweight format for developers and users to
-  quickly and easily add to their existing entities.
+The following syntax is supported by Orion:
 
 * *GeoJSON*.  [GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) is a geospatial data
   interchange format based on the JavaScript Object Notation (JSON).
@@ -923,73 +921,6 @@ If extra locations are defined in this way take, into account that the location 
 is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
 the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
 part in geo-queries.
-
-### Simple Location Format
-
-Simple Location Format supports basic geometries ( *point*, *line*, *box*, *polygon* ) and covers
-the typical use cases when encoding geographical locations. It has been inspired by
-[GeoRSS Simple](http://www.georss.org/simple.html).
-
-It is noteworthy that the Simple Location Format is not intended to represent complex positions on
-Earth surface.
-For instance, applications that require to capture altitude coordinates will have to use GeoJSON as
-representation format for the geospatial properties of their entities. 
-
-A context attribute representing a location encoded with the Simple Location Format
-must conform to the following syntax:
-
-* The attribute type must be one of the following values: (`geo:point`, `geo:line`, `geo:box` or 
-  `geo:polygon`).
-* The attribute value must be a list of coordinates. By default, coordinates are defined
-  using the [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-  [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) coordinate reference system (CRS),
-  with latitude and longitude units of decimal degrees. Such coordinate list allow to encode
-  the geometry specified by the `type` attribute and are encoded according to the specific
-  rules defined below:
-
-  * Type `geo:point`:   the attribute value must contain a string containing a
-    valid latitude-longitude pair, separated by comma.
-  * Type `geo:line`:    the attribute value must contain a string array of
-    valid latitude-longitude pairs. There must be at least two pairs.
-  * Type `geo:polygon`: the attribute value must contain a string array
-    of valid latitude-longitude pairs.
-    There must be at least four pairs, with the last being identical to the first
-    (so a polygon has a minimum of three actual points).
-    Coordinate pairs should be properly ordered so that the line segments
-    that compose the polygon remain on the outer edge of the defined area.
-    For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid
-    polygon definition. 
-    Orion should raise an error when none of the former conditions are met by input data.
-  * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of
-    a map or a rough area of interest. A box is represented by a two-length string array of
-    latitude-longitude pairs.
-    The first pair is the lower corner, the second is the upper corner.
-
-Note: Circle geometries are not supported, as the [literature](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)
-describes different shortcomings for implementations. 
-
-The examples below illustrate the referred syntax:
-
-```
-{
-  "location": {
-    "value": "41.3763726, 2.186447514",
-    "type": "geo:point"
-  }
-}
-```
-
-```
-{
-  "location": {
-    "value": [
-      "40.63913831188419, -8.653321266174316",
-      "40.63881265804603, -8.653149604797363"
-    ],
-    "type": "geo:box"
-  }
-}
-```
 
 ### GeoJSON
 
@@ -1191,7 +1122,7 @@ provide more information about the relationship. The following values are recogn
   reference geometry. 
 
 `geometry` allows to define the reference shape to be used when resolving the query.
- The following geometries (see [Simple Location Format](#simple-location-format)) must be supported:
+ The following geometries are supported:
 
 + `geometry=point`, defines a point on the Earth surface.
 + `geometry=line`, defines a polygonal line.
@@ -1229,8 +1160,8 @@ the API implementation is responsible for determining which entity attribute
 contains the geographical location to be used for matching purposes.
 To this aim, the following rules must be followed:
 
-* If an entity has no attribute corresponding to a location (encoded as GeoJSON or the
-  Simple Location Format), then such an entity has not declared any geospatial property and will not
+* If an entity has no attribute corresponding to a location (encoded as GeoJSON),
+  then such an entity has not declared any geospatial property and will not
   match any geographical query.
 
 * If an entity only exposes one attribute corresponding to a location, then such an attribute will
@@ -1629,41 +1560,19 @@ So be careful of avoiding these situations.
 The only exception to "use only one operator" rule is the case of `$set` and
 `$unset`, that can be used together [as described above](#combining-set-and-unset).
 
-### Current limitations
+### Usage in create or replace entity operations
 
-#### Create or replace entities
+Update operators can be used in entity creation or replace operations. In particular:
 
-Update operators cannot be used in entity creation or replace operations. For instance if
-you create an entity this way:
-
-```
-POST /v2/entities
-{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-the attribute A in the just created entity will have as value (literally) this JSON object: `{ "$inc": 2 }`.
-
-However, note that the case of adding new attributes to existing entities will work. For instance if
-we already have an entity E with attributes A and B and we append C this way:
-
-```
-POST /v2/entities/E/attrs
-{
-  "C": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-then C will be created with value `2`.
+* Numeric operators takes 0 as reference. For instance, `{"$inc": 4}` results in 4,
+  `{$mul: 1000}` results in 0, etc.
+* `$set` takes the empty object (`{}`) as reference. For instance, `"$set": {"X": 1}` results in just `{"X": 1}`
+* `$push` and `$addToSet` take the empty array (`[]`) as reference. For instance, `{"$push": 4}`
+  results in `[ 4 ]`.
+* `$pull`, `$pullAll` and `$unset` are ignored. This means that the attribute in which the operator is used
+  is not created in the entity. For instance, creating an entity with 2 attributes, the first one containing an operator 
+  `"A": {"value": {"$unset": 1}, ... }"` and the second one `"B": {"value": 3, ...}`, just a normal one, will result in an
+  entity with just one attribute, `B`.
 
 ## Filtering out attributes and metadata
 
@@ -2644,6 +2553,42 @@ From lowest to highest:
 5. Array
 6. Boolean
 
+### Ties
+
+Note that in the cases of ties, Orion doesn't guarantee that the same query using `orderBy` will result in the same
+results sequence. In other words, the tied results could be returned in different relative order when the same query is
+repeated. This is the same behaviour that MongoDB (the underlying DB used by Orion) implements (see [this MongoDB documentation](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/).
+
+Note this may be problematic in the case of pagination. Let's illustrate with the following example. Consider we have four entities (E1 to E4)
+
+* E1, with attribute `colour` set to `blue`
+* E2, with attribute `colour` set to `blue`
+* E3, with attribute `colour` set to `red`
+* E4, with attribute `colour` set to `red`
+
+A first execution of `GET /v2/entities?orderBy=colour` could return `E1, E2, E3, E4` but a second execution of the query
+could `E2, E1, E4, E3`, a third execution could return `E1, E2, E4, E3`, etc.
+
+Let's consider a typical paginated sequence of queries like this:
+
+```
+GET /v2/entities?orderBy=colour&limit=3&offset=0
+GET /v2/entities?orderBy=colour&limit=3&offset=3
+```
+
+The same sequence of results is not guaranteed among queries, so in the first query the sequence could be `E1, E2, E3, E4` (so
+client would get `E1, E2, E3`) but in the second query it could be (`E1, E2, E4, E3`) so the client will get `E3` again
+(instead of the expected `E4`).
+
+Another similar (more complex case) is described in [this issue](https://github.com/telefonicaid/fiware-orion/issues/4394)).
+
+The solution is to add an attribute to `orderBy` to guarantee that ties doesn't occur. In this sense, `dateCreated` [builtin attributes](#builtin-attributes) is a very good candidate, so the above queries could be adapted the following way:
+
+```
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=0
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=3
+```
+
 # API Routes
 
 ## Entities Operations
@@ -2801,8 +2746,11 @@ Example:
     "value": 60
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84"
@@ -2894,8 +2842,11 @@ Example:
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
@@ -2974,8 +2925,11 @@ Example:
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
@@ -3759,6 +3713,7 @@ A `mqtt` object contains the following subfields:
 | `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
 | `topic`   |          | string | Represent the MQTT topic to use                                                                                                            |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `retain`  | ✓        | boolean | MQTT retain value to use in the notifications associated to the subscription (`true` or `false`). If omitted then retain `false` is used. |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
 | `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 
@@ -3792,6 +3747,7 @@ A `mqttCustom` object contains the following subfields.
 | `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
 | `topic`   |          | string | Represent the MQTT topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `retain`  | ✓        | boolean | MQTT retain value to use in the notifications associated to the subscription (`true` or `false`). If omitted then retain `false` is used. |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
 | `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 | `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
