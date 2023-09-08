@@ -163,7 +163,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
 * libmosquitto: 2.0.15 (from source)
-* Mongo C driver: 1.23.1 (from source)
+* Mongo C driver: 1.24.3 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
@@ -182,9 +182,9 @@ commands that require root privilege):
 
 * Install the Mongo Driver from source.
 
-        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz
-        tar xfvz mongo-c-driver-1.23.1.tar.gz
-        cd mongo-c-driver-1.23.1
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz
+        tar xfvz mongo-c-driver-1.24.3.tar.gz
+        cd mongo-c-driver-1.24.3
         mkdir cmake-build 
         cd cmake-build 
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. 

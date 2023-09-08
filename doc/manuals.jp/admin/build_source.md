@@ -164,7 +164,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 * openssl: 1.1.1f
 * libuuid: 2.34-0.1
 * libmosquitto: 2.0.15 (ソースから)
-* Mongo C driver: 1.23.1 (ソースから)
+* Mongo C driver: 1.24.3 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
 * gtest (only for `make unit_test` building target): 1.5 (ソースから)
 * gmock (only for `make unit_test` building target): 1.5 (ソースから)
@@ -182,9 +182,9 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
 * ソースから Mongo Driver をインストールします
 
-        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.23.1/mongo-c-driver-1.23.1.tar.gz
-        tar xfvz mongo-c-driver-1.23.1.tar.gz
-        cd mongo-c-driver-1.23.1
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz
+        tar xfvz mongo-c-driver-1.24.3.tar.gz
+        cd mongo-c-driver-1.24.3
         mkdir cmake-build
         cd cmake-build
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
