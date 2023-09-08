@@ -959,14 +959,19 @@ bool orionldPatchSubscription(void)
   // modified.
   // ngsildSubscriptionPatch() performs that modification.
   //
-  CachedSubscription* cSubP;
+  CachedSubscription* cSubP = NULL;
 
   if (timeInterval == 0)
-    cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
-  else
   {
-    // Can't get here right now
+    cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+    if (cSubP == NULL)
+    {
+      orionldError(OrionldResourceNotFound, "Subscription not found", subscriptionId, 404);
+      return false;
+    }
   }
+  else
+    LM_X(131, ("Can't reach this point, right? ;-)"));
 
   if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP, qRenderedForDb) == false)
   {
