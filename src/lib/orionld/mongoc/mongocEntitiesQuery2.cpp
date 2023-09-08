@@ -320,7 +320,7 @@ KjNode* mongocEntitiesQuery2
   if (geoInfoP != NULL)
   {
     if (geoFilter(&mongoFilter, geoInfoP) == false)
-      return NULL;
+      LM_RE(NULL, ("geoFilter flagged an error"));
     geojsonGeometry = geoInfoP->geoProperty;
   }
 

@@ -312,12 +312,6 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "timeInterval": 12,
   "q": "P2>10",
-  "geoQ": {
-    "geometry": "Point",
-    "coordinates": "[1,2]",
-    "georel": "near;maxDistance==1000",
-    "geoproperty": "not supported"
-  },
   "isActive": false,
   "notification": {
     "attributes": [ "P1", "P2", "A3" ],

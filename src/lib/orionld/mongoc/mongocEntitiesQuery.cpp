@@ -255,7 +255,9 @@ static bool geoNearFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
   char geoPropertyPath[512];
   int  geoPropertyPathLen;
   if (geoPropertyDbPath(geoPropertyPath, sizeof(geoPropertyPath), geoInfoP->geoProperty, &geoPropertyPathLen) == false)
-    return false;
+    LM_RE(false, ("Failed to aeemble the geoProperty path"));
+
+  LM_T(LmtMongoc, ("geoPropertyPath: '%s'", geoPropertyPath));
 
   bson_append_document(mongoFilterP, geoPropertyPath, geoPropertyPathLen, &location);
 
@@ -310,6 +312,7 @@ static bool geoWithinFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
   bson_init(&within);
   bson_init(&coordinates);
 
+  kjTreeLog(geoInfoP->coordinates, "coordinates", LmtMongoc);
   mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
 
   bson_append_array(&geometry,    "coordinates", 11, &coordinates);

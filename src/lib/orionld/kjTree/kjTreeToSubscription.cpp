@@ -260,15 +260,8 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if (strcmp(kNodeP->name, "timeInterval") == 0)
     {
-      DUPLICATE_CHECK(timeIntervalP, "Subscription::timeInterval", kNodeP);
-      NUMBER_CHECK(timeIntervalP, "Subscription::timeInterval");
-      subP->timeInterval = (timeIntervalP->type == KjInt)? timeIntervalP->value.i : timeIntervalP->value.f;
-
-      if (subP->timeInterval <= 0)
-      {
-        orionldError(OrionldBadRequestData, "Invalid value for Subscription::timeInterval", "must be a Number > 0", 400);
-        return false;
-      }
+      orionldError(OrionldOperationNotSupported, "Not Implemented", "Periodic Notification Subscriptions are not implemented", 501);
+      return false;
     }
     else if ((kNodeP->name[0] == 'q') && (kNodeP->name[1] == 0))
     {

@@ -306,10 +306,6 @@ KjNode* dbModelToApiSubscription
     // There is no "isPattern" in NGSI-LD
     kjChildRemove(entityP, isPatternP);
 
-    LM_T(LmtSR, ("entityId:   %s", idP->value.s));
-    LM_T(LmtSR, ("isPattern:  %s", isPatternP->value.s));
-    LM_T(LmtSR, ("type:       %s", typeP->value.s));
-
     if (strcmp(isPatternP->value.s, "true") == 0)
     {
       if (strcmp(idP->value.s, ".*") == 0)
@@ -539,7 +535,6 @@ KjNode* dbModelToApiSubscription
   // Add "notification" to top level
   kjChildAdd(apiSubP, notificationP);
 
-  
   if (dbReferenceP != NULL)
   {
     kjChildAdd(endpointP, dbReferenceP);

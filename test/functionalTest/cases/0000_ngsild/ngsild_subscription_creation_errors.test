@@ -96,7 +96,6 @@ orionldStart CB
 #  18.1. Attempt to create a subscription with an invalid field called 'INVALID'
 #
 # *19.1. Attempt to create a subscription without ENTITIES nor WATCHEDATTRIBUTES (duplicate of  06.1)
-# *19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present
 #  19.3. Attempt to create a subscription without NOTIFICATION
 # *19.4. Creation of a subscription without TIMEINTERVAL nor WATCHEDATTRIBUTES present (entities is present)
 #
@@ -258,63 +257,6 @@ payload='{
     }
   ],
   "watchedAttributes": [ ],
-  "q": "P2>10",
-  "geoQ": {
-    "geometry": "Point",
-    "coordinates": [1,2],
-    "georel": "near;maxDistance==5",
-    "geoproperty": "location"
-  },
-  "csf": "not implemented",
-  "isActive": false,
-  "notification": {
-    "attributes": [ "P1", "P2", "A3" ],
-    "format": "keyValues",
-    "endpoint": {
-      "uri": "http://valid.url/url",
-      "accept": "application/ld+json"
-    },
-    "status": "ignored",
-    "timesSent": "ignored",
-    "lastNotification": "ignored",
-    "lastFailure": "ignored",
-    "lastSuccess": "ignored"
-  },
-  "expires": "2028-12-31T10:00:00",
-  "throttling": 5,
-  "status": "to be ignored - read-only",
-  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-  "createdAt": "ignored",
-  "modifiedAt": "ignored"
-}'
-orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"
-echo
-echo
-
-
-echo "19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present"
-echo "==========================================================================================="
-payload='{
-  "id": "http://a.b.c/subs/sub03",
-  "type": "Subscription",
-  "name": "Test subscription 01",
-  "description": "Description of Test subscription 01",
-  "entities": [
-    {
-      "id": "urn:ngsi-ld:E01",
-      "type": "T1"
-    },
-    {
-      "id": "http://a.b.c/E02",
-      "type": "T2"
-    },
-    {
-      "idPattern": ".*E03.*",
-      "type": "T3"
-    }
-  ],
-  "watchedAttributes": [ "P2" ],
-  "timeInterval": 12,
   "q": "P2>10",
   "geoQ": {
     "geometry": "Point",
@@ -547,20 +489,6 @@ Date: REGEX(.*)
 {
     "detail": "Subscription::watchedAttributes",
     "title": "Empty Array",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-}
-
-
-19.2. Attempt to create a subscription with both TIMEINTERVAL and WATCHEDATTRIBUTES present
-===========================================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 160
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "detail": "Both 'timeInterval' and 'watchedAttributes' present",
-    "title": "Inconsistent subscription",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

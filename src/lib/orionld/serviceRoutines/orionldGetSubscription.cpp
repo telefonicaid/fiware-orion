@@ -184,7 +184,7 @@ static bool orionldGetSubscriptionFromDb(void)
     return false;
   }
   kjTreeLog(dbSubP, "DB Sub", LmtSubCacheStats);
-  
+
   KjNode*      coordinatesNodeP = NULL;           // Not needed here, but dbModelToApiSubscription requires it
   KjNode*      contextNodeP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
   KjNode*      showChangesP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it

@@ -36,9 +36,10 @@ extern "C"
 #include "common/RenderFormat.h"                               // RenderFormat
 #include "common/MimeType.h"                                   // MimeType
 
+#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/types/Protocol.h"                            // Protocol
 #include "orionld/types/StringArray.h"                         // StringArray
-#include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+#include "orionld/types/OrionldGeoInfo.h"                      // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                   // QNode
 
 
@@ -84,6 +85,7 @@ typedef struct PernotSubscription
   KjNode*                     eSelector;
   KjNode*                     attrsSelector;
   QNode*                      qSelector;
+  OrionldGeoInfo*             geoSelector;
 
   // Counters
   uint32_t                    notificationAttemptsDb;   // Total number of notification attempts, in DB

@@ -42,6 +42,7 @@ extern "C"
 #include "orionld/types/Protocol.h"                            // Protocol, protocolFromString
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/payloadCheck/pcheckGeoQ.h"                   // pcheckGeoQ
 #include "orionld/kjTree/kjChildCount.h"                       // kjChildCount
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
@@ -74,7 +75,7 @@ static void receiverInfo(PernotSubscription* pSubP, KjNode* endpointP)
       KjNode* valueP = kjLookup(kvPairP, "value");
       int     sLen   = strlen(keyP->value.s) + strlen(valueP->value.s) + 4;
       char*   s      = (char*) malloc(sLen);
-        
+
       snprintf(s, sLen - 1, "%s:%s\r\n", keyP->value.s, valueP->value.s);
       pSubP->headers.array[ix] = s;
       ++ix;
@@ -173,8 +174,28 @@ PernotSubscription* pernotSubCacheAdd
   // Query parameters
   pSubP->eSelector      = kjLookup(pSubP->kjSubP, "entities");
   pSubP->attrsSelector  = kjLookup(notificationP, "attributes");
-  pSubP->qSelector      = qTree;  // I probably need to clone this ...
+  pSubP->qSelector      = qTree;
+  pSubP->geoSelector    = NULL;
 
+  KjNode* geoqP = kjLookup(apiSubP, "geoQ");
+  if (geoqP != NULL)
+  {
+    pSubP->geoSelector = pcheckGeoQ(NULL, geoqP, true);  // FIXME: Already done in pcheckSubscription()
+    if (pSubP->geoSelector != NULL)
+    {
+      if (pSubP->geoSelector->geoProperty == NULL)
+        pSubP->geoSelector->geoProperty = (char*) "location";
+
+      LM_T(LmtPernotQuery, ("geometry:    %d", pSubP->geoSelector->geometry));
+      LM_T(LmtPernotQuery, ("georel:      %d", pSubP->geoSelector->georel));
+      LM_T(LmtPernotQuery, ("minDistance: %d", pSubP->geoSelector->minDistance));
+      LM_T(LmtPernotQuery, ("maxDistance: %d", pSubP->geoSelector->maxDistance));
+      LM_T(LmtPernotQuery, ("geoProperty: '%s'", pSubP->geoSelector->geoProperty));
+      pSubP->geoSelector->coordinates = kjClone(NULL, pSubP->geoSelector->coordinates);
+      kjTreeLog(pSubP->geoSelector->coordinates, "coordinates", LmtPernotQuery);
+      
+    }
+  }
 
   // notification::endpoint
   if (endpointP == NULL)

@@ -119,8 +119,8 @@ static void* pernotTreat(void* vP)
   KjNode*          apiEntityArray;
 
   orionldState.uriParams.offset = 0;
-  orionldState.uriParams.limit  = 20;  // Or: set in subscription
-  orionldState.uriParams.count  = true;
+  orionldState.uriParams.limit  = 20;     // Or: set in subscription
+  orionldState.uriParams.count  = true;   // Need the count to be able to paginate
   orionldState.tenantP          = subP->tenantP;
 
   kjTreeLog(subP->eSelector,     "eSelector",     LmtPernotQuery);

@@ -237,11 +237,17 @@ bool pCheckSubscription
     }
     else if (strcmp(subItemP->name, "geoQ") == 0)
     {
+      if (*timeInterval > 0)
+      {
+        orionldError(OrionldOperationNotSupported, "Not Implemented", "Geo-Query is not yet implemented for Periodic Notification Subscriptions", 501);
+        return false;
+      }
+
       PCHECK_OBJECT(subItemP, 0, NULL, SubscriptionGeoqPath, 400);
       PCHECK_DUPLICATE(geoqP, subItemP, 0, NULL, SubscriptionGeoqPath, 400);
 
       OrionldGeoInfo* geoInfoP;
-      if ((geoInfoP = pcheckGeoQ(geoqP, true)) == NULL)
+      if ((geoInfoP = pcheckGeoQ(&orionldState.kalloc, geoqP, true)) == NULL)
         return false;
 
       *geoCoordinatesPP = geoInfoP->coordinates;
