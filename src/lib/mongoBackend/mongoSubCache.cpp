@@ -150,13 +150,13 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   cSubP->tenant                = (tenant == NULL || tenant[0] == 0)? strdup("") : strdup(tenant);  // FIXME: strdup("") ... really?
   cSubP->servicePath           = strdup(sub.hasField(CSUB_SERVICE_PATH)? getStringFieldF(&sub, CSUB_SERVICE_PATH) : "/");
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING)       : -1;
-  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(&sub, CSUB_EXPIRATION)       : 0;
-  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(&sub, CSUB_STATUS)                   : "active";
-  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(&sub, CSUB_BLACKLIST)                  : false;
-  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(&sub, CSUB_LASTFAILURE)      : -1;
-  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(&sub, CSUB_LASTSUCCESS)      : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING, true)       : -1;
+  cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getNumberFieldAsDoubleF(&sub, CSUB_EXPIRATION, true)       : 0;
+  cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION, true) : -1;
+  cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(&sub, CSUB_STATUS)                         : "active";
+  cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(&sub, CSUB_BLACKLIST)                        : false;
+  cSubP->lastFailure           = sub.hasField(CSUB_LASTFAILURE)?      getNumberFieldAsDoubleF(&sub, CSUB_LASTFAILURE, true)      : -1;
+  cSubP->lastSuccess           = sub.hasField(CSUB_LASTSUCCESS)?      getNumberFieldAsDoubleF(&sub, CSUB_LASTSUCCESS, true)      : -1;
   cSubP->count                 = 0;
   cSubP->next                  = NULL;
 
@@ -452,14 +452,14 @@ int mongoSubCacheItemInsert
     // if the database objuect contains lastNotificationTime,
     // then use the value from the database
     //
-    lastNotificationTime = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION);
+    lastNotificationTime = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION, true);
   }
 
   cSubP->tenant                = (tenant == NULL || tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->servicePath           = strdup(servicePath);
   cSubP->renderFormat          = renderFormat;
-  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING) : -1;
+  cSubP->throttling            = sub.hasField(CSUB_THROTTLING)?       getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING, true) : -1;
   cSubP->expirationTime        = expirationTime;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->count                 = 0;
@@ -639,6 +639,35 @@ static void mongoSubCountersUpdateCount
 
 /* ****************************************************************************
 *
+* mongoSubCountersUpdateFailures -
+*/
+static void mongoSubCountersUpdateFailures
+(
+  const std::string&  collection,
+  const std::string&  subId,
+  long long           failures,
+  bool                ngsild
+)
+{
+  BSONObj      condition;
+  BSONObj      update;
+  std::string  err;
+
+  if (ngsild == true)
+    condition = BSON("_id"  << subId);
+  else
+    condition = BSON("_id"  << OID(subId));
+
+  update = BSON("$inc" << BSON(CSUB_FAILURES << failures));
+
+  if (collectionUpdate(collection.c_str(), condition, update, false, &err) != true)
+    LM_E(("Internal Error (error updating 'failures' for a subscription)"));
+}
+
+
+
+/* ****************************************************************************
+*
 * mongoSubCountersUpdateLastNotificationTime -
 */
 static void mongoSubCountersUpdateLastNotificationTime
@@ -764,6 +793,7 @@ void mongoSubCountersUpdate
   const std::string& tenant,
   const std::string& subId,
   long long          count,
+  long long          failures,
   double             lastNotificationTime,
   double             lastFailure,
   double             lastSuccess,
@@ -783,12 +813,13 @@ void mongoSubCountersUpdate
   else
     snprintf(collectionPath, sizeof(collectionPath), "%s.csubs", dbName);
 
-  LM_T(LmtLegacy, ("count:                %d", count));
-  LM_T(LmtLegacy, ("lastNotificationTime: %f", lastNotificationTime));
-  LM_T(LmtLegacy, ("lastFailure:          %f", lastFailure));
-  LM_T(LmtLegacy, ("lastSuccess:          %f", lastSuccess));
+  LM_T(LmtSubCacheStats, ("Updating sub::count to %ll", count));
+  LM_T(LmtSubCacheStats, ("lastNotificationTime: %f", lastNotificationTime));
+  LM_T(LmtSubCacheStats, ("lastFailure:          %f", lastFailure));
+  LM_T(LmtSubCacheStats, ("lastSuccess:          %f", lastSuccess));
 
   if (count                 > 0)  mongoSubCountersUpdateCount(collectionPath, subId, count, ngsild);
+  if (failures              > 0)  mongoSubCountersUpdateFailures(collectionPath, subId, failures, ngsild);
   if (lastNotificationTime  > 0)  mongoSubCountersUpdateLastNotificationTime(collectionPath, subId, lastNotificationTime, ngsild);
   if (lastFailure           > 0)  mongoSubCountersUpdateLastFailure(collectionPath, subId, lastFailure, ngsild);
   if (lastSuccess           > 0)  mongoSubCountersUpdateLastSuccess(collectionPath, subId, lastSuccess, ngsild);

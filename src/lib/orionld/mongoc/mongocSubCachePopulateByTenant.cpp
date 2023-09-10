@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // mongocPool
 #include "orionld/common/subCacheApiSubscriptionInsert.h"        // subCacheApiSubscriptionInsert
+#include "orionld/pernot/pernotSubCacheAdd.h"                    // pernotSubCacheAdd
 #include "orionld/dbModel/dbModelToApiSubscription.h"            // dbModelToApiSubscription
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/q/QNode.h"                                     // QNode
@@ -124,6 +125,9 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP, bool refresh)
     KjNode*      showChangesP  = NULL;
     KjNode*      sysAttrsP     = NULL;
     RenderFormat renderFormat  = RF_NORMALIZED;
+    double       timeInterval  = 0;
+
+    kjTreeLog(dbSubP, "dbSubP", LmtPernot);
     KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,
                                                           tenantP->tenant,
                                                           true,
@@ -132,17 +136,25 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP, bool refresh)
                                                           &contextNodeP,
                                                           &showChangesP,
                                                           &sysAttrsP,
-                                                          &renderFormat);
+                                                          &renderFormat,
+                                                          &timeInterval);
 
     if (apiSubP == NULL)
       continue;
+
+    kjTreeLog(apiSubP, "apiSubP", LmtPernot);
 
     OrionldContext* contextP = NULL;
     if (contextNodeP != NULL)
       contextP = orionldContextFromUrl(contextNodeP->value.s, NULL);
 
-    CachedSubscription* cSubP = subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat);
-    cSubP->inDB = true;
+    if (timeInterval == 0)
+    {
+      CachedSubscription* cSubP = subCacheApiSubscriptionInsert(apiSubP, qTree, coordinatesP, contextP, tenantP->tenant, showChangesP, sysAttrsP, renderFormat);
+      cSubP->inDB = true;
+    }
+    else
+      pernotSubCacheAdd(NULL, apiSubP, NULL, qTree, coordinatesP, contextP, tenantP, showChangesP, sysAttrsP, renderFormat, timeInterval);
   }
 
   if (refresh == true)

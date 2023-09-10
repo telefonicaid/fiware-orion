@@ -50,13 +50,15 @@ void kjTreeLogFunction(KjNode* tree, const char* msg, const char* path, int line
 
   if (tree == NULL)
   {
-    lmOut((char*) "NULL Tree", 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+    char error[256];
+    snprintf(error, sizeof(error) - 1, "%s: NULL", msg);
+    lmOut(error, 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
     return;
   }
 
   int bufSize = kjFastRenderSize(tree);
 
-  // Too big trees will not be rendered - this is just tracing
+  // Too big trees will not be rendered - this is just logging
   if (bufSize < 10 * 1024)
   {
     char* treeBuf = kaAlloc(&orionldState.kalloc, bufSize + 512);

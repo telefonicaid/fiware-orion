@@ -269,7 +269,7 @@ TreeNode* pCheckQuery(KjNode* queryP)
   if ((treeNodeV[1].nodeP != NULL) && (pCheckEntities(treeNodeV[1].nodeP)          == false))                         return NULL;
   if ((treeNodeV[2].nodeP != NULL) && (pCheckAttrs(treeNodeV[2].nodeP)             == false))                         return NULL;
   if ((treeNodeV[3].nodeP != NULL) && ((treeNodeV[3].output = pcheckQ(treeNodeV[3].nodeP->value.s))  == NULL)) return NULL;
-  if ((treeNodeV[4].nodeP != NULL) && ((treeNodeV[4].output = pcheckGeoQ(treeNodeV[4].nodeP, false)) == NULL)) return NULL;
+  if ((treeNodeV[4].nodeP != NULL) && ((treeNodeV[4].output = pcheckGeoQ(&orionldState.kalloc, treeNodeV[4].nodeP, false)) == NULL)) return NULL;
 
   //
   // Now, for the query to not be too wide, we need at least one of:

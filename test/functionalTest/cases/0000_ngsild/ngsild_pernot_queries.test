@@ -1,0 +1,220 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Pernot Subscription - periodic notifications
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -pernot -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a pernot subscription on entity type T only and with a time interval of 2 seconds
+# 02. Create a matching entity urn:E1
+# 03. Create a matching entity urn:E2
+# 04. Create a non matching entity urn:E3
+# 05. Sleep 2 seconds to make sure the periodic notification have time
+# 06. Dump/Reset the accumulator - see one notification with urn:E1 and urn:E2
+#
+
+echo "01. Create a pernot subscription on entity type T only and with a time interval of 2 seconds"
+echo "============================================================================================"
+#
+# Test also:
+#  geoQ
+#  expiresAt
+#  lang
+#  jsonldContext
+#  
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "q": "P3==1|P3==2",
+  "timeInterval": 2,
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "attributes": [ "P1", "P2" ],
+    "sysAttrs": false,
+    "format": "normalized"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a matching entity urn:E1"
+echo "==================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1,
+  "P2": 1,
+  "P3": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create a matching entity urn:E2"
+echo "==================================="
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P1": 2,
+  "P2": 2,
+  "P3": 2
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create a non matching entity urn:E3"
+echo "======================================="
+payload='{
+  "id": "urn:E3",
+  "type": "T2",
+  "P1": 3
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Sleep 2 seconds to make sure the periodic notification have time"
+echo "===================================================================="
+sleep 2
+echo
+echo
+
+
+echo "06. Dump/Reset the accumulator - see one notification with urn:E1 and urn:E2"
+echo "============================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a pernot subscription on entity type T only and with a time interval of 2 seconds
+============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+02. Create a matching entity urn:E1
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Create a matching entity urn:E2
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+04. Create a non matching entity urn:E3
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+05. Sleep 2 seconds to make sure the periodic notification have time
+====================================================================
+
+
+06. Dump/Reset the accumulator - see one notification with urn:E1 and urn:E2
+============================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 361
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 1
+            },
+            "P2": {
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:E1",
+            "type": "T"
+        },
+        {
+            "P1": {
+                "type": "Property",
+                "value": 2
+            },
+            "P2": {
+                "type": "Property",
+                "value": 2
+            },
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

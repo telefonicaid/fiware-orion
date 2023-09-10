@@ -280,7 +280,7 @@ bool getBoolField(const BSONObj* bP, const char* field, const char* caller, int 
 *
 * getNumberFieldAsDouble -
 */
-double getNumberFieldAsDouble(const BSONObj* bP, const char* field, const char* caller, int line)
+double getNumberFieldAsDouble(const BSONObj* bP, const char* field, bool okToNotExist, const char* caller, int line)
 {
   mongo::BSONType type = mongo::EOO;
 
@@ -296,6 +296,9 @@ double getNumberFieldAsDouble(const BSONObj* bP, const char* field, const char* 
   }
   else
   {
+    if (okToNotExist == true)
+      return 0;
+
     LM_E(("Runtime Error (double/int/long field '%s' is missing in BSONObj <%s> from caller %s:%d)",
           field,
           bP->toString().c_str(),

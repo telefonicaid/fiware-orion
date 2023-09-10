@@ -268,7 +268,7 @@ bye
 02. GET S1 from CB1
 ===================
 HTTP/1.1 200 OK
-Content-Length: 514
+Content-Length: 597
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -283,6 +283,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:Subscription:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "lang": "en",
     "modifiedAt": "202REGEX(.*)Z",
     "notification": {
@@ -307,7 +308,7 @@ OK, slept 2.1 seconds
 04. GET S1 from CB2 - must be there
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 514
+Content-Length: 597
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -322,6 +323,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:Subscription:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "lang": "en",
     "modifiedAt": "202REGEX(.*)Z",
     "notification": {
@@ -348,7 +350,7 @@ Date: REGEX(.*)
 06. GET Sub 1 from CB1
 ======================
 HTTP/1.1 200 OK
-Content-Length: 598
+Content-Length: 681
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -369,6 +371,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
     },
     "id": "urn:ngsi-ld:Subscription:S1",
     "isActive": false,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "lang": "es",
     "modifiedAt": "202REGEX(.*)Z",
     "notification": {
@@ -448,7 +451,7 @@ OK, slept 2.1 seconds
 08. GET Sub 1 from CB2 - make sure it's identical in CB2
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 598
+Content-Length: 681
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -472,6 +475,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
     },
     "id": "urn:ngsi-ld:Subscription:S1",
     "isActive": false,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "lang": "es",
     "modifiedAt": "202REGEX(.*)Z",
     "notification": {

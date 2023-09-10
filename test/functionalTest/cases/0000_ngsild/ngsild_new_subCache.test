@@ -90,7 +90,7 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 03. GET S1
 ==========
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 362
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -103,6 +103,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:subs:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

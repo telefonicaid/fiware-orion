@@ -105,7 +105,7 @@ char            dbPwd[64]               = { 0 };
 bool            experimental            = false;
 bool            mongocOnly              = false;
 bool            debugCurl               = false;
-int             cSubCounters            = 0;
+uint32_t        cSubCounters            = 0;
 char            localIpAndPort[135];
 unsigned long long  inReqPayloadMaxSize;
 unsigned long long  outReqMsgMaxSize;

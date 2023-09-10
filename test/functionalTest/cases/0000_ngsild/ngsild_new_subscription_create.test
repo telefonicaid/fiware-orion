@@ -239,13 +239,6 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "timeInterval": 12,
   "q": "P2>10",
-  "geoQ": {
-    "geometry": "circle",
-    "coordinates": "[1,2]",
-    "georel": "near",
-    "geoproperty": "not supported"
-  },
-  "csf": "not implemented",
   "isActive": false,
   "notification": {
     "attributes": [ "P1", "P2", "A3" ],
@@ -458,7 +451,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, see @context in HTTP header
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1260
+Content-Length: 1354
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -526,7 +519,8 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
   "throttling": 5,
   "createdAt": "202REGEX(.*)",
   "modifiedAt": "202REGEX(.*)",
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 
 
@@ -534,7 +528,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1262
+Content-Length: 1356
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
@@ -600,6 +594,7 @@ Date: REGEX(.*)
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "origin": "cache",
+  "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 
@@ -635,15 +630,15 @@ Date: REGEX(.*)
 
 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
 ===================================================================================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 137
+HTTP/1.1 400 Bad Request
+Content-Length: 164
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Time-Interval for Subscriptions",
-    "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+    "detail": "Both 'timeInterval' and 'watchedAttributes' are present",
+    "title": "Inconsistent subscription",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -668,7 +663,7 @@ Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub09
 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 485
+Content-Length: 568
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -684,6 +679,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
     ],
     "id": "http://a.b.c/subs/sub09",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "modifiedAt": REGEX(.*),
     "notification": {
         "attributes": [

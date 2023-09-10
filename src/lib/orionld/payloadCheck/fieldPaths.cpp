@@ -40,6 +40,7 @@ const char* SubscriptionEntitiesIdPatternPath          = "Subscription::entities
 const char* SubscriptionEntitiesTypePath               = "Subscription::entities::type";
 const char* SubscriptionWatchedAttributesPath          = "Subscription::watchedAttributes";
 const char* SubscriptionWatchedAttributesItemPath      = "Subscription::watchedAttributes[X]";
+const char* SubscriptionTimeIntervalPath               = "Subscription::timeInterval";
 const char* SubscriptionNotificationPath               = "Subscription::notification";
 const char* SubscriptionNotificationFormatPath         = "Subscription::notification::format";
 const char* SubscriptionNotificationAttributesPath     = "Subscription::notification::attributes";

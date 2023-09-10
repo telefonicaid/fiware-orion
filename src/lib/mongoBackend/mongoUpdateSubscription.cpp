@@ -78,7 +78,7 @@ static void setExpiration(const SubscriptionUpdate& subUp, const BSONObj& subOri
   {
     if (subOrig.hasField(CSUB_EXPIRATION))
     {
-      double expires = getNumberFieldAsDoubleF(&subOrig, CSUB_EXPIRATION);
+      double expires = getNumberFieldAsDoubleF(&subOrig, CSUB_EXPIRATION, true);
 
       b->append(CSUB_EXPIRATION, expires);
       LM_T(LmtLegacy, ("Subscription expiration: %f", expires));
@@ -162,7 +162,7 @@ static void setThrottling(const SubscriptionUpdate& subUp, const BSONObj& subOri
   {
     if (subOrig.hasField(CSUB_THROTTLING))
     {
-      double throttling = getNumberFieldAsDoubleF(&subOrig, CSUB_THROTTLING);
+      double throttling = getNumberFieldAsDoubleF(&subOrig, CSUB_THROTTLING, true);
 
       b->append(CSUB_THROTTLING, throttling);
       LM_T(LmtLegacy, ("Subscription throttling: %f", throttling));
@@ -528,7 +528,7 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
     return;
   }
 
-  double lastNotification = getNumberFieldAsDoubleF(&subOrig, CSUB_LASTNOTIFICATION);
+  double lastNotification = getNumberFieldAsDoubleF(&subOrig, CSUB_LASTNOTIFICATION, true);
 
   //
   // Compare with 'lastNotificationTime', that might come from the sub-cache.
@@ -550,7 +550,7 @@ static void setLastNotification(const BSONObj& subOrig, CachedSubscription* subC
 */
 static double setLastFailure(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  double lastFailure = subOrig.hasField(CSUB_LASTFAILURE)? getNumberFieldAsDoubleF(&subOrig, CSUB_LASTFAILURE) : 0;
+  double lastFailure = subOrig.hasField(CSUB_LASTFAILURE)? getNumberFieldAsDoubleF(&subOrig, CSUB_LASTFAILURE, true) : 0;
 
   //
   // Compare with 'lastFailure' from the sub-cache.
@@ -574,7 +574,7 @@ static double setLastFailure(const BSONObj& subOrig, CachedSubscription* subCach
 */
 static double setLastSuccess(const BSONObj& subOrig, CachedSubscription* subCacheP, BSONObjBuilder* b)
 {
-  double lastSuccess = getNumberFieldAsDoubleF(&subOrig, CSUB_LASTSUCCESS);
+  double lastSuccess = getNumberFieldAsDoubleF(&subOrig, CSUB_LASTSUCCESS, true);
 
   //
   // Compare with 'lastSuccess' from the sub-cache.
@@ -805,7 +805,7 @@ void updateInCache
                                           lastNotification,
                                           lastFailure,
                                           lastSuccess,
-                                          doc.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(&doc, CSUB_EXPIRATION) : 0,
+                                          doc.hasField(CSUB_EXPIRATION)? getNumberFieldAsDoubleF(&doc, CSUB_EXPIRATION, true) : 0,
                                           doc.hasField(CSUB_STATUS)? getStringFieldF(&doc, CSUB_STATUS) : STATUS_ACTIVE,
                                           q,
                                           mq,

@@ -306,12 +306,12 @@ ContextElementResponse::ContextElementResponse
     /* Set creDate and modDate at attribute level */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE))
     {
-      caP->creDate = getNumberFieldAsDoubleF(&attr, ENT_ATTRS_CREATION_DATE);
+      caP->creDate = getNumberFieldAsDoubleF(&attr, ENT_ATTRS_CREATION_DATE, false);
     }
 
     if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
     {
-      caP->modDate = getNumberFieldAsDoubleF(&attr, ENT_ATTRS_MODIFICATION_DATE);
+      caP->modDate = getNumberFieldAsDoubleF(&attr, ENT_ATTRS_MODIFICATION_DATE, false);
     }
 
     contextElement.contextAttributeVector.push_back(caP);
@@ -320,12 +320,12 @@ ContextElementResponse::ContextElementResponse
   /* Set creDate and modDate at entity level */
   if (entityDocP->hasField(ENT_CREATION_DATE))
   {
-    contextElement.entityId.creDate = getNumberFieldAsDoubleF(entityDocP, ENT_CREATION_DATE);
+    contextElement.entityId.creDate = getNumberFieldAsDoubleF(entityDocP, ENT_CREATION_DATE, false);
   }
 
   if (entityDocP->hasField(ENT_MODIFICATION_DATE))
   {
-    contextElement.entityId.modDate = getNumberFieldAsDoubleF(entityDocP, ENT_MODIFICATION_DATE);
+    contextElement.entityId.modDate = getNumberFieldAsDoubleF(entityDocP, ENT_MODIFICATION_DATE, false);
   }
 }
 

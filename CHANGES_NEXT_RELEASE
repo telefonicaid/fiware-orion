@@ -7,3 +7,4 @@ Fixed issues:
   * #280  - Fixed a bug in error detection of downloading errors in arrays of contexts, at lower nesting levels
   * #280  - Better 501 handling of temporal operations
   * #280  - Highly experimental feature for subscriptions: allowing a wildcard as value for entity type, to not filter on entity type
+  * #280  - Implemented Periodic Notifications (subscriptions with a 'timeInterval')

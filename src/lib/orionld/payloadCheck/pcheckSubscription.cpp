@@ -161,7 +161,7 @@ bool pcheckSubscription
       DUPLICATE_CHECK(geoqP, "geoQ", nodeP);
       OBJECT_CHECK(nodeP, "geoQ");
       EMPTY_OBJECT_CHECK(nodeP, "geoQ");
-      OrionldGeoInfo* geoInfoP = pcheckGeoQ(nodeP, true);
+      OrionldGeoInfo* geoInfoP = pcheckGeoQ(&orionldState.kalloc, nodeP, true);
       if (geoInfoP == NULL)
         return false;
       *geoCoordinatesPP = geoInfoP->coordinates;

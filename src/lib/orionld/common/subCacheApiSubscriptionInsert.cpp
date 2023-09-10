@@ -70,7 +70,7 @@ static void subCacheItemFill
   RenderFormat         renderFormat
 )
 {
-  kjTreeLog(apiSubscriptionP, "apiSubscriptionP", LmtSR);
+  kjTreeLog(apiSubscriptionP, "apiSubscriptionP", LmtSubCacheSync);
 
   cSubP->tenant              = (tenant == NULL || *tenant == 0)? NULL : strdup(tenant);
   cSubP->servicePath         = strdup("/#");
@@ -100,16 +100,11 @@ static void subCacheItemFill
   KjNode* langP              = kjLookup(apiSubscriptionP, "lang");
   KjNode* createdAtP         = kjLookup(apiSubscriptionP, "createdAt");
   KjNode* modifiedAtP        = kjLookup(apiSubscriptionP, "modifiedAt");
-  KjNode* dbCountP           = kjLookup(apiSubscriptionP, "count");
-  KjNode* lastNotificationP  = kjLookup(apiSubscriptionP, "lastNotification");
-  KjNode* lastSuccessP       = kjLookup(apiSubscriptionP, "lastSuccess");
-  KjNode* lastFailureP       = kjLookup(apiSubscriptionP, "lastFailure");
-
-  // Fixing false alarms for q and mq
-  if ((qP != NULL) && (qP->value.s != NULL) && (qP->value.s[0] == 0))
-    qP = NULL;
-  if ((mqP != NULL) && (mqP->value.s != NULL) && (mqP->value.s[0] == 0))
-    mqP = NULL;
+  KjNode* dbCountP           = kjLookup(notificationP,    "timesSent");
+  KjNode* dbFailuresP        = kjLookup(notificationP,    "timesFailed");
+  KjNode* lastNotificationP  = kjLookup(notificationP,    "lastNotification");
+  KjNode* lastSuccessP       = kjLookup(notificationP,    "lastSuccess");
+  KjNode* lastFailureP       = kjLookup(notificationP,    "lastFailure");
 
   if (subscriptionIdP == NULL)
     subscriptionIdP = kjLookup(apiSubscriptionP, "id");
@@ -123,22 +118,34 @@ static void subCacheItemFill
   if (subscriptionNameP != NULL)
     cSubP->name = subscriptionNameP->value.s;
 
-  if (dbCountP != NULL)
-    cSubP->dbCount = dbCountP->value.i;
-  else
-    cSubP->dbCount = 0;
-
-  if (lastNotificationP != NULL)
-    cSubP->lastNotificationTime = lastNotificationP->value.f;
-
-  if (lastSuccessP != NULL)
-    cSubP->lastSuccess = lastSuccessP->value.f;
-
-  if (lastFailureP != NULL)
-    cSubP->lastFailure = lastFailureP->value.f;
-
   if (descriptionP != NULL)
     cSubP->description = strdup(descriptionP->value.s);
+
+
+  //
+  // DB Counters
+  //
+  cSubP->dbCount    = (dbCountP    != NULL)? dbCountP->value.i    : 0;
+  cSubP->dbFailures = (dbFailuresP != NULL)? dbFailuresP->value.i : 0;
+
+  LM_T(LmtSubCacheSync, ("%s: dbFailures == %d", subscriptionIdP->value.s, cSubP->dbFailures));
+  LM_T(LmtSubCacheSync, ("%s: count      == %d", subscriptionIdP->value.s, cSubP->count));
+  LM_T(LmtSubCacheSync, ("%s: dbCount    == %d", subscriptionIdP->value.s, cSubP->dbCount));
+
+
+  //
+  // timestamps
+  //
+  if (lastNotificationP != NULL)   cSubP->lastNotificationTime = lastNotificationP->value.f;
+  if (lastSuccessP      != NULL)   cSubP->lastSuccess          = lastSuccessP->value.f;
+  if (lastFailureP      != NULL)   cSubP->lastFailure          = lastFailureP->value.f;
+
+
+  // Fixing false alarms for q and mq
+  if ((qP != NULL) && (qP->value.s != NULL) && (qP->value.s[0] == 0))
+    qP = NULL;
+  if ((mqP != NULL) && (mqP->value.s != NULL) && (mqP->value.s[0] == 0))
+    mqP = NULL;
 
   if (qP != NULL)
     cSubP->expression.q = qP->value.s;
@@ -148,6 +155,7 @@ static void subCacheItemFill
 
   if (ldqP != NULL)
     cSubP->qText = strdup(ldqP->value.s);
+
 
   if (isActiveP != NULL)
   {
@@ -227,20 +235,36 @@ static void subCacheItemFill
   {
     for (KjNode* eSelectorP = entitiesP->value.firstChildP; eSelectorP != NULL; eSelectorP = eSelectorP->next)
     {
-      KjNode*       idP         = kjLookup(eSelectorP, "id");
-      KjNode*       idPatternP  = kjLookup(eSelectorP, "idPattern");
-      KjNode*       typeP       = kjLookup(eSelectorP, "type");
-      char*         id          = (idP        != NULL)? idP->value.s : (char*) "";
-      const char*   idPattern   = (idPatternP != NULL)? idPatternP->value.s : "";
-      const char*   type        = (typeP      != NULL)? typeP->value.s : "";
-      const char*   isPattern   = "false";
+      KjNode*       idP             = kjLookup(eSelectorP, "id");
+      KjNode*       idPatternP      = kjLookup(eSelectorP, "idPattern");
+      KjNode*       typeP           = kjLookup(eSelectorP, "type");
+      char*         id              = (idP            != NULL)? idP->value.s : NULL;
+      char*         idPattern       = (idPatternP     != NULL)? idPatternP->value.s : NULL;
+      char*         type            = (typeP          != NULL)? typeP->value.s : NULL;
+      char*         isPattern       = (char*) "false";
 
-      if (idP == NULL)
+      LM_T(LmtSR, ("id:           '%s'", id));
+      LM_T(LmtSR, ("idPattern:    '%s'", idPattern));
+      LM_T(LmtSR, ("type:         '%s'", type));
+
+      if ((idP == NULL) && (idPattern == NULL))
       {
-        id        = (char*) ((idPatternP != NULL)? idPattern : ".*");
+        id        = (char*) ".*";
         isPattern = (char*) "true";
       }
+      else
+      {
+        if ((idP != NULL) && (idPatternP != NULL))
+          idPatternP = NULL;
 
+        if (idPattern != NULL)
+        {
+          id = idPatternP->value.s;
+          isPattern = (char*) "true";
+        }
+      }
+
+      LM_T(LmtSR, ("Creating a new EntityInfo (id: '%s', idPattern: '%s', type: '%s')", id, idPattern, type));
       EntityInfo* eP = new EntityInfo(id, type, isPattern, false);
       cSubP->entityIdInfos.push_back(eP);
     }
@@ -458,7 +482,8 @@ static CachedSubscription* subCacheApiSubscriptionUpdate
     cSubP->modifiedAt = modifiedAtNode->value.f;  // The new value is in the DB
   }
 
-  cSubP->count = 0;
+  cSubP->count    = 0;
+  cSubP->failures = 0;
 
   subCacheItemStrip(cSubP);
   subCacheItemFill(cSubP, apiSubscriptionP, qTree, geoCoordinatesP, contextP, tenant, showChangesP, sysAttrsP, renderFormat);

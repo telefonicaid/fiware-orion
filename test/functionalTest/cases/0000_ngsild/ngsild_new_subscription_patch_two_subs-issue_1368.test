@@ -432,7 +432,7 @@ bye
 08. GET all subscriptions, see updates
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 820
+Content-Length: 986
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -447,6 +447,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
         "notification": {
             "attributes": [
                 "humidity"
@@ -474,6 +475,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
         "notification": {
             "attributes": [
                 "temperature"
