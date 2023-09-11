@@ -109,6 +109,7 @@ uint32_t        cSubCounters            = 0;
 char            localIpAndPort[135];
 unsigned long long  inReqPayloadMaxSize;
 unsigned long long  outReqMsgMaxSize;
+bool                triggerOperation = false;
 
 
 
