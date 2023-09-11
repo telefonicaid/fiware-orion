@@ -25,7 +25,7 @@ showChanges in Subscription - provoke a notification and see the previousValue
 
 --SHELL-INIT--
 dbInit CB
-orionldStart CB -experimental
+orionldStart CB -experimental -triggerOperation
 accumulatorStart --pretty-print
 
 --SHELL--
@@ -130,7 +130,7 @@ echo
 echo "08. Restart broker"
 echo "=================="
 brokerStop CB
-orionldStart CB -experimental
+orionldStart CB -experimental -triggerOperation
 echo
 echo
 
@@ -303,7 +303,7 @@ Date: REGEX(.*)
 05. Dump/Reset accumulator, see A1's value and previousValue
 ============================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
-Content-Length: 265
+Content-Length: 320
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -326,6 +326,7 @@ Ngsild-Attribute-Format: Normalized
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "20REGEX(.*)Z",
     "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "trigger": "PATCH /ngsi-ld/v1/entities/urn:E1/attrs/A1",
     "type": "Notification"
 }
 =======================================
@@ -483,7 +484,7 @@ Date: REGEX(.*)
 12. Dump/Reset accumulator, see A1's value and previousValue
 ============================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
-Content-Length: 266
+Content-Length: 321
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -506,6 +507,7 @@ Ngsild-Attribute-Format: Normalized
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "20REGEX(.*)Z",
     "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "trigger": "PATCH /ngsi-ld/v1/entities/urn:E1/attrs/A1",
     "type": "Notification"
 }
 =======================================
