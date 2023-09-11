@@ -557,7 +557,7 @@ MongoDB server version: REGEX(.*)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "Test subscription S01",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -583,7 +583,7 @@ HTTP/1.1 200 OK
 Content-Length: 838
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -644,7 +644,7 @@ HTTP/1.1 200 OK
 Content-Length: 825
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -705,7 +705,7 @@ HTTP/1.1 200 OK
 Content-Length: 804
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -797,7 +797,7 @@ MongoDB server version: REGEX(.*)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -823,7 +823,7 @@ HTTP/1.1 200 OK
 Content-Length: 805
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -917,7 +917,7 @@ MongoDB server version: REGEX(.*)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -943,7 +943,7 @@ HTTP/1.1 200 OK
 Content-Length: 805
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -995,15 +995,15 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 
 14. PATCH 'timeInterval' and see error
 ======================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 137
+HTTP/1.1 400 Bad Request
+Content-Length: 174
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Time-Interval for Subscriptions",
-    "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+    "detail": "urn:ngsi-ld:subscriptions:S01",
+    "title": "Invalid modification (on-change to timeInterval subscription)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -1051,7 +1051,7 @@ MongoDB server version: REGEX(.)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -1078,7 +1078,7 @@ HTTP/1.1 200 OK
 Content-Length: 814
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1172,7 +1172,7 @@ MongoDB server version: REGEX(.)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -1199,7 +1199,7 @@ HTTP/1.1 200 OK
 Content-Length: 812
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1293,7 +1293,7 @@ MongoDB server version: REGEX(.)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -1320,7 +1320,7 @@ HTTP/1.1 200 OK
 Content-Length: 813
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1414,7 +1414,7 @@ MongoDB server version: REGEX(.)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -1441,7 +1441,7 @@ HTTP/1.1 200 OK
 Content-Length: 812
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1504,7 +1504,7 @@ HTTP/1.1 200 OK
 Content-Length: 812
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1567,7 +1567,7 @@ HTTP/1.1 200 OK
 Content-Length: 813
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1654,7 +1654,7 @@ MongoDB server version: REGEX(.)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "New Name",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -1688,7 +1688,7 @@ HTTP/1.1 200 OK
 Content-Length: 878
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1777,7 +1777,7 @@ MongoDB server version: REGEX(.)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "Name 34",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -1842,7 +1842,7 @@ MongoDB server version: REGEX(.)
 	"metadata" : [ ],
 	"blacklist" : false,
 	"name" : "Name 34",
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"csf" : "not implemented",
 	"createdAt" : REGEX(\d+\.\d+),
 	"modifiedAt" : REGEX(\d+\.\d+),
@@ -1872,7 +1872,7 @@ HTTP/1.1 200 OK
 Content-Length: 976
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1943,7 +1943,7 @@ HTTP/1.1 200 OK
 Content-Length: 976
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",

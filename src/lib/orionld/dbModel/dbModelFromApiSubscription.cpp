@@ -34,7 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/context/orionldCoreContext.h"                // ORIONLD_CORE_CONTEXT_URL_V1_0
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContextP
 #include "orionld/context/orionldContextSimplify.h"            // orionldContextSimplify
 #include "orionld/dbModel/dbModelFromApiKeyValues.h"           // dbModelFromApiKeyValues
 #include "orionld/dbModel/dbModelFromApiCoordinates.h"         // dbModelFromApiCoordinates
@@ -348,6 +348,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
   // it's much better to not do this inside the loop. Especially as the tree must be modified and a for-loop
   // would no longer be possible
   //
+  kjTreeLog(notificationP, "notificationP", LmtSR);
   if (notificationP != NULL)
   {
     KjNode* nItemP = notificationP->value.firstChildP;
@@ -373,6 +374,16 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
         // Keep the name, just move the node up to toplevel
         kjChildRemove(notificationP, formatP);
         kjChildAdd(apiSubscriptionP, formatP);
+      }
+      else if (strcmp(nItemP->name, "showChanges") == 0)
+      {
+        kjChildRemove(notificationP, nItemP);
+        kjChildAdd(apiSubscriptionP, nItemP);
+      }
+      else if (strcmp(nItemP->name, "sysAttrs") == 0)
+      {
+        kjChildRemove(notificationP, nItemP);
+        kjChildAdd(apiSubscriptionP, nItemP);
       }
       else if (strcmp(nItemP->name, "endpoint") == 0)
       {
@@ -504,7 +515,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
       // For now, I'll just overwrite the context with the Core Context
       //
       orionldState.payloadContextNode->type    = KjString;
-      orionldState.payloadContextNode->value.s = (char*) ORIONLD_CORE_CONTEXT_URL_V1_0;
+      orionldState.payloadContextNode->value.s = orionldCoreContextP->url;
       LM_W(("Warning - the context is not a string - changing it for the Core Context (API Spec v1.6)"));
     }
 

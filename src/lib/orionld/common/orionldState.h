@@ -62,6 +62,7 @@ extern "C"
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/troe/troe.h"                                   // TroeMode
+#include "orionld/pernot/PernotSubCache.h"                       // PernotSubCache
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
@@ -70,7 +71,7 @@ extern "C"
 //
 // ORIONLD_VERSION -
 //
-#define ORIONLD_VERSION "post-v1.2.0"
+#define ORIONLD_VERSION "post-v1.4.0"
 
 
 
@@ -460,6 +461,9 @@ typedef struct OrionldConnectionState
   // FIWARE Correlator
   char* correlator;
 
+  // Previous Values
+  KjNode* previousValues;
+
   //
   // Compounds
   //
@@ -543,6 +547,7 @@ extern __thread char  static_buffer[STATIC_BUFFER_SIZE + 1];
 // Global state
 //
 extern char*             coreContextUrl;
+extern const char*       builtinCoreContext;
 extern char              orionldHostName[128];
 extern int               orionldHostNameLen;
 extern char              kallocBuffer[32 * 1024];
@@ -565,6 +570,8 @@ extern char              dbURI[];                  // From orionld.cpp
 extern bool              multitenancy;             // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
+extern int               subCacheInterval;         // From orionld.cpp
+extern int               subCacheFlushInterval;    // From orionld.cpp
 extern bool              troe;                     // From orionld.cpp
 extern char              troeHost[256];            // From orionld.cpp
 extern unsigned short    troePort;                 // From orionld.cpp
@@ -587,12 +594,10 @@ extern int               maxAge;                   // From orionld.cpp (CORS)
 extern char              userAgentHeader[64];      // From notificationSend.cpp - move to orionld.cpp?
 extern size_t            userAgentHeaderLen;       // From notificationSend.cpp - move to orionld.cpp?
 extern char              userAgentHeaderNoLF[64];  // move to orionld.cpp?
-extern char              hostHeader[256];          // move to orionld.cpp?
-extern char              hostHeaderNoLF[128];      // move to orionld.cpp?
-extern size_t            hostHeaderLen;            // move to orionld.cpp?
 extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
-extern int               cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
+extern uint32_t          cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
+extern PernotSubCache    pernotSubCache;
 extern char              localIpAndPort[135];      // Local address for X-Forwarded-For (from orionld.cpp)
 extern unsigned long long  inReqPayloadMaxSize;
 extern unsigned long long  outReqMsgMaxSize;

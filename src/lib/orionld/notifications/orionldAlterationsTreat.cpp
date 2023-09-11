@@ -466,7 +466,7 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
-#if 0
+#if 1
   // <DEBUG>
   int alterations = 0;
   for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
@@ -545,9 +545,11 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
   {
     altList->finalApiEntityP = dbModelToApiEntity(altList->dbEntityP, false, altList->entityId);  // No sysAttrs options for subscriptions?
 
+    int patchNo = 0;
     for (KjNode* patchP = altList->inEntityP->value.firstChildP; patchP != NULL; patchP = patchP->next)
     {
-      orionldPatchApply(altList->finalApiEntityP, patchP);
+      ++patchNo;
+      orionldPatchApply(altList->finalApiEntityP, patchP, true);
     }
   }
 
@@ -615,8 +617,6 @@ void orionldAlterationsTreat(OrionldAlteration* altList)
       LM_E(("Error starting HTTPS notifications: curl_multi_perform: error %d", cm));
       curlError = true;
     }
-    else
-      LM_T(LmtNotificationSend, ("Started HTTPS notifications"));
   }
   else
     LM_T(LmtNotificationSend, ("No HTTPS notifications"));

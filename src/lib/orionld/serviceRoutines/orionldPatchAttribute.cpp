@@ -40,11 +40,14 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/responseFix.h"                          // responseFix
+#include "orionld/legacyDriver/legacyPatchAttribute.h"           // legacyPatchAttribute
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // dbModelFromApiSubAttribute
 #include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
+#include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/mongoc/mongocEntityGet.h"                      // mongocEntityGet
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
 #include "orionld/forwarding/DistOp.h"                           // DistOp
@@ -52,9 +55,8 @@ extern "C"
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/notifications/alteration.h"                    // alteration
-#include "orionld/legacyDriver/legacyPatchAttribute.h"           // legacyPatchAttribute
-#include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
-#include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
+#include "orionld/notifications/sysAttrsStrip.h"                 // sysAttrsStrip
+#include "orionld/notifications/previousValuePopulate.h"         // previousValuePopulate
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"       // Own interface
 
 
@@ -147,6 +149,7 @@ static void attributeMerge(KjNode* dbAttrP, KjNode* incomingP, KjNode* addedV, K
     //
     if (isValue == true)
     {
+      previousValuePopulate(NULL, dbAttrP, orionldState.in.pathAttrExpanded);
       // Can't be null - must have been captured earlier (pCheckAttribute?)
       KjNode* dbValueP = kjLookup(dbAttrP, "value");
       if (dbValueP != NULL)
@@ -425,7 +428,7 @@ bool orionldPatchAttribute(void)
 
         if (entityType != NULL)
         {
-          KjNode* finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
+          KjNode* finalApiEntityWithSysAttrsP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, NULL, false, &orionldState.pd);
 
           // We need the "Incoming Entity", we have just an attribute ...
           KjNode* attributeNodeP = incomingP;
@@ -438,7 +441,11 @@ bool orionldPatchAttribute(void)
 
           kjChildAdd(inEntityP, attributeNodeP);
 
-          alteration(entityId, entityType, finalApiEntityP, inEntityP, initialDbEntityP);
+          KjNode* finalApiEntityWithoutSysAttrsP = kjClone(orionldState.kjsonP, finalApiEntityWithSysAttrsP);
+          sysAttrsStrip(finalApiEntityWithoutSysAttrsP);
+
+          OrionldAlteration* alterationP = alteration(entityId, entityType, finalApiEntityWithoutSysAttrsP, inEntityP, initialDbEntityP);
+          alterationP->finalApiEntityWithSysAttrsP = finalApiEntityWithSysAttrsP;
         }
         else
           LM_E(("Database Error (no _id::type in the DB for entity '%s')", entityId));

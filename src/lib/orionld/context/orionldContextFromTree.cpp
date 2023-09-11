@@ -49,31 +49,6 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// willBeSimplified -
-//
-bool willBeSimplified(KjNode* contextTreeP, int* itemsInArrayP)
-{
-  int  itemsInArray  = 0;
-  int  itemsToRemove = 0;
-
-  for (KjNode* itemP = contextTreeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
-  {
-    ++itemsInArray;
-    if ((itemP->type == KjString) && (strcmp(itemP->value.s, coreContextUrl) == 0))
-      ++itemsToRemove;
-  }
-
-  if (itemsInArray - itemsToRemove > 1)  // More than one item in array - must stay array
-    return false;
-
-  *itemsInArrayP = itemsInArray;
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // orionldContextFromTree -
 //
 OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, char* id, KjNode* contextTreeP)
@@ -177,6 +152,9 @@ OrionldContext* orionldContextFromTree(char* url, OrionldContextOrigin origin, c
         contextP->context.array.items     = 1;
         contextP->context.array.vector    = (OrionldContext**) kaAlloc(&kalloc, 1 * sizeof(OrionldContext*));
         contextP->context.array.vector[0] = orionldContextFromUrl(contextTreeP->value.s, NULL);
+
+        if (contextP->context.array.vector[0] == NULL)
+          LM_RE(NULL, ("Context Error from orionldContextFromUrl"));
       }
 
       if (contextP != NULL)

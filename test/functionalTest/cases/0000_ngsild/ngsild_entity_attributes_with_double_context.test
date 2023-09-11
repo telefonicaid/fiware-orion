@@ -75,13 +75,13 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:TemperatureSensor:001
 02. GET attributes with application/ld+json, and details=true - see ONE @context in the payload body
 ====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 661
+Content-Length: 671
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 [
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "https://uri.fiware.org/ns/data-models#category",
     "type": "Attribute",
     "attributeCount": 1,
@@ -93,7 +93,7 @@ Date: REGEX(.*)
     ]
   },
   {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "id": "https://w3id.org/saref#temperature",
     "type": "Attribute",
     "attributeCount": 1,

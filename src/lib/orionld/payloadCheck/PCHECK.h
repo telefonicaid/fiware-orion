@@ -98,6 +98,25 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// PCHECK_INTEGER -
+//
+#define PCHECK_INTEGER(kNodeP, _type, _title, detail, status)                                \
+do                                                                                           \
+{                                                                                            \
+  if (kNodeP->type != KjInt)                                                                 \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Not a JSON Integer"   : _title;                   \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // PCHECK_STRING_OR_ARRAY -
 //
 #define PCHECK_STRING_OR_ARRAY(kNodeP, _type, _title, detail, status)                        \
@@ -160,6 +179,34 @@ do                                                                              
   {                                                                                          \
     int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
     const char* title = (_title == NULL)? "Not a JSON Number"   : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_NUMBER_GT -
+//
+#define PCHECK_NUMBER_GT(kNodeP, _type, _title, detail, status, minValue)                    \
+do                                                                                           \
+{                                                                                            \
+  if ((kNodeP->type == KjInt) && (kNodeP->value.i <= minValue))                              \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Too small a Number"  : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+                                                                                             \
+  if ((kNodeP->type == KjFloat) && (kNodeP->value.f <= minValue))                            \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Too small a Number"  : _title;                    \
                                                                                              \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \
@@ -296,6 +343,25 @@ do                                                                              
   const char* title = (_title == NULL)? "Invalid ISO8601"     : _title;                      \
                                                                                              \
   if ((iso8601Var = parse8601Time(iso8601String)) == -1)                                     \
+  {                                                                                          \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_EXPIRESAT_IN_FUTURE
+//
+#define PCHECK_EXPIRESAT_IN_FUTURE(_type, _title, detail, status, expiresAt, now)            \
+do                                                                                           \
+{                                                                                            \
+  int         type  = (_type  ==    0)? OrionldBadRequestData   : _type;                     \
+  const char* title = (_title == NULL)? "expiresAt in the past" : _title;                    \
+                                                                                             \
+  if (expiresAt < now)                                                                       \
   {                                                                                          \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \

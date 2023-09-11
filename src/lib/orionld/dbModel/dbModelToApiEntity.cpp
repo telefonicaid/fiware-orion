@@ -57,7 +57,7 @@ extern "C"
 //   orionldAlterationsTreat() ?
 //   orionldPostBatchUpsert()
 //
-KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, const char* entityId)
+KjNode* dbModelToApiEntity(KjNode* dbEntityP, bool sysAttrs, char* entityId)
 {
   KjNode* apiEntityP  = kjObject(orionldState.kjsonP, NULL);
   KjNode* dbIdObjectP = kjLookup(dbEntityP, "_id");

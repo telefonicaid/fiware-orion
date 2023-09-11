@@ -1,0 +1,302 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH a LanguageProperty and see the notification
+
+--SHELL-INIT--
+dbInit CB
+export CB_TRACELEVELS=${CB_TRACELEVELS:-47,241,252}
+
+orionldStart CB -experimental
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create an entity urn:E1 with a LanguageProperty L1 == { "en": "one", "es": "uno" }
+# 02. Create a matching subscription
+# 03. GET urn:E1 to see L1
+# 03b. See urn:E1 in the DB
+# 04. PATCH urn:E1, setting L1 == { "en": "two", "es": "dos" }
+# 05. GET urn:E1 to see L1
+# 05b. See urn:E1 in the DB
+# 06. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap
+#
+
+echo '01. Create an entity urn:E1 with a LanguageProperty L1 == { "en": "one", "es": "uno" }'
+echo '======================================================================================'
+payload='{
+  "id": "urn:E1",
+  "type": "Device",
+  "L1": { "languageMap": { "en": "one", "es": "uno" } }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Create a matching subscription'
+echo '=================================='
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "Device"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "showChanges": true
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. GET urn:E1 to see L1'
+echo '========================'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo '03b. See urn:E1 in the DB'
+echo '========================='
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo '04. PATCH urn:E1, setting L1 == { "en": "two", "es": "dos" }'
+echo '============================================================'
+payload='{
+  "L1": { "languageMap": { "en": "two", "es": "dos" } }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '05. GET urn:E1 to see L1'
+echo '========================'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo '05b. See urn:E1 in the DB'
+echo '========================='
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
+
+echo "06. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap"
+echo "========================================================================"
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:E1 with a LanguageProperty L1 == { "en": "one", "es": "uno" }
+======================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create a matching subscription
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+
+
+
+03. GET urn:E1 to see L1
+========================
+HTTP/1.1 200 OK
+Content-Length: 102
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "L1": {
+        "languageMap": {
+            "en": "one",
+            "es": "uno"
+        },
+        "type": "LanguageProperty"
+    },
+    "id": "urn:E1",
+    "type": "Device"
+}
+
+
+03b. See urn:E1 in the DB
+=========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/L1" : {
+			"type" : "LanguageProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"en" : "one",
+				"es" : "uno"
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+04. PATCH urn:E1, setting L1 == { "en": "two", "es": "dos" }
+============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET urn:E1 to see L1
+========================
+HTTP/1.1 200 OK
+Content-Length: 102
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "L1": {
+        "languageMap": {
+            "en": "two",
+            "es": "dos"
+        },
+        "type": "LanguageProperty"
+    },
+    "id": "urn:E1",
+    "type": "Device"
+}
+
+
+05b. See urn:E1 in the DB
+=========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:E1",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/Device",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/L1"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/L1" : {
+			"type" : "LanguageProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"en" : "two",
+				"es" : "dos"
+			},
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+06. Dump/Reset accumulator, see L1's languageMap and previousLanguageMap
+========================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 329
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "L1": {
+                "languageMap": {
+                    "en": "two",
+                    "es": "dos"
+                },
+                "previousLanguageMap": {
+                    "en": "one",
+                    "es": "uno"
+                },
+                "type": "LanguageProperty"
+            },
+            "id": "urn:E1",
+            "type": "Device"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

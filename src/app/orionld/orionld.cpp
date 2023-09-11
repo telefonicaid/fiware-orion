@@ -121,6 +121,7 @@ extern "C"
 #include "orionld/prometheus/promInit.h"                      // promInit
 #include "orionld/mongoc/mongocInit.h"                        // mongocInit
 #include "orionld/mongoc/mongocServerVersionGet.h"            // mongocServerVersionGet
+#include "orionld/context/orionldCoreContext.h"               // ORIONLD_CORE_CONTEXT_URL_*
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
@@ -129,6 +130,8 @@ extern "C"
 #include "orionld/regCache/regCacheInit.h"                    // regCacheInit
 #include "orionld/regCache/regCacheCreate.h"                  // regCacheCreate
 #include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
+#include "orionld/pernot/pernotSubCacheInit.h"                // pernotSubCacheInit
+#include "orionld/pernot/pernotLoop.h"                        // pernotLoopStart
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -204,6 +207,7 @@ char            reqMutexPolicy[16];
 int             writeConcern;
 unsigned int    cprForwardLimit;
 int             subCacheInterval;
+int             subCacheFlushInterval;
 char            notificationMode[64];
 int             notificationQueueSize;
 int             notificationThreadNum;
@@ -232,6 +236,7 @@ bool            ngsiv1Autocast;
 int             contextDownloadAttempts;
 int             contextDownloadTimeout;
 bool            troe;
+bool            pernot;
 bool            disableFileLog;
 bool            lmtmp;
 char            troeHost[256];
@@ -248,7 +253,8 @@ bool            noswap;
 bool            experimental = false;
 bool            mongocOnly   = false;
 bool            debugCurl    = false;
-int             cSubCounters;
+uint32_t        cSubCounters;
+char            coreContextVersion[64];
 
 
 
@@ -289,6 +295,7 @@ int             cSubCounters;
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of distributed requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC    "interval in seconds between calls to Subscription Cache refresh (0: no refresh)"
+#define SUB_CACHE_FLUSH_IVAL_DESC    "interval in seconds between calls to Pernot Subscription Cache Flush to DB (0: no flush)"
 #define NOTIFICATION_MODE_DESC "notification mode (persistent|transient|threadpool:q:n)"
 #define NO_CACHE               "disable subscription cache for lookups"
 #define CONN_MEMORY_DESC       "maximum memory size per connection (in kilobytes)"
@@ -312,6 +319,7 @@ int             cSubCounters;
 #define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define TROE_DESC              "enable TRoE - temporal representation of entities"
+#define PERNOT_DESC            "enable Pernot - Periodic Notifications"
 #define DISABLE_FILE_LOG       "disable logging into file"
 #define TMPTRACES_DESC         "disable traces"
 #define TROE_HOST_DESC         "host for troe database db server"
@@ -335,6 +343,7 @@ int             cSubCounters;
 #define DBURI_DESC             "complete URI for database connection"
 #define DEBUG_CURL_DESC        "turn on debugging of libcurl - to the broker's logfile"
 #define CSUBCOUNTERS_DESC      "number of subscription counter updates before flush from sub-cache to DB (0: never, 1: always)"
+#define CORE_CONTEXT_DESC      "Core context version (v1.0|v1.3|v1.4|v1.5|v1.6|v1.7) - v1.6 is default"
 
 
 
@@ -357,7 +366,8 @@ int             cSubCounters;
 */
 PaArgument paArgs[] =
 {
-  { "-noswap",                &noswap,                  "NOSWAP",                    PaBool,    PaHid,  false,           false,  true,             NOSWAP_DESC              },
+  { "-coreContext",           coreContextVersion,       "CORE_CONTEXT",              PaString,  PaOpt,  _i ORIONLD_CORE_CONTEXT_URL_DEFAULT, PaNL, PaNL, CORE_CONTEXT_DESC },
+
   { "-fg",                    &fg,                      "FOREGROUND",                PaBool,    PaOpt,  false,           false,  true,             FG_DESC                  },
   { "-localIp",               bindAddress,              "LOCALIP",                   PaString,  PaOpt,  IP_ALL,          PaNL,   PaNL,             LOCALIP_DESC             },
   { "-port",                  &port,                    "PORT",                      PaInt,     PaOpt,  1026,            1024,   65535,            PORT_DESC                },
@@ -375,10 +385,8 @@ PaArgument paArgs[] =
   { "-dbTimeout",             &dbTimeout,               "MONGO_TIMEOUT",             PaDouble,  PaOpt,  10000,           PaNL,   PaNL,             DB_TMO_DESC              },
   { "-dbPoolSize",            &dbPoolSize,              "MONGO_POOL_SIZE",           PaInt,     PaOpt,  10,              1,      10000,            DBPS_DESC                },
   { "-writeConcern",          &writeConcern,            "MONGO_WRITE_CONCERN",       PaInt,     PaOpt,  1,               0,      1,                WRITE_CONCERN_DESC       },
-  { "-idIndex",               &idIndex,                 "MONGO_ID_INDEX",            PaBool,    PaHid,  false,           false,  true,             ID_INDEX_DESC            },
   { "-ipv4",                  &useOnlyIPv4,             "USEIPV4",                   PaBool,    PaOpt,  false,           false,  true,             USEIPV4_DESC             },
   { "-ipv6",                  &useOnlyIPv6,             "USEIPV6",                   PaBool,    PaOpt,  false,           false,  true,             USEIPV6_DESC             },
-  { "-harakiri",              &harakiri,                "HARAKIRI",                  PaBool,    PaHid,  false,           false,  true,             HARAKIRI_DESC            },
   { "-https",                 &https,                   "HTTPS",                     PaBool,    PaOpt,  false,           false,  true,             HTTPS_DESC               },
   { "-key",                   httpsKeyFile,             "HTTPS_KEYFILE",             PaString,  PaOpt,  _i "",           PaNL,   PaNL,             HTTPSKEYFILE_DESC        },
   { "-cert",                  httpsCertFile,            "HTTPS_CERTFILE",            PaString,  PaOpt,  _i "",           PaNL,   PaNL,             HTTPSCERTFILE_DESC       },
@@ -390,6 +398,7 @@ PaArgument paArgs[] =
   { "-corsMaxAge",            &maxAge,                  "CORS_MAX_AGE",              PaInt,     PaOpt,  86400,           -1,     86400,            CORS_MAX_AGE_DESC        },
   { "-cprForwardLimit",       &cprForwardLimit,         "CPR_FORWARD_LIMIT",         PaUInt,    PaOpt,  1000,            0,      UINT_MAX,         CPR_FORWARD_LIMIT_DESC   },
   { "-subCacheIval",          &subCacheInterval,        "SUBCACHE_IVAL",             PaInt,     PaOpt,  0,               0,      3600,             SUB_CACHE_IVAL_DESC      },
+  { "-subCacheFlushIval",     &subCacheFlushInterval,   "SUBCACHE_FLUSH_IVAL",       PaInt,     PaOpt,  10,              0,      3600,             SUB_CACHE_FLUSH_IVAL_DESC },
   { "-noCache",               &noCache,                 "NOCACHE",                   PaBool,    PaOpt,  false,           false,  true,             NO_CACHE                 },
   { "-connectionMemory",      &connectionMemory,        "CONN_MEMORY",               PaUInt,    PaOpt,  64,              0,      1024,             CONN_MEMORY_DESC         },
   { "-maxConnections",        &maxConnections,          "MAX_CONN",                  PaUInt,    PaOpt,  1020,            1,      PaNL,             MAX_CONN_DESC            },
@@ -414,22 +423,27 @@ PaArgument paArgs[] =
   { "-ngsiv1Autocast",        &ngsiv1Autocast,          "NGSIV1_AUTOCAST",           PaBool,    PaOpt,  false,           false,  true,             NGSIV1_AUTOCAST          },
   { "-ctxTimeout",            &contextDownloadTimeout,  "CONTEXT_DOWNLOAD_TIMEOUT",  PaInt,     PaOpt,  5000,            0,      20000,            CTX_TMO_DESC             },
   { "-ctxAttempts",           &contextDownloadAttempts, "CONTEXT_DOWNLOAD_ATTEMPTS", PaInt,     PaOpt,  3,               0,      100,              CTX_ATT_DESC             },
+  { "-pernot",                &pernot,                  "PERNOT",                    PaBool,    PaOpt,  false,           false,  true,             PERNOT_DESC              },
   { "-troe",                  &troe,                    "TROE",                      PaBool,    PaOpt,  false,           false,  true,             TROE_DESC                },
-  { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC           },
-  { "-socketService",         &socketService,           "SOCKET_SERVICE",            PaBool,    PaHid,  false,           false,  true,             SOCKET_SERVICE_DESC      },
   { "-troeHost",              troeHost,                 "TROE_HOST",                 PaString,  PaOpt,  _i "localhost",  PaNL,   PaNL,             TROE_HOST_DESC           },
   { "-troePort",              &troePort,                "TROE_PORT",                 PaInt,     PaOpt,  5432,            PaNL,   PaNL,             TROE_PORT_DESC           },
   { "-troeUser",              troeUser,                 "TROE_USER",                 PaString,  PaOpt,  _i "postgres",   PaNL,   PaNL,             TROE_HOST_USER           },
   { "-troePwd",               troePwd,                  "TROE_PWD",                  PaString,  PaOpt,  _i "password",   PaNL,   PaNL,             TROE_HOST_PWD            },
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
-  { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
-  { "-forwarding",            &distributed,             "FORWARDING",                PaBool,    PaHid,  false,           false,  true,             FORWARDING_DESC          },
   { "-distributed",           &distributed,             "DISTRIBUTED",               PaBool,    PaOpt,  false,           false,  true,             DISTRIBUTED_DESC         },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaOpt,  false,           false,  true,             EXPERIMENTAL_DESC        },
   { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC          },
   { "-cSubCounters",          &cSubCounters,            "CSUB_COUNTERS",             PaInt,     PaOpt,  20,              0,      PaNL,             CSUBCOUNTERS_DESC        },
+  { "-forwarding",            &distributed,             "FORWARDING",                PaBool,    PaHid,  false,           false,  true,             FORWARDING_DESC          },
+  { "-socketService",         &socketService,           "SOCKET_SERVICE",            PaBool,    PaHid,  false,           false,  true,             SOCKET_SERVICE_DESC      },
+  { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
+  { "-harakiri",              &harakiri,                "HARAKIRI",                  PaBool,    PaHid,  false,           false,  true,             HARAKIRI_DESC            },
+  { "-idIndex",               &idIndex,                 "MONGO_ID_INDEX",            PaBool,    PaHid,  false,           false,  true,             ID_INDEX_DESC            },
+  { "-noswap",                &noswap,                  "NOSWAP",                    PaBool,    PaHid,  false,           false,  true,             NOSWAP_DESC              },
+  { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC           },
   { "-debugCurl",             &debugCurl,               "DEBUG_CURL",                PaBool,    PaHid,  false,           false,  true,             DEBUG_CURL_DESC          },
+  { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC           },
 
   PA_END_OF_ARGS
 };
@@ -780,6 +794,7 @@ static void versionInfo(void)
   LM_K(("-----------------------------------------"));
   LM_K(("orionld version:    %s", orionldVersion));
   LM_K(("based on orion:     %s", ORION_VERSION));
+  LM_K(("core @context:      %s", coreContextUrl));
   LM_K(("git hash:           %s", GIT_HASH));
   LM_K(("build branch:       %s", ORIONLD_BRANCH));
   LM_K(("compiled by:        %s", COMPILED_BY));
@@ -836,6 +851,68 @@ static void libLogFunction
 }
 
 
+#ifdef DEBUG
+// -----------------------------------------------------------------------------
+//
+// regCachePresent -
+//
+void regCachePresent(void)
+{
+  for (OrionldTenant* tenantP = &tenant0; tenantP != NULL; tenantP = tenantP->next)
+  {
+    if (tenantP->regCache == NULL)
+      LM_T(LmtRegCache, ("Tenant '%s': No regCache", tenantP->mongoDbName));
+    else
+    {
+      LM_T(LmtRegCache, ("Tenant '%s':", tenantP->mongoDbName));
+      RegCacheItem* rciP = tenantP->regCache->regList;
+
+      while (rciP != NULL)
+      {
+        KjNode* regIdP = kjLookup(rciP->regTree, "id");
+
+        LM_T(LmtRegCache, ("  o Registration %s:", (regIdP != NULL)? regIdP->value.s : "unknown"));
+        LM_T(LmtRegCache, ("    o mode:  %s", registrationModeToString(rciP->mode)));
+        LM_T(LmtRegCache, ("    o ops:   0x%x", rciP->opMask));
+
+        if (rciP->idPatternRegexList != NULL)
+        {
+          LM_T(LmtRegCache, ("    o patterns:"));
+          for (RegIdPattern* ripP = rciP->idPatternRegexList; ripP != NULL; ripP = ripP->next)
+          {
+            LM_T(LmtRegCache, ("      o %s (idPattern at %p)", ripP->owner->value.s, ripP->owner));
+          }
+        }
+        else
+          LM_T(LmtRegCache, ("    o patterns: NONE"));
+        LM_T(LmtRegCache, ("  -----------------------------------"));
+        rciP = rciP->next;
+      }
+    }
+  }
+}
+#endif
+
+
+
+// -----------------------------------------------------------------------------
+//
+// coreContextUrlSetup -
+//
+static char* coreContextUrlSetup(const char* version)
+{
+  if      (strcmp(version, "v1.0") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_0;
+  else if (strcmp(version, "v1.3") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_3;
+  else if (strcmp(version, "v1.4") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_4;
+  else if (strcmp(version, "v1.5") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_5;
+  else if (strcmp(version, "v1.6") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_6;
+  else if (strcmp(version, "v1.7") == 0)    return ORIONLD_CORE_CONTEXT_URL_V1_7;
+
+  return NULL;
+}
+
+
+
 #define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | corr=CORR_ID | trans=TRANS_ID | from=FROM_IP | srv=SERVICE | subsrv=SUB_SERVICE | comp=Orion | op=FILE[LINE]:FUNC | msg=TEXT"
 /* ****************************************************************************
 *
@@ -843,7 +920,7 @@ static void libLogFunction
 */
 int main(int argC, char* argV[])
 {
-# if 0
+#if 0
   //
   // Just an experiment.
   // It's an interesting way of "comparing strings"
@@ -962,6 +1039,11 @@ int main(int argC, char* argV[])
     strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel) - 1);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
+
+  coreContextUrl = coreContextUrlSetup(coreContextVersion);
+  if (coreContextUrl == NULL)
+    LM_X(1, ("Invalid version for the Core Context: %s (valid: v1.0|v1.3|v1.4|v1.5|v1.6|v1.7)", coreContextVersion));
+
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   if ((debugCurl == true) && ((lmTraceIsSet(LmtCurl) == false) || (strcmp(paLogLevel, "DEBUG") != 0)))
@@ -1037,7 +1119,6 @@ int main(int argC, char* argV[])
   }
 
   notificationModeParse(notificationMode, &notificationQueueSize, &notificationThreadNum);
-
   LM_I(("Orion Context Broker is running"));
 
   versionInfo();
@@ -1124,6 +1205,9 @@ int main(int argC, char* argV[])
   //
   regCacheInit();
 
+  if (pernot == true)
+    pernotSubCacheInit();
+
   orionldServiceInit(restServiceVV, 9);
 
   if (mongocOnly == false)
@@ -1132,7 +1216,7 @@ int main(int argC, char* argV[])
     mongoInit(dbHost, rplSet, dbName, dbUser, dbPwd, multitenancy, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   }
 
-  // Initialize orion libs
+  // Initialize libs
   alarmMgr.init(relogAlarms);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
@@ -1155,7 +1239,7 @@ int main(int argC, char* argV[])
     if (subCacheInterval == 0)
     {
       // Populate subscription cache from database
-      subCacheRefresh();
+      subCacheRefresh(false);
     }
     else
     {
@@ -1258,14 +1342,13 @@ int main(int argC, char* argV[])
 
   if (mongocOnly == true)
   {
-    LM_K(("  Mongo Driver:            mongoc driver"));
+    LM_K(("  Mongo Driver:            mongoc driver- ONLY (MongoDB C++ Legacy Driver is DISABLED)"));
     LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
-    LM_K(("  The MongoDB C++ Legacy Driver is DISABLED - registration requests don't work in this mode"));
   }
   else if (experimental  == true)
   {
-    LM_K(("  Mongo Driver:            mongoc driver"));
-    LM_K(("  MongoC Driver Version:   %s (for all requests but registrations)", MONGOC_VERSION_S));
+    LM_K(("  Mongo Driver:            mongoc driver for NGSI-LD requests, Legacy Mongo C++ Driver for NGSIv1&2"));
+    LM_K(("  MongoC Driver Version:   %s", MONGOC_VERSION_S));
   }
   else
     LM_K(("  Mongo Driver:            Legacy C++ Driver (deprecated by mongodb)"));
@@ -1273,6 +1356,10 @@ int main(int argC, char* argV[])
   // Startup is done - we can free up the allocated kalloc buffers - assuming socketService doesn't use kalloc ...
   kaBufferReset(&orionldState.kalloc, KFALSE);
 
+
+  // Start the thread for periodic notifications
+  if (pernot == true)
+    pernotLoopStart();
 
   if (socketService == true)
   {

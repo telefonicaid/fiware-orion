@@ -91,6 +91,7 @@ echo
 
 echo "03. GET subscription - see failure"
 echo "=================================="
+sleep .3
 valgrindSleep 1
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:8f6f80a4-a7a4-11ed-9cbf-16804aa0063b  --tenant captn
 echo
@@ -124,10 +125,10 @@ NGSILD-Tenant: captn
 03. GET subscription - see failure
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 748
+Content-Length: 847
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "description": "NR WeatherObserved zu addixio",
@@ -139,6 +140,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subscription:8f6f80a4-a7a4-11ed-9cbf-16804aa0063b",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "attributes": [
             "location",
@@ -155,6 +157,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "lastFailure": "202REGEX(.*)Z",
         "lastNotification": "202REGEX(.*)Z",
         "status": "failed",
+        "timesFailed": 1,
         "timesSent": 1
     },
     "origin": "cache",

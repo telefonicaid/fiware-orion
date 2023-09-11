@@ -29,10 +29,10 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/pqHeader.h"                           // Postgres header
-#include "orionld/common/orionldState.h"                       // troePort
+#include "orionld/common/orionldState.h"                       // troePort, troePoolSize
 #include "orionld/troe/pgConnectionPoolInit.h"                 // pgConnectionPoolInit
 #include "orionld/troe/pgDatabasePrepare.h"                    // pgDatabasePrepare
-#include "orionld/troe/pgConnectionPoolsPresent.h"              // pgConnectionPoolsPresent
+#include "orionld/troe/pgConnectionPoolsPresent.h"             // pgConnectionPoolsPresent
 #include "orionld/troe/pgInit.h"                               // Own interface
 
 
@@ -45,7 +45,7 @@ bool pgInit(const char* dbPrefix)
 {
   snprintf(pgPortString, sizeof(pgPortString), "%d", troePort);
 
-  if (pgConnectionPoolInit(10) == false)
+  if (pgConnectionPoolInit(troePoolSize) == false)
     LM_RE(false, ("error initializing the postgres connection pools"));
 
   bool b = pgDatabasePrepare(dbPrefix);

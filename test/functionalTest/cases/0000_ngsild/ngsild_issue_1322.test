@@ -210,7 +210,7 @@ Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: captn
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 Ngsild-Attribute-Format: Normalized
 
 {
@@ -245,7 +245,7 @@ Host: REGEX(.*)
 Accept: application/json
 Ngsild-Tenant: captn
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 Ngsild-Attribute-Format: Normalized
 
 {
@@ -280,7 +280,7 @@ HTTP/1.1 200 OK
 Content-Length: 235
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 NGSILD-Tenant: captn
 
 {

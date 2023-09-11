@@ -34,11 +34,12 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // dbHost, coreContextUrl
+#include "orionld/common/orionldState.h"                         // dbHost, coreContextUrl, builtinCoreContext
 #include "orionld/mongoc/mongocContextCacheGet.h"                // mongocContextCacheGet
-#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP, builtinCoreContextUrl, builtinCoreContext
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
+#include "orionld/context/orionldContextFromBuffer.h"            // orionldContextFromBuffer
 #include "orionld/contextCache/orionldContextCache.h"            // orionldContextCacheArray, orionldContextCacheSem
 #include "orionld/contextCache/orionldContextCachePersist.h"     // orionldContextCachePersist
 #include "orionld/contextCache/orionldContextCacheInit.h"        // Own interface
@@ -102,10 +103,6 @@ void orionldContextCacheInit(void)
   //
   KjNode* contextArray = mongocContextCacheGet();
 
-  if (contextArray == NULL)
-    return;
-
-
   //
   // Three loops:
   // 1. Core Context + cleanup
@@ -122,46 +119,78 @@ void orionldContextCacheInit(void)
   //    - Lastly, go over all contexts of Array type
   //
 
-  // 1. Get the Core Context
-  KjNode* contextNodeP = contextArray->value.firstChildP;
-  KjNode* next;
-  while (contextNodeP != NULL)
+  // 1. Find the Core Context
+  LM_T(LmtCoreContext, ("Trying to find the core context (%s)", coreContextUrl));
+  if (contextArray != NULL)
   {
-    next = contextNodeP->next;
-
-    KjNode* valueNodeP = kjLookup(contextNodeP, "value");
-    KjNode* urlNodeP   = kjLookup(contextNodeP, "url");
-
-    if (valueNodeP == NULL)
+    KjNode* contextNodeP = contextArray->value.firstChildP;
+    KjNode* next;
+    while (contextNodeP != NULL)
     {
-      LM_E(("Database Error (invalid context in orionld::contexts collection - 'value' node is missing)"));
-      kjChildRemove(contextArray, contextNodeP);
-    }
-    else if (urlNodeP == NULL)
-    {
-      LM_E(("Database Error (invalid context in orionld::contexts collection - 'url' node is missing)"));
-      kjChildRemove(contextArray, contextNodeP);
-    }
-    else if (strcmp(urlNodeP->value.s, coreContextUrl) == 0)
-    {
-      kjChildRemove(contextArray, contextNodeP);
-      dbContextToCache(contextNodeP, valueNodeP, true, true);
-    }
+      next = contextNodeP->next;
 
-    contextNodeP = next;
+      KjNode* valueNodeP = kjLookup(contextNodeP, "value");
+      KjNode* urlNodeP   = kjLookup(contextNodeP, "url");
+
+      if (valueNodeP == NULL)
+      {
+        LM_E(("Database Error (invalid context in orionld::contexts collection - 'value' node is missing)"));
+        kjChildRemove(contextArray, contextNodeP);
+      }
+      else if (urlNodeP == NULL)
+      {
+        LM_E(("Database Error (invalid context in orionld::contexts collection - 'url' node is missing)"));
+        kjChildRemove(contextArray, contextNodeP);
+      }
+      else if (strcmp(urlNodeP->value.s, coreContextUrl) == 0)
+      {
+        kjChildRemove(contextArray, contextNodeP);
+        dbContextToCache(contextNodeP, valueNodeP, true, true);
+      }
+
+      contextNodeP = next;
+    }
   }
 
-  // Still no core context? - download it
+  // Still no core context? - try to download it
   if (orionldCoreContextP == NULL)
   {
+    LM_T(LmtCoreContext, ("Still no core context - trying to download it (%s)", coreContextUrl));
     orionldCoreContextP = orionldContextFromUrl(coreContextUrl, NULL);
     if (orionldCoreContextP == NULL)
-      LM_X(1, ("Unable to download the core context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
+      LM_W(("Unable to download the core context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
   }
 
+  // Still no core context? - use the default core context, meant for airgapped setups
+  if (orionldCoreContextP == NULL)
+  {
+    LM_T(LmtCoreContext, ("Still no core context - no network?  Getting the core context from builtin"));
+
+    //
+    // The builtin core context is a string in a read-only segment.
+    // The parser needs to modify it, so, the buffer needs to be copied to read/write memory.
+    //
+    int   bufLen = strlen(builtinCoreContext);
+    char* buf    = (char*) calloc(1, bufLen + 1);
+
+    if (buf == NULL)
+      LM_X(1, ("Out of memory trying to allocate %d bytes for the built-in Core Context"));
+
+    memcpy(buf, builtinCoreContext, bufLen + 1);
+    orionldCoreContextP = orionldContextFromBuffer(coreContextUrl, OrionldContextBuiltinCoreContext, (char*) builtinCoreContextUrl, buf);
+    free(buf);
+    LM_T(LmtContextCache, ("Core Context at %p", orionldCoreContextP));
+    if (orionldCoreContextP == NULL)
+      LM_X(1, ("Unable to create the core context from in-compiled default core context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
+    LM_W(("Falling back to Built-in Core Context (hard-coded copy of %s)", builtinCoreContextUrl));
+  }
+
+  if (contextArray == NULL)
+    return;
 
   // 2. Key-Value contexts
-  contextNodeP = contextArray->value.firstChildP;
+  KjNode* contextNodeP = contextArray->value.firstChildP;
+  KjNode* next;
   while (contextNodeP != NULL)
   {
     next = contextNodeP->next;

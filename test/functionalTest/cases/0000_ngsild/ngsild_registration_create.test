@@ -636,12 +636,12 @@ bye
 03. GET the registration, with sysAttrs included
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 2018
+Content-Length: 2023
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
   "id": "urn:ngsi-ld:ContextSourceRegistration:csr1a341",
   "type": "ContextSourceRegistration",
   "name": "reg_csr1a341",

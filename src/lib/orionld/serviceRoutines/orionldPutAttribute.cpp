@@ -55,6 +55,8 @@ extern "C"
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/notifications/previousValuePopulate.h"         // previousValuePopulate
+#include "orionld/notifications/sysAttrsStrip.h"                 // sysAttrsStrip
 #include "orionld/serviceRoutines/orionldPutAttribute.h"         // Own Interface
 
 
@@ -95,11 +97,16 @@ bool orionldPutAttribute(void)
   char*   attrLongNameEq        = kaStrdup(&orionldState.kalloc, attrLongName);
   KjNode* apiAttributeAsEntityP = NULL;
   KjNode* dbEntityCopy          = NULL;
-  KjNode* apiEntityP            = NULL;
   KjNode* oldAttrP              = NULL;
   KjNode* apiAttributeClone     = NULL;
   bool    entityNotFoundLocally = false;
   bool    attrNotFoundLocally   = false;
+
+  OrionldAlteration* alterationP                = NULL;
+  KjNode*            finalApiEntityWithSysAttrs = NULL;
+  KjNode*            finalApiEntity             = NULL;
+  KjNode*            createdAtP                 = NULL;
+  KjNode*            modifiedAtP                 = NULL;
 
   dotForEq(attrLongNameEq);
 
@@ -144,6 +151,8 @@ bool orionldPutAttribute(void)
 
   if (pCheckAttribute(entityId, orionldState.requestTree, true, NoAttributeType, true, NULL) == false)
     return false;  // pcheckAttribute() calls orionldError
+
+  previousValuePopulate(NULL, dbAttrP, orionldState.in.pathAttrExpanded);
 
   // Distributed requests?
   DistOp* distOpList   = NULL;
@@ -195,6 +204,7 @@ bool orionldPutAttribute(void)
 
   // Set creDate (mongocAttributeReplace sets modDate)
   dbModelAttributeCreatedAtSet(orionldState.requestTree, createdAt);
+  kjTreeLog(orionldState.requestTree, "orionldState.requestTree", LmtSR);
 
   // Write to mongo
   if (mongocAttributeReplace(entityId, orionldState.requestTree, &detail) == false)
@@ -230,15 +240,16 @@ bool orionldPutAttribute(void)
   // o Insert a copy of the attribute that was replaced (new copy)
   //
   dbEntityCopy = kjClone(orionldState.kjsonP, dbEntityP);
-  apiEntityP   = dbModelToApiEntity2(dbEntityCopy, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
 
-  if (apiEntityP == NULL)
+  finalApiEntityWithSysAttrs = dbModelToApiEntity2(dbEntityCopy, true, RF_NORMALIZED, NULL, false, &orionldState.pd);
+
+  if (finalApiEntityWithSysAttrs == NULL)
   {
     LM_E(("dbModelToApiEntity unable to convert DB Entity '%s' to API Entity (%s: %s)", entityId, orionldState.pd.title, orionldState.pd.detail));
     goto response;
   }
 
-  oldAttrP = kjLookup(apiEntityP, attrLongName);
+  oldAttrP = kjLookup(finalApiEntityWithSysAttrs, attrLongName);
   if (oldAttrP == NULL)
   {
     LM_E(("Unable to find the attribute '%s' in the entity '%s'", attrLongName, entityId));
@@ -251,10 +262,32 @@ bool orionldPutAttribute(void)
     LM_E(("Unable to clone the attribute '%s' in the entity '%s'", attrLongName, entityId));
     goto response;
   }
-  kjChildRemove(apiEntityP, oldAttrP);
-  kjChildAdd(apiEntityP, apiAttributeClone);
+  kjChildRemove(finalApiEntityWithSysAttrs, oldAttrP);
+  kjChildAdd(finalApiEntityWithSysAttrs, apiAttributeClone);
 
-  alteration(entityId, entityType, apiEntityP, apiAttributeAsEntityP, dbEntityP);
+  // Now get createdAt/modifiedAt from oldAttrP
+  createdAtP  = kjLookup(oldAttrP, "createdAt");
+  modifiedAtP = kjLookup(oldAttrP, "modifiedAt");
+
+  if (createdAtP != NULL)
+  {
+    kjChildRemove(oldAttrP, createdAtP);
+    kjChildAdd(apiAttributeClone, createdAtP);
+  }
+
+  if (modifiedAtP != NULL)
+  {
+    kjChildRemove(oldAttrP, modifiedAtP);
+    kjChildAdd(apiAttributeClone, modifiedAtP);
+  }
+
+
+  finalApiEntity = kjClone(orionldState.kjsonP, finalApiEntityWithSysAttrs);  // Check for NULL !
+  sysAttrsStrip(finalApiEntity);
+
+
+  alterationP = alteration(entityId, entityType, finalApiEntity, apiAttributeAsEntityP, dbEntityP);
+  alterationP->finalApiEntityWithSysAttrsP = finalApiEntityWithSysAttrs;
 
  response:
   if (distOpList != NULL)

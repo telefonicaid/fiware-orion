@@ -1,0 +1,346 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription with new notifications sent as GeoJSON
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create a subscription with notifications in GeoJSON format
+# 01b. See subscription in mongo
+# 02. Create an entity 'pig003' according to issue #1381
+# 03. Dump accumulator to see one notification - in GeoJSON format, make sure the special GeoJSON 'geometry' attribute is present
+# 04. Add a property P3 to the pig
+# 05. Dump accumulator to see another GeoJSON format notification
+#
+
+echo "01. Create a subscription with notifications in GeoJSON format"
+echo "=============================================================="
+payload='{
+  "description": "Notify me of movement of an Animal",
+  "type": "Subscription",
+  "entities": [
+    {
+      "id": "urn:ngsi-ld:Animal:pig003",
+      "type": "Animal"
+    }
+  ],
+  "notification": {
+    "format": "concise",
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/geo+json"
+    }
+  },
+  "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --in application/ld+json
+echo
+echo
+
+
+echo "01b. See subscription in mongo"
+echo "=============================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "02. Create an entity 'pig003' according to issue #1381"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:Animal:pig003",
+  "type": "Animal",
+  "species": "pig",
+  "name": "Flamingo",
+  "sex": "male",
+  "phenologicalCondition": "maleAdult",
+  "reproductiveCondition": "active",
+  "legalID": "M-boar003-Flamingo",
+  "heartRate": {
+    "value": 64,
+    "unitCode": "5K",
+    "observedAt": "2023-06-09T09:54:15.064Z",
+    "providedBy": {
+      "object": "urn:ngsi-ld:Device:pig003"
+    }
+  },
+  "location": {
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        13.357,
+        52.515
+      ]
+    },
+    "observedAt": "2023-06-09T09:54:15.064Z",
+    "providedBy": {
+      "object": "urn:ngsi-ld:Device:pig003"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator to see one notification - in GeoJSON format, make sure the special GeoJSON 'geometry' attribute is present"
+echo "==============================================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Add a property P3 to the pig"
+echo "================================"
+payload='{
+  "P3": {
+    "type": "Property",
+    "value": 3
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Animal:pig003 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator to see another GeoJSON format notification"
+echo "==============================================================="
+sleep .3
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with notifications in GeoJSON format
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/REGEX(.*)
+
+
+
+01b. See subscription in mongo
+==============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscription:REGEX(.*)",
+	"description" : "Notify me of movement of an Animal",
+	"entities" : [
+		{
+			"id" : "urn:ngsi-ld:Animal:pig003",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/Animal",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		}
+	],
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "concise",
+	"reference" : "REGEX(.*)",
+	"mimeType" : "application/geo+json",
+	"attrs" : [ ],
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+}
+bye
+
+
+02. Create an entity 'pig003' according to issue #1381
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Animal:pig003
+
+
+
+03. Dump accumulator to see one notification - in GeoJSON format, make sure the special GeoJSON 'geometry' attribute is present
+===============================================================================================================================
+POST http://REGEX(.*)
+Content-Length: 928
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/geo+json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": {
+        "features": [
+            {
+                "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+                "geometry": {
+                    "coordinates": [
+                        13.357,
+                        52.515
+                    ],
+                    "type": "Point"
+                },
+                "id": "urn:ngsi-ld:Animal:pig003",
+                "properties": {
+                    "heartRate": {
+                        "observedAt": "2023-06-09T09:54:15.064Z",
+                        "providedBy": {
+                            "object": "urn:ngsi-ld:Device:pig003"
+                        },
+                        "unitCode": "5K",
+                        "value": 64
+                    },
+                    "legalID": "M-boar003-Flamingo",
+                    "location": {
+                        "observedAt": "2023-06-09T09:54:15.064Z",
+                        "providedBy": {
+                            "object": "urn:ngsi-ld:Device:pig003"
+                        },
+                        "value": {
+                            "coordinates": [
+                                13.357,
+                                52.515
+                            ],
+                            "type": "Point"
+                        }
+                    },
+                    "name": "Flamingo",
+                    "phenologicalCondition": "maleAdult",
+                    "reproductiveCondition": "active",
+                    "sex": "male",
+                    "species": "pig",
+                    "type": "Animal"
+                },
+                "type": "Feature"
+            }
+        ],
+        "type": "FeatureCollection"
+    },
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "REGEX(.*)",
+    "type": "Notification"
+}
+=======================================
+
+
+04. Add a property P3 to the pig
+================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Dump accumulator to see another GeoJSON format notification
+===============================================================
+POST http://REGEX(.*)
+Content-Length: 935
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/geo+json
+Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Ngsild-Attribute-Format: Concise
+
+{
+    "data": {
+        "features": [
+            {
+                "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+                "geometry": {
+                    "coordinates": [
+                        13.357,
+                        52.515
+                    ],
+                    "type": "Point"
+                },
+                "id": "urn:ngsi-ld:Animal:pig003",
+                "properties": {
+                    "P3": 3,
+                    "heartRate": {
+                        "observedAt": "2023-06-09T09:54:15.064Z",
+                        "providedBy": {
+                            "object": "urn:ngsi-ld:Device:pig003"
+                        },
+                        "unitCode": "5K",
+                        "value": 64
+                    },
+                    "legalID": "M-boar003-Flamingo",
+                    "location": {
+                        "observedAt": "2023-06-09T09:54:15.064Z",
+                        "providedBy": {
+                            "object": "urn:ngsi-ld:Device:pig003"
+                        },
+                        "value": {
+                            "coordinates": [
+                                13.357,
+                                52.515
+                            ],
+                            "type": "Point"
+                        }
+                    },
+                    "name": "Flamingo",
+                    "phenologicalCondition": "maleAdult",
+                    "reproductiveCondition": "active",
+                    "sex": "male",
+                    "species": "pig",
+                    "type": "Animal"
+                },
+                "type": "Feature"
+            }
+        ],
+        "type": "FeatureCollection"
+    },
+    "id": "urn:ngsi-ld:Notification:REGEX([0-9a-f\-]{36})",
+    "notifiedAt": "REGEX(.*)",
+    "subscriptionId": "REGEX(.*)",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

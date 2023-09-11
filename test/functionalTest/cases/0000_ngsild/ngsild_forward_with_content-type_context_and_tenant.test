@@ -347,7 +347,7 @@ HTTP/1.1 200 OK
 Content-Length: 61
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "P1": {
@@ -420,7 +420,7 @@ HTTP/1.1 200 OK
 Content-Length: 61
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "P1": {
@@ -454,7 +454,7 @@ Date: REGEX(.*)
 14. Dump and reset the accumulator. See Content-Type: application/ld+json and a @context field in the payload body (Core Context)
 =================================================================================================================================
 PATCH http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1
-Content-Length: 109
+Content-Length: 114
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -464,7 +464,7 @@ Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "P1": {
         "type": "Property",
         "value": 9
@@ -523,7 +523,7 @@ HTTP/1.1 200 OK
 Content-Length: 62
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "P1": {

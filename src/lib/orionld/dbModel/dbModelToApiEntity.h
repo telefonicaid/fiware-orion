@@ -49,7 +49,7 @@ extern "C"
 // USED BY
 //   - orionldAlterationsTreat (for notifications)
 //
-extern KjNode* dbModelToApiEntity(KjNode* attrP, bool sysAttrs, const char* entityId);
+extern KjNode* dbModelToApiEntity(KjNode* attrP, bool sysAttrs, char* entityId);
 
 
 

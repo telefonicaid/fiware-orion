@@ -44,6 +44,8 @@ static size_t writeCallback(void* contents, size_t size, size_t members, void* u
   OrionldResponseBuffer*  rBufP        = (OrionldResponseBuffer*) userP;
   int                     xtraBytes    = 512;
 
+  LM_T(LmtCurl, ("CURL: got %d bytes of payload body: %s", bytesToCopy, contents));
+
   if (bytesToCopy + rBufP->used >= rBufP->size)
   {
     if (rBufP->buf == rBufP->internalBuffer)
@@ -271,7 +273,9 @@ bool orionldRequestSend
     char contentLenHeader[128];
 
     snprintf(contentTypeHeader, sizeof(contentTypeHeader), "Content-Type:%s", contentType);
+    LM_T(LmtDistOpRequestHeaders, ("Adding DistOp Request header '%s'", contentTypeHeader));
     snprintf(contentLenHeader,  sizeof(contentLenHeader),  "Content-Length:%d", payloadLen);
+    LM_T(LmtDistOpRequestHeaders, ("Adding DistOp Request header '%s'", contentLenHeader));
 
     headers = curl_slist_append(headers, contentTypeHeader);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
@@ -287,12 +291,14 @@ bool orionldRequestSend
     char linkHeaderString[512];
 
     snprintf(linkHeaderString, sizeof(linkHeaderString), "Link: %s", linkHeader);
+    LM_T(LmtDistOpRequestHeaders, ("Adding DistOp Request header '%s'", linkHeader));
     headers = curl_slist_append(headers, linkHeaderString);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);
   }
 
   if (acceptHeader != NULL)
   {
+    LM_T(LmtDistOpRequestHeaders, ("Adding DistOp Request header '%s'", acceptHeader));
     headers = curl_slist_append(headers, acceptHeader);
     curl_easy_setopt(cc.curl, CURLOPT_HTTPHEADER, headers);  // Should be enough with one call ...
   }
@@ -304,6 +310,7 @@ bool orionldRequestSend
     OrionldHttpHeader* headerP = &headerV[ix];
 
     snprintf(headerString, sizeof(headerString), "%s:%s", headerName[headerP->type], headerP->value);
+    LM_T(LmtDistOpRequestHeaders, ("Adding DistOp Request header '%s'", headerString));
     headers = curl_slist_append(headers, headerString);
     ++ix;
   }
@@ -312,6 +319,7 @@ bool orionldRequestSend
   if (orionldState.in.authorization != NULL)
   {
     snprintf(headerString, sizeof(headerString), "Authorization:%s", orionldState.in.authorization);
+    LM_T(LmtDistOpRequestHeaders, ("Adding DistOp Request header '%s'", headerString));
     headers = curl_slist_append(headers, headerString);
   }
 

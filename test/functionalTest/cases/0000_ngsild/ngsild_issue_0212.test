@@ -106,16 +106,20 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Store:santander:COM4111
 02. GET the entity by type - longname
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 639
+Content-Length: 668
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
     {
         "description": {
             "type": "Property",
             "value": "Cosmetica natural fabricada en Santander."
+        },
+        "https://uri.etsi.org/ngsi-ld/name": {
+            "type": "Property",
+            "value": "MARTA KAUFMANN"
         },
         "https://uri.synchronicity-iot.eu/ns/data-models#currenciesAccepted": {
             "type": "Property",
@@ -135,10 +139,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
                 ],
                 "type": "Point"
             }
-        },
-        "name": {
-            "type": "Property",
-            "value": "MARTA KAUFMANN"
         },
         "type": "https://uri.synchronicity-iot.eu/ns/data-models#Store"
     }
@@ -148,16 +148,20 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 03. GET the entity with id as URI param
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 639
+Content-Length: 668
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
     {
         "description": {
             "type": "Property",
             "value": "Cosmetica natural fabricada en Santander."
+        },
+        "https://uri.etsi.org/ngsi-ld/name": {
+            "type": "Property",
+            "value": "MARTA KAUFMANN"
         },
         "https://uri.synchronicity-iot.eu/ns/data-models#currenciesAccepted": {
             "type": "Property",
@@ -177,10 +181,6 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
                 ],
                 "type": "Point"
             }
-        },
-        "name": {
-            "type": "Property",
-            "value": "MARTA KAUFMANN"
         },
         "type": "https://uri.synchronicity-iot.eu/ns/data-models#Store"
     }

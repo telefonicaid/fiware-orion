@@ -205,10 +205,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E3
 04. GET Entity Type T1 - see T1, count 1, and attrs P1 and R1
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 398
+Content-Length: 391
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "attributeDetails": [
@@ -231,7 +231,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "entityCount": 1,
     "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
-    "type": "EntityTypeInformation",
+    "type": "EntityTypeInfo",
     "typeName": "T1"
 }
 
@@ -248,10 +248,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E5
 06. GET Entity Type T1 - see T1, count 2, and attrs P1, P2, R1, and R2
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 656
+Content-Length: 649
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "attributeDetails": [
@@ -290,7 +290,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "entityCount": 2,
     "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
-    "type": "EntityTypeInformation",
+    "type": "EntityTypeInfo",
     "typeName": "T1"
 }
 
@@ -307,10 +307,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E7
 08. GET Entity Type T1 - see T1, count 3, and attrs P1, P2, R1, and R2
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 708
+Content-Length: 701
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "attributeDetails": [
@@ -353,7 +353,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "entityCount": 3,
     "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
-    "type": "EntityTypeInformation",
+    "type": "EntityTypeInfo",
     "typeName": "T1"
 }
 
@@ -361,12 +361,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 09. Same same, but Accept: application/ld+json
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 781
+Content-Length: 779
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "attributeDetails": [
         {
             "attributeName": "P1",
@@ -407,7 +407,7 @@ Date: REGEX(.*)
     ],
     "entityCount": 3,
     "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
-    "type": "EntityTypeInformation",
+    "type": "EntityTypeInfo",
     "typeName": "T1"
 }
 
@@ -415,12 +415,12 @@ Date: REGEX(.*)
 10. Same same, but type in URL as long name
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 781
+Content-Length: 779
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "attributeDetails": [
         {
             "attributeName": "P1",
@@ -461,7 +461,7 @@ Date: REGEX(.*)
     ],
     "entityCount": 3,
     "id": "https://uri.etsi.org/ngsi-ld/default-context/T1",
-    "type": "EntityTypeInformation",
+    "type": "EntityTypeInfo",
     "typeName": "T1"
 }
 

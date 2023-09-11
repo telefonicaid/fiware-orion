@@ -164,7 +164,8 @@ echo
 
 echo "11. GET all entities with idPattern=urn.*E[1359] - see E1, E3, and E5"
 echo "====================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E[1359]&prettyPrint=yes" --noPayloadCheck
+#orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E[1359]&prettyPrint=yes" --noPayloadCheck
+orionCurl --url "/ngsi-ld/v1/entities?idPattern=.*E\[1359\]&prettyPrint=yes" --noPayloadCheck
 echo
 echo
 
@@ -245,7 +246,7 @@ HTTP/1.1 200 OK
 Content-Length: 723
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
   {
@@ -317,7 +318,7 @@ HTTP/1.1 200 OK
 Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
   {
@@ -338,7 +339,7 @@ HTTP/1.1 200 OK
 Content-Length: 363
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
   {

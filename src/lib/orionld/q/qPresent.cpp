@@ -24,9 +24,7 @@
 */
 #include <string.h>                                            // memset
 
-#include "logMsg/logMsg.h"                                     // LM_T
-#include "logMsg/traceLevels.h"                                // LmtQ
-
+#include "logMsg/logMsg.h"                                     // TraceLevels, LM_*
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qPresent.h"                                // Own interface
 
@@ -36,7 +34,7 @@
 //
 // qTreePresent -
 //
-static void qTreePresent(QNode* qP, int indent, const char* prefix)
+static void qTreePresent(QNode* qP, int indent, const char* prefix, TraceLevels tLevel)
 {
   if (lmTraceIsSet(LmtQ) == false)
     return;
@@ -48,78 +46,78 @@ static void qTreePresent(QNode* qP, int indent, const char* prefix)
 
   if (qP->type == QNodeEQ)
   {
-    LM_T(LmtQ, ("%s:%sEQ:", prefix, indentV));
-    qTreePresent(qP->value.children, indent+2, prefix);
-    qTreePresent(qP->value.children->next, indent+2, prefix);
+    LM_T(tLevel, ("%s:%sEQ:", prefix, indentV));
+    qTreePresent(qP->value.children, indent+2, prefix, tLevel);
+    qTreePresent(qP->value.children->next, indent+2, prefix, tLevel);
   }
   else if (qP->type == QNodeNE)
   {
-    LM_T(LmtQ, ("%s:%sNE:", prefix, indentV));
-    qTreePresent(qP->value.children, indent+2, prefix);
-    qTreePresent(qP->value.children->next, indent+2, prefix);
+    LM_T(tLevel, ("%s:%sNE:", prefix, indentV));
+    qTreePresent(qP->value.children, indent+2, prefix, tLevel);
+    qTreePresent(qP->value.children->next, indent+2, prefix, tLevel);
   }
   else if (qP->type == QNodeLT)
   {
-    LM_T(LmtQ, ("%s:%sLT:", prefix, indentV));
-    qTreePresent(qP->value.children, indent+2, prefix);
-    qTreePresent(qP->value.children->next, indent+2, prefix);
+    LM_T(tLevel, ("%s:%sLT:", prefix, indentV));
+    qTreePresent(qP->value.children, indent+2, prefix, tLevel);
+    qTreePresent(qP->value.children->next, indent+2, prefix, tLevel);
   }
   else if (qP->type == QNodeLE)
   {
-    LM_T(LmtQ, ("%s:%sLE:", prefix, indentV));
-    qTreePresent(qP->value.children, indent+2, prefix);
-    qTreePresent(qP->value.children->next, indent+2, prefix);
+    LM_T(tLevel, ("%s:%sLE:", prefix, indentV));
+    qTreePresent(qP->value.children, indent+2, prefix, tLevel);
+    qTreePresent(qP->value.children->next, indent+2, prefix, tLevel);
   }
   else if (qP->type == QNodeGT)
   {
-    LM_T(LmtQ, ("%s:%sGT:", prefix, indentV));
-    qTreePresent(qP->value.children, indent+2, prefix);
-    qTreePresent(qP->value.children->next, indent+2, prefix);
+    LM_T(tLevel, ("%s:%sGT:", prefix, indentV));
+    qTreePresent(qP->value.children, indent+2, prefix, tLevel);
+    qTreePresent(qP->value.children->next, indent+2, prefix, tLevel);
   }
   else if (qP->type == QNodeGE)
   {
-    LM_T(LmtQ, ("%s:%sGE:", prefix, indentV));
-    qTreePresent(qP->value.children, indent+2, prefix);
-    qTreePresent(qP->value.children->next, indent+2, prefix);
+    LM_T(tLevel, ("%s:%sGE:", prefix, indentV));
+    qTreePresent(qP->value.children, indent+2, prefix, tLevel);
+    qTreePresent(qP->value.children->next, indent+2, prefix, tLevel);
   }
   else if (qP->type == QNodeVariable)
-    LM_T(LmtQ, ("%s:%s%s (Variable) (v at %p, qP at %p)", prefix, indentV, qP->value.v, qP->value.v, qP));
+    LM_T(tLevel, ("%s:%s%s (Variable) (v at %p, qP at %p)", prefix, indentV, qP->value.v, qP->value.v, qP));
   else if (qP->type == QNodeIntegerValue)
-    LM_T(LmtQ, ("%s:%s%d (Int)", prefix, indentV, qP->value.i));
+    LM_T(tLevel, ("%s:%s%d (Int)", prefix, indentV, qP->value.i));
   else if (qP->type == QNodeFloatValue)
-    LM_T(LmtQ, ("%s:%s%f (Float)", prefix, indentV, qP->value.f));
+    LM_T(tLevel, ("%s:%s%f (Float)", prefix, indentV, qP->value.f));
   else if (qP->type == QNodeStringValue)
-    LM_T(LmtQ, ("%s:%s%s (String) at %p (String at %p)", prefix, indentV, qP->value.s, qP, qP->value.s));
+    LM_T(tLevel, ("%s:%s%s (String) at %p (String at %p)", prefix, indentV, qP->value.s, qP, qP->value.s));
   else if (qP->type == QNodeTrueValue)
-    LM_T(LmtQ, ("%s:%sTRUE (Bool)", prefix, indentV));
+    LM_T(tLevel, ("%s:%sTRUE (Bool)", prefix, indentV));
   else if (qP->type == QNodeFalseValue)
-    LM_T(LmtQ, ("%s:%sFALSE (Bool)", prefix, indentV));
+    LM_T(tLevel, ("%s:%sFALSE (Bool)", prefix, indentV));
   else if (qP->type == QNodeExists)
   {
-    LM_T(LmtQ, ("%s:%s Exists (at %p):", prefix, indentV, qP));
-    qTreePresent(qP->value.children, indent+2, prefix);
+    LM_T(tLevel, ("%s:%s Exists (at %p):", prefix, indentV, qP));
+    qTreePresent(qP->value.children, indent+2, prefix, tLevel);
   }
   else if (qP->type == QNodeNotExists)
   {
-    LM_T(LmtQ, ("%s:%s Not Exists:", prefix, indentV));
-    qTreePresent(qP->value.children, indent+2, prefix);
+    LM_T(tLevel, ("%s:%s Not Exists:", prefix, indentV));
+    qTreePresent(qP->value.children, indent+2, prefix, tLevel);
   }
   else if (qP->type == QNodeOr)
   {
-    LM_T(LmtQ, ("%s:%sOR:", prefix, indentV));
+    LM_T(tLevel, ("%s:%sOR:", prefix, indentV));
     indent+=2;
     for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
-      qTreePresent(childP, indent, prefix);
+      qTreePresent(childP, indent, prefix, tLevel);
   }
   else if (qP->type == QNodeAnd)
   {
-    LM_T(LmtQ, ("%s:%sAND:", prefix, indentV));
+    LM_T(tLevel, ("%s:%sAND:", prefix, indentV));
     indent+=2;
     for (QNode* childP = qP->value.children; childP != NULL; childP = childP->next)
-      qTreePresent(childP, indent, prefix);
+      qTreePresent(childP, indent, prefix, tLevel);
   }
   else
-    LM_T(LmtQ, ("%s:%s%s (presentation TBI)", prefix, indentV, qNodeType(qP->type)));
+    LM_T(tLevel, ("%s:%s%s (presentation TBI)", prefix, indentV, qNodeType(qP->type)));
 }
 
 
@@ -128,11 +126,11 @@ static void qTreePresent(QNode* qP, int indent, const char* prefix)
 //
 // qPresent -
 //
-void qPresent(QNode* qP, const char* prefix, const char* what)
+void qPresent(QNode* qP, const char* prefix, const char* what, TraceLevels tLevel)
 {
-  LM_T(LmtQ, ("%s: --------------------- %s -----------------------------------", prefix, what));
-  qTreePresent(qP, 0, prefix);
-  LM_T(LmtQ, ("%s: --------------------------------------------------------", prefix));
+  LM_T(tLevel, ("%s: --------------------- %s -----------------------------------", prefix, what));
+  qTreePresent(qP, 0, prefix, tLevel);
+  LM_T(tLevel, ("%s: --------------------------------------------------------", prefix));
 }
 
 

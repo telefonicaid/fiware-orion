@@ -71,6 +71,17 @@ bool qAliasCompact(KjNode* qP, bool compact)
     char c0 = cP[0];
     char c1 = cP[1];
 
+    if ((c0 == '(') || (c0 == ')'))
+    {
+      LM_T(LmtQ, ("Found a parenthesis - skipping it"));
+      ++cP;
+      varStart = cP;
+      out[outIx] = c0;
+      ++outIx;
+
+      continue;
+    }
+
     if (c0 == '!')
     {
       varStart = &cP[1];
@@ -103,6 +114,7 @@ bool qAliasCompact(KjNode* qP, bool compact)
           ++eqP;
         }
 
+        LM_T(LmtQ, ("Compacting '%s'", varStart));
         alias = orionldContextItemAliasLookup(orionldState.contextP, varStart, NULL, NULL);
       }
       else

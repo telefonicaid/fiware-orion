@@ -26,6 +26,7 @@ Delete AND RELOAD a @context from the context cache
 --SHELL-INIT--
 dbInit CB
 dbDrop orionld
+dbDrop CB
 orionldStart CB
 
 --SHELL--

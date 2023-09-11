@@ -34,13 +34,14 @@ const char* orionldContextOriginName(OrionldContextOrigin origin)
 {
   switch (origin)
   {
-  case OrionldContextUnknownOrigin:     return "Unknown";
-  case OrionldContextFromInline:        return "Inline";
-  case OrionldContextDownloaded:        return "Downloaded";
-  case OrionldContextFileCached:        return "FileCached";
-  case OrionldContextForNotifications:  return "Notifications";
-  case OrionldContextForForwarding:     return "Forwarding";
-  case OrionldContextUserCreated:       return "UserCreated";
+  case OrionldContextUnknownOrigin:      return "Unknown";
+  case OrionldContextFromInline:         return "Inline";
+  case OrionldContextDownloaded:         return "Downloaded";
+  case OrionldContextFileCached:         return "FileCached";
+  case OrionldContextForNotifications:   return "Notifications";
+  case OrionldContextForForwarding:      return "Forwarding";
+  case OrionldContextUserCreated:        return "UserCreated";
+  case OrionldContextBuiltinCoreContext: return "BuiltinCoreContext";
   }
 
   return "Unknown Origin II";

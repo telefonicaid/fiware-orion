@@ -29,13 +29,14 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheHeadGet, subCacheItemLookup
+#include "common/RenderFormat.h"                                 // RenderFormat
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/kjTree/kjTreeFromPernotSubscription.h"         // kjTreeFromPernotSubscription
 #include "orionld/legacyDriver/legacyGetSubscriptions.h"         // legacyGetSubscriptions
 #include "orionld/kjTree/kjTreeFromCachedSubscription.h"         // kjTreeFromCachedSubscription
 #include "orionld/mongoc/mongocSubscriptionsGet.h"               // mongocSubscriptionsGet
@@ -67,7 +68,7 @@ static bool tenantMatch(OrionldTenant* requestTenantP, const char* subscriptionT
 }
 
 
-extern void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP);
+extern void orionldSubCounters(KjNode* apiSubP, CachedSubscription* cSubP, PernotSubscription* pSubP);
 // -----------------------------------------------------------------------------
 //
 // orionldGetSubscriptionsFromDb -
@@ -107,10 +108,23 @@ static bool orionldGetSubscriptionsFromDb(void)
   //
   for (KjNode* dbSubP = dbSubV->value.firstChildP; dbSubP != NULL; dbSubP = dbSubP->next)
   {
-    QNode*  qTree        = NULL;
-    KjNode* contextNodeP = NULL;
-    KjNode* coordinatesP = NULL;
-    KjNode* apiSubP      = dbModelToApiSubscription(dbSubP, orionldState.tenantP->tenant, false, &qTree, &coordinatesP, &contextNodeP);
+    QNode*       qTree         = NULL;
+    KjNode*      contextNodeP  = NULL;
+    KjNode*      coordinatesP  = NULL;
+    KjNode*      showChangesP  = NULL;
+    KjNode*      sysAttrsP     = NULL;
+    RenderFormat renderFormat  = RF_NORMALIZED;
+    double       timeInterval  = 0;
+    KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,
+                                                          orionldState.tenantP->tenant,
+                                                          false,
+                                                          &qTree,
+                                                          &coordinatesP,
+                                                          &contextNodeP,
+                                                          &showChangesP,
+                                                          &sysAttrsP,
+                                                          &renderFormat,
+                                                          &timeInterval);
 
     if (apiSubP == NULL)
     {
@@ -127,12 +141,49 @@ static bool orionldGetSubscriptionsFromDb(void)
         kjChildAdd(apiSubP, nodeP);
     }
 
-    orionldSubCounters(apiSubP, NULL);
+    orionldSubCounters(apiSubP, NULL, NULL);
 
     kjChildAdd(apiSubV, apiSubP);
   }
 
   return true;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// subCacheCount - move to subCache.cpp
+//
+int subCacheCount(void)
+{
+  int count = 0;
+  for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
+  {
+    if (tenantMatch(orionldState.tenantP, cSubP->tenant) == true)
+      ++count;
+  }
+
+  return count;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// pernotSubCacheCount - move to pernotSubCacheCount.cpp
+//
+int pernotSubCacheCount(void)
+{
+  int count = 0;
+
+  for (PernotSubscription* pSubP = pernotSubCache.head; pSubP != NULL; pSubP = pSubP->next)
+  {
+    if (pSubP->tenantP == orionldState.tenantP)
+      ++count;
+  }
+
+  return count;
 }
 
 
@@ -147,12 +198,7 @@ bool orionldGetSubscriptions(void)
     return legacyGetSubscriptions();
 
   if (orionldState.uriParamOptions.fromDb == true)
-  {
-    //
-    // GET Subscriptions with mongoc
-    //
     return orionldGetSubscriptionsFromDb();
-  }
 
   //
   // Not Legacy, not "From DB" - Getting the subscriptions from the subscription cache
@@ -160,50 +206,72 @@ bool orionldGetSubscriptions(void)
 
   int      offset    = orionldState.uriParams.offset;
   int      limit     = orionldState.uriParams.limit;
+  int      subs      = 0;
   KjNode*  subArray  = kjArray(orionldState.kjsonP, NULL);
   int      ix        = 0;
-  int      subs      = 0;
+  int      cSubs     = subCacheCount();
+  int      pSubs     = pernotSubCacheCount();
 
-  if (orionldState.uriParams.count == true)  // Empty loop over the subscriptions, just to count how many there are
-  {
-    int count = 0;
-    for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
-    {
-      if (tenantMatch(orionldState.tenantP, cSubP->tenant) == true)
-        ++count;
-    }
-
-    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
-  }
+  if (orionldState.uriParams.count == true)
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, cSubs + pSubs);
 
   if (limit != 0)
   {
-    for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
+    // Start with Pernot Subscriptions
+    if (offset < pSubs)
     {
-      if (tenantMatch(orionldState.tenantP, cSubP->tenant) == false)
-        continue;
-
-      if (ix < offset)
+      for (PernotSubscription* pSubP = pernotSubCache.head; pSubP != NULL; pSubP = pSubP->next)
       {
-        ++ix;
-        continue;
+        if (pSubP->tenantP == orionldState.tenantP)
+        {
+          KjNode* subP = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+
+          if (subP == NULL)
+          {
+            LM_E(("Internal Error (kjTreeFromPernotSubscription failed for subscription '%s')", pSubP->subscriptionId));
+            ++ix;
+            continue;
+          }
+
+          kjChildAdd(subArray, subP);
+          ++ix;
+          ++subs;
+
+          if (subs >= limit)
+            break;
+        }
       }
+    }
 
-      KjNode* subP = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
-
-      if (subP == NULL)
+    if (subs < limit)
+    {
+      for (CachedSubscription* cSubP = subCacheHeadGet(); cSubP != NULL; cSubP = cSubP->next)
       {
-        LM_E(("Internal Error (kjTreeFromCachedSubscription failed for subscription '%s')", cSubP->subscriptionId));
+        if (tenantMatch(orionldState.tenantP, cSubP->tenant) == false)
+          continue;
+
+        if (ix < offset)
+        {
+          ++ix;
+          continue;
+        }
+
+        KjNode* subP = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+
+        if (subP == NULL)
+        {
+          LM_E(("Internal Error (kjTreeFromCachedSubscription failed for subscription '%s')", cSubP->subscriptionId));
+          ++ix;
+          continue;
+        }
+
+        kjChildAdd(subArray, subP);
         ++ix;
-        continue;
+        ++subs;
+
+        if (subs >= limit)
+          break;
       }
-
-      kjChildAdd(subArray, subP);
-      ++ix;
-      ++subs;
-
-      if (subs >= limit)
-        break;
     }
   }
   else

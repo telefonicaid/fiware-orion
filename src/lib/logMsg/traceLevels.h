@@ -54,6 +54,7 @@ typedef enum TraceLevels
   LmtNotificationSend,                 // Sending of notifications
   LmtNotificationHeaders,              // notification request/response headers
   LmtNotificationBody,                 // notification request/response body
+  LmtShowChanges,                      // Add the field 'previousX' to attributes in notifications
 
   //
   // Subscription Cache
@@ -61,6 +62,9 @@ typedef enum TraceLevels
   LmtSubCache = 50,                    // Subscription Cache
   LmtSubCacheMatch,                    // Subscription Cache Matches
   LmtSubCacheDebug,                    // Subscription Cache Debug
+  LmtSubCacheStats,                    // Subscription Cache Counters and Timestamps
+  LmtSubCacheSync,                     // Subscription Cache Refresh
+  LmtSubCacheFlush,                    // Subscription Cache Flush
 
   //
   // Registration Cache
@@ -77,6 +81,7 @@ typedef enum TraceLevels
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
+  LmtDistOpRequestHeaders,             // HTTP headers of request of distributed requests
   LmtDistOpList,                       // Linked list of DistOps
 
   //
@@ -85,32 +90,51 @@ typedef enum TraceLevels
   LmtContexts = 80,                    // Contexts
   LmtContextTree,                      // Context Tree
   LmtContextCache,                     // Context Cache
+  LmtContextDownload,                  // Context Download
+  LmtCoreContext,                      // Core Context
+
+  // GeoJSON
+  LmtGeoJSON = 90,                     // GeoJSON ... everything (for now)
+
+  //
+  // Pernot sub-cache
+  //
+  LmtPernot = 100,                     // Periodic Notification Subscription cache
+  LmtPernotLoop,                       // Pernot loop, when each sub is triggered in time
+  LmtPernotLoopTimes,                  // Pernot loop, details on timestamps
+  LmtPernotFlush,                      // Pernot flush to DB
+  LmtPernotQuery,                      // Pernot query
 
   //
   // Pagination
   //
-  LmtEntityMap = 80,                   // The arrays of registrations per entity - distributed GET /entities
+  LmtEntityMap = 110,                  // The arrays of registrations per entity - distributed GET /entities
   LmtEntityMapDetail,                  // Details of the entity-registration maps
 
   //
   // Misc
   //
-  LmtMongoc = 240,                     // Entire mongoc library
+  LmtMongoc = 200,                     // Entire mongoc library
   LmtSR,                               // Service Routine (whatever it is doing)
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
   LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
+  LmtLegacySubMatch,                   // Old code - update/subscription match for subs/notifs
+  LmtLegacySubCacheRefresh,            // Old code - sub-cache-refresh
   LmtMqtt,                             // MQTT notifications
   LmtQ,                                // Query Language
   LmtPostgres,                         // Postgres (TRoE)
   LmtSql,                              // SQL command for TRoE
   LmtPgPool,                           // Postgres Connection Pool
   LmtTenants,                          // Well, tenants :)
-  LmtGeoJSON,                          // GeoJSON transformations
   LmtSocketService,                    // Socket Service
   LmtRegex,                            // Regular expressions - all of them
-  LmtCurl,                             // CURL library
+
+  LmtCurl    = 250,                    // CURL library
   LmtToDo,                             // To Do list
+  LmtPatchEntity,                      // Real merge+patch
+  LmtPatchEntity2,                     // Real merge+patch: merging for final API Entity, for notifications
+  LmtSysAttrs,                         // System Attributes
   LmtLeak                              // Used when debugging leaks and valgrind errors
 } TraceLevels;
 

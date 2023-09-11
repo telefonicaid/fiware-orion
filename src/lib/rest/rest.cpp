@@ -1358,7 +1358,7 @@ static MHD_Result connectionTreat
 
     ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
 
-    if (mongocOnly == true)
+    if ((mongocOnly == true) && (strcmp("/exit/harakiri", url) != 0))
     {
       OrionError error(SccNotImplemented, "NGSIv1/v2 request not supported if -mongocOnly is set");
       LM_E(("NGSIv1/v2 request not supported if -mongocOnly is set"));

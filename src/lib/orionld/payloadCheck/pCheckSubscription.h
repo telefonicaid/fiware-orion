@@ -30,6 +30,9 @@ extern "C"
 #include "kjson/KjNode.h"                                     // KjNode
 }
 
+#include "common/RenderFormat.h"                              // RenderFormat
+#include "orionld/q//QNode.h"                                 // QNode
+
 
 
 // -----------------------------------------------------------------------------
@@ -38,21 +41,25 @@ extern "C"
 //
 extern bool pCheckSubscription
 (
-  KjNode*   subP,
-  bool      isCreate,          // true if POST, false if PATCH
-  char*     subscriptionId,    // non-NULL if PATCH
-  KjNode*   idP,
-  KjNode*   typeP,
-  KjNode**  endpointP,
-  KjNode**  qNodeP,
-  QNode**   qTreeP,
-  char**    qTextP,
-  bool*     qValidForV2P,
-  bool*     qIsMqP,
-  KjNode**  uriPP,
-  KjNode**  notifierInfoPP,
-  KjNode**  geoCoordinatesPP,
-  bool*     mqttChangeP
+  KjNode*        subP,
+  bool           isCreate,          // true if POST, false if PATCH
+  char*          subscriptionId,    // non-NULL if PATCH
+  KjNode*        idP,
+  KjNode*        typeP,
+  KjNode**       endpointP,
+  KjNode**       qNodeP,
+  QNode**        qTreeP,
+  char**         qTextP,
+  bool*          qValidForV2P,
+  bool*          qIsMqP,
+  KjNode**       uriPP,
+  KjNode**       notifierInfoPP,
+  KjNode**       geoCoordinatesPP,
+  bool*          mqttChangeP,
+  KjNode**       showChangesP,
+  KjNode**       sysAttrsP,
+  double*        timeInterval,
+  RenderFormat*  renderFormatP
 );
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKSUBSCRIPTION_H_

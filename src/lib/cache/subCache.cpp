@@ -32,6 +32,7 @@
 
 extern "C"
 {
+#include "kbase/kTime.h"                             // kTimeGet
 #include "kalloc/kaStrdup.h"                         // kaStrdup
 #include "kalloc/kaBufferReset.h"                    // kaBufferReset
 #include "kjson/kjFree.h"                            // kjFree
@@ -51,6 +52,7 @@ extern "C"
 #include "orionld/types/OrionldTenant.h"                    // OrionldTenant
 #include "orionld/common/orionldState.h"                    // orionldState
 #include "orionld/common/tenantList.h"                      // tenantList
+#include "orionld/common/orionldTenantLookup.h"             // orionldTenantLookup
 #include "orionld/common/urlParse.h"                        // urlParse
 #include "orionld/q/qBuild.h"                               // qBuild
 #include "orionld/q/qRelease.h"                             // qRelease
@@ -567,11 +569,11 @@ int subCacheMatch
 
 
 
-/* ****************************************************************************
-*
-* subCacheItemDestroy -
-*/
-void subCacheItemDestroy(CachedSubscription* cSubP)
+// -----------------------------------------------------------------------------
+//
+// subCacheItemStrip -
+//
+void subCacheItemStrip(CachedSubscription* cSubP)
 {
   if (cSubP->subscriptionId != NULL)
   {
@@ -663,6 +665,17 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
       cSubP->httpInfo.notifierInfo[ix] = NULL;
     }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* subCacheItemDestroy -
+*/
+void subCacheItemDestroy(CachedSubscription* cSubP)
+{
+  subCacheItemStrip(cSubP);
 
   cSubP->next = NULL;
 }
@@ -734,9 +747,7 @@ CachedSubscription* subCacheItemLookup(const char* tenant, const char* subscript
   while (cSubP != NULL)
   {
     if ((tenantMatch(tenant, cSubP->tenant)) && (strcmp(subscriptionId, cSubP->subscriptionId) == 0))
-    {
       return cSubP;
-    }
 
     cSubP = cSubP->next;
   }
@@ -872,6 +883,7 @@ bool subCacheItemInsert
   // First the non-complex values
   //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->tenantP               = orionldTenantLookup(tenant);
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -879,14 +891,18 @@ bool subCacheItemInsert
   cSubP->lastSuccess           = lastNotificationSuccessTime;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
+  cSubP->dbCount               = 0;
   cSubP->count                 = 0;
+  cSubP->failures              = 0;
+  cSubP->dbFailures            = 0;
   cSubP->status                = status;
   cSubP->url                   = NULL;
   cSubP->ip                    = NULL;
   cSubP->protocolString        = NULL;
   cSubP->rest                  = NULL;
 
-  if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < orionldState.requestTime))
+  double now = getCurrentTime();
+  if ((cSubP->expirationTime > 0) && (cSubP->expirationTime < now))
   {
     cSubP->status   = "expired";
     cSubP->isActive = false;
@@ -942,7 +958,7 @@ bool subCacheItemInsert
       // FIXME: Instead of calling qBuild here, I should pass the pointer from pCheckSubscription
       if (cSubP->qP != NULL)
         qRelease(cSubP->qP);
-      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true);  // cSubP->qText needs real allocation
+      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true, false);  // cSubP->qText needs real allocation
 
       if (cSubP->qText != NULL)
         cSubP->qText = strdup(cSubP->qText);
@@ -1096,19 +1112,8 @@ void subCacheStatisticsGet
       char          msg[256];
       unsigned int  bytesLeft = listSize - strlen(list);
 
-#if 0
-      //
-      // FIXME P5: To be removed once sub-update is OK in QA
-      //
-      snprintf(msg, sizeof(msg), "%s|N:%lu|E:%lu|T:%lu|DUR:%lu",
-               cSubP->subscriptionId,
-               cSubP->lastNotificationTime,
-               cSubP->expirationTime,
-               cSubP->throttling,
-               cSubP->expirationTime - orionldState.requestTime);
-#else
-        snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
-#endif
+      snprintf(msg, sizeof(msg), "%s", cSubP->subscriptionId);
+
       //
       // If "msg" and ", " has no room in the "list", then no list is shown.
       // (the '+ 2' if for the string ", ")
@@ -1232,25 +1237,28 @@ void subCacheDebug(const char* prefix, const char* title)
 *    cacheSemTake(__FUNCTION__, "Reason");
 *  And released after subCacheRefresh finishes, of course.
 */
-void subCacheRefresh(void)
+void subCacheRefresh(bool refresh)
 {
   // subCacheDebug("KZ", "------------- BEFORE REFRESH ------------------------");
 
-  // Empty the cache
-  subCacheDestroy();
+  LM_T(LmtSubCache, ("Refreshing sub-cache"));
 
   // Recreate the subCache for the default tenant
   if (experimental)
-    mongocSubCachePopulateByTenant(&tenant0);
+    mongocSubCachePopulateByTenant(&tenant0, refresh);
   else
+  {
+    // Empty the cache
+    subCacheDestroy();
     mongoSubCacheRefresh(tenant0.mongoDbName);
+  }
 
   // Recreate the subCache for each and every tenant
   OrionldTenant* tenantP = tenantList;
   while (tenantP != NULL)
   {
     if (experimental)
-      mongocSubCachePopulateByTenant(tenantP);
+      mongocSubCachePopulateByTenant(tenantP, refresh);
     else
       mongoSubCacheRefresh(tenantP->mongoDbName);
 
@@ -1272,6 +1280,7 @@ typedef struct CachedSubSaved
 {
   double   lastNotificationTime;
   int64_t  count;
+  int64_t  failures;
   double   lastFailure;
   double   lastSuccess;
   bool     ngsild;
@@ -1335,6 +1344,7 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;       // This count is later pushed ($inc) to DB - needs to go to cache as well
+    cssP->failures             = cSubP->failures;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
     cssP->ngsild               = (cSubP->ldContext != "")? true : false;
@@ -1348,7 +1358,8 @@ void subCacheSync(void)
   //
   // 2. Refresh cache (count set to 0)
   //
-  subCacheRefresh();
+  LM_T(LmtSubCacheSync, ("================================= Refreshing subscription cache ====================="));
+  subCacheRefresh(true);
 
 
   //
@@ -1361,7 +1372,7 @@ void subCacheSync(void)
 
     if (cssP != NULL)
     {
-      if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
+      if (cssP->lastNotificationTime < cSubP->lastNotificationTime)
       {
         // cssP->lastNotificationTime is older than what's currently in DB => throw away
         cssP->lastNotificationTime = 0;
@@ -1395,15 +1406,24 @@ void subCacheSync(void)
 
     if (cssP != NULL)
     {
+      const char* tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
       if (experimental == true)
-        mongocSubCountersUpdate(cSubP, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->lastSuccess, false, cssP->ngsild);
+        mongocSubCountersUpdate(cSubP->tenantP,
+                                cSubP->subscriptionId,
+                                cssP->ngsild,
+                                cssP->count,
+                                cssP->failures,
+                                0,  // noMatch - not here - only for PerNot
+                                cssP->lastNotificationTime,
+                                cssP->lastSuccess,
+                                cssP->lastFailure,
+                                false);
       else
       {
-        std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;  // Use char* !!!
-
         mongoSubCountersUpdate(tenant,
                                cSubP->subscriptionId,
                                cssP->count,
+                               cssP->failures,
                                cssP->lastNotificationTime,
                                cssP->lastFailure,
                                cssP->lastSuccess,
@@ -1416,7 +1436,10 @@ void subCacheSync(void)
       if (cssP->lastNotificationTime != 0) cSubP->lastNotificationTime  = cssP->lastNotificationTime;
 
       // Here the delta (just $inc'ed to DB) is also inc'ed to subCache
-      cSubP->dbCount += cssP->count;
+      cSubP->dbCount    += cssP->count;
+      cSubP->count       = 0;
+      cSubP->dbFailures += cssP->failures;
+      cSubP->failures    = 0;
     }
 
     cSubP = cSubP->next;
@@ -1451,7 +1474,9 @@ static void* subCacheRefresherThread(void* vP)
   while (1)
   {
     sleep(subCacheInterval);
+
     subCacheSync();
+
     kaBufferReset(&orionldState.kalloc, true);  // Should be inside orionldStateRelease ... Right?
     orionldStateRelease();
   }
@@ -1471,7 +1496,7 @@ void subCacheStart(void)
   int        ret;
 
   // Populate subscription cache from database
-  subCacheRefresh();
+  subCacheRefresh(false);
 
   ret = pthread_create(&tid, NULL, subCacheRefresherThread, NULL);
 
@@ -1480,6 +1505,7 @@ void subCacheStart(void)
     LM_E(("Runtime Error (error creating thread: %d)", ret));
     return;
   }
+
   pthread_detach(tid);
 }
 
@@ -1501,14 +1527,18 @@ extern bool noCache;
 */
 void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::string& subscriptionId, int errors, bool ngsild)
 {
+  struct timespec ts;
+  kTimeGet(&ts);
+  double kNow = ts.tv_sec + ts.tv_nsec / 1000000000.0;
+
   if (noCache)
   {
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
 
     if (errors == 0)
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, -1, orionldState.requestTime, ngsild);  // lastFailure == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, kNow, -1, kNow, ngsild);  // lastFailure == -1
     else
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, orionldState.requestTime, orionldState.requestTime, -1, ngsild);  // lastSuccess == -1, count == 0
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, kNow, kNow, -1, ngsild);  // lastSuccess == -1, count == 0
 
     return;
   }
@@ -1523,13 +1553,23 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     const char* errorString = "intent to update error status of non-existing subscription";
 
     alarmMgr.badInput(clientIp, errorString);
+    LM_W(("no sub found (subId: '%s') - counters/timestamps lost", subscriptionId.c_str()));
     return;
   }
 
+  LM_T(LmtSubCacheStats, ("%s: Setting lastNotificationTime to %f (old value in cache: %f)", subP->subscriptionId, kNow));
+  subP->lastNotificationTime = kNow;
+
   if (errors == 0)
-    subP->lastSuccess  = orionldState.requestTime;
+  {
+    subP->lastSuccess  = kNow;
+    LM_T(LmtSubCacheStats, ("%s: Setting lastSuccess to %f (in cache)", subP->subscriptionId, subP->lastSuccess));
+  }
   else
-    subP->lastFailure  = orionldState.requestTime;
+  {
+    subP->lastFailure  = kNow;
+    LM_T(LmtSubCacheStats, ("%s: Setting lastFailure to %f (in cache)", subP->subscriptionId, subP->lastFailure));
+  }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 }

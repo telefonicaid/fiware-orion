@@ -32,14 +32,14 @@ orionldStart CB
 #
 # 01. Create entity E1, with test context and type=T2 (FQN: http://example.org/T2)
 # 02. GET entities with type T2, giving the test context - see the entity
-# 03. GET entities with	type http://example.org/T2, giving NO context - see the entity
-# 04. GET entities with	type T2, giving no context - see nothing
+# 03. GET entities with type http://example.org/T2, giving NO context - see the entity
+# 04. GET entities with type T2, giving no context - see nothing
 #
 # 05. Create entity E5, with fiware-datamodels-context.jsonld and type=AgriProductType (FQN: https://uri.fiware.org/ns/data-models#AgriProductType)
 # 06. See entity E5 in mongo
 # 07. GET entities with type AgriProductType, giving the fiware-datamodels-context.jsonld context - see the entity
-# 08. GET entities with	type https://uri.fiware.org/ns/data-models#AgriProductType, giving NO context - see the entity
-# 09. GET entities with	type AgriProductType, giving no context - see nothing
+# 08. GET entities with type https://uri.fiware.org/ns/data-models#AgriProductType, giving NO context - see the entity
+# 09. GET entities with type AgriProductType, giving no context - see nothing
 #
 
 
@@ -66,14 +66,14 @@ echo
 echo
 
 
-echo "03. GET entities with	type http://example.org/T2, giving NO context - see the entity"
+echo "03. GET entities with type http://example.org/T2, giving NO context - see the entity"
 echo "===================================================================================="
 orionCurl --url "/ngsi-ld/v1/entities?type=http://example.org/T2"
 echo
 echo
 
 
-echo "04. GET entities with	type T2, giving no context - see nothing"
+echo "04. GET entities with type T2, giving no context - see nothing"
 echo "=============================================================="
 orionCurl --url "/ngsi-ld/v1/entities?type=T2"
 echo
@@ -109,14 +109,14 @@ echo
 echo
 
 
-echo "08. GET entities with	type https://uri.fiware.org/ns/data-models#AgriProductType, giving NO context - see the entity"
+echo "08. GET entities with type https://uri.fiware.org/ns/data-models#AgriProductType, giving NO context - see the entity"
 echo "===================================================================================================================="
 orionCurl --url "/ngsi-ld/v1/entities?type=https://uri.fiware.org/ns/data-models%23AgriProductType"
 echo
 echo
 
 
-echo "09. GET entities with	type AgriProductType, giving no context - see nothing"
+echo "09. GET entities with type AgriProductType, giving no context - see nothing"
 echo "==========================================================================="
 orionCurl --url "/ngsi-ld/v1/entities?type=AgriProductType"
 echo
@@ -153,13 +153,13 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 ]
 
 
-03. GET entities with	type http://example.org/T2, giving NO context - see the entity
+03. GET entities with type http://example.org/T2, giving NO context - see the entity
 ====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
     {
@@ -173,7 +173,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 ]
 
 
-04. GET entities with	type T2, giving no context - see nothing
+04. GET entities with type T2, giving no context - see nothing
 ==============================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -242,27 +242,27 @@ Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.
 ]
 
 
-08. GET entities with	type https://uri.fiware.org/ns/data-models#AgriProductType, giving NO context - see the entity
+08. GET entities with type https://uri.fiware.org/ns/data-models#AgriProductType, giving NO context - see the entity
 ====================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 140
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
     {
-        "id": "http://a.b.c/entity/E5",
-        "name": {
+        "https://uri.etsi.org/ngsi-ld/name": {
             "type": "Property",
             "value": "John 5"
         },
+        "id": "http://a.b.c/entity/E5",
         "type": "https://uri.fiware.org/ns/data-models#AgriProductType"
     }
 ]
 
 
-09. GET entities with	type AgriProductType, giving no context - see nothing
+09. GET entities with type AgriProductType, giving no context - see nothing
 ===========================================================================
 HTTP/1.1 200 OK
 Content-Length: 2

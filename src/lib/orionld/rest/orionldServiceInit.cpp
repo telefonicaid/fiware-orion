@@ -35,7 +35,7 @@
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "orionld/common/orionldState.h"                             // orionldState, userAgentHeader, hostHeader
+#include "orionld/common/orionldState.h"                             // orionldState, userAgentHeader
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
 #include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
@@ -73,12 +73,22 @@
 #include "orionld/serviceRoutines/orionldGetEntityType.h"            // orionldGetEntityType
 #include "orionld/serviceRoutines/orionldGetEntityAttributes.h"      // orionldGetEntityAttributes
 #include "orionld/serviceRoutines/orionldGetEntityAttribute.h"       // orionldGetEntityAttribute
-#include "orionld/serviceRoutines/orionldPostTemporalEntities.h"     // orionldPostTemporalEntities
+
 #include "orionld/serviceRoutines/orionldGetContexts.h"              // orionldGetContexts
 #include "orionld/serviceRoutines/orionldGetContext.h"               // orionldGetContext
 #include "orionld/serviceRoutines/orionldPostContexts.h"             // orionldPostContexts
 #include "orionld/serviceRoutines/orionldDeleteContext.h"            // orionldDeleteContext
 #include "orionld/serviceRoutines/orionldPostNotify.h"               // orionldPostNotify
+
+#include "orionld/serviceRoutines/orionldGetTemporalEntities.h"              // orionldGetTemporalEntities
+#include "orionld/serviceRoutines/orionldGetTemporalEntity.h"                // orionldGetTemporalEntity
+#include "orionld/serviceRoutines/orionldPostTemporalQuery.h"                // orionldPostTemporalQuery
+#include "orionld/serviceRoutines/orionldPostTemporalEntities.h"             // orionldPostTemporalEntities
+#include "orionld/serviceRoutines/orionldDeleteTemporalAttribute.h"          // orionldDeleteTemporalAttribute
+#include "orionld/serviceRoutines/orionldDeleteTemporalAttributeInstance.h"  // orionldDeleteTemporalAttributeInstance
+#include "orionld/serviceRoutines/orionldDeleteTemporalEntity.h"             // orionldDeleteTemporalEntity
+#include "orionld/serviceRoutines/orionldPatchTemporalAttributeInstance.h"   // orionldPatchTemporalAttributeInstance
+#include "orionld/serviceRoutines/orionldPostTemporalAttributes.h"           // orionldPostTemporalAttributes
 
 #include "orionld/troe/troePostEntities.h"                           // troePostEntities
 #include "orionld/troe/troePostBatchDelete.h"                        // troePostBatchDelete
@@ -346,17 +356,23 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPostBatchCreate)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->options    = 0;  // Tenant will be created if necessary
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpdate)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }
   else if (serviceP->serviceRoutine == orionldPostBatchUpsert)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->options    = 0;  // Tenant will be created if necessary
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
 
@@ -364,11 +380,15 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   }
   else if (serviceP->serviceRoutine == orionldPostBatchDelete)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
   }
   else if (serviceP->serviceRoutine == orionldPostQuery)
   {
+    serviceP->isBatchOp  = true;
+
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_COUNT;
     serviceP->uriParams |= ORIONLD_URIPARAM_LIMIT;
@@ -395,6 +415,24 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options |= ORIONLD_SERVICE_OPTION_EXPAND_TYPE;
   }
+  else if (serviceP->serviceRoutine == orionldGetTemporalEntities)
+    serviceP->mintaka = true;
+  else if (serviceP->serviceRoutine == orionldGetTemporalEntity)
+    serviceP->mintaka = true;
+  else if (serviceP->serviceRoutine == orionldPostTemporalQuery)
+    serviceP->mintaka = true;
+  else if (serviceP->serviceRoutine == orionldDeleteTemporalAttribute)
+    serviceP->notImplemented = true;
+  else if (serviceP->serviceRoutine == orionldDeleteTemporalAttributeInstance)
+    serviceP->notImplemented = true;
+  else if (serviceP->serviceRoutine == orionldDeleteTemporalEntity)
+    serviceP->notImplemented = true;
+  else if (serviceP->serviceRoutine == orionldPatchTemporalAttributeInstance)
+    serviceP->notImplemented = true;
+  else if (serviceP->serviceRoutine == orionldPostTemporalAttributes)
+    serviceP->notImplemented = true;
+
+
   else if (serviceP->serviceRoutine == orionldGetVersion)
   {
     serviceP->options  = 0;  // Tenant is Ignored
@@ -501,12 +539,9 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   //
   // * userAgentHeader(Len): Notifications with HTTP(s)
   // * userAgentHeaderNoLF:  Forwarding
-  // * hostHeader(Len):      Notifications with HTTP(s)
   //
   userAgentHeaderLen = snprintf(userAgentHeader, sizeof(userAgentHeader) -1, "User-Agent: orionld/%s\r\n", ORIONLD_VERSION);  // Used in notifications as value of HTTP Header User-Agent
   snprintf(userAgentHeaderNoLF, sizeof(userAgentHeaderNoLF) -1, "User-Agent: orionld/%s", ORIONLD_VERSION);  // Used in forwarding as value of HTTP Header User-Agent
-
-  hostHeaderLen = snprintf(hostHeader, sizeof(hostHeader) - 1, "Host: %s\r\n", orionldHostName);
 
   int svIx;    // Service Vector Index
   for (svIx = 0; svIx < vecItems; svIx++)

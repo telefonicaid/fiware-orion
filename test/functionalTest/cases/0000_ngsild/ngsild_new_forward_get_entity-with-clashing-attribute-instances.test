@@ -406,7 +406,7 @@ HTTP/1.1 200 OK
 Content-Length: 449
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "L2": {
@@ -450,7 +450,7 @@ HTTP/1.1 200 OK
 Content-Length: 923
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "L2": {
@@ -506,7 +506,7 @@ HTTP/1.1 200 OK
 Content-Length: 233
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "L2": {
@@ -551,7 +551,7 @@ HTTP/1.1 200 OK
 Content-Length: 333
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "L2": {
@@ -588,7 +588,7 @@ HTTP/1.1 200 OK
 Content-Length: 817
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "L2": {
@@ -639,7 +639,7 @@ HTTP/1.1 200 OK
 Content-Length: 747
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "L2": {
@@ -684,7 +684,7 @@ HTTP/1.1 200 OK
 Content-Length: 363
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "L2": {
@@ -722,7 +722,7 @@ HTTP/1.1 200 OK
 Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "L2": "comida local",
@@ -748,7 +748,7 @@ HTTP/1.1 200 OK
 Content-Length: 676
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "G2": {
@@ -812,7 +812,7 @@ HTTP/1.1 200 OK
 Content-Length: 323
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "G2": {
@@ -853,7 +853,7 @@ HTTP/1.1 200 OK
 Content-Length: 485
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "G2": {
@@ -902,12 +902,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 19. GET E1 on CB with Accept: application/geo+json and geoproperty==G2
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 831
+Content-Length: 836
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             1,
@@ -977,12 +977,12 @@ Date: REGEX(.*)
 20. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with concise
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 640
+Content-Length: 645
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             1,
@@ -1040,12 +1040,12 @@ Date: REGEX(.*)
 21. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 478
+Content-Length: 483
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             1,
@@ -1092,12 +1092,12 @@ Date: REGEX(.*)
 22. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with lang=es
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 745
+Content-Length: 750
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             1,
@@ -1161,12 +1161,12 @@ Date: REGEX(.*)
 23. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with concise AND with lang=es
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 570
+Content-Length: 575
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             1,
@@ -1218,12 +1218,12 @@ Date: REGEX(.*)
 24. GET E1 on CB with Accept: application/geo+json and geoproperty==G2 AND with keyValues AND with lang=es
 ==========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 364
+Content-Length: 369
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "geometry": {
         "coordinates": [
             1,

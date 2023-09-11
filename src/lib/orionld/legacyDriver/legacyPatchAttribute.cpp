@@ -176,6 +176,9 @@ bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, cha
 //
 // kjAttributeMerge -
 //
+// Merge:
+//   inAttribute = inAttribute + dbAttribute
+//
 bool kjAttributeMerge(KjNode* inAttribute, KjNode* dbAttribute, KjNode* dbAttributeType, KjNode* inAttributeType, KjNode* dbCreatedAt)
 {
   KjNode* inValueP = NULL;
@@ -553,10 +556,7 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
     else if (strcmp(mdP->name, "value") == 0)
       kjTreeToAttributeValue(caP, mdP, &level);
     else if (strcmp(mdP->name, "object") == 0)
-    {
-      caP->valueType   = orion::ValueTypeString;
-      caP->stringValue = mdP->value.s;
-    }
+      kjTreeToAttributeValue(caP, mdP, &level);      // As ARRAY is allowed as well - to be deprecated
     else if (strcmp(mdP->name, "languageMap") == 0)
     {
       caP->valueType      = orion::ValueTypeObject;

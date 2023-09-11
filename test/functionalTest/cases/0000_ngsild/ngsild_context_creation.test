@@ -202,16 +202,16 @@ Date: REGEX(.*)
     {
         "createdAt": "REGEX(.*)",
         "hash-table": {
-            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
             "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
         },
         "id": "REGEX(.*)",
         "origin": "Downloaded",
         "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
     },
     {
         "createdAt": "REGEX(.*)",
@@ -261,7 +261,7 @@ HTTP/1.1 200 OK
 Content-Length: 183
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "id": "urn:ngsi-ld:entities:E1",
@@ -335,16 +335,16 @@ Date: REGEX(.*)
     {
         "createdAt": "REGEX(.*)",
         "hash-table": {
-            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
             "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
             "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
         },
         "id": "REGEX(.*)",
         "origin": "Downloaded",
         "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
     },
     {
         "createdAt": "REGEX(.*)",

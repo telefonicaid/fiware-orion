@@ -65,7 +65,7 @@ static KjNode* getEntityAttributesResponse(KjNode* sortedArrayP)
 
   KjNode* attributeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
   KjNode* idNodeP                = kjString(orionldState.kjsonP, "id", entityAttributesId);
-  KjNode* typeNodeP              = kjString(orionldState.kjsonP, "type", "EntityAttributeList");
+  KjNode* typeNodeP              = kjString(orionldState.kjsonP, "type", "AttributeList");
 
   kjChildAdd(attributeNodeResponseP, idNodeP);
   kjChildAdd(attributeNodeResponseP, typeNodeP);

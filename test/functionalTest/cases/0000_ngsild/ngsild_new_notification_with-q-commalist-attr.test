@@ -354,7 +354,7 @@ User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 Ngsild-Attribute-Format: Simplified
 
 {
@@ -412,7 +412,7 @@ User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 Ngsild-Attribute-Format: Simplified
 
 {
@@ -470,7 +470,7 @@ User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 Ngsild-Attribute-Format: Simplified
 
 {
@@ -528,7 +528,7 @@ User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
 Content-Type: application/json
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 Ngsild-Attribute-Format: Normalized
 
 {
@@ -567,10 +567,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:T:E8
 21. GET the subscription S4 to see the 'q'
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 473
+Content-Length: 556
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "entities": [
@@ -580,6 +580,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subs:S4",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

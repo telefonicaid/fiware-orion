@@ -570,7 +570,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -578,10 +578,10 @@ bye
 03. GET subscription from the broker
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 831
+Content-Length: 918
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -624,7 +624,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -639,10 +640,10 @@ Date: REGEX(.*)
 05. GET subscription and see the new 'subscriptionName'
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 818
+Content-Length: 905
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -685,7 +686,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -700,10 +702,10 @@ Date: REGEX(.*)
 07. GET subscription and see the new 'description'
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 797
+Content-Length: 884
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -746,7 +748,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -809,7 +812,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -817,10 +820,10 @@ bye
 10. GET subscription and see the new 'entities'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 798
+Content-Length: 885
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -865,7 +868,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -928,7 +932,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -936,10 +940,10 @@ bye
 13. GET subscription and see the new 'watchedAttributes'
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 798
+Content-Length: 885
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -984,22 +988,23 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
 
 14. PATCH 'timeInterval' and see error
 ======================================
-HTTP/1.1 501 Not Implemented
-Content-Length: 137
+HTTP/1.1 400 Bad Request
+Content-Length: 174
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Time-Interval for Subscriptions",
-    "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+    "detail": "urn:ngsi-ld:subscriptions:S01",
+    "title": "Invalid modification (on-change to timeInterval subscription)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 
@@ -1061,7 +1066,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -1069,10 +1074,10 @@ bye
 17. GET subscription and see the new 'q'
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 807
+Content-Length: 894
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1117,7 +1122,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1180,7 +1186,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -1188,10 +1194,10 @@ bye
 20. GET subscription and see the new 'geoQ'
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 786
+Content-Length: 873
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1233,7 +1239,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1296,7 +1303,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -1304,10 +1311,10 @@ bye
 25. GET subscription and see the new 'isActive'
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 787
+Content-Length: 874
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1349,7 +1356,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1412,7 +1420,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -1420,10 +1428,10 @@ bye
 28. GET subscription and see the new 'notification'
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 786
+Content-Length: 873
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1465,7 +1473,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1480,10 +1489,10 @@ Date: REGEX(.*)
 30. GET subscription and see the new 'expiresAt'
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 786
+Content-Length: 873
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1525,7 +1534,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2026-04-01T12:34:56.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1540,10 +1550,10 @@ Date: REGEX(.*)
 32. GET subscription and see the new 'throttling'
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 787
+Content-Length: 874
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1585,7 +1595,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2026-04-01T12:34:56.000Z",
   "throttling": 12,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1641,7 +1652,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -1656,10 +1667,10 @@ Date: REGEX(.*)
 35. GET subscription and see all the fields
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 939
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1703,7 +1714,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:34:34.000Z",
   "throttling": 34,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1759,7 +1771,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -1822,7 +1834,7 @@ MongoDB server version: REGEX(.)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"headers" : {
 		"A" : "1"
 	}
@@ -1833,10 +1845,10 @@ bye
 39. GET subscription and see A=1 in receiverInfo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 950
+Content-Length: 1037
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1886,7 +1898,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:34:34.000Z",
   "throttling": 34,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -1901,10 +1914,10 @@ Date: REGEX(.*)
 41. GET subscription and see A=2 in receiverInfo
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 950
+Content-Length: 1037
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S01",
@@ -1954,7 +1967,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:34:34.000Z",
   "throttling": 34,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 

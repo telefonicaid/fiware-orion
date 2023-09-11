@@ -36,6 +36,7 @@ extern "C"
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocAuxAttributesFilter.h"            // mongocAuxAttributesFilter
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_RLOG
 #include "orionld/mongoc/mongocEntityLookup.h"                   // Own interface
 
 
@@ -116,6 +117,7 @@ KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringA
   //
   // Run the query
   //
+  MONGOC_RLOG("Entity Lookup", orionldState.tenantP->mongoDbName, "entities", &mongoFilter, &options, LmtMongoc);
   if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));

@@ -298,7 +298,7 @@ echo
 echo "21. PATCH the registration with a new expires"
 echo "============================================="
 payload='{
-  "expiresAt": "2021-12-31T18:19:20.210Z"
+  "expiresAt": "2035-12-31T18:19:20.210Z"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1 -X PATCH --payload "$payload"
 echo
@@ -523,7 +523,7 @@ HTTP/1.1 200 OK
 Content-Length: 1093
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -598,7 +598,7 @@ HTTP/1.1 200 OK
 Content-Length: 1099
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -673,7 +673,7 @@ HTTP/1.1 200 OK
 Content-Length: 1093
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -748,7 +748,7 @@ HTTP/1.1 200 OK
 Content-Length: 1039
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -892,7 +892,7 @@ HTTP/1.1 200 OK
 Content-Length: 1039
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -966,7 +966,7 @@ HTTP/1.1 200 OK
 Content-Length: 1039
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -1040,7 +1040,7 @@ HTTP/1.1 200 OK
 Content-Length: 1038
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -1114,7 +1114,7 @@ HTTP/1.1 200 OK
 Content-Length: 1037
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -1188,7 +1188,7 @@ HTTP/1.1 200 OK
 Content-Length: 1036
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -1262,7 +1262,7 @@ HTTP/1.1 200 OK
 Content-Length: 1036
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -1314,7 +1314,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       2
     ]
   },
-  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2035-12-31T18:19:20.210Z",
   "status": "active",
   "endpoint": "http://my.csource.org:1026",
   "P1": 1,
@@ -1336,7 +1336,7 @@ HTTP/1.1 200 OK
 Content-Length: 1034
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -1388,7 +1388,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       2
     ]
   },
-  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2035-12-31T18:19:20.210Z",
   "status": "active",
   "endpoint": "http://localhost:1026/go",
   "P1": 1,
@@ -1410,7 +1410,7 @@ HTTP/1.1 200 OK
 Content-Length: 1041
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -1462,7 +1462,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       2
     ]
   },
-  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2035-12-31T18:19:20.210Z",
   "status": "active",
   "endpoint": "http://localhost:1026/go",
   "P1": "New P1",
@@ -1484,7 +1484,7 @@ HTTP/1.1 200 OK
 Content-Length: 1069
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",
@@ -1536,7 +1536,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       2
     ]
   },
-  "expiresAt": "2021-12-31T18:19:20.210Z",
+  "expiresAt": "2035-12-31T18:19:20.210Z",
   "status": "active",
   "endpoint": "http://localhost:1026/go",
   "P1": "New P1",
@@ -1630,7 +1630,7 @@ HTTP/1.1 200 OK
 Content-Length: 1190
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "type": "ContextSourceRegistration",

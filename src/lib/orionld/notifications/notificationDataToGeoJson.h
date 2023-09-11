@@ -36,6 +36,14 @@ extern "C"
 //
 // notificationDataToGeoJson -
 //
-extern void notificationDataToGeoJson(KjNode* notificationNodeP);
+extern void notificationDataToGeoJson
+(
+  KjNode*      notificationNodeP,
+  const char*  attrs,
+  const char*  geometryProperty,
+  const char*  preferHeader,
+  bool         concise,
+  const char*  context
+);
 
 #endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONDATATOGEOJSON_H_

@@ -1250,7 +1250,7 @@ function mongoCmd2()
 
   db=$1
   cmd=$2
-  echo $cmd | mongo mongodb://$host:$port/$db | grep -v "Implicit session: session" | sed 's/?gssapiServiceName=mongodb//'
+  echo $cmd | mongo mongodb://$host:$port/$db | grep -v "Implicit session: session" | grep -v "WARNING: shell and server versions do not match" | sed 's/?gssapiServiceName=mongodb//'
 }
 
 

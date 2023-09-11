@@ -25,11 +25,12 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                       // KjNode
+#include "kjson/kjBuilder.h"                                    // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
-
 #include "common/RenderFormat.h"                                // RenderFormat, stringToRenderFormat
+
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
@@ -44,17 +45,33 @@ extern "C"
 //
 // pCheckNotification -
 //
-bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNode** notifierInfoPP, bool* mqttChangeP)
+bool pCheckNotification
+(
+  KjNode*        notificationP,
+  bool           patch,
+  KjNode**       uriPP,
+  KjNode**       notifierInfoPP,
+  bool*          mqttChangeP,
+  KjNode**       showChangesOutP,
+  KjNode**       sysAttrsOutP,
+  RenderFormat*  renderFormatP
+)
 {
-  KjNode* attributesP = NULL;
-  KjNode* formatP     = NULL;
-  KjNode* endpointP   = NULL;
+  KjNode* attributesP  = NULL;
+  KjNode* formatP      = NULL;
+  KjNode* endpointP    = NULL;
+  KjNode* showChangesP = NULL;
+  KjNode* sysAttrsP    = NULL;
 
   PCHECK_OBJECT(notificationP, 0, NULL, SubscriptionNotificationPath, 400);
   PCHECK_OBJECT_EMPTY(notificationP, 0, NULL, SubscriptionNotificationPath, 400);
 
-  for (KjNode* nItemP = notificationP->value.firstChildP; nItemP != NULL; nItemP = nItemP->next)
+  KjNode* nItemP = notificationP->value.firstChildP;
+  KjNode* next;
+  while (nItemP != NULL)
   {
+    next = nItemP->next;
+
     if (strcmp(nItemP->name, "attributes") == 0)
     {
       PCHECK_DUPLICATE(attributesP, nItemP, 0, NULL, SubscriptionNotificationAttributesPath, 400);
@@ -79,6 +96,7 @@ bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNod
         orionldError(OrionldBadRequestData, "Invalid value for 'Subscription::notification::format'", formatP->value.s, 400);
         return false;
       }
+      *renderFormatP = rf;
     }
     else if (strcmp(nItemP->name, "endpoint") == 0)
     {
@@ -89,22 +107,50 @@ bool pCheckNotification(KjNode* notificationP, bool patch, KjNode** uriPP, KjNod
       if (pcheckEndpoint(endpointP, patch, uriPP, notifierInfoPP, mqttChangeP) == false)
         return false;
     }
-    else if (strcmp(nItemP->name, "status")           == 0) {}  // Ignored
-    else if (strcmp(nItemP->name, "timesSent")        == 0) {}  // Ignored
-    else if (strcmp(nItemP->name, "lastNotification") == 0) {}  // Ignored
-    else if (strcmp(nItemP->name, "lastSuccess")      == 0) {}  // Ignored
-    else if (strcmp(nItemP->name, "lastFailure")      == 0) {}  // Ignored
+    else if (strcmp(nItemP->name, "showChanges") == 0)
+    {
+      PCHECK_DUPLICATE(showChangesP, nItemP, 0, NULL, SubscriptionNotificationShowChangesPath, 400);
+      PCHECK_BOOL(showChangesP, 0, NULL, SubscriptionNotificationShowChangesPath, 400);
+      *showChangesOutP = showChangesP;
+    }
+    else if (strcmp(nItemP->name, "sysAttrs") == 0)
+    {
+      PCHECK_DUPLICATE(sysAttrsP, nItemP, 0, NULL, SubscriptionNotificationSysAttrsPath, 400);
+      PCHECK_BOOL(sysAttrsP, 0, NULL, SubscriptionNotificationSysAttrsPath, 400);
+      *sysAttrsOutP = sysAttrsP;
+      LM_T(LmtSysAttrs, ("Found a 'sysAttrs' in Subscription::notification (%s)", (sysAttrsP->value.b == true)? "true" : "false"));
+    }
+    else if ((strcmp(nItemP->name, "status")           == 0) ||
+             (strcmp(nItemP->name, "timesSent")        == 0) ||
+             (strcmp(nItemP->name, "timesFailed")      == 0) ||
+             (strcmp(nItemP->name, "lastNotification") == 0) ||
+             (strcmp(nItemP->name, "lastSuccess")      == 0) ||
+             (strcmp(nItemP->name, "lastFailure")      == 0))
+    {
+      kjChildRemove(notificationP, nItemP);
+    }
     else
     {
       orionldError(OrionldBadRequestData, "Invalid field for Subscription::notification", nItemP->name, 400);
       return false;
     }
+
+    nItemP = next;
   }
 
-  if (endpointP == NULL)
+  if ((endpointP == NULL) && (patch == false))
   {
     orionldError(OrionldBadRequestData, "Mandatory field missing", SubscriptionNotificationEndpointPath, 400);
     return false;
+  }
+
+  if ((formatP != NULL) && (sysAttrsP != NULL))
+  {
+    if ((sysAttrsP->value.b == true) && (*renderFormatP == RF_KEYVALUES))
+    {
+      orionldError(OrionldBadRequestData, "Inconsistent fields in Subscription (format=simplified + sysAttrs=true)", SubscriptionNotificationSysAttrsPath, 400);
+      return false;
+    }
   }
 
   return true;

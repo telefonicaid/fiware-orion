@@ -69,6 +69,7 @@ extern "C"
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
+#include "orionld/notifications/previousValues.h"                // previousValues
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // Own Interface
 
 
@@ -243,6 +244,7 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
 
   if (newP->type != oldP->type)  // Different type?  - overwrite the old
   {
+    LM_T(LmtPatchEntity, ("Attribute '%s': its type has changed (from %d to %d) - overwriting", newP->name, newP->type, oldP->type));
     patchTreeItemAdd(patchTree, path, newP, NULL);
     return;
   }
@@ -303,6 +305,7 @@ static void orionldEntityPatchTree(KjNode* oldP, KjNode* newP, char* path, KjNod
       int     newPathLen  = strlen(path) + 1 + strlen(newItemP->name) + 1;
       char*   newPathV    = kaAlloc(&orionldState.kalloc, newPathLen);
 
+      LM_T(LmtPatchEntity, ("Adding name '%s' to PATH '%s'", newItemP->name, path));
       snprintf(newPathV, newPathLen, "%s.%s", path, newItemP->name);
       newPath = newPathV;
     }
@@ -517,7 +520,9 @@ bool apiEntitySimplifiedToNormalized(KjNode* apiEntityFragmentP, KjNode* dbAttrs
             }
           }
 
+          kjTreeLog(attrP, "Attribute BEFORE attributeTransform", LmtSR);
           attributeTransform(attrP, attrTypeFromDb, dbAttrTypeP->value.s, orionldState.uriParams.lang);
+          kjTreeLog(attrP, "Attribute AFTER attributeTransform", LmtSR);
         }
         else if ((attrTypeFromDb == Property) && (attrP->type == KjObject))
         {
@@ -587,6 +592,9 @@ bool orionldPatchEntity2(void)
     return false;
   }
 
+  previousValues(orionldState.requestTree, dbAttrsP);
+
+
   DistOp*  distOpList = NULL;
   if (orionldState.distributed)
   {
@@ -606,6 +614,10 @@ bool orionldPatchEntity2(void)
   bool    dbUpdateResult  = false;
   KjNode* requestForLocal = (orionldState.requestTree != NULL)? kjClone(orionldState.kjsonP, orionldState.requestTree) : NULL;
 
+  //
+  // Anything left for local database?
+  // Remember: distOpRequests() removes all attributes that match exclusive/redirect regiostrations
+  //
   if (requestForLocal != NULL)
   {
     orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP, false);
@@ -672,6 +684,7 @@ bool orionldPatchEntity2(void)
 
     kjChildAdd(dbAttrsObject, dbAttrsP);
     orionldState.requestTree->name = NULL;
+
     orionldEntityPatchTree(dbAttrsObject, orionldState.requestTree, NULL, patchTree);
 
     orionldState.alterations->inEntityP       = patchTree;  // Not sure this is needed - alteredAttributeV should be used instead ... Right?

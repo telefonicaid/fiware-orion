@@ -44,6 +44,7 @@ extern "C"
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/pernot/PernotSubCache.h"                       // PernotSubCache
 #include "orionld/common/orionldState.h"                         // Own interface
 
 
@@ -94,7 +95,7 @@ Kjson             kjson;
 Kjson*            kjsonP;
 uint16_t          portNo                   = 0;
 int               dbNameLen;
-char*             coreContextUrl           = (char*) ORIONLD_CORE_CONTEXT_URL_V1_0;
+char*             coreContextUrl           = (char*) ORIONLD_CORE_CONTEXT_URL_DEFAULT;  // v1.6, see orionld/context/orionldCoreContext.h
 char              orionldHostName[128];
 int               orionldHostNameLen       = -1;
 OrionldGeoIndex*  geoIndexList             = NULL;
@@ -106,6 +107,8 @@ char              userAgentHeaderNoLF[64];     // "User-Agent: orionld/" + ORION
 char              hostHeaderNoLF[128];
 char              hostHeader[256];             // Host: xxx
 size_t            hostHeaderLen;
+PernotSubCache    pernotSubCache;
+
 
 char              orionldEntityMapId[64];      // Used by GET /entities in the distributed case, for pagination
 KjNode*           orionldEntityMap         = NULL;
@@ -117,9 +120,6 @@ DistOp*           orionldDistOps           = NULL;
 //
 // Variables for Mongo C Driver
 //
-mongoc_collection_t*  mongoEntitiesCollectionP      = NULL;    // Deprecated
-mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;    // Deprecated
-
 mongoc_uri_t*          mongocUri;
 mongoc_client_pool_t*  mongocPool;
 sem_t                  mongocContextsSem;

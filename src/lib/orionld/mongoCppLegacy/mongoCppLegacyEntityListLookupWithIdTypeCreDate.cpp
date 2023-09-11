@@ -39,7 +39,7 @@ extern "C"
 
 #include "mongoBackend/MongoGlobal.h"                                    // getMongoConnection, releaseMongoConnection, ...
 #include "mongoBackend/safeMongo.h"                                      // getStringFieldF, ...
-#include "orionld/common/orionldState.h"                                 // orionldState, dbName, mongoEntitiesCollectionP
+#include "orionld/common/orionldState.h"                                 // orionldState, dbName
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbNumberFieldGet.h"       // mongoCppLegacyDbNumberFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbStringFieldGet.h"       // mongoCppLegacyDbStringFieldGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyDbObjectFieldGet.h"       // mongoCppLegacyDbObjectFieldGet

@@ -47,7 +47,6 @@ SET (SOURCES
     orionldGetContext.cpp
     orionldGetContexts.cpp
     orionldGetVersion.cpp
-    orionldNotImplemented.cpp
     orionldPostBatchCreate.cpp
     orionldPostBatchUpsert.cpp
     orionldPostBatchUpdate.cpp
@@ -70,6 +69,11 @@ SET (SOURCES
     orionldOptions.cpp
     orionldPutEntity.cpp
     orionldPutAttribute.cpp
+    orionldDeleteTemporalAttribute.cpp
+    orionldDeleteTemporalAttributeInstance.cpp
+    orionldDeleteTemporalEntity.cpp
+    orionldPatchTemporalAttributeInstance.cpp
+    orionldPostTemporalAttributes.cpp
 )
 
 # Include directories

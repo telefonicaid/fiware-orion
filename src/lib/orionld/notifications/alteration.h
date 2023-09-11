@@ -33,6 +33,6 @@
 //
 // alteration -
 //
-extern void alteration(const char* entityId, const char* entityType, KjNode* apiEntityP, KjNode* incomingP, KjNode* dbEntityBeforeP);
+extern OrionldAlteration* alteration(const char* entityId, const char* entityType, KjNode* apiEntityP, KjNode* incomingP, KjNode* dbEntityBeforeP);
 
 #endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_ALTERATION_H_

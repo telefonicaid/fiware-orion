@@ -203,9 +203,7 @@ static void* workerFunc(void* pSyncQ)
           alarmMgr.notificationErrorReset(url);
 
           if (params->registration == false)
-          {
             subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, ngsildSubscription);
-          }
         }
         else
         {
@@ -213,9 +211,7 @@ static void* workerFunc(void* pSyncQ)
           alarmMgr.notificationError(url, "notification failure for queue worker");
 
           if (params->registration == false)
-          {
             subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1, ngsildSubscription);
-          }
         }
       }
 

@@ -66,7 +66,7 @@ bool mongocSubscriptionReplace(const char* subscriptionId, KjNode* dbSubscriptio
 
   mongocKjTreeToBson(dbSubscriptionP, &replacement);
 
-  MONGOC_WLOG("Updating Subscription", orionldState.tenantP->mongoDbName, "subscriptions", &selector, &replacement, LmtMongoc);
+  MONGOC_WLOG("Replacing Subscription", orionldState.tenantP->mongoDbName, "subscriptions", &selector, &replacement, LmtMongoc);
   bool b = mongoc_collection_replace_one(orionldState.mongoc.subscriptionsP, &selector, &replacement, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
   {

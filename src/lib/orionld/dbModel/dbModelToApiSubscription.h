@@ -30,6 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "common/RenderFormat.h"                                 // RenderFormat
+
 #include "orionld/q/QNode.h"                                     // QNode
 
 
@@ -38,6 +40,18 @@ extern "C"
 //
 // dbModelToApiSubscription - modify the DB Model tree into an API Subscription
 //
-extern KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* database, bool forSubCache, QNode** qNodePP, KjNode** coordinatesPP, KjNode** contextNodePP);
+extern KjNode* dbModelToApiSubscription
+(
+  KjNode*        dbSubP,
+  const char*    tenant,
+  bool           forSubCache,
+  QNode**        qNodePP,
+  KjNode**       coordinatesPP,
+  KjNode**       contextNodePP,
+  KjNode**       showChangesP,
+  KjNode**       sysAttrsP,
+  RenderFormat*  renderFormatP,
+  double*        timeIntervalP
+);
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_

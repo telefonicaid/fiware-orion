@@ -48,6 +48,8 @@ extern "C"
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocAttributesAdd.h"                  // mongocAttributesAdd
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/notifications/previousValues.h"                // previousValues
+#include "orionld/notifications/sysAttrsStrip.h"                 // sysAttrsStrip
 #include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
@@ -104,17 +106,34 @@ static bool attributeToDbArray(KjNode* dbAttrArray, KjNode* apiAttributeP, KjNod
 //
 static void dbAttrsMerge(KjNode* dbAttrsP, KjNode* dbAttrsUpdate, bool replace)
 {
-  for (KjNode* dbAttrP = dbAttrsUpdate->value.firstChildP; dbAttrP != NULL; dbAttrP = dbAttrP->next)
+  KjNode* newAttrP = dbAttrsUpdate->value.firstChildP;
+  KjNode* next;
+
+  while (newAttrP != NULL)
   {
-    if (replace)
+    LM_T(LmtSR, ("Incoming attribute '%s'", newAttrP->name));
+
+    next = newAttrP->next;
+
+    kjChildRemove(dbAttrsUpdate, newAttrP);
+
+    KjNode* oldAttrP = kjLookup(dbAttrsP, newAttrP->name);
+
+    if (oldAttrP != NULL)
     {
-      KjNode* toRemoveP = kjLookup(dbAttrsP, dbAttrP->name);
-      if (toRemoveP != NULL)
-        kjChildRemove(dbAttrsP, toRemoveP);
+      // Either REPLACE or IGNORE
+      if (replace == true)
+        kjChildRemove(dbAttrsP, oldAttrP);
+      else
+      {
+        newAttrP = next;
+        continue;
+      }
     }
 
-    kjChildRemove(dbAttrsUpdate, dbAttrP);
-    kjChildAdd(dbAttrsP, dbAttrP);
+    kjChildAdd(dbAttrsP, newAttrP);
+
+    newAttrP = next;
   }
 }
 
@@ -158,6 +177,8 @@ bool orionldPostEntity(void)
   //
   if (pCheckEntity(orionldState.requestTree, false, dbAttrsP) == false)
     return false;
+
+  previousValues(orionldState.requestTree, dbAttrsP);
 
   //
   // We need the Entity Type for ALTERATIONS - match subscriptions
@@ -277,9 +298,11 @@ bool orionldPostEntity(void)
       dbAttrsMerge(dbAttrsP, dbAttrsUpdate, orionldState.uriParamOptions.noOverwrite == false);
 
       OrionldProblemDetails  pd;
-      KjNode*                finalApiEntityP = dbModelToApiEntity2(dbEntityP, false, RF_NORMALIZED, orionldState.uriParams.lang, false, &pd);
-
-      alteration(entityId, entityType, finalApiEntityP, orionldState.requestTree, initialDbEntityP);
+      KjNode*                finalApiEntityWithSysAttrs = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, orionldState.uriParams.lang, false, &pd);
+      KjNode*                finalApiEntity             = kjClone(orionldState.kjsonP, finalApiEntityWithSysAttrs);
+      sysAttrsStrip(finalApiEntity);
+      OrionldAlteration*     alterationP                = alteration(entityId, entityType, finalApiEntity, orionldState.requestTree, initialDbEntityP);
+      alterationP->finalApiEntityWithSysAttrsP = finalApiEntityWithSysAttrs;
     }
   }
 

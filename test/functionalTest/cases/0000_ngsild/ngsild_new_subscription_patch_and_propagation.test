@@ -1,0 +1,505 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription PATCH and propagation in HA with two brokers
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB  -mongocOnly -subCacheIval 2
+orionldStart CB2 -mongocOnly -subCacheIval 2
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 in CB1
+# 02. GET S1 from CB1
+# 03. Sleep 2.1 secs to let CB2 refresh its sub-cache
+# 04. GET S1 from CB2 - must be there
+# 05. PATCH S1 on CB1
+# 06. GET Sub 1 from CB1
+# 06b. See Sub 1 in mongo
+# 07. Sleep 2.1 secs to let CB2 refresh its sub-cache
+# 08. GET Sub 1 from CB2 - make sure it's identical in CB2
+#
+
+echo "01. Create a subscription S1 in CB1"
+echo "==================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:S1",
+  "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "IndoorEnvironmentObserved"
+    }
+  ],
+  "notification": {
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7",
+      "accept": "application/json"
+    }
+  },
+  "lang": "en"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "01b. See Sub 1 in mongo"
+echo "======================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "02. GET S1 from CB1"
+echo "==================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1?options=sysAttrs
+modifiedAt2=$(echo $_response | awk -F\"modifiedAt\" '{ print $2 }' | awk -F\" '{ print $2 }')
+createdAt2=$(echo $_response | awk -F\"createdAt\" '{ print $2 }' | awk -F\" '{ print $2 }')
+if [ "$modifiedAt2" != "$createdAt2" ]
+then
+  echo modifiedAt != createdAt
+fi
+echo
+echo
+
+
+echo "03. Sleep 2.1 secs to let CB2 refresh its sub-cache"
+echo "==================================================="
+sleep 2.1
+echo OK, slept 2.1 seconds
+echo
+echo
+
+
+echo "04. GET S1 from CB2 - must be there"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1?options=sysAttrs --port $CB2_PORT
+modifiedAt4=$(echo $_response | awk -F\"modifiedAt\" '{ print $2 }' | awk -F\" '{ print $2 }')
+createdAt4=$(echo $_response | awk -F\"createdAt\" '{ print $2 }' | awk -F\" '{ print $2 }')
+if [ "$modifiedAt4" != "$createdAt4" ]
+then
+  echo modifiedAt != createdAt
+fi
+if [ "$createdAt4" != "$createdAt2" ]
+then
+  echo "createdAt has changed!"
+fi
+if [ "$modifiedAt4" != "$modifiedAt2" ]
+then
+  echo "modifiedAt has changed between brokers without PATCH!"
+fi
+
+echo
+echo
+
+
+echo "05. PATCH S1 on CB1"
+echo "==================="
+payload='{
+  "description": "New description",
+  "subscriptionName": "New name",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "watchedAttributes": ["P1", "R1"],
+  "q": "a>12",
+  "geoQ": {
+    "geometry": "Point",
+    "coordinates": [ 5,5 ],
+    "georel": "near;maxDistance==100"
+  },
+  "isActive": false,
+  "notification": {
+    "format": "concise",
+    "endpoint": {
+      "uri": "https://httpdump2.app2/dumps2",
+      "accept": "application/json"
+    }
+  },
+  "expiresAt": "2024-06-01T10:00:00.123Z",
+  "throttling": 5.5,
+  "lang": "es"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. GET Sub 1 from CB1"
+echo "======================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1?options=sysAttrs
+
+createdAt6=$(echo $_response | awk -F\"createdAt\" '{ print $2 }' | awk -F\" '{ print $2 }')
+if [ "$createdAt6" != "$createdAt2" ]
+then
+  echo "createdAt has changed!"
+  echo "createdAt2: $createdAt2"
+  echo "createdAt6: $createdAt6"
+fi
+
+modifiedAt6=$(echo $_response | awk -F\"modifiedAt\" '{ print $2 }' | awk -F\" '{ print $2 }')
+if [ "$modifiedAt6" == "$modifiedAt2" ]
+then
+  echo "modifiedAt has not changed!"
+fi
+echo
+echo
+
+
+echo "06b. See Sub 1 in mongo"
+echo "======================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "07. Sleep 2.1 secs to let CB2 refresh its sub-cache"
+echo "==================================================="
+sleep 2
+echo OK, slept 2.1 seconds
+echo
+echo
+
+
+echo "08. GET Sub 1 from CB2 - make sure it's identical in CB2"
+echo "========================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1?options=sysAttrs --port $CB2_PORT
+
+createdAt8=$(echo $_response | awk -F\"createdAt\" '{ print $2 }' | awk -F\" '{ print $2 }')
+if [ "$createdAt8" != "$createdAt2" ]
+then
+  echo "createdAt has changed!"
+  echo "createdAt2: $createdAt2"
+  echo "createdAt8: $createdAt8"
+fi
+
+modifiedAt8=$(echo $_response | awk -F\"modifiedAt\" '{ print $2 }' | awk -F\" '{ print $2 }')
+if [ "$modifiedAt8" == "$modifiedAt2" ]
+then
+  echo "modifiedAt has not changed since creation!"
+fi
+
+if [ "$modifiedAt8" != "$modifiedAt6" ]
+then
+  echo "modifiedAt has changed since cache resync!"
+fi
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 in CB1
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
+
+
+
+01b. See Sub 1 in mongo
+=======================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:S1",
+	"description" : "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/IndoorEnvironmentObserved",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"lang" : "en",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "",
+		"mq" : ""
+	},
+	"format" : "keyValues",
+	"reference" : "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+}
+bye
+
+
+02. GET S1 from CB1
+===================
+HTTP/1.1 200 OK
+Content-Length: 597
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "createdAt": "202REGEX(.*)Z",
+    "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+    "entities": [
+        {
+            "type": "IndoorEnvironmentObserved"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "lang": "en",
+    "modifiedAt": "202REGEX(.*)Z",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+03. Sleep 2.1 secs to let CB2 refresh its sub-cache
+===================================================
+OK, slept 2.1 seconds
+
+
+04. GET S1 from CB2 - must be there
+===================================
+HTTP/1.1 200 OK
+Content-Length: 597
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "createdAt": "202REGEX(.*)Z",
+    "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+    "entities": [
+        {
+            "type": "IndoorEnvironmentObserved"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "lang": "en",
+    "modifiedAt": "202REGEX(.*)Z",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+05. PATCH S1 on CB1
+===================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. GET Sub 1 from CB1
+======================
+HTTP/1.1 200 OK
+Content-Length: 681
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "createdAt": "202REGEX(.*)Z",
+    "description": "New description",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expiresAt": "2024-06-01T10:00:00.123Z",
+    "geoQ": {
+        "coordinates": "5,5",
+        "geometry": "Point",
+        "georel": "near;maxDistance==100"
+    },
+    "id": "urn:ngsi-ld:Subscription:S1",
+    "isActive": false,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "lang": "es",
+    "modifiedAt": "202REGEX(.*)Z",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://httpdump2.app2/dumps2"
+        },
+        "format": "concise",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "a>12",
+    "status": "paused",
+    "subscriptionName": "New name",
+    "throttling": 5.5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "P1",
+        "R1"
+    ]
+}
+
+
+06b. See Sub 1 in mongo
+=======================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:Subscription:S1",
+	"description" : "New description",
+	"entities" : [
+		{
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"id" : ".*",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"lang" : "es",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 5.5,
+	"expression" : {
+		"geoproperty" : "",
+		"q" : "https://uri=etsi=org/ngsi-ld/default-context/a.value>12",
+		"mq" : "",
+		"geometry" : "point",
+		"coords" : "5,5",
+		"georel" : "near;maxDistance:100"
+	},
+	"format" : "concise",
+	"reference" : "https://httpdump2.app2/dumps2",
+	"mimeType" : "application/json",
+	"attrs" : [ ],
+	"conditions" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/R1"
+	],
+	"status" : "inactive",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+	"ldQ" : "https://uri=etsi=org/ngsi-ld/default-context/a.value>12",
+	"name" : "New name",
+	"expiration" : 1717236000.123
+}
+bye
+
+
+07. Sleep 2.1 secs to let CB2 refresh its sub-cache
+===================================================
+OK, slept 2.1 seconds
+
+
+08. GET Sub 1 from CB2 - make sure it's identical in CB2
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 681
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "createdAt": "202REGEX(.*)Z",
+    "description": "New description",
+    "entities": [
+        {
+            "type": "T"
+        }
+    ],
+    "expiresAt": "2024-06-01T10:00:00.123Z",
+    "geoQ": {
+        "coordinates": [
+            5,
+            5
+        ],
+        "geometry": "Point",
+        "georel": "near;maxDistance==100"
+    },
+    "id": "urn:ngsi-ld:Subscription:S1",
+    "isActive": false,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "lang": "es",
+    "modifiedAt": "202REGEX(.*)Z",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://httpdump2.app2/dumps2"
+        },
+        "format": "concise",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "q": "a>12",
+    "status": "paused",
+    "subscriptionName": "New name",
+    "throttling": 5.5,
+    "type": "Subscription",
+    "watchedAttributes": [
+        "P1",
+        "R1"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CB2
+dbDrop CB

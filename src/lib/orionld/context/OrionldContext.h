@@ -78,7 +78,8 @@ typedef enum OrionldContextOrigin
   OrionldContextFileCached,
   OrionldContextForNotifications,
   OrionldContextForForwarding,
-  OrionldContextUserCreated
+  OrionldContextUserCreated,
+  OrionldContextBuiltinCoreContext
 } OrionldContextOrigin;
 
 

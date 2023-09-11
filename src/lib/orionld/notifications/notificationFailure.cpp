@@ -48,6 +48,7 @@ void notificationFailure(CachedSubscription* subP, const char* errorReason, doub
   subP->lastFailure           = notificationTime;
   subP->consecutiveErrors    += 1;
   subP->count                += 1;
+  subP->failures             += 1;
   subP->dirty                += 1;
 
   strncpy(subP->lastErrorReason, errorReason, sizeof(subP->lastErrorReason) - 1);
@@ -74,16 +75,106 @@ void notificationFailure(CachedSubscription* subP, const char* errorReason, doub
   //
   if (((cSubCounters != 0) && (subP->dirty >= cSubCounters)) || (forcedToPause == true))
   {
-    LM_T(LmtNotificationStats, ("%s: Calling mongocSubCountersUpdate", subP->subscriptionId));
-    mongocSubCountersUpdate(subP, subP->count, subP->lastNotificationTime, subP->lastFailure, subP->lastSuccess, forcedToPause, true);
-    subP->dirty    = 0;
-    subP->dbCount += subP->count;
-    subP->count    = 0;
+    mongocSubCountersUpdate(subP->tenantP,
+                            subP->subscriptionId,
+                            (subP->ldContext != ""),
+                            subP->count,
+                            subP->failures,
+                            0,
+                            subP->lastNotificationTime,
+                            subP->lastSuccess,
+                            subP->lastFailure,
+                            forcedToPause);
+    subP->dirty       = 0;
+    subP->dbCount    += subP->count;
+    subP->count       = 0;
+    subP->dbFailures += subP->failures;
+    subP->failures    = 0;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// notificationFailure -
+//
+void notificationFailure(PernotSubscription* pSubP, const char* errorReason, double notificationTime)
+{
+  LM_T(LmtNotificationStats, ("%s: notification failure (timestamp: %f)", pSubP->subscriptionId, notificationTime));
+  bool forcedToPause = false;
+
+  pSubP->lastNotificationTime   = notificationTime;
+  pSubP->lastFailureTime        = notificationTime;
+  pSubP->consecutiveErrors     += 1;
+  pSubP->notificationAttempts  += 1;
+  pSubP->dirty                 += 1;
+
+  strncpy(pSubP->lastErrorReason, errorReason, sizeof(pSubP->lastErrorReason) - 1);
+
+  // Force the subscription into "paused" due to too many consecutive errors
+  if (pSubP->consecutiveErrors >= 3)
+  {
+    LM_T(LmtNotificationStats, ("%s: force the subscription into PAUSE due to 3 consecutive errors", pSubP->subscriptionId));
+    pSubP->isActive = false;
+    pSubP->state    = SubPaused;
+    forcedToPause   = true;
+  }
+
+  promCounterIncrease(promNotifications);
+  promCounterIncrease(promNotificationsFailed);
+
+  LM_T(LmtNotificationStats, ("%s: dirty: %d, cSubCounters: %d", pSubP->subscriptionId, pSubP->dirty, cSubCounters));
+
+  //
+  // Flush to DB?
+  // - If forcedToPause
+  // - If pSubP->dirty (number of counter updates since last flush) >= cSubCounters
+  //   - AND cSubCounters != 0
+  //
+  if (((cSubCounters != 0) && (pSubP->dirty >= cSubCounters)) || (forcedToPause == true))
+  {
+    LM_T(LmtNotificationStats, ("%s: Calling mongocSubCountersUpdate", pSubP->subscriptionId));
+
+    // Save to database
+    mongocSubCountersUpdate(pSubP->tenantP,
+                            pSubP->subscriptionId,
+                            true,
+                            pSubP->notificationAttempts,
+                            pSubP->notificationErrors,
+                            pSubP->noMatch,
+                            pSubP->lastNotificationTime,
+                            pSubP->lastSuccessTime,
+                            pSubP->lastFailureTime,
+                            forcedToPause);
+
+    // Reset counters
+    pSubP->dirty                   = 0;
+    pSubP->notificationAttemptsDb += pSubP->notificationAttempts;
+    pSubP->notificationAttempts    = 0;
+    pSubP->notificationErrorsDb   += pSubP->notificationErrors;
+    pSubP->notificationErrors      = 0;
+    pSubP->noMatchDb              += pSubP->noMatch;
+    pSubP->noMatch                 = 0;
   }
   else
     LM_T(LmtNotificationStats, ("%s: Not calling mongocSubCountersUpdate (cSubCounters: %d, dirty: %d, forcedToPause: %s)",
-                                subP->subscriptionId,
+                                pSubP->subscriptionId,
                                 cSubCounters,
-                                subP->dirty,
+                                pSubP->dirty,
                                 (forcedToPause == true)? "true" : "false"));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// notificationFailure -
+//
+void notificationFailure(CachedSubscription* cSubP, PernotSubscription* pSubP, const char* errorReason, double notificationTime)
+{
+  if (cSubP != NULL)
+    notificationFailure(cSubP, errorReason, notificationTime);
+  else
+    notificationFailure(pSubP, errorReason, notificationTime);
 }

@@ -171,7 +171,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -179,10 +179,10 @@ bye
 03. GET the subscription - from DB (options=fromDb)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 1040
+Content-Length: 1127
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S1",
@@ -235,7 +235,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
   "createdAt": "202REGEX(.*)Z",
-  "modifiedAt": "202REGEX(.*)Z"
+  "modifiedAt": "202REGEX(.*)Z",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 
@@ -243,10 +244,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 04. GET the subscription - from sub-cache (default since Summer '22)
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 950
+Content-Length: 1037
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:subscriptions:S1",
@@ -297,7 +298,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
   },
   "expiresAt": "2028-12-31T10:00:00.000Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 
 

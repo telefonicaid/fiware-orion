@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_WLOG
 #include "orionld/mongoc/mongocEntityInsert.h"                   // Own interface
 
 
@@ -60,6 +61,7 @@ bool mongocEntityInsert(KjNode* dbEntityP, const char* entityId)
 
   mongocKjTreeToBson(dbEntityP, &document);
 
+  MONGOC_WLOG("Creating Entity", orionldState.tenantP->mongoDbName, "entities", NULL, &document, LmtMongoc);
   bool b = mongoc_collection_insert_one(orionldState.mongoc.entitiesP, &document, NULL, &reply, &orionldState.mongoc.error);
   if (b == false)
   {

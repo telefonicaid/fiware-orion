@@ -36,6 +36,7 @@
 #include "orionld/context/OrionldContext.h"                  // OrionldContext
 #include "orionld/types/Protocol.h"                          // Protocol
 #include "orionld/types/OrionldAlteration.h"                 // OrionldAlterationTypes
+#include "orionld/types/OrionldTenant.h"                     // OrionldTenant
 
 
 
@@ -95,6 +96,7 @@ struct CachedSubscription
   std::vector<std::string>    metadata;
   std::vector<std::string>    notifyConditionV;
   char*                       tenant;
+  OrionldTenant*              tenantP;
   char*                       servicePath;
   bool                        triggers[OrionldAlterationTypes];
   double                      throttling;
@@ -109,22 +111,28 @@ struct CachedSubscription
   QNode*                      qP;
   char*                       qText;  // Note that NGSIv2/mongoBackend q/mq are inside SubscriptionExpression
   KjNode*                     geoCoordinatesP;
+  bool                        showChanges;
+  bool                        sysAttrs;
 
   bool                        isActive;
   std::string                 status;
   int64_t                     count;                 // delta count - since last sub cache refresh
   int64_t                     dbCount;               // count taken from the database
+  int64_t                     failures;
+  int64_t                     dbFailures;
+  int                         consecutiveErrors;     // Not in DB, no need
+
   double                      lastNotificationTime;  // timestamp of last notification attempt
   double                      lastFailure;           // timestamp of last notification failure
   double                      lastSuccess;           // timestamp of last successful notification
-  int                         consecutiveErrors;     // Not in DB
   char                        lastErrorReason[128];  // Not in DB
-  int                         dirty;
+  uint32_t                    dirty;
 
   double                      createdAt;
   double                      modifiedAt;
 
   struct CachedSubscription*  next;
+  bool                        inDB;                  // Used by mongocSubCachePopulateByTenant to find subs that have been removed
 };
 
 #endif  // SRC_LIB_CACHE_CACHEDSUBSCRIPTION_H_

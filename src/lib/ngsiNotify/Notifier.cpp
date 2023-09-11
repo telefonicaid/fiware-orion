@@ -523,7 +523,25 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       }
 
       if (httpInfo.mimeType == GEOJSON)
-        notificationDataToGeoJson(kjTree);
+      {
+        char*        attrs            = NULL;
+        char*        preferHeader     = NULL;
+        bool         concise          = subP->renderFormat == RF_CONCISE;
+        const char*  context          = subP->ldContext.c_str();
+        char*        geometryProperty = (char*) subP->expression.geoproperty.c_str();
+
+        if (geometryProperty[0] == 0)
+          geometryProperty = (char*) "location";
+
+        for (unsigned int ix = 0; ix < subP->httpInfo.notifierInfo.size(); ix++)
+        {
+          KeyValue* kvP = subP->httpInfo.notifierInfo[ix];
+          if (strcmp(kvP->key, "Prefer") == 0)
+            preferHeader = kvP->value;
+        }
+
+        notificationDataToGeoJson(kjTree, attrs, geometryProperty, preferHeader, concise, context);  // FIXME: 
+      }
 
       int   bufSize = kjFastRenderSize(kjTree);
       char* buf     = (char*) malloc(bufSize);

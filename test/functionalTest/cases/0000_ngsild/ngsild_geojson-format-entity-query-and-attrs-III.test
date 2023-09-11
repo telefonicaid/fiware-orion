@@ -158,14 +158,14 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:barn002
 03. GET /entities, as geo+json (with P1 as Geo-Property)
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 1225
+Content-Length: 1235
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     13.3505,
@@ -211,7 +211,7 @@ Date: REGEX(.*)
             "type": "Feature"
         },
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     13.3698,
@@ -264,14 +264,14 @@ Date: REGEX(.*)
 04. GET /entities, as geo+json (with P1 as Geo-Property), and with attrs=category,address
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 955
+Content-Length: 965
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     13.3505,
@@ -303,7 +303,7 @@ Date: REGEX(.*)
             "type": "Feature"
         },
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     13.3698,
@@ -342,14 +342,14 @@ Date: REGEX(.*)
 05. GET /entities, as geo+json (with P1 as Geo-Property), and with attrs=category,address,P1
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1125
+Content-Length: 1135
 Content-Type: application/geo+json
 Date: REGEX(.*)
 
 {
     "features": [
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     13.3505,
@@ -391,7 +391,7 @@ Date: REGEX(.*)
             "type": "Feature"
         },
         {
-            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+            "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
             "geometry": {
                 "coordinates": [
                     13.3698,

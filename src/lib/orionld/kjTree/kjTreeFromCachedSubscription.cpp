@@ -132,14 +132,21 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
       KjNode*     eObjectP = kjObject(orionldState.kjsonP, NULL);
       NULL_CHECK(eObjectP);
 
+      LM_T(LmtSR, ("Got an entity"));
       //
       // id/idPattern
       //
       // SPECIAL CASE:
       //  If it's a .* pattern, then it is omitted
       //
-      const char*  entityId   = eiP->entityId.c_str();
-      bool         noIdNeeded = (eiP->isPattern == true) && (strcmp(entityId, ".*") == 0);
+      const char*  entityId    = eiP->entityId.c_str();
+      const char*  entityType  = eiP->entityType.c_str();
+      bool         noIdNeeded  = (eiP->isPattern == true) && (strcmp(entityId, ".*") == 0);
+
+      LM_T(LmtSR, ("entityId:    %s", entityId));
+      LM_T(LmtSR, ("isPattern:   %s", (eiP->isPattern == true)? "true" : "false"));
+      LM_T(LmtSR, ("entityType:  %s", entityType));
+      LM_T(LmtSR, ("noIdNeeded:  %s", (noIdNeeded == false)? "FALSE" : "TRUE"));
 
       if ((noIdNeeded == false) && (*entityId != 0))
       {
@@ -282,6 +289,22 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   NULL_CHECK(nodeP);
   kjChildAdd(notificationNodeP, nodeP);
 
+  // notification::showChanges
+  if (cSubP->showChanges == true)
+  {
+    nodeP = kjBoolean(orionldState.kjsonP, "showChanges", true);
+    NULL_CHECK(nodeP);
+    kjChildAdd(notificationNodeP, nodeP);
+  }
+
+  // notification::sysAttrs
+  if (cSubP->sysAttrs == true)
+  {
+    nodeP = kjBoolean(orionldState.kjsonP, "sysAttrs", true);
+    NULL_CHECK(nodeP);
+    kjChildAdd(notificationNodeP, nodeP);
+  }
+
   // notification::endpoint
   KjNode* endpointNodeP = kjObject(orionldState.kjsonP, "endpoint");
   NULL_CHECK(endpointNodeP);
@@ -361,6 +384,9 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   if (cSubP->count + cSubP->dbCount > 0)
   {
+    LM_T(LmtSubCacheStats, ("count:   %d", cSubP->count));
+    LM_T(LmtSubCacheStats, ("dbCount: %d", cSubP->dbCount));
+
     nodeP = kjInteger(orionldState.kjsonP, "timesSent", cSubP->count + cSubP->dbCount);
     NULL_CHECK(nodeP);
     kjChildAdd(notificationNodeP, nodeP);
@@ -369,7 +395,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // notification::lastNotification
   //
-  if (cSubP->lastNotificationTime > 0)
+  if (cSubP->lastNotificationTime > 0.1)
   {
     numberToDate(cSubP->lastNotificationTime, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastNotification", dateTime);
@@ -380,7 +406,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // notification::lastFailure
   //
-  if (cSubP->lastFailure > 0)
+  if (cSubP->lastFailure > 0.1)
   {
     numberToDate(cSubP->lastFailure, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastFailure", dateTime);
@@ -391,7 +417,7 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   //
   // notification::lastSuccess
   //
-  if (cSubP->lastSuccess > 0)
+  if (cSubP->lastSuccess > 0.1)
   {
     numberToDate(cSubP->lastSuccess, dateTime, sizeof(dateTime));
     nodeP = kjString(orionldState.kjsonP, "lastSuccess", dateTime);
@@ -483,6 +509,16 @@ KjNode* kjTreeFromCachedSubscription(CachedSubscription* cSubP, bool sysAttrs, b
   if (experimental == true)
   {
     nodeP = kjString(orionldState.kjsonP, "origin", "cache");
+    NULL_CHECK(nodeP);
+    kjChildAdd(sP, nodeP);
+  }
+
+  //
+  // jsonldCcontext
+  //
+  if (cSubP->ldContext != "")
+  {
+    nodeP = kjString(orionldState.kjsonP, "jsonldContext", cSubP->ldContext.c_str());
     NULL_CHECK(nodeP);
     kjChildAdd(sP, nodeP);
   }

@@ -31,6 +31,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/common/orionldState.h"                         // kjTreeLog
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"           // kjGeojsonEntitiesTransform
 #include "orionld/notifications/notificationDataToGeoJson.h"     // Own interface
 
@@ -40,7 +41,15 @@ extern "C"
 *
 * notificationDataToGeoJson -
 */
-void notificationDataToGeoJson(KjNode* notificationNodeP)
+void notificationDataToGeoJson
+(
+  KjNode*      notificationNodeP,
+  const char*  attrs,
+  const char*  geometryProperty,
+  const char*  preferHeader,
+  bool         concise,
+  const char*  context
+)
 {
   KjNode* dataP = kjLookup(notificationNodeP, "data");
 
@@ -48,7 +57,7 @@ void notificationDataToGeoJson(KjNode* notificationNodeP)
   {
     kjChildRemove(notificationNodeP, dataP);
 
-    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP);
+    KjNode* geojsonTree = kjGeojsonEntitiesTransform(dataP, attrs, geometryProperty, preferHeader, concise, context);
 
     geojsonTree->name = (char*) "data";
     kjChildAdd(notificationNodeP, geojsonTree);

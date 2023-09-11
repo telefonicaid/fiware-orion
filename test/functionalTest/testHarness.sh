@@ -195,6 +195,7 @@ function usage()
   echo "$empty [--cache (force broker to be started without the option --noCache)]"
   echo "$empty [--noThreadpool (do not use a threadpool, unless specified by a test case. If not set, a thread pool of 200:20 is used by default in test cases which do not set notificationMode options)]"
   echo "$empty [ <directory or file> ]*"
+  echo "$empty [--errors (show errors from last run)]"
   echo
   echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"
   echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
@@ -403,6 +404,18 @@ logMsg "$ME, in directory $SCRIPT_HOME"
 
 
 
+# ------------------------------------------------------------------------------
+#
+# showErrorsdAndExit -
+#
+function showErrorsdAndExit()
+{
+    grep ERROR /tmp/functest.old
+    exit 0
+}
+
+
+
 # ------------------------------------https://github.com/telefonicaid/fiware-orion/pull/394#discussion_r13321709------------------------------------------
 #
 # Argument parsing
@@ -465,6 +478,7 @@ do
   elif [ "$1" == "--noCache" ];      then noCache=ON;
   elif [ "$1" == "--cache" ];        then noCache=OFF;
   elif [ "$1" == "--noThreadpool" ]; then threadpool=OFF;
+  elif [ "$1" == "--errors" ];       then showErrorsdAndExit;
   else
     if [ "$dirOrFile" == "" ]
     then
@@ -685,6 +699,10 @@ else
 fi
 
 
+# Mongo may also run in a docker container:
+# docker run -p 27017:27017 mongo:4.4
+# docker run -p 27017:27017 mongo:5.0
+# docker run -p 27017:27017 mongo:6.0
 
 # ------------------------------------------------------------------------------
 #

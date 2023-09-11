@@ -33,8 +33,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // LmtWatchedAttributes
 
-#include "cache/subCache.h"                                    // CachedSubscription, subCacheMatch, tenantMatch
 #include "common/globals.h"                                    // parse8601Time
+#include "common/sem.h"                                        // cacheSemTake, cacheSemGive
+#include "cache/subCache.h"                                    // CachedSubscription, subCacheMatch, tenantMatch
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/dotForEq.h"                           // dotForEq
@@ -90,9 +91,13 @@ static bool entityTypeMatch(CachedSubscription* subP, const char* entityType, in
 {
   for (int ix = 0; ix < eItems; ++ix)
   {
-    EntityInfo* eiP = subP->entityIdInfos[ix];
+    EntityInfo* eiP   = subP->entityIdInfos[ix];
+    const char* eType = eiP->entityType.c_str();
 
-    if (strcmp(entityType, eiP->entityType.c_str()) == 0)
+    if (strcmp(entityType, eType) == 0)
+      return true;
+
+    if ((eType[0] == '*') && (eType[1] == 0))
       return true;
   }
 
@@ -1103,10 +1108,10 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
   // Loop over each alteration, and check ALL SUBSCRIPTIONS in the cache for that alteration
   // For each matching subscription, add the alterations into 'matchList'
   //
-  int ix = 0;
+  cacheSemTake(__FUNCTION__, "Looping over sub-cache");
+
   for (OrionldAlteration* altP = alterationList; altP != NULL; altP = altP->next)
   {
-    ++ix;
     for (CachedSubscription* subP = subCacheHeadGet(); subP != NULL; subP = subP->next)
     {
       if ((multitenancy == true) && (tenantMatch(subP->tenant, orionldState.tenantName) == false))
@@ -1156,7 +1161,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       // Only done if its an NGSI-LD operation AND if it's an NGSI-LD Subscription (ldContext has a value != "")
       //
       if ((subP->qP == NULL) && (subP->ldContext != "") && (subP->qText != NULL))
-        subP->qP = qBuild(subP->qText, NULL, NULL, NULL, false);
+        subP->qP = qBuild(subP->qText, NULL, NULL, NULL, false, false);
 
       if (subP->qP != NULL)
       {
@@ -1179,6 +1184,7 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       matchList = attributeMatch(matchList, subP, altP, &matches);  // Each call adds to matchList AND matches
     }
   }
+  cacheSemGive(__FUNCTION__, "Looping over sub-cache");
 
   *matchesP = matches;
 

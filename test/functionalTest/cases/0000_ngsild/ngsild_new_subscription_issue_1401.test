@@ -1,0 +1,241 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Deletion in HA with two brokers
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB  -mongocOnly -subCacheIval 1
+orionldStart CB2 -mongocOnly -subCacheIval 1
+
+--SHELL--
+
+#
+# 01. Create a subscription S1 in CB1
+# 02. GET S1 from CB1
+# 03. Sleep 2 secs to let CB2 refresh its sub-cache
+# 04. GET S1 from CB2 - must be there
+# 05. DELETE S1 using CB1
+# 06. Attempt to GET Sub 1 from CB1
+# 07. Sleep 2 secs to let CB2 refresh its sub-cache
+# 08. Attempt to GET Sub 1 from CB2 - must be gone
+#
+
+echo "01. Create a subscription S1 in CB1"
+echo "==================================="
+payload='{
+  "id": "urn:ngsi-ld:Subscription:S1",
+  "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "IndoorEnvironmentObserved"
+    }
+  ],
+  "notification": {
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. GET S1 from CB1"
+echo "==================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
+echo
+echo
+
+
+echo "03. Sleep 2 secs to let CB2 refresh its sub-cache"
+echo "================================================="
+sleep 2
+echo OK, slept 2 seconds
+echo
+echo
+
+
+echo "04. GET S1 from CB2 - must be there"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1 --port $CB2_PORT
+echo
+echo
+
+
+echo "05. DELETE S1 using CB1"
+echo "======================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1 -X DELETE
+echo
+echo
+
+
+echo "06. Attempt to GET Sub 1 from CB1"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
+echo
+echo
+
+
+echo "07. Sleep 2 secs to let CB2 refresh its sub-cache"
+echo "================================================="
+sleep 2
+echo OK, slept 2 seconds
+echo
+echo
+
+
+echo "08. Attempt to GET Sub 1 from CB2 - must be gone"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1 --port $CB2_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1 in CB1
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:S1
+
+
+
+02. GET S1 from CB1
+===================
+HTTP/1.1 200 OK
+Content-Length: 506
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+    "entities": [
+        {
+            "type": "IndoorEnvironmentObserved"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+03. Sleep 2 secs to let CB2 refresh its sub-cache
+=================================================
+OK, slept 2 seconds
+
+
+04. GET S1 from CB2 - must be there
+===================================
+HTTP/1.1 200 OK
+Content-Length: 506
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "description": "v1 Notify me when temperature is above 22 or c02 above 700 or humidity is above 60",
+    "entities": [
+        {
+            "type": "IndoorEnvironmentObserved"
+        }
+    ],
+    "id": "urn:ngsi-ld:Subscription:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://httpdump.app/dumps/7fa23ea9-96d8-4d8d-bc5b-a09e66d0d8c7"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+05. DELETE S1 using CB1
+=======================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. Attempt to GET Sub 1 from CB1
+=================================
+HTTP/1.1 404 Not Found
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:Subscription:S1",
+    "title": "subscription not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+07. Sleep 2 secs to let CB2 refresh its sub-cache
+=================================================
+OK, slept 2 seconds
+
+
+08. Attempt to GET Sub 1 from CB2 - must be gone
+================================================
+HTTP/1.1 404 Not Found
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:Subscription:S1",
+    "title": "subscription not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CB2
+dbDrop CB

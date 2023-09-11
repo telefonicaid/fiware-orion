@@ -1,0 +1,141 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Test "044_02_04_endpoint /temporal/entities" of the ETSI test suite
+
+--SHELL-INIT--
+export BROKER=orionld
+dbInit CB
+pgInit $CB_DB_NAME
+orionldStart CB 
+
+--SHELL--
+
+#
+# The broker crashed when receiving a POST /temporal/entities but troe is not turned on.
+# It crashes when trying to access postgres, as this hasn't been initialized.
+# A protection is needed (and now implemented).
+#
+
+#
+# 01. Push an entity directly to the TRoE DB, according to 044_02_04_endpoint of the ETSI test suite
+# 02. GET NGSI-LD version just to make sure the broker is OK
+#
+
+echo "01. Push an entity directly to the TRoE DB, according to 044_02_04_endpoint of the ETSI test suite"
+echo "=================================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:6431834806480381",
+  "type": "Vehicle",
+  "speed": [
+    {
+      "type": "Property",
+      "value": 120,
+      "observedAt": "2020-09-01T12:03:00Z"
+    },
+    {
+      "type": "Property",
+      "value": 80,
+      "observedAt": "2020-09-01T12:05:00Z"
+    }
+  ],
+  "fuelLevel": [
+    {
+      "type": "Property",
+      "value": 67,
+      "observedAt": "2020-09-01T12:03:00Z"
+    },
+    {
+      "type": "Property",
+      "value": 53,
+      "observedAt": "2020-09-01T13:05:00Z"
+    },
+    {
+      "type": "Property",
+      "value": 40,
+      "observedAt": "2020-09-01T14:07:00Z",
+      "datasetId": "urn:ngsi-ld:Vehicle:12345-fuel"
+    }
+  ],
+  "@context": [ "https://forge.etsi.org/rep/cim/ngsi-ld-test-suite/-/raw/develop/resources/jsonld-contexts/ngsi-ld-test-suite-compound.jsonld" ]
+}'
+orionCurl --url /ngsi-ld/v1/temporal/entities --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "02. GET NGSI-LD version just to make sure the broker is OK"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/ex/v1/version
+echo
+echo
+
+
+--REGEXPECT--
+01. Push an entity directly to the TRoE DB, according to 044_02_04_endpoint of the ETSI test suite
+==================================================================================================
+HTTP/1.1 503 Service Unavailable
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/ngsi-ld/v1/temporal/entities",
+    "title": "TRoE Not Enabled",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+02. GET NGSI-LD version just to make sure the broker is OK
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "Next File Descriptor": REGEX(.*),
+    "Orion-LD version": "REGEX(.*)",
+    "based on orion": "REGEX(.*)",
+    "boost version": "REGEX(.*)",
+    "branch": "REGEX(.*)",
+    "bson version": "REGEX(.*)",
+    "cached subscriptions": 0,
+    "kalloc version": "REGEX(.*)",
+    "kbase version": "REGEX(.*)",
+    "khash version": "REGEX(.*)",
+    "kjson version": "REGEX(.*)",
+    "libcurl version": "REGEX(.*)",
+    "libuuid version": "UNKNOWN",
+    "microhttpd version": "REGEX(.*)",
+    "mongoc version": "REGEX(.*)",
+    "mongocpp version": "REGEX(.*)",
+    "mongodb server version": "REGEX(.*)",
+    "openssl version": "REGEX(.*)",
+    "rapidjson version": "REGEX(.*)"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

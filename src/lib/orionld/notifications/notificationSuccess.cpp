@@ -40,7 +40,7 @@
 //
 void notificationSuccess(CachedSubscription* subP, const double timestamp)
 {
-  LM_T(LmtNotificationStats, ("%s: notification success", subP->subscriptionId));
+  LM_T(LmtNotificationStats, ("%s: notification success (sub at %p)", subP->subscriptionId, subP));
 
   subP->lastSuccess           = timestamp;
   subP->lastNotificationTime  = timestamp;
@@ -55,13 +55,18 @@ void notificationSuccess(CachedSubscription* subP, const double timestamp)
   // - If subP->dirty (number of counter updates since last flush) >= cSubCounters
   //   - AND cSubCounters != 0
   //
+  LM_T(LmtNotificationStats, ("%s: dirty: %d AND cSubCounters=%d", subP->subscriptionId, subP->dirty, cSubCounters));
+
   if ((cSubCounters != 0) && (subP->dirty >= cSubCounters))
   {
     LM_T(LmtNotificationStats, ("%s: Calling mongocSubCountersUpdate", subP->subscriptionId));
-    mongocSubCountersUpdate(subP, subP->count, subP->lastNotificationTime, subP->lastFailure, subP->lastSuccess, false, true);
-    subP->dirty    = 0;
-    subP->dbCount += subP->count;
-    subP->count    = 0;
+
+    mongocSubCountersUpdate(subP->tenantP, subP->subscriptionId, (subP->ldContext != ""), subP->count, subP->failures, 0, subP->lastNotificationTime, subP->lastSuccess, subP->lastFailure, false);
+    subP->dirty       = 0;
+    subP->dbCount    += subP->count;
+    subP->count       = 0;
+    subP->dbFailures += subP->failures;
+    subP->failures    = 0;
   }
   else
     LM_T(LmtNotificationStats, ("%s: Not calling mongocSubCountersUpdate (cSubCounters: %d, dirty: %d)",

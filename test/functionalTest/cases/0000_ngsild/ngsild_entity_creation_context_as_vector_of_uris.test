@@ -107,12 +107,12 @@ bye
 03. GET entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 247
+Content-Length: 252
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
   "id": "urn:ngsi-ld:T:12:13:14",
   "type": "http://example.org/T",
   "http://example.org/DateProp": {

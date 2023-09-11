@@ -86,12 +86,12 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 02. GET E1
 ==========
 HTTP/1.1 200 OK
-Content-Length: 187
+Content-Length: 192
 Content-Type: application/ld+json
 Date: REGEX(.*)
 
 {
-  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+  "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
   "id": "http://a.b.c/entity/E1",
   "type": "A",
   "name": {

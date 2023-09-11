@@ -216,14 +216,14 @@ static bool payloadEmptyCheck(void)
   // No payload?
   if (orionldState.in.payload == NULL)
   {
-    orionldError(OrionldInvalidRequest, "payload missing", NULL, 400);
+    orionldError(OrionldBadRequestData, "payload missing", NULL, 400);
     return false;
   }
 
   // Empty payload?
   if (orionldState.in.payload[0] == 0)
   {
-    orionldError(OrionldInvalidRequest, "payload missing", NULL, 400);
+    orionldError(OrionldBadRequestData, "payload missing", NULL, 400);
     return false;
   }
 
@@ -262,7 +262,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type != KjArray) && (orionldState.requestTree->type != KjObject))
   {
-    orionldError(OrionldInvalidRequest, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object", 400);
+    orionldError(OrionldBadRequestData, "Invalid Payload", "The payload data must be either a JSON Array or a JSON Object", 400);
     return false;
   }
 
@@ -271,7 +271,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type == KjObject) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldError(OrionldInvalidRequest, "Invalid Payload Body", "Empty Object", 400);
+    orionldError(OrionldBadRequestData, "Invalid Payload Body", "Empty Object", 400);
     return false;
   }
 
@@ -280,7 +280,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if ((orionldState.requestTree->type == KjArray) && (orionldState.requestTree->value.firstChildP == NULL))
   {
-    orionldError(OrionldInvalidRequest, "Invalid Payload Body", "Empty Array", 400);
+    orionldError(OrionldBadRequestData, "Invalid Payload Body", "Empty Array", 400);
     return false;
   }
 
@@ -454,7 +454,7 @@ static bool linkGet(const char* link)
 
   orionldState.contextP = orionldContextFromUrl(url, NULL);
   if (orionldState.contextP == NULL)
-    return false;
+    LM_RE(false, ("orionldContextFromUrl returned NULL - no context!"));
 
   orionldState.link = orionldState.contextP->url;
 
@@ -940,6 +940,21 @@ MHD_Result orionldMhdConnectionTreat(void)
 
   promCounterIncrease(promNgsildRequests);
 
+  if (orionldState.serviceP == NULL)
+    goto respond;
+
+  if (orionldState.serviceP->mintaka == true)
+  {
+    serviceRoutineResult = orionldState.serviceP->serviceRoutine();
+    goto respond;
+  }
+
+  if (orionldState.serviceP->notImplemented == true)
+  {
+    serviceRoutineResult = orionldState.serviceP->serviceRoutine();
+    goto respond;
+  }
+
   // If OPTIONS verb, we skip all checks, go straight to the service routine
   if (orionldState.verb == OPTIONS)
     goto serviceRoutine;
@@ -1054,7 +1069,10 @@ MHD_Result orionldMhdConnectionTreat(void)
         goto respond;
 
       if (linkGet(link) == false)  // Lookup/Download if necessary
+      {
+        LM_W(("linkGet failed, going to 'respond'"));
         goto respond;
+      }
     }
 
     //
@@ -1111,7 +1129,9 @@ MHD_Result orionldMhdConnectionTreat(void)
  serviceRoutine:
   if (orionldState.requestTree != NULL)
     kjTreeLog(orionldState.requestTree, "Request Payload Body", LmtRequest);
+
   serviceRoutineResult = orionldState.serviceP->serviceRoutine();
+
   PERFORMANCE(serviceRoutineEnd);
   if (orionldState.in.performance == true)
     performanceHeader();

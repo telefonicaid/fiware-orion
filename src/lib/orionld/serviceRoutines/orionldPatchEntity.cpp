@@ -61,6 +61,8 @@ extern "C"
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
 #include "orionld/notifications/alteration.h"                    // alteration
+#include "orionld/notifications/previousValuePopulate.h"         // previousValuePopulate
+#include "orionld/notifications/sysAttrsStrip.h"                 // sysAttrsStrip
 #include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
 #include "orionld/serviceRoutines/orionldPatchEntity.h"          // Own interface
@@ -83,12 +85,24 @@ static void attributesMerge(KjNode* finalApiEntityP, KjNode* apiAttrs)
 {
   for (KjNode* apiAttrP = apiAttrs->value.firstChildP; apiAttrP != NULL; apiAttrP = apiAttrP->next)
   {
-    KjNode* oldAttrP = kjLookup(finalApiEntityP, apiAttrP->name);
+    KjNode* oldAttrP    = kjLookup(finalApiEntityP, apiAttrP->name);
+    KjNode* createdAtP  = NULL;
+    KjNode* modifiedAtP = NULL;
 
     if (oldAttrP != NULL)
+    {
       kjChildRemove(finalApiEntityP, oldAttrP);
+      createdAtP  = kjLookup(oldAttrP, "createdAt");
+      modifiedAtP = kjLookup(oldAttrP, "modifiedAt");
+    }
 
-    kjChildAdd(finalApiEntityP, kjClone(orionldState.kjsonP, apiAttrP));
+    KjNode* attrCopy = kjClone(orionldState.kjsonP, apiAttrP);
+    kjChildAdd(finalApiEntityP, attrCopy);
+
+    if (createdAtP != NULL)
+      kjChildAdd(attrCopy, createdAtP);
+    if (modifiedAtP != NULL)
+      kjChildAdd(attrCopy, modifiedAtP);
   }
 }
 
@@ -226,14 +240,16 @@ bool orionldPatchEntity(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyPatchEntity();
 
-  KjNode*  incomingP        = NULL;
-  KjNode*  finalApiEntityP  = NULL;
-  KjNode*  dbEntityCopy     = NULL;
-  DistOp*  distOpList       = NULL;
-  char*    entityId         = orionldState.wildcard[0];
-  char*    entityType       = orionldState.uriParams.type;
-  KjNode*  attrP;
-  KjNode*  next;
+  KjNode*            finalApiEntityWithSysAttrs = NULL;
+  KjNode*            finalApiEntityP            = NULL;
+  OrionldAlteration* alterationP                = NULL;
+  KjNode*            incomingP                  = NULL;
+  KjNode*            dbEntityCopy               = NULL;
+  DistOp*            distOpList                 = NULL;
+  char*              entityId                   = orionldState.wildcard[0];
+  char*              entityType                 = orionldState.uriParams.type;
+  KjNode*            attrP;
+  KjNode*            next;
 
   //
   // Initial Validity Checks;
@@ -254,7 +270,6 @@ bool orionldPatchEntity(void)
     return false;
   }
 
-
   //
   // If entity type is present in the payload body, it must be a String and identical to the entity type in the database.
   // [ It is already extracted (by orionldMhdConnectionTreat) and checked for String ]
@@ -267,6 +282,7 @@ bool orionldPatchEntity(void)
     LM_W(("Invalid payload body. %s: %s", orionldState.pd.title, orionldState.pd.detail));
     return false;
   }
+
 
   //
   // Distributed Operations
@@ -293,20 +309,25 @@ bool orionldPatchEntity(void)
     goto done;
   }
 
+  dbEntityCopy = kjClone(orionldState.kjsonP, dbEntityP);  // dbModelToApiEntity2 is DESTRUCTIVE
+
   //
   // Transform the remaining attributes to DB format, for storage in local database
   // But before that, as this is DESTRUCTIVE, save a copy of the attributes for Alterations and TRoE
   //
   incomingP = kjClone(orionldState.kjsonP, orionldState.requestTree);  // For Alterations and TRoE
 
-  attrP = orionldState.requestTree->value.firstChildP;
+  LM_T(LmtShowChanges, ("Looping over modified attributes"));
 
+  attrP = orionldState.requestTree->value.firstChildP;
   while (attrP != NULL)
   {
     next = attrP->next;
 
+    LM_T(LmtShowChanges, ("Modified attribute: '%s'", attrP->name));
     if (attributeLookup(dbAttrsP, attrP->name) == false)
     {
+      LM_T(LmtSR, ("Removing attribute '%s' from the incoming tree", attrP->name));
       kjChildRemove(orionldState.requestTree, attrP);
       distOpFailure(responseBody, NULL, "Attribute Not Found", NULL, 404, attrP->name);
 
@@ -316,7 +337,14 @@ bool orionldPatchEntity(void)
         kjChildRemove(incomingP, attrP);
     }
     else
-      dbModelFromApiAttribute(attrP, dbAttrsP, NULL, NULL, NULL, true);
+    {
+      LM_T(LmtShowChanges, ("Lookup attribute '%s' in dbAttrsP and copy its value - store in orionldState", attrP->name));
+      char* eqName = kaStrdup(&orionldState.kalloc, attrP->name);
+      dotForEq(eqName);
+
+      previousValuePopulate(dbAttrsP, NULL, eqName);
+      dbModelFromApiAttribute(attrP, dbAttrsP, NULL, NULL, NULL, true);  // Removes creDate for attributes
+    }
 
     attrP = next;
   }
@@ -359,7 +387,6 @@ bool orionldPatchEntity(void)
     distOpSuccess(responseBody, &local, NULL);
   }
 
-
   //
   // For alteration() we need:
   // - Initial DB entity, before the merge  (dbEntityP)
@@ -367,9 +394,10 @@ bool orionldPatchEntity(void)
   // - Final API Entity, for q, etc AND for the Notifications (finalApiEntityP)
   //     Note; the Final API Entity needs to be Expanded and Normalized - each subscription may have a different context to for compaction
   //
-  dbEntityCopy    = kjClone(orionldState.kjsonP, dbEntityP);  // dbModelToApiEntity2 is DESTRUCTIVE
-  finalApiEntityP = dbModelToApiEntity2(dbEntityCopy, false, RF_NORMALIZED, NULL, false, &orionldState.pd);
-  if (finalApiEntityP == NULL)
+
+
+  finalApiEntityWithSysAttrs = dbModelToApiEntity2(dbEntityCopy, true, RF_NORMALIZED, NULL, false, &orionldState.pd);
+  if (finalApiEntityWithSysAttrs == NULL)
   {
     // There will be no notifications for this update :(  - Well.  cause something important failed ...
     LM_E(("dbModelToApiEntity2: %s: %s", orionldState.pd.title, orionldState.pd.detail));
@@ -380,8 +408,13 @@ bool orionldPatchEntity(void)
   //
   // Notifications
   //
-  attributesMerge(finalApiEntityP, incomingP);
-  alteration(entityId, entityType, finalApiEntityP, incomingP, dbEntityP);
+  attributesMerge(finalApiEntityWithSysAttrs, incomingP);
+
+  finalApiEntityP = kjClone(orionldState.kjsonP, finalApiEntityWithSysAttrs);
+  sysAttrsStrip(finalApiEntityP);
+
+  alterationP = alteration(entityId, entityType, finalApiEntityP, incomingP, dbEntityP);
+  alterationP->finalApiEntityWithSysAttrsP = finalApiEntityWithSysAttrs;
 
   //
   // For TRoE we need:

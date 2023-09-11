@@ -30,6 +30,7 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
+#include "common/RenderFormat.h"                                 // RenderFormat
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -133,7 +134,7 @@ static bool notificationStatus(KjNode* dbLastSuccessP, KjNode* dbLastFailureP)
 //   "custom": false,
 //   "servicePath": "/#",
 //   "blacklist": false,
-//   "ldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+//   "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
 // }
 //
 // An API Subscription looks like this:
@@ -170,7 +171,19 @@ static bool notificationStatus(KjNode* dbLastSuccessP, KjNode* dbLastFailureP)
 //   "throttling": 5                          => SAME
 // }
 //
-KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSubCache, QNode** qNodePP, KjNode** coordinatesPP, KjNode** contextNodePP)
+KjNode* dbModelToApiSubscription
+(
+  KjNode*        dbSubP,
+  const char*    tenant,
+  bool           forSubCache,
+  QNode**        qNodePP,
+  KjNode**       coordinatesPP,
+  KjNode**       contextNodePP,
+  KjNode**       showChangesP,
+  KjNode**       sysAttrsP,
+  RenderFormat*  renderFormatP,
+  double*        timeIntervalP
+)
 {
   KjNode* dbSubIdP            = kjLookup(dbSubP, "_id");         DB_ITEM_NOT_FOUND(dbSubIdP, "id",          tenant);
   KjNode* dbNameP             = kjLookup(dbSubP, "name");
@@ -191,13 +204,19 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   KjNode* dbExpirationP       = kjLookup(dbSubP, "expiration");
   KjNode* dbLdContextP        = kjLookup(dbSubP, "ldContext");
   KjNode* dbCountP            = kjLookup(dbSubP, "count");
+  KjNode* timesFailedP        = kjLookup(dbSubP, "timesFailed");
+  KjNode* noMatchP            = kjLookup(dbSubP, "noMatch");
   KjNode* dbLastNotificationP = kjLookup(dbSubP, "lastNotification");
   KjNode* dbLastSuccessP      = kjLookup(dbSubP, "lastSuccess");
   KjNode* dbLastFailureP      = kjLookup(dbSubP, "lastFailure");
+  KjNode* dbShowChangesP      = kjLookup(dbSubP, "showChanges");
+  KjNode* dbSysAttrsP         = kjLookup(dbSubP, "sysAttrs");
+  KjNode* dbLangP             = kjLookup(dbSubP, "lang");
   KjNode* dbCreatedAtP        = NULL;
   KjNode* dbModifiedAtP       = NULL;
+  KjNode* timeIntervalNodeP   = kjLookup(dbSubP, "timeInterval");
 
-  if (orionldState.uriParamOptions.sysAttrs == true)
+  if ((orionldState.uriParamOptions.sysAttrs == true) || (forSubCache == true))
   {
     dbCreatedAtP  = kjLookup(dbSubP, "createdAt");   DB_ITEM_NOT_FOUND(dbSubIdP, "createdAt",   tenant);
     dbModifiedAtP = kjLookup(dbSubP, "modifiedAt");  DB_ITEM_NOT_FOUND(dbSubIdP, "modifiedAt",  tenant);
@@ -214,6 +233,14 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   // type
   KjNode* typeNodeP = kjString(orionldState.kjsonP, "type", "Subscription");
   kjChildAdd(apiSubP, typeNodeP);
+
+  // showChanges
+  if ((dbShowChangesP != NULL) && (showChangesP != NULL))
+    *showChangesP = dbShowChangesP;
+
+  // sysAttrs
+  if ((dbSysAttrsP != NULL) && (sysAttrsP != NULL))
+    *sysAttrsP = dbSysAttrsP;
 
   //
   // If dbSubIdP is a JSON Object, it's an NGSIv2 subscription and its "id" looks like this:
@@ -255,6 +282,9 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   if (dbDescriptionP != NULL)
     kjChildAdd(apiSubP, dbDescriptionP);
 
+  // lang
+  if (dbLangP != NULL)
+    kjChildAdd(apiSubP, dbLangP);
 
   //
   // "entities"
@@ -265,39 +295,31 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   //
   for (KjNode* entityP = dbEntitiesP->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
+    KjNode* idP            = kjLookup(entityP, "id");
     KjNode* isPatternP     = kjLookup(entityP, "isPattern");
-    KjNode* isTypePatternP = kjLookup(entityP, "isTypePattern");
     KjNode* typeP          = kjLookup(entityP, "type");
+    KjNode* isTypePatternP = kjLookup(entityP, "isTypePattern");
 
+    // There is no "Type Pattern" in NGSI-LD
+    kjChildRemove(entityP, isTypePatternP);
 
-    // bool ngsild  = (dbLdContextP != NULL);
-    // if (ngsild)
+    // There is no "isPattern" in NGSI-LD
+    kjChildRemove(entityP, isPatternP);
+
+    if (strcmp(isPatternP->value.s, "true") == 0)
     {
-      if (isTypePatternP != NULL)
-        kjChildRemove(entityP, isTypePatternP);
-
-      if (isPatternP != NULL)
-      {
-        if (strcmp(isPatternP->value.s, "true") == 0)
-        {
-          KjNode* idP = kjLookup(entityP, "id");
-          if (strcmp(idP->value.s, ".*") == 0)
-            kjChildRemove(entityP, idP);
-          else
-            idP->name = (char*) "idPattern";
-        }
-
-        kjChildRemove(entityP, isPatternP);
-
-        // type must be compacted
-        if (typeP != NULL)  // Can't really be NULL though ...
-        {
-          // But, for sub-cache we need the long names
-          if (forSubCache == false)
-            typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
-        }
-      }
+      if (strcmp(idP->value.s, ".*") == 0)
+        kjChildRemove(entityP, idP);
+      else
+        idP->name = (char*) "idPattern";
     }
+
+    kjChildRemove(entityP, isPatternP);
+
+    // type must be compacted
+    // However, for sub-cache we need the long names
+    if (forSubCache == false)
+      typeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, typeP->value.s, NULL, NULL);
   }
   kjChildAdd(apiSubP, dbEntitiesP);
 
@@ -315,6 +337,13 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
         attrNameNodeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrNameNodeP->value.s, NULL, NULL);
       }
     }
+  }
+
+  // timeInterval
+  if (timeIntervalNodeP != NULL)
+  {
+    kjChildAdd(apiSubP, timeIntervalNodeP);
+    *timeIntervalP = (timeIntervalNodeP->type == KjInt)? timeIntervalNodeP->value.i : timeIntervalNodeP->value.f;
   }
 
   // "q" for NGSI-LD
@@ -433,11 +462,28 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
   }
 
   if (dbFormatP != NULL)
+  {
     kjChildAdd(notificationP, dbFormatP);
+    *renderFormatP = stringToRenderFormat(dbFormatP->value.s);
+  }
 
   KjNode* endpointP = kjObject(orionldState.kjsonP, "endpoint");
 
   kjChildAdd(notificationP, endpointP);
+
+  // Notification::showChanges
+  if ((dbShowChangesP != NULL) && (dbShowChangesP->value.b == true))
+  {
+    KjNode* showChangesP = kjBoolean(orionldState.kjsonP, "showChanges", true);
+    kjChildAdd(notificationP, showChangesP);
+  }
+
+  // notification::sysAttrs
+  if ((dbSysAttrsP != NULL) && (dbSysAttrsP->value.b == true))
+  {
+    KjNode* sysAttrsP = kjBoolean(orionldState.kjsonP, "sysAttrs", true);
+    kjChildAdd(notificationP, sysAttrsP);
+  }
 
   // notification::status
   bool    nStatus      = notificationStatus(dbLastSuccessP, dbLastFailureP);
@@ -445,6 +491,49 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
 
   kjChildAdd(notificationP, nStatusNodeP);
 
+  // lastNotification
+  if (dbLastNotificationP != NULL)
+    kjChildAdd(notificationP, dbLastNotificationP);
+
+  // lastSuccess
+  if (dbLastSuccessP != NULL)
+    kjChildAdd(notificationP, dbLastSuccessP);
+
+  // lastFailure
+  if (dbLastFailureP != NULL)
+    kjChildAdd(notificationP, dbLastFailureP);
+
+  // timesSent
+  if (dbCountP != NULL)
+  {
+    int timesSent = 0;
+
+    if (dbCountP->type == KjInt)
+      timesSent = dbCountP->value.i;
+    else if (dbCountP->type == KjObject)
+      LM_W(("Subscription::count: find the integer inside the object!"));
+
+    //
+    // Transform to KjInt named "timesSent"
+    //
+    dbCountP->name    = (char*) "timesSent";
+    dbCountP->type    = KjInt;
+    dbCountP->value.i = timesSent;
+
+    kjChildAdd(notificationP, dbCountP);
+    LM_T(LmtSubCacheStats, ("count/timesSent: %d", timesSent));
+  }
+
+  // timesFailed
+  if (timesFailedP != NULL)
+    kjChildAdd(notificationP, timesFailedP);
+
+  // noMatch
+  if (noMatchP != NULL)
+    kjChildAdd(notificationP, noMatchP);
+
+  // Add "notification" to top level
+  kjChildAdd(apiSubP, notificationP);
 
   if (dbReferenceP != NULL)
   {
@@ -458,7 +547,6 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
     dbMimeTypeP->name = (char*) "accept";
   }
 
-  kjChildAdd(apiSubP, notificationP);
 
 
   //
@@ -591,32 +679,21 @@ KjNode* dbModelToApiSubscription(KjNode* dbSubP, const char* tenant, bool forSub
       modifiedAtNodeP = kjString(orionldState.kjsonP, "modifiedAt", dateTime);
     }
     else
-      modifiedAtNodeP = kjFloat(orionldState.kjsonP, "modifiedAt", dbCreatedAtP->value.f);
+    {
+      LM_T(LmtSubCacheSync, ("modifiedAt from DB: %f", dbModifiedAtP->value.f));
+      modifiedAtNodeP = kjFloat(orionldState.kjsonP, "modifiedAt", dbModifiedAtP->value.f);
+    }
 
     kjChildAdd(apiSubP, modifiedAtNodeP);
   }
 
-#if 0
-  // ldContext ... not yet implemented in the API SPEC for subscriptions to have their own @context
+  // jsonldContext
   if (dbLdContextP != NULL)
+  {
     kjChildAdd(apiSubP, dbLdContextP);
-#endif
+    dbLdContextP->name = (char*) "jsonldContext";
+  }
 
-  // count - take sub-cache delta into consideration
-  if (dbCountP != NULL)
-    kjChildAdd(apiSubP, dbCountP);
-
-  // lastNotification - take from sub-cache
-  if (dbLastNotificationP != NULL)
-    kjChildAdd(apiSubP, dbLastNotificationP);
-
-  // lastSuccess - take from sub-cache
-  if (dbLastSuccessP != NULL)
-    kjChildAdd(apiSubP, dbLastSuccessP);
-
-  // lastFailure - take from sub-cache
-  if (dbLastFailureP != NULL)
-    kjChildAdd(apiSubP, dbLastFailureP);
 
   if (qNodePP != NULL)  // FIXME: This is more than a bit weird ...
     *qNodePP = NULL;

@@ -475,7 +475,15 @@ bool legacyGetEntity(void)
   }
 
   if (orionldState.out.contentType == GEOJSON)
-    orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree, orionldState.geoPropertyNode);
+    orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree,
+                                                         orionldState.geoPropertyNode,
+                                                         orionldState.link,
+                                                         orionldState.preferHeader,
+                                                         orionldState.uriParams.geometryProperty,
+                                                         orionldState.geoPropertyMissing,
+                                                         orionldState.linkHeaderAdded,
+                                                         orionldState.uriParamOptions.concise,
+                                                         orionldState.contextP->url);
 
   return true;
 }

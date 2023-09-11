@@ -106,7 +106,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:A4501
 ===============================================================================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subscription:s1
 Fiware-Servicepath: /
-Content-Length: 348
+Content-Length: 353
 User-Agent: orion/REGEX(.*)
 Ngsiv2-Attrsformat: normalized
 Host: REGEX(.*)
@@ -114,7 +114,7 @@ Accept: application/json
 Content-Type: application/ld+json
 
 {
-    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+    "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "data": [
         {
             "P1": {

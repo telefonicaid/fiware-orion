@@ -47,13 +47,15 @@ orionldStart CB
 # 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 # 05. Attempt to create a subscription with an ID that is not a URI - see failure
 # 06. Attempt to create a subscription without 'entities' nor 'watchedAttributes' - see failure
-# 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
+# 07. Attempt to create a subscription with 'timeInterval' - see 501
 # 08. Create a subscription without 'timeInterval' nor 'watchedAttributes' - OK
 # 09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK
 # 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
 #
 # 11. Create the subscription from https://github.com/FIWARE/context.Orion-LD/issues/895
 # 12. See the subscription in mongo
+#
+# 13. Attempt to create a subscription with an expiresAt in the past
 #
 
 
@@ -232,8 +234,8 @@ echo
 echo
 
 
-echo "07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure"
-echo "==================================================================================================="
+echo "07. Attempt to create a subscription with 'timeInterval' - see 501"
+echo "=================================================================="
 payload='{
   "id": "http://a.b.c/subs/sub03",
   "type": "Subscription",
@@ -256,12 +258,6 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "timeInterval": 12,
   "q": "P2>10",
-  "geoQ": {
-    "geometry": "Point",
-    "coordinates": [1,2],
-    "georel": "near",
-    "geoproperty": "location"
-  },
   "csf": "not implemented",
   "isActive": false,
   "notification": {
@@ -397,6 +393,31 @@ echo
 echo "12. See the subscription in mongo"
 echo "================================="
 mongoCmd2 ftest 'db.csubs.findOne({"_id": "urn:ngsi-ld:subs:11"})'
+echo
+echo
+
+
+echo "13. Attempt to create a subscription with an expiresAt in the past"
+echo "=================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subs:13",
+  "description": "test0001",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "http://XXXX/YYYY/ngsi-context.jsonld#Person"
+    }
+  ],
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://tutorial:3000/subscription/test0001",
+      "accept": "application/json"
+    }
+  },
+  "expiresAt": "2023-09-01T10:00:00.000Z"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/json"
 echo
 echo
 
@@ -626,17 +647,17 @@ Date: REGEX(.*)
 }
 
 
-07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
-===================================================================================================
+07. Attempt to create a subscription with 'timeInterval' - see 501
+==================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 144
+Content-Length: 161
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Subscription::timeInterval is not implemented",
+    "detail": "Periodic Notification Subscriptions are not implemented",
     "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 
@@ -730,7 +751,7 @@ MongoDB server REGEX(.*)
 	"attrs" : [ ],
 	"metadata" : [ ],
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"createdAt" : REGEX(.*),
 	"modifiedAt" : REGEX(.*),
 	"conditions" : [ ],
@@ -745,6 +766,20 @@ MongoDB server REGEX(.*)
 	"format" : "normalized"
 }
 bye
+
+
+13. Attempt to create a subscription with an expiresAt in the past
+==================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 127
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "/expiresAt/ in the past",
+    "title": "Invalid Subscription",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
 
 
 --TEARDOWN--

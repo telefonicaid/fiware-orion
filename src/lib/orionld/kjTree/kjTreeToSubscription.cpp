@@ -37,7 +37,7 @@ extern "C"
 #include "orionld/common/CHECK.h"                                // CHECKx()
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
-#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
+#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI, PCHECK_EXPIRESAT_IN_FUTURE
 #include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload
 #include "orionld/q/qRender.h"                                   // qRender
 #include "orionld/kjTree/kjTreeToEntIdVector.h"                  // kjTreeToEntIdVector
@@ -48,6 +48,10 @@ extern "C"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// oldTreatmentForQ -
+//
 bool oldTreatmentForQ(ngsiv2::Subscription* subP, char* q)
 {
   bool  qWithOr = false;
@@ -255,7 +259,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if (strcmp(kNodeP->name, "timeInterval") == 0)
     {
-      orionldError(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented", 501);
+      orionldError(OrionldOperationNotSupported, "Not Implemented", "Periodic Notification Subscriptions are not implemented", 501);
       return false;
     }
     else if ((kNodeP->name[0] == 'q') && (kNodeP->name[1] == 0))
@@ -305,6 +309,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
       DUPLICATE_CHECK(expiresP, "Subscription::expiresAt", kNodeP->value.s);
       STRING_CHECK(kNodeP, "Subscription::expiresAt");
       DATETIME_CHECK(expiresP, subP->expires, "Subscription::expiresAt");
+      PCHECK_EXPIRESAT_IN_FUTURE(0, "Invalid Subscription", "/expiresAt/ in the past", 400, subP->expires, orionldState.requestTime);
     }
     else if (strcmp(kNodeP->name, "throttling") == 0)
     {
@@ -356,7 +361,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
 
   if ((timeIntervalP != NULL) && (watchedAttributesPresent == true))
   {
-    orionldError(OrionldBadRequestData, "Both 'timeInterval' and 'watchedAttributes' present", NULL, 400);
+    orionldError(OrionldBadRequestData, "Inconsistent subscription", "Both 'timeInterval' and 'watchedAttributes' present", 400);
     return false;
   }
 

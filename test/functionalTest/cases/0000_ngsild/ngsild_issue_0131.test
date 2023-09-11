@@ -67,7 +67,7 @@ payload='{
   },
   "@context": [
     "https://fiware.github.io/data-models/full-context.jsonld",
-    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/json" --linkHeaderFix
@@ -106,7 +106,7 @@ payload='{
   },
   "@context": [
     "https://fiware.github.io/data-models/full-context.jsonld",
-    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+    "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
   ]
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" -H "Content-Type: application/ld+json" --linkHeaderFix
@@ -155,10 +155,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Building:store00221
 03. GET the entity, without context, see long names
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 685
+Content-Length: 714
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
   "id": "urn:ngsi-ld:Building:store00221",
@@ -186,7 +186,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
       ]
     }
   },
-  "name": {
+  "https://uri.etsi.org/ngsi-ld/name": {
     "type": "Property",
     "value": "Bösebrücke Einkauf"
   }

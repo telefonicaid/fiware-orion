@@ -151,7 +151,7 @@ Location: /ngsi-ld/v1/subscriptions/http://a.b.c/subs/sub01
 02. GET subscription 'http://a.b.c/subs/sub01' and see it
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 789
+Content-Length: 883
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -196,7 +196,8 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
   },
   "expiresAt": "2028-12-31T10:00:00.123Z",
   "throttling": 5,
-  "origin": "cache"
+  "origin": "cache",
+  "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }
 
 

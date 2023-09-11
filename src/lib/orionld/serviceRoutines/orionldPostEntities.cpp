@@ -65,6 +65,35 @@ extern "C"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// sysAttrsToEntity -
+//
+void sysAttrsToEntity(KjNode* apiEntityP)
+{
+  KjNode* createdAtP  = kjString(orionldState.kjsonP, "createdAt",  orionldState.requestTimeString);
+  KjNode* modifiedAtP = kjString(orionldState.kjsonP, "modifiedAt", orionldState.requestTimeString);
+
+  kjChildAdd(apiEntityP, createdAtP);
+  kjChildAdd(apiEntityP, modifiedAtP);
+
+  // Loop over all attributes
+  for (KjNode* attrP = apiEntityP->value.firstChildP; attrP != NULL; attrP = attrP->next)
+  {
+    // Not an object?  Not an attribute!  (Arrays(datasetId) comes later)
+    if (attrP->type != KjObject)
+      continue;
+
+    KjNode* createdAtP  = kjString(orionldState.kjsonP, "createdAt",  orionldState.requestTimeString);
+    KjNode* modifiedAtP = kjString(orionldState.kjsonP, "modifiedAt", orionldState.requestTimeString);
+
+    kjChildAdd(attrP, createdAtP);
+    kjChildAdd(attrP, modifiedAtP);
+  }
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldPostEntities -
@@ -212,14 +241,20 @@ bool orionldPostEntities(void)
   // Prepare for notifications
   //
   orionldState.alterations = (OrionldAlteration*) kaAlloc(&orionldState.kalloc, sizeof(OrionldAlteration));
-  orionldState.alterations->entityId          = entityId;
-  orionldState.alterations->entityType        = entityType;
-  orionldState.alterations->inEntityP         = apiEntityP;
-  orionldState.alterations->dbEntityP         = NULL;
-  orionldState.alterations->finalApiEntityP   = apiEntityP;  // entity id, createdAt, modifiedAt ...
-  orionldState.alterations->alteredAttributes = 0;
-  orionldState.alterations->alteredAttributeV = NULL;
-  orionldState.alterations->next              = NULL;
+  orionldState.alterations->entityId                    = entityId;
+  orionldState.alterations->entityType                  = entityType;
+  orionldState.alterations->inEntityP                   = apiEntityP;
+  orionldState.alterations->dbEntityP                   = NULL;
+  orionldState.alterations->finalApiEntityP             = apiEntityP;
+  orionldState.alterations->finalApiEntityWithSysAttrsP = kjClone(orionldState.kjsonP, apiEntityP);  // Later we add createdAt+modifiedAt
+  orionldState.alterations->alteredAttributes           = 0;
+  orionldState.alterations->alteredAttributeV           = NULL;
+  orionldState.alterations->next                        = NULL;
+
+  //
+  // Must add the sysAttrs to the "Final API Entity" as subscriptions may have "notification::sysAttrs" set to true ...
+  //
+  sysAttrsToEntity(orionldState.alterations->finalApiEntityWithSysAttrsP);
 
   if (cloneForTroeP != NULL)
     orionldState.requestTree = cloneForTroeP;

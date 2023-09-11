@@ -44,17 +44,17 @@ bool pCheckGeorel(KjNode* georelP, OrionldGeoInfo* geoInfoP)
 {
   if (georelP == NULL)
   {
-    orionldError(OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel missing", 400);
+    orionldError(OrionldBadRequestData, "Invalid Geo-Spatial Filter", "georel missing", 400);
     return false;
   }
   else if (georelP->type != KjString)
   {
-    orionldError(OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel must be a string", 400);
+    orionldError(OrionldBadRequestData, "Invalid Geo-Spatial Filter", "georel must be a string", 400);
     return false;
   }
   else if (georelP->value.s[0] == 0)
   {
-    orionldError(OrionldInvalidRequest, "Invalid Geo-Spatial Filter", "georel value is empty", 400);
+    orionldError(OrionldBadRequestData, "Invalid Geo-Spatial Filter", "georel value is empty", 400);
     return false;
   }
 

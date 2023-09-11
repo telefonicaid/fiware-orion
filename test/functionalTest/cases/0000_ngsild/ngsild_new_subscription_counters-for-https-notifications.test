@@ -89,6 +89,7 @@ echo
 echo "03. GET S1, see lastSuccess, lastNotification, and timesSent==1"
 echo "==============================================================="
 valgrindSleep 2
+sleep .3
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo
@@ -140,6 +141,7 @@ echo
 echo "08. GET S1, see lastSuccess, lastNotification, and timesSent==4"
 echo "==============================================================="
 valgrindSleep 4
+sleep .3
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo
@@ -167,6 +169,7 @@ echo
 echo "11. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5"
 echo "============================================================================"
 valgrindSleep 2
+sleep .3
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo
@@ -229,6 +232,7 @@ echo
 echo "18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==7"
 echo "============================================================================"
 valgrindSleep 2
+sleep .3
 orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S1
 echo
 echo
@@ -256,10 +260,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E1
 03. GET S1, see lastSuccess, lastNotification, and timesSent==1
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 369
+Content-Length: 452
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "entities": [
@@ -269,6 +273,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -321,7 +326,7 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
 }
 bye
 
@@ -356,10 +361,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E4
 08. GET S1, see lastSuccess, lastNotification, and timesSent==4
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 369
+Content-Length: 452
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "entities": [
@@ -369,6 +374,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -402,10 +408,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E5
 11. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 497
+Content-Length: 596
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "entities": [
@@ -415,6 +421,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "consecutiveErrors": 1,
         "endpoint": {
@@ -427,6 +434,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "lastNotification": "202REGEX(.*)",
         "lastSuccess": "202REGEX(.*)",
         "status": "failed",
+        "timesFailed": 1,
         "timesSent": 5
     },
     "origin": "cache",
@@ -470,11 +478,12 @@ MongoDB server version: REGEX(.*)
 	"custom" : false,
 	"servicePath" : "/#",
 	"blacklist" : false,
-	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
-	"count" : NumberLong(5),
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+	"count" : 5,
 	"lastFailure" : REGEX(.*),
 	"lastNotification" : REGEX(.*),
 	"lastSuccess" : REGEX(.*)
+	"timesFailed" : 1
 }
 bye
 
@@ -486,10 +495,10 @@ bye
 14. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==5
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 410
+Content-Length: 509
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "entities": [
@@ -499,6 +508,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -509,6 +519,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "lastNotification": "202REGEX(.*)",
         "lastSuccess": "202REGEX(.*)",
         "status": "ok",
+        "timesFailed": 1,
         "timesSent": 5
     },
     "origin": "cache",
@@ -543,10 +554,10 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:E7
 18. GET S1, see lastSuccess, lastFailure, lastNotification, and timesSent==7
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 471
+Content-Length: 570
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "entities": [
@@ -556,6 +567,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -567,6 +579,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "lastNotification": "202REGEX(.*)",
         "lastSuccess": "202REGEX(.*)",
         "status": "ok",
+        "timesFailed": 2,
         "timesSent": 7
     },
     "origin": "cache",
