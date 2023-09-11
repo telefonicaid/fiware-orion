@@ -26,6 +26,8 @@ suse_distro=$(cat /etc/SuSE-release 2> /dev/null | grep SUSE | cut -d ' ' -f 1-2
 
 centos_distro=$(cat /etc/redhat-release 2> /dev/null | awk '{print $3}')
 
+alpine_distro=$(cat /etc/alpine-release 2> /dev/null)
+
 # In some cases (e.g. CentOS 7.x) we have found that the /etc/redhat-release content uses the following pattern:
 #
 #  CentOS Linux release 7.2.1511 (Core)
@@ -69,6 +71,9 @@ then
 elif [ "$centos_distro" != "" ]
 then
   distro=CentOS_$centos_distro 
+elif [ "$alpine_distro" != "" ]
+then
+  distro=Alpine_$alpine_distro
 fi
 
 echo -n $distro
