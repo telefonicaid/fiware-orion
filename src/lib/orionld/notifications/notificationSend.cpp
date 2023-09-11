@@ -554,6 +554,15 @@ static KjNode* notificationTree(OrionldAlterationMatch* matchList)
   kjChildAdd(notificationP, notifiedAtNodeP);
   kjChildAdd(notificationP, dataNodeP);
 
+  // Reason for the notification
+  if (triggerOperation == true)
+  {
+    char trigger[128];
+    snprintf(trigger, sizeof(trigger) - 1, "%s %s", orionldState.verbString, orionldState.urlPath);
+    KjNode* triggerP = kjString(orionldState.kjsonP, "trigger", trigger);
+    kjChildAdd(notificationP, triggerP);
+  }
+
   for (OrionldAlterationMatch* matchP = matchList; matchP != NULL; matchP = matchP->next)
   {
     KjNode* apiEntityP = (subP->sysAttrs == false)? matchP->altP->finalApiEntityP : matchP->altP->finalApiEntityWithSysAttrsP;

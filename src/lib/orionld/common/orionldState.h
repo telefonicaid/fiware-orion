@@ -582,6 +582,7 @@ extern OrionldPhase      orionldPhase;
 extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 extern bool              idIndex;                  // From orionld.cpp
 extern bool              noNotifyFalseUpdate;      // From orionld.cpp
+extern bool              triggerOperation;         // From orionld.cpp
 extern char              mongoServerVersion[32];
 extern bool              experimental;             // From orionld.cpp
 extern bool              mongocOnly;               // From orionld.cpp
