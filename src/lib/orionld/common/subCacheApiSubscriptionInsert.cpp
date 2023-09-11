@@ -315,7 +315,7 @@ static void subCacheItemFill
             cSubP->rest));
         cSubP->protocolString = strdup(cSubP->protocolString);
         cSubP->ip             = strdup(cSubP->ip);
-        cSubP->rest           = strdup(cSubP->rest);
+        cSubP->rest           = (cSubP->rest != NULL)? strdup(cSubP->rest) : NULL;
       }
 
       if (cSubP->protocol == MQTT)

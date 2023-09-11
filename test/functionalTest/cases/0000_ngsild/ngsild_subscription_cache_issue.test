@@ -1,0 +1,212 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Possible error in Subscription Cache
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+
+--SHELL--
+
+#
+# 01. Create a subscription S1
+# 02. Create a subscription S2
+# 03. Restart broker
+# 04. GET Subscriptions, make sure all is OK
+#
+
+echo "01. Create a subscription S1"
+echo "============================"
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "description": "Notify me of all product price changes",
+  "entities": [
+    {
+      "type": "product"
+    }
+  ],
+  "watchedAttributes": [ "name" ],
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "https://ttttt.free.beeceptor.com",
+      "accept": "application/json",
+      "receiverInfo": [
+        {
+          "key": "a",
+          "value": "b"
+        }
+      ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription S2"
+echo "============================"
+payload='{
+  "id": "urn:S2",
+  "type": "Subscription",
+  "description": "Notify me of all product price changes",
+  "entities": [
+    {
+      "type": "product"
+    }
+  ],
+  "notification": {
+    "format": "normalized",
+    "endpoint": {
+      "uri": "https://ttttt.free.beeceptor.com",
+      "accept": "application/json",
+      "receiverInfo": [
+        {
+          "key": "a",
+          "value": "b"
+        }
+      ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Restart the broker"
+echo "======================"
+brokerStop CB
+orionldStart CB -experimental
+echo
+echo
+
+
+
+echo "04. GET Subscriptions, make sure all is OK"
+echo "=========================================="
+orionCurl --url /ngsi-ld/v1/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription S1
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+02. Create a subscription S2
+============================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S2
+
+
+
+03. Restart the broker
+======================
+
+
+04. GET Subscriptions, make sure all is OK
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 900
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "description": "Notify me of all product price changes",
+        "entities": [
+            {
+                "type": "product"
+            }
+        ],
+        "id": "urn:S1",
+        "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "receiverInfo": [
+                    {
+                        "key": "a",
+                        "value": "b"
+                    }
+                ],
+                "uri": "https://ttttt.free.beeceptor.com"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription",
+        "watchedAttributes": [
+            "name"
+        ]
+    },
+    {
+        "description": "Notify me of all product price changes",
+        "entities": [
+            {
+                "type": "product"
+            }
+        ],
+        "id": "urn:S2",
+        "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "notification": {
+            "endpoint": {
+                "accept": "application/json",
+                "receiverInfo": [
+                    {
+                        "key": "a",
+                        "value": "b"
+                    }
+                ],
+                "uri": "https://ttttt.free.beeceptor.com"
+            },
+            "format": "normalized",
+            "status": "ok"
+        },
+        "origin": "cache",
+        "status": "active",
+        "type": "Subscription"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
