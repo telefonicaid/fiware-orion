@@ -258,6 +258,7 @@ bool            mongocOnly   = false;
 bool            debugCurl    = false;
 uint32_t        cSubCounters;
 char            coreContextVersion[64];
+bool            triggerOperation = false;
 
 
 
@@ -337,6 +338,7 @@ char            coreContextVersion[64];
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
 #define NO_NOTIFY_FALSE_UPDATE_DESC  "turn off notifications on non-updates"
+#define TRIGGER_OPERATION_DESC "include the operation that triggered the notification"
 #define EXPERIMENTAL_DESC      "enable experimental implementation - use at own risk - see release notes of Orion-LD v1.1.0"
 #define MONGOCONLY_DESC        "enable experimental implementation + turn off mongo legacy driver"
 #define DBAUTHDB_DESC          "database used for authentication"
@@ -435,6 +437,7 @@ PaArgument paArgs[] =
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
   { "-distributed",           &distributed,             "DISTRIBUTED",               PaBool,    PaOpt,  false,           false,  true,             DISTRIBUTED_DESC         },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
+  { "-triggerOperation",      &triggerOperation,        "TRIGGER_OPERATION",         PaBool,    PaHid,  false,           false,  true,             TRIGGER_OPERATION_DESC   },
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaOpt,  false,           false,  true,             EXPERIMENTAL_DESC        },
   { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC          },
   { "-cSubCounters",          &cSubCounters,            "CSUB_COUNTERS",             PaInt,     PaOpt,  20,              0,      PaNL,             CSUBCOUNTERS_DESC        },
