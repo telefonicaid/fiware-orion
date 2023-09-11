@@ -2,6 +2,8 @@
 
 Orion Context Broker reference distribution is Debian 12. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section may include indications on how to build in other distributions, just in the case it may help people that don't use Debian. However, note that the only "officially supported" procedure is the one for Debian 12.
 
+You can also have a look to [3.1 Building in not official distributions](../../../docker/README.md#31-building-in-not-official-distributions) section in the Docker documentation to check how to build Docker containers images in distributions other than the official one.
+
 ## Debian 12 (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
