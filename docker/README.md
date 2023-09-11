@@ -130,7 +130,8 @@ The parameter `--build-arg` in the `docker build` can be set build-time variable
 
 | ARG             | Description                                                         | Example                         |
 | --------------- | ------------------------------------------------------------------- | ------------------------------- |
-| IMAGE_TAG       | Specify a tag of the base image.                                    | --build-arg IMAGE_TAG=centos7   |
+| IMAGE_NAME      | Specify a name of the base image.                                   | --build-arg IMAGE_TAG=ubuntu    |
+| IMAGE_TAG       | Specify a tag of the base image.                                    | --build-arg IMAGE_TAG=22.04     |
 | GIT_NAME        | Specify a username of GitHub repository.                            | --build-arg GIT_NAME=fiware-ges |
 | GIT_REV_ORION   | Specify the Orion version you want to build.                        | --build-arg GIT_REV_ORION=2.3.0 |
 | CLEAN_DEV_TOOLS | Specify whether the development tools clear. It is remained when 0. | --build-arg CLEAN_DEV_TOOLS=0   |

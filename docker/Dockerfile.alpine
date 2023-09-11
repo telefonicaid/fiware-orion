@@ -22,8 +22,9 @@
 # FIXME the change from mongoc driver 1.23.1 to 1.24.1 (PR https://github.com/telefonicaid/fiware-orion/pull/4415)
 # has not been actually tested. Remove this FIXME mark after succesfull test
 
+ARG  IMAGE_NAME=alpine
 ARG  IMAGE_TAG=3.16.0
-FROM alpine:${IMAGE_TAG}
+FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
 ARG GITHUB_REPOSITORY=fiware-orion

@@ -19,8 +19,9 @@
 # iot_support at tid dot es
 #
 
+ARG  IMAGE_NAME=debian
 ARG  IMAGE_TAG=12.1-slim
-FROM debian:${IMAGE_TAG}
+FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
 ARG GITHUB_REPOSITORY=fiware-orion

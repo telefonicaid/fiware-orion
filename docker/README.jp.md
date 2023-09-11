@@ -128,7 +128,8 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 | ARG             | 説明                                                           | 例                              |
 | --------------- | -------------------------------------------------------------- | ------------------------------- |
-| IMAGE_TAG       | ベース・イメージのタグを指定します                             | --build-arg IMAGE_TAG=centos7   |
+| IMAGE_NAME      | ベース・イメージの名前を指定します                             | --build-arg IMAGE_NAME=ubuntu   |
+| IMAGE_TAG       | ベース・イメージのタグを指定します                             | --build-arg IMAGE_TAG=22.04     |
 | GIT_NAME        | GitHub リポジトリのユーザ名を指定します                        | --build-arg GIT_NAME=fiware-ges |
 | GIT_REV_ORION   | ビルドする Orion バージョンを指定します                        | --build-arg GIT_REV_ORION=2.3.0 |
 | CLEAN_DEV_TOOLS | 開発ツールをクリアするかどうかを指定します。0 の場合は残ります | --build-arg CLEAN_DEV_TOOLS=0   |
