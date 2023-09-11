@@ -124,7 +124,7 @@ Check that everything works with
 
 The parameter `-t orion` in the `docker build` command gives the image a name. This name could be anything, or even include an organization like `-t org/fiware-orion`. This name is later used to run the container based on the image.
 
-Two Dockerfiles are provided for step 3 above: the official one (`Dockefile` itself) based in Debian and `Dockefile.alpine`, which is not official but in can be useful as starting point if you want to use Alpine as base distribution.
+Two Dockerfiles are provided for step 3 above: the official one (`Dockefile` itself) based in Debian and `Dockefile.alpine`, which is not official but in can be useful as starting point if you want to use [Alpine](https://www.alpinelinux.org/) as base distribution.
 
 The parameter `--build-arg` in the `docker build` can be set build-time variables. 
 
@@ -136,6 +136,14 @@ The parameter `--build-arg` in the `docker build` can be set build-time variable
 | CLEAN_DEV_TOOLS | Specify whether the development tools clear. It is remained when 0. | --build-arg CLEAN_DEV_TOOLS=0   |
 
 If you want to know more about images and the building process you can find it in [Docker's documentation](https://docs.docker.com/userguide/dockerimages/).
+
+### 3.1 Building in not official distributions
+
+As explained in the [requirements section of the installation documentation](../doc/manuals/admin/install.md#requirements), Debian 12 is the only officially supported
+distribution. However, the following commands have been tested to build Docker containers based in alternative distributions:
+
+* Ubuntu 22.04 TLS: `docker build -t orion-ubuntu22.04 --build-arg IMAGE_NAME=ubuntu --build-arg IMAGE_TAG=22.04 --build-arg CLEAN_DEV_TOOLS=0`
+* Alpine 3.16.0: `docker build -t orion-alpine3.16 -f Dockerfile.alpine`
 
 ## 4. Other info
 
