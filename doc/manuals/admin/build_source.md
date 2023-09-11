@@ -1,6 +1,6 @@
 # Building from sources
 
-Orion Context Broker reference distribution is Debian 12. This doesn't mean that the broker cannot be built in other distributions (actually, it can). However, note that the only "officially supported" procedure is the one for Debian 12.
+Orion Context Broker reference distribution is Debian 12. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section may include indications on how to build in other distributions, just in the case it may help people that don't use Debian. However, note that the only "officially supported" procedure is the one for Debian 12.
 
 ## Debian 12 (officially supported)
 
