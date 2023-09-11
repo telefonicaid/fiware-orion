@@ -122,7 +122,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 `docker build` コマンドのパラメータ `-t orion` は、イメージに名前を付けます。この名前は何でもかまいませんし、`-t org/fiware-orion` のような組織も含めています。この名前は後でイメージに基づいてコンテナを実行するために使用されます。
 
-上記のステップ3には、2つの Dockerfile が用意されています: Debian ベースの公式のもの (`Dockefile` 自体) と、公式ではありませんが、Alpine をベース・ディストリビューションとして使用する場合の開始点として役立つ `Dockefile.alpine` です。
+上記のステップ3には、2つの Dockerfile が用意されています: Debian ベースの公式のもの (`Dockefile` 自体) と、公式ではありませんが、[Alpine](https://www.alpinelinux.org/) をベース・ディストリビューションとして使用する場合の開始点として役立つ `Dockefile.alpine` です。
 
 `docker build` のパラメータ `--build-arg` はビルド時の変数を設定できます。
 
@@ -134,6 +134,14 @@ Orion Context Broker を試してみたいし、データベースについて�
 | CLEAN_DEV_TOOLS | 開発ツールをクリアするかどうかを指定します。0 の場合は残ります | --build-arg CLEAN_DEV_TOOLS=0   |
 
 イメージとビルド・プロセスの詳細については、[Docker のドキュメント](https://docs.docker.com/userguide/dockerimages/)を参照してください。
+
+<a name="31-building-in-not-official-distributions"></a>
+### 3.1 非公式ディストリビューションでのビルド
+
+[インストール・ドキュメントの要件セクション](../doc/manuals.jp/admin/install.md#requirements)で説明されているように、Debian 12 は公式にサポートされている唯一のディストリビューションです。ただし、次のコマンドは、代替ディストリビューションをベースとする Docker コンテナを構築するためにテストされています。
+
+* Ubuntu 22.04 LTS: `docker build -t orion-ubuntu22.04 --build-arg IMAGE_NAME=ubuntu --build-arg IMAGE_TAG=22.04 --build-arg CLEAN_DEV_TOOLS=0 .`
+* Alpine 3.16.0: `docker build -t orion-alpine3.16 -f Dockerfile.alpine .`
 
 ## 4. その他の情報
 

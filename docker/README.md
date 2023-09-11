@@ -142,8 +142,8 @@ If you want to know more about images and the building process you can find it i
 As explained in the [requirements section of the installation documentation](../doc/manuals/admin/install.md#requirements), Debian 12 is the only officially supported
 distribution. However, the following commands have been tested to build Docker containers based in alternative distributions:
 
-* Ubuntu 22.04 TLS: `docker build -t orion-ubuntu22.04 --build-arg IMAGE_NAME=ubuntu --build-arg IMAGE_TAG=22.04 --build-arg CLEAN_DEV_TOOLS=0`
-* Alpine 3.16.0: `docker build -t orion-alpine3.16 -f Dockerfile.alpine`
+* Ubuntu 22.04 LTS: `docker build -t orion-ubuntu22.04 --build-arg IMAGE_NAME=ubuntu --build-arg IMAGE_TAG=22.04 --build-arg CLEAN_DEV_TOOLS=0 .`
+* Alpine 3.16.0: `docker build -t orion-alpine3.16 -f Dockerfile.alpine .`
 
 ## 4. Other info
 
