@@ -36,7 +36,7 @@ check the FIWARE Catalogue entry for
 [Core Context Management](https://github.com/Fiware/catalogue/tree/master/core).
 
 | :books: [Documentation](https://fiware-orion.rtfd.io) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion) | <img style="height:1em" src="https://quay.io/static/img/quay_favicon.png"/> [quay.io](https://quay.io/repository/fiware/orion) | :whale: [Docker Hub](https://registry.hub.docker.com/r/telefonicaiot/fiware-orion) | :dart: [Roadmap](doc/roadmap.md) |
-|---|---|---|---|
+|---|---|---|---|--|
 
 ## Content
 
