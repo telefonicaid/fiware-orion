@@ -197,7 +197,7 @@ static char* uriCompose
     bool dbAuthMechanismPresent = (dbAuthMechanism != NULL) && (dbAuthMechanism[0] != 0);
 
     if ((dbAuthDbPresent == true) || (dbReplicaSetPresent == true) || (dbAuthMechanismPresent == true)  || (dbSSL == true))
-      compV[compNo++] = (char*) "?";
+      compV[compNo++] = (char*) "/?";
 
     if (dbAuthDbPresent == true)
       compV[compNo++] = dbAuthDb;
