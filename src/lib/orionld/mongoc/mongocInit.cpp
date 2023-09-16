@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <stdlib.h>                                              // calloc, free
+#include <string.h>                                              // strchr
 #include <semaphore.h>                                           // sem_init
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
@@ -192,12 +193,19 @@ static char* uriCompose
 
     compV[compNo++] = dbHost;
 
+    //
+    // If dbHost is a list, the list must end with a slash
+    // Assuming it's a list if there's a comma in the string
+    //
+    if (strchr(dbHost, ',') != NULL)
+      compV[compNo++] = (char*) "/";
+
     bool dbAuthDbPresent        = (dbAuthDb        != NULL) && (dbAuthDb[0]        != 0);
     bool dbReplicaSetPresent    = (dbReplicaSet    != NULL) && (dbReplicaSet[0]    != 0);
     bool dbAuthMechanismPresent = (dbAuthMechanism != NULL) && (dbAuthMechanism[0] != 0);
 
     if ((dbAuthDbPresent == true) || (dbReplicaSetPresent == true) || (dbAuthMechanismPresent == true)  || (dbSSL == true))
-      compV[compNo++] = (char*) "/?";
+      compV[compNo++] = (char*) "?";
 
     if (dbAuthDbPresent == true)
       compV[compNo++] = dbAuthDb;
