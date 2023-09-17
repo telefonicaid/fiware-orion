@@ -46,7 +46,21 @@ orionldStart CP4 -experimental
 
 echo "00. Make sure mongo is clean"
 echo "============================"
-mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:E1"})'
+mongoCmd2 ftest 'db.entities.findOne()'
+echo
+echo
+
+
+echo "00. Make sure mongo is clean"
+echo "============================"
+mongoCmd2 ftest 'db.csubs.findOne()'
+echo
+echo
+
+
+echo "00. Make sure mongo is clean"
+echo "============================"
+mongoCmd2 ftest 'db.registrations.findOne()'
 echo
 echo
 
@@ -219,6 +233,24 @@ echo
 
 
 --REGEXPECT--
+00. Make sure mongo is clean
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
+00. Make sure mongo is clean
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
 00. Make sure mongo is clean
 ============================
 MongoDB shell version REGEX(.*)
