@@ -44,6 +44,13 @@ orionldStart CP4 -experimental
 # 09. GET all entities in CP4, see urn:E1 without attrs
 #
 
+echo "00. Make sure mongo is clean"
+echo "============================"
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:E1"})'
+echo
+echo
+
+
 echo "01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2"
 echo "========================================================================================================"
 payload='{
@@ -212,6 +219,15 @@ echo
 
 
 --REGEXPECT--
+00. Make sure mongo is clean
+============================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
 01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2
 ========================================================================================================
 HTTP/1.1 201 Created
