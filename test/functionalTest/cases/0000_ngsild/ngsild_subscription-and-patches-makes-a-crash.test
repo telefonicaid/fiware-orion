@@ -189,7 +189,7 @@ Ngsild-Attribute-Format: Simplified
 07. See the good subscription and its counters/timestamps
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 432
+Content-Length: 515
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -202,6 +202,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
     ],
     "id": "urn:ngsi-ld:Subscription:SubscriptionPrivateSub",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

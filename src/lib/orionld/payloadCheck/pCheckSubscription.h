@@ -58,6 +58,7 @@ extern bool pCheckSubscription
   bool*          mqttChangeP,
   KjNode**       showChangesP,
   KjNode**       sysAttrsP,
+  double*        timeInterval,
   RenderFormat*  renderFormatP
 );
 

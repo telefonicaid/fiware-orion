@@ -1,4 +1,4 @@
-z# Copyright 2022 FIWARE Foundation e.V.
+# Copyright 2022 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -422,7 +422,7 @@ MongoDB server version: REGEX(.*)
 	"servicePath" : "/#",
 	"blacklist" : false,
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-	"count" : NumberLong(1),
+	"count" : 1,
 	"lastNotification" : REGEX(.*),
 	"lastSuccess" : REGEX(.*)
 }
@@ -468,9 +468,10 @@ MongoDB server version: REGEX(.*)
 	"servicePath" : "/#",
 	"blacklist" : false,
 	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-	"count" : NumberLong(1),
+	"count" : 1,
 	"lastFailure" : REGEX(.*),
-	"lastNotification" : REGEX(.*)
+	"lastNotification" : REGEX(.*),
+	"timesFailed" : 1
 }
 bye
 

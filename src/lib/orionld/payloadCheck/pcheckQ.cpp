@@ -65,6 +65,6 @@ QNode* pcheckQ(char* qString)
     return NULL;
   }
 
-  qPresent(qTree, "QP", "pcheckQ");
+  qPresent(qTree, "QP", "pcheckQ", LmtQ);
   return qTree;
 }

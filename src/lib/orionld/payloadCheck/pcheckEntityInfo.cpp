@@ -115,8 +115,13 @@ bool pcheckEntityInfo(KjNode* entityInfoP, bool typeMandatory, bool idMandatory,
       // Expand, unless already expanded
       // If a ':' is found inside the first 10 chars, the value is assumed to be expanded ...
       //
-      if (orionldContextItemAlreadyExpanded(entityItemP->value.s) == false)
-        entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, true, NULL);  // entity type
+      // No expansion if the type is '*' - meaning "ALL ENTITY TYPES"
+      //
+      if ((entityItemP->value.s[0] != '*') || (entityItemP->value.s[1] != 0))
+      {
+        if (orionldContextItemAlreadyExpanded(entityItemP->value.s) == false)
+          entityItemP->value.s = orionldContextItemExpand(orionldState.contextP, entityItemP->value.s, true, NULL);  // entity type
+      }
     }
     else
     {

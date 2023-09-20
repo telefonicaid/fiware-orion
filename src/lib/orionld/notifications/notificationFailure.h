@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "cache/CachedSubscription.h"                               // CachedSubscription
+#include "orionld/pernot/PernotSubscription.h"                      // PernotSubscription
 
 
 
@@ -33,6 +34,8 @@
 //
 // notificationFailure -
 //
-extern void notificationFailure(CachedSubscription* subP, const char* errorReason, double timestamp);
+extern void notificationFailure(CachedSubscription* cSubP, const char* errorReason, double timestamp);
+extern void notificationFailure(PernotSubscription* pSubP, const char* errorReason, double timestamp);
+extern void notificationFailure(CachedSubscription* cSubP, PernotSubscription* pSubP, const char* errorReason, double timestamp);
 
 #endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_NOTIFICATIONFAILURE_H_

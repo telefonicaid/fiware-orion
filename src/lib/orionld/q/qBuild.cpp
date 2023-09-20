@@ -67,7 +67,7 @@
 //   isMqP        output parameter indicating whether the q para meter corresponds to 'mq' in NGSIv2
 //   qToDbModel   transform the variables in 'q' to look like they look in the q in the database
 //
-QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool qToDbModel)
+QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool qToDbModel, bool pernot)
 {
   QNode*      qP = NULL;
   char*       title;
@@ -104,7 +104,7 @@ QNode* qBuild(const char* q, char** qRenderP, bool* v2ValidP, bool* isMqP, bool 
       }
     }
 
-    qP = qParse(qList, NULL, false, qToDbModel, &title, &detail);  // 3rd parameter: forDb=false
+    qP = qParse(qList, NULL, pernot, qToDbModel, &title, &detail);  // 3rd parameter: 'forDb' false unless pernot subscription
     if (qP == NULL)
     {
       orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);

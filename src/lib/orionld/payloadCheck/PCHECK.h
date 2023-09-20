@@ -98,6 +98,25 @@ do                                                                              
 
 // -----------------------------------------------------------------------------
 //
+// PCHECK_INTEGER -
+//
+#define PCHECK_INTEGER(kNodeP, _type, _title, detail, status)                                \
+do                                                                                           \
+{                                                                                            \
+  if (kNodeP->type != KjInt)                                                                 \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Not a JSON Integer"   : _title;                   \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
 // PCHECK_STRING_OR_ARRAY -
 //
 #define PCHECK_STRING_OR_ARRAY(kNodeP, _type, _title, detail, status)                        \
@@ -160,6 +179,34 @@ do                                                                              
   {                                                                                          \
     int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
     const char* title = (_title == NULL)? "Not a JSON Number"   : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+} while (0)
+
+
+
+// -----------------------------------------------------------------------------
+//
+// PCHECK_NUMBER_GT -
+//
+#define PCHECK_NUMBER_GT(kNodeP, _type, _title, detail, status, minValue)                    \
+do                                                                                           \
+{                                                                                            \
+  if ((kNodeP->type == KjInt) && (kNodeP->value.i <= minValue))                              \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Too small a Number"  : _title;                    \
+                                                                                             \
+    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    return false;                                                                            \
+  }                                                                                          \
+                                                                                             \
+  if ((kNodeP->type == KjFloat) && (kNodeP->value.f <= minValue))                            \
+  {                                                                                          \
+    int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                     \
+    const char* title = (_title == NULL)? "Too small a Number"  : _title;                    \
                                                                                              \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \

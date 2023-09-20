@@ -1,0 +1,390 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Pernot Subscription - periodic notifications and counters/timestamps
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -pernot -experimental -subCacheFlushIval 2
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# Need to test:
+# - noMatch
+# - lastSuccess
+# - lastFailure
+# - lastNotification
+# - timesSent
+# - timesFailed
+# - consecutiveErrors
+# - lastErrorReason
+# * subCacheRefresh (wait a few secs and re-query the sub)
+# * restart of broker
+# * dirty
+# 
+# noMatch:
+#   01. Create a pernot subscription urn:S1 with a timeInterval of 2 seconds
+#   02. Sleep 100 ms to await first attempt (that resulted in no match as there are no entities)
+#   03. GET urn:S1 and see noMatch == 1, and the other relevant counters/timestamps
+#
+# lastSuccess+lastNotification+timesSent
+#   11. Create a matching entity urn:E4
+#   12. Sleep 2.1 secs to give the broker time to notify the accumulator
+#   13. Dump the accumulator to see the notification
+#   14. GET urn:S1 and see lastSuccess, lastNotification, no lastFailure, noMatch=1, timesSent=2, timesFailed=0
+#   15. See the subscription in the database
+#
+# lastFailure+timesFailed
+#   21. Kill accumulator
+#   22. sleep 2.1 seconds to get another pernot attempt
+#   23. GET urn:S1 and see lastFailure, and timesFailed=1, consecutiveErrors=1, lastErrorReason
+#
+# subCacheRefresh
+#   31. Sleep 2 secs to give the broker time to refresh its subCache
+#   32. GET urn:S1 and see the exact same results at step 10
+#
+# restart of broker
+#   41. Restart the broker
+#   42. GET urn:S1 and see the exact same results at step 10 (perhaps one more notification attempt)
+#
+# flush the cache to DB
+#   51. Update urn:E4 twice and sleep a second to give the broker time to flush the sub-cache contents to DB
+#   52. GET urn:S1 and see the exact same results at step 10
+#   53. See urn:S1 in DB and have the exact same numbers as step 16
+#
+
+echo "01. Create a pernot subscription urn:S1 with timeInterval"
+echo "========================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "description": "Test Subscription No 1",
+  "subscriptionName": "S1",
+  "entities": [
+    {
+      "id": "urn:E1",
+      "type": "T"
+    },
+    {
+      "idPattern": "urn:E.*",
+      "type": "T"
+    }
+  ],
+  "q": "(a>5&b<9)|a<4",
+  "timeInterval": 2,
+  "notification": {
+    "attributes": [ "P1", "P2" ],
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Sleep 100 ms to await first attempt (that resulted in no match as there are no entities)"
+echo "============================================================================================"
+sleep 0.1  
+echo slept 100 ms
+echo
+echo
+
+
+echo "03. GET urn:S1 and see noMatch == 1, and the other relevant counters/timestamps"
+echo "==============================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
+echo
+echo
+
+
+echo "11. Create a matching entity urn:E4"
+echo "==================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "a": 1,
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "12. Sleep 2.1 secs to give the broker time to notify the accumulator"
+echo "===================================================================="
+sleep 2.1
+echo Slept 2100ms
+echo
+echo
+
+
+echo "13. Dump the accumulator to see the notification"
+echo "================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "14. GET urn:S1 and see lastSuccess, lastNotification, no lastFailure, noMatch=1, timesSent=2, timesFailed=0"
+echo "==========================================================================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:S1
+echo
+echo
+
+echo "15. See the subscription in the database"
+echo "========================================"
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+# 13. Restart the broker
+# orionldStop
+# orionldStart CB -pernot -experimental -subCacheIval 4 -cSubCounters 2
+# 14. GET urn:S1 and see the exact same results at step 10 (perhaps one more notification attempt)
+
+# flush the cache to DB
+# 15. Update urn:E4 twice and sleep a second to give the broker time to flush the sub-cache contents to DB
+# 16. GET urn:S1 and see the exact same results at step 10
+# 17. See urn:S1 in DB and have the exact same numbers as step 16
+
+
+--REGEXPECT--
+01. Create a pernot subscription urn:S1 with timeInterval
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+02. Sleep 100 ms to await first attempt (that resulted in no match as there are no entities)
+============================================================================================
+slept 100 ms
+
+
+03. GET urn:S1 and see noMatch == 1, and the other relevant counters/timestamps
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 574
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "description": "Test Subscription No 1",
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        },
+        {
+            "idPattern": "urn:E.*",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "notification": {
+        "attributes": [
+            "P1",
+            "P2"
+        ],
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "noMatch": 1,
+        "status": "ok",
+        "timesSent": 1
+    },
+    "origin": "cache",
+    "q": "(a>5;b<9)|a<4",
+    "status": "active",
+    "subscriptionName": "S1",
+    "timeInterval": 2,
+    "type": "Subscription"
+}
+
+
+11. Create a matching entity urn:E4
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+12. Sleep 2.1 secs to give the broker time to notify the accumulator
+====================================================================
+Slept 2100ms
+
+
+13. Dump the accumulator to see the notification
+================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 229
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "P1": {
+                "type": "Property",
+                "value": 1
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+14. GET urn:S1 and see lastSuccess, lastNotification, no lastFailure, noMatch=1, timesSent=2, timesFailed=0
+===========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 615
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "description": "Test Subscription No 1",
+    "entities": [
+        {
+            "id": "urn:E1",
+            "type": "T"
+        },
+        {
+            "idPattern": "urn:E.*",
+            "type": "T"
+        }
+    ],
+    "id": "urn:S1",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "notification": {
+        "attributes": [
+            "P1",
+            "P2"
+        ],
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://127.0.0.1:9997/notify"
+        },
+        "format": "normalized",
+        "lastNotification": "202REGEX(.*)Z",
+        "lastSuccess": "202REGEX(.*)Z",
+        "noMatch": 1,
+        "status": "ok",
+        "timesSent": 2
+    },
+    "origin": "cache",
+    "q": "(a>5;b<9)|a<4",
+    "status": "active",
+    "subscriptionName": "S1",
+    "timeInterval": 2,
+    "type": "Subscription"
+}
+
+
+15. See the subscription in the database
+========================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:S1",
+	"description" : "Test Subscription No 1",
+	"name" : "S1",
+	"entities" : [
+		{
+			"id" : "urn:E1",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isPattern" : "false",
+			"isTypePattern" : false
+		},
+		{
+			"id" : "urn:E.*",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+			"isPattern" : "true",
+			"isTypePattern" : false
+		}
+	],
+	"ldQ" : "(https://uri=etsi=org/ngsi-ld/default-context/a.value>5;https://uri=etsi=org/ngsi-ld/default-context/b.value<9)|https://uri=etsi=org/ngsi-ld/default-context/a.value<4",
+	"timeInterval" : 2,
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"throttling" : 0,
+	"expression" : {
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : "",
+		"q" : "P;!P",
+		"mq" : "P.P;!P.P"
+	},
+	"attrs" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2"
+	],
+	"reference" : "http://127.0.0.1:9997/notify",
+	"mimeType" : "application/json",
+	"format" : "normalized",
+	"conditions" : [ ],
+	"status" : "active",
+	"custom" : false,
+	"servicePath" : "/#",
+	"blacklist" : false,
+	"ldContext" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+	"count" : 1,
+	"lastNotification" : REGEX(.*),
+	"noMatch" : 1
+}
+bye
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

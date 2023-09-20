@@ -780,7 +780,7 @@ NGSILD-Tenant: t1
 03. GET subscriptions - see the first 20
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 13321
+Content-Length: 15121
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -813,6 +813,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -863,6 +864,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0002",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -913,6 +915,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0003",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -963,6 +966,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0004",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1013,6 +1017,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0005",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1063,6 +1068,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0006",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1113,6 +1119,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0007",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1163,6 +1170,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0008",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1213,6 +1221,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0009",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1263,6 +1272,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0010",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1313,6 +1323,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0011",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1363,6 +1374,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0012",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1413,6 +1425,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0013",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1463,6 +1476,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0014",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1513,6 +1527,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0015",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1563,6 +1578,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0016",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1613,6 +1629,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0017",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1663,6 +1680,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0018",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1713,6 +1731,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0019",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1763,6 +1782,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0020",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1792,7 +1812,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 04. GET subscriptions with limit 5 - see the first 5
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 3331
+Content-Length: 3781
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -1825,6 +1845,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1875,6 +1896,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0002",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1925,6 +1947,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0003",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -1975,6 +1998,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0004",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2025,6 +2049,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0005",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2054,7 +2079,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 05. GET subscriptions with limit 5 and offset 25, see subs 25-29
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 3331
+Content-Length: 3781
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2087,6 +2112,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0026",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2137,6 +2163,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0027",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2187,6 +2214,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0028",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2237,6 +2265,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0029",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2287,6 +2316,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0030",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2327,7 +2357,7 @@ NGSILD-Results-Count: 50
 07. GET subscriptions count with limit 1 - see HTTP header (NGSILD-Results-Count) and ONE (sub0001) subscription in the array
 =============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 860
+Content-Length: 950
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -2362,6 +2392,7 @@ NGSILD-Results-Count: 50
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "modifiedAt": "202REGEX(.*)",
         "notification": {
             "attributes": [
@@ -2392,7 +2423,7 @@ NGSILD-Results-Count: 50
 08. GET subscriptions from tenant t1, with offset 36 - see 4 subs
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 2665
+Content-Length: 3025
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2426,6 +2457,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0037",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2476,6 +2508,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0038",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2526,6 +2559,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0039",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2576,6 +2610,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0040",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2605,7 +2640,7 @@ NGSILD-Results-Count: 40
 09. GET subscriptions from tenant t1, with offset 36 AND with Accept: application/ld+json - see 4 subs
 ======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 3005
+Content-Length: 3365
 Content-Type: application/ld+json
 Date: REGEX(.*)
 NGSILD-Results-Count: 40
@@ -2639,6 +2674,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0037",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2690,6 +2726,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0038",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2741,6 +2778,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0039",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2792,6 +2830,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0040",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2821,7 +2860,7 @@ NGSILD-Results-Count: 40
 10. GET subscriptions from DB - see the first 20
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 13381
+Content-Length: 15181
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -2854,6 +2893,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2904,6 +2944,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0002",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -2954,6 +2995,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0003",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3004,6 +3046,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0004",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3054,6 +3097,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0005",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3104,6 +3148,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0006",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3154,6 +3199,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0007",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3204,6 +3250,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0008",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3254,6 +3301,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0009",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3304,6 +3352,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0010",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3354,6 +3403,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0011",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3404,6 +3454,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0012",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3454,6 +3505,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0013",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3504,6 +3556,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0014",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3554,6 +3607,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0015",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3604,6 +3658,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0016",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3654,6 +3709,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0017",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3704,6 +3760,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0018",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3754,6 +3811,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0019",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3804,6 +3862,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0020",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3833,7 +3892,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 11. GET subscriptions from DB - with limit 5 - see the first 5
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 3346
+Content-Length: 3796
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -3866,6 +3925,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3916,6 +3976,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0002",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -3966,6 +4027,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0003",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4016,6 +4078,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0004",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4066,6 +4129,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0005",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4095,7 +4159,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
 12. GET subscriptions from DB - with limit 5 and offset 25, see subs 25-29
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 3346
+Content-Length: 3796
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -4128,6 +4192,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0026",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4178,6 +4243,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0027",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4228,6 +4294,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0028",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4278,6 +4345,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0029",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4328,6 +4396,7 @@ Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;
         },
         "id": "urn:ngsi-ld:Subscription:sub0030",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4368,7 +4437,7 @@ NGSILD-Results-Count: 50
 14. GET subscriptions from DB - count with limit 1 - see HTTP header (NGSILD-Results-Count) and ONE (sub0001) subscription in the array
 =======================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 863
+Content-Length: 953
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -4403,6 +4472,7 @@ NGSILD-Results-Count: 50
         },
         "id": "urn:ngsi-ld:Subscription:sub0001",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "modifiedAt": "202REGEX(.*)",
         "notification": {
             "attributes": [
@@ -4433,7 +4503,7 @@ NGSILD-Results-Count: 50
 15. GET subscriptions from DB - from tenant t1, with offset 36 - see 4 subs
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 2677
+Content-Length: 3037
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -4467,6 +4537,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0037",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4517,6 +4588,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0038",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4567,6 +4639,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0039",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4617,6 +4690,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0040",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4646,7 +4720,7 @@ NGSILD-Results-Count: 40
 16. GET subscriptions from DB - from tenant t1, with offset 36 AND with Accept: application/ld+json - see 4 subs
 ================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 3017
+Content-Length: 3377
 Content-Type: application/ld+json
 Date: REGEX(.*)
 NGSILD-Results-Count: 40
@@ -4680,6 +4754,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0037",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4731,6 +4806,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0038",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4782,6 +4858,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0039",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",
@@ -4833,6 +4910,7 @@ NGSILD-Results-Count: 40
         },
         "id": "urn:ngsi-ld:Subscription:sub0040",
         "isActive": false,
+        "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "notification": {
             "attributes": [
                 "P1",

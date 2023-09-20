@@ -114,6 +114,7 @@
 #define CSUB_ENTITY_ISPATTERN        "isPattern"
 #define CSUB_ENTITY_ISTYPEPATTERN    "isTypePattern"
 #define CSUB_COUNT                   "count"
+#define CSUB_FAILURES                "failures"
 #define CSUB_FORMAT                  "format"
 #define CSUB_STATUS                  "status"
 #define CSUB_SERVICE_PATH            "servicePath"

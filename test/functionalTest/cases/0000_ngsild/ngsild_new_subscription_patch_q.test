@@ -156,7 +156,7 @@ Location: /ngsi-ld/v1/subscriptions/urn:S1
 02. GET S1 from cache, see the "q"
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 258
+Content-Length: 341
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -169,6 +169,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -235,7 +236,7 @@ Date: REGEX(.*)
 05. GET S1 from cache, see the new "q"
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 258
+Content-Length: 341
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -248,6 +249,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -266,7 +268,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 06. GET S1 from DB, see the new "q"
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 261
+Content-Length: 344
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -279,6 +281,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -345,7 +348,7 @@ Date: REGEX(.*)
 09. GET S1 from cache, see the new "q"
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 265
+Content-Length: 348
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -358,6 +361,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -376,7 +380,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 10. GET S1 from DB, see the new "q"
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 351
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -389,6 +393,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

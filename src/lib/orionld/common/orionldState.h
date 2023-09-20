@@ -61,6 +61,7 @@ extern "C"
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/troe/troe.h"                                   // TroeMode
+#include "orionld/pernot/PernotSubCache.h"                       // PernotSubCache
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
@@ -565,6 +566,8 @@ extern char              dbURI[];                  // From orionld.cpp
 extern bool              multitenancy;             // From orionld.cpp
 extern int               contextDownloadAttempts;  // From orionld.cpp
 extern int               contextDownloadTimeout;   // From orionld.cpp
+extern int               subCacheInterval;         // From orionld.cpp
+extern int               subCacheFlushInterval;    // From orionld.cpp
 extern bool              troe;                     // From orionld.cpp
 extern char              troeHost[256];            // From orionld.cpp
 extern unsigned short    troePort;                 // From orionld.cpp
@@ -579,6 +582,7 @@ extern OrionldPhase      orionldPhase;
 extern bool              orionldStartup;           // For now, only used inside sub-cache routines
 extern bool              idIndex;                  // From orionld.cpp
 extern bool              noNotifyFalseUpdate;      // From orionld.cpp
+extern bool              triggerOperation;         // From orionld.cpp
 extern char              mongoServerVersion[32];
 extern bool              experimental;             // From orionld.cpp
 extern bool              mongocOnly;               // From orionld.cpp
@@ -589,7 +593,8 @@ extern size_t            userAgentHeaderLen;       // From notificationSend.cpp 
 extern char              userAgentHeaderNoLF[64];  // move to orionld.cpp?
 extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
-extern int               cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
+extern uint32_t          cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
+extern PernotSubCache    pernotSubCache;
 extern char              localIpAndPort[135];      // Local address for X-Forwarded-For (from orionld.cpp)
 extern unsigned long long  inReqPayloadMaxSize;
 extern unsigned long long  outReqMsgMaxSize;
