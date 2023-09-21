@@ -616,9 +616,9 @@ bool orionldPatchEntity2(void)
 
   //
   // Anything left for local database?
-  // Remember: distOpRequests() removes all attributes that match exclusive/redirect regiostrations
+  // Remember: distOpRequests() removes all attributes that match exclusive/redirect registrations
   //
-  if (requestForLocal != NULL)
+  if ((requestForLocal != NULL) && (dbEntityP != NULL))
   {
     orionldState.alterations = orionldAlterations(entityId, entityType, orionldState.requestTree, dbAttrsP, false);
     orionldAlterationsPresent(orionldState.alterations);
