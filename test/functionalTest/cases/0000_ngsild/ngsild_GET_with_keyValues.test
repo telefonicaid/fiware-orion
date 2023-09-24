@@ -32,9 +32,10 @@ orionldStart CB
 #
 # 01. Create an entity with attributes P1-P5
 # 02. See the entity in mongo
-# 02. GET the entity with options=keyValues
-# 03. GET attributes P1 and P4 with options=keyValues
-# 04. GET all entities with options=keyValues
+# 03. GET all entities
+# 04. GET the entity with options=keyValues
+# 05. GET attributes P1 and P4 with options=keyValues
+# 06. GET all entities with options=keyValues
 #
 
 echo "01. Create an entity with attributes P1-P5"
@@ -76,28 +77,28 @@ echo
 echo
 
 
-echo "02. GET all entities"
+echo "03. GET all entities"
 echo "===================="
 orionCurl --url /ngsi-ld/v1/entities?local=true
 echo
 echo
 
 
-echo "02. GET the entity with options=keyValues"
+echo "04. GET the entity with options=keyValues"
 echo "========================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
 echo
 echo
 
 
-echo "03. GET attributes P1 and P4 with options=keyValues"
+echo "05. GET attributes P1 and P4 with options=keyValues"
 echo "==================================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=keyValues&attrs=P1,P4' --noPayloadCheck
 echo
 echo
 
 
-echo "04. GET all entities with options=keyValues"
+echo "06. GET all entities with options=keyValues"
 echo "==========================================="
 orionCurl --url '/ngsi-ld/v1/entities?prettyPrint=yes&spaces=2&options=keyValues&type=T' --noPayloadCheck
 echo
@@ -183,7 +184,7 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-02. GET all entities
+03. GET all entities
 ====================
 HTTP/1.1 200 OK
 Content-Length: 265
@@ -226,7 +227,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
 ]
 
 
-02. GET the entity with options=keyValues
+04. GET the entity with options=keyValues
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 186
@@ -253,7 +254,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 
 
-03. GET attributes P1 and P4 with options=keyValues
+05. GET attributes P1 and P4 with options=keyValues
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 114
@@ -273,7 +274,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 
 
-04. GET all entities with options=keyValues
+06. GET all entities with options=keyValues
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 222
