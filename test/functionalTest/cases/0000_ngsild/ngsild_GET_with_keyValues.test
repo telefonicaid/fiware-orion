@@ -31,6 +31,7 @@ orionldStart CB
 
 #
 # 01. Create an entity with attributes P1-P5
+# 02. See the entity in mongo
 # 02. GET the entity with options=keyValues
 # 03. GET attributes P1 and P4 with options=keyValues
 # 04. GET all entities with options=keyValues
@@ -68,10 +69,23 @@ echo
 echo
 
 
+echo "02. See the entity in mongo"
+echo "==========================="
+mongoCmd2 ftest "db.entities.findOne()"
+echo
+echo
+
 
 echo "02. GET the entity with options=keyValues"
 echo "========================================="
 orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
+echo
+echo
+
+
+echo "02. GET all entities"
+echo "===================="
+orionCurl --url /ngsi-ld/v1/entities?local=true
 echo
 echo
 
@@ -100,6 +114,75 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00
 
 
 
+02. See the entity in mongo
+===========================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : {
+		"id" : "urn:ngsi-ld:T:2018-11-22T10:00:00",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/P1",
+		"https://uri.etsi.org/ngsi-ld/default-context/P2",
+		"https://uri.etsi.org/ngsi-ld/default-context/P3",
+		"https://uri.etsi.org/ngsi-ld/default-context/P4",
+		"https://uri.etsi.org/ngsi-ld/default-context/P5"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/P1" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : 1,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P2" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "Stringeling",
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P3" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : true,
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P4" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : {
+				"a" : 1,
+				"b" : "2"
+			},
+			"mdNames" : [ ]
+		},
+		"https://uri=etsi=org/ngsi-ld/default-context/P5" : {
+			"type" : "Property",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : [
+				1,
+				2,
+				3
+			],
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
 02. GET the entity with options=keyValues
 =========================================
 HTTP/1.1 200 OK
@@ -125,6 +208,49 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
   ]
 }
 
+
+
+02. GET all entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 265
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": 1
+        },
+        "P2": {
+            "type": "Property",
+            "value": "Stringeling"
+        },
+        "P3": {
+            "type": "Property",
+            "value": true
+        },
+        "P4": {
+            "type": "Property",
+            "value": {
+                "a": 1,
+                "b": "2"
+            }
+        },
+        "P5": {
+            "type": "Property",
+            "value": [
+                1,
+                2,
+                3
+            ]
+        },
+        "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
+        "type": "T"
+    }
+]
 
 
 03. GET attributes P1 and P4 with options=keyValues
