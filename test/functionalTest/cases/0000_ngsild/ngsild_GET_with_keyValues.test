@@ -76,16 +76,16 @@ echo
 echo
 
 
-echo "02. GET the entity with options=keyValues"
-echo "========================================="
-orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
-echo
-echo
-
-
 echo "02. GET all entities"
 echo "===================="
 orionCurl --url /ngsi-ld/v1/entities?local=true
+echo
+echo
+
+
+echo "02. GET the entity with options=keyValues"
+echo "========================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:T:2018-11-22T10:00:00?prettyPrint=yes&spaces=2&options=keyValues' --noPayloadCheck
 echo
 echo
 
@@ -183,33 +183,6 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-02. GET the entity with options=keyValues
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
-
-{
-  "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
-  "type": "T",
-  "P1": 1,
-  "P2": "Stringeling",
-  "P3": true,
-  "P4": {
-    "a": 1,
-    "b": "2"
-  },
-  "P5": [
-    1,
-    2,
-    3
-  ]
-}
-
-
-
 02. GET all entities
 ====================
 HTTP/1.1 200 OK
@@ -251,6 +224,33 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
         "type": "T"
     }
 ]
+
+
+02. GET the entity with options=keyValues
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 186
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+  "id": "urn:ngsi-ld:T:2018-11-22T10:00:00",
+  "type": "T",
+  "P1": 1,
+  "P2": "Stringeling",
+  "P3": true,
+  "P4": {
+    "a": 1,
+    "b": "2"
+  },
+  "P5": [
+    1,
+    2,
+    3
+  ]
+}
+
 
 
 03. GET attributes P1 and P4 with options=keyValues
