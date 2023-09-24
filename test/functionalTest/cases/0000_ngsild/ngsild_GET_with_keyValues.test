@@ -25,7 +25,7 @@ GET entity with keyValues
 
 --SHELL-INIT--
 dbInit CB
-orionldStart CB
+orionldStart CB -t 0-255
 
 --SHELL--
 
