@@ -169,7 +169,7 @@ bool legacyPostEntities(void)
     return false;
   }
 
-  LM_T(39, ("Creating an entity '%s' of type '%s' on tenant '%s'", entityId, entityType, orionldState.tenantP->tenant));
+  LM_W(("Creating an entity '%s' of type '%s' on tenant '%s'", entityId, entityType, orionldState.tenantP->tenant));
 
   //
   // NOTE
