@@ -51,20 +51,19 @@ static void mongocLog
 )
 {
   if (level == MONGOC_LOG_LEVEL_CRITICAL)
-    LM_E(("MONGOC[%s]: %s", domain, msg));  // Perhaps even LM_X ?
+    LM_E(("MONGOC[%s]:critical %s", domain, msg));  // Perhaps even LM_X ?
   else if (level == MONGOC_LOG_LEVEL_ERROR)
-    LM_E(("MONGOC[%s]: %s", domain, msg));
+    LM_E(("MONGOC[%s]:error: %s", domain, msg));
   else if (level == MONGOC_LOG_LEVEL_WARNING)
-    LM_W(("MONGOC[%s]: %s", domain, msg));
+    LM_W(("MONGOC[%s]:warning: %s", domain, msg));
   else if (level == MONGOC_LOG_LEVEL_MESSAGE)
-    LM_M(("MONGOC[%s]: %s", domain, msg));  // This LM_M is OK
+    LM_W(("MONGOC[%s]:message: %s", domain, msg));  // This LM_M is OK
   else if (level == MONGOC_LOG_LEVEL_INFO)
-    LM_I(("MONGOC[%s]: %s", domain, msg));
-  else if ((level == MONGOC_LOG_LEVEL_DEBUG) || (level ==  MONGOC_LOG_LEVEL_TRACE))
-  {
-    // if (mongo log is on)
-    //   LM_M(("MONGOC[%s]: %s", domain, msg));
-  }
+    LM_W(("MONGOC[%s]:info: %s", domain, msg));
+  else if (level == MONGOC_LOG_LEVEL_DEBUG)
+    LM_W(("MONGOC[%s]:debug: %s", domain, msg));
+  else if (level == MONGOC_LOG_LEVEL_TRACE)
+    LM_W(("MONGOC[%s]:trace: %s", domain, msg));
 }
 
 
