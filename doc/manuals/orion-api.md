@@ -3877,7 +3877,9 @@ Example:
     "condition": {
       "attrs": [ "temperature" ],
       "expression": {
-        "q": "temperature>40"
+        "georel": "near;maxDistance:15000",
+        "geometry": "point",
+        "coords": "coords": "37.407804, -6.004552"
       }
     }
   },
