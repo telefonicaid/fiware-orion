@@ -86,19 +86,32 @@ static bool attrsMatch(KjNode* propertiesP, KjNode* relationshipsP, KjNode* rciP
   bool rciRelationshipsEmpty = (rciRelationshipsArray == NULL) || (rciRelationshipsArray->value.firstChildP == NULL);
 
   if ((propertiesEmpty == true) && (relationshipsEmpty == true))
-    return true;
+  {
+    LM_T(LmtRegMatch, ("No overlap as both reg-attrs-arrays are empty"));
+    return false;
+  }
 
   if ((rciPropertiesEmpty == true) && (rciRelationshipsEmpty == true))
-    return true;
+  {
+    LM_T(LmtRegMatch, ("No overlap as both rci-reg-attrs-arrays are empty"));
+    return false;
+  }
 
   if (propertiesP != NULL)
   {
     for (KjNode* attrNameP = propertiesP->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
     {
       if (kjStringValueLookupInArray(rciPropertiesArray, attrNameP->value.s) != NULL)
+      {
+        LM_T(LmtRegMatch, ("overlap for attribute '%s'", attrNameP->value.s));
         return true;
+      }
+
       if (kjStringValueLookupInArray(rciRelationshipsArray, attrNameP->value.s) != NULL)
+      {
+        LM_T(LmtRegMatch, ("overlap for attribute '%s'", attrNameP->value.s));
         return true;
+      }
     }
   }
 
@@ -107,11 +120,20 @@ static bool attrsMatch(KjNode* propertiesP, KjNode* relationshipsP, KjNode* rciP
     for (KjNode* attrNameP = relationshipsP->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
     {
       if (kjStringValueLookupInArray(rciPropertiesArray, attrNameP->value.s) != NULL)
+      {
+        LM_T(LmtRegMatch, ("overlap for attribute '%s'", attrNameP->value.s));
         return true;
+      }
+
       if (kjStringValueLookupInArray(rciRelationshipsArray, attrNameP->value.s) != NULL)
+      {
+        LM_T(LmtRegMatch, ("overlap for attribute '%s'", attrNameP->value.s));
         return true;
+      }
     }
   }
+
+  LM_T(LmtRegMatch, ("No overlap for attributes"));
 
   return false;
 }
