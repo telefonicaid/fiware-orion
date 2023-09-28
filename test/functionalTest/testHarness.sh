@@ -289,7 +289,8 @@ function exitFunction()
           # then
               echo "Errors and warnings from the orionld log file"
               echo "-------------------------------------------------"
-              cat /tmp/orionld.err-warn.log
+              # cat /tmp/orionld.err-warn.log
+              cat /tmp/orionld.log
               echo "-------------------------------------------------"
               echo
               echo
