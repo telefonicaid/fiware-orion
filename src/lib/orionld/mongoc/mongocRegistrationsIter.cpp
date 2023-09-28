@@ -48,7 +48,7 @@ extern "C"
 int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
 {
   bson_t                mongoFilter;
-  const bson_t*         mongoDocP;
+  const bson_t*         mongoDocP = NULL;
   mongoc_cursor_t*      mongoCursorP;
   bson_error_t          mongoError;
   mongoc_read_prefs_t*  readPrefs = mongoc_read_prefs_new(MONGOC_READ_NEAREST);
@@ -84,7 +84,9 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   int hits = 0;
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
-    LM_T(LmtMongoc, ("Got a matching registration"));
+    char* json = bson_as_relaxed_extended_json(mongoDocP, NULL);
+    LM_T(LmtMongoc, ("Found a registration in the DB: '%s'", json));
+
     KjNode* dbRegP = mongocKjTreeFromBson(mongoDocP, &title, &details);
     if (dbRegP == NULL)
     {
