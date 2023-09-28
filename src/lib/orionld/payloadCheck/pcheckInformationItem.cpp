@@ -175,6 +175,8 @@ static bool pCheckOverlappingRegistrations
       if ((currentRegId != NULL) && (strcmp(currentRegId, rciP->regId) == 0))
         continue;
 
+      LM_T(LmtRegMatch, ("Trying registration '%s'", rciP->regId));
+
       //
       // Conflict must be checked if any of the two regs are Exclusive, BUT not if the other is Auxiliary
       //

@@ -29,6 +29,8 @@ extern "C"
 #include "kjson/KjNode.h"                                                  // KjNode
 }
 
+#include "logMsg/logMsg.h"                                                 // TraceLevels
+
 #include "orionld/kjTree/kjStringValueLookupInArray.h"                     // Own interface
 
 
@@ -43,16 +45,22 @@ extern "C"
 //
 KjNode* kjStringValueLookupInArray(KjNode* stringArray, const char* value)
 {
+  LM_T(LmtRegMatch, ("stringArray at %p", stringArray));
+
   if (stringArray != NULL)
   {
     if ((stringArray->type != KjArray) && (stringArray->type != KjObject))
+    {
+      LM_T(LmtRegMatch, ("stringArray not array nor object: %s", kjValueType(stringArray->type)));
       return NULL;
+    }
 
     for (KjNode* nodeP = stringArray->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
     {
       if (nodeP->type != KjString)
         continue;
 
+      LM_T(LmtRegMatch, ("Comparing attrs '%s' with '%s'", value, nodeP->value.s));
       if (strcmp(value, nodeP->value.s) == 0)
         return nodeP;
     }

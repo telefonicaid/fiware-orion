@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheIterFunc
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_RLOG
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 
@@ -70,6 +71,7 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   //
   // Run the query
   //
+  MONGOC_RLOG("Query for all regs", rcP->tenantP->mongoDbName, "registrations", NULL, LmtMongoc);
   mongoCursorP = mongoc_collection_find_with_opts(regsCollectionP, &mongoFilter, NULL, readPrefs);
   if (mongoCursorP == NULL)
   {
@@ -79,8 +81,10 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
     return 1;
   }
 
+  int hits = 0;
   while (mongoc_cursor_next(mongoCursorP, &mongoDocP))
   {
+    LM_T(LmtMongoc, ("Got a matching registration"));
     KjNode* dbRegP = mongocKjTreeFromBson(mongoDocP, &title, &details);
     if (dbRegP == NULL)
     {
@@ -93,7 +97,11 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
       retVal = 2;
       break;
     }
+
+    ++hits;
   }
+
+  LM_T(LmtMongoc, ("Found %d hits in the db", hits));
 
   if (mongoc_cursor_error(mongoCursorP, &mongoError))
   {
