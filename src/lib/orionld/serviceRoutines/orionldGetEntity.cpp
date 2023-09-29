@@ -274,7 +274,7 @@ bool orionldGetEntity(void)
         {
           if (distOpP->httpResponseCode >= 400)
           {
-            LM_W(("Got an error response (%d) from a forwarded request: '%s'", distOpP->httpResponseCode, distOpP->rawResponse));
+            LM_W(("Got an ERROR response (%d) from a forwarded request: '%s'", distOpP->httpResponseCode, distOpP->rawResponse));
             continue;
           }
 
@@ -341,7 +341,7 @@ bool orionldGetEntity(void)
     distOpListRelease(distOpList);
   }
 
-  if ((forwards > 0) || (forcedSysAttrs == true))  // Nothing to do with SysAttrs really, just a bieffekt
+  if ((dbEntityP != NULL) && ((forwards > 0) || (forcedSysAttrs == true)))  // Nothing to do with SysAttrs really, just a bieffekt
   {
     // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
 
