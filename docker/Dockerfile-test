@@ -14,6 +14,8 @@ WORKDIR lcov-1.14
 RUN make install
 WORKDIR ${PATH_TO_SRC}
 
+RUN yum-config-manager --disable pgdg10
+
 RUN  yum install -y gnupg
 
 RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-database-tools-100.4.1.x86_64.rpm

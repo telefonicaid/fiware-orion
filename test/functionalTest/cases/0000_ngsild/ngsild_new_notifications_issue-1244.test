@@ -50,7 +50,6 @@ payload='{
   "type": "Subscription",
   "entities": [{"type": "Vehicle"}],
   "watchedAttributes": ["speed"],
-  "throttling": 0,
   "notification": {
     "format": "normalized",
     "attributes": ["speed", "brandName"],
@@ -72,7 +71,6 @@ payload='{
   "type": "Subscription",
   "entities": [{"type": "Vehicle"}],
   "watchedAttributes": ["speed"],
-  "throttling": 0,
   "notification": {
     "format": "normalized",
     "endpoint": {

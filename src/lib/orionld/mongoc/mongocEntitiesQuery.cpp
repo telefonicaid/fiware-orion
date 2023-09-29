@@ -40,6 +40,7 @@ extern "C"
 #include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/q/qTreeToBson.h"                               // qTreeToBson
+#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_RLOG - FIXME: change name to mongocLog.h
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
@@ -254,7 +255,9 @@ static bool geoNearFilter(bson_t* mongoFilterP, OrionldGeoInfo*  geoInfoP)
   char geoPropertyPath[512];
   int  geoPropertyPathLen;
   if (geoPropertyDbPath(geoPropertyPath, sizeof(geoPropertyPath), geoInfoP->geoProperty, &geoPropertyPathLen) == false)
-    return false;
+    LM_RE(false, ("Failed to aeemble the geoProperty path"));
+
+  LM_T(LmtMongoc, ("geoPropertyPath: '%s'", geoPropertyPath));
 
   bson_append_document(mongoFilterP, geoPropertyPath, geoPropertyPathLen, &location);
 
@@ -309,6 +312,7 @@ static bool geoWithinFilter(bson_t* mongoFilterP, OrionldGeoInfo* geoInfoP)
   bson_init(&within);
   bson_init(&coordinates);
 
+  kjTreeLog(geoInfoP->coordinates, "coordinates", LmtMongoc);
   mongocKjTreeToBson(geoInfoP->coordinates, &coordinates);
 
   bson_append_array(&geometry,    "coordinates", 11, &coordinates);
@@ -788,6 +792,7 @@ KjNode* mongocEntitiesQuery
 
   if (limit != 0)
   {
+    MONGOC_RLOG("Lookup Entities", orionldState.tenantP->mongoDbName, "entities", &mongoFilter, LmtMongoc);
     mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs);
     bson_destroy(&options);
 

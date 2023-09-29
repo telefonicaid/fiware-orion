@@ -44,6 +44,7 @@ extern "C"
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
+#include "orionld/pernot/PernotSubCache.h"                       // PernotSubCache
 #include "orionld/common/orionldState.h"                         // Own interface
 
 
@@ -103,13 +104,15 @@ bool              orionldStartup           = true;
 char              pgPortString[16];
 char              mongoServerVersion[32];
 char              userAgentHeaderNoLF[64];     // "User-Agent: orionld/" + ORIONLD_VERSION - initialized in orionldServiceInit()
+char              hostHeaderNoLF[128];
+char              hostHeader[128];             // Host: xxx
+size_t            hostHeaderLen;
+PernotSubCache    pernotSubCache;
+
 
 //
 // Variables for Mongo C Driver
 //
-mongoc_collection_t*  mongoEntitiesCollectionP      = NULL;    // Deprecated
-mongoc_collection_t*  mongoRegistrationsCollectionP = NULL;    // Deprecated
-
 mongoc_uri_t*          mongocUri;
 mongoc_client_pool_t*  mongocPool;
 sem_t                  mongocContextsSem;

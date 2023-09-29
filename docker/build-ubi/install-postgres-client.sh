@@ -34,7 +34,7 @@ yum -y install https://rpmfind.net/linux/centos/8-stream/PowerTools/x86_64/os/Pa
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/blas-3.8.0-8.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/lapack-3.8.0-8.el8.x86_64.rpm
 #yum -y install https://rpmfind.net/linux/epel/8/Everything/x86_64/Packages/a/armadillo-10.8.2-1.el8.x86_64.rpm
-yum -y install http://yum.stanford.edu/mrepo/epel-EL8-x86_64/RPMS.all/armadillo-9.700.2-1.el8.x86_64.rpm
+yum -y install https://archives.fedoraproject.org/pub/archive/epel/8.1/Everything/x86_64/Packages/a/armadillo-9.700.2-1.el8.x86_64.rpm
 
 echo "Add repos"
 yum update -y --nogpgcheck

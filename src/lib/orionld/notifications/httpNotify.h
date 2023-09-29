@@ -28,6 +28,7 @@
 #include <sys/uio.h>                                             // iovec
 
 #include "cache/CachedSubscription.h"                            // CachedSubscription
+#include "orionld/pernot/PernotSubscription.h"                   // PernotSubscription
 
 
 
@@ -35,6 +36,17 @@
 //
 // httpNotify - send a notification over http
 //
-extern int httpNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, double timestamp);
+extern int httpNotify
+(
+  CachedSubscription*  cSubP,
+  PernotSubscription*  pSubP,
+  const char*          subscriptionId,
+  const char*          ip,
+  unsigned short       port,
+  const char*          path,
+  struct iovec*        ioVec,
+  int                  ioVecLen,
+  double               notificationTime
+);
 
 #endif  // SRC_LIB_ORIONLD_NOTIFICATIONS_HTTPNOTIFY_H_

@@ -25,6 +25,7 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                       // KjNode
+#include "kjson/kjBuilder.h"                                    // kjChildRemove
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
@@ -65,8 +66,12 @@ bool pCheckNotification
   PCHECK_OBJECT(notificationP, 0, NULL, SubscriptionNotificationPath, 400);
   PCHECK_OBJECT_EMPTY(notificationP, 0, NULL, SubscriptionNotificationPath, 400);
 
-  for (KjNode* nItemP = notificationP->value.firstChildP; nItemP != NULL; nItemP = nItemP->next)
+  KjNode* nItemP = notificationP->value.firstChildP;
+  KjNode* next;
+  while (nItemP != NULL)
   {
+    next = nItemP->next;
+
     if (strcmp(nItemP->name, "attributes") == 0)
     {
       PCHECK_DUPLICATE(attributesP, nItemP, 0, NULL, SubscriptionNotificationAttributesPath, 400);
@@ -115,16 +120,22 @@ bool pCheckNotification
       *sysAttrsOutP = sysAttrsP;
       LM_T(LmtSysAttrs, ("Found a 'sysAttrs' in Subscription::notification (%s)", (sysAttrsP->value.b == true)? "true" : "false"));
     }
-    else if (strcmp(nItemP->name, "status")           == 0) {}  // Ignored
-    else if (strcmp(nItemP->name, "timesSent")        == 0) {}  // Ignored
-    else if (strcmp(nItemP->name, "lastNotification") == 0) {}  // Ignored
-    else if (strcmp(nItemP->name, "lastSuccess")      == 0) {}  // Ignored
-    else if (strcmp(nItemP->name, "lastFailure")      == 0) {}  // Ignored
+    else if ((strcmp(nItemP->name, "status")           == 0) ||
+             (strcmp(nItemP->name, "timesSent")        == 0) ||
+             (strcmp(nItemP->name, "timesFailed")      == 0) ||
+             (strcmp(nItemP->name, "lastNotification") == 0) ||
+             (strcmp(nItemP->name, "lastSuccess")      == 0) ||
+             (strcmp(nItemP->name, "lastFailure")      == 0))
+    {
+      kjChildRemove(notificationP, nItemP);
+    }
     else
     {
       orionldError(OrionldBadRequestData, "Invalid field for Subscription::notification", nItemP->name, 400);
       return false;
     }
+
+    nItemP = next;
   }
 
   if ((endpointP == NULL) && (patch == false))

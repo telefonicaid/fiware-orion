@@ -59,7 +59,6 @@ payload='{
     }
   },
   "expires": "2028-12-31T10:00:00",
-  "throttling": 0,
   "@context": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
 }'
 orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "Content-Type: application/ld+json"

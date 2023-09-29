@@ -25,6 +25,7 @@
 #include <string.h>                                             // strcmp
 extern "C"
 {
+#include "kalloc/KAlloc.h"                                      // KAlloc
 #include "kjson/KjNode.h"                                       // KjNode
 #include "kjson/kjParse.h"                                      // kjParse
 }
@@ -52,13 +53,13 @@ extern "C"
 //
 // pcheckGeoQ -
 //
-OrionldGeoInfo* pcheckGeoQ(KjNode* geoqNodeP, bool isSubscription)
+OrionldGeoInfo* pcheckGeoQ(KAlloc* kallocP, KjNode* geoqNodeP, bool isSubscription)
 {
   KjNode*          geometryP    = NULL;
   KjNode*          coordinatesP = NULL;
   KjNode*          georelP      = NULL;
   KjNode*          geopropertyP = NULL;
-  OrionldGeoInfo*  geoInfoP     = (OrionldGeoInfo*) kaAlloc(&orionldState.kalloc, sizeof(OrionldGeoInfo));
+  OrionldGeoInfo*  geoInfoP     = (OrionldGeoInfo*) ((kallocP != NULL)? kaAlloc(kallocP, sizeof(OrionldGeoInfo)) : malloc(sizeof(OrionldGeoInfo)));
 
   if (geoInfoP == NULL)
   {

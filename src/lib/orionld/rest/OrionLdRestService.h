@@ -179,6 +179,8 @@ typedef struct OrionLdRestService
   uint32_t               options;                       // Peculiarities of this type of requests (bitmask)
   uint64_t               uriParams;                     // Supported URI parameters (bitmask)
   bool                   isBatchOp;                     // true for BATCH operations
+  bool                   notImplemented;                // Flags that the service hasn't been implemented
+  bool                   mintaka;                       // Flags that the service is not for Orion-LD but for Mintaka
 } OrionLdRestService;
 
 

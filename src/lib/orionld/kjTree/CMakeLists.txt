@@ -60,6 +60,7 @@ SET (SOURCES
     kjNodeDecouple.cpp
     kjNavigate.cpp
     kjTreeFromCachedSubscription.cpp
+    kjTreeFromPernotSubscription.cpp
     kjAttributeNormalizedToSimplified.cpp
     kjAttributeNormalizedToConcise.cpp
     kjSysAttrsRemove.cpp

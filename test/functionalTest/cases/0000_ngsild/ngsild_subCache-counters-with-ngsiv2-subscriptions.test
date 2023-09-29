@@ -468,7 +468,7 @@ MongoDB server version: REGEX(.*)
 		"geoproperty" : ""
 	},
 	"format" : "normalized",
-	"count" : NumberLong(1),
+	"count" : 1,
 	"lastNotification" : REGEX(.*),
 	"lastSuccess" : REGEX(.*)
 }
@@ -515,7 +515,7 @@ MongoDB server version: REGEX(.*)
 		"geoproperty" : ""
 	},
 	"format" : "normalized",
-	"count" : NumberLong(1),
+	"count" : 1,
 	"lastFailure" : REGEX(.*),
 	"lastNotification" : REGEX(.*)
 }

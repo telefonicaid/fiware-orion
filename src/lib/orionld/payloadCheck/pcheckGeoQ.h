@@ -27,6 +27,7 @@
 */
 extern "C"
 {
+#include "kalloc/KAlloc.h"                                       // KAlloc
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
@@ -38,6 +39,6 @@ extern "C"
 //
 // pcheckGeoQ -
 //
-extern OrionldGeoInfo* pcheckGeoQ(KjNode* geoqNodeP, bool pCheckGeoGeometry);
+extern OrionldGeoInfo* pcheckGeoQ(KAlloc* kallocP, KjNode* geoqNodeP, bool pCheckGeoGeometry);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKGEOQ_H_

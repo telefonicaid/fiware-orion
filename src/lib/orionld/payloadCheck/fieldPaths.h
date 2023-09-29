@@ -47,6 +47,7 @@ extern const char* SubscriptionNotificationShowChangesPath;
 extern const char* SubscriptionNotificationSysAttrsPath;
 extern const char* SubscriptionWatchedAttributesPath;
 extern const char* SubscriptionWatchedAttributesItemPath;
+extern const char* SubscriptionTimeIntervalPath;
 extern const char* SubscriptionQPath;
 extern const char* SubscriptionGeoqPath;
 extern const char* SubscriptionIsActivePath;
