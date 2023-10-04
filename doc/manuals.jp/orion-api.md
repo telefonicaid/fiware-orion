@@ -2125,7 +2125,8 @@ Content-Length: 0
 同時に使用できるのは、`payload`, `json` また `ngsi` のうちの1つだけであることに注意してください。
 
 -   [一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions`
-    などの API オペレーションの `httpCustom.payload` フィールドにも適用されます。以下に例を示します
+    などの API オペレーションの `httpCustom.payload` フィールドにも適用されます。ただし、通知時には、`payload`
+    内の URL エンコードされた文字はすべてデコードされます。以下に例を示します
 -   `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `text/plain` に設定されます
 
 例：
