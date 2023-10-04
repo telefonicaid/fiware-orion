@@ -2134,8 +2134,9 @@ If `payload` is used in `httpCustom` or `mqttCustom` the following consideration
 Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
 
 * [General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload`
-  field in the API operations, such as `POST /v2/subscription` or `GET /v2/subscriptions`. An example
-  is shown below. However, at notification time, any URL encoded characters in `payload` is decoded.
+  field in the API operations, such as `POST /v2/subscription` or `GET /v2/subscriptions`. However,
+  at notification time, any URL encoded characters in `payload` is decoded. An example
+  is shown below.
 * `Content-Type` header is set to `text/plain`, except if overwritten by `headers` field
 
 Example:
