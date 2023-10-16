@@ -546,7 +546,7 @@ static std::string parseCustomPayload
 
         ngsi->attributeVector.push_back(caP);
 
-        std::string r = parseContextAttribute(ciP, iter, caP);
+        std::string r = parseContextAttribute(ciP, iter, caP, false);
 
         if (r == "max deep reached")
         {
