@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <stdlib.h>                                              // calloc, free
+#include <string.h>                                              // strchr
 #include <semaphore.h>                                           // sem_init
 #include <mongoc/mongoc.h>                                       // MongoDB C Client Driver
 
@@ -51,20 +52,19 @@ static void mongocLog
 )
 {
   if (level == MONGOC_LOG_LEVEL_CRITICAL)
-    LM_E(("MONGOC[%s]: %s", domain, msg));  // Perhaps even LM_X ?
+    LM_E(("MONGOC[%s]:critical %s", domain, msg));  // Perhaps even LM_X ?
   else if (level == MONGOC_LOG_LEVEL_ERROR)
-    LM_E(("MONGOC[%s]: %s", domain, msg));
+    LM_E(("MONGOC[%s]:error: %s", domain, msg));
   else if (level == MONGOC_LOG_LEVEL_WARNING)
-    LM_W(("MONGOC[%s]: %s", domain, msg));
+    LM_W(("MONGOC[%s]:warning: %s", domain, msg));
   else if (level == MONGOC_LOG_LEVEL_MESSAGE)
-    LM_M(("MONGOC[%s]: %s", domain, msg));  // This LM_M is OK
+    LM_W(("MONGOC[%s]:message: %s", domain, msg));  // This LM_M is OK
   else if (level == MONGOC_LOG_LEVEL_INFO)
-    LM_I(("MONGOC[%s]: %s", domain, msg));
-  else if ((level == MONGOC_LOG_LEVEL_DEBUG) || (level ==  MONGOC_LOG_LEVEL_TRACE))
-  {
-    // if (mongo log is on)
-    //   LM_M(("MONGOC[%s]: %s", domain, msg));
-  }
+    LM_W(("MONGOC[%s]:info: %s", domain, msg));
+  else if (level == MONGOC_LOG_LEVEL_DEBUG)
+    LM_W(("MONGOC[%s]:debug: %s", domain, msg));
+  else if (level == MONGOC_LOG_LEVEL_TRACE)
+    LM_W(("MONGOC[%s]:trace: %s", domain, msg));
 }
 
 
@@ -192,6 +192,13 @@ static char* uriCompose
 
     compV[compNo++] = dbHost;
 
+    //
+    // If dbHost is a list, the list must end with a slash
+    // Assuming it's a list if there's a comma in the string
+    //
+    if (strchr(dbHost, ',') != NULL)
+      compV[compNo++] = (char*) "/";
+
     bool dbAuthDbPresent        = (dbAuthDb        != NULL) && (dbAuthDb[0]        != 0);
     bool dbReplicaSetPresent    = (dbReplicaSet    != NULL) && (dbReplicaSet[0]    != 0);
     bool dbAuthMechanismPresent = (dbAuthMechanism != NULL) && (dbAuthMechanism[0] != 0);
@@ -288,7 +295,7 @@ void mongocInit
   char*         mongoUri = uriCompose(dbURI, dbHost, dbUser, dbPwd, dbAuthDb, dbReplicaSet, dbAuthMechanism, dbSSL, tlsCertificateFilePath);
   bson_error_t  mongoError;
 
-  LM_K(("Connecting to mongo for the C driver"));
+  LM_K(("Connecting to mongo for the C driver (URI: %s)", mongoUri));
   mongocUri = mongoc_uri_new_with_error(mongoUri, &mongoError);
   if (mongocUri == NULL)
     LM_X(1, ("Unable to connect to mongo(URI: %s): %s", mongoUri, mongoError.message));

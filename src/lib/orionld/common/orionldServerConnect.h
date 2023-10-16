@@ -32,6 +32,6 @@
 //
 // orionldServerConnect -
 //
-extern int orionldServerConnect(char* ip, uint16_t portNo);
+extern int orionldServerConnect(const char* ip, uint16_t portNo);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDSERVERCONNECT_H_

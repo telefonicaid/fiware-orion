@@ -46,7 +46,7 @@
 #define getNumberFieldF(b, field)           getNumberField(b, field, __FUNCTION__, __LINE__)
 #define getIntFieldF(b, field)              getIntField(b, field, __FUNCTION__, __LINE__)
 #define getIntOrLongFieldAsLongF(b, field)  getIntOrLongFieldAsLong(b, field, __FUNCTION__, __LINE__)
-#define getNumberFieldAsDoubleF(b, field)   getNumberFieldAsDouble(b, field, __FUNCTION__, __LINE__)
+#define getNumberFieldAsDoubleF(b, field, okToNotExist)   getNumberFieldAsDouble(b, field, okToNotExist, __FUNCTION__, __LINE__)
 #define getBoolFieldF(b, field)             getBoolField(b, field, __FUNCTION__, __LINE__)
 #define getFieldF(b, field)                 getField(b, field, __FUNCTION__,  __LINE__)
 #define setStringVectorF(b, field, v)       setStringVector(b, field, v, __FUNCTION__,  __LINE__)
@@ -148,6 +148,7 @@ extern double getNumberFieldAsDouble
 (
   const mongo::BSONObj*  bP,
   const char*            field,
+  bool                   okToNotExist,
   const char*            caller = "<none>",
   int                    line   = 0
 );

@@ -1049,6 +1049,13 @@ MHD_Result orionldMhdConnectionInit
   if (orionldState.serviceP == NULL)  // 405 or 404 - no need to continue - prettyPrint not possible here
     return MHD_YES;
 
+  if (orionldState.serviceP->mintaka == true)
+    return MHD_YES;
+
+  if (orionldState.serviceP->notImplemented == true)
+    return MHD_YES;
+
+
   //
   // 5. GET URI params
   //

@@ -260,7 +260,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
     }
     else if (strcmp(kNodeP->name, "timeInterval") == 0)
     {
-      orionldError(OrionldBadRequestData, "Not Implemented", "Subscription::timeInterval is not implemented", 501);
+      orionldError(OrionldOperationNotSupported, "Not Implemented", "Periodic Notification Subscriptions are not implemented", 501);
       return false;
     }
     else if ((kNodeP->name[0] == 'q') && (kNodeP->name[1] == 0))
@@ -362,7 +362,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
 
   if ((timeIntervalP != NULL) && (watchedAttributesPresent == true))
   {
-    orionldError(OrionldBadRequestData, "Both 'timeInterval' and 'watchedAttributes' present", NULL, 400);
+    orionldError(OrionldBadRequestData, "Inconsistent subscription", "Both 'timeInterval' and 'watchedAttributes' present", 400);
     return false;
   }
 

@@ -50,7 +50,8 @@ extern KjNode* dbModelToApiSubscription
   KjNode**       contextNodePP,
   KjNode**       showChangesP,
   KjNode**       sysAttrsP,
-  RenderFormat*  renderFormatP
+  RenderFormat*  renderFormatP,
+  double*        timeIntervalP
 );
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_

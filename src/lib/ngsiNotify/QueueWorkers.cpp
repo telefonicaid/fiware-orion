@@ -203,12 +203,7 @@ static void* workerFunc(void* pSyncQ)
           alarmMgr.notificationErrorReset(url);
 
           if (params->registration == false)
-          {
-            LM_T(LmtNotificationStats, ("Calling subCacheItemNotificationErrorStatus with OK"));
             subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 0, ngsildSubscription);
-          }
-          else
-            LM_T(LmtNotificationStats, ("NOT calling subCacheItemNotificationErrorStatus with ERROR"));
         }
         else
         {
@@ -216,12 +211,7 @@ static void* workerFunc(void* pSyncQ)
           alarmMgr.notificationError(url, "notification failure for queue worker");
 
           if (params->registration == false)
-          {
-            LM_T(LmtNotificationStats, ("Calling subCacheItemNotificationErrorStatus with ERROR"));
             subCacheItemNotificationErrorStatus(params->tenant, params->subscriptionId, 1, ngsildSubscription);
-          }
-          else
-            LM_T(LmtNotificationStats, ("NOT calling subCacheItemNotificationErrorStatus with ERROR"));
         }
       }
 

@@ -103,7 +103,7 @@ NGSILD-Tenant: t_02
 02. Retrieve S1
 ===============
 HTTP/1.1 200 OK
-Content-Length: 395
+Content-Length: 478
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -117,6 +117,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:subscr:123457",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "attributes": [
             "status"
@@ -145,7 +146,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 04. Retrieve S1 (using tenant t_02)
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 395
+Content-Length: 478
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -159,6 +160,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:subscr:123457",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
     "notification": {
         "attributes": [
             "status"

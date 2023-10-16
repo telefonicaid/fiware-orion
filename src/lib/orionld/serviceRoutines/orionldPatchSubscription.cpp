@@ -823,6 +823,7 @@ bool orionldPatchSubscription(void)
   KjNode*       notifierInfoP          = NULL;
   KjNode*       showChangesP           = NULL;
   KjNode*       sysAttrsP              = NULL;
+  double        timeInterval           = 0;
   RenderFormat  renderFormat           = RF_NORMALIZED;
   bool          r;
 
@@ -843,6 +844,7 @@ bool orionldPatchSubscription(void)
                          &mqttChange,
                          &showChangesP,
                          &sysAttrsP,
+                         &timeInterval,
                          &renderFormat);
   if (r == false)
   {
@@ -864,6 +866,50 @@ bool orionldPatchSubscription(void)
     orionldError(OrionldResourceNotFound, "Subscription not found", subscriptionId, 404);
     return false;
   }
+
+  KjNode* dbTimeIntervalP = kjLookup(dbSubscriptionP, "timeInterval");
+  double  dbTimeInterval  = 0;
+
+  if (dbTimeIntervalP != NULL)
+    dbTimeInterval = (dbTimeIntervalP->type == KjInt)? dbTimeIntervalP->value.i : dbTimeIntervalP->value.f;
+
+  bool    subWasPernot    = (dbTimeInterval != 0);
+
+  //
+  // If the subscription used to be "on-change", timeInterval cannot be set
+  //
+  if (subWasPernot == false)
+  {
+    if (timeInterval != 0)
+    {
+      if (qNodeP != NULL)
+        qRelease(qNodeP);
+      orionldError(OrionldBadRequestData, "Invalid modification (on-change to timeInterval subscription)", subscriptionId, 400);
+      return false;
+    }
+  }
+  else  // If the subscription used to be "pernot", watchedAttributes+throtttling cannot be set
+  {
+#if 0
+    //
+    // These checks really belong to pCheckSubscription() - just need to pass it the dbTimeInterval value
+    //
+    KjNode* watchedAttributesP = kjLookup(subTree, "watchedAttributes");
+    KjNode* throttlingP        = kjLookup(subTree, "throttling");
+
+    if (watchedAttributesP != NULL)
+      orionldError(OrionldBadRequestData, "Invalid modification (pernot subscription cannot have watchedAttributes", subscriptionId, 400);
+    if (throttlingP != NULL)
+      orionldError(OrionldBadRequestData, "Invalid modification (pernot subscription cannot have throttlingP", subscriptionId, 400);
+
+    if ((watchedAttributesP != NULL) || (throttlingP != NULL))
+      return false;
+#else
+    orionldError(OrionldOperationNotSupported, "Not Implemented", "Patching of periodic notification subscriptions", 501);
+    return false;
+#endif
+  }
+
 
   //
   // If the subscription used to be an MQTT subscription, the MQTT connection might need closing
@@ -913,7 +959,19 @@ bool orionldPatchSubscription(void)
   // modified.
   // ngsildSubscriptionPatch() performs that modification.
   //
-  CachedSubscription* cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+  CachedSubscription* cSubP = NULL;
+
+  if (timeInterval == 0)
+  {
+    cSubP = subCacheItemLookup(orionldState.tenantP->tenant, subscriptionId);
+    if (cSubP == NULL)
+    {
+      orionldError(OrionldResourceNotFound, "Subscription not found", subscriptionId, 404);
+      return false;
+    }
+  }
+  else
+    LM_X(131, ("Can't reach this point, right? ;-)"));
 
   if (ngsildSubscriptionPatch(dbSubscriptionP, cSubP, orionldState.requestTree, qP, geoqP, qRenderedForDb) == false)
   {
@@ -973,8 +1031,16 @@ bool orionldPatchSubscription(void)
   }
 
   // Modify the subscription in the subscription cache
-  if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP, qNodeP, qRenderedForDb, showChangesP) == false)
-    LM_E(("Internal Error (unable to update the cached subscription '%s' after a PATCH)", subscriptionId));
+  if (timeInterval == 0)
+  {
+    if (subCacheItemUpdate(orionldState.tenantP, subscriptionId, patchBody, geoCoordinatesP, qNodeP, qRenderedForDb, showChangesP) == false)
+      LM_E(("Internal Error (unable to update the cached subscription '%s' after a PATCH)", subscriptionId));
+  }
+  else
+  {
+    // Update the subscription in the pernot-cache
+    LM_X(1, ("Implement PATCH for pernot subscriptions!"));
+  }
 
   // All OK? 204 No Content
   orionldState.httpStatusCode = 204;

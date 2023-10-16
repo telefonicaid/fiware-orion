@@ -27,7 +27,7 @@ Forwarding of POST Entities requests - errors handling for forwarded requests
 dbInit CB
 dbInit CP1
 dbInit CP4
-orionldStart CB  -experimental -forwarding
+orionldStart CB  -experimental -forwarding -t 0-255
 orionldStart CP1 -experimental
 orionldStart CP4 -experimental
 
@@ -43,6 +43,49 @@ orionldStart CP4 -experimental
 # 08. GET all entities in CP1, see urn:E1 with attr P1
 # 09. GET all entities in CP4, see urn:E1 without attrs
 #
+
+echo "00. Make sure mongo is clean"
+echo "============================"
+echo CB:entities
+mongoCmd2 ftest 'db.entities.findOne()'
+echo
+echo CP1:entities
+mongoCmd2 ftest_cp1 'db.entities.findOne()'
+echo
+echo CP4:entities
+mongoCmd2 ftest_cp4 'db.entities.findOne()'
+echo
+echo
+
+
+echo "00. Make sure mongo is clean"
+echo "============================"
+echo CB:csubs
+mongoCmd2 ftest 'db.csubs.findOne()'
+echo
+echo CP1:csubs
+mongoCmd2 ftest_cp1 'db.csubs.findOne()'
+echo
+echo CP4:csubs
+mongoCmd2 ftest_cp4 'db.csubs.findOne()'
+echo
+echo
+
+
+echo "00. Make sure mongo is clean"
+echo "============================"
+echo CB:registrations
+mongoCmd2 ftest 'db.registrations.findOne()'
+echo
+echo CP1:registrations
+mongoCmd2 ftest_cp1 'db.registrations.findOne()'
+echo
+echo CP4:registrations
+mongoCmd2 ftest_cp4 'db.registrations.findOne()'
+echo
+echo
+
+
 
 echo "01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2"
 echo "========================================================================================================"
@@ -212,6 +255,78 @@ echo
 
 
 --REGEXPECT--
+00. Make sure mongo is clean
+============================
+CB:entities
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP1:entities
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP4:entities
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
+00. Make sure mongo is clean
+============================
+CB:csubs
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP1:csubs
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP4:csubs
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
+00. Make sure mongo is clean
+============================
+CB:registrations
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP1:registrations
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP4:registrations
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
 01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2
 ========================================================================================================
 HTTP/1.1 201 Created

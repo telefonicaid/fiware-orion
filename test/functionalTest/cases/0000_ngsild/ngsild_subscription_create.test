@@ -47,7 +47,7 @@ orionldStart CB
 # 04. GET /ngsi-ld/v1/subscription/http://a.b.c/subs/sub01, accepting jsonld - see @context in payload
 # 05. Attempt to create a subscription with an ID that is not a URI - see failure
 # 06. Attempt to create a subscription without 'entities' nor 'watchedAttributes' - see failure
-# 07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
+# 07. Attempt to create a subscription with 'timeInterval' - see 501
 # 08. Create a subscription without 'timeInterval' nor 'watchedAttributes' - OK
 # 09. Create a subscription 'sub09' without 'expires' and 'throttling' - OK
 # 10. GET sub09 with sysAttrs and make sure no 'expires' nor 'throttling' is returned
@@ -234,8 +234,8 @@ echo
 echo
 
 
-echo "07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure"
-echo "==================================================================================================="
+echo "07. Attempt to create a subscription with 'timeInterval' - see 501"
+echo "=================================================================="
 payload='{
   "id": "http://a.b.c/subs/sub03",
   "type": "Subscription",
@@ -258,12 +258,6 @@ payload='{
   "watchedAttributes": [ "P2" ],
   "timeInterval": 12,
   "q": "P2>10",
-  "geoQ": {
-    "geometry": "Point",
-    "coordinates": [1,2],
-    "georel": "near",
-    "geoproperty": "location"
-  },
   "csf": "not implemented",
   "isActive": false,
   "notification": {
@@ -653,17 +647,17 @@ Date: REGEX(.*)
 }
 
 
-07. Attempt to create a subscription with both 'watchedAttributes' and 'timeInterval' - see failure
-===================================================================================================
+07. Attempt to create a subscription with 'timeInterval' - see 501
+==================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 144
+Content-Length: 161
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Subscription::timeInterval is not implemented",
+    "detail": "Periodic Notification Subscriptions are not implemented",
     "title": "Not Implemented",
-    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
 }
 
 

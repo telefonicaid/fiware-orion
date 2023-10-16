@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "cache/subCache.h"                                      // CachedSubscription
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 
 
 
@@ -35,14 +35,16 @@
 //
 extern void mongocSubCountersUpdate
 (
-  const char*          tenant,
-  CachedSubscription*  cSubP,
-  int                  deltaCount,
+  OrionldTenant*       tenantP,
+  const char*          subscriptionId,
+  bool                 ngsild,
+  int32_t              deltaAttempts,
+  int32_t              deltaFailures,
+  int32_t              deltaNoMatch,
   double               lastNotificationTime,
-  double               lastFailure,
   double               lastSuccess,
-  bool                 forcedToPause,
-  bool                 ngsild
+  double               lastFailure,
+  bool                 forcedToPause
 );
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCSUBCOUNTERSUPDATE_H_

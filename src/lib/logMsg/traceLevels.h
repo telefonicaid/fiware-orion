@@ -62,8 +62,9 @@ typedef enum TraceLevels
   LmtSubCache = 50,                    // Subscription Cache
   LmtSubCacheMatch,                    // Subscription Cache Matches
   LmtSubCacheDebug,                    // Subscription Cache Debug
+  LmtSubCacheStats,                    // Subscription Cache Counters and Timestamps
   LmtSubCacheSync,                     // Subscription Cache Refresh
-  LmtSubCacheStats,                    // Errors and timestamps in sub-cache
+  LmtSubCacheFlush,                    // Subscription Cache Flush
 
   //
   // Registration Cache
@@ -94,6 +95,15 @@ typedef enum TraceLevels
 
   // GeoJSON
   LmtGeoJSON = 90,                     // GeoJSON ... everything (for now)
+
+  //
+  // Pernot sub-cache
+  //
+  LmtPernot = 100,                     // Periodic Notification Subscription cache
+  LmtPernotLoop,                       // Pernot loop, when each sub is triggered in time
+  LmtPernotLoopTimes,                  // Pernot loop, details on timestamps
+  LmtPernotFlush,                      // Pernot flush to DB
+  LmtPernotQuery,                      // Pernot query
 
   //
   // Misc

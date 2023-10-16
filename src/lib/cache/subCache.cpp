@@ -52,6 +52,7 @@ extern "C"
 #include "orionld/types/OrionldTenant.h"                    // OrionldTenant
 #include "orionld/common/orionldState.h"                    // orionldState
 #include "orionld/common/tenantList.h"                      // tenantList
+#include "orionld/common/orionldTenantLookup.h"             // orionldTenantLookup
 #include "orionld/common/urlParse.h"                        // urlParse
 #include "orionld/q/qBuild.h"                               // qBuild
 #include "orionld/q/qRelease.h"                             // qRelease
@@ -882,6 +883,7 @@ bool subCacheItemInsert
   // First the non-complex values
   //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->tenantP               = orionldTenantLookup(tenant);
   cSubP->expirationTime        = expirationTime;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
@@ -889,7 +891,10 @@ bool subCacheItemInsert
   cSubP->lastSuccess           = lastNotificationSuccessTime;
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
+  cSubP->dbCount               = 0;
   cSubP->count                 = 0;
+  cSubP->failures              = 0;
+  cSubP->dbFailures            = 0;
   cSubP->status                = status;
   cSubP->url                   = NULL;
   cSubP->ip                    = NULL;
@@ -953,7 +958,7 @@ bool subCacheItemInsert
       // FIXME: Instead of calling qBuild here, I should pass the pointer from pCheckSubscription
       if (cSubP->qP != NULL)
         qRelease(cSubP->qP);
-      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true);  // cSubP->qText needs real allocation
+      cSubP->qP = qBuild(q.c_str(), &cSubP->qText, &validForV2, &isMq, true, false);  // cSubP->qText needs real allocation
 
       if (cSubP->qText != NULL)
         cSubP->qText = strdup(cSubP->qText);
@@ -1275,6 +1280,7 @@ typedef struct CachedSubSaved
 {
   double   lastNotificationTime;
   int64_t  count;
+  int64_t  failures;
   double   lastFailure;
   double   lastSuccess;
   bool     ngsild;
@@ -1338,6 +1344,7 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;       // This count is later pushed ($inc) to DB - needs to go to cache as well
+    cssP->failures             = cSubP->failures;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
     cssP->ngsild               = (cSubP->ldContext != "")? true : false;
@@ -1401,12 +1408,22 @@ void subCacheSync(void)
     {
       const char* tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
       if (experimental == true)
-        mongocSubCountersUpdate(tenant, cSubP, cssP->count, cssP->lastNotificationTime, cssP->lastFailure, cssP->lastSuccess, false, cssP->ngsild);
+        mongocSubCountersUpdate(cSubP->tenantP,
+                                cSubP->subscriptionId,
+                                cssP->ngsild,
+                                cssP->count,
+                                cssP->failures,
+                                0,  // noMatch - not here - only for PerNot
+                                cssP->lastNotificationTime,
+                                cssP->lastSuccess,
+                                cssP->lastFailure,
+                                false);
       else
       {
         mongoSubCountersUpdate(tenant,
                                cSubP->subscriptionId,
                                cssP->count,
+                               cssP->failures,
                                cssP->lastNotificationTime,
                                cssP->lastFailure,
                                cssP->lastSuccess,
@@ -1419,8 +1436,10 @@ void subCacheSync(void)
       if (cssP->lastNotificationTime != 0) cSubP->lastNotificationTime  = cssP->lastNotificationTime;
 
       // Here the delta (just $inc'ed to DB) is also inc'ed to subCache
-      cSubP->dbCount += cssP->count;
-      cSubP->count    = 0;
+      cSubP->dbCount    += cssP->count;
+      cSubP->count       = 0;
+      cSubP->dbFailures += cssP->failures;
+      cSubP->failures    = 0;
     }
 
     cSubP = cSubP->next;
@@ -1486,6 +1505,7 @@ void subCacheStart(void)
     LM_E(("Runtime Error (error creating thread: %d)", ret));
     return;
   }
+
   pthread_detach(tid);
 }
 
@@ -1516,9 +1536,9 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
 
     if (errors == 0)
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, kNow, -1, kNow, ngsild);  // lastFailure == -1
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 0, kNow, -1, kNow, ngsild);  // lastFailure == -1
     else
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, kNow, kNow, -1, ngsild);  // lastSuccess == -1, count == 0
+      mongoSubCountersUpdate(tenant, subscriptionId, 0, 1, kNow, kNow, -1, ngsild);  // lastSuccess == -1, count == 0
 
     return;
   }
