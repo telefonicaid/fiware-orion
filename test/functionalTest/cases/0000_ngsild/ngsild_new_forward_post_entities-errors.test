@@ -44,6 +44,49 @@ orionldStart CP4 -experimental
 # 09. GET all entities in CP4, see urn:E1 without attrs
 #
 
+echo "00. Make sure mongo is clean"
+echo "============================"
+echo CP1
+mongoCmd2 ftest_cp1 'db.entities.findOne()'
+echo
+echo CP2
+mongoCmd2 ftest_cp2 'db.entities.findOne()'
+echo
+echo CP3
+mongoCmd2 ftest_cp3 'db.entities.findOne()'
+echo
+echo
+
+
+echo "00. Make sure mongo is clean"
+echo "============================"
+echo CP1
+mongoCmd2 ftest_cp1 'db.csubs.findOne()'
+echo
+echo CP2
+mongoCmd2 ftest_cp2 'db.csubs.findOne()'
+echo
+echo CP3
+mongoCmd2 ftest_cp3 'db.csubs.findOne()'
+echo
+echo
+
+
+echo "00. Make sure mongo is clean"
+echo "============================"
+echo CP1
+mongoCmd2 ftest_cp1 'db.registrations.findOne()'
+echo
+echo CP2
+mongoCmd2 ftest_cp2 'db.registrations.findOne()'
+echo
+echo CP3
+mongoCmd2 ftest_cp3 'db.registrations.findOne()'
+echo
+echo
+
+
+
 echo "01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2"
 echo "========================================================================================================"
 payload='{
@@ -212,6 +255,78 @@ echo
 
 
 --REGEXPECT--
+00. Make sure mongo is clean
+============================
+CP1
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP2
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP3
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
+00. Make sure mongo is clean
+============================
+CP1
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP2
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP3
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
+00. Make sure mongo is clean
+============================
+CP1
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP2
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP3
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
 01. Create an exclusive registration R1 in CB for CP1 of entity type T, id 'urn:E1' and properties P1+P2
 ========================================================================================================
 HTTP/1.1 201 Created
