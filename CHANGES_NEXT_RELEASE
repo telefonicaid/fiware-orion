@@ -10,3 +10,4 @@ Fixed issues:
   * #280  - Implemented Periodic Notifications (subscriptions with a 'timeInterval')
   * #280  - Fixed a crash in the subscription cache for subscriptions with empty URL paths in the notification::endpoint::uri field
   * #280  - New CLI (hidden) for extra field in notifications (trigger: "VERB URL PATH"): -triggerOperation
+  * #1427 - Disabling the keep-alive as it seems to be missing in libpaho (this is just a part of the issue)

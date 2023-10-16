@@ -52,6 +52,8 @@ void mqttDisconnect(const char* host, unsigned short port, const char* username,
   if (mcP->connections > 0)
     return;
 
+  LM_T(LmtMqtt, ("Disconnection for %s/%s", mcP->host, mcP->username));
+
   if (mcP->host     != NULL)      free(mcP->host);
   if (mcP->username != NULL)      free(mcP->username);
   if (mcP->password != NULL)      free(mcP->password);

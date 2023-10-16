@@ -152,6 +152,7 @@ int mqttNotification
 
   if (mqttP == NULL)
   {
+    LM_T(LmtMqtt, ("No MQTT connection found, getting one"));
     mqttP = mqttConnectionAdd(false, username, password, host, port, mqttVersion);
     if (mqttP == NULL)
     {
@@ -165,14 +166,24 @@ int mqttNotification
   mqttMsg.qos        = QoS;
   mqttMsg.retained   = 0;
 
-  MQTTClient_publishMessage(mqttP->client, topic, &mqttMsg, &mqttToken);
+  LM_T(LmtMqtt, ("Sending a notification over MQTT (topic: '%s')", topic));
+  int  mr = MQTTClient_publishMessage(mqttP->client, topic, &mqttMsg, &mqttToken);
+  if (mr != MQTTCLIENT_SUCCESS)
+  {
+    LM_E(("MQTT Broker error %d", mr));
+    // Reconnect and try again
+    return -1;
+  }
+  LM_T(LmtMqtt, ("MQTTClient_publishMessage says OK (returned MQTTCLIENT_SUCCESS)"));
 
+  LM_T(LmtMqtt, ("Waiting for completion (timeout: %d)", mqttTimeout));
   int rc = MQTTClient_waitForCompletion(mqttP->client, mqttToken, mqttTimeout);
-  if (rc != 0)
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     LM_E(("Internal Error (MQTT waitForCompletion error %d)", rc));
     return -1;
   }
+  LM_T(LmtMqtt, ("MQTTClient_waitForCompletion says OK (returned MQTTCLIENT_SUCCESS)"));
 
   return 0;
 }
