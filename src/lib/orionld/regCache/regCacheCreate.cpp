@@ -48,12 +48,17 @@ extern void apiModelToCacheRegistration(KjNode* apiRegistrationP);
 //
 int regIterFunc(RegCache* rcP, KjNode* dbRegP)
 {
+  LM_T(LmtRegMatch, ("In regIterFunc"));
+  kjTreeLog(dbRegP, "dbRegP", LmtRegMatch);
+
   // Convert DB Reg to API Reg
   if (dbModelToApiRegistration(dbRegP, true, true) == false)
   {
     LM_E(("dbModelToApiRegistration failed"));
     return 1;
   }
+  kjTreeLog(dbRegP, "apiReg", LmtRegMatch);
+
   // The DB Registration 'dbRegP' is now in API Registration format (after calling dbModelToApiRegistration)
   KjNode* apiRegP = dbRegP;
 

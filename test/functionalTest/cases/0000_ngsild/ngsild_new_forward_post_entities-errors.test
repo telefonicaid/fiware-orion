@@ -27,7 +27,7 @@ Forwarding of POST Entities requests - errors handling for forwarded requests
 dbInit CB
 dbInit CP1
 dbInit CP4
-orionldStart CB  -experimental -forwarding
+orionldStart CB  -experimental -forwarding -t 0-255
 orionldStart CP1 -experimental
 orionldStart CP4 -experimental
 
@@ -46,42 +46,42 @@ orionldStart CP4 -experimental
 
 echo "00. Make sure mongo is clean"
 echo "============================"
-echo CP1
+echo CB:entities
+mongoCmd2 ftest 'db.entities.findOne()'
+echo
+echo CP1:entities
 mongoCmd2 ftest_cp1 'db.entities.findOne()'
 echo
-echo CP2
-mongoCmd2 ftest_cp2 'db.entities.findOne()'
-echo
-echo CP3
-mongoCmd2 ftest_cp3 'db.entities.findOne()'
+echo CP4:entities
+mongoCmd2 ftest_cp4 'db.entities.findOne()'
 echo
 echo
 
 
 echo "00. Make sure mongo is clean"
 echo "============================"
-echo CP1
+echo CB:csubs
+mongoCmd2 ftest 'db.csubs.findOne()'
+echo
+echo CP1:csubs
 mongoCmd2 ftest_cp1 'db.csubs.findOne()'
 echo
-echo CP2
-mongoCmd2 ftest_cp2 'db.csubs.findOne()'
-echo
-echo CP3
-mongoCmd2 ftest_cp3 'db.csubs.findOne()'
+echo CP4:csubs
+mongoCmd2 ftest_cp4 'db.csubs.findOne()'
 echo
 echo
 
 
 echo "00. Make sure mongo is clean"
 echo "============================"
-echo CP1
+echo CB:registrations
+mongoCmd2 ftest 'db.registrations.findOne()'
+echo
+echo CP1:registrations
 mongoCmd2 ftest_cp1 'db.registrations.findOne()'
 echo
-echo CP2
-mongoCmd2 ftest_cp2 'db.registrations.findOne()'
-echo
-echo CP3
-mongoCmd2 ftest_cp3 'db.registrations.findOne()'
+echo CP4:registrations
+mongoCmd2 ftest_cp4 'db.registrations.findOne()'
 echo
 echo
 
@@ -257,45 +257,21 @@ echo
 --REGEXPECT--
 00. Make sure mongo is clean
 ============================
-CP1
+CB:entities
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 null
 bye
 
-CP2
+CP1:entities
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 null
 bye
 
-CP3
-MongoDB shell version REGEX(.*)
-connecting to: REGEX(.*)
-MongoDB server version: REGEX(.*)
-null
-bye
-
-
-00. Make sure mongo is clean
-============================
-CP1
-MongoDB shell version REGEX(.*)
-connecting to: REGEX(.*)
-MongoDB server version: REGEX(.*)
-null
-bye
-
-CP2
-MongoDB shell version REGEX(.*)
-connecting to: REGEX(.*)
-MongoDB server version: REGEX(.*)
-null
-bye
-
-CP3
+CP4:entities
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
@@ -305,21 +281,45 @@ bye
 
 00. Make sure mongo is clean
 ============================
-CP1
+CB:csubs
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 null
 bye
 
-CP2
+CP1:csubs
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)
 null
 bye
 
-CP3
+CP4:csubs
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+
+00. Make sure mongo is clean
+============================
+CB:registrations
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP1:registrations
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+null
+bye
+
+CP4:registrations
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
 MongoDB server version: REGEX(.*)

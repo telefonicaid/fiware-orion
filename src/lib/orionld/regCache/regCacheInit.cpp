@@ -41,8 +41,12 @@ extern "C"
 //
 void regCacheInit(void)
 {
+  LM_T(LmtRegMatch, ("Creating regCache for default tenant"));
   tenant0.regCache = regCacheCreate(&tenant0, true);
 
   for (OrionldTenant* tenantP = tenantList; tenantP != NULL; tenantP = tenantP->next)
+  {
+    LM_T(LmtRegMatch, ("Creating regCache for tenant '%s'", tenantP->tenant));
     tenantP->regCache = regCacheCreate(tenantP, true);
+  }
 }
