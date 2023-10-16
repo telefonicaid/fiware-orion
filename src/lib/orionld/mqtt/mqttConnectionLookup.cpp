@@ -48,6 +48,11 @@ MqttConnection* mqttConnectionLookup(const char* host, unsigned short port, cons
     if ((mqP->password != NULL) && (strcmp(password, mqP->password) != 0))  continue;
     if ((mqP->version  != NULL) && (strcmp(version,  mqP->version)  != 0))  continue;
 
+    if (MQTTClient_isConnected(mqP->client) != true)
+      LM_T(LmtMqtt, ("Found the MQTT connection, just, it's not connected!"));
+    else
+      LM_T(LmtMqtt, ("Found the MQTT connection and it's connected"));
+
     return mqP;
   }
 
