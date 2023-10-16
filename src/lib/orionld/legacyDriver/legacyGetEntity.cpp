@@ -381,8 +381,6 @@ bool legacyGetEntity(void)
   KjNode*  regArray = NULL;
   char*    eId      = orionldState.wildcard[0];
 
-  LM_W(("Retreiving entity '%s' from tenant '%s'", eId, orionldState.tenantP->tenant));
-
   //
   // Make sure the ID (eId) is a valid URI
   //

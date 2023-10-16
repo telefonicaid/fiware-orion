@@ -60,7 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [ 'functional_633_634', 'unit']
+        test: [ 'functional_146_146', functional_634_634 ]
 
     steps:
       - uses: actions/checkout@v2

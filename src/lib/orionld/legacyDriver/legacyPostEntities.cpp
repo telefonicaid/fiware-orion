@@ -169,8 +169,6 @@ bool legacyPostEntities(void)
     return false;
   }
 
-  LM_W(("Creating an entity '%s' of type '%s' on tenant '%s'", entityId, entityType, orionldState.tenantP->tenant));
-
   //
   // NOTE
   //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type

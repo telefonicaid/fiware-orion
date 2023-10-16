@@ -154,8 +154,6 @@ bool legacyGetEntities(void)
   QueryContextRequest   mongoRequest;
   QueryContextResponse  mongoResponse;
 
-  LM_W(("Getting entities on tenant '%s'", orionldState.tenantP->tenant));
-
   if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL) && (local == false))
   {
     orionldError(OrionldBadRequestData,
