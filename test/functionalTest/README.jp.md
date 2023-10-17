@@ -27,6 +27,7 @@ virtualenv --python=/usr/bin/python3 /path/to/ft_env
 
 ```
 pip install Flask==2.0.2
+pip install Werkzeug==2.0.2
 pip install paho-mqtt==1.6.1
 pip install amqtt==0.11.0b1  # Not actually an accumulator-server.py dependency, but needed by some tests
 ```
@@ -55,6 +56,7 @@ RUN apt-get update -y
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
 RUN pip install Flask==2.0.2
+RUN pip install Werkzeug==2.0.2
 RUN pip install paho-mqtt==1.6.1
 COPY . /app
 WORKDIR /app

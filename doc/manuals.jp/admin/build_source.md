@@ -132,7 +132,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
         . scripts/testEnv.sh
         python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
+        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
 
 * この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
