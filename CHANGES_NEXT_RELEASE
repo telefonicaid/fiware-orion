@@ -1,5 +1,6 @@
 - Add: servicePath field to builtin attributes (#2877)
 - Add: notification.mqtt.retain and notification.mqttCustom.retain flag for MQTT retain in notifications (#4388)
+- Fix: DateTime and geo:json types were not supported in custom notifications using ngsi patching (#4435)
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
 - Fix: improve error traces (#4387)
 - Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
