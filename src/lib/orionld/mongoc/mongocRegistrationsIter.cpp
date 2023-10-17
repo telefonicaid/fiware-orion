@@ -71,7 +71,7 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   //
   // Run the query
   //
-  MONGOC_RLOG("Query for all regs", rcP->tenantP->mongoDbName, "registrations", NULL, LmtMongoc);
+  MONGOC_RLOG("Query for all regs", rcP->tenantP->mongoDbName, "registrations", NULL, NULL, LmtMongoc);
   mongoCursorP = mongoc_collection_find_with_opts(regsCollectionP, &mongoFilter, NULL, readPrefs);
   if (mongoCursorP == NULL)
   {
