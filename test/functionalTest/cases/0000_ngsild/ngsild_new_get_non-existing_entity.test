@@ -39,7 +39,7 @@ orionldStart CP1 -experimental
 #
 
 echo "01. Create a registration in CB for all entities of type IE"
-echo "==============================================="
+echo "==========================================================="
 payload='{
   "id": "urn:R1",
   "type": "ContextSourceRegistration",
@@ -110,6 +110,76 @@ echo
 
 
 --REGEXPECT--
+01. Create a registration in CB for all entities of type IE
+===========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create an entity urn:ngsi-ld:IE:0001 in CP1
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:IE:0001
+
+
+
+03. GET the entity urn:ngsi-ld:IE:0001 from CB
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 304
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "CPU": {
+        "type": "Property",
+        "value": 2.5
+    },
+    "RAM": {
+        "type": "Property",
+        "value": 8
+    },
+    "available": {
+        "type": "Property",
+        "value": true
+    },
+    "id": "urn:ngsi-ld:IE:0001",
+    "powerConsumption": {
+        "type": "Property",
+        "value": 50
+    },
+    "realTimeCapabilities": {
+        "type": "Property",
+        "value": 5
+    },
+    "storage": {
+        "type": "Property",
+        "value": 256
+    },
+    "type": "IE"
+}
+
+
+04. GET a non-existing urn:ngsi-ld:IE:0045 from CB - see 404
+============================================================
+HTTP/1.1 404 Not Found
+Content-Length: 121
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:ngsi-ld:IE:0045",
+    "title": "Entity not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
