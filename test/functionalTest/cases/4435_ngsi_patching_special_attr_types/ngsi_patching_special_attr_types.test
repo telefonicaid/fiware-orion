@@ -58,7 +58,7 @@ payload='{
   "notification": {
     "attrs": [
       "dateobservedto",
-      "location"
+      "mylocation"
     ],
     "onlyChangedAttrs": false,
     "attrsFormat": "normalized",
@@ -97,8 +97,8 @@ echo "==========================================================================
 payload='{
   "notification": {
     "attrs": [
-      "dateobservedto",
-      "location"
+      "dateobservedto2",
+      "mylocation2"
     ],
     "onlyChangedAttrs": false,
     "attrsFormat": "normalized",
@@ -146,7 +146,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 522
+Content-Length: 524
 
 {
     "description": "DateTime test",
@@ -154,7 +154,7 @@ Content-Length: 522
     "notification": {
         "attrs": [
             "dateobservedto",
-            "location"
+            "mylocation"
         ],
         "attrsFormat": "normalized",
         "covered": false,
@@ -205,15 +205,15 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 524
+Content-Length: 528
 
 {
     "description": "DateTime test",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
         "attrs": [
-            "dateobservedto",
-            "location"
+            "dateobservedto2",
+            "mylocation2"
         ],
         "attrsFormat": "normalized",
         "covered": false,
