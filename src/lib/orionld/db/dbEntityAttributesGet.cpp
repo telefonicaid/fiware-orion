@@ -61,7 +61,7 @@ static KjNode* getEntityAttributesResponse(KjNode* sortedArrayP)
 {
   char entityAttributesId[128];
 
-  uuidGenerate(entityAttributesId, sizeof(entityAttributesId), "urn:ngsi-ld:EntityAttributeList:");
+  uuidGenerate(entityAttributesId, sizeof(entityAttributesId), "urn:ngsi-ld:AttributeList:");
 
   KjNode* attributeNodeResponseP = kjObject(orionldState.kjsonP, NULL);
   KjNode* idNodeP                = kjString(orionldState.kjsonP, "id", entityAttributesId);
