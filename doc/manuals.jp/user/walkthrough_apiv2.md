@@ -92,8 +92,8 @@ broker を再起動するには、*root* として実行するか、`sudo` コ�
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
-このスクリプトには Flask version 2.0.2 と paho-mqtt version 1.6.1 が必要であることに注意してください。
-これらは、`pip install Flask==2.0.2` と `pip install paho-mqtt==1.6.1` を使用してインストールできます。
+このスクリプトには Flask version 2.0.2 (Werkzeug 2.0.2 とともに) と paho-mqtt version 1.6.1 が必要であることに注意してください。
+これらは、それぞれ、`pip install Flask==2.0.2 Werkzeug==2.0.2` と `pip install paho-mqtt==1.6.1` を使用してインストールできます。
 さらに、Python 3.10.x を使用することをお勧めします。ベース・オペレーティングシステムの Python
 インストールと競合する場合は、[virtualenv](https://virtualenv.pypa.io/en/latest/) を使用することを
 お勧めします。
