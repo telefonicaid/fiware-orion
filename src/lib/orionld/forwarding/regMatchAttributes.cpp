@@ -72,12 +72,15 @@ KjNode* regMatchAttributes(RegCacheItem* regP, DistOpType operation, KjNode* pro
     KjNode* body = kjClone(orionldState.kjsonP, payloadBody);
 
     // Add entity type and id
-    if (operation != DoUpdateAttrs)
+    if (orionldState.payloadIdNode != NULL)  // WAS: if ((operation != DoUpdateAttrs) && (operation != DoMergeEntity))
     {
       KjNode* idP   = kjClone(orionldState.kjsonP, orionldState.payloadIdNode);
-      KjNode* typeP = kjClone(orionldState.kjsonP, orionldState.payloadTypeNode);
-
       kjChildAdd(body, idP);
+    }
+
+    if (orionldState.payloadTypeNode != NULL)
+    {
+      KjNode* typeP = kjClone(orionldState.kjsonP, orionldState.payloadTypeNode);
       kjChildAdd(body, typeP);
     }
 

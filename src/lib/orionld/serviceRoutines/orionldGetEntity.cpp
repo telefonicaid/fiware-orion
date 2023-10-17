@@ -1,3 +1,4 @@
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -274,7 +275,12 @@ bool orionldGetEntity(void)
         {
           if (distOpP->httpResponseCode >= 400)
           {
-            LM_W(("Got an error response (%d) from a forwarded request: '%s'", distOpP->httpResponseCode, distOpP->rawResponse));
+            LM_W(("Got an ERROR response (%d) from a forwarded request: '%s'", distOpP->httpResponseCode, distOpP->rawResponse));
+            continue;
+          }
+          else if (distOpP->httpResponseCode != 200)
+          {
+            LM_W(("Got a non-200 response code (%d)", distOpP->httpResponseCode));
             continue;
           }
 
@@ -341,22 +347,17 @@ bool orionldGetEntity(void)
     distOpListRelease(distOpList);
   }
 
-  if ((forwards > 0) || (forcedSysAttrs == true))  // Nothing to do with SysAttrs really, just a bieffekt
+  if ((apiEntityP != NULL) && (forcedSysAttrs == true))
   {
     // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
 
-    if (orionldState.out.format == RF_KEYVALUES)
-      ntosEntity(apiEntityP, lang);
-    else if (orionldState.out.format == RF_CONCISE)
-      ntocEntity(apiEntityP, lang, sysAttrs);
-    else
-      ntonEntity(apiEntityP, lang, sysAttrs);
+    if      (orionldState.out.format == RF_KEYVALUES)  ntosEntity(apiEntityP, lang);
+    else if (orionldState.out.format == RF_CONCISE)    ntocEntity(apiEntityP, lang, sysAttrs);
+    else                                               ntonEntity(apiEntityP, lang, sysAttrs);
   }
 
-  if ((dbEntityP != NULL) && (fwdMerges == 0) && (forcedSysAttrs == true) && (sysAttrs == false))
-  {
+  if ((apiEntityP != NULL) && (sysAttrs == false))
     kjSysAttrsRemove(apiEntityP, 2);
-  }
 
   if (orionldState.out.contentType == GEOJSON)
   {
@@ -408,8 +409,13 @@ bool orionldGetEntity(void)
   if (orionldState.tenantP != &tenant0)
     orionldHeaderAdd(&orionldState.out.headers, HttpTenant, orionldState.tenantP->tenant, 0);
 
+  if (apiEntityP == NULL)
+  {
+    orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
+    return false;
+  }
+
   orionldState.responseTree   = apiEntityP;
   orionldState.httpStatusCode = 200;
-
   return true;
 }

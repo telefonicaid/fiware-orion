@@ -41,6 +41,7 @@ orionldStart CP2 -experimental -multiservice
 # 03. Register E1:P1 for CP1 on CB, tenant t1
 # 04. Register E1:R1 for CP2 on CB, tenant t1
 # 05. GET E1 on CB, tenant t1 - see E1:P1+R1
+# 05b. GET E1 on CB, tenant t1, with sysAttrs - see E1:P1+R1
 # 06. GET E1 on CB, tenant t1, with local=true set - 404
 # 07. GET E1 on CB, default tenant - 404
 # 08. Register E1:P1 for CP1 on CB, default tenant, but with tenant==t1 in the registration
@@ -129,6 +130,13 @@ echo
 echo
 
 
+echo "05b. GET E1 on CB, tenant t1, with sysAttrs - see E1:P1+R1"
+echo "=========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?options=sysAttrs --tenant T1
+echo
+echo
+
+
 echo "06. GET E1 on CB, tenant t1, with local=true set - 404"
 echo "======================================================"
 orionCurl --url '/ngsi-ld/v1/entities/urn:E1?local=true' --tenant T1
@@ -203,6 +211,35 @@ NGSILD-Tenant: t1
         "type": "Relationship"
     },
     "id": "urn:E1",
+    "type": "T"
+}
+
+
+05b. GET E1 on CB, tenant t1, with sysAttrs - see E1:P1+R1
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 359
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-Tenant: t1
+
+{
+    "P1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "type": "Property",
+        "value": "P1 in CP1"
+    },
+    "R1": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "object": "urn:CP2:R1",
+        "type": "Relationship"
+    },
+    "createdAt": "202REGEX(.*)",
+    "id": "urn:E1",
+    "modifiedAt": "202REGEX(.*)",
     "type": "T"
 }
 
