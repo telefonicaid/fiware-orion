@@ -85,20 +85,34 @@ static bool attrsMatch(KjNode* propertiesP, KjNode* relationshipsP, KjNode* rciP
   bool rciPropertiesEmpty    = (rciPropertiesArray    == NULL) || (rciPropertiesArray->value.firstChildP    == NULL);
   bool rciRelationshipsEmpty = (rciRelationshipsArray == NULL) || (rciRelationshipsArray->value.firstChildP == NULL);
 
+
   if ((propertiesEmpty == true) && (relationshipsEmpty == true))
+  {
+    LM_T(LmtRegMatch, ("Overlap as both reg-attrs-arrays are empty"));
     return true;
+  }
 
   if ((rciPropertiesEmpty == true) && (rciRelationshipsEmpty == true))
+  {
+    LM_T(LmtRegMatch, ("Overlap as both rci-reg-attrs-arrays are empty"));
     return true;
+  }
 
   if (propertiesP != NULL)
   {
     for (KjNode* attrNameP = propertiesP->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
     {
       if (kjStringValueLookupInArray(rciPropertiesArray, attrNameP->value.s) != NULL)
+      {
+        LM_T(LmtRegMatch, ("overlap for attribute '%s'", attrNameP->value.s));
         return true;
+      }
+
       if (kjStringValueLookupInArray(rciRelationshipsArray, attrNameP->value.s) != NULL)
+      {
+        LM_T(LmtRegMatch, ("overlap for attribute '%s'", attrNameP->value.s));
         return true;
+      }
     }
   }
 
@@ -107,11 +121,20 @@ static bool attrsMatch(KjNode* propertiesP, KjNode* relationshipsP, KjNode* rciP
     for (KjNode* attrNameP = relationshipsP->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
     {
       if (kjStringValueLookupInArray(rciPropertiesArray, attrNameP->value.s) != NULL)
+      {
+        LM_T(LmtRegMatch, ("overlap for attribute '%s'", attrNameP->value.s));
         return true;
+      }
+
       if (kjStringValueLookupInArray(rciRelationshipsArray, attrNameP->value.s) != NULL)
+      {
+        LM_T(LmtRegMatch, ("overlap for attribute '%s'", attrNameP->value.s));
         return true;
+      }
     }
   }
+
+  LM_T(LmtRegMatch, ("No overlap for attributes"));
 
   return false;
 }
@@ -153,6 +176,8 @@ static bool pCheckOverlappingRegistrations
       if ((currentRegId != NULL) && (strcmp(currentRegId, rciP->regId) == 0))
         continue;
 
+      LM_T(LmtRegMatch, ("Trying registration '%s'", rciP->regId));
+
       //
       // Conflict must be checked if any of the two regs are Exclusive, BUT not if the other is Auxiliary
       //
@@ -163,12 +188,20 @@ static bool pCheckOverlappingRegistrations
         return false;
       }
 
-      RegistrationMode  mode = (rciRegModeNodeP == NULL)? RegModeInclusive : registrationMode(rciRegModeNodeP->value.s);
+      RegistrationMode  rciRegMode = (rciRegModeNodeP == NULL)? RegModeInclusive : registrationMode(rciRegModeNodeP->value.s);
 
-      if ((regMode == RegModeAuxiliary) || (mode == RegModeAuxiliary))
+      if ((regMode == RegModeAuxiliary) || (rciRegMode == RegModeAuxiliary))
         continue;
-      else if ((regMode != RegModeExclusive) && (mode != RegModeExclusive))
+      if ((regMode != RegModeExclusive) && (rciRegMode != RegModeExclusive))
         continue;
+
+      //
+      // From here on none of the two registrations are AUXILIARY
+      //                    And at least one of them is EXCLUSIVE
+      //
+      // Meaning, we'll have a collision if any of them is for ALL ATTRIBUTES
+      // And if both specify the Properties/Relationships, there can be no match
+      //
 
       KjNode* rciInformationArray = kjLookup(rciP->regTree, "information");
 

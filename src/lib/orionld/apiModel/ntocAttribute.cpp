@@ -33,6 +33,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/common/orionldState.h"                         // kjTreeLog
 #include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
 #include "orionld/kjTree/kjSysAttrsRemove.h"                     // kjSysAttrsRemove
 #include "orionld/apiModel/langFixNormalized.h"                  // langFixNormalized
@@ -89,6 +90,9 @@ void ntocAttribute(KjNode* attrP, const char* lang, bool sysAttrs)
   // Loop over sub-attributes
   for (KjNode* fieldP = attrP->value.firstChildP; fieldP != NULL; fieldP = fieldP->next)
   {
+    if (fieldP->name == NULL)
+      continue;
+
     if (strcmp(fieldP->name, "type")        == 0)  continue;
     if (strcmp(fieldP->name, "value")       == 0)  continue;
     if (strcmp(fieldP->name, "createdAt")   == 0)  continue;

@@ -184,7 +184,16 @@ int mqttNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecSize, do
   mqttMsg.qos        = mqttP->qos;
   mqttMsg.retained   = 0;
 
-  MQTTClient_publishMessage(mqttConnectionP->client, mqttP->topic, &mqttMsg, &mqttToken);
+  LM_T(LmtMqtt, ("Sending a notification over MQTT (topic: '%s')", mqttP->topic));
+  int  mr = MQTTClient_publishMessage(mqttConnectionP->client, mqttP->topic, &mqttMsg, &mqttToken);
+  if (mr != MQTTCLIENT_SUCCESS)
+  {
+    LM_E(("MQTT Broker error %d", mr));
+    // Reconnect and try again
+    orionldError(OrionldInternalError, "MQTT Broker Problem", "MQTTClient_publishMessage failed", 500);
+    notificationFailure(cSubP, "MQTT Broker error", notificationTime);
+    return -1;
+  }
 
   extern int  mqttTimeout;  // From mqttNotification.cpp - should be a CLI
   int rc = MQTTClient_waitForCompletion(mqttConnectionP->client, mqttToken, mqttTimeout);

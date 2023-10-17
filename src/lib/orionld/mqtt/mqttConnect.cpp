@@ -46,7 +46,7 @@ bool mqttConnect(MqttConnection* mqP, bool mqtts, const char* username, const ch
   snprintf(address, sizeof(address), "%s:%d", host, port);
   MQTTClient_create(&mqP->client, address, "Orion-LD", MQTTCLIENT_PERSISTENCE_NONE, NULL);
 
-  connectOptions.keepAliveInterval = 20;
+  connectOptions.keepAliveInterval = 0;
   connectOptions.cleansession      = 1;
   connectOptions.username          = username;
   connectOptions.password          = password;

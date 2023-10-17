@@ -242,10 +242,10 @@ function exitFunction()
   errorText=$2
   testFile=$3
   errorString=$4
-  stderrFile=$5
-  diffFile=$5    # In the case of exitCode 9
+  diffFile=$5
   stdoutFile=$6
   forced=$7
+  stderrFile=$8    # In the case of exitCode 9
 
   partOk=false
 
@@ -270,6 +270,18 @@ function exitFunction()
           echo  "---------------------------------------"
           echo
 
+          echo $stdoutFile:
+          echo  "---------------------------------------"
+          cat $stdoutFile
+          echo  "---------------------------------------"
+          echo
+
+          echo $stderrFile:
+          echo  "---------------------------------------"
+          cat $stderrFile
+          echo  "---------------------------------------"
+          echo
+
           cat /tmp/orionld.log | egrep 'lvl=ERR|lvl=WARN' > /tmp/orionld.err-warn.log
           echo "------------ Last 30 Lines: ---------------------" >> /tmp/orionld.err-warn.log
           tail -30 /tmp/orionld.log >> /tmp/orionld.err-warn.log
@@ -277,7 +289,8 @@ function exitFunction()
           # then
               echo "Errors and warnings from the orionld log file"
               echo "-------------------------------------------------"
-              cat /tmp/orionld.err-warn.log
+              # cat /tmp/orionld.err-warn.log
+              cat /tmp/orionld.log
               echo "-------------------------------------------------"
               echo
               echo
@@ -1044,7 +1057,7 @@ function partExecute()
       logMsg "$what $dirname/$filename: eCode=$eCode"
       if [ $__tryNo == $MAX_TRIES ]
       then
-        exitFunction 9 "output not as expected" $path "($path) output not as expected" $dirname/$filename.diff 
+        exitFunction 9 "output not as expected" $path "($path) output not as expected" $dirname/$filename.diff $dirname/$filename.out "Survive" "$dirname/$filename.$what.stderr"
       else
         echo -n "(ERROR 9 - .out and .regexpect differ) "
       fi
