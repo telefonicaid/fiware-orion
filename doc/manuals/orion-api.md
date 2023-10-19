@@ -3651,7 +3651,7 @@ A `condition` contains the following subfields:
 | Parameter    | Optional | Type  | Description                                                                                                                   |
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification. Empty list is not allowed.                                       |
-| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed |
+| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed. `georel`, `geometry` and `coords` have to be used together (i.e. "all or nothing"). Check the example using geoquery as expression [above](#create-subscription-post-v2subscriptions).|
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 | `notifyOnMetadataChange` | ✓   | boolean | If `true` then metadata is considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is triggered. If `false` then the metadata is not considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is not triggered. Default value is `true`. |
 
@@ -3863,6 +3863,37 @@ The payload is a JSON object containing a subscription that follows the JSON sub
 format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
 
 Example:
+
+```json
+{
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature" ],
+      "expression": {
+        "q": "temperature>40"
+
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"]
+  },            
+  "expires": "2025-04-05T14:00:00.00Z",
+  "throttling": 5
+}
+```
+
+Example using geoquery as condition:
 
 ```json
 {
