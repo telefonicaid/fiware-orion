@@ -59,6 +59,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         test: [ 'functional_146_146', functional_634_634 ]
 
