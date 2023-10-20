@@ -46,10 +46,11 @@ jobs:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
+      # Currently not used as functional test is started with "d" flag that results in locally started mongodb
+      # mongodb:
+      #   image: mongo:4.4
+      #   ports:
+      #     - 27017:27017
       context-server:
         image: wistefan/context-server:0.2.0
         env:
