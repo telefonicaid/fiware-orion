@@ -64,14 +64,20 @@ DistOp* regMatchInformationArray
     // If we get this far, then it's a match
     if (operation == DoCreateEntity)
     {
-      KjNode* entityIdP   = kjString(orionldState.kjsonP, "id",   entityId);
-      KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", entityType);
+      if (kjLookup(attrUnion, "id") == NULL)
+      {
+        KjNode* entityIdP = kjString(orionldState.kjsonP, "id", entityId);
+        kjChildAdd(attrUnion, entityIdP);
+      }
 
-      kjChildAdd(attrUnion, entityIdP);
-      kjChildAdd(attrUnion, entityTypeP);
+      if (kjLookup(attrUnion, "type") == NULL)
+      {
+        KjNode* entityTypeP = kjString(orionldState.kjsonP, "type", entityType);
+        kjChildAdd(attrUnion, entityTypeP);
+      }
     }
 
-    DistOp* distOpP      = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
+    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
 
     distOpP->regP        = regP;
     distOpP->requestBody = attrUnion;
