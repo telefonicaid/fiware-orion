@@ -109,6 +109,7 @@ typedef enum TraceLevels
   // Pagination
   //
   LmtEntityMap = 110,                  // The arrays of registrations per entity - distributed GET /entities
+  LmtEntityMapRetrieve,                // Retrieval of an entity map
   LmtEntityMapDetail,                  // Details of the entity-registration maps
 
   //

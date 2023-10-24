@@ -137,6 +137,7 @@ KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, bool geoPr
         geometryP = NULL;
     }
   }
+
   if (geometryP == NULL)
     geometryP = kjNull(orionldState.kjsonP, "geometry");
 
@@ -170,14 +171,17 @@ bool orionldGetEntitiesLocal
   bool             countHeaderAlreadyAdded
 )
 {
-  LM_W(("onlyIds: %s", (onlyIds == true)? "TRUE" : "FALSE"));
-
   char* geojsonGeometryLongName = NULL;
 
   if (orionldState.out.contentType == GEOJSON)
-    geojsonGeometryLongName = orionldContextItemExpand(orionldState.contextP, geometryProperty, true, NULL);
+  {
+    if ((geometryProperty != NULL) && (strcmp(geometryProperty, "location") != 0))
+      geojsonGeometryLongName = orionldContextItemExpand(orionldState.contextP, geometryProperty, true, NULL);
+    else
+      geojsonGeometryLongName = (char*) "location";
+  }
 
-  int64_t       count;
+  int64_t       count = 0;
   KjNode*       dbEntityArray = mongocEntitiesQuery(typeList,
                                                     idList,
                                                     idPattern,
@@ -187,19 +191,17 @@ bool orionldGetEntitiesLocal
                                                     &count,
                                                     geojsonGeometryLongName,
                                                     onlyIds);
-  LM_W(("After mongocEntitiesQuery. dbEntityArray aat %p", dbEntityArray));
+
   if (dbEntityArray == NULL)
     return false;
 
   if (onlyIds == true)
   {
-    LM_W(("Here: inside 'onlyIds == true'"));
     orionldState.responseTree = dbModelToEntityIdAndTypeObject(dbEntityArray);
     orionldState.noLinkHeader = true;
   }
   else
   {
-    LM_W(("Here: inside 'onlyIds == false'"));
     KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
     RenderFormat  rf              = RF_NORMALIZED;
 
@@ -250,10 +252,7 @@ bool orionldGetEntitiesLocal
   }
 
   if ((orionldState.uriParams.count == true) && (countHeaderAlreadyAdded == false))
-  {
-    LM_T(LmtSR, ("COUNT: Adding HttpResultsCount header: %d", count));
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
-  }
 
   // If empty result array, no Link header is needed
   if (orionldState.responseTree->value.firstChildP == NULL)

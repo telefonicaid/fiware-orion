@@ -245,10 +245,8 @@ void distOpsReceive2(DistOpResponseTreatFunction treatFunction, void* callbackPa
 static void distOpQueryRequest(DistOpListItem* distOpList, KjNode* entityArray)
 {
   // Send all distributed requests
-  LM_T(LmtSR, ("Calling distOpsSend2"));
-  
+
   int forwards = distOpsSend2(distOpList);
-  LM_T(LmtSR, ("distOpsSend2 says %d forwards", forwards));
 
   // Await all responses, if any
   if (forwards > 0)
@@ -259,7 +257,7 @@ static void distOpQueryRequest(DistOpListItem* distOpList, KjNode* entityArray)
 
 // -----------------------------------------------------------------------------
 //
-// cleanupSysAttrs - 
+// cleanupSysAttrs -
 //
 static void cleanupSysAttrs(void)
 {
@@ -276,7 +274,7 @@ static void cleanupSysAttrs(void)
       else if (strcmp(attrP->name, "modifiedAt") == 0)  kjChildRemove(entityP, attrP);
       else if (attrP->type == KjObject)
       {
-        // It's an attribute        
+        // It's an attribute
 
         KjNode* subAttrP = attrP->value.firstChildP;
         KjNode* nextSubAttrP;
@@ -290,7 +288,6 @@ static void cleanupSysAttrs(void)
 
           subAttrP = nextSubAttrP;
         }
-
       }
 
       attrP = nextAttrP;

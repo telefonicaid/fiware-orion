@@ -404,28 +404,130 @@ Date: REGEX(.*)
 11. Query CB for all entities (they're all type 'T')
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 2
+Content-Length: 244
 Content-Type: application/json
 Date: REGEX(.*)
 Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
-NGSILD-Results-Count: 30
+NGSILD-Results-Count: 40
 
-[]
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E6:A1"
+        },
+        "id": "urn:cb:entities:E05",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E7:A1"
+        },
+        "id": "urn:cb:entities:E06",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E8:A1"
+        },
+        "id": "urn:cb:entities:E07",
+        "type": "T"
+    }
+]
 
 
 12. Query using the entity map I got from step 11
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 831
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 
 [
-  {
-    ...   (to be implemented)
-  }
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E33:A1"
+        },
+        "id": "urn:cp3:entities:E32",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E32:A1"
+        },
+        "id": "urn:cp3:entities:E31",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E34:A1"
+        },
+        "id": "urn:cp3:entities:E33",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E31:A1"
+        },
+        "id": "urn:cp3:entities:E30",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E35:A1"
+        },
+        "id": "urn:cp3:entities:E34",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E36:A1"
+        },
+        "id": "urn:cp3:entities:E35",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E37:A1"
+        },
+        "id": "urn:cp3:entities:E36",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E38:A1"
+        },
+        "id": "urn:cp3:entities:E37",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E39:A1"
+        },
+        "id": "urn:cp3:entities:E38",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E40:A1"
+        },
+        "id": "urn:cp3:entities:E39",
+        "type": "T"
+    }
 ]
 
 

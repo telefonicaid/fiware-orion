@@ -45,7 +45,6 @@ extern "C"
 #include "orionld/mongoc/mongocKjTreeToBson.h"                   // mongocKjTreeToBson
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
 #include "orionld/mongoc/mongocAuxAttributesFilter.h"            // mongocAuxAttributesFilter
-#include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_RLOG
 #include "orionld/mongoc/mongocEntitiesQuery.h"                  // Own interface
 
 

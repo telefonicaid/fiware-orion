@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,29 +22,29 @@
 *
 * Author: Ken Zangelin
 */
-#include <strings.h>                                                // bzero
+#include <unistd.h>                                              // NULL
+#include <curl/curl.h>                                           // curl
 
-extern "C"
-{
-#include "kjson/kjFree.h"                                           // kjFree
-}
-
-#include "orionld/common/orionldState.h"                            // orionldEntityMap
+#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpLookupById.h"                 // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldEntityMapRelease -
+// distOpLookupById -
 //
-void orionldEntityMapRelease(void)
+DistOp* distOpLookupById(DistOp* distOpList, const char* id)
 {
-  if (orionldEntityMap != NULL)
-  {
-    kjFree(orionldEntityMap);
-    bzero(orionldEntityMapId, sizeof(orionldEntityMapId));
+  DistOp* distOpP = distOpList;
 
-    orionldEntityMap      = NULL;
-    orionldEntityMapCount = 0;
+  while (distOpP != NULL)
+  {
+    if (strcmp(distOpP->id, id) == 0)
+      return distOpP;
+
+    distOpP = distOpP->next;
   }
+
+  return NULL;
 }

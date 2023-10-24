@@ -1,4 +1,3 @@
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.

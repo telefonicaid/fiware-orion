@@ -127,7 +127,7 @@ DistOp* distOpCreate
   }
   else
     strncpy(distOpP->id, "local", sizeof(distOpP->id));
-  
+
   if (distOpP->regP != NULL)
     LM_T(LmtDistOpList, ("Created distOp '%s', for reg '%s'", distOpP->id, distOpP->regP->regId));
   else

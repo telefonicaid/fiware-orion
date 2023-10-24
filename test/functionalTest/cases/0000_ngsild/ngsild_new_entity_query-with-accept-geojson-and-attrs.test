@@ -142,7 +142,7 @@ echo
 
 echo "11. Retrieve Entity with geo+json, attrs (without location) and key-values"
 echo "=========================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?id=urn:ngsi-ld:City:Madrid&attrs=P1,R1&options=keyValues' --out "application/geo+json"
+orionCurl --url '/ngsi-ld/v1/entities?id=urn:ngsi-ld:City:Madrid&attrs=P1,R1&options=keyValues&local=true' --out "application/geo+json"
 echo
 echo
 

@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYMAP_H_
+#define SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYMAP_H_
+
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,29 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <strings.h>                                                // bzero
-
-extern "C"
-{
-#include "kjson/kjFree.h"                                           // kjFree
-}
-
-#include "orionld/common/orionldState.h"                            // orionldEntityMap
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// orionldEntityMapRelease -
+// orionldGetEntityMap -
 //
-void orionldEntityMapRelease(void)
-{
-  if (orionldEntityMap != NULL)
-  {
-    kjFree(orionldEntityMap);
-    bzero(orionldEntityMapId, sizeof(orionldEntityMapId));
+extern bool orionldGetEntityMap(void);
 
-    orionldEntityMap      = NULL;
-    orionldEntityMapCount = 0;
-  }
-}
+#endif  // SRC_LIB_ORIONLD_SERVICEROUTINES_ORIONLDGETENTITYMAP_H_

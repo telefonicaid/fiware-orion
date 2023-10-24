@@ -117,11 +117,14 @@ void mongocReadLog
   snprintf(line, sizeof(line), "  * Collection Name:       '%s'", collectionName);
   lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
 
-  char* filter = bson_as_json(filterP, NULL);
 
-  snprintf(line, sizeof(line), "  * Filter:                '%s'", filter);
-  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
-  bson_free(filter);
+  if (filterP != NULL)
+  {
+    char* filter = bson_as_json(filterP, NULL);
+    snprintf(line, sizeof(line), "  * Filter:                '%s'", filter);
+    lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+    bson_free(filter);
+  }
 
   if (optionsP != NULL)
   {

@@ -31,6 +31,7 @@ SET (SOURCES
     distOpSuccess.cpp
     distOpFailure.cpp
     distOpLookupByCurlHandle.cpp
+    distOpLookupById.cpp
     distOpEntityMerge.cpp
     distOpRequests.cpp
     distOpResponses.cpp

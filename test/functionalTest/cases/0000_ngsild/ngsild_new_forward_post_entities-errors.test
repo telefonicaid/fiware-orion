@@ -27,7 +27,7 @@ Forwarding of POST Entities requests - errors handling for forwarded requests
 dbInit CB
 dbInit CP1
 dbInit CP4
-orionldStart CB  -experimental -forwarding -t 0-255
+orionldStart CB  -experimental -forwarding
 orionldStart CP1 -experimental
 orionldStart CP4 -experimental
 

@@ -236,9 +236,6 @@ bool orionldGetEntities(void)
   char*   entityMap = orionldState.uriParams.entityMap;
   QNode*  qNode     = NULL;
 
-  if (orionldState.uriParams.onlyIds == true)
-    LM_W(("orionldState.uriParams.onlyIds == true"));
-
   // According to the spec, id takes precedence over idPattern, so, if both are present, idPattern is NULLed out
   if ((orionldState.in.idList.items > 0) && (orionldState.uriParams.idPattern != NULL))
     idPattern = NULL;
@@ -258,6 +255,7 @@ bool orionldGetEntities(void)
 
     if (orionldState.uriParams.reset == true)
     {
+      LM_T(LmtSR, ("Deleting entity map '%s'", orionldEntityMapId));
       orionldEntityMapRelease();
       orionldEntityMap      = NULL;
       orionldEntityMapCount = 0;
@@ -287,7 +285,7 @@ bool orionldGetEntities(void)
                                    orionldState.uriParamOptions.sysAttrs,
                                    orionldState.uriParams.geometryProperty,
                                    orionldState.uriParams.onlyIds,
-                                   true);
+                                   false);
 
   if (orionldState.uriParams.entityMap == NULL)
   {
@@ -325,7 +323,7 @@ bool orionldGetEntities(void)
     local->geoInfo.geoProperty = (geoInfo.geoProperty != NULL)? strdup(geoInfo.geoProperty)        : NULL;
     local->geometryProperty    = (orionldState.uriParams.geometryProperty != NULL)? strdup(orionldState.uriParams.geometryProperty) : NULL;
     local->qNode               = (qNode != NULL)? qClone(qNode) : NULL;
-    
+
     // Add the "local" DistOp to the linked list of DistOps
     local->next    = orionldDistOps;
     orionldDistOps = local;
