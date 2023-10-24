@@ -154,7 +154,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 03. Dump the accumulator to see all the HTTP headers of the forwarded request
 =============================================================================
 POST http://REGEX(.*)/ngsi-ld/v1/entities
-Content-Length: 51
+Content-Length: 26
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -195,7 +195,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 06. Dump the accumulator to see all the HTTP headers of the forwarded request
 =============================================================================
 POST http://REGEX(.*)/ngsi-ld/v1/entities
-Content-Length: 87
+Content-Length: 62
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/ld+json
