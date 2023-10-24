@@ -197,7 +197,7 @@ def ignore(root, file):
         return True
 
     # Particular cases of files that are also ignored
-    files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
+    files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE', '.readthedocs.yml',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu', 'orionld.ubuntu',
                    'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.travis.yml',

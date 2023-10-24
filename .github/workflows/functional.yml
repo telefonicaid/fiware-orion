@@ -46,10 +46,11 @@ jobs:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
+      # Currently not used as functional test is started with "d" flag that results in locally started mongodb
+      # mongodb:
+      #   image: mongo:4.4
+      #   ports:
+      #     - 27017:27017
       context-server:
         image: wistefan/context-server:0.2.0
         env:
@@ -59,8 +60,9 @@ jobs:
 
     strategy:
       fail-fast: false
+      #max-parallel: 1
       matrix:
-        test: [ 'functional_146_146', functional_634_634 ]
+        test: [ 'functional_0_632','functional_633_1003', 'functional_1004_1440', 'functional_1441_end', 'unit']
 
     steps:
       - uses: actions/checkout@v2

@@ -1,0 +1,313 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Replication of an entity
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+orionldStart CB -experimental -forwarding -t 70-79,231
+orionldStart CP1 -experimental
+
+--SHELL--
+#
+# 01. Register entities of type IE in CB, for replication in CP1
+# 02. Create an entity E1, of type IE - have it created locally AND in CP1
+# 03. GET E1 in CB, with local=true
+# 04. GET E1 in CP1, with local=true
+# 05. PATCH urn:ngsi-ld:IE:001/totalRAM in CB
+# 06. GET the entity E1 from CP1 - see totalRAM changed
+#
+
+echo "01. Register entities of type IE in CB, for replication in CP1"
+echo "=============================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "IE"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "mode": "inclusive",
+  "operations": [ "updateOps", "redirectionOps" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+
+echo "02. Create an entity E1, of type IE - have it created locally AND in CP1"
+echo "========================================================================"
+payload='{
+  "id": "urn:ngsi-ld:IE:001",
+  "type": "IE",
+  "domain": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:Domain:01"
+  },
+  "totalRAM": {
+    "type": "Property",
+    "value": 32
+  },
+  "cPUCores": {
+    "type": "Property",
+    "value": 4
+  },
+  "avgPowerConsumption": {
+    "type": "Property",
+    "value": 50
+  },
+  "realTimeCapable": {
+    "type": "Property",
+    "value": true
+  },
+  "currentRAM": {
+    "type": "Property",
+    "value": 45
+  },
+  "currentCPUUsage": {
+    "type": "Property",
+    "value": 2
+  },
+  "currentPowerConsumption": {
+    "type": "Property",
+    "value": 9
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET E1 in CB, with local=true"
+echo "================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:IE:001?local=true
+echo
+echo
+
+
+echo "04. GET E1 in CP1, with local=true"
+echo "=================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:IE:001?local=true --port $CP1_PORT
+echo
+echo
+
+
+echo "05. PATCH urn:ngsi-ld:IE:001/totalRAM in CB"
+echo "==========================================="
+payload='{
+  "value": 5,
+  "origin": "Changed in CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:IE:001/attrs/totalRAM --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. GET the entity E1 from CP1 - see totalRAM changed"
+echo "====================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:IE:001 --port $CP1_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Register entities of type IE in CB, for replication in CP1
+==============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create an entity E1, of type IE - have it created locally AND in CP1
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:IE:001
+
+
+
+03. GET E1 in CB, with local=true
+=================================
+HTTP/1.1 200 OK
+Content-Length: 440
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "avgPowerConsumption": {
+        "type": "Property",
+        "value": 50
+    },
+    "cPUCores": {
+        "type": "Property",
+        "value": 4
+    },
+    "currentCPUUsage": {
+        "type": "Property",
+        "value": 2
+    },
+    "currentPowerConsumption": {
+        "type": "Property",
+        "value": 9
+    },
+    "currentRAM": {
+        "type": "Property",
+        "value": 45
+    },
+    "domain": {
+        "object": "urn:ngsi-ld:Domain:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:IE:001",
+    "realTimeCapable": {
+        "type": "Property",
+        "value": true
+    },
+    "totalRAM": {
+        "type": "Property",
+        "value": 32
+    },
+    "type": "IE"
+}
+
+
+04. GET E1 in CP1, with local=true
+==================================
+HTTP/1.1 200 OK
+Content-Length: 440
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "avgPowerConsumption": {
+        "type": "Property",
+        "value": 50
+    },
+    "cPUCores": {
+        "type": "Property",
+        "value": 4
+    },
+    "currentCPUUsage": {
+        "type": "Property",
+        "value": 2
+    },
+    "currentPowerConsumption": {
+        "type": "Property",
+        "value": 9
+    },
+    "currentRAM": {
+        "type": "Property",
+        "value": 45
+    },
+    "domain": {
+        "object": "urn:ngsi-ld:Domain:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:IE:001",
+    "realTimeCapable": {
+        "type": "Property",
+        "value": true
+    },
+    "totalRAM": {
+        "type": "Property",
+        "value": 32
+    },
+    "type": "IE"
+}
+
+
+05. PATCH urn:ngsi-ld:IE:001/totalRAM in CB
+===========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+06. GET the entity E1 from CP1 - see totalRAM changed
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 492
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "avgPowerConsumption": {
+        "type": "Property",
+        "value": 50
+    },
+    "cPUCores": {
+        "type": "Property",
+        "value": 4
+    },
+    "currentCPUUsage": {
+        "type": "Property",
+        "value": 2
+    },
+    "currentPowerConsumption": {
+        "type": "Property",
+        "value": 9
+    },
+    "currentRAM": {
+        "type": "Property",
+        "value": 45
+    },
+    "domain": {
+        "object": "urn:ngsi-ld:Domain:01",
+        "type": "Relationship"
+    },
+    "id": "urn:ngsi-ld:IE:001",
+    "realTimeCapable": {
+        "type": "Property",
+        "value": true
+    },
+    "totalRAM": {
+        "origin": {
+            "type": "Property",
+            "value": "Changed in CB"
+        },
+        "type": "Property",
+        "value": 5
+    },
+    "type": "IE"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1
