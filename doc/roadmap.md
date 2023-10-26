@@ -53,8 +53,7 @@ after next planned release:
  supported by a Expressions Language - help wanted 
 ([#4004](https://github.com/telefonicaid/fiware-orion/issues/4004)),
 ([#3815](https://github.com/telefonicaid/fiware-orion/issues/3815))
-- Service provisioning API (pools, etc.) 
-(based in [#3843](https://github.com/telefonicaid/fiware-orion/issues/3843))
+- Service provisioning API (pools, etc.) ([#4442](https://github.com/telefonicaid/fiware-orion/issues/4442))
 - Advanced subscription management
    - Subscription debug mode (precise statistics consolidation, keep recent history of notifications sent, etc.) ([#4399](https://github.com/telefonicaid/fiware-orion/issues/4399))
    - Custom ID subscription ([#4400](https://github.com/telefonicaid/fiware-orion/issues/4400))
