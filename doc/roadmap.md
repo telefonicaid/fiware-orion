@@ -33,7 +33,7 @@ The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
 - MQTT Retain flag ([#4388](https://github.com/telefonicaid/fiware-orion/issues/4388))
-- MQTT notification retrial ([#4431](https://github.com/telefonicaid/fiware-orion/pull/4431))
+- MQTT notification retrial ([#4439](https://github.com/telefonicaid/fiware-orion/issues/4439))
 - Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
 - Pattern/filter batch updates ([#2389](https://github.com/telefonicaid/fiware-orion/issues/2389))
 - Notification endpoint alias ([#3655](https://github.com/telefonicaid/fiware-orion/issues/3655))
