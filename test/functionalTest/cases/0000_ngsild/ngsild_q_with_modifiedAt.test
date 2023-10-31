@@ -1,0 +1,189 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Q-Filter and modifiedAt
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+
+--SHELL--
+
+#
+# 01. Create E1 with type T and attr A=1 and B=1
+# 02. GET E12 with sysAttrs and save the modifiedAt of E1
+# 03. Sleep 0.5 seconds
+# 04. Create E2 with type T and attr A=2 and B=2
+# 05. Attempt to filter on existence of 'modifiedAt' - see 400
+# 06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2
+#
+
+echo "01. Create E1 with type T and attr A=1 and B=1"
+echo "=============================================="
+payload='{
+  "id": "http://a.b.c/entity/E1",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 1
+  },
+  "B": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "02. GET E1 with sysAttrs and save the modifiedAt of E1"
+echo "======================================================"
+orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1?options=sysAttrs
+e1ModifiedAt=$(echo $_response | awk -F\"modifiedAt\" '{ print $2 }' | head -1 | awk -F\" '{ print $2 }')
+echo
+echo
+
+
+echo "03. Sleep 0.5 seconds"
+echo "====================="
+sleep .5
+echo Slept
+echo
+echo
+
+
+echo '04. Create E2 with type T and attr A=2 and B=2'
+echo '=============================================='
+payload='{
+  "id": "http://a.b.c/entity/E2",
+  "type": "T",
+  "A": {
+    "type": "Property",
+    "value": 2
+  },
+  "B": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Attempt to filter on existence of 'modifiedAt' - see 400"
+echo "============================================================"
+orionCurl --url "/ngsi-ld/v1/entities?q=modifiedAt"
+echo
+echo
+
+
+echo "06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2"
+echo "================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=modifiedAt>$e1ModifiedAt"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with type T and attr A=1 and B=1
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
+
+
+
+02. GET E1 with sysAttrs and save the modifiedAt of E1
+======================================================
+HTTP/1.1 200 OK
+Content-Length: 347
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "A": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": 1
+    },
+    "B": {
+        "createdAt": "REGEX(.*)",
+        "modifiedAt": "REGEX(.*)",
+        "type": "Property",
+        "value": 1
+    },
+    "createdAt": "REGEX(.*)",
+    "id": "http://a.b.c/entity/E1",
+    "modifiedAt": "REGEX(.*)",
+    "type": "T"
+}
+
+
+03. Sleep 0.5 seconds
+=====================
+Slept
+
+
+04. Create E2 with type T and attr A=2 and B=2
+==============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E2
+
+
+
+05. Attempt to filter on existence of 'modifiedAt' - see 400
+============================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 154
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "modifiedAt",
+    "title": "Invalid Q-Filter (Cannot use Existence on system attributes)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+  E2
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

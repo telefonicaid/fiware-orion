@@ -161,7 +161,17 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, bool qToDbModel, cha
       if ((qLexP->next == NULL) || (qLexP->next->type == QNodeOr) || (qLexP->next->type == QNodeAnd) || (qLexP->next->type == QNodeClose))
       {
         if (compOpP == NULL)
+        {
+          if ((strcmp(qLexP->value.v, "creDate") == 0) || (strcmp(qLexP->value.v, "modDate") == 0))
+          {
+            *titleP   = (char*) "Invalid Q-Filter (Cannot use Existence on system attributes)";
+            *detailsP = (strcmp(qLexP->value.v, "creDate") == 0)? (char*) "createdAt" : (char*) "modifiedAt";
+            return NULL;
+          }
+
+          LM_T(LmtQ, ("Existence of '%s'", qLexP->value.v));
           compOpP = qNode(QNodeExists);
+        }
 
         qNodeAppend(compOpP, qLexP);
         qNodeV[qNodeIx++] = compOpP;

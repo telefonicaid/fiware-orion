@@ -258,7 +258,11 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
 
   if (forDb)
   {
-    if (caseNo == 1)
+    if (strcmp(longName, "createdAt") == 0)
+      snprintf(fullPath, sizeof(fullPath) - 1, "%s", "creDate");
+    else if (strcmp(longName, "modifiedAt") == 0)
+      snprintf(fullPath, sizeof(fullPath) - 1, "%s", "modDate");
+    else if (caseNo == 1)
       snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value", longName);
     else if (caseNo == 2)
       snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value.%s", longName, rest);
