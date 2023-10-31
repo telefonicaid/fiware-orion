@@ -197,6 +197,7 @@ DistOp* distOpRequestsForEntitiesQuery(char* idPattern, QNode* qNode)
   DistOp* exclusiveList = regMatchForEntitiesQuery(RegModeExclusive, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
   DistOp* redirectList  = regMatchForEntitiesQuery(RegModeRedirect,  &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
   // FIXME: Strip off attrs, entityId, entityType, etc from URI params (regMatchForEntitiesQuery(RegModeExclusive) already does it for each match
+
   DistOp* inclusiveList = regMatchForEntitiesQuery(RegModeInclusive, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
   DistOp* distOpList;
 
@@ -310,21 +311,21 @@ bool orionldGetEntities(void)
                                      orionldState.uriParams.onlyIds,
                                      true);
 
-    // Create the "local" DistOp
+    // Create the "@none" DistOp
     DistOp* local  = distOpCreate(DoQueryEntity, NULL, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList, true);
 
-    // Add lang, geometryProperty, qNode, ...   to the "local" DistOp
-    local->lang                = (orionldState.uriParams.lang             != NULL)? strdup(orionldState.uriParams.lang)        : NULL;
+    // Add lang, geometryProperty, qNode, ...   to the "@none" DistOp
+    local->lang                = (orionldState.uriParams.lang != NULL)? strdup(orionldState.uriParams.lang) : NULL;
     local->geoInfo.geometry    = geoInfo.geometry;
     local->geoInfo.georel      = geoInfo.georel;
     local->geoInfo.coordinates = (geoInfo.coordinates != NULL)? kjClone(NULL, geoInfo.coordinates) : NULL;
     local->geoInfo.minDistance = geoInfo.minDistance;
     local->geoInfo.maxDistance = geoInfo.maxDistance;
-    local->geoInfo.geoProperty = (geoInfo.geoProperty != NULL)? strdup(geoInfo.geoProperty)        : NULL;
+    local->geoInfo.geoProperty = (geoInfo.geoProperty != NULL)? strdup(geoInfo.geoProperty) : NULL;
     local->geometryProperty    = (orionldState.uriParams.geometryProperty != NULL)? strdup(orionldState.uriParams.geometryProperty) : NULL;
     local->qNode               = (qNode != NULL)? qClone(qNode) : NULL;
 
-    // Add the "local" DistOp to the linked list of DistOps
+    // Add the "@none" DistOp to the linked list of DistOps
     local->next    = orionldDistOps;
     orionldDistOps = local;
 

@@ -111,6 +111,8 @@ static KjNode* newerAttribute(KjNode* currentP, KjNode* pretenderP)
 //
 // distOpEntityMerge -
 //
+// FIXME: createdAt and modifiedAt should be converted to floats before comparing!
+//
 void distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary)
 {
   KjNode* idP             = kjLookup(additionP,  "id");
@@ -141,46 +143,62 @@ void distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, boo
   {
     next = attrP->next;
 
-    KjNode* currentP = kjLookup(apiEntityP, attrP->name);
+    KjNode* currentP   = kjLookup(apiEntityP, attrP->name);
+    bool    createdAt  = strcmp(attrP->name, "createdAt")  == 0;
+    bool    modifiedAt = strcmp(attrP->name, "modifiedAt") == 0;
 
     if (currentP == NULL)
     {
+      LM_T(LmtDistOpMerge, ("New Attribute '%s' - adding it to the entity", attrP->name));
       kjChildRemove(additionP, attrP);
       kjChildAdd(apiEntityP, attrP);
     }
-    else if (auxiliary == false)  // two copies of the same attr ...  and NOT from an auxiliary registration
+    else if (createdAt == true)  // Special attribute - need to keep the oldest, not the newest
     {
-      if (newerAttribute(currentP, attrP) == attrP)
+      LM_T(LmtDistOpMerge, ("'createdAt' in any type of registration"));
+      LM_T(LmtDistOpMerge, ("Current createdAt:   %s", currentP->value.s));
+      LM_T(LmtDistOpMerge, ("Candidate createdAt: %s", attrP->value.s));
+      if (strcmp(attrP->value.s, currentP->value.s) > 0)
       {
+        LM_T(LmtDistOpMerge, ("Existing Attribute '%s' - keeping it as it is OLDER than the old one", attrP->name));
         kjChildRemove(apiEntityP, currentP);
         kjChildRemove(additionP, attrP);
         kjChildAdd(apiEntityP, attrP);
       }
+      else
+        LM_T(LmtDistOpMerge, ("Existing Attribute '%s' - ignoring it as it is NEWER than the old one", attrP->name));
     }
+    else if (modifiedAt == true)  // Special attribute - non-reified
+    {
+      LM_T(LmtDistOpMerge, ("'modifiedAt' in any type of registration"));
+      LM_T(LmtDistOpMerge, ("Current modifiedAt:   %s", currentP->value.s));
+      LM_T(LmtDistOpMerge, ("Candidate modifiedAt: %s", attrP->value.s));
+      if (strcmp(attrP->value.s, currentP->value.s) < 0)
+      {
+        LM_T(LmtDistOpMerge, ("Existing Attribute '%s' - keeping it as it is newer than the old one", attrP->name));
+        kjChildRemove(apiEntityP, currentP);
+        kjChildRemove(additionP, attrP);
+        kjChildAdd(apiEntityP, attrP);
+      }
+      else
+        LM_T(LmtDistOpMerge, ("Existing Attribute '%s' - ignoring it as it is older than the old one", attrP->name));
+    }
+    else if (auxiliary == false)  // two copies of the same attr ...  and NOT from an auxiliary registration
+    {
+      LM_T(LmtDistOpMerge, ("Existing Attribute '%s' in non-Auxiliary registration", attrP->name));
+      if (newerAttribute(currentP, attrP) == attrP)
+      {
+        LM_T(LmtDistOpMerge, ("Existing Attribute '%s' - keeping it as it is newer than the old one", attrP->name));
+        kjChildRemove(apiEntityP, currentP);
+        kjChildRemove(additionP, attrP);
+        kjChildAdd(apiEntityP, attrP);
+      }
+      else
+        LM_T(LmtDistOpMerge, ("Existing Attribute '%s' - ignoring it as it is older than the old one", attrP->name));
+    }
+    else
+      LM_T(LmtDistOpMerge, ("Existing Attribute '%s' - ignoring it as the registration is Auxiliary", attrP->name));
 
     attrP = next;
   }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpEntityMerge -
-//
-void distOpEntityMerge(KjNode* entityArray, KjNode* entityP)
-{
-  KjNode* entityIdNode = kjLookup(entityP, "id");
-
-  if (entityIdNode == NULL)
-    LM_RVE(("Invalid entity in response from forwarded request"));
-
-  char* entityId = entityIdNode->value.s;
-
-  KjNode* arrayEntityP = kjEntityIdLookupInEntityArray(entityArray, entityId);
-
-  if (arrayEntityP == NULL)  // Not there yet - let's add it
-    kjChildAdd(entityArray, entityP);
-  else  // Need to merge the two entities
-    distOpEntityMerge(arrayEntityP, entityP, orionldState.uriParamOptions.sysAttrs, false);
 }

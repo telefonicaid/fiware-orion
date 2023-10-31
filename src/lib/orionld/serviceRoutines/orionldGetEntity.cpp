@@ -189,6 +189,7 @@ bool orionldGetEntity(void)
         // Send the forwarded request and await all responses
         if (distOpP->regP != NULL)
         {
+          LM_T(LmtDistOpAttributes, ("distOp::attrsParam: '%s'", distOpP->attrsParam));
           if (distOpSend(distOpP, dateHeader, xff) == 0)
           {
             ++forwards;

@@ -38,7 +38,7 @@ orionldStart CP1 -experimental
 # 03. In CP1, create an entity urn:E1 with attributes P1+P2+R1
 # 04. In CP1, create an entity urn:E2 with attributes P1+P2+R1
 # 05. Create an inclusive registration R1 on urn:E1/P1+R1 for CP1
-# 06. Create an inclusive registration R1 on urn:E2/P1+R1 for CP1
+# 06. Create an inclusive registration R2 on urn:E2/P1+R1 for CP1
 # 07. Query the CB with type=T, to get urn:E1+urn:E2 and the entity map
 # 08. Query the CB with attrs=P1,P2 - see only P1, as P2 isn't registered
 #
@@ -101,7 +101,7 @@ echo
 echo "05. Create an inclusive registration R1 on urn:E1/P1+R1 for CP1"
 echo "==============================================================="
 payload='{
-  "id": "urn:Reg1",
+  "id": "urn:R1",
   "type": "ContextSourceRegistration",
   "information": [
     {
@@ -124,10 +124,10 @@ echo
 echo
 
 
-echo "06. Create an inclusive registration R1 on urn:E1/P1+R1 for CP1"
+echo "06. Create an inclusive registration R2 on urn:E1/P1+R1 for CP1"
 echo "==============================================================="
 payload='{
-  "id": "urn:Reg2",
+  "id": "urn:R2",
   "type": "ContextSourceRegistration",
   "information": [
     {
@@ -207,37 +207,33 @@ Location: /ngsi-ld/v1/entities/urn:E2
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg1
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
 
 
 
-06. Create an inclusive registration R1 on urn:E1/P1+R1 for CP1
+06. Create an inclusive registration R2 on urn:E1/P1+R1 for CP1
 ===============================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
-Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg2
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
 
 
 
 07. Query the CB with type=T, to get urn:E1+urn:E2 and the entity map
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length:
+Content-Length: 376
 Content-Type: application/json
 Date: REGEX(.*)
 Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
     {
         "P1": {
             "type": "Property",
             "value": "P1 in CP1"
-        },
-        "P2": {
-            "type": "Property",
-            "value": "P2 in CP1"
         },
         "P3": {
             "type": "Property",
@@ -257,7 +253,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         },
         "P2": {
             "type": "Property",
-            "value": "P2 in CP1"
+            "value": "In CB"
         },
         "R1": {
             "object": "urn:in:cp1",
@@ -276,11 +272,32 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
 08. Query the CB with attrs=P1,P2 - see only P1, as P2 isn't registered
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 186
 Content-Type: application/json
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
+    {
+        "P1": {
+            "type": "Property",
+            "value": "P1 in CP1"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "P1 in CP1"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "In CB"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    }
 ]
 
 

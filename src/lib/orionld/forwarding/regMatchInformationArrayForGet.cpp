@@ -38,7 +38,7 @@ extern "C"
 #include "orionld/forwarding/regMatchInformationItemForGet.h"    // Own interface
 
 
-
+extern void attrsParam(DistOp* distOpP, StringArray* attrList, bool permanent);
 // -----------------------------------------------------------------------------
 //
 // regMatchInformationArrayForGet -
@@ -56,6 +56,9 @@ DistOp* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId,
 
     // If we get this far, then it's a match and we can create the DistOp item and return
     DistOp* distOpP = distOpCreate(DoQueryEntity, regP, NULL, NULL, attrList, false);
+
+    if ((distOpP->attrList != NULL) && (distOpP->attrList->items > 0))
+      attrsParam(distOpP, distOpP->attrList, true);
 
     distOpP->geometryProperty  = (char*) geoProp;
 

@@ -147,7 +147,7 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 //
 // Right now it looks like this:
 // {
-//   "urn:entities:E1": [ "urn:registrations:R1", "urn:registrations:R2", ... "local" ],
+//   "urn:entities:E1": [ "urn:registrations:R1", "urn:registrations:R2", ... "@none" ],
 //   "urn:entities:E1": [ "urn:registrations:R1", "urn:registrations:R2", ... ],
 // }
 //
@@ -155,7 +155,7 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 // {
 //   "urn:registrations:R1": ["urn:entities:E1", "urn:entities:E2" ],
 //   "urn:registrations:R2": ["urn:entities:E1", "urn:entities:E2" ],
-//   "local":                ["urn:entities:E1"]
+//   "@none":                ["urn:entities:E1"]
 // }
 //
 // BUT, I need also entity type and attrs ...
@@ -163,7 +163,7 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 // New Entity Map:
 // {
 //   "urn:entities:E1": {
-//     "regs": [ "urn:registrations:R1", "urn:registrations:R2", ... "local" ]
+//     "regs": [ "urn:registrations:R1", "urn:registrations:R2", ... "@none" ]
 //     "type": "T",
 //     "attrs": [ "urn:attribute:P1", "urn:attribute:P2", ... ]
 //   }
@@ -188,14 +188,14 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 //
 // New Entity Map II:
 // {
-//   "urn:entities:E1": [ "DistOp0001", "DistOp0002", "DistOp0003", ... "local" ],
+//   "urn:entities:E1": [ "DistOp0001", "DistOp0002", "DistOp0003", ... "@none" ],
 // }
 //
 // And turn that into:
 // {
 //   "DistOp0001": [ "urn:entities:E1", "urn:entities:E2" ],
 //   "DistOp0002": [ "urn:entities:E1", "urn:entities:E2" ],
-//   "local":      [ "urn:entities:E1", "urn:entities:E2" ],
+//   "@none":      [ "urn:entities:E1", "urn:entities:E2" ],
 // }
 //
 // Does local have a DistOp?
@@ -223,7 +223,7 @@ static void entityMapItemAdd(const char* entityId, DistOp* distOpP)
   //
   // Add DistOp ID to matchP's array - remember it's a global variable, can't use kaAlloc
   //
-  const char*  distOpId      = (distOpP != NULL)? distOpP->id : "local";
+  const char*  distOpId      = (distOpP != NULL)? distOpP->id : "@none";
   KjNode*      distOpIdNodeP = kjString(NULL, NULL, distOpId);
 
   LM_T(LmtEntityMap, ("Adding DistOp '%s' to entity '%s'", distOpId, matchP->name));
@@ -281,6 +281,7 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
 //
 static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
 {
+  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
   orionldEntityMap = kjObject(NULL, "orionldEntityMap");
 
   //
@@ -300,6 +301,19 @@ static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, O
 
   // Get the local matches
   KjNode* localEntityV   = NULL;
+  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
+  LM_T(LmtMongoc, ("Calling mongocEntitiesQuery"));
+
+  //
+  // Can't do any pagination in this step, and we only really need the Entity ID
+  // Need to teporarily modify the users input for that
+  //
+  int offset = orionldState.uriParams.offset;
+  int limit  = orionldState.uriParams.limit;
+
+  orionldState.uriParams.offset = 0;
+  orionldState.uriParams.limit  = 1000;
+
   KjNode* localDbMatches = mongocEntitiesQuery(&orionldState.in.typeList,
                                              &orionldState.in.idList,
                                              idPattern,
@@ -309,6 +323,9 @@ static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, O
                                              NULL,
                                              geojsonGeometryLongName,
                                              true);
+
+  orionldState.uriParams.offset = offset;
+  orionldState.uriParams.limit  = limit;
 
   kjTreeLog(localDbMatches, "localDbMatches", LmtSR);
   if (localDbMatches != NULL)
@@ -356,10 +373,16 @@ static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, O
 //
 bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
 {
+  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
   if (orionldEntityMap != NULL)
+  {
+    LM_T(LmtMongoc, ("Calling orionldGetEntitiesPage"));
     return orionldGetEntitiesPage();
+  }
 
+  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
   entityMapCreate(distOpList, idPattern, qNode, geoInfoP);
+  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
 
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request

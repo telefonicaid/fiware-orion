@@ -42,20 +42,20 @@ orionldStart CP4 -experimental
 # 03. In CP2, Create an entity urn:E1 with attributes P1-P3+R1
 # 04. In CP3, Create an entity urn:E1 with attributes P1-P3+R1
 # 05. In CP4, Create an entity urn:E1 with attributes P1-P4+R1+R4 (only P4 and R4 will be used)
-# 06. Create an exclusive registration R1 on urn:E1/P1 for CP1
-# 07. Create a  redirect  registration R2 on urn:E1/P2 for CP2
-# 08. Create an inclusive registration R3 on T/P3 for CP3
-# 09. Create an auxiliar  registration R4 on T for CP4
+# 06. Create an exclusive registration R1 on urn:E1/P1 for CP1  (on urn:E1 only)
+# 07. Create a  redirect  registration R2 on urn:E1/P2 for CP2  (on urn:E1 only)
+# 08. Create an inclusive registration R3 on T/P3 for CP3       (on type:T)
+# 09. Create an auxiliar  registration R4 on T for CP4          (on type:T)
 # 10. GET /entities, only to create the entityMap
-# 11. GET /entityMap/* - see the entityMap with urn:E1 and its 4 registrations + URLs
+# 11. GET /entityMaps/* - see the entityMap with urn:E1 and its 4 registrations + URLs
 # 12. In CB,  create an entity urn:E2
 # 13. In CP1, create an entity urn:E3
 # 14. In CP2, Create an entity urn:E4
 # 15. In CP3, Create an entity urn:E5
 # 16. In CP4, Create an entity urn:E6
 # 17. Delete the old entity map
-# 18. GET /entities, only to create a new entityMap
-# 19. GET /entityMap/* - see the entityMap with urn:E1 - urn:E5
+# 18. GET /entities, only to create a new entityMap (finding urn:E1, urn:E5)
+# 19. GET /entityMaps/* - see the entityMap with urn:E1 - urn:E5
 #
 
 echo "01. In CB,  create an entity urn:E1 with attribute P0"
@@ -237,9 +237,9 @@ echo
 echo
 
 
-echo "11. GET /entityMap/* - see the entityMap with urn:E1 and its 4 registrations + URLs"
-echo "==================================================================================="
-orionCurl --url /ngsi-ld/v1/entityMap/$entityMap
+echo "11. GET /entityMaps/* - see the entityMap with urn:E1 and its 4 registrations + URLs"
+echo "===================================================================================="
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap
 echo
 echo
 
@@ -306,7 +306,7 @@ echo
 
 echo "17. Delete the old entity map"
 echo "============================="
-orionCurl --url /ngsi-ld/v1/entityMap/$entityMap -X DELETE
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap -X DELETE
 echo
 echo
 
@@ -319,9 +319,9 @@ echo
 echo
 
 
-echo "19. GET /entityMap/* - see the entityMap with urn:E1 - urn:E5"
-echo "============================================================="
-orionCurl --url /ngsi-ld/v1/entityMap/$entityMap
+echo "19. GET /entityMaps/* - see the entityMap with urn:E1 - urn:E5"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap
 echo
 echo
 
@@ -421,15 +421,16 @@ NGSILD-Results-Count: 1
 []
 
 
-11. GET /entityMap/* - see the entityMap with urn:E1 and its 4 registrations + URLs
-===================================================================================
+11. GET /entityMaps/* - see the entityMap with urn:E1 and its 4 registrations + URLs
+====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 108
+Content-Length: 116
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "urn:E1": [
+        "@none",
         "http://localhost:9801",
         "http://localhost:9802",
         "http://localhost:9803",
@@ -504,22 +505,23 @@ NGSILD-Results-Count: 3
 []
 
 
-19. GET /entityMap/* - see the entityMap with urn:E1 - urn:E5
-=============================================================
+19. GET /entityMaps/* - see the entityMap with urn:E1 - urn:E5
+==============================================================
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 170
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "urn:E1": [
+        "@none",
         "http://localhost:9801",
         "http://localhost:9802",
         "http://localhost:9803",
         "http://localhost:9804"
     ],
-    "urn:E5": [
-        "http://localhost:9803"
+    "urn:E2": [
+        "@none"
     ],
     "urn:E6": [
         "http://localhost:9804"

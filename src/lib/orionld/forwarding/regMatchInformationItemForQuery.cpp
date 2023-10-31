@@ -31,12 +31,67 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
 #include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
 #include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery
 #include "orionld/forwarding/regMatchAttributesForGet.h"         // regMatchAttributesForGet
 #include "orionld/forwarding/regMatchInformationItemForQuery.h"  // Own interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// attrsParam -
+//
+void attrsParam(DistOp* distOpP, StringArray* attrList, bool permanent)
+{
+  //
+  // The attributes are in longnames but ... should probably compact them.
+  // A registration can have its own @context, in cSourceInfo - for now, we use the @context of the original request.
+  // The attrList is always cloned, so, no problem modifying it.
+  //
+  int attrsLen = 0;
+  for (int ix = 0; ix < attrList->items; ix++)
+  {
+    attrList->array[ix]  = orionldContextItemAliasLookup(orionldState.contextP, attrList->array[ix], NULL, NULL);
+    attrsLen            += strlen(attrList->array[ix]) + 1;
+  }
+
+  // Make room for "attrs=" and the string-end zero
+  attrsLen += 7;
+
+  char* attrs = (char*) ((permanent == true)? malloc(attrsLen) : kaAlloc(&orionldState.kalloc, attrsLen));
+
+  if (attrs == NULL)
+    LM_X(1, ("Out of memory"));
+
+  bzero(attrs, attrsLen);
+
+  strcpy(attrs, "attrs=");
+
+  int   pos = 6;
+  for (int ix = 0; ix < attrList->items; ix++)
+  {
+    int len = strlen(attrList->array[ix]);
+    strcpy(&attrs[pos], attrList->array[ix]);
+
+    // Add comma unless it's the last attr (in which case we add a zero, just in case)
+    pos += len;
+
+    if (ix != attrList->items - 1)  // Not the last attr
+    {
+      attrs[pos] = ',';
+      pos += 1;
+    }
+    else
+      attrs[pos] = 0;
+  }
+
+  distOpP->attrsParam    = attrs;
+  distOpP->attrsParamLen = pos;
+}
 
 
 
@@ -114,6 +169,10 @@ DistOp* regMatchInformationItemForQuery
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
   {
     distOpP->attrList = attrUnionP;
+    if ((distOpP->attrList != NULL) && (distOpP->attrList->items > 0))
+      attrsParam(distOpP, distOpP->attrList, true);
+    else
+      distOpP->attrsParam = NULL;
   }
 
   return distOpList;

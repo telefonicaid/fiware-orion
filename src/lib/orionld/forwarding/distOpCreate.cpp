@@ -27,66 +27,12 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/types/StringArray.h"                           // StringArray, stringArrayClone
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
 
 
-
-// -----------------------------------------------------------------------------
-//
-// attrsParam -
-//
-static void attrsParam(DistOp* distOpP, StringArray* attrList, bool permanent)
-{
-  //
-  // The attributes are in longnames but ... should probably compact them.
-  // A registration can have its own @context, in cSourceInfo - for now, we use the @context of the original request.
-  // The attrList is always cloned, so, no problem modifying it.
-  //
-  int attrsLen = 0;
-  for (int ix = 0; ix < attrList->items; ix++)
-  {
-    attrList->array[ix]  = orionldContextItemAliasLookup(orionldState.contextP, attrList->array[ix], NULL, NULL);
-    attrsLen            += strlen(attrList->array[ix]) + 1;
-  }
-
-  // Make room for "attrs=" and the string-end zero
-  attrsLen += 7;
-
-  char* attrs = (char*) ((permanent == true)? malloc(attrsLen) : kaAlloc(&orionldState.kalloc, attrsLen));
-
-  if (attrs == NULL)
-    LM_X(1, ("Out of memory"));
-
-  bzero(attrs, attrsLen);
-
-  strcpy(attrs, "attrs=");
-
-  int   pos = 6;
-  for (int ix = 0; ix < attrList->items; ix++)
-  {
-    int len = strlen(attrList->array[ix]);
-    strcpy(&attrs[pos], attrList->array[ix]);
-
-    // Add comma unless it's the last attr (in which case we add a zero, just in case)
-    pos += len;
-
-    if (ix != attrList->items - 1)  // Not the last attr
-    {
-      attrs[pos] = ',';
-      pos += 1;
-    }
-    else
-      attrs[pos] = 0;
-  }
-
-  distOpP->attrsParam    = attrs;
-  distOpP->attrsParamLen = pos;
-}
-
-
+extern void attrsParam(DistOp* distOpP, StringArray* attrList, bool permanent);
 
 // -----------------------------------------------------------------------------
 //
@@ -98,7 +44,7 @@ DistOp* distOpCreate
   RegCacheItem* regP,
   StringArray*  idList,
   StringArray*  typeList,
-  StringArray*  attrList,
+  StringArray*  attrList,    // As it arrives in the GET request (URL param 'attrs')
   bool          permanent
 )
 {
@@ -111,13 +57,14 @@ DistOp* distOpCreate
 
   distOpP->regP       = regP;
   distOpP->operation  = operation;
-  distOpP->attrList   = attrList;
   distOpP->idList     = idList;
   distOpP->typeList   = typeList;
 
-  // Fix the comma-separated attribute list
+  attrList = (attrList != NULL)? stringArrayClone(attrList) : NULL;
   if ((attrList != NULL) && (attrList->items > 0))
-    attrsParam(distOpP, attrList, permanent);
+    attrsParam(distOpP, attrList, true);
+  else
+    distOpP->attrsParam = NULL;
 
   // Assign an ID to this DistOp
   if (regP != NULL)
@@ -126,7 +73,7 @@ DistOp* distOpCreate
     ++orionldState.distOpNo;
   }
   else
-    strncpy(distOpP->id, "local", sizeof(distOpP->id));
+    strncpy(distOpP->id, "@none", sizeof(distOpP->id));
 
   if (distOpP->regP != NULL)
     LM_T(LmtDistOpList, ("Created distOp '%s', for reg '%s'", distOpP->id, distOpP->regP->regId));

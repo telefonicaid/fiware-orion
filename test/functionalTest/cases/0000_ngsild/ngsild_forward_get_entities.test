@@ -408,7 +408,7 @@ Content-Length: 244
 Content-Type: application/json
 Date: REGEX(.*)
 Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 NGSILD-Results-Count: 40
 
 [
@@ -445,9 +445,10 @@ HTTP/1.1 200 OK
 Content-Length: 831
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
+#SORT_START
     {
         "A1": {
             "type": "Property",
@@ -528,6 +529,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http:/
         "id": "urn:cp3:entities:E39",
         "type": "T"
     }
+#SORT_END
 ]
 
 

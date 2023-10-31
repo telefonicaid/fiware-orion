@@ -37,8 +37,10 @@ extern "C"
 #include "orionld/common/orionldState.h"                            // orionldState, orionldEntityMapCount
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
+#include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"           // kjEntityIdLookupInEntityArray
 #include "orionld/regCache/regCacheItemLookup.h"                    // regCacheItemLookup
 #include "orionld/forwarding/DistOp.h"                              // DistOp
+#include "orionld/forwarding/distOpLookupById.h"                    // distOpLookupById
 #include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
 #include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
 #include "orionld/forwarding/distOpEntityMerge.h"                   // distOpEntityMerge
@@ -117,16 +119,16 @@ DistOp* distOpLookup(const char* distOpId)
 //
 DistOpListItem* distOpListItemCreate(const char* distOpId, char* idString)
 {
-  DistOpListItem* itemP = (DistOpListItem*) kaAlloc(&orionldState.kalloc, sizeof(DistOpListItem));
+  DistOp* distOpP = distOpLookupById(orionldDistOps, distOpId);
 
+  if (distOpP == NULL)
+    LM_RE(NULL, ("Internal Error (unable to find the DistOp '%s'", distOpId));
+
+  DistOpListItem* itemP = (DistOpListItem*) kaAlloc(&orionldState.kalloc, sizeof(DistOpListItem));
   if (itemP == NULL)
     LM_X(1, ("Out of memory"));
 
-  itemP->distOpP = distOpLookup(distOpId);
-
-  if (itemP->distOpP == NULL)
-    LM_RE(NULL, ("Internal Error (unable to find the DistOp '%s'", distOpId));
-
+  itemP->distOpP   =  distOpP;
   itemP->next      = NULL;
   itemP->entityIds = idString;
 
@@ -160,6 +162,12 @@ DistOpListItem* distOpListItemAdd(DistOpListItem* distOpList, const char* distOp
 //
 // queryResponse -
 //
+// FIXME:
+//   I have a problem here with responses for requests forwarded due to Auxiliary Registrations.
+//   They can't be taken into account until AFTER all other responses have been dealt with,
+//   So, unless all other responses have been treated (merging entities), responses from Aux Regs must be delayed.
+//   They must be kept in a list and treated once no other responses are left.
+//
 static int queryResponse(DistOp* distOpP, void* callbackParam)
 {
   LM_T(LmtSR, ("Got a response. status code: %d. body: '%s'", distOpP->httpResponseCode, distOpP->rawResponse));
@@ -169,7 +177,7 @@ static int queryResponse(DistOp* distOpP, void* callbackParam)
   if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
   {
     LM_T(LmtSR, ("Got a body from endpoint registered in reg '%s'", distOpP->regP->regId));
-    LM_T(LmtSR, ("Must merge these new entities with the once already received"));
+    LM_T(LmtSR, ("Must merge these new entities with the ones already received"));
 
     KjNode* entityP = distOpP->responseBody->value.firstChildP;
     KjNode* next;
@@ -177,7 +185,33 @@ static int queryResponse(DistOp* distOpP, void* callbackParam)
     {
       next = entityP->next;
       kjChildRemove(distOpP->responseBody, entityP);
-      distOpEntityMerge(entityArray, entityP);
+
+      // Lookup the entity in entityArray and:
+      // - Add entityP if not found in entityArray
+      // - Merge the two if found in entityArray
+      //
+      KjNode* entityIdNodeP = kjLookup(entityP, "id");
+
+      if (entityIdNodeP != NULL)
+      {
+        char*   entityId    = entityIdNodeP->value.s;
+        KjNode* baseEntityP = kjEntityIdLookupInEntityArray(entityArray, entityId);
+
+        if (baseEntityP == NULL)
+        {
+          LM_T(LmtDistOpMerge, ("New Entity '%s' - adding it to the entity array", entityId));
+          kjChildAdd(entityArray, entityP);
+        }
+        else
+        {
+          bool auxiliary = distOpP->regP->mode == RegModeAuxiliary;
+          LM_T(LmtDistOpMerge, ("Existing Entity '%s' - merging it in the entity array (reg-mode: %s)", entityId, registrationModeToString(distOpP->regP->mode)));
+          distOpEntityMerge(baseEntityP, entityP, orionldState.uriParamOptions.sysAttrs, auxiliary);
+        }
+      }
+      else
+        LM_W(("No Entity ID in response from forwarded GET /entities request (reg %s)", distOpP->regP->regId));
+
       entityP = next;
     }
   }
@@ -261,15 +295,19 @@ static void distOpQueryRequest(DistOpListItem* distOpList, KjNode* entityArray)
 //
 static void cleanupSysAttrs(void)
 {
+  LM_T(LmtSR, ("In cleanupSysAttrs: orionldState.responseTree: %p", orionldState.responseTree));
+
   for (KjNode* entityP = orionldState.responseTree->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
     KjNode* attrP = entityP->value.firstChildP;
     KjNode* nextAttrP;
 
+    kjTreeLog(entityP, "Entity", LmtSR);
     while (attrP != NULL)
     {
       nextAttrP = attrP->next;
 
+      LM_T(LmtSR, ("attrP->name: '%s'", attrP->name));
       if      (strcmp(attrP->name, "createdAt")  == 0)  kjChildRemove(entityP, attrP);
       else if (strcmp(attrP->name, "modifiedAt") == 0)  kjChildRemove(entityP, attrP);
       else if (attrP->type == KjObject)
@@ -307,6 +345,7 @@ bool orionldGetEntitiesPage(void)
   int limit  = orionldState.uriParams.limit;
 
   KjNode* entityArray = kjArray(orionldState.kjsonP, NULL);
+  LM_T(LmtDistOpResponseDetail, ("entityArray at %p", entityArray));
 
   LM_T(LmtEntityMap, ("entity map:          '%s'", orionldEntityMapId));
   LM_T(LmtEntityMap, ("items in entity map:  %d",  orionldEntityMapCount));
@@ -315,6 +354,7 @@ bool orionldGetEntitiesPage(void)
 
   // HTTP Status code and payload body
   orionldState.responseTree   = entityArray;
+  LM_T(LmtSR, ("orionldState.responseTree: %p", orionldState.responseTree));
   orionldState.httpStatusCode = 200;
 
   if (orionldState.uriParams.count == true)
@@ -356,7 +396,7 @@ bool orionldGetEntitiesPage(void)
   //   {
   //     "urn:reg1": [ "urn:E1", ... "urn:En" ],
   //     "urn:reg2": [ "urn:E1", ... "urn:En" ],
-  //     "local":  [ "urn:E1", ... "urn:En" ]
+  //     "@none":    [ "urn:E1", ... "urn:En" ]
   //   }
   // ]
   //
@@ -373,7 +413,7 @@ bool orionldGetEntitiesPage(void)
 
     for (KjNode* regP = entityMap->value.firstChildP; regP != NULL; regP = regP->next)
     {
-      const char* regId    = (regP->type == KjString)? regP->value.s : "local";
+      const char* regId    = (regP->type == KjString)? regP->value.s : "@none";
       KjNode*     regArray = kjLookup(sources, regId);
 
       if (regArray == NULL)
@@ -394,9 +434,9 @@ bool orionldGetEntitiesPage(void)
   DistOpListItem* distOpList = NULL;
   for (KjNode* sourceP = sources->value.firstChildP; sourceP != NULL; sourceP = sourceP->next)
   {
-    if (strcmp(sourceP->name, "local") == 0)
+    if (strcmp(sourceP->name, "@none") == 0)
     {
-      DistOp* distOpP = distOpLookup("local");
+      DistOp* distOpP = distOpLookupById(orionldDistOps, "@none");
 
       // Local query - set input params for orionldGetEntitiesLocal
 
@@ -406,14 +446,34 @@ bool orionldGetEntitiesPage(void)
       // The type doesn't matter, we have a list of entity ids
       orionldState.in.typeList.items = 0;
 
-      // Set orionldState.in.attrList according to the entityMap creation request (that's filtering away attributes)
-      orionldState.uriParams.attrs = distOpP->attrsParam;
+#if 0
+      LM_T(LmtDistOpAttributes, ("------------ Local DB Query -------------"));
+      LM_T(LmtDistOpAttributes, ("orionldState.uriParams.attrs:   %s", orionldState.uriParams.attrs));
+      LM_T(LmtDistOpAttributes, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
+      for (int ix = 0; ix < orionldState.in.attrList.items; ix++)
+      {
+        LM_T(LmtDistOpAttributes, ("orionldState.in.attrList.array[%d]: '%s'", ix, orionldState.in.attrList.array[ix]));
+      }
+      LM_T(LmtDistOpAttributes, ("distOpP->attrsParam:          %s", distOpP->attrsParam));
+      LM_T(LmtDistOpAttributes, ("distOpP->attrList:            %p", distOpP->attrList));
+
+      if (distOpP->attrList != NULL)
+      {
+        LM_T(LmtDistOpAttributes, ("distOpP->attrList->items: %d", distOpP->attrList->items));
+        for (int ix = 0; ix < distOpP->attrList->items; ix++)
+        {
+          LM_T(LmtDistOpAttributes, ("distOpP->attrList->array[%d]: '%s'", ix, distOpP->attrList->array[ix]));
+        }
+      }
+#endif
 
       // Set orionldState.in.geometryPropertyExpanded according to the entityMap creation request (that's modifying the response)
       orionldState.in.geometryPropertyExpanded = NULL;  // FIXME: fix
 
       // Set orionldState.in.idList according to the entities in the entityMap
       idListFix(sourceP);
+
+      // Use orionldState.in.attrList and not distOpP->attrList for local requests
 
       // No paging here
       orionldState.uriParams.offset = 0;
@@ -422,7 +482,7 @@ bool orionldGetEntitiesPage(void)
       LM_T(LmtEntityMap, ("Query local database for %d entities", orionldState.in.idList.items));
       orionldGetEntitiesLocal(distOpP->typeList,
                               distOpP->idList,
-                              distOpP->attrList,
+                              &orionldState.in.attrList,
                               NULL,
                               distOpP->qNode,
                               &distOpP->geoInfo,
@@ -433,9 +493,10 @@ bool orionldGetEntitiesPage(void)
                               true);
 
       // Response comes in orionldState.responseTree - move those to entityArray
-      kjTreeLog(orionldState.responseTree, "orionldState.responseTree", LmtEntityMapDetail);
+      kjTreeLog(orionldState.responseTree, "orionldState.responseTree", LmtDistOpResponseDetail);
       if ((orionldState.responseTree != NULL) && (orionldState.responseTree->value.firstChildP != NULL))
       {
+        LM_T(LmtDistOpResponseDetail, ("Adding a 'distop-response-entity' to the entityArray"));
         orionldState.responseTree->lastChild->next = entityArray->value.firstChildP;
         entityArray->value.firstChildP = orionldState.responseTree->value.firstChildP;
       }
@@ -478,6 +539,7 @@ bool orionldGetEntitiesPage(void)
     distOpQueryRequest(distOpList, entityArray);
   }
 
+  orionldState.responseTree = entityArray;
 
   //
   // Time to cleanup ...

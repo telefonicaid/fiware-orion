@@ -83,11 +83,13 @@ typedef enum TraceLevels
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
   LmtDistOpRequestHeaders,             // HTTP headers of request of distributed requests
   LmtDistOpList,                       // Linked list of DistOps
+  LmtDistOpAttributes,                 // The union of attributes URL-Param / Registered Attributes
+  LmtDistOpMerge,                      // Merge of responses from forwsrded requests (GET /entities)
 
   //
   // Context
   //
-  LmtContexts = 80,                    // Contexts
+  LmtContexts = 82,                    // Contexts
   LmtContextTree,                      // Context Tree
   LmtContextCache,                     // Context Cache
   LmtContextDownload,                  // Context Download

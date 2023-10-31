@@ -64,10 +64,14 @@ bool orionldGetEntityMap(void)
       DistOp* distOpP = distOpLookupById(orionldDistOps, distOpId->value.s);
       if (distOpP == NULL)
         continue;
-      KjNode* urlP = (distOpP->regP->regTree != NULL)? kjLookup(distOpP->regP->regTree, "endpoint") : NULL;
+
+      KjNode* urlP = ((distOpP->regP != NULL) && (distOpP->regP->regTree != NULL))? kjLookup(distOpP->regP->regTree, "endpoint") : NULL;
       if (urlP != NULL)
         distOpId->value.s = urlP->value.s;
+      else
+        distOpId->value.s = (char*) "@none";
     }
+
     kjStringArraySort(eArray);
   }
 

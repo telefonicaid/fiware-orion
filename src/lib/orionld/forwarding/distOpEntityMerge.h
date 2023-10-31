@@ -38,12 +38,4 @@ extern "C"
 //
 extern void distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary);
 
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpEntityMerge -
-//
-extern void distOpEntityMerge(KjNode* entityArray, KjNode* entityP);
-
 #endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPENTITYMERGE_H_

@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_ORIONLD_TYPES_STRINGARRAY_H_
-#define SRC_LIB_ORIONLD_TYPES_STRINGARRAY_H_
-
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,19 +22,14 @@
 *
 * Author: Ken Zangelin
 */
-
-
-
-// -----------------------------------------------------------------------------
-//
-// StringArray -
-//
-typedef struct StringArray
+extern "C"
 {
-  int     items;
-  char**  array;
-} StringArray;
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
+}
 
+#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/types/StringArray.h"                           // Own interface
 
 
 
@@ -45,6 +37,17 @@ typedef struct StringArray
 //
 // stringArrayClone -
 //
-extern StringArray* stringArrayClone(StringArray* saP);
+StringArray* stringArrayClone(StringArray* saP)
+{
+  StringArray* clone = (StringArray*) kaAlloc(&orionldState.kalloc, sizeof(StringArray));
 
-#endif  // SRC_LIB_ORIONLD_TYPES_STRINGARRAY_H_
+  clone->items = saP->items;
+  clone->array = (char**) kaAlloc(&orionldState.kalloc, saP->items * sizeof(char*));
+
+  for (int ix = 0; ix < clone->items; ix++)
+  {
+    clone->array[ix] = kaStrdup(&orionldState.kalloc, saP->array[ix]);
+  }
+
+  return clone;
+}

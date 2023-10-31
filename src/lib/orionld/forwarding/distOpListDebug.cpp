@@ -119,7 +119,7 @@ void distOpListDebug2(DistOp* distOpP, const char* what)
 
     if (distOpP->attrsParam != NULL)
     {
-      LM_T(LmtDistOpList, ("  URL Attributes:        %s (len: %d)", distOpP->attrsParam, distOpP->attrsParamLen));
+      LM_T(LmtDistOpList, ("  URL Attributes:        '%s' (len: %d)", distOpP->attrsParam, distOpP->attrsParamLen));
     }
 
     if (distOpP->typeList != NULL)

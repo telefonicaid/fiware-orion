@@ -60,7 +60,6 @@ orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
 echo
 echo
 
-
 echo "02. In CP1, create an entity urn:E1 with attributes P1-P3+R1"
 echo "============================================================"
 payload='{
@@ -213,7 +212,7 @@ payload='{
   ],
   "mode": "auxiliary",
   "operations": [ "queryEntity" ],
-  "endpoint": "http://localhost:'$CP1_PORT'"
+  "endpoint": "http://localhost:'$CP4_PORT'"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo
@@ -312,17 +311,46 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg4
 10. GET /entities - see all properties P1-P4, each from a different broker, and relationships R1+R4 from CP4
 ============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 351
 Content-Type: application/json
 Date: REGEX(.*)
 Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 NGSILD-Results-Count: 1
 
 [
-  {
-    ...   (to be implemented)
-  }
+    {
+        "P0": {
+            "type": "Property",
+            "value": "In CB"
+        },
+        "P1": {
+            "type": "Property",
+            "value": "P1 in CP1"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "P2 in CP2"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "P3 in CP3"
+        },
+        "P4": {
+            "type": "Property",
+            "value": "P4 in CP4"
+        },
+        "R1": {
+            "object": "urn:in:cp4",
+            "type": "Relationship"
+        },
+        "R4": {
+            "object": "urn:in:cp4",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    }
 ]
 
 
