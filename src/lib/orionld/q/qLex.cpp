@@ -153,24 +153,15 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
 
       if (others == 0)
       {
-        if (hyphens > 0)
-        {
-          if (term[4] == '-')
-            dateTime = true;             // MIGHT be a DateTime
+        if ((hyphens > 0) && (term[4] == '-'))
+          dateTime = true;             // MIGHT be a DateTime
 
-          if (dots == 0)
-            type = QNodeIntegerValue;  // hyphens found but no dots - its an Integer (or a DateTime)
-          else if (dots == 1)
-            type = QNodeFloatValue;    // hyphen found and one dot - its a Float (or a DateTime)
-          else
-            type = QNodeVariable;
-        }
-        else if (dots == 0)
+        if (dots == 0)
           type = QNodeIntegerValue;    // no dots - its an Integer
         else if (dots == 1)
           type = QNodeFloatValue;      // one dot - its a Floating point
         else
-          type = QNodeVariable;
+          type = QNodeVariable;        // more than one dot ... probably an error
       }
       else
         type = QNodeVariable;
