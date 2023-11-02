@@ -3862,7 +3862,7 @@ _**Request payload**_
 The payload is a JSON object containing a subscription that follows the JSON subscription representation 
 format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
 
-Example:
+Example using attribute filter:
 
 ```json
 {
@@ -3887,8 +3887,7 @@ Example:
     },
     "attrs": ["temperature", "humidity"]
   },            
-  "expires": "2025-04-05T14:00:00.00Z",
-  "throttling": 5
+  "expires": "2025-04-05T14:00:00.00Z"
 }
 ```
 
@@ -3909,7 +3908,7 @@ Example using geoquery as condition:
       "expression": {
         "georel": "near;maxDistance:15000",
         "geometry": "point",
-        "coords": "coords": "37.407804, -6.004552"
+        "coords": "37.407804,-6.004552"
       }
     }
   },
@@ -3919,8 +3918,7 @@ Example using geoquery as condition:
     },
     "attrs": ["temperature", "humidity"]
   },            
-  "expires": "2025-04-05T14:00:00.00Z",
-  "throttling": 5
+  "expires": "2025-04-05T14:00:00.00Z"
 }
 ```
 
