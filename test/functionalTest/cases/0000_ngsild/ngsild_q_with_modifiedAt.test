@@ -32,7 +32,7 @@ orionldStart CB -experimental
 #
 # 01. Create E1 with type T and attr A=1 and B=1
 # 02. GET E12 with sysAttrs and save the modifiedAt of E1
-# 03. Sleep 0.5 seconds
+# 03. Sleep 1 second
 # 04. Create E2 with type T and attr A=2 and B=2
 # 05. Attempt to filter on existence of 'modifiedAt' - see 400
 # 06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2
@@ -60,14 +60,15 @@ echo
 echo "02. GET E1 with sysAttrs and save the modifiedAt of E1"
 echo "======================================================"
 orionCurl --url /ngsi-ld/v1/entities/http://a.b.c/entity/E1?options=sysAttrs
-e1ModifiedAt=$(echo $_response | awk -F\"modifiedAt\" '{ print $2 }' | head -1 | awk -F\" '{ print $2 }')
+e1ModifiedAt=$(date +%s)
+e1ModifiedAt=$(echo $e1ModifiedAt + 0.9 | bc)
 echo
 echo
 
 
-echo "03. Sleep 0.5 seconds"
-echo "====================="
-sleep .5
+echo "03. Sleep 1 second"
+echo "=================="
+sleep 1
 echo Slept
 echo
 echo
@@ -101,7 +102,7 @@ echo
 
 echo "06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2"
 echo "================================================================================="
-orionCurl --url "/ngsi-ld/v1/entities?q=modifiedAt>$e1ModifiedAt"
+orionCurl --url "/ngsi-ld/v1/entities?q=modifiedAt>$e1ModifiedAt&options=sysAttrs"
 echo
 echo
 
@@ -144,8 +145,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 }
 
 
-03. Sleep 0.5 seconds
-=====================
+03. Sleep 1 second
+==================
 Slept
 
 
@@ -175,15 +176,33 @@ Date: REGEX(.*)
 06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 349
 Content-Type: application/json
 Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
-  E2
+    {
+        "A": {
+            "createdAt": "REGEX(.*)",
+            "modifiedAt": "REGEX(.*)",
+            "type": "Property",
+            "value": 2
+        },
+        "B": {
+            "createdAt": "REGEX(.*)",
+            "modifiedAt": "REGEX(.*)",
+            "type": "Property",
+            "value": 2
+        },
+        "createdAt": "REGEX(.*)",
+        "id": "http://a.b.c/entity/E2",
+        "modifiedAt": "REGEX(.*)",
+        "type": "T"
+    }
 ]
 
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB

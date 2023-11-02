@@ -41,6 +41,8 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
 {
   QNode* qNodeP = qNode(QNodeStringValue);
 
+  LM_T(LmtQ, ("Pushing a String: '%s'", stringValue));
+
   if (orionldState.useMalloc == false)
     qNodeP->value.s = stringValue;
   else
@@ -61,6 +63,7 @@ static QNode* qDateTimePush(QNode* prev, double dateTime)
 {
   QNode* qNodeP = qNode(QNodeFloatValue);
 
+  LM_T(LmtQ, ("Pushing a timestamp: %f", dateTime));
   qNodeP->value.f = dateTime;
 
   prev->next = qNodeP;
@@ -89,12 +92,17 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     --termLen;
   }
 
-  if ((termLen >= 9) && (strcmp(&term[termLen-9], "createdAt") == 0))
-    *lastTermIsTimestampP = true;
-  else if ((termLen >= 10) && ((strcmp(&term[termLen-10], "modifiedAt") == 0) || (strcmp(&term[termLen-10], "observedAt") == 0)))
-    *lastTermIsTimestampP = true;
+  LM_T(LmtQ, ("term: '%s' (termLen: %d)", term, termLen));
+
+  if      (strcmp(&term[termLen - 10], "modifiedAt") == 0)    *lastTermIsTimestampP = true;
+  else if (strcmp(&term[termLen -  9], "createdAt")  == 0)    *lastTermIsTimestampP = true;
+  else if (strcmp(&term[termLen - 10], "observedAt") == 0)    *lastTermIsTimestampP = true;
+  else                                                        *lastTermIsTimestampP = false;
+
+  if (*lastTermIsTimestampP == true)
+    LM_T(LmtQ, ("Pushing a Timestamp term: '%s'", term));
   else
-    *lastTermIsTimestampP = false;
+    LM_T(LmtQ, ("Pushing a term: '%s'", term));
 
   if (*term != 0)
   {
@@ -147,12 +155,13 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
       {
         if (hyphens > 0)
         {
-          dateTime = true;             // MIGHT be a DateTime
+          if (term[4] == '-')
+            dateTime = true;             // MIGHT be a DateTime
 
           if (dots == 0)
             type = QNodeIntegerValue;  // hyphens found but no dots - its an Integer (or a DateTime)
           else if (dots == 1)
-            type = QNodeFloatValue;    // hyphen found and one dot - its a Float
+            type = QNodeFloatValue;    // hyphen found and one dot - its a Float (or a DateTime)
           else
             type = QNodeVariable;
         }
@@ -166,27 +175,30 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
       else
         type = QNodeVariable;
     }
+    LM_T(LmtQ, ("'%s' seems like a %s", term, qNodeType(type)));
 
     if ((prev != NULL) && ((prev->type == QNodeMatch) || (prev->type == QNodeNoMatch)))
       type = QNodeRegexpValue;
 
     QNode* qNodeP = qNode(type);
 
-    if (type == QNodeIntegerValue)
+    if (dateTime == true)
     {
-      int64_t dTime;
+      LM_T(LmtQ, ("'%s' might be a DateTime", term));
 
-      if (dateTime == true)
+      double dTime = parse8601Time(term);
+
+      if (dTime == -1)
+        LM_W(("Invalid DateTime: '%s'", term));
+      else
       {
-        if ((dTime = parse8601Time(term)) == -1)
-          dateTime = false;
-        else
-          qNodeP->value.i = dTime;
+        LM_T(LmtQ, ("term: '%s', dTime: %f", term, dTime));
+        qNodeP->value.f = dTime;
+        qNodeP->type    = QNodeFloatValue;
       }
-
-      if (dateTime == false)
-        qNodeP->value.i = strtoul(term, NULL, 10);
     }
+    else if (type == QNodeIntegerValue)
+      qNodeP->value.i = strtoul(term, NULL, 10);
     else if (type == QNodeFloatValue)
       qNodeP->value.f = strtod(term, NULL);
     else if (type == QNodeVariable)
@@ -401,12 +413,13 @@ QNode* qLex(char* s, bool timestampToFloat, char** titleP, char** detailsP)
       *sP = 0;
       ++sP;
 
+      LM_T(LmtQ, ("timestampToFloat: %s", (timestampToFloat == true)? "true" : "false"));
       if (timestampToFloat == true)
       {
         double    dateTime;
         uint64_t  sLen = (uint64_t) (sP - start - 2);
 
-        if ((sLen > 4) && (start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
+        if ((sLen >= 9) && (start[4] == '-') && ((dateTime = parse8601Time(start)) != -1))
         {
           if (lastTermIsTimestamp)
             current = qDateTimePush(current, dateTime);

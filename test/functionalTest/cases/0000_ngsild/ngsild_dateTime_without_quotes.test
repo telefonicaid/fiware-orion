@@ -84,7 +84,7 @@ echo
 
 echo "02. NGSI-LD Test Suite Case 042: Query by condition over observedAt"
 echo "==================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=P100.observedAt>\"2018-12-03T12:05:06.000Z\"'
+orionCurl --url '/ngsi-ld/v1/entities?type=T_Query&q=P100.observedAt>%222018-12-03T12:05:06.000Z%22'
 echo
 echo
 

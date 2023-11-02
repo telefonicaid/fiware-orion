@@ -162,6 +162,7 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, bool qToDbModel, cha
       {
         if (compOpP == NULL)
         {
+          LM_T(LmtQ, ("Existence for '%s'", qLexP->value.v));
           if ((strcmp(qLexP->value.v, "creDate") == 0) || (strcmp(qLexP->value.v, "modDate") == 0))
           {
             *titleP   = (char*) "Invalid Q-Filter (Cannot use Existence on system attributes)";
