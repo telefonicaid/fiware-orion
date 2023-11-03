@@ -1,0 +1,178 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue 1419 - Error updating an attribute of an entity
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB
+
+--SHELL--
+
+#
+# 01. Create Entity urn:ngsi-ld:Vehicle:4577314217839414
+# 02. Update Entity Attributes
+# 03. Make sure the broker is still alive - by retreiving the patched entity
+#
+
+echo "01. Create Entity urn:ngsi-ld:Vehicle:4577314217839414"
+echo "======================================================"
+payload='{
+  "id": "urn:ngsi-ld:Vehicle:4577314217839414",
+  "type": "Vehicle",
+  "brandName": {
+    "type": "Property",
+    "value": "Mercedes"
+  },
+  "isParked": {
+    "type": "Relationship",
+    "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+    "observedAt": "2017-07-29T12:00:04Z",
+    "providedBy": {
+      "type": "Relationship",
+      "object": "urn:ngsi-ld:Person:Bob"
+    },
+    "datasetId": "urn:ngsi-ld:Relationship:parked12345"
+  },
+  "speed": [
+    {
+      "type": "Property",
+      "value": 55,
+      "source": {
+        "type": "Property",
+        "value": "Speedometer"
+      }
+    },
+    {
+      "type": "Property",
+      "value": 54.5,
+      "source": {
+        "type": "Property",
+        "value": "GPS"
+      },
+      "datasetId": "urn:ngsi-ld:Property:gpsBxyz123-speed"
+    }
+  ],
+  "@context": [
+    "https://forge.etsi.org/rep/cim/ngsi-ld-test-suite/-/raw/develop/resources/jsonld-contexts/ngsi-ld-test-suite-compound.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload" --in jsonld -H "User-Agent: python-requests/2.31.0" -H "Accept-Encoding: gzip, deflate" -H "Connection: keep-alive" --out "*/*"
+echo
+echo
+
+
+echo "02. Update Entity Attributes"
+echo "============================"
+payload='{
+  "speed": {
+    "type": "Property",
+    "value": 99,
+    "source": {
+      "type": "Property",
+      "value": "Speedometer"
+    }
+  },
+  "@context": [
+    "https://forge.etsi.org/rep/cim/ngsi-ld-test-suite/-/raw/develop/resources/jsonld-contexts/ngsi-ld-test-suite-compound.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:4577314217839414/attrs -X PATCH --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "03. Make sure the broker is still alive - by retreiving the patched entity"
+echo "=========================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:4577314217839414
+echo
+echo
+
+
+--REGEXPECT--
+01. Create Entity urn:ngsi-ld:Vehicle:4577314217839414
+======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Vehicle:4577314217839414
+
+
+
+02. Update Entity Attributes
+============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+03. Make sure the broker is still alive - by retreiving the patched entity
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 796
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "https://ngsi-ld-test-suite/context#brandName": {
+        "type": "Property",
+        "value": "Mercedes"
+    },
+    "https://ngsi-ld-test-suite/context#speed": [
+        {
+            "https://ngsi-ld-test-suite/context#source": {
+                "type": "Property",
+                "value": "Speedometer"
+            },
+            "type": "Property",
+            "value": 99
+        },
+        {
+            "datasetId": "urn:ngsi-ld:Property:gpsBxyz123-speed",
+            "https://ngsi-ld-test-suite/context#source": {
+                "type": "Property",
+                "value": "GPS"
+            },
+            "type": "Property",
+            "value": 54.5
+        }
+    ],
+    "id": "urn:ngsi-ld:Vehicle:4577314217839414",
+    "isParked": {
+        "datasetId": "urn:ngsi-ld:Relationship:parked12345",
+        "https://uri.etsi.org/ngsi-ld/default-context/providedBy": {
+            "object": "urn:ngsi-ld:Person:Bob",
+            "type": "Relationship"
+        },
+        "object": "urn:ngsi-ld:OffStreetParking:Downtown1",
+        "observedAt": "2017-07-29T12:00:04Z",
+        "type": "Relationship"
+    },
+    "type": "https://ngsi-ld-test-suite/context#Vehicle"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
