@@ -35,7 +35,14 @@ orionldStart CB -experimental
 # 03. Sleep 1 second
 # 04. Create E2 with type T and attr A=2 and B=2
 # 05. Attempt to filter on existence of 'modifiedAt' - see 400
-# 06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2
+# 06. GET all entities that have a modifiedAt > the timestamp between E1 and E2 - see E2
+# 07. GET all entities that have a modifiedAt < the timestamp between E1 and E2 - see E1
+# 08. GET all entities that have a createdAt > the timestamp between E1 and E2 - see E2
+# 09. GET all entities that have a createdAt < the timestamp between E1 and E2 - see E1
+# 10. GET all entities that have an attribute A with a modifiedAt > the timestamp between E1 and E2 - see E2
+# 11. GET all entities that have an attribute A with a modifiedAt < the timestamp between E1 and E2 - see E1
+# 12. GET all entities that have an attribute A with a createdAt > the timestamp between E1 and E2 - see E2
+# 13. GET all entities that have an attribute A with a createdAt < the timestamp between E1 and E2 - see E1
 #
 
 echo "01. Create E1 with type T and attr A=1 and B=1"
@@ -100,9 +107,58 @@ echo
 echo
 
 
-echo "06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2"
-echo "================================================================================="
+echo "06. GET all entities that have a modifiedAt > the timestamp between E1 and E2 - see E2"
+echo "======================================================================================"
 orionCurl --url "/ngsi-ld/v1/entities?q=modifiedAt>$e1ModifiedAt&options=sysAttrs"
+echo
+echo
+
+
+echo "07. GET all entities that have a modifiedAt < the timestamp between E1 and E2 - see E1"
+echo "======================================================================================"
+orionCurl --url "/ngsi-ld/v1/entities?q=modifiedAt<$e1ModifiedAt&options=sysAttrs"
+echo
+echo
+
+
+echo "08. GET all entities that have a createdAt > the timestamp between E1 and E2 - see E2"
+echo "====================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=createdAt>$e1ModifiedAt&options=sysAttrs"
+echo
+echo
+
+
+echo "09. GET all entities that have a createdAt < the timestamp between E1 and E2 - see E1"
+echo "====================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=createdAt<$e1ModifiedAt&options=sysAttrs"
+echo
+echo
+
+
+echo "10. GET all entities that have an attribute A with a modifiedAt > the timestamp between E1 and E2 - see E2"
+echo "=========================================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=A.modifiedAt>$e1ModifiedAt"
+echo
+echo
+
+
+echo "11. GET all entities that have an attribute A with a modifiedAt < the timestamp between E1 and E2 - see E1"
+echo "=========================================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=A.modifiedAt<$e1ModifiedAt"
+echo
+echo
+
+
+echo "12. GET all entities that have an attribute A with a createdAt > the timestamp between E1 and E2 - see E2"
+echo "========================================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=A.createdAt>$e1ModifiedAt"
+echo
+echo
+
+
+echo "13. GET all entities that have an attribute A with a createdAt < the timestamp between E1 and E2 - see E1"
+echo "========================================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=A.createdAt<$e1ModifiedAt"
 echo
 echo
 
@@ -173,8 +229,8 @@ Date: REGEX(.*)
 }
 
 
-06. GET all entities that have a modifiedAt > the saved modifiedAt of E1 - see E2
-=================================================================================
+06. GET all entities that have a modifiedAt > the timestamp between E1 and E2 - see E2
+======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 349
 Content-Type: application/json
@@ -203,6 +259,192 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 ]
 
 
+07. GET all entities that have a modifiedAt < the timestamp between E1 and E2 - see E1
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 349
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 1
+        },
+        "B": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 1
+        },
+        "createdAt": "202REGEX(.*)Z",
+        "id": "http://a.b.c/entity/E1",
+        "modifiedAt": "202REGEX(.*)Z",
+        "type": "T"
+    }
+]
+
+
+08. GET all entities that have a createdAt > the timestamp between E1 and E2 - see E2
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 349
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 2
+        },
+        "B": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 2
+        },
+        "createdAt": "202REGEX(.*)Z",
+        "id": "http://a.b.c/entity/E2",
+        "modifiedAt": "202REGEX(.*)Z",
+        "type": "T"
+    }
+]
+
+
+09. GET all entities that have a createdAt < the timestamp between E1 and E2 - see E1
+=====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 349
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 1
+        },
+        "B": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 1
+        },
+        "createdAt": "202REGEX(.*)Z",
+        "id": "http://a.b.c/entity/E1",
+        "modifiedAt": "202REGEX(.*)Z",
+        "type": "T"
+    }
+]
+
+
+10. GET all entities that have an attribute A with a modifiedAt > the timestamp between E1 and E2 - see E2
+==========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A": {
+            "type": "Property",
+            "value": 2
+        },
+        "B": {
+            "type": "Property",
+            "value": 2
+        },
+        "id": "http://a.b.c/entity/E2",
+        "type": "T"
+    }
+]
+
+
+11. GET all entities that have an attribute A with a modifiedAt < the timestamp between E1 and E2 - see E1
+==========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A": {
+            "type": "Property",
+            "value": 1
+        },
+        "B": {
+            "type": "Property",
+            "value": 1
+        },
+        "id": "http://a.b.c/entity/E1",
+        "type": "T"
+    }
+]
+
+
+12. GET all entities that have an attribute A with a createdAt > the timestamp between E1 and E2 - see E2
+=========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A": {
+            "type": "Property",
+            "value": 2
+        },
+        "B": {
+            "type": "Property",
+            "value": 2
+        },
+        "id": "http://a.b.c/entity/E2",
+        "type": "T"
+    }
+]
+
+
+13. GET all entities that have an attribute A with a createdAt < the timestamp between E1 and E2 - see E1
+=========================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A": {
+            "type": "Property",
+            "value": 1
+        },
+        "B": {
+            "type": "Property",
+            "value": 1
+        },
+        "id": "http://a.b.c/entity/E1",
+        "type": "T"
+    }
+]
+
+
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
