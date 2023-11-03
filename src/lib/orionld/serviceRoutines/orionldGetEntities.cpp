@@ -148,7 +148,7 @@ static QNode* qCheck(char* qString)
   QNode* qNode = qParse(qList, NULL, true, true, &title, &detail);  // 3rd parameter: forDb=true
   if (qNode == NULL)
   {
-    orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
+    orionldError(OrionldBadRequestData, title, detail, 400);
     LM_E(("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
   }
 

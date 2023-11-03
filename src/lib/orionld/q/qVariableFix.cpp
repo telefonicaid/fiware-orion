@@ -259,21 +259,50 @@ char* qVariableFix(char* varPathIn, bool forDb, bool* isMdP, char** detailsP)
   if (forDb)
   {
     if (caseNo == 1)
-      snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value", longName);
+    {
+      LM_T(LmtQ, ("Case 1: attr: '%s'", longName));
+
+      if (strcmp(longName, "createdAt") == 0)
+        snprintf(fullPath, sizeof(fullPath) - 1, "%s", "creDate");
+      else if (strcmp(longName, "modifiedAt") == 0)
+        snprintf(fullPath, sizeof(fullPath) - 1, "%s", "modDate");
+      else
+        snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value", longName);
+    }
     else if (caseNo == 2)
+    {
+      LM_T(LmtQ, ("Case 2: attr: '%s', sub-attr: '%s', rest: '%s'", longName, mdNameP, rest));
       snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.value.%s", longName, rest);
+    }
     else if (caseNo == 3)
-      snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value", longName, mdNameP);
+    {
+      LM_T(LmtQ, ("Case 3: attr: '%s', sub-attr: '%s'", longName, mdNameP));
+
+      if (strcmp(mdNameP, "createdAt") == 0)
+        snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.%s", longName, "creDate");
+      else if (strcmp(mdNameP, "modifiedAt") == 0)
+        snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.%s", longName, "modDate");
+      else
+        snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value", longName, mdNameP);
+    }
     else
+    {
+      LM_T(LmtQ, ("Case 3+: attr: '%s', sub-attr: '%s', rest: '%s'", longName, mdNameP, rest));
       snprintf(fullPath, sizeof(fullPath) - 1, "attrs.%s.md.%s.value.%s", longName, mdNameP, rest);
+    }
   }
   else
   {
+    LM_T(LmtQ, ("Not for DB, case %d: attr: '%s', sub-attr: '%s', rest: '%s'", caseNo, longName, mdNameP, rest));
+
     // If observedAt, createdAt, modifiedAt, unitCode, ...   No ".value" must be appended
     if (caseNo == 3)
     {
       if ((strcmp(mdNameP, "observedAt") == 0) || (strcmp(mdNameP, "modifiedAt") == 0) || (strcmp(mdNameP, "createdAt") == 0))
+      {
+        LM_T(LmtQ, ("Case 5 - it's a timestamp (%s)", mdNameP));
         caseNo = 5;
+      }
     }
 
     if (caseNo == 1)
