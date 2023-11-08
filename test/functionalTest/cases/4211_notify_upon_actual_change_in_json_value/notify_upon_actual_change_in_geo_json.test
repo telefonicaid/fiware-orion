@@ -110,7 +110,7 @@ echo
 echo
 
 
-echo "05. Dump accumulator, see 3 notifications"
+echo "05. Dump accumulator, see 2 notifications"
 echo "========================================="
 accumulatorDump
 echo

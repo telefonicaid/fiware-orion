@@ -532,6 +532,7 @@ bool CompoundValueNode::equal(const orion::BSONElement& be)
 {
   // Note object cannot be declared inside switch block
   std::vector<orion::BSONElement> ba;
+  orion::BSONObj bo;
 
   switch (valueType)
   {
@@ -575,7 +576,22 @@ bool CompoundValueNode::equal(const orion::BSONElement& be)
     {
       return false;
     }
-    // TBD
+    bo = be.embeddedObject();
+    if ((int) childV.size() != bo.nFields())
+    {
+      return false;
+    }
+    for (unsigned int ix = 0; ix < childV.size(); ix++)
+    {
+      if (!bo.hasField(childV[ix]->name))
+      {
+        return false;
+      }
+      if (!(childV[ix]->equal(getFieldF(bo, childV[ix]->name))))
+      {
+        return false;
+      }
+    }
     return true;
 
   case orion::ValueTypeNotGiven:

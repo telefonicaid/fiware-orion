@@ -529,47 +529,48 @@ static ChangeType mergeAttrInfo
   /* Was it an actual update? */
   ChangeType changeType = NO_CHANGE;
 
+  /* We consider there is a change in the value if one or more of the following are true:
+   *
+   * 1) the value of the attribute changed (see attrValueChanges or CompoundValueNode::equal() for details)
+   * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
+   *    type is optional according to NGSI and the attribute may not have that field in the BSON)
+   *
+   * In addition, we consider there is change in the metadata if:
+   *
+   * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
+   *    different and, if they are of the same size, checking if the vectors are not equal)
+   */
+  bool valueChanged;
+  bool typeChanged;
+  bool mdChanged;
   if (caP->compoundValueP == NULL)
   {
-    /* In the case of simple value, we consider there is a change in the value if one or more of the following are true:
-     *
-     * 1) the value of the attribute changed (see attrValueChanges for details)
-     * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
-     *    type is optional according to NGSI and the attribute may not have that field in the BSON)
-     *
-     * In addition, we consider there is change in the metadata if:
-     *
-     * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
-     *    different and, if they are of the same size, checking if the vectors are not equal)
-     */
-    bool valueChanged = attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
-                      ((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) );
-    bool mdChanged = (mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
-
-    if (valueChanged && !mdChanged)
-    {
-      changeType = CHANGE_ONLY_VALUE;
-    }
-    else if (!valueChanged && mdChanged)
-    {
-      changeType = CHANGE_ONLY_MD;
-    }
-    else if (valueChanged && mdChanged)
-    {
-      changeType = CHANGE_VALUE_AND_MD;
-    }
-    else  // !valueChanged && !mdChanged
-    {
-      changeType = NO_CHANGE;
-    }
+    valueChanged = attrValueChanges(attr, caP, forcedUpdate, apiVersion);
   }
   else
   {
-    // FIXME #643 P6: in the case of compound value, it's more difficult to know if an attribute
-    // has really changed its value (many levels have to be traversed). Until we can develop the
-    // matching logic, we consider CHANGE_VALUE_AND_MD always.
-    //
+    valueChanged = !caP->compoundValueP->equal(getFieldF(attr, ENT_ATTRS_VALUE));
+  }
+  typeChanged = ((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type));
+  mdChanged = (mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
+
+  valueChanged = valueChanged || typeChanged;
+
+  if (valueChanged && !mdChanged)
+  {
+    changeType = CHANGE_ONLY_VALUE;
+  }
+  else if (!valueChanged && mdChanged)
+  {
+    changeType = CHANGE_ONLY_MD;
+  }
+  else if (valueChanged && mdChanged)
+  {
     changeType = CHANGE_VALUE_AND_MD;
+  }
+  else  // !valueChanged && !mdChanged
+  {
+    changeType = NO_CHANGE;
   }
 
   /* 5. Add modification date (actual change only if actual update) */
