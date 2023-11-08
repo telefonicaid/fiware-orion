@@ -42,7 +42,7 @@ accumulatorStart --pretty-print
 # 06. Update E-A entity with same JSON array in metadata (notification)
 # 07. Update E-A entity with different JSON array in metadata (notification)
 # 08. Update E-A entity with same string in metadata (notification)
-# 09. Dump accumulator, see 5 notifications
+# 09. Dump accumulator, see 7 notifications
 #
 
 echo "01. Create subscription covering E-A"

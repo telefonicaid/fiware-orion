@@ -530,7 +530,7 @@ std::string CompoundValueNode::check(const std::string& path)
 */
 bool CompoundValueNode::equal(const orion::BSONElement& be)
 {
-  // Note object cannot be declared inside switch block
+  // Note objects cannot be declared inside switch block
   std::vector<orion::BSONElement> ba;
   orion::BSONObj bo;
 
@@ -540,7 +540,8 @@ bool CompoundValueNode::equal(const orion::BSONElement& be)
     return (be.type() == orion::String) && (stringValue == be.String());
 
   case orion::ValueTypeNumber:
-    // FIXME PR: unurure if this is going to work with all the Number types (int32/int64/double)
+    // FIXME P2: according to regression tests, this seems to work with all number types (int32/int64/double)
+    // However, let's keep an eye on this in the case some day it fails...
     return (be.type() == orion::NumberDouble && numberValue == be.Number());
 
   case orion::ValueTypeBoolean:
