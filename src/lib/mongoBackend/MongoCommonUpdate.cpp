@@ -136,7 +136,7 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute* ca
 *
 * equalMetadataValues -
 */
-static bool equalMetadataValues(const orion::BSONObj& md1, const orion::BSONObj& md2)
+static bool equalMetadataItems(const orion::BSONObj& md1, const orion::BSONObj& md2)
 {
   bool md1TypeExist = md1.hasField(ENT_ATTRS_MD_TYPE);
   bool md2TypeExist = md2.hasField(ENT_ATTRS_MD_TYPE);
@@ -147,58 +147,23 @@ static bool equalMetadataValues(const orion::BSONObj& md1, const orion::BSONObj&
     return false;
   }
 
-  // If type exists in both metadata elments, check if they are the same
+  // If type exists in both metadata elements, check if they are the same
   if (md1TypeExist && md2TypeExist)
   {
-    if (getFieldF(md1, ENT_ATTRS_MD_TYPE).type() != getFieldF(md2, ENT_ATTRS_MD_TYPE).type())
+    if ((getFieldF(md1, ENT_ATTRS_MD_TYPE).type() != orion::String))
     {
+      LM_E(("Runtime Error (unallowed JSON type for metadata NGSI type: %d)", getFieldF(md1, ENT_ATTRS_MD_TYPE).type()));
       return false;
     }
-    switch (getFieldF(md1, ENT_ATTRS_MD_TYPE).type())
+    if ((getFieldF(md2, ENT_ATTRS_MD_TYPE).type() != orion::String))
     {
-      /* FIXME #643 P6: metadata array/object are now supported, but we haven't
-         implemented yet the logic to compare compounds between them
-      case Object:
-        ...
-        break;
-
-       case Array:
-        ...
-        break;
-      */
-
-    case orion::NumberDouble:
-      if (getNumberFieldF(md1, ENT_ATTRS_MD_TYPE) != getNumberFieldF(md2, ENT_ATTRS_MD_TYPE))
-      {
-        return false;
-      }
-      break;
-
-    case orion::Bool:
-      if (getBoolFieldF(md1, ENT_ATTRS_MD_TYPE) != getBoolFieldF(md2, ENT_ATTRS_MD_TYPE))
-      {
-        return false;
-      }
-      break;
-
-    case orion::String:
-      if (getStringFieldF(md1, ENT_ATTRS_MD_TYPE) != getStringFieldF(md2, ENT_ATTRS_MD_TYPE))
-      {
-        return false;
-      }
-      break;
-
-    case orion::jstNULL:
-      if (!getFieldF(md2, ENT_ATTRS_MD_TYPE).isNull())
-      {
-        return false;
-      }
-      break;
-
-    default:
-      LM_E(("Runtime Error (unknown JSON type for metadata NGSI type: %d)", getFieldF(md1, ENT_ATTRS_MD_TYPE).type()));
+      LM_E(("Runtime Error (unallowed JSON type for metadata NGSI type: %d)", getFieldF(md2, ENT_ATTRS_MD_TYPE).type()));
       return false;
-      break;
+    }
+
+    if (getStringFieldF(md1, ENT_ATTRS_MD_TYPE) != getStringFieldF(md2, ENT_ATTRS_MD_TYPE))
+    {
+      return false;
     }
   }
 
@@ -210,15 +175,11 @@ static bool equalMetadataValues(const orion::BSONObj& md1, const orion::BSONObj&
 
   switch (getFieldF(md1, ENT_ATTRS_MD_VALUE).type())
   {
-    /* FIXME not yet
     case orion::Object:
-      ...
-      break;
+      return getObjectFieldF(md1, ENT_ATTRS_MD_VALUE).equal(getObjectFieldF(md2, ENT_ATTRS_MD_VALUE));
 
     case orion::Array:
-      ...
-      break;
-    */
+      return getArrayFieldF(md1, ENT_ATTRS_MD_VALUE).equal(getArrayFieldF(md2, ENT_ATTRS_MD_VALUE));
 
     case orion::NumberDouble:
       return getNumberFieldF(md1, ENT_ATTRS_MD_VALUE) == getNumberFieldF(md2, ENT_ATTRS_MD_VALUE);
@@ -266,7 +227,7 @@ static bool equalMetadata(const orion::BSONObj& md1, const orion::BSONObj& md2)
     orion::BSONObj md1Item = getObjectFieldF(md1, currentMd);
     orion::BSONObj md2Item = getObjectFieldF(md2, currentMd);
 
-    if (!equalMetadataValues(md1Item, md2Item))
+    if (!equalMetadataItems(md1Item, md2Item))
     {
       return false;
     }
@@ -281,7 +242,7 @@ static bool equalMetadata(const orion::BSONObj& md1, const orion::BSONObj& md2)
 *
 * changedAttr -
 */
-static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, const bool& forcedUpdate, ApiVersion apiVersion)
+static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP)
 {
   /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -304,13 +265,13 @@ static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, 
     return true;
 
   case orion::NumberDouble:
-    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE);
 
   case orion::Bool:
-    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
 
   case orion::String:
-    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
 
   case orion::jstNULL:
     return caP->valueType != orion::ValueTypeNull;
@@ -529,47 +490,49 @@ static ChangeType mergeAttrInfo
   /* Was it an actual update? */
   ChangeType changeType = NO_CHANGE;
 
+  /* We consider there is a change in the value if one or more of the following are true:
+   *
+   * 1) forcedUpdate is enabled
+   * 2) the value of the attribute changed (see attrValueChanges or CompoundValueNode::equal() for details)
+   * 3) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
+   *    type is optional according to NGSI and the attribute may not have that field in the BSON)
+   *
+   * In addition, we consider there is change in the metadata if:
+   *
+   * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
+   *    different and, if they are of the same size, checking if the vectors are not equal)
+   */
+  bool valueChanged;
+  bool typeChanged;
+  bool mdChanged;
   if (caP->compoundValueP == NULL)
   {
-    /* In the case of simple value, we consider there is a change in the value if one or more of the following are true:
-     *
-     * 1) the value of the attribute changed (see attrValueChanges for details)
-     * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
-     *    type is optional according to NGSI and the attribute may not have that field in the BSON)
-     *
-     * In addition, we consider there is change in the metadata if:
-     *
-     * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
-     *    different and, if they are of the same size, checking if the vectors are not equal)
-     */
-    bool valueChanged = attrValueChanges(attr, caP, forcedUpdate, apiVersion) ||
-                      ((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type) );
-    bool mdChanged = (mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
-
-    if (valueChanged && !mdChanged)
-    {
-      changeType = CHANGE_ONLY_VALUE;
-    }
-    else if (!valueChanged && mdChanged)
-    {
-      changeType = CHANGE_ONLY_MD;
-    }
-    else if (valueChanged && mdChanged)
-    {
-      changeType = CHANGE_VALUE_AND_MD;
-    }
-    else  // !valueChanged && !mdChanged
-    {
-      changeType = NO_CHANGE;
-    }
+    valueChanged = forcedUpdate || attrValueChanges(attr, caP);
   }
   else
   {
-    // FIXME #643 P6: in the case of compound value, it's more difficult to know if an attribute
-    // has really changed its value (many levels have to be traversed). Until we can develop the
-    // matching logic, we consider CHANGE_VALUE_AND_MD always.
-    //
+    valueChanged = forcedUpdate || !caP->compoundValueP->equal(getFieldF(attr, ENT_ATTRS_VALUE));
+  }
+  typeChanged = ((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type));
+  mdChanged = (mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
+
+  valueChanged = valueChanged || typeChanged;
+
+  if (valueChanged && !mdChanged)
+  {
+    changeType = CHANGE_ONLY_VALUE;
+  }
+  else if (!valueChanged && mdChanged)
+  {
+    changeType = CHANGE_ONLY_MD;
+  }
+  else if (valueChanged && mdChanged)
+  {
     changeType = CHANGE_VALUE_AND_MD;
+  }
+  else  // !valueChanged && !mdChanged
+  {
+    changeType = NO_CHANGE;
   }
 
   /* 5. Add modification date (actual change only if actual update) */
