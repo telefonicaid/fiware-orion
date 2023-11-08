@@ -242,7 +242,7 @@ static bool equalMetadata(const orion::BSONObj& md1, const orion::BSONObj& md2)
 *
 * changedAttr -
 */
-static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, const bool& forcedUpdate)
+static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP)
 {
   /* Not finding the attribute field at MongoDB is considered as an implicit "" */
   if (!attr.hasField(ENT_ATTRS_VALUE))
@@ -265,13 +265,13 @@ static bool attrValueChanges(const orion::BSONObj& attr, ContextAttribute* caP, 
     return true;
 
   case orion::NumberDouble:
-    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeNumber || caP->numberValue != getNumberFieldF(attr, ENT_ATTRS_VALUE);
 
   case orion::Bool:
-    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeBoolean || caP->boolValue != getBoolFieldF(attr, ENT_ATTRS_VALUE);
 
   case orion::String:
-    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE) || forcedUpdate;
+    return caP->valueType != orion::ValueTypeString || caP->stringValue != getStringFieldF(attr, ENT_ATTRS_VALUE);
 
   case orion::jstNULL:
     return caP->valueType != orion::ValueTypeNull;
@@ -492,8 +492,9 @@ static ChangeType mergeAttrInfo
 
   /* We consider there is a change in the value if one or more of the following are true:
    *
-   * 1) the value of the attribute changed (see attrValueChanges or CompoundValueNode::equal() for details)
-   * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
+   * 1) forcedUpdate is enabled
+   * 2) the value of the attribute changed (see attrValueChanges or CompoundValueNode::equal() for details)
+   * 3) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
    *    type is optional according to NGSI and the attribute may not have that field in the BSON)
    *
    * In addition, we consider there is change in the metadata if:
@@ -506,7 +507,7 @@ static ChangeType mergeAttrInfo
   bool mdChanged;
   if (caP->compoundValueP == NULL)
   {
-    valueChanged = attrValueChanges(attr, caP, forcedUpdate);
+    valueChanged = forcedUpdate || attrValueChanges(attr, caP);
   }
   else
   {
