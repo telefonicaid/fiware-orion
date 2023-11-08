@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notify upon actual change in geo:json value
+Right JSON change evaluation in subs (GeoJson case)
 
 --SHELL-INIT--
 dbInit CB

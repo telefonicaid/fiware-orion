@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notify upon actual change in JSON value
+Right JSON change evaluation in subs (objects and arrays in attribute value case)
 
 --SHELL-INIT--
 dbInit CB
