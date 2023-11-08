@@ -510,7 +510,7 @@ static ChangeType mergeAttrInfo
   }
   else
   {
-    valueChanged = !caP->compoundValueP->equal(getFieldF(attr, ENT_ATTRS_VALUE));
+    valueChanged = forcedUpdate || !caP->compoundValueP->equal(getFieldF(attr, ENT_ATTRS_VALUE));
   }
   typeChanged = ((!caP->type.empty()) && (!attr.hasField(ENT_ATTRS_TYPE) || getStringFieldF(attr, ENT_ATTRS_TYPE) != caP->type));
   mdChanged = (mdNew.nFields() != mdSize || !equalMetadata(md, mdNew));
