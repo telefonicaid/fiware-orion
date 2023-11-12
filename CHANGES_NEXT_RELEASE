@@ -13,3 +13,4 @@ Fixed issues:
   * #280  - New CLI (hidden) for extra field in notifications (trigger: "VERB URL PATH"): -triggerOperation
   * #1456 - Bug fix - entity id+type duplicated in forwarded request of "Create Entity"
   * #1458 - Supporting system timestamps (createdAt/modifiedAt) in q
+  * #1451 - Bug fix - removed a trailing ampersand from the URI for the connection to mongodb

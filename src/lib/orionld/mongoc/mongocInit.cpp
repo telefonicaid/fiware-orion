@@ -143,7 +143,6 @@ static char* uriCompose
   char* compV[50];
   int   compNo = 0;
 
-  LM_T(LmtMongoc, ("dbURI:           '%s'", dbURI));
   LM_T(LmtMongoc, ("dbHost:          '%s'", dbHost));
   LM_T(LmtMongoc, ("dbUser:          '%s'", dbUser));
   if (dbPwd != NULL)
@@ -162,21 +161,22 @@ static char* uriCompose
     // Is "${PWD}" present?
     // If so, split dbURI into two parts - before and after "${PWD}" and add dbPwd in between
     //
+    compV[0] = dbURI;
+    compNo   = 1;
+
     char* pwdP = strstr(dbURI, "${PWD}");
     if (pwdP != NULL)
     {
       if (dbPwd[0] == 0)
         LM_X(1, ("Invalid Command Line Options: -dbURI is used with a password substitution, but no password (-dbPwd) is supplied"));
 
-      compV[compNo++] = dbURI;
-      *pwdP = 0;
-      compV[compNo++] = dbPwd;
-      compV[compNo++] = &pwdP[6];
-    }
-    else
-      compV[compNo++] = dbURI;
+      *pwdP    = 0;
+      compV[1] = dbPwd;
+      compV[2] = &pwdP[6];
+      compNo   = 3;
 
-    compV[compNo++] = (char*) "&";
+      LM_T(LmtMongoc, ("dbURI:           '%s****%s'", compV[0], compV[2]));
+    }
   }
   else
   {
