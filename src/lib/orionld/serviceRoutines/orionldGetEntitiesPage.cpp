@@ -170,8 +170,9 @@ DistOpListItem* distOpListItemAdd(DistOpListItem* distOpList, const char* distOp
 //
 static int queryResponse(DistOp* distOpP, void* callbackParam)
 {
-  LM_T(LmtSR, ("Got a response. status code: %d. body: '%s'", distOpP->httpResponseCode, distOpP->rawResponse));
+  LM_T(LmtSR, ("Got a response. status code: %d. callbackParam: %p", distOpP->httpResponseCode, callbackParam));
   KjNode* entityArray = (KjNode*) callbackParam;
+
   kjTreeLog(distOpP->responseBody, "Response", LmtSR);
 
   if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
@@ -199,7 +200,7 @@ static int queryResponse(DistOp* distOpP, void* callbackParam)
 
         if (baseEntityP == NULL)
         {
-          LM_T(LmtDistOpMerge, ("New Entity '%s' - adding it to the entity array", entityId));
+          LM_T(LmtDistOpMerge, ("New Entity '%s' - adding it to the entity array (at %p)", entityId, entityArray));
           kjChildAdd(entityArray, entityP);
         }
         else
@@ -497,8 +498,11 @@ bool orionldGetEntitiesPage(void)
       if ((orionldState.responseTree != NULL) && (orionldState.responseTree->value.firstChildP != NULL))
       {
         LM_T(LmtDistOpResponseDetail, ("Adding a 'distop-response-entity' to the entityArray"));
+
         orionldState.responseTree->lastChild->next = entityArray->value.firstChildP;
         entityArray->value.firstChildP = orionldState.responseTree->value.firstChildP;
+        if (entityArray->lastChild == NULL)
+          entityArray->lastChild = orionldState.responseTree->lastChild;
       }
     }
     else
