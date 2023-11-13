@@ -358,14 +358,14 @@ bool orionldPatchAttribute(void)
     //
     // First of all, make sure the attribute exists
     //
-    KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");
+    KjNode* dbAttrsP = (dbEntityP != NULL)? kjLookup(dbEntityP, "attrs") : NULL;
     if ((dbAttrsP == NULL) && (orionldState.distributed == false))  // Entity without attributes
     {
       orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
       return false;
     }
 
-    KjNode* dbAttrP = kjLookup(dbAttrsP, longAttrNameEq);
+    KjNode* dbAttrP = (dbAttrsP != NULL)? kjLookup(dbAttrsP, longAttrNameEq) : NULL;
     if ((dbAttrP == NULL) && (orionldState.distributed == false))
     {
       orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
