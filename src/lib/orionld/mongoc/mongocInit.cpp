@@ -196,8 +196,10 @@ static char* uriCompose
     // If dbHost is a list, the list must end with a slash
     // Assuming it's a list if there's a comma in the string
     //
-    if (strchr(dbHost, ',') != NULL)
-      compV[compNo++] = (char*) "/";
+    // Correction: seems like the slash is needed ALWAYS
+    //
+    // if (strchr(dbHost, ',') != NULL)
+    compV[compNo++] = (char*) "/";
 
     bool dbAuthDbPresent        = (dbAuthDb        != NULL) && (dbAuthDb[0]        != 0);
     bool dbReplicaSetPresent    = (dbReplicaSet    != NULL) && (dbReplicaSet[0]    != 0);
