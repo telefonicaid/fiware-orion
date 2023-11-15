@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-V2 batch update REPLACE
+V2 batch update DELETE
 
 --SHELL-INIT--
 dbInit CB
