@@ -4511,7 +4511,7 @@ _**リクエスト・ペイロード**_
 -   `appendStrict`: `POST /v2/entities` (エンティティがまだ存在しない場合) または
     `POST /v2/entities/<id>/attrs?options=append` (エンティティが既に存在する場合) にマップします
 -   `update`: `PATCH /v2/entities/<id>/attrs` にマップされます
--   `delete`: エンティティに含まれているすべての属性に対して、`DELETE /v2/entities/<id>/attrs/<attrName>`
+-   `delete`: エンティティに含まれているすべての属性に対して (この場合、属性の実際の値は関係ありません)、`DELETE /v2/entities/<id>/attrs/<attrName>`
     にマッピングし、エンティティに属性が含まれていない場合は、`DELETE /v2/entities/<id>` にマッピングします
 -   `replace`: `PUT /v2/entities/<id>/attrs` にマッピングします
 
