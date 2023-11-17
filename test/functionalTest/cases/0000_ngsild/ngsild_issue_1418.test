@@ -1,0 +1,121 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Batch Create with an array of three entities, see issue #776
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -mongocOnly
+
+--SHELL--
+
+#
+# 01. Batch create 1000 entities with 2 geoproperties each
+# 02. Kill and restart the broker (and measure the time it takes to start)
+#
+
+echo "01. Batch create 1000 entities with 2 geoproperties each"
+echo "========================================================"
+typeset -i eId
+eId=1
+while [ $eId -le 1000 ]
+do
+  entity='{
+    "id": "urn:ngsi-ld:TemperatureSensor:'$eId'",
+    "type": "TemperatureSensor",
+    "location": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "locationArea": {
+      "type": "GeoProperty",
+      "value": {
+        "type": "Point",
+        "coordinates": [1,2]
+      }
+    },
+    "p1": 1,
+    "p2": 1,
+    "p3": 1,
+    "p4": 1,
+    "p5": 1,
+    "p6": 1,
+    "p7": 1,
+    "p8": 1,
+    "p9": 1,
+    "p10": 1,
+    "p11": 1,
+    "p12": 1,
+    "p13": 1,
+    "p14": 1,
+    "p15": 1,
+    "p16": 1,
+    "p17": 1,
+    "p18": 1,
+    "p19": 1
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$entity"
+  eId=$eId+1
+done | grep Location | wc -l
+
+
+echo
+echo
+
+echo "02. Kill and restart the broker (and measure the time it takes to start)"
+echo "========================================================================"
+brokerStop CB
+typeset -i before
+typeset -i after
+typeset -i diff
+before=$(date +%s)
+orionldStart CB -mongocOnly -t 222
+after=$(date +%s)
+diff=$after-$before
+if [ $diff -gt 2 ]
+then
+    echo Too slow: $diff seconds!!
+else
+    echo OK!
+fi
+echo
+echo
+
+
+--REGEXPECT--
+01. Batch create 1000 entities with 2 geoproperties each
+========================================================
+1000
+
+
+02. Kill and restart the broker (and measure the time it takes to start)
+========================================================================
+OK!
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
