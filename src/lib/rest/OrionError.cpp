@@ -100,6 +100,17 @@ void OrionError::fill(const StatusCode& sc)
 
 /* ****************************************************************************
 *
+* OrionError::appendDetails -
+*/
+void OrionError::appendDetails(const std::string& _details)
+{
+  details  += _details;
+}
+
+
+
+/* ****************************************************************************
+*
 * OrionError::smartRender -
 */
 std::string OrionError::smartRender(ApiVersion apiVersion)

@@ -2448,7 +2448,7 @@ static bool updateContextAttributeItem
                             " - offending attribute: " + targetAttr->getName();
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+      //oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
@@ -2613,7 +2613,7 @@ static bool deleteContextAttributeItem
                           " - attribute not found";
 
     cerP->statusCode.fill(SccInvalidParameter, details);
-    oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+    //oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found", targetAttr->getName());
     ca->found = false;
@@ -3645,7 +3645,7 @@ static unsigned int updateEntity
     *attributeAlreadyExistsList += " ]";
   }
 
-  if ((apiVersion == V2) && (action == ActionTypeUpdate))
+  if ((apiVersion == V2) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
     for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
@@ -4451,16 +4451,34 @@ unsigned int processContextElement
 
   if (attributeAlreadyExistsError == true)
   {
-    std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
-    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    if (responseP->oe.code == SccInvalidModification)
+    {
+      // Another previous entity had problems. Use appendDetails()
+      responseP->oe.appendDetails(", " + eP->id + " - " + attributeAlreadyExistsList);
+    }
+    else
+    {
+      // First entity with this problem. Use fill()
+      std::string details = "one or more of the attributes in the request already exist: " + eP->id + " - " + attributeAlreadyExistsList;
+      buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+      responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    }
   }
 
   if (attributeNotExistingError == true)
   {
-    std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
-    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    if (responseP->oe.code == SccInvalidModification)
+    {
+      // Another previous entity had problems. Use appendDetails()
+      responseP->oe.appendDetails(", " + eP->id + " - " + attributeNotExistingList);
+    }
+    else
+    {
+      // First entity with this problem. Use fill()
+      std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - " + attributeNotExistingList;
+      buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
+      responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    }
   }
 
   // Response in responseP

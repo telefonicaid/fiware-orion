@@ -55,6 +55,8 @@ public:
   std::string  toJsonV1(void);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
   void         fill(const StatusCode& sc);
+  void         appendDetails(const std::string& _details);
+
 
 private:
   void         shrinkReasonPhrase(void);
