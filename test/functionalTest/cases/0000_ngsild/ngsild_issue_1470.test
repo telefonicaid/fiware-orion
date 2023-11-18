@@ -35,6 +35,14 @@ orionldStart CB -experimental
 # 03. Query all entities
 #
 
+
+echo "00. Check for github actions debugging"
+echo "======================================"
+ls -l $REPO_HOME/etc/input/megaAttributeForIssue1470.json
+echo
+echo
+
+
 echo "01. Create an Entity with a very large compound as value of an attribute - see no crash!"
 echo "========================================================================================"
 orionCurl --url /ngsi-ld/v1/entities --payload "$REPO_HOME/etc/input/megaAttributeForIssue1470.json" --in jsonld
@@ -57,6 +65,11 @@ echo
 
 
 --REGEXPECT--
+00. Check for github actions debugging
+======================================
+REGEX(.*)etc/input/megaAttributeForIssue1470.json
+
+
 01. Create an Entity with a very large compound as value of an attribute - see no crash!
 ========================================================================================
 HTTP/1.1 201 Created

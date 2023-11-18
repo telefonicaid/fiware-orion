@@ -1,5 +1,5 @@
- {
-        "id": "urn:ngsi-ld:WaterSubscriptionControlTradingHouse:53704bda-dced-4f1c-9d2f-4c766637198b",
+{
+   "id": "urn:ngsi-ld:WaterSubscriptionControlTradingHouse:53704bda-dced-4f1c-9d2f-4c766637198b",
         "type": "WaterSubscriptionControlTradingHouse",
         "neighbourhoodCode": {
             "type": "Property",
