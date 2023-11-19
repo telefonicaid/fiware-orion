@@ -1100,14 +1100,10 @@ int main(int argC, char* argV[])
   paCleanup();
 
   if (strlen(dbName) > DB_NAME_MAX_LEN)
-  {
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
-  }
 
   if (useOnlyIPv6 && useOnlyIPv4)
-  {
     LM_X(1, ("Fatal Error (-ipv4 and -ipv6 can not be activated at the same time. They are incompatible)"));
-  }
 
   if (https)
   {
@@ -1161,7 +1157,6 @@ int main(int argC, char* argV[])
   // Initialize the 'context download list' - to avoid multiple downloads of the same contexts
   //
   contextDownloadListInit();
-
 
 
   //

@@ -85,6 +85,7 @@ typedef enum TraceLevels
   LmtDistOpList,                       // Linked list of DistOps
   LmtDistOpAttributes,                 // The union of attributes URL-Param / Registered Attributes
   LmtDistOpMerge,                      // Merge of responses from forwsrded requests (GET /entities)
+  LmtDistOpLoop,                       // Loop detection in forwarded messages
 
   //
   // Context

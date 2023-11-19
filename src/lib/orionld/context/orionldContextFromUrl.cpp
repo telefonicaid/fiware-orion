@@ -245,7 +245,7 @@ static OrionldContext* contextCacheWait(char* url)
 //
 OrionldContext* orionldContextFromUrl(char* url, char* id)
 {
-  LM_T(LmtContextDownload, ("Downloading a context URL: '%s'", url));
+  LM_T(LmtContextDownload, ("Possibly downloading a context URL: '%s'", url));
 
   OrionldContext* contextP = orionldContextCacheLookup(url);
 

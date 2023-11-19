@@ -28,6 +28,8 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/types/StringArray.h"                           // StringArray
