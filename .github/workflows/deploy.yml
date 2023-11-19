@@ -1,8 +1,11 @@
 name: Deploy
 
 on:
-  push:
+  pull_request:
     branches:
+      - 'develop'
+    types:
+      - closed
 
 env:
   IMAGE_ORG: fiware
@@ -17,7 +20,7 @@ jobs:
   deploy-release-dockerhub:
 
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+    if: ${{ github.event.pull_request.merged == true && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
       - uses: actions/checkout@v2
@@ -75,7 +78,7 @@ jobs:
   deploy-debug-dockerhub:
 
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+    if: ${{ github.event.pull_request.merged == true && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
       - uses: actions/checkout@v2
@@ -106,7 +109,7 @@ jobs:
   deploy-release-quay:
 
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+    if: ${{ github.event.pull_request.merged == true && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
       - uses: actions/checkout@v2
@@ -157,7 +160,7 @@ jobs:
   deploy-debug-quay:
 
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'FIWARE/context.Orion-LD' }}
+    if: ${{ github.event.pull_request.merged == true && github.repository == 'FIWARE/context.Orion-LD' }}
 
     steps:
       - uses: actions/checkout@v2
