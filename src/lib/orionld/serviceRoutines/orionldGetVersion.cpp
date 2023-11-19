@@ -53,6 +53,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState, orionldVersion, postgresServerVersion, mongocServerVersion
 #include "orionld/common/branchName.h"                         // ORIONLD_BRANCH
 #include "orionld/common/pqHeader.h"                           // Postgres header
+#include "orionld/context/orionldCoreContext.h"                // orionldCoreContextP
 #include "orionld/troe/pgVersionGet.h"                         // pgVersionToString
 #include "orionld/mqtt/mqttConnectionList.h"                   // Mqtt Connection List
 #include "orionld/serviceRoutines/orionldGetVersion.h"         // Own Interface
@@ -183,8 +184,12 @@ bool orionldGetVersion(void)
   nodeP = kjString(orionldState.kjsonP, "branch", ORIONLD_BRANCH);
   kjChildAdd(orionldState.responseTree, nodeP);
 
-  // Number of item in the subscription cache
+  // Number of items in the subscription cache
   nodeP = kjInteger(orionldState.kjsonP, "cached subscriptions", subCacheItems());
+  kjChildAdd(orionldState.responseTree, nodeP);
+
+  // Version of the core context
+  nodeP = kjString(orionldState.kjsonP, "Core Context", orionldCoreContextP->url);
   kjChildAdd(orionldState.responseTree, nodeP);
 
   //

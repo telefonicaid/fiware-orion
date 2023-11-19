@@ -985,9 +985,11 @@ function partExecute()
   #
   grep -v "already exists"                               $dirname/$filename.$what.stderr  > $dirname/$filename.$what.stderr2
   grep -v "mongoc: falling back to malloc for counters." $dirname/$filename.$what.stderr2 > $dirname/$filename.$what.stderr3
-  grep -v "mongoc: Falling back to malloc for counters." $dirname/$filename.$what.stderr3 > $dirname/$filename.$what.stderr
+  grep -v "mongoc: Falling back to malloc for counters." $dirname/$filename.$what.stderr3 > $dirname/$filename.$what.stderr4
+  grep -v "screen size is bogus"                         $dirname/$filename.$what.stderr4 > $dirname/$filename.$what.stderr
   rm -f $dirname/$filename.$what.stderr2
   rm -f $dirname/$filename.$what.stderr3
+  rm -f $dirname/$filename.$what.stderr4
 
   #
   # Check that stderr is empty

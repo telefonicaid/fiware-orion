@@ -280,26 +280,28 @@ Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
+#SORT_START
+  {
+    "tenant": "tn1",
+    "attribute": "g1"
+  },
   {
     "tenant": "tn1",
     "attribute": "g2"
   },
   {
-    "tenant": "tn1",
+    "tenant": "",
     "attribute": "g1"
+  },
+  {
+    "tenant": "",
+    "attribute": "g2"
   },
   {
     "tenant": "",
     "attribute": "g3"
-  },
-  {
-    "tenant": "",
-    "attribute": "g2"
-  },
-  {
-    "tenant": "",
-    "attribute": "g1"
   }
+#SORT_END
 ]
 
 
@@ -333,30 +335,32 @@ Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
+#SORT_START
   {
     "tenant": "tn3",
     "attribute": "g1"
   },
   {
     "tenant": "tn1",
-    "attribute": "g2"
+    "attribute": "g1"
   },
   {
     "tenant": "tn1",
+    "attribute": "g2"
+  },
+  {
+    "tenant": "",
     "attribute": "g1"
+  },
+  {
+    "tenant": "",
+    "attribute": "g2"
   },
   {
     "tenant": "",
     "attribute": "g3"
-  },
-  {
-    "tenant": "",
-    "attribute": "g2"
-  },
-  {
-    "tenant": "",
-    "attribute": "g1"
   }
+#SORT_END
 ]
 
 

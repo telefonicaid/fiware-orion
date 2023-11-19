@@ -49,17 +49,8 @@ extern "C"
 //
 bool mongocGeoIndexInit(void)
 {
-  bson_t            mongoFilter;
   mongoc_cursor_t*  mongoCursorP;
   const bson_t*     mongoDocP;
-  bson_t*           options = BCON_NEW("projection", "{",
-                                         "attrs", BCON_BOOL(true),
-                                         "_id",   BCON_BOOL(false),
-                                       "}");
-  //
-  // Create the filter for the query - no restriction, we want all entities!
-  //
-  bson_init(&mongoFilter);
 
   //
   // DB Connection
@@ -82,14 +73,83 @@ bool mongocGeoIndexInit(void)
     //
     mCollectionP = mongoc_client_get_collection(orionldState.mongoc.client, tenantP->mongoDbName, "entities");
 
+    // Aggregation pipeline
+
+    // {
+    //   "pipeline":
+    //   [
+    //      {
+    //          $project: {
+    //              attributeKeys: {
+    //                  $filter: {
+    //                      input: { $objectToArray: "$attrs" },
+    //                      as: "item",
+    //                      cond: { $eq: ["$$item.v.type", "GeoProperty"] }
+    //                  }
+    //              }
+    //          }
+    //      },
+    //      {
+    //          $unwind: "$attributeKeys"
+    //      },
+    //      {
+    //          $group: {
+    //              _id: "$attributeKeys.k"
+    //          }
+    //      }
+    //   ]
+    // }
+
+    bson_t* pipeline = bson_new();
+    bson_t* project;
+    bson_t* unwind;
+    bson_t* group;
+    bson_t* objectArray = bson_new();
+
+    project = BCON_NEW("$project", "{",
+                       "attributeKeys", "{",
+                       "$filter", "{",
+                       "input", "{", "$objectToArray", BCON_UTF8("$attrs"), "}",
+                       "as", BCON_UTF8("item"),
+                       "cond", "{", "$eq", "[", BCON_UTF8("$$item.v.type"), BCON_UTF8("GeoProperty"), "]", "}",
+                       "}",
+                       "}",
+                       "}");
+
+    unwind = BCON_NEW("$unwind", BCON_UTF8("$attributeKeys"));
+
+    group = BCON_NEW("$group", "{",
+                     "_id", BCON_UTF8("$attributeKeys.k"),
+                     "}");
+
+    bson_append_document(objectArray, "0", 1, project);
+    bson_append_document(objectArray, "1", 1, unwind);
+    bson_append_document(objectArray, "2", 1, group);
+
+    // Append the array to the document
+    bson_append_array(pipeline, "pipeline", 8, objectArray);
+
+    // Print the BSON document as a JSON string
+    if (lmTraceIsSet(LmtMongoc))
+    {
+      char* str = bson_as_relaxed_extended_json(pipeline, NULL);
+      LM_T(LmtMongoc, ("%s", str));
+    }
+
     //
     // Run the query
     //
-    if ((mongoCursorP = mongoc_collection_find_with_opts(mCollectionP, &mongoFilter, options, NULL)) == NULL)
+    mongoCursorP = mongoc_collection_aggregate(
+        mCollectionP,
+        MONGOC_QUERY_NONE,
+        pipeline,
+        NULL,     // Additional options, can be NULL for default options
+        NULL);    // Result (pass NULL if you don't need it)
+
+
+    if (mongoCursorP == NULL)
     {
-      LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));
-      bson_destroy(options);
-      bson_destroy(&mongoFilter);
+      LM_E(("Internal Error (mongoc_collection_aggregate ERROR)"));
       mongoc_collection_destroy(mCollectionP);
       mongoc_cursor_destroy(mongoCursorP);
       return NULL;
@@ -99,57 +159,30 @@ bool mongocGeoIndexInit(void)
     {
       char*   title;
       char*   detail;
-      KjNode* entityNodeP;
-      KjNode* attrsP;
+      KjNode* _idObjectP;
+      KjNode* _idNodeP;
 
-      entityNodeP = mongocKjTreeFromBson(mongoDocP, &title, &detail);
-      if (entityNodeP == NULL)
+      _idObjectP = mongocKjTreeFromBson(mongoDocP, &title, &detail);
+      _idNodeP   = (_idObjectP == NULL)? NULL : kjLookup(_idObjectP, "_id");
+
+      if (_idNodeP == NULL)
       {
-        LM_W(("mongocKjTreeFromBson failed"));
+        LM_W(("_idNodeP is NULL"));
         continue;
       }
 
-      attrsP = entityNodeP->value.firstChildP;
-      if (attrsP == NULL)  //  Entity without attributes ?
-      {
-        LM_W(("Entity without attributes?"));
-        continue;
-      }
+      char* geoPropertyName = _idNodeP->value.s;
 
-      //
-      // Foreach Attribute, check if GeoProperty and if so create its geo index
-      //
-      for (KjNode* attrP = attrsP->value.firstChildP; attrP != NULL; attrP = attrP->next)
-      {
-        KjNode* typeP = kjLookup(attrP, "type");
+      LM_T(LmtMongoc, ("Found geoProperty: '%s'", geoPropertyName));
 
-        if (typeP == NULL)
-        {
-          LM_E(("Database Error (attribute '%s' has no 'type' field)", attrP->name));
-          continue;
-        }
-
-        if (typeP->type != KjString)
-        {
-          LM_E(("Database Error (attribute with a 'type' field that is not a string)"));
-          continue;
-        }
-
-        if (strcmp(typeP->value.s, "GeoProperty") == 0)
-        {
-          if (dbGeoIndexLookup(tenantP->tenant, attrP->name) == NULL)
-            mongocGeoIndexCreate(tenantP, attrP->name);
-        }
-      }
+      if (dbGeoIndexLookup(tenantP->tenant, geoPropertyName) == NULL)
+        mongocGeoIndexCreate(tenantP, geoPropertyName);
     }
 
     mongoc_cursor_destroy(mongoCursorP);
     mongoc_collection_destroy(mCollectionP);
     tenantP = tenantP->next;
   }
-
-  bson_destroy(options);
-  bson_destroy(&mongoFilter);
 
   return true;
 }

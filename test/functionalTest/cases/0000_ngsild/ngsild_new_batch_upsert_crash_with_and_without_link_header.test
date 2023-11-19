@@ -188,6 +188,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "Core Context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
     "Next File Descriptor": REGEX(.*),
     "Orion-LD version": "REGEX(.*)",
     "based on orion": "REGEX(.*)",

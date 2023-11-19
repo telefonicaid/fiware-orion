@@ -1,11 +1,11 @@
 name: Deploy Baseimage
 
-# Will only run on pushes to the docker directory, to prevent a rebuild of the base image on every change.
-# We also only build on develop, so that the latest base image is always valid. If you want to verify with  an snapshot image, please push one
+# Will only run on modifications in the docker directory, to prevent a rebuild of the base image on every change.
+# We also only build on develop, so that the latest base image is always valid. If you want to verify with n snapshot image, please push one
 # to your local registry and build from there.
 
 on:
-  push:
+  pull_request:
     paths:
       - docker/**
   workflow_dispatch:
