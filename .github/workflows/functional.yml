@@ -62,7 +62,7 @@ jobs:
       fail-fast: false
       #max-parallel: 1
       matrix:
-        test: [ 'functional_0_632','functional_633_1003', 'functional_1004_1440', 'functional_1441_end', 'unit']
+        test: [ 'functional_0_700','functional_701_1200', 'functional_1201_1600', 'functional_1601_end' ]
 
     steps:
       - uses: actions/checkout@v2

@@ -86,6 +86,7 @@ Date: REGEX(.*)
   "postgres server version": "12.REGEX(.*)",
   "branch": REGEX(.*),
   "cached subscriptions": 0,
+  "Core Context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
   "Next File Descriptor": REGEX(.*)
 }
 

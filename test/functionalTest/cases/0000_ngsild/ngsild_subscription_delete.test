@@ -319,6 +319,7 @@ Date: REGEX(.*)
   "openssl version": REGEX(.*),
   "branch": REGEX(.*),
   "cached subscriptions": 0,
+  "Core Context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
   "Next File Descriptor": REGEX(.*)
 }
 
