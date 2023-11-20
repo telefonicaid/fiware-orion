@@ -98,6 +98,7 @@
 #define ERROR_DESC_NOT_FOUND_REGISTRATION             "The requested registration has not been found. Check id"
 
 #define ERROR_UNPROCESSABLE                           "Unprocessable"
+#define ERROR_PARTIAL_UPDATE                          "PartialUpdate"
 #define ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS       "Already Exists"
 
 #define ERROR_NO_RESOURCES_AVAILABLE                  "NoResourcesAvailable"

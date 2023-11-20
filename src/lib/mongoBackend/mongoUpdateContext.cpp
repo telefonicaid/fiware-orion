@@ -183,8 +183,7 @@ HttpStatusCode mongoUpdateContext
     // Other cases follow the usual response processing flow (whatever it is :)
     if (atLeastOneSuccess && atLeastOneFail)
     {
-      // FIXME PR: move to errorMessages.h
-      responseP->oe.reasonPhrase = "PartialUpdate";
+      responseP->oe.reasonPhrase = ERROR_PARTIAL_UPDATE;
     }
 
     LM_T(LmtNotifier, ("total notifications sent during update: %d", notifSent));
