@@ -102,15 +102,15 @@ Content-Length: 121
 
 03. DELETE /v2/entities/E1/attrs/none
 =====================================
-HTTP/1.1 404 Not Found
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 79
+Content-Length: 114
 
 {
-    "description": "The entity does not have such an attribute",
-    "error": "NotFound"
+    "description": "one or more of the attributes in the request do not exist: E1 - [ none ]",
+    "error": "Unprocessable"
 }
 
 

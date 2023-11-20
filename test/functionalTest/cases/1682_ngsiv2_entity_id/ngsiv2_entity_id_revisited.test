@@ -148,10 +148,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 107
+Content-Length: 112
 
 {
-    "description": "one or more of the attributes in the request already exist: [ A ]",
+    "description": "one or more of the attributes in the request already exist: E1 - [ A ]",
     "error": "Unprocessable"
 }
 

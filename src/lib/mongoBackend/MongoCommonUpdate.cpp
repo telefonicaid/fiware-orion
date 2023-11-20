@@ -3623,7 +3623,7 @@ static unsigned int updateEntity
   {
     for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
-      if (attrs.hasField(eP->attributeVector[ix]->name))
+      if (attrs.hasField(dbEncode(eP->attributeVector[ix]->name)))
       {
         alarmMgr.badInput(clientIp, "attribute already exists", eP->attributeVector[ix]->name);
         *attributeAlreadyExistsError = true;
@@ -3649,7 +3649,7 @@ static unsigned int updateEntity
   {
     for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
     {
-      if (!attrs.hasField (eP->attributeVector[ix]->name))
+      if (!attrs.hasField(dbEncode(eP->attributeVector[ix]->name)))
       {
         *attributeNotExistingError = true;
 

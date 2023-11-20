@@ -117,10 +117,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 112
+Content-Length: 120
 
 {
-    "description": "one or more of the attributes in the request do not exist: [ pressur ]",
+    "description": "one or more of the attributes in the request do not exist: Room1 - [ pressur ]",
     "error": "Unprocessable"
 }
 
@@ -131,10 +131,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 120
+Content-Length: 128
 
 {
-    "description": "one or more of the attributes in the request do not exist: [ temper, pressur ]",
+    "description": "one or more of the attributes in the request do not exist: Room1 - [ temper, pressur ]",
     "error": "Unprocessable"
 }
 
