@@ -120,6 +120,8 @@ jobs:
         with:
           image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
           oci: true
+          labels: |
+            quay.expires-after=1w
           tags: ${{ env.IMAGE_TAG_LATEST }} ${{ env.IMAGE_TAG_PRE }} ${{ github.sha }}
           dockerfiles: |
             ./docker/Dockerfile-ubi
@@ -141,6 +143,8 @@ jobs:
           image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAG_PRE }}-GDB
           oci: true
+          labels: |
+            quay.expires-after=1w
           dockerfiles: |
             ./docker/Dockerfile-gdb
           build-args: |
@@ -172,6 +176,8 @@ jobs:
           image: ${{ env.IMAGE_ORG }}/${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAG_PRE }}-${{ env.IMAGE_TAG_DEBUG }}
           oci: true
+          labels: |
+            quay.expires-after=1w
           dockerfiles: |
             ./docker/Dockerfile-debug
 
