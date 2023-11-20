@@ -150,6 +150,8 @@ HttpStatusCode mongoUpdateContext
   else
   {
     /* Process each ContextElement */
+    bool atLeastOneSuccess = false;
+    bool atLeastOneFail    = false;
     for (unsigned int ix = 0; ix < requestP->entityVector.size(); ++ix)
     {
       notifSent += processContextElement(requestP->entityVector[ix],
@@ -166,6 +168,23 @@ HttpStatusCode mongoUpdateContext
                                          notifSent,
                                          apiVersion,
                                          ngsiv2Flavour);
+
+      if (responseP->oe.code == SccNone)
+      {
+        atLeastOneSuccess = true;
+      }
+      else
+      {
+        atLeastOneFail = true;
+      }
+    }
+
+    // Only the PartialUpdate case (at least one success + at least one fail) needs to be "intercepted" here
+    // Other cases follow the usual response processing flow (whatever it is :)
+    if (atLeastOneSuccess && atLeastOneFail)
+    {
+      // FIXME PR: move to errorMessages.h
+      responseP->oe.reasonPhrase = "PartialUpdate";
     }
 
     LM_T(LmtNotifier, ("total notifications sent during update: %d", notifSent));

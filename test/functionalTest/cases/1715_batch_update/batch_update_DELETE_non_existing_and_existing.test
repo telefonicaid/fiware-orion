@@ -237,7 +237,7 @@ Content-Length: 112
 
 {
     "description": "one or more of the attributes in the request do not exist: E2 - [ A2 ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 
