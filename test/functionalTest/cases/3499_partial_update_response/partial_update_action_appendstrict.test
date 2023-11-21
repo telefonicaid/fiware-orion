@@ -127,10 +127,103 @@ echo
 
 
 --REGEXPECT--
-
+01. Create entity E-A=1
+=======================
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
+
+
+02. POST /v2/op/update appendStrict E A=10, B=20, C=30, get error about already existing attribute A
+====================================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 111
+
+{
+    "description": "one or more of the attributes in the request already exist: E - [ A ]",
+    "error": "Unprocessable"
+}
+
+
+03. Get E, check A=1, B=20, C=30
+================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 161
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 20
+    },
+    "C": {
+        "metadata": {},
+        "type": "Number",
+        "value": 30
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+04. POST /v2/op/update appendStrict E D=400 B=200, get error about about already existing attribute B
+=====================================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 111
+
+{
+    "description": "one or more of the attributes in the request already exist: E - [ B ]",
+    "error": "Unprocessable"
+}
+
+
+05. Get E, check A=1, B=20, C=30, D=400
+=======================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 209
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 20
+    },
+    "C": {
+        "metadata": {},
+        "type": "Number",
+        "value": 30
+    },
+    "D": {
+        "metadata": {},
+        "type": "Number",
+        "value": 400
+    },
+    "id": "E",
+    "type": "T"
+}
 
 
 --TEARDOWN--

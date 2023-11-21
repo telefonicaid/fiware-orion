@@ -33,7 +33,7 @@ brokerStart CB 0
 # 01. Create E1/T/A1-A2-A3, E2/T/A1-A3 and E3/T/A1-A2-A3 using POST /v2/op/update with append
 # 02. GET /v2/entities to see E1/T/A1-A2-A3, E2/T/A1-A3 and E3/T/A1-A2-A3
 # 03. Delete E1-A1/A2=null, E2-A1/A2=null (A2 not existing) and E3-A1/A2=null using POST /v2/op/update with delete, get error
-# 04. GET /v2/entities to see E1/T/A3, E2/T/A1-A3 and E3/T/A3 in entities
+# 04. GET /v2/entities to see E1/T/A3, E2/T/A3 and E3/T/A3 in entities
 #
 
 echo "01. Create E1/T/A1-A2-A3, E2/T/A1-A3 and E3/T/A1-A2-A3 using POST /v2/op/update with append"
@@ -147,8 +147,8 @@ echo
 echo
 
 
-echo "04. GET /v2/entities to see E1/T/A3, E2/T/A1-A3 and E3/T/A3 in entities"
-echo "======================================================================="
+echo "04. GET /v2/entities to see E1/T/A3, E2/T/A3 and E3/T/A3 in entities"
+echo "===================================================================="
 orionCurl --url /v2/entities
 echo
 echo
@@ -241,13 +241,13 @@ Content-Length: 112
 }
 
 
-04. GET /v2/entities to see E1/T/A3, E2/T/A1-A3 and E3/T/A3 in entities
-=======================================================================
+04. GET /v2/entities to see E1/T/A3, E2/T/A3 and E3/T/A3 in entities
+====================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 262
+Content-Length: 214
 
 [
     {
@@ -260,11 +260,6 @@ Content-Length: 262
         "type": "T"
     },
     {
-        "A1": {
-            "metadata": {},
-            "type": "Number",
-            "value": 21
-        },
         "A3": {
             "metadata": {},
             "type": "Number",

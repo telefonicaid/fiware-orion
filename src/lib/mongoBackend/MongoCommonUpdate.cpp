@@ -2618,7 +2618,7 @@ static bool deleteContextAttributeItem
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found", targetAttr->getName());
     ca->found = false;
 
-    return false;
+    //return false;
   }
 
   return true;
@@ -4342,7 +4342,7 @@ unsigned int processContextElement
         }
         else
         {
-          responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+          responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
         }
       }
     }
@@ -4350,7 +4350,7 @@ unsigned int processContextElement
     {
       cerP->statusCode.fill(SccContextElementNotFound);
 
-      responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+      responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
       responseP->contextElementResponseVector.push_back(cerP);
     }
     else   /* APPEND or APPEND_STRICT */

@@ -31,10 +31,10 @@ brokerStart CB
 
 #
 # 01. Create entity E1-A=1/D=4, E2-A=1/B=2/D=4, E3-A=1/B=2/C=3/D=4
-# 02. POST /v2/op/update delete E/E1/E2 A=10, B=20, C=30, get error about entity does not have attribute B and C in E1 and C in E2
+# 02. POST /v2/op/update delete E1/E2/E3 A=10, B=20, C=30, get error about entity does not have attribute B and C in E1 and C in E2
 # 03. Get entities, E1-D=4, E2-D=4, E3-D=4
-# 04. POST /v2/op/update update E/E1/E2 D=400 B=200, get error about entity does not have attribute B in E1/E2/E3
-# 05. Get entities without attributes
+# 04. POST /v2/op/update update E1/E2/E3 D=400 B=200, get error about entity does not have attribute B in E1/E2/E3
+# 05. Get entities E1, E2 and E3 without attributes
 #
 
 echo "01. Create entity E1-A=1/D=4, E2-A=1/B=2/D=4, E3-A=1/B=2/C=3/D=4"
@@ -99,8 +99,8 @@ echo
 echo
 
 
-echo "02. POST /v2/op/update delete E/E1/E2 A=10, B=20, C=30, get error about entity does not have attribute B and C in E1 and C in E2"
-echo "================================================================================================================================"
+echo "02. POST /v2/op/update delete E1/E2/E3 A=10, B=20, C=30, get error about entity does not have attribute B and C in E1 and C in E2"
+echo "================================================================================================================================="
 payload='{
   "actionType": "delete",
   "entities":
@@ -167,8 +167,8 @@ echo
 echo
 
 
-echo "04. POST /v2/op/update update E/E1/E2 D=400 B=200, get error about entity does not have attribute B in E1/E2/E3"
-echo "==============================================================================================================="
+echo "04. POST /v2/op/update update E1/E2/E3 D=400 B=200, get error about entity does not have attribute B in E1/E2/E3"
+echo "================================================================================================================"
 payload='{
   "actionType": "delete",
   "entities":
@@ -188,8 +188,8 @@ payload='{
     {
       "type": "T",
       "id":   "E2",
-      "A": {
-         "value": 100,
+      "D": {
+         "value": 400,
          "type": "Number"
       },
       "B": {
@@ -200,8 +200,8 @@ payload='{
     {
       "type": "T",
       "id":   "E3",
-      "A": {
-         "value": 100,
+      "D": {
+         "value": 400,
          "type": "Number"
       },
       "B": {
@@ -216,18 +216,111 @@ echo
 echo
 
 
-echo "05. Get entities without attributes"
-echo "==================================="
+echo "05. Get entities E1, E2 and E3 without attributes"
+echo "================================================="
 orionCurl --url /v2/entities
 echo
 echo
 
 
 --REGEXPECT--
-
+01. Create entity E1-A=1/D=4, E2-A=1/B=2/D=4, E3-A=1/B=2/C=3/D=4
+================================================================
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
+
+
+02. POST /v2/op/update delete E1/E2/E3 A=10, B=20, C=30, get error about entity does not have attribute B and C in E1 and C in E2
+=================================================================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 126
+
+{
+    "description": "one or more of the attributes in the request do not exist: E1 - [ B, C ], E2 - [ C ]",
+    "error": "Unprocessable"
+}
+
+
+03. Get entities, E1-D=4, E2-D=4, E3-D=4
+========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 208
+
+[
+    {
+        "D": {
+            "metadata": {},
+            "type": "Number",
+            "value": 4
+        },
+        "id": "E1",
+        "type": "T"
+    },
+    {
+        "D": {
+            "metadata": {},
+            "type": "Number",
+            "value": 4
+        },
+        "id": "E2",
+        "type": "T"
+    },
+    {
+        "D": {
+            "metadata": {},
+            "type": "Number",
+            "value": 4
+        },
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+04. POST /v2/op/update update E1/E2/E3 D=400 B=200, get error about entity does not have attribute B in E1/E2/E3
+================================================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 135
+
+{
+    "description": "one or more of the attributes in the request do not exist: E1 - [ B ], E2 - [ B ], E3 - [ B ]",
+    "error": "Unprocessable"
+}
+
+
+05. Get entities E1, E2 and E3 without attributes
+=================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+[
+    {
+        "id": "E1",
+        "type": "T"
+    },
+    {
+        "id": "E2",
+        "type": "T"
+    },
+    {
+        "id": "E3",
+        "type": "T"
+    }
+]
 
 
 --TEARDOWN--

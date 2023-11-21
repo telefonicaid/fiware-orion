@@ -101,7 +101,7 @@ echo
 echo "04. POST /v2/op/update delete E D=400 B=200, get error about entity does not have attribute B"
 echo "============================================================================================="
 payload='{
-  "actionType": "update",
+  "actionType": "delete",
   "entities":
   [
     {
@@ -131,10 +131,73 @@ echo
 
 
 --REGEXPECT--
-
+01. Create entity E-A=1/D=4
+===========================
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
+
+
+02. POST /v2/op/update delete E A=10, B=20, C=30, get error about entity does not have attribute B and C
+========================================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
+
+{
+    "description": "one or more of the attributes in the request do not exist: E - [ B, C ]",
+    "error": "Unprocessable"
+}
+
+
+03. Get E, check D=4
+====================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 67
+
+{
+    "D": {
+        "metadata": {},
+        "type": "Number",
+        "value": 4
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+04. POST /v2/op/update delete E D=400 B=200, get error about entity does not have attribute B
+=============================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 110
+
+{
+    "description": "one or more of the attributes in the request do not exist: E - [ B ]",
+    "error": "Unprocessable"
+}
+
+
+05. Get E, check no attr
+========================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 21
+
+{
+    "id": "E",
+    "type": "T"
+}
 
 
 --TEARDOWN--
