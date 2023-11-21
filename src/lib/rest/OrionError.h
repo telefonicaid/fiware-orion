@@ -56,7 +56,6 @@ public:
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
   void         fill(const StatusCode& sc);
   void         fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _reasonPhrase);
-  void         appendDetails(const std::string& _details);
 
 
 private:
