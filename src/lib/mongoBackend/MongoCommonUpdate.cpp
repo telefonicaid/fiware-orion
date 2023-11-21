@@ -3616,53 +3616,45 @@ static unsigned int updateEntity
   }
 
   //
-  // Before calling processContextAttributeVector and actually do the work, let's check if the
-  // request is of type 'append-only' and if we have any problem with attributes already existing.
-  //
-  if (action == ActionTypeAppendStrict)
-  {
-    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
-    {
-      if (attrs.hasField(dbEncode(eP->attributeVector[ix]->name)))
-      {
-        alarmMgr.badInput(clientIp, "attribute already exists", eP->attributeVector[ix]->name);
-        *attributeAlreadyExistsError = true;
+  // Calculate list of existing and not existing attributes (used by decide if this was a partial update, full update or full fail
+  // depending on the operation)
 
-        //
-        // This attribute should now be removed from the 'query' ...
-        // processContextAttributeVector looks at the 'skip' field
-        //
+  for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
+  {
+    if (attrs.hasField(dbEncode(eP->attributeVector[ix]->name)))
+    {
+      *attributeAlreadyExistsError = true;
+
+      //
+      // If action is ActionTypeAppendStrict, this attribute should now be removed from the 'query' ...
+      // processContextAttributeVector looks at the 'skip' field
+      //
+      if (action == ActionTypeAppendStrict)
+      {
         eP->attributeVector[ix]->skip = true;
-
-        // Add to the list of existing attributes - for the error response
-        if (*attributeAlreadyExistsList != "[ ")
-        {
-          *attributeAlreadyExistsList += ", ";
-        }
-        *attributeAlreadyExistsList += eP->attributeVector[ix]->name;
       }
-    }
-    *attributeAlreadyExistsList += " ]";
-  }
 
-  if ((apiVersion == V2) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
-  {
-    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
-    {
-      if (!attrs.hasField(dbEncode(eP->attributeVector[ix]->name)))
+      // Add to the list of existing attributes
+      if (*attributeAlreadyExistsList != "[ ")
       {
-        *attributeNotExistingError = true;
-
-        // Add to the list of non existing attributes - for the error response
-        if (*attributeNotExistingList != "[ ")
-        {
-          *attributeNotExistingList += ", ";
-        }
-        *attributeNotExistingList += eP->attributeVector[ix]->name;
+        *attributeAlreadyExistsList += ", ";
       }
+      *attributeAlreadyExistsList += eP->attributeVector[ix]->name;
     }
-    *attributeNotExistingList += " ]";
+    else  // !attrs.hasField(dbEncode(eP->attributeVector[ix]->name))
+    {
+      *attributeNotExistingError = true;
+
+      // Add to the list of non existing attributes
+      if (*attributeNotExistingList != "[ ")
+      {
+        *attributeNotExistingList += ", ";
+      }
+      *attributeNotExistingList += eP->attributeVector[ix]->name;
+    }
   }
+  *attributeNotExistingList += " ]";
+  *attributeAlreadyExistsList += " ]";
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
@@ -4449,14 +4441,14 @@ unsigned int processContextElement
     }
   }
 
-  if (attributeAlreadyExistsError == true)
+  if ((attributeAlreadyExistsError == true) && (action == ActionTypeAppendStrict))
   {
     std::string details = "one or more of the attributes in the request already exist: " + eP->id + " - " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
-  if (attributeNotExistingError == true)
+  if ((attributeNotExistingError == true) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
 
     std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - " + attributeNotExistingList;
