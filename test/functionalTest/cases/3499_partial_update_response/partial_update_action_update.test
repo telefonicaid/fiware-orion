@@ -145,7 +145,7 @@ Content-Length: 113
 
 {
     "description": "one or more of the attributes in the request do not exist: E - [ B, C ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 
@@ -178,7 +178,7 @@ Content-Length: 110
 
 {
     "description": "one or more of the attributes in the request do not exist: E - [ B ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 

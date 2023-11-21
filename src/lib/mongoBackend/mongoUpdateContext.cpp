@@ -150,10 +150,10 @@ HttpStatusCode mongoUpdateContext
   else
   {
     /* Process each ContextElement */
-    bool atLeastOneSuccess = false;
-    bool atLeastOneFail    = false;
+    UpdateCoverage         updateCoverage = UC_NONE;
     for (unsigned int ix = 0; ix < requestP->entityVector.size(); ++ix)
     {
+      UpdateCoverage entityUpdateCoverage;
       notifSent += processContextElement(requestP->entityVector[ix],
                                          responseP,
                                          requestP->updateActionType,
@@ -167,21 +167,34 @@ HttpStatusCode mongoUpdateContext
                                          overrideMetadata,
                                          notifSent,
                                          apiVersion,
-                                         ngsiv2Flavour);
-
-      if (responseP->oe.code == SccNone)
+                                         ngsiv2Flavour,
+                                         &entityUpdateCoverage);
+      switch(updateCoverage)
       {
-        atLeastOneSuccess = true;
-      }
-      else
-      {
-        atLeastOneFail = true;
+        case UC_NONE:
+          updateCoverage = entityUpdateCoverage;
+          break;
+        case UC_FULL_SUCCESS:
+          if (entityUpdateCoverage != UC_FULL_SUCCESS)
+          {
+            updateCoverage = UC_PARTIAL;
+          }
+          break;
+        case UC_FULL_FAILURE:
+          if (entityUpdateCoverage != UC_FULL_FAILURE)
+          {
+            updateCoverage = UC_PARTIAL;
+          }
+          break;
+        case UC_PARTIAL:
+          updateCoverage = UC_PARTIAL;
+          break;
       }
     }
 
     // Only the PartialUpdate case (at least one success + at least one fail) needs to be "intercepted" here
     // Other cases follow the usual response processing flow (whatever it is :)
-    if (atLeastOneSuccess && atLeastOneFail)
+    if (updateCoverage == UC_PARTIAL)
     {
       responseP->oe.reasonPhrase = ERROR_PARTIAL_UPDATE;
     }

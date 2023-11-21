@@ -229,7 +229,7 @@ Content-Length: 145
 
 {
     "description": "one or more of the attributes in the request already exist: E1 - [ A ], E2 - [ A, B ], E3 - [ A, B, C ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 
@@ -312,7 +312,7 @@ Content-Length: 136
 
 {
     "description": "one or more of the attributes in the request already exist: E1 - [ B ], E2 - [ B ], E3 - [ B ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 

@@ -4457,6 +4457,42 @@ unsigned int processContextElement
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
   }
 
+  if (updateCoverageP != NULL)
+  {
+    // By default, everyghing gone ok. Next we are going to detect some partial/failure cases
+    *updateCoverageP = UC_FULL_SUCCESS;
+
+    if ((action == ActionTypeUpdate) || (action == ActionTypeDelete))
+    {
+      // Full failure if the number of the non-existing attributes are all the ones in the request
+      if (attributeNotExistingNumber == eP->attributeVector.size())
+      {
+        *updateCoverageP = UC_FULL_FAILURE;
+      }
+      // Partial failure/success if the number of the non-existing attributes is less than the ones in the request (else branch)
+      // and at least there was one existing attribute
+      else if (attributeNotExistingNumber > 0)
+      {
+        *updateCoverageP = UC_PARTIAL;
+      }
+    }
+
+    if (action == ActionTypeAppendStrict)
+    {
+      // Full failure if the number of the existing attributes are all the ones in the request
+      if (attributeAlreadyExistsNumber == eP->attributeVector.size())
+      {
+        *updateCoverageP = UC_FULL_FAILURE;
+      }
+      // Partial failure/success if the number of the existing attributes is less than the ones in the request (else branch)
+      // and at least there was one non-existing attribute
+      else if (attributeAlreadyExistsNumber > 0)
+      {
+        *updateCoverageP = UC_PARTIAL;
+      }
+    }
+  }
+
   // Response in responseP
   return notifSent;
 }
