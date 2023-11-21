@@ -3473,9 +3473,9 @@ static unsigned int updateEntity
   const std::string&              xauthToken,
   Entity*                         eP,
   UpdateContextResponse*          responseP,
-  bool*                           attributeAlreadyExistsError,
+  unsigned int*                   attributeAlreadyExistsNumber,
   std::string*                    attributeAlreadyExistsList,
-  bool*                           attributeNotExistingError,
+  unsigned int*                   attributeNotExistingNumber,
   std::string*                    attributeNotExistingList,
   const bool&                     forcedUpdate,
   const bool&                     overrideMetadata,
@@ -3486,10 +3486,10 @@ static unsigned int updateEntity
 )
 {
   // Used to accumulate error response information
-  *attributeAlreadyExistsError         = false;
+  *attributeAlreadyExistsNumber        = 0;
   *attributeAlreadyExistsList          = "[ ";
 
-  *attributeNotExistingError           = false;
+  *attributeNotExistingNumber          = 0;
   *attributeNotExistingList            = "[ ";
 
   const std::string  idString          = "_id." ENT_ENTITY_ID;
@@ -3623,7 +3623,7 @@ static unsigned int updateEntity
   {
     if (attrs.hasField(dbEncode(eP->attributeVector[ix]->name)))
     {
-      *attributeAlreadyExistsError = true;
+      (*attributeAlreadyExistsNumber)++;;
 
       //
       // If action is ActionTypeAppendStrict, this attribute should now be removed from the 'query' ...
@@ -3643,7 +3643,7 @@ static unsigned int updateEntity
     }
     else  // !attrs.hasField(dbEncode(eP->attributeVector[ix]->name))
     {
-      *attributeNotExistingError = true;
+      (*attributeNotExistingNumber)++;
 
       // Add to the list of non existing attributes
       if (*attributeNotExistingList != "[ ")
@@ -3694,7 +3694,7 @@ static unsigned int updateEntity
     //
     searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
 
-    if (!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict)))
+    if (!(attributeAlreadyExistsNumber && (action == ActionTypeAppendStrict)))
     {
       // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
       // processContextElement() function so we need to skip this addition or we will get duplicated
@@ -4107,7 +4107,8 @@ unsigned int processContextElement
   const bool&                          overrideMetadata,
   unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion,
-  Ngsiv2Flavour                        ngsiv2Flavour
+  Ngsiv2Flavour                        ngsiv2Flavour,
+  UpdateCoverage*                      updateCoverageP
 )
 {
   /* Check preconditions */
@@ -4255,11 +4256,11 @@ unsigned int processContextElement
   unsigned int notifSent = 0;
 
   // Used to accumulate error response information, checked at the end
-  bool         attributeAlreadyExistsError = false;
-  std::string  attributeAlreadyExistsList  = "[ ";
+  unsigned int  attributeAlreadyExistsNumber = 0;
+  std::string   attributeAlreadyExistsList   = "[ ";
 
-  bool         attributeNotExistingError = false;
-  std::string  attributeNotExistingList  = "[ ";
+  unsigned int  attributeNotExistingNumber  = 0;
+  std::string   attributeNotExistingList    = "[ ";
 
   /* Note that the following loop is not executed if result size is 0, which leads to the
    * 'if' just below to create a new entity */
@@ -4272,9 +4273,9 @@ unsigned int processContextElement
                              xauthToken,
                              eP,
                              responseP,
-                             &attributeAlreadyExistsError,
+                             &attributeAlreadyExistsNumber,
                              &attributeAlreadyExistsList,
-                             &attributeNotExistingError,
+                             &attributeNotExistingNumber,
                              &attributeNotExistingList,
                              forcedUpdate,
                              overrideMetadata,
@@ -4441,14 +4442,14 @@ unsigned int processContextElement
     }
   }
 
-  if ((attributeAlreadyExistsError == true) && (action == ActionTypeAppendStrict))
+  if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
     std::string details = "one or more of the attributes in the request already exist: " + eP->id + " - " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
-  if ((attributeNotExistingError == true) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
+  if ((attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
 
     std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - " + attributeNotExistingList;

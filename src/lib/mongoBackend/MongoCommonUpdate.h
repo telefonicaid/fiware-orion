@@ -36,6 +36,20 @@
 #define MONGODB_ERROR_WRONGJSON      "Can't extract geo keys"
 
 
+
+/* ****************************************************************************
+*
+*  UpdateCoverage -
+*/
+typedef enum UpdateCoverage
+{
+  FULL_SUCCESS  = 0,
+  FULL_FAILURE  = 1,
+  PARTIAL       = 2
+} UpdateCoverage;
+
+
+
 /* ****************************************************************************
 *
 * processContextElement -
@@ -55,7 +69,8 @@ extern unsigned int processContextElement
   const bool&                          overrideMetadata,
   unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion       = V1,
-  Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR
+  Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR,
+  UpdateCoverage*                      updateCoverageP  = NULL
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_
