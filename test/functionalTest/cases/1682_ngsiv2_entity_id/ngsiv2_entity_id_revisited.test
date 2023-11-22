@@ -74,8 +74,8 @@ orionCurl --url /v2/entities/E1/attrs  --payload "$payload"
 echo
 echo
 
-echo "04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)"
-echo "==========================================================================="
+echo "04. POST /v2/entities/E1?options=append A and B (and check 422 Unprocessable Content)"
+echo "====================================================================================="
 payload='{
   "A": {
     "value": 30
@@ -142,8 +142,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
-===========================================================================
+04. POST /v2/entities/E1?options=append A and B (and check 422 Unprocessable Content)
+=====================================================================================
 HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -152,7 +152,7 @@ Content-Length: 112
 
 {
     "description": "one or more of the attributes in the request already exist: E1 - [ A ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 

@@ -77,7 +77,7 @@ echo '03. PATCH /v2/entities/Room1/attrs, to update existing attribute (temperat
 echo '===================================================================================================================================================================='
 payload='{
   "temperature": {
-    "value": 24,
+    "value": 25,
     "type": "Float"
   },
   "temper": {
@@ -121,7 +121,7 @@ Content-Length: 120
 
 {
     "description": "one or more of the attributes in the request do not exist: Room1 - [ pressur ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 
@@ -135,7 +135,7 @@ Content-Length: 128
 
 {
     "description": "one or more of the attributes in the request do not exist: Room1 - [ temper, pressur ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 
@@ -158,7 +158,7 @@ Content-Length: 141
         "temperature": {
             "metadata": {},
             "type": "Float",
-            "value": 24
+            "value": 25
         },
         "type": "Thing"
     }

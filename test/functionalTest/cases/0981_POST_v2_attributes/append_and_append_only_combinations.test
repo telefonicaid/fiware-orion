@@ -267,7 +267,7 @@ Content-Length: 116
 
 {
     "description": "one or more of the attributes in the request already exist: E1 - [ attr4 ]",
-    "error": "Unprocessable"
+    "error": "PartialUpdate"
 }
 
 
