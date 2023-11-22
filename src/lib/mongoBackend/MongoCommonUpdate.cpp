@@ -4442,14 +4442,14 @@ unsigned int processContextElement
     }
   }
 
-  if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
+  if ((apiVersion == V2) && (attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
     std::string details = "one or more of the attributes in the request already exist: " + eP->id + " - " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
-  if ((attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
+  if ((apiVersion == V2) && (attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
 
     std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - " + attributeNotExistingList;
