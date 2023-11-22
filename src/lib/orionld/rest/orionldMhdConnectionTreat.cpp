@@ -1161,16 +1161,8 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   if ((orionldState.pd.status >= 400) && (orionldState.responseTree == NULL) && (orionldState.pd.status != 405))
   {
-    if (orionldState.pd.status != 0)  // Perhaps the error is in orionldState.pd ?
-    {
-      errorTree(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
-      orionldState.httpStatusCode = orionldState.pd.status;
-    }
-    else
-    {
-      errorTree(OrionldInternalError, "Unknown Error", "The reason for this error is unknown");
-      orionldState.httpStatusCode = 500;
-    }
+    errorTree(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
+    orionldState.httpStatusCode = orionldState.pd.status;
   }
 
   //

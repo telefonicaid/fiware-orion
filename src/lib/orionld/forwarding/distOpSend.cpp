@@ -424,6 +424,12 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   if ((distOpP->operation == DoAppendAttrs) && (orionldState.uriParamOptions.noOverwrite == true))
     uriParamAdd(&urlParts, "options", "noOverwrite", 11);
 
+  if (orionldState.uriParams.qCopy != NULL)
+  {
+    uriParamAdd(&urlParts, "q", orionldState.uriParams.qCopy, -1);
+    LM_T(LmtDistOpRequest, ("%s: orionldState.uriParams.q: '%s'", distOpP->regP->regId, orionldState.uriParams.qCopy));
+  }
+
   //
   // Compose the entire URL and pass it to CURL
   //

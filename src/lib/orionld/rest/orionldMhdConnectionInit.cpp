@@ -29,6 +29,8 @@ extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_FT, K_VEC_SIZE
 #include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/kjBuilder.h"                                     // kjString, kjChildAdd
 }
 
@@ -505,6 +507,50 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
 }
 
 
+// -----------------------------------------------------------------------------
+//
+// hyphensEncode -
+//
+static char* hyphensEncode(char* value)
+{
+  int doubleQuotes = 0;
+
+  // 1. Count the number of double quotes
+  char* cP = value;
+  while (*cP != 0)
+  {
+    if (*cP == '"')
+      ++doubleQuotes;
+    ++cP;
+  }
+
+  if (doubleQuotes == 0)
+    return kaStrdup(&orionldState.kalloc, value);
+
+  int len = strlen(value) + doubleQuotes * 2 + 1;  // 2 extra chars needed to encode " to %22
+
+  char* out    = kaAlloc(&orionldState.kalloc, len);
+  int   outIx  = 0;
+
+  while (*value != 0)
+  {
+    if (*value != '"')
+      out[outIx++] = *value;
+    else
+    {
+      out[outIx++] = '%';
+      out[outIx++] = '2';
+      out[outIx++] = '2';
+    }
+
+    ++value;
+  }
+
+  out[outIx] = 0;
+  return out;
+}
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -666,7 +712,13 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   }
   else if (strcmp(key, "q") == 0)
   {
-    orionldState.uriParams.q = (char*) value;
+    char* qraw = (char*) value;
+    orionldState.uriParams.q     = (char*) value;
+
+    if (strchr(qraw, '"') != NULL)
+      orionldState.uriParams.qCopy = hyphensEncode(qraw);
+    else
+      orionldState.uriParams.qCopy = kaStrdup(&orionldState.kalloc, qraw);
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_Q;
   }
   else if (strcmp(key, "mq") == 0)
@@ -1026,6 +1078,7 @@ MHD_Result orionldMhdConnectionInit
   // Save URL path in ConnectionInfo
   orionldState.urlPath = (char*) url;
 
+
   //
   // Does the URL path end in a '/'?
   // If so, remove it.
@@ -1136,13 +1189,6 @@ MHD_Result orionldMhdConnectionInit
   if ((orionldState.in.contentType == JSONLD) && (orionldState.linkHttpHeaderPresent == true))
   {
     orionldError(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed", 400);
-    return MHD_YES;
-  }
-
-  // Check payload too big
-  if (orionldState.in.contentLength > 2000000)
-  {
-    orionldError(OrionldBadRequestData, "Invalid Payload", "Payload too large", 400);
     return MHD_YES;
   }
 
