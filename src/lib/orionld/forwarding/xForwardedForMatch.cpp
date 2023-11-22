@@ -60,7 +60,7 @@ bool xForwardedForMatch(char* hostsHeader, char* host)
     return false;
   }
 
-  char charBefore = subString[-1];
+  char charBefore = (subString == hostsHeader)? ' ' : subString[-1];
   char charAfter  = subString[strlen(host)];
 
   LM_T(LmtDistOpLoop, ("Loop Detection: subString: '%s'", subString));
