@@ -3694,9 +3694,9 @@ static unsigned int updateEntity
     //
     searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
 
-    if (!(attributeAlreadyExistsNumber && (action == ActionTypeAppendStrict)))
+    if (!((*attributeAlreadyExistsNumber) > 0 && (action == ActionTypeAppendStrict)))
     {
-      // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
+      // Note that CER generation in the case of attributeAlreadyExistsNumber has its own logic at
       // processContextElement() function so we need to skip this addition or we will get duplicated
       // CER
       responseP->contextElementResponseVector.push_back(cerP);
@@ -4442,7 +4442,7 @@ unsigned int processContextElement
     }
   }
 
-  if ((apiVersion == V2) && (attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
+  if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
     std::string details = "one or more of the attributes in the request already exist: " + eP->id + " - " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
