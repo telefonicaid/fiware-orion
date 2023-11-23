@@ -267,6 +267,18 @@ typedef struct OrionldStateIn
 
 // -----------------------------------------------------------------------------
 //
+// OrionldStateDistOp - distributed request information
+//
+typedef struct OrionldStateDistOp
+{
+  uint32_t requests;
+  uint32_t e404;
+} OrionldStateDistOp;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // OrionldMongoC -
 //
 typedef struct OrionldMongoC
@@ -441,8 +453,9 @@ typedef struct OrionldConnectionState
   KjNode*                 geoPropertyNodes;           // object with "entityId": { <GeoProperty value> }, one per entity (for Query Entities
   bool                    geoPropertyFromProjection;  // It was added to the projection but needs to be removed
 
-  OrionldStateOut out;
-  OrionldStateIn  in;
+  OrionldStateOut     out;
+  OrionldStateIn      in;
+  OrionldStateDistOp  distOp;
 
   // NGSI-LD Scope (or NGSIv2 ServicePath)
   char* scopeV[10];

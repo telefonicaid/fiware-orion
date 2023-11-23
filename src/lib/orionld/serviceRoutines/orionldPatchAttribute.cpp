@@ -353,19 +353,25 @@ bool orionldPatchAttribute(void)
   }
 
   KjNode* incomingP = NULL;
-  if ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL))  // Attribute left for local request
+  //
+  // If the entity is not found locally and all distributed requests give 404
+  // then it's a 404
+  //
+  bool notFound = ((dbEntityP == NULL) && (orionldState.distOp.requests == orionldState.distOp.e404));
+
+  if ((notFound == false) && (orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL))  // Attribute left for local request
   {
     //
     // First of all, make sure the attribute exists
     //
-    KjNode* dbAttrsP = kjLookup(dbEntityP, "attrs");
+    KjNode* dbAttrsP = (dbEntityP != NULL)? kjLookup(dbEntityP, "attrs") : NULL;
     if ((dbAttrsP == NULL) && (orionldState.distributed == false))  // Entity without attributes
     {
       orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
       return false;
     }
 
-    KjNode* dbAttrP = kjLookup(dbAttrsP, longAttrNameEq);
+    KjNode* dbAttrP = (dbAttrsP != NULL)? kjLookup(dbAttrsP, longAttrNameEq) : NULL;
     if ((dbAttrP == NULL) && (orionldState.distributed == false))
     {
       orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
@@ -451,6 +457,12 @@ bool orionldPatchAttribute(void)
           LM_E(("Database Error (no _id::type in the DB for entity '%s')", entityId));
       }
     }
+  }
+
+  if (notFound == true)
+  {
+    orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
+    return false;
   }
 
   responseFix(responseBody, DoUpdateAttrs, 204, entityId);

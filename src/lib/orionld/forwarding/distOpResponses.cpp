@@ -273,6 +273,9 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     const char* title   = (titleP  != NULL)? titleP->value.s : "unspecified error from remote provider";
     const char* detail  = (detailP != NULL)? detailP->value.s : NULL;
 
+    if (httpResponseCode == 404)
+      orionldState.distOp.e404 += 1;
+
     distOpFailure(responseBody, distOpP, title, detail, httpResponseCode, NULL);
   }
   else if (httpResponseCode == 0)
