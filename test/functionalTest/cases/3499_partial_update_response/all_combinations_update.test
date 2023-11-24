@@ -1,0 +1,391 @@
+
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+All fail/success/partial combinations for update actionType
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1-A/B, E2-A/B
+# 02. Update E1-A/B (full success) + E2-A/B (full success): OK
+# 03. Update E3-A/B (full fail)    + E4-A/B (full fail):    Unprocessable
+# 04. Update E1-A/B (full success) + E3-A/B (full fail):    PartialUpdate
+# 05. Update E1-A/C (partial)      + E2-A/B (full success): PartialUpdate
+# 06. Update E1-A/C (partial)      + E3-A/B (full fail):    PartialUpdate
+# 07. Update E1-A/C (partial)      + E2-A/C (partial):      PartialUpdate
+#
+
+echo "01. Create E1-A/B, E2-A/B"
+echo "========================="
+payload='{
+  "actionType": "appendStrict",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E2",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      }      
+    }   
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "02. Update E1-A/B (full success) + E2-A/B (full success): OK"
+echo "============================================================"
+payload='{
+  "actionType": "update",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 1,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E2",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "03. Update E3-A/B (full fail)    + E4-A/B (full fail):    Unprocessable"
+echo "======================================================================="
+payload='{
+  "actionType": "update",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E3",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 1,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E4",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "04. Update E1-A/B (full success) + E3-A/B (full fail):    PartialUpdate"
+echo "======================================================================="
+payload='{
+  "actionType": "update",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 1,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E3",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "05. Update E1-A/C (partial)      + E2-A/B (full success): PartialUpdate"
+echo "======================================================================="
+payload='{
+  "actionType": "update",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "C": {
+         "value": 1,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E2",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "06. Update E1-A/C (partial)      + E3-A/C (full fail):    PartialUpdate"
+echo "======================================================================="
+payload='{
+  "actionType": "update",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "C": {
+         "value": 1,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E3",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "07. Update E1-A/C (partial)      + E2-A/C (partial):      PartialUpdate"
+echo "======================================================================="
+payload='{
+  "actionType": "update",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "C": {
+         "value": 1,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E2",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "C": {
+         "value": 2,
+         "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1-A/B, E2-A/B
+=========================
+HTTP/1.1 204 No Content
+Date: Fri, 24 Nov 2023 12:44:45 GMT
+Fiware-Correlator: 3ebe9756-8ac7-11ee-8889-000c29e06b83
+
+
+
+02. Update E1-A/B (full success) + E2-A/B (full success): OK
+============================================================
+HTTP/1.1 204 No Content
+Date: Fri, 24 Nov 2023 12:44:45 GMT
+Fiware-Correlator: 3ec7f8dc-8ac7-11ee-935d-000c29e06b83
+
+
+
+03. Update E3-A/B (full fail)    + E4-A/B (full fail):    Unprocessable
+=======================================================================
+HTTP/1.1 404 Not Found
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
+
+{
+    "description": "The requested entity has not been found. Check type and id. FIX?",
+    "error": "NotFound"
+}
+
+
+04. Update E1-A/B (full success) + E3-A/B (full fail):    PartialUpdate
+=======================================================================
+HTTP/1.1 404 Not Found
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
+
+{
+    "description": "The requested entity has not been found. Check type and id. FIX",
+    "error": "NotFound"
+}
+
+
+05. Update E1-A/C (partial)      + E2-A/B (full success): PartialUpdate
+=======================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 111
+
+{
+    "description": "one or more of the attributes in the request do not exist: E1 - [ C ]",
+    "error": "PartialUpdate"
+}
+
+
+06. Update E1-A/C (partial)      + E3-A/C (full fail):    PartialUpdate
+=======================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 131
+
+{
+    "description": "one or more of the attributes in the request do not exist: E1 - [ C ], E3 [entity itself]",
+    "error": "PartialUpdate"
+}
+
+
+07. Update E1-A/C (partial)      + E2-A/C (partial):      PartialUpdate
+=======================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 123
+
+{
+    "description": "one or more of the attributes in the request do not exist: E1 - [ C ], E2 - [ C ]",
+    "error": "PartialUpdate"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
