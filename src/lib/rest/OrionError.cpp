@@ -91,9 +91,9 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 */
 void OrionError::fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _reasonPhrase)
 {
-  if (code == SccInvalidModification)
+  if (code == _code)
   {
-    // Already filled by a prevoius operation. This can happen in batch update processing
+    // Already filled by a previous operation. This can happen in batch update processing
     details += appendDetail;
   }
   else

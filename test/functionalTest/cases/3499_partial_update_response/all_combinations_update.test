@@ -303,44 +303,44 @@ echo
 01. Create E1-A/B, E2-A/B
 =========================
 HTTP/1.1 204 No Content
-Date: Fri, 24 Nov 2023 12:44:45 GMT
-Fiware-Correlator: 3ebe9756-8ac7-11ee-8889-000c29e06b83
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 02. Update E1-A/B (full success) + E2-A/B (full success): OK
 ============================================================
 HTTP/1.1 204 No Content
-Date: Fri, 24 Nov 2023 12:44:45 GMT
-Fiware-Correlator: 3ec7f8dc-8ac7-11ee-935d-000c29e06b83
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. Update E3-A/B (full fail)    + E4-A/B (full fail):    Unprocessable
 =======================================================================
-HTTP/1.1 404 Not Found
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 95
+Content-Length: 141
 
 {
-    "description": "The requested entity has not been found. Check type and id. FIX?",
-    "error": "NotFound"
+    "description": "one or more of the attributes in the request do not exist: E3 - [entity itself], E4 [entity itself]",
+    "error": "Unprocessable"
 }
 
 
 04. Update E1-A/B (full success) + E3-A/B (full fail):    PartialUpdate
 =======================================================================
-HTTP/1.1 404 Not Found
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 95
+Content-Length: 121
 
 {
-    "description": "The requested entity has not been found. Check type and id. FIX",
-    "error": "NotFound"
+    "description": "one or more of the attributes in the request do not exist: E3 - [entity itself]",
+    "error": "PartialUpdate"
 }
 
 

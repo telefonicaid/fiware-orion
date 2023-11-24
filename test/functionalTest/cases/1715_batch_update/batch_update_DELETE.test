@@ -132,15 +132,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 04. Delete E1 again, see it fail
 ================================
-HTTP/1.1 404 Not Found
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 95
+Content-Length: 121
 
 {
-    "description": "The requested entity has not been found. Check type and id",
-    "error": "NotFound"
+    "description": "one or more of the attributes in the request do not exist: E1 - [entity itself]",
+    "error": "Unprocessable"
 }
 
 

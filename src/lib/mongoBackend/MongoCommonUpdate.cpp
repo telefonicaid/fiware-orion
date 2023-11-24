@@ -4111,6 +4111,9 @@ unsigned int processContextElement
   UpdateCoverage*                      updateCoverageP
 )
 {
+  // By default, assume everything is gone to be ok. Next in this function we are going to check for some partial/failure cases
+  *updateCoverageP = UC_FULL_SUCCESS;
+
   /* Check preconditions */
   if (!contextElementPreconditionsCheck(eP, responseP, action, apiVersion))
   {
@@ -4335,7 +4338,13 @@ unsigned int processContextElement
         }
         else
         {
-          responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
+          //responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
+          std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - [entity itself]";
+          responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " [entity itself]", ERROR_UNPROCESSABLE);
+          if (updateCoverageP != NULL)
+          {
+            *updateCoverageP = UC_FULL_FAILURE;
+          }
         }
       }
     }
@@ -4343,8 +4352,14 @@ unsigned int processContextElement
     {
       cerP->statusCode.fill(SccContextElementNotFound);
 
-      responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
+      //responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
+      std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - [entity itself]";
+      responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " [entity itself]", ERROR_UNPROCESSABLE);
       responseP->contextElementResponseVector.push_back(cerP);
+      if (updateCoverageP != NULL)
+      {
+        *updateCoverageP = UC_FULL_FAILURE;
+      }
     }
     else   /* APPEND or APPEND_STRICT */
     {
@@ -4444,6 +4459,7 @@ unsigned int processContextElement
 
   if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
+    // FIXME PR move to errorsMesage.h
     std::string details = "one or more of the attributes in the request already exist: " + eP->id + " - " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
@@ -4451,7 +4467,6 @@ unsigned int processContextElement
 
   if ((apiVersion == V2) && (attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
-
     std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
@@ -4459,9 +4474,6 @@ unsigned int processContextElement
 
   if (updateCoverageP != NULL)
   {
-    // By default, everyghing gone ok. Next we are going to detect some partial/failure cases
-    *updateCoverageP = UC_FULL_SUCCESS;
-
     if ((action == ActionTypeUpdate) || (action == ActionTypeDelete))
     {
       // Full failure if the number of the non-existing attributes are all the ones in the request
