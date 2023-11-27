@@ -1,0 +1,127 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Test for issue 1479
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+orionldStart CB -experimental -forwarding
+orionldStart CP1 -experimental
+
+--SHELL--
+
+#
+# 01. Create an Exclusive registration R1 with operations 'updateOps' (no GETs) on CB for CP1
+# 02. Create a matching entity E1 in CP1
+# 03. Attempt to retrieve E1 from CP1 (R1 does not support GETs) - see 404
+#
+
+echo "01. Create an Exclusive registration R1 with operations 'updateOps' (no GETs) on CB for CP1"
+echo "==========================================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "endpoint": "http://localhost:'$CP1_PORT'",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [
+        "add",
+        "remove",
+        "refill"
+      ]
+    }
+  ],
+  "mode": "exclusive",
+  "operations": [ "updateOps" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a matching entity E1 in CP1"
+echo "======================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "add": "ADD",
+  "remove": "REMOVE",
+  "refill": "REFILL"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Attempt to retrieve E1 from CP1 (R1 does not support GETs) - see 404"
+echo "========================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an Exclusive registration R1 with operations 'updateOps' (no GETs) on CB for CP1
+===========================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create a matching entity E1 in CP1
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Attempt to retrieve E1 from CP1 (R1 does not support GETs) - see 404
+========================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1
