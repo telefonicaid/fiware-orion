@@ -42,7 +42,7 @@ orionldStart CP1 -experimental
 #
 # 08. DELETE the registration R1, to not introduce noise for the next steps
 # 09. Create an exclusive registration R2 for CP1, on entity type T, not supporting entity deletions
-# 10. Attempt to DELETE urn:E1 in local broker - see the 409 from CP1
+# 10. Attempt to DELETE urn:E1 in local broker - see the 404 from CP1
 #
 
 echo "01. Create Entity urn:E1 (type T) in local broker"
@@ -157,7 +157,7 @@ echo
 echo
 
 
-echo "10. Attempt to DELETE urn:E1 in local broker - see the 409 from CP1"
+echo "10. Attempt to DELETE urn:E1 in local broker - see the 404 from CP1"
 echo "==================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X DELETE
 echo
@@ -261,18 +261,17 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
 
 
 
-10. Attempt to DELETE urn:E1 in local broker - see the 409 from CP1
+10. Attempt to DELETE urn:E1 in local broker - see the 404 from CP1
 ===================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 72
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
-Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 {
     "detail": "urn:E1",
-    "registrationId": "urn:R2",
-    "title": "Entity not found"
+    "title": "Entity not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 
