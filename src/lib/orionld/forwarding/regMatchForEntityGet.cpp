@@ -110,6 +110,7 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
         doP->detail           = (char*) "A matching exclusive registration forbids the Operation";
         doP->httpResponseCode = 409;
       }
+      continue;
     }
 
     // Add extra info in DistOp, needed by forwardRequestSend
