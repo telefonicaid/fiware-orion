@@ -1,0 +1,156 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH Attribute on a forwarded non-existing entity must give a 404
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+orionldStart CB -experimental -forwarding
+orionldStart CP1 -experimental
+
+--SHELL--
+
+#
+# 01. Create a registration urn:R1 on entity type T in CB for CP1
+# 02. Attempt to PATCH the attribute P1 on non-existing entity urn:E1 on CP1 (urn:R1 matches) via CB - see 404
+# 03. Create a registration urn:R2 on entity type T in CB for CP1
+# 04. Attempt to PATCH the attribute P1 on non-existing entity urn:E1 on CP1 (urn:R1 matches) via CB - see 404
+#
+
+echo "01. Create a registration urn:R1 on entity type T in CB for CP1"
+echo "==============================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "localhost:'$CP1_PORT'",
+  "operations": [ "updateAttrs" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to PATCH the attribute P1 on non-existing entity urn:E1 on CP1 (urn:R1 matches) via CB - see 404"
+echo "============================================================================================================"
+payload='{
+  "value": 14
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "03. Create a registration urn:R2 on entity type T in CB for CP1"
+echo "==============================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "localhost:'$CP1_PORT'",
+  "operations": [ "updateAttrs" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Attempt to PATCH the attribute P1 on non-existing entity urn:E1 on CP1 (urn:R1 matches) via CB - see 404"
+echo "============================================================================================================"
+payload='{
+  "value": 14
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/P1 -X PATCH --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration urn:R1 on entity type T in CB for CP1
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Attempt to PATCH the attribute P1 on non-existing entity urn:E1 on CP1 (urn:R1 matches) via CB - see 404
+============================================================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity/Attribute Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+03. Create a registration urn:R2 on entity type T in CB for CP1
+===============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+04. Attempt to PATCH the attribute P1 on non-existing entity urn:E1 on CP1 (urn:R1 matches) via CB - see 404
+============================================================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 118
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E1",
+    "title": "Entity/Attribute Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1
