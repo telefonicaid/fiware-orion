@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPCREATE_H_
-#define SRC_LIB_ORIONLD_FORWARDING_DISTOPCREATE_H_
-
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -25,23 +22,45 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/StringArray.h"                           // StringArray
+#include <unistd.h>                                              // NULL
+#include <curl/curl.h>                                           // curl
+
 #include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
+#include "orionld/forwarding/distOpLookupByRegId.h"              // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// distOpCreate -
+// distOpLookupByRegId -
 //
-extern DistOp* distOpCreate
-(
-  DistOpType    operation,
-  RegCacheItem* regP,
-  StringArray*  idListP,
-  StringArray*  typeListP,
-  StringArray*  attrListP
-);
+DistOp* distOpLookupByRegId(DistOp* distOpList, const char* regId)
+{
+  DistOp* distOpP = distOpList;
+  bool    local   = strcmp(regId, "@none") == 0;
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPCREATE_H_
+  LM_T(LmtDistOpList, ("Looking for DistOp '%s'", regId));
+  while (distOpP != NULL)
+  {
+    if ((local == true) && (distOpP->regP == NULL))
+    {
+      LM_T(LmtDistOpList, ("Found DistOp '%s'", regId));
+      return distOpP;
+    }
+
+    if ((distOpP->regP != NULL) && (distOpP->regP->regId != NULL))
+    {
+      LM_T(LmtDistOpList, ("Comparing with '%s'", distOpP->regP->regId));
+      if (strcmp(distOpP->regP->regId, regId) == 0)
+      {
+        LM_T(LmtDistOpList, ("Found DistOp for reg '%s'", regId));
+        return distOpP;
+      }
+    }
+
+    distOpP = distOpP->next;
+  }
+
+  LM_T(LmtDistOpList, ("DistOp for reg '%s' NOT FOUND", regId));
+  return NULL;
+}

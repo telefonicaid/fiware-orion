@@ -33,7 +33,6 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState, orionldEntityMap, orionldEntityMapId
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
-#include "orionld/forwarding/distOpLookupById.h"                 // distOpLookupById
 #include "orionld/serviceRoutines/orionldGetEntityMap.h"         // Own interface
 
 
@@ -55,24 +54,14 @@ bool orionldGetEntityMap(void)
   // Cloning the entityMap - to later modify it
   orionldState.responseTree   = kjClone(orionldState.kjsonP, orionldEntityMap);
 
-  for (KjNode* eArray = orionldState.responseTree->value.firstChildP; eArray != NULL; eArray = eArray->next)
+  // Sort all entity arrays in alphabetic order (for functests to work ...)
+  // NOTE;
+  //   Instead of doing that on entity map creation, it's done here, for performance reasons.
+  //   It's a valid assumption that many more entity maps will be created than queried
+  //
+  for (KjNode* eV = orionldState.responseTree->value.firstChildP; eV != NULL; eV = eV->next)
   {
-    LM_T(LmtSR, ("Fixing map detail of entity '%s'", eArray->name));
-    for (KjNode* distOpId = eArray->value.firstChildP; distOpId != NULL; distOpId = distOpId->next)
-    {
-      LM_T(LmtSR, ("Fixing distOp info for '%s' of entity '%s'", distOpId->value, eArray->name));
-      DistOp* distOpP = distOpLookupById(orionldDistOps, distOpId->value.s);
-      if (distOpP == NULL)
-        continue;
-
-      KjNode* urlP = ((distOpP->regP != NULL) && (distOpP->regP->regTree != NULL))? kjLookup(distOpP->regP->regTree, "endpoint") : NULL;
-      if (urlP != NULL)
-        distOpId->value.s = urlP->value.s;
-      else
-        distOpId->value.s = (char*) "@none";
-    }
-
-    kjStringArraySort(eArray);
+    kjStringArraySort(eV);
   }
 
   orionldState.httpStatusCode = 200;

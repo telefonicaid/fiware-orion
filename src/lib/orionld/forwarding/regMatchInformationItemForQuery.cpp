@@ -124,7 +124,7 @@ DistOp* regMatchInformationItemForQuery
       //   - it is NULLed, and
       //   - it is allocated again in the next round of the loop
       //
-      distOpP = distOpCreate(DoQueryEntity, regP, idListP, typeListP, attrListP, true);
+      distOpP = distOpCreate(DoQueryEntity, regP, idListP, typeListP, attrListP);
 
       if (regMatchEntityInfoForQuery(regP, entityInfoP, idListP, typeListP, distOpP) == true)
       {
@@ -145,7 +145,7 @@ DistOp* regMatchInformationItemForQuery
   }
   else
   {
-    DistOp* distOpP = distOpCreate(DoQueryEntity, regP, NULL, typeListP, attrListP, true);
+    DistOp* distOpP = distOpCreate(DoQueryEntity, regP, NULL, typeListP, attrListP);
 
     if (distOpList == NULL)
       distOpList = distOpP;

@@ -78,7 +78,7 @@ DistOp* regMatchInformationArray
       }
     }
 
-    DistOp* distOpP = distOpCreate(operation, regP, NULL, NULL, NULL, false);
+    DistOp* distOpP = distOpCreate(operation, regP, NULL, NULL, NULL);
 
     distOpP->requestBody = attrUnion;
 

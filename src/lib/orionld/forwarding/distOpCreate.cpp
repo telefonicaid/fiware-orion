@@ -44,11 +44,10 @@ DistOp* distOpCreate
   RegCacheItem* regP,
   StringArray*  idList,
   StringArray*  typeList,
-  StringArray*  attrList,    // As it arrives in the GET request (URL param 'attrs')
-  bool          permanent
+  StringArray*  attrList    // As it arrives in the GET request (URL param 'attrs')
 )
 {
-  DistOp* distOpP = (DistOp*) ((permanent == true)? malloc(sizeof(DistOp)) : kaAlloc(&orionldState.kalloc, sizeof(DistOp)));
+  DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
 
   if (distOpP == NULL)
     LM_X(1, ("Out of memory"));
@@ -62,7 +61,7 @@ DistOp* distOpCreate
 
   attrList = (attrList != NULL)? stringArrayClone(attrList) : NULL;
   if ((attrList != NULL) && (attrList->items > 0))
-    attrsParam(distOpP, attrList, true);
+    attrsParam(distOpP, attrList, false);
   else
     distOpP->attrsParam = NULL;
 

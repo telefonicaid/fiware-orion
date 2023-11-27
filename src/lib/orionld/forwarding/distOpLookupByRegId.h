@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPLOOKUPBYREGID_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPLOOKUPBYREGID_H_
+
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -22,29 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
-#include <curl/curl.h>                                           // curl
+#include <curl/curl.h>                                           // CURL
 
-#include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/forwarding/distOpLookupById.h"                 // Own interface
+#include "orionld/forwarding/DistOp.h"                          // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// distOpLookupById -
+// distOpLookupByRegId -
 //
-DistOp* distOpLookupById(DistOp* distOpList, const char* id)
-{
-  DistOp* distOpP = distOpList;
+extern DistOp* distOpLookupByRegId(DistOp* distOpList, const char* regId);
 
-  while (distOpP != NULL)
-  {
-    if (strcmp(distOpP->id, id) == 0)
-      return distOpP;
-
-    distOpP = distOpP->next;
-  }
-
-  return NULL;
-}
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPLOOKUPBYREGID_H_

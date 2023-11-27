@@ -236,18 +236,18 @@ NGSILD-Results-Count: 2
 08. GET the entity map - see E1 and E2 both with "local" and R1/2
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 87
+Content-Length: 57
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "urn:E1": [
         "@none",
-        "http://localhost:9801"
+        "urn:R1"
     ],
     "urn:E2": [
         "@none",
-        "http://localhost:9801"
+        "urn:R2"
     ]
 }
 

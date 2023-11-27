@@ -54,7 +54,6 @@ payload='{
   ],
   "endpoint": "localhost:'$CP1_PORT'",
   "operations": [ "createEntity", "retrieveEntity","mergeEntity" ]
-
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo

@@ -419,6 +419,7 @@ typedef struct OrionldConnectionState
   //
   bool                    distOpAttrsCompacted;
   int                     distOpNo;
+  DistOp*                 distOpList;
   uint32_t                acceptMask;            // "1 << MimeType" mask for all accepted Mime Types, regardless of which is chosen and of weight
 
   //
@@ -606,7 +607,6 @@ extern unsigned long long  outReqMsgMaxSize;
 extern char                orionldEntityMapId[64];   // Used by GET /entities in the distributed case, for pagination
 extern KjNode*             orionldEntityMap;
 extern int                 orionldEntityMapCount;
-extern DistOp*             orionldDistOps;
 
 
 

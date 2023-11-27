@@ -424,17 +424,17 @@ NGSILD-Results-Count: 1
 11. GET /entityMaps/* - see the entityMap with urn:E1 and its 4 registrations + URLs
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 116
+Content-Length: 64
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "urn:E1": [
         "@none",
-        "http://localhost:9801",
-        "http://localhost:9802",
-        "http://localhost:9803",
-        "http://localhost:9804"
+        "urn:Reg1",
+        "urn:Reg2",
+        "urn:Reg3",
+        "urn:Reg4"
     ]
 }
 
@@ -508,23 +508,23 @@ NGSILD-Results-Count: 3
 19. GET /entityMaps/* - see the entityMap with urn:E1 - urn:E5
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 170
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "urn:E1": [
         "@none",
-        "http://localhost:9801",
-        "http://localhost:9802",
-        "http://localhost:9803",
-        "http://localhost:9804"
+        "urn:Reg1",
+        "urn:Reg2",
+        "urn:Reg3",
+        "urn:Reg4"
     ],
     "urn:E2": [
         "@none"
     ],
     "urn:E6": [
-        "http://localhost:9804"
+        "urn:Reg4"
     ]
 }
 

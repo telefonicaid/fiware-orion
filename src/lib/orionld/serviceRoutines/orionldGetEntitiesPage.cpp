@@ -40,7 +40,7 @@ extern "C"
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"           // kjEntityIdLookupInEntityArray
 #include "orionld/regCache/regCacheItemLookup.h"                    // regCacheItemLookup
 #include "orionld/forwarding/DistOp.h"                              // DistOp
-#include "orionld/forwarding/distOpLookupById.h"                    // distOpLookupById
+#include "orionld/forwarding/distOpLookupByRegId.h"                 // distOpLookupByRegId
 #include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
 #include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
 #include "orionld/forwarding/distOpEntityMerge.h"                   // distOpEntityMerge
@@ -98,7 +98,7 @@ static void idListFix(KjNode* entityIdArray)
 //
 DistOp* distOpLookup(const char* distOpId)
 {
-  DistOp* distOpP = orionldDistOps;
+  DistOp* distOpP = orionldState.distOpList;
 
   while (distOpP != NULL)
   {
@@ -119,10 +119,19 @@ DistOp* distOpLookup(const char* distOpId)
 //
 DistOpListItem* distOpListItemCreate(const char* distOpId, char* idString)
 {
-  DistOp* distOpP = distOpLookupById(orionldDistOps, distOpId);
+  LM_T(LmtDistOpList, ("orionldState.distOpList at %p", orionldState.distOpList));
+  DistOp* distOpP = distOpLookupByRegId(orionldState.distOpList, distOpId);
+  LM_T(LmtDistOpList, ("Response: %p", distOpP));
 
   if (distOpP == NULL)
+  {
+    //
+    // I think this LM_RE here is incorrect.
+    // The DistOps are for one request only.
+    // So, create a new DistOp if it does not exist.
+    //
     LM_RE(NULL, ("Internal Error (unable to find the DistOp '%s'", distOpId));
+  }
 
   DistOpListItem* itemP = (DistOpListItem*) kaAlloc(&orionldState.kalloc, sizeof(DistOpListItem));
   if (itemP == NULL)
@@ -250,7 +259,7 @@ void distOpsReceive2(DistOpResponseTreatFunction treatFunction, void* callbackPa
 
     if (msgP->data.result == CURLE_OK)
     {
-      DistOp* distOpP = distOpLookupByCurlHandle(orionldDistOps, msgP->easy_handle);
+      DistOp* distOpP = distOpLookupByCurlHandle(orionldState.distOpList, msgP->easy_handle);
 
       if (distOpP == NULL)
       {
@@ -437,7 +446,8 @@ bool orionldGetEntitiesPage(void)
   {
     if (strcmp(sourceP->name, "@none") == 0)
     {
-      DistOp* distOpP = distOpLookupById(orionldDistOps, "@none");
+      LM_T(LmtDistOpList, ("orionldState.distOpList at %p", orionldState.distOpList));
+      DistOp* distOpP = distOpLookupByRegId(orionldState.distOpList, "@none");
 
       // Local query - set input params for orionldGetEntitiesLocal
 

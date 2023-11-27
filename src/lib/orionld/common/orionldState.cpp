@@ -113,7 +113,6 @@ PernotSubCache    pernotSubCache;
 char              orionldEntityMapId[64];      // Used by GET /entities in the distributed case, for pagination
 KjNode*           orionldEntityMap         = NULL;
 int               orionldEntityMapCount    = 0;
-DistOp*           orionldDistOps           = NULL;
 
 
 

@@ -44,6 +44,7 @@ extern "C"
 #include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpsSend.h"                         // distOpsSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
+#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug2
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // orionldGetEntitiesPage
@@ -223,7 +224,8 @@ static void entityMapItemAdd(const char* entityId, DistOp* distOpP)
   //
   // Add DistOp ID to matchP's array - remember it's a global variable, can't use kaAlloc
   //
-  const char*  distOpId      = (distOpP != NULL)? distOpP->id : "@none";
+  // const char*  distOpId      = (distOpP != NULL)? distOpP->id : "@none";
+  const char*  distOpId      = (distOpP != NULL)? distOpP->regP->regId : "@none";
   KjNode*      distOpIdNodeP = kjString(NULL, NULL, distOpId);
 
   LM_T(LmtEntityMap, ("Adding DistOp '%s' to entity '%s'", distOpId, matchP->name));
@@ -265,6 +267,7 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
   if (distOpList == NULL)
     return;
 
+  distOpListDebug2(distOpList, "DistOps before sending the onlyId=true requests");
   // Send all distributed requests
   int forwards = distOpsSend(distOpList);
 
@@ -281,8 +284,8 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
 //
 static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
 {
-  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
   orionldEntityMap = kjObject(NULL, "orionldEntityMap");
+  LM_T(LmtDistOpList, ("Created an entity map at %p", orionldEntityMap));
 
   //
   // Send requests to all matching registration-endpoints, to fill in the entity map

@@ -687,7 +687,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
 
   //
-  // Reading the response
+  // Set the callback function (responseSave) for reading the response
   //
   HttpResponse* httpResponseP = (HttpResponse*) kaAlloc(&orionldState.kalloc, sizeof(HttpResponse));
 
@@ -713,9 +713,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   curl_easy_setopt(distOpP->curlHandle, CURLOPT_HTTPHEADER, headers);
 
   //
-  // SEND (sort of)
+  // SEND (sort of - enqueue the request)
   //
-  LM_T(LmtDistOpRequest, ("%s: distributed request %s %s '%s'", distOpP->regP->regId, orionldState.verbString, url, payloadBody));
+  LM_T(LmtDistOpRequest, ("%s: distributed request '%s' %s %s '%s'", distOpP->regP->regId, distOpP->id, orionldState.verbString, url, (payloadBody == NULL)? "no body" : payloadBody));
   curl_multi_add_handle(orionldState.curlDoMultiP, distOpP->curlHandle);
 
   return 0;

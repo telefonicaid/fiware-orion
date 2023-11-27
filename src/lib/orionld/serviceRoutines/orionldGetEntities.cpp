@@ -153,16 +153,19 @@ DistOp* regMatchForEntitiesQuery
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-    // Loop detection
-    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
-      continue;
-
     if ((regP->mode & regMode) == 0)
       continue;
 
     if (regMatchOperation(regP, DoQueryEntity) == false)
     {
       LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation (operation == QueryEntity)", regP->regId));
+      continue;
+    }
+
+    // Loop detection
+    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop", regP->regId));
       continue;
     }
 
@@ -293,12 +296,12 @@ bool orionldGetEntities(void)
     //
     // Find matching registrations
     //
-    orionldDistOps = distOpRequestsForEntitiesQuery(idPattern, qNode);
+    orionldState.distOpList = distOpRequestsForEntitiesQuery(idPattern, qNode);
 
     //
     // if there are no matching registrations, the request is treated as a local request
     //
-    if (orionldDistOps == NULL)
+    if (orionldState.distOpList == NULL)
       return orionldGetEntitiesLocal(&orionldState.in.typeList,
                                      &orionldState.in.idList,
                                      &orionldState.in.attrList,
@@ -312,7 +315,7 @@ bool orionldGetEntities(void)
                                      true);
 
     // Create the "@none" DistOp
-    DistOp* local  = distOpCreate(DoQueryEntity, NULL, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList, true);
+    DistOp* local  = distOpCreate(DoQueryEntity, NULL, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
 
     // Add lang, geometryProperty, qNode, ...   to the "@none" DistOp
     local->lang                = (orionldState.uriParams.lang != NULL)? strdup(orionldState.uriParams.lang) : NULL;
@@ -326,13 +329,13 @@ bool orionldGetEntities(void)
     local->qNode               = (qNode != NULL)? qClone(qNode) : NULL;
 
     // Add the "@none" DistOp to the linked list of DistOps
-    local->next    = orionldDistOps;
-    orionldDistOps = local;
+    local->next    = orionldState.distOpList;
+    orionldState.distOpList = local;
 
     // This is the DistOp list to be used over pagination - it is "malloqued" so it survives the current request
-    distOpListDebug2(orionldDistOps, "distOpList for Entity Query");
+    distOpListDebug2(orionldState.distOpList, "distOpList for Entity Query");
     LM_T(LmtDistOpList, ("--------------- "));
   }
 
-  return orionldGetEntitiesDistributed(orionldDistOps, idPattern, qNode, &geoInfo);
+  return orionldGetEntitiesDistributed(orionldState.distOpList, idPattern, qNode, &geoInfo);
 }

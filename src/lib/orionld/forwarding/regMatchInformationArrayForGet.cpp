@@ -55,7 +55,7 @@ DistOp* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId,
       continue;
 
     // If we get this far, then it's a match and we can create the DistOp item and return
-    DistOp* distOpP = distOpCreate(DoQueryEntity, regP, NULL, NULL, attrList, false);
+    DistOp* distOpP = distOpCreate(DoQueryEntity, regP, NULL, NULL, attrList);
 
     if ((distOpP->attrList != NULL) && (distOpP->attrList->items > 0))
       attrsParam(distOpP, distOpP->attrList, true);
