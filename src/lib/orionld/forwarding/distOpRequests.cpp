@@ -139,7 +139,10 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, K
     if ((distOpP->regP != NULL) && (distOpP->error == false))
     {
       if (distOpSend(distOpP, dateHeader, xff) == 0)
+      {
         distOpP->error = false;
+        orionldState.distOp.requests += 1;
+     }
       else
         distOpP->error = true;
 

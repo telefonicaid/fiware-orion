@@ -353,7 +353,13 @@ bool orionldPatchAttribute(void)
   }
 
   KjNode* incomingP = NULL;
-  if ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL))  // Attribute left for local request
+  //
+  // If the entity is not found locally and all distributed requests give 404
+  // then it's a 404
+  //
+  bool notFound = ((dbEntityP == NULL) && (orionldState.distOp.requests == orionldState.distOp.e404));
+
+  if ((notFound == false) && (orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL))  // Attribute left for local request
   {
     //
     // First of all, make sure the attribute exists
@@ -451,6 +457,12 @@ bool orionldPatchAttribute(void)
           LM_E(("Database Error (no _id::type in the DB for entity '%s')", entityId));
       }
     }
+  }
+
+  if (notFound == true)
+  {
+    orionldError(OrionldResourceNotFound, "Entity/Attribute Not Found", entityId, 404);
+    return false;
   }
 
   responseFix(responseBody, DoUpdateAttrs, 204, entityId);
