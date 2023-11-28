@@ -100,6 +100,9 @@
 #define ERROR_UNPROCESSABLE                           "Unprocessable"
 #define ERROR_PARTIAL_UPDATE                          "PartialUpdate"
 #define ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS       "Already Exists"
+#define ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS  "one or more of the attributes in the request already exist: "
+
+#define ERROR_DESC_DO_NOT_EXIT                        "do not exist: "
 
 #define ERROR_NO_RESOURCES_AVAILABLE                  "NoResourcesAvailable"
 #define ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC      "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations."

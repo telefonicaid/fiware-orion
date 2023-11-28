@@ -172,22 +172,47 @@ HttpStatusCode mongoUpdateContext
       switch(updateCoverage)
       {
         case UC_NONE:
+          // If global UC is not set yet, then take the UC corresponding to the (first) processed entity
           updateCoverage = entityUpdateCoverage;
           break;
-        case UC_FULL_SUCCESS:
-          if (entityUpdateCoverage != UC_FULL_SUCCESS)
+        case UC_SUCCESS:
+          // If global UC is success, we need also success in the processed entity to keep global success
+          // Otherwise (full attrs fail, partial, not found entity), the global UC changes to partial
+          if (entityUpdateCoverage != UC_SUCCESS)
           {
             updateCoverage = UC_PARTIAL;
           }
           break;
-        case UC_FULL_FAILURE:
-          if (entityUpdateCoverage != UC_FULL_FAILURE)
+        case UC_FULL_ATTRS_FAIL:
+          // If global UC is full attrs fail, we need also full attrs fail in the processed entity to keep global full attrs fail
+          // Otherwise (success, partial, not found entity), the global UC changes to partial
+          if (entityUpdateCoverage != UC_FULL_ATTRS_FAIL)
           {
             updateCoverage = UC_PARTIAL;
+          }
+          break;
+        case UC_ENTITY_NOT_FOUND:
+          // If global UC is entity not found, we need also entity not found in the processed entity to keep entity not found
+          // Otherwise, two possibilities: 1) if processed entity is full attrs fail, global UC changes so, or 2) if processed entity is
+          // success/partial, the global UC changes to partial
+          if (entityUpdateCoverage == UC_ENTITY_NOT_FOUND)
+          {
+            // do nothing (explicity block here for the sake of clearness)
+          }
+          else
+          {
+            if (entityUpdateCoverage == UC_FULL_ATTRS_FAIL)
+            {
+              updateCoverage = UC_FULL_ATTRS_FAIL;
+            }
+            else
+            {
+              updateCoverage = UC_PARTIAL;
+            }
           }
           break;
         case UC_PARTIAL:
-          updateCoverage = UC_PARTIAL;
+          // If global UC is partial, we keep partial (no matter the result of processed entity)
           break;
       }
     }
@@ -196,6 +221,7 @@ HttpStatusCode mongoUpdateContext
     // Other cases follow the usual response processing flow (whatever it is :)
     if (updateCoverage == UC_PARTIAL)
     {
+      responseP->oe.code         = SccInvalidModification;
       responseP->oe.reasonPhrase = ERROR_PARTIAL_UPDATE;
     }
 

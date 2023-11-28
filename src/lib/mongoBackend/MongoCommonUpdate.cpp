@@ -4112,7 +4112,7 @@ unsigned int processContextElement
 )
 {
   // By default, assume everything is gone to be ok. Next in this function we are going to check for some partial/failure cases
-  *updateCoverageP = UC_FULL_SUCCESS;
+  *updateCoverageP = UC_SUCCESS;
 
   /* Check preconditions */
   if (!contextElementPreconditionsCheck(eP, responseP, action, apiVersion))
@@ -4339,11 +4339,11 @@ unsigned int processContextElement
         else
         {
           //responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
-          std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - [entity itself]";
-          responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " [entity itself]", ERROR_UNPROCESSABLE);
+          std::string details = ERROR_DESC_DO_NOT_EXIT + eP->id + "/" + eP->type + " - [entity itself]";
+          responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + eP->id + "/" + eP->type + " [entity itself]", ERROR_NOT_FOUND);
           if (updateCoverageP != NULL)
           {
-            *updateCoverageP = UC_FULL_FAILURE;
+            *updateCoverageP = UC_ENTITY_NOT_FOUND;
           }
         }
       }
@@ -4353,12 +4353,12 @@ unsigned int processContextElement
       cerP->statusCode.fill(SccContextElementNotFound);
 
       //responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
-      std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - [entity itself]";
-      responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " [entity itself]", ERROR_UNPROCESSABLE);
+      std::string details = ERROR_DESC_DO_NOT_EXIT + eP->id + "/" + eP->type + " - [entity itself]";
+      responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + eP->id + "/" + eP->type + " [entity itself]", ERROR_NOT_FOUND);
       responseP->contextElementResponseVector.push_back(cerP);
       if (updateCoverageP != NULL)
       {
-        *updateCoverageP = UC_FULL_FAILURE;
+        *updateCoverageP = UC_ENTITY_NOT_FOUND;
       }
     }
     else   /* APPEND or APPEND_STRICT */
@@ -4459,17 +4459,16 @@ unsigned int processContextElement
 
   if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
-    // FIXME PR move to errorsMesage.h
-    std::string details = "one or more of the attributes in the request already exist: " + eP->id + " - " + attributeAlreadyExistsList;
+    std::string details = ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS + eP->id + "/" + eP->type + " - " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
+    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + "/" + eP->type + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
   if ((apiVersion == V2) && (attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
-    std::string details = "one or more of the attributes in the request do not exist: " + eP->id + " - " + attributeNotExistingList;
+    std::string details = ERROR_DESC_DO_NOT_EXIT + eP->id + "/" + eP->type + " - " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
+    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + "/" + eP->type + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
   }
 
   if (updateCoverageP != NULL)
@@ -4479,7 +4478,7 @@ unsigned int processContextElement
       // Full failure if the number of the non-existing attributes are all the ones in the request
       if (attributeNotExistingNumber == eP->attributeVector.size())
       {
-        *updateCoverageP = UC_FULL_FAILURE;
+        *updateCoverageP = UC_FULL_ATTRS_FAIL;
       }
       // Partial failure/success if the number of the non-existing attributes is less than the ones in the request (else branch)
       // and at least there was one existing attribute
@@ -4494,7 +4493,7 @@ unsigned int processContextElement
       // Full failure if the number of the existing attributes are all the ones in the request
       if (attributeAlreadyExistsNumber == eP->attributeVector.size())
       {
-        *updateCoverageP = UC_FULL_FAILURE;
+        *updateCoverageP = UC_FULL_ATTRS_FAIL;
       }
       // Partial failure/success if the number of the existing attributes is less than the ones in the request (else branch)
       // and at least there was one non-existing attribute

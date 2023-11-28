@@ -44,6 +44,7 @@ public:
   HttpStatusCode  code;
   std::string     reasonPhrase;
   std::string     details;
+  bool            filled;
 
   OrionError();
   OrionError(StatusCode& statusCode);

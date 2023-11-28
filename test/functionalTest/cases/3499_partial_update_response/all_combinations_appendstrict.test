@@ -321,10 +321,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 130
+Content-Length: 134
 
 {
-    "description": "one or more of the attributes in the request already exist: E1 - [ A, B ], E2 - [ A, B ]",
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A, B ], E2/T - [ A, B ]",
     "error": "Unprocessable"
 }
 
@@ -335,10 +335,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 115
+Content-Length: 117
 
 {
-    "description": "one or more of the attributes in the request already exist: E2 - [ A, B ]",
+    "description": "one or more of the attributes in the request already exist: E2/T - [ A, B ]",
     "error": "PartialUpdate"
 }
 
@@ -349,10 +349,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 112
+Content-Length: 114
 
 {
-    "description": "one or more of the attributes in the request already exist: E1 - [ A ]",
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A ]",
     "error": "PartialUpdate"
 }
 
@@ -363,10 +363,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 127
+Content-Length: 131
 
 {
-    "description": "one or more of the attributes in the request already exist: E1 - [ A ], E2 - [ A, B ]",
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A ], E2/T - [ A, B ]",
     "error": "PartialUpdate"
 }
 
@@ -377,10 +377,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 124
+Content-Length: 128
 
 {
-    "description": "one or more of the attributes in the request already exist: E1 - [ A ], E2 - [ A ]",
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A ], E2/T - [ A ]",
     "error": "PartialUpdate"
 }
 

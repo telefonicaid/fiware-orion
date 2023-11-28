@@ -43,10 +43,11 @@
 */
 typedef enum UpdateCoverage
 {
-  UC_NONE          = 0,
-  UC_FULL_SUCCESS  = 1,
-  UC_FULL_FAILURE  = 2,
-  UC_PARTIAL       = 3
+  UC_NONE             = 0,
+  UC_SUCCESS          = 1,
+  UC_FULL_ATTRS_FAIL  = 2,
+  UC_ENTITY_NOT_FOUND = 3,
+  UC_PARTIAL          = 4
 } UpdateCoverage;
 
 

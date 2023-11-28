@@ -86,43 +86,43 @@ echo
 --REGEXPECT--
 01. Batch Update with actionType UPDATE on non-existing entity, see error
 =========================================================================
-HTTP/1.1 422 Unprocessable Content
+HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 120
+Content-Length: 72
 
 {
-    "description": "one or more of the attributes in the request do not exist: E - [entity itself]",
-    "error": "Unprocessable"
+    "description": "do not exist: E/T - [entity itself]",
+    "error": "NotFound"
 }
 
 
 02. Batch Update with actionType DELETE on non-existing entity, see error
 =========================================================================
-HTTP/1.1 422 Unprocessable Content
+HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 120
+Content-Length: 72
 
 {
-    "description": "one or more of the attributes in the request do not exist: E - [entity itself]",
-    "error": "Unprocessable"
+    "description": "do not exist: E/T - [entity itself]",
+    "error": "NotFound"
 }
 
 
 03. Batch Update with actionType REPLACE on non-existing entity, see error
 ==========================================================================
-HTTP/1.1 422 Unprocessable Content
+HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 120
+Content-Length: 72
 
 {
-    "description": "one or more of the attributes in the request do not exist: E - [entity itself]",
-    "error": "Unprocessable"
+    "description": "do not exist: E/T - [entity itself]",
+    "error": "NotFound"
 }
 
 

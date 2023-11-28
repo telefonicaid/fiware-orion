@@ -42,6 +42,7 @@ OrionError::OrionError()
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
+  filled       = false;
 }
 
 
@@ -55,6 +56,7 @@ OrionError::OrionError(HttpStatusCode _code, const std::string& _details, const 
   code          = _code;
   reasonPhrase  = _reasonPhrase.empty() ? httpStatusCodeString(code) : _reasonPhrase;
   details       = _details;
+  filled        = true;
 }
 
 
@@ -68,6 +70,7 @@ OrionError::OrionError(StatusCode& sc)
   code          = sc.code;
   reasonPhrase  = httpStatusCodeString(code);
   details       = sc.details;
+  filled        = true;
 }
 
 
@@ -81,27 +84,7 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
   code          = _code;
   reasonPhrase  = _reasonPhrase.empty()? httpStatusCodeString(code) : _reasonPhrase;
   details       = _details;
-}
-
-
-
-/* ****************************************************************************
-*
-* OrionError::fillOrAppend -
-*/
-void OrionError::fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _reasonPhrase)
-{
-  if (code == _code)
-  {
-    // Already filled by a previous operation. This can happen in batch update processing
-    details += appendDetail;
-  }
-  else
-  {
-    code          = _code;
-    reasonPhrase  = _reasonPhrase.empty()? httpStatusCodeString(code) : _reasonPhrase;
-    details       = fullDetails;
-  }
+  filled        = true;
 }
 
 
@@ -115,6 +98,29 @@ void OrionError::fill(const StatusCode& sc)
   code          = sc.code;
   reasonPhrase  = (sc.reasonPhrase.empty())? httpStatusCodeString(code) : sc.reasonPhrase;
   details       = sc.details;
+  filled        = true;
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::fillOrAppend -
+*/
+void OrionError::fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _reasonPhrase)
+{
+  if (filled)
+  {
+    // Already filled by a previous operation. This can happen in batch update processing
+    details += appendDetail;
+  }
+  else
+  {
+    code          = _code;
+    reasonPhrase  = _reasonPhrase.empty()? httpStatusCodeString(code) : _reasonPhrase;
+    details       = fullDetails;
+    filled        = true;
+  }
 }
 
 

@@ -233,10 +233,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 112
+Content-Length: 69
 
 {
-    "description": "one or more of the attributes in the request do not exist: E2 - [ A2 ]",
+    "description": "do not exist: E2/T - [ A2 ]",
     "error": "PartialUpdate"
 }
 

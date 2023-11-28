@@ -141,10 +141,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 113
+Content-Length: 70
 
 {
-    "description": "one or more of the attributes in the request do not exist: E - [ B, C ]",
+    "description": "do not exist: E/T - [ B, C ]",
     "error": "PartialUpdate"
 }
 
@@ -174,10 +174,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 110
+Content-Length: 67
 
 {
-    "description": "one or more of the attributes in the request do not exist: E - [ B ]",
+    "description": "do not exist: E/T - [ B ]",
     "error": "PartialUpdate"
 }
 

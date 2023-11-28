@@ -233,8 +233,8 @@ echo
 echo
 
 
-echo "03. Update E3-A/B (full fail)    + E4-A/B (full fail):    Unprocessable"
-echo "======================================================================="
+echo "03. Update E3-A/B (full fail)    + E4-A/B (full fail):    NotFound"
+echo "=================================================================="
 payload='{
   "actionType": "delete",
   "entities":
@@ -435,17 +435,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-03. Update E3-A/B (full fail)    + E4-A/B (full fail):    Unprocessable
-=======================================================================
-HTTP/1.1 422 Unprocessable Content
+03. Update E3-A/B (full fail)    + E4-A/B (full fail):    NotFound
+==================================================================
+HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 141
+Content-Length: 97
 
 {
-    "description": "one or more of the attributes in the request do not exist: E3 - [entity itself], E4 [entity itself]",
-    "error": "Unprocessable"
+    "description": "do not exist: E3/T3 - [entity itself], E4/T3 [entity itself]",
+    "error": "NotFound"
 }
 
 
@@ -455,10 +455,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 121
+Content-Length: 79
 
 {
-    "description": "one or more of the attributes in the request do not exist: E3 - [entity itself]",
+    "description": "do not exist: E3/T4 - [entity itself]",
     "error": "PartialUpdate"
 }
 
@@ -469,10 +469,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 111
+Content-Length: 69
 
 {
-    "description": "one or more of the attributes in the request do not exist: E1 - [ C ]",
+    "description": "do not exist: E1/T5 - [ C ]",
     "error": "PartialUpdate"
 }
 
@@ -483,10 +483,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 131
+Content-Length: 92
 
 {
-    "description": "one or more of the attributes in the request do not exist: E1 - [ C ], E3 [entity itself]",
+    "description": "do not exist: E1/T6 - [ C ], E3/T6 [entity itself]",
     "error": "PartialUpdate"
 }
 
@@ -497,10 +497,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 123
+Content-Length: 84
 
 {
-    "description": "one or more of the attributes in the request do not exist: E1 - [ C ], E2 - [ C ]",
+    "description": "do not exist: E1/T7 - [ C ], E2/T7 - [ C ]",
     "error": "PartialUpdate"
 }
 
