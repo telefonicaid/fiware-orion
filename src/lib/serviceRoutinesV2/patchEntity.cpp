@@ -85,6 +85,12 @@ std::string patchEntity
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
+  // Adjust NotFound description (to avoid redundant missing entity information)
+  if (parseDataP->upcrs.res.oe.code == SccContextElementNotFound)
+  {
+    parseDataP->upcrs.res.oe.details = ERROR_DESC_NOT_FOUND_ENTITY;
+  }
+
   // 03. Check output from mongoBackend - any errors?
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
