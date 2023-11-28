@@ -4124,14 +4124,16 @@ unsigned int processContextElement
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
 
-  EntityId           en(eP->id, eP->type);
-  orion::BSONObjBuilder     bob;
+  orion::BSONObjBuilder  bob;
+  EntityId               en(eP->id, eP->type);
+  std::string            enStr = eP->id;
 
   bob.append(idString, eP->id);
 
   if (!eP->type.empty())
   {
     bob.append(typeString, eP->type);
+    enStr += '/' + eP->type;
   }
 
   // Service path
@@ -4338,9 +4340,8 @@ unsigned int processContextElement
         }
         else
         {
-          //responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
-          std::string details = ERROR_DESC_DO_NOT_EXIT + eP->id + "/" + eP->type + " - [entity itself]";
-          responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + eP->id + "/" + eP->type + " [entity itself]", ERROR_NOT_FOUND);
+          std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
+          responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
           if (updateCoverageP != NULL)
           {
             *updateCoverageP = UC_ENTITY_NOT_FOUND;
@@ -4352,9 +4353,8 @@ unsigned int processContextElement
     {
       cerP->statusCode.fill(SccContextElementNotFound);
 
-      //responseP->oe.fillOrAppend(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ", " + eP->id + " [entity itself]", ERROR_NOT_FOUND);
-      std::string details = ERROR_DESC_DO_NOT_EXIT + eP->id + "/" + eP->type + " - [entity itself]";
-      responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + eP->id + "/" + eP->type + " [entity itself]", ERROR_NOT_FOUND);
+      std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
+      responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
       responseP->contextElementResponseVector.push_back(cerP);
       if (updateCoverageP != NULL)
       {
@@ -4459,16 +4459,16 @@ unsigned int processContextElement
 
   if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
-    std::string details = ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS + eP->id + "/" + eP->type + " - " + attributeAlreadyExistsList;
+    std::string details = ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS + enStr + " - " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + "/" + eP->type + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
+    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
   if ((apiVersion == V2) && (attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
-    std::string details = ERROR_DESC_DO_NOT_EXIT + eP->id + "/" + eP->type + " - " + attributeNotExistingList;
+    std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + eP->id + "/" + eP->type + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
+    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
   }
 
   if (updateCoverageP != NULL)
