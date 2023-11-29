@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-All fail/success/partial combinations for delete actionType
+All fail/success/partial combinations for delete actionType in batch operation
 
 --SHELL-INIT--
 dbInit CB

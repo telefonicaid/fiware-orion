@@ -22,7 +22,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-All fail/success/partial combinations for update actionType
+All fail/success/partial combinations for update actionType in batch operation
 
 --SHELL-INIT--
 dbInit CB

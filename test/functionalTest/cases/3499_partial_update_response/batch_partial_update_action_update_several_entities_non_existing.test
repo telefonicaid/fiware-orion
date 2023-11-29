@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PartialUpdate response for update case for several entities one of them non existing
+PartialUpdate response for update case for several entities one of them non existing in batch operation
 
 --SHELL-INIT--
 dbInit CB
