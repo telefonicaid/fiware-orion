@@ -86,6 +86,7 @@ std::string patchEntity
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // Adjust NotFound description (to avoid redundant missing entity information)
+  // FIXME PR: duplicated code in several places
   if ((parseDataP->upcrs.res.oe.code == SccContextElementNotFound) & (parseDataP->upcrs.res.oe.reasonPhrase == ERROR_NOT_FOUND))
   {
     parseDataP->upcrs.res.oe.details = ERROR_DESC_NOT_FOUND_ENTITY;

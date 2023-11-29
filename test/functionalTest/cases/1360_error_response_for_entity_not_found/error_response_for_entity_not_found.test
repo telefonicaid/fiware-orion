@@ -97,10 +97,10 @@ HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 122
+Content-Length: 77
 
 {
-    "description": "one or more of the attributes in the request do not exist: room_2 - [ dfgdfgdf ]",
+    "description": "do not exist: room_2 - [ dfgdfgdf ]",
     "error": "Unprocessable"
 }
 

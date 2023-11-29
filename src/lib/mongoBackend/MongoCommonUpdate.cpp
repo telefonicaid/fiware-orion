@@ -4112,7 +4112,10 @@ unsigned int processContextElement
 )
 {
   // By default, assume everything is gone to be ok. Next in this function we are going to check for some partial/failure cases
-  *updateCoverageP = UC_SUCCESS;
+  if (updateCoverageP != NULL)
+  {
+    *updateCoverageP = UC_SUCCESS;
+  }
 
   /* Check preconditions */
   if (!contextElementPreconditionsCheck(eP, responseP, action, apiVersion))

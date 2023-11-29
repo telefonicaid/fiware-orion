@@ -239,7 +239,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 229
+Content-Length: 232
 
 {
     "contextResponses": [
@@ -251,7 +251,7 @@ Content-Length: 229
             },
             "statusCode": {
                 "code": "400",
-                "details": "one or more of the attributes in the request already exist: E1 - [ attr2 ]",
+                "details": "one or more of the attributes in the request already exist: E1/T1 - [ attr2 ]",
                 "reasonPhrase": "Bad Request"
             }
         }
@@ -289,7 +289,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 393
+Content-Length: 396
 
 {
     "contextResponses": [
@@ -319,7 +319,7 @@ Content-Length: 393
             },
             "statusCode": {
                 "code": "400",
-                "details": "one or more of the attributes in the request already exist: E1 - [ attr2 ]",
+                "details": "one or more of the attributes in the request already exist: E1/T1 - [ attr2 ]",
                 "reasonPhrase": "Bad Request"
             }
         }
