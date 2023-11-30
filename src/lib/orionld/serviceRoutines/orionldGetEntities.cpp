@@ -258,25 +258,25 @@ bool orionldGetEntities(void)
       orionldError(OrionldResourceNotFound, "Entity Map Not Found", orionldState.uriParams.entityMap, 404);
       return false;
     }
+  }
 
-    if (orionldState.uriParams.reset == true)
+  if (orionldState.uriParams.reset == true)
+  {
+    LM_T(LmtSR, ("Deleting entity map '%s'", orionldEntityMapId));
+    orionldEntityMapRelease();
+    orionldEntityMap      = NULL;
+    orionldEntityMapCount = 0;
+    orionldState.uriParams.entityMap = NULL;
+    entityMap = NULL;
+  }
+  else if (orionldState.uriParams.entityMap != NULL)
+  {
+    // No query params can be used when asking for pages in an entity map
+    if ((id       != NULL) || (type  != NULL) || (idPattern != NULL) || (q != NULL)      ||
+        (geometry != NULL) || (attrs != NULL) || (orionldState.uriParams.local == true))
     {
-      LM_T(LmtSR, ("Deleting entity map '%s'", orionldEntityMapId));
-      orionldEntityMapRelease();
-      orionldEntityMap      = NULL;
-      orionldEntityMapCount = 0;
-      orionldState.uriParams.entityMap = NULL;
-      entityMap = NULL;
-    }
-    else
-    {
-      // No query params can be used when asking for pages in an entity map
-      if ((id       != NULL) || (type  != NULL) || (idPattern != NULL) || (q != NULL)      ||
-          (geometry != NULL) || (attrs != NULL) || (orionldState.uriParams.local == true))
-      {
-        orionldError(OrionldBadRequestData, "Query parameters present", "not allowed when paginating using an entity map", 400);
-        return false;
-      }
+      orionldError(OrionldBadRequestData, "Query parameters present", "not allowed when paginating using an entity map", 400);
+      return false;
     }
   }
 

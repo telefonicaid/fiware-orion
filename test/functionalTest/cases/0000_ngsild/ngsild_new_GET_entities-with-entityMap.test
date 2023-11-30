@@ -275,6 +275,7 @@ HTTP/1.1 200 OK
 Content-Length: 186
 Content-Type: application/json
 Date: REGEX(.*)
+Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 [
