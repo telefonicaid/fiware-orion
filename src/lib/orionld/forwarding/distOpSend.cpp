@@ -230,7 +230,7 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
       snprintf(httpResponseP->buf, newSize + 1023, "%s%s", oldBuf, chunkP);
       LM_T(LmtDistOpResponseBuf, ("httpResponseP->buf: '%s'", httpResponseP->buf));
     }
-    else  // > 20k: use malloc
+    else
     {
       httpResponseP->buf = (char*) malloc(newSize + 1024);
       if (httpResponseP->buf == NULL)
@@ -457,13 +457,6 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Date
   headers = curl_slist_append(headers, dateHeader);
 
-#if 0
-  // Host
-  char hostHeader[256];
-  snprintf(hostHeader, sizeof(hostHeader), "Host: %s", ip);
-  headers = curl_slist_append(headers, hostHeader);
-#endif
-
   // X-Forwarded-For
   headers = curl_slist_append(headers, xForwardedForHeader);
 
@@ -518,15 +511,8 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
         contentType = JSON;
         continue;
       }
-
       if (strcasecmp(keyP->value.s, "Accept") == 0)
-      {
         accept = valueP->value.s;
-        char  header[256];  // Assuming 256 is enough
-        snprintf(header, sizeof(header), "Accept: %s", valueP->value.s);
-        headers = curl_slist_append(headers, header);
-        continue;
-      }
 
       // None of the above, adding the header
       char  header[256];  // Assuming 256 is enough

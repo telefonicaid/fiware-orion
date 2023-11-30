@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET /entities with three brokers all connected via registrations
+GET /entities with Entity Map using crossed registrations
 
 --SHELL-INIT--
 dbInit CB
@@ -46,35 +46,13 @@ orionldStart CP2 -experimental -forwarding
 # 10. Create an inclusive registration R2 in CP1 on entities of type T pointing to CP2
 # 11. Create an inclusive registration R1 in CP2 on entities of type T pointing to CB
 # 12. Create an inclusive registration R2 in CP2 on entities of type T pointing to CP1
-# 13. GET /entities?type=T in CB
+# 13. Create an entity map for a GET /entities?type=T in CB
+# 14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1
+# 15. Create an entity map for a GET /entities?type=T in CP1
+# 16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
+# 17. Create an entity map for a GET /entities?type=T in CP2
+# 18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
 #
-
-#
-# Flow:
-# Client -> CB      GET /entities
-#   CB -> CP1       GET /entities?idsOly=true
-#      CP1 - CB     LOOP
-#      CP1 - CP2    GET /entities?idsOly=true
-#        CP2 - CB   LOOP
-#        CP2 - CP1  LOOP
-
-#   CB -> CP2     GET /entities?idsOly=true
-#      CP2 - CB     LOOP
-#      CP2 - CP1    GET /entities?idsOly=true
-#        CP1 - CB   LOOP
-#        CP1 - CP2  LOOP
-
-#   CB -> CP1       GET /entities
-#      CP1 - CB     LOOP
-#      CP1 - CP2    GET /entities
-#        CP2 - CB   LOOP
-#        CP2 - CP1  LOOP
-
-#   CB -> CP2     GET /entities
-#      CP2 - CB     LOOP
-#      CP2 - CP1    GET /entities
-#        CP1 - CB   LOOP
-#        CP1 - CP2  LOOP
 
 echo "01. In CB, create an entity urn:E1 with attributes P1+R1"
 echo "========================================================="
@@ -292,12 +270,50 @@ echo
 echo
 
 
-echo "13. GET /entities?type=T in CB"
-echo "=============================="
+echo "13. Create an entity map for a GET /entities?type=T in CB"
+echo "==================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true'
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
+
+
+echo '14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1'
+echo '================================================================='
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --noPayloadCheck
+echo
+echo
+
+
+echo "15. Create an entity map for a GET /entities?type=T in CP1"
+echo "==================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' --port $CP1_PORT
+entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo '16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB'
+echo '================================================================='
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --port $CP1_PORT
+echo
+echo
+
+
+echo "17. Create an entity map for a GET /entities?type=T in CP2"
+echo "==================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' --port $CP2_PORT
+entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo '18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB'
+echo '================================================================='
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --port $CP2_PORT
+echo
+echo
+
 
 
 --REGEXPECT--
@@ -409,8 +425,8 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
 
 
 
-13. GET /entities?type=T in CB
-==============================
+13. Create an entity map for a GET /entities?type=T in CB
+===================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
 Content-Type: application/json
@@ -493,6 +509,264 @@ NGSILD-Results-Count: 6
         "type": "T"
     }
 ]
+
+
+14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:E1": [
+        "@none"
+    ],
+    "urn:E2": [
+        "@none"
+    ],
+    "urn:E3": [
+        "http://orionld-dev:9801"
+    ],
+    "urn:E4": [
+        "http://orionld-dev:9801"
+    ],
+    "urn:E5": [
+        "http://orionld-dev:9802"
+    ],
+    "urn:E6": [
+        "http://orionld-dev:9802"
+    ]
+}
+
+
+15. Create an entity map for a GET /entities?type=T in CP1
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-Results-Count: 6
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E3 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E4",
+            "type": "Relationship"
+        },
+        "id": "urn:E3",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E4 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E4",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E5 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E6",
+            "type": "Relationship"
+        },
+        "id": "urn:E5",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E1 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E6 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E5",
+            "type": "Relationship"
+        },
+        "id": "urn:E6",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E2 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    }
+]
+
+16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
+===================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:E1": [
+        "http://orionld-dev:9999"
+    ],
+    "urn:E2": [
+        "http://orionld-dev:9999"
+    ],
+    "urn:E3": [
+        "@none"
+    ],
+    "urn:E4": [
+        "@none"
+    ],
+    "urn:E5": [
+        "http://orionld-dev:9802"
+    ],
+    "urn:E6": [
+        "http://orionld-dev:9802"
+    ]
+}
+
+
+17. Create an entity map for a GET /entities?type=T in CP2
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-Results-Count: 6
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E5 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E6",
+            "type": "Relationship"
+        },
+        "id": "urn:E5",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E6 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E5",
+            "type": "Relationship"
+        },
+        "id": "urn:E6",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E1 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E4 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E4",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E3 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E4",
+            "type": "Relationship"
+        },
+        "id": "urn:E3",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E2 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    }
+]
+
+
+18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:E1": [
+        "http://orionld-dev:9999"
+    ],
+    "urn:E2": [
+        "http://orionld-dev:9999"
+    ],
+    "urn:E3": [
+        "http://orionld-dev:9801"
+    ],
+    "urn:E4": [
+        "http://orionld-dev:9801"
+    ],
+    "urn:E5": [
+        "@none"
+    ],
+    "urn:E6": [
+        "@none"
+    ]
+}
 
 
 --TEARDOWN---

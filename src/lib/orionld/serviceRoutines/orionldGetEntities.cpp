@@ -240,6 +240,8 @@ bool orionldGetEntities(void)
   char*   entityMap = orionldState.uriParams.entityMap;
   QNode*  qNode     = NULL;
 
+  LM_T(LmtEntityMap, ("onlyIds: %s", (orionldState.uriParams.onlyIds == true)? "TRUE" : "FALSE"));
+
   // According to the spec, id takes precedence over idPattern, so, if both are present, idPattern is NULLed out
   if ((orionldState.in.idList.items > 0) && (orionldState.uriParams.idPattern != NULL))
     idPattern = NULL;

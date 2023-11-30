@@ -192,7 +192,11 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "sysAttrs")      == 0)  orionldState.uriParamOptions.sysAttrs      = true;
       else if (strcmp(optionStart, "fromDb")        == 0)  orionldState.uriParamOptions.fromDb        = true;
       else if (strcmp(optionStart, "append")        == 0)  orionldState.uriParamOptions.append        = true;  // NGSIv2 compatibility
-      else if (strcmp(optionStart, "count")         == 0)  orionldState.uriParams.count               = true;  // NGSIv2 compatibility
+      else if (strcmp(optionStart, "count")         == 0)
+      {
+        orionldState.uriParams.count               = true;  // NGSIv2 compatibility
+        LM_T(LmtCount, ("Count is ON"));
+      }
       else if (strcmp(optionStart, "values")        == 0)  orionldState.uriParamOptions.values        = true;  // NGSIv2 compatibility
       else if (strcmp(optionStart, "unique")        == 0)  orionldState.uriParamOptions.uniqueValues  = true;  // NGSIv2 compatibility
       else if (strcmp(optionStart, "dateCreated")   == 0)  orionldState.uriParamOptions.dateCreated   = true;  // NGSIv2 compatibility
@@ -701,7 +705,10 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (strcmp(key, "count") == 0)
   {
     if (strcmp(value, "true") == 0)
+    {
       orionldState.uriParams.count = true;
+      LM_T(LmtCount, ("Count is ON"));
+    }
     else if (strcmp(value, "false") != 0)
     {
       orionldError(OrionldBadRequestData, "Bad value for URI parameter /count/", value, 400);
@@ -956,7 +963,10 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (strcmp(key, "onlyIds") == 0)
   {
     if (strcmp(value, "true") == 0)
+    {
       orionldState.uriParams.onlyIds = true;
+      LM_T(LmtCount, ("onlyIds is ON"));
+    }
     else if (strcmp(key, "false") != 0)
     {
       orionldError(OrionldBadRequestData, "Invalid value for uri parameter /onlyIds/", value, 400);
@@ -1133,6 +1143,7 @@ MHD_Result orionldMhdConnectionInit
   // 5. GET URI params
   //
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
+  LM_T(LmtCount, ("orionldState.uriParams.count: %s", K_FT(orionldState.uriParams.count)));
 
   //
   // Format of response payload

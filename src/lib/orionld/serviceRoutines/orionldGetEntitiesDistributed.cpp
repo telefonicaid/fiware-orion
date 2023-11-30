@@ -104,14 +104,15 @@ typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam)
 //
 // distOpsReceive - FIXME: move to orionld/forwarding/distOpsReceive.cpp/h
 //
-void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam)
+void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam, int requestsSent)
 {
-  LM_T(LmtSR, ("Receiving responses"));
+  LM_T(LmtCount, ("Receiving %d responses", requestsSent));
   //
   // Read the responses to the forwarded requests
   //
   CURLMsg* msgP;
   int      msgsLeft;
+  int      responses = 0;
 
   while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
   {
@@ -130,15 +131,17 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 
       curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &distOpP->httpResponseCode);
 
+      LM_T(LmtDistOpResponse, ("%s: received a %d response for a forwarded request; %s", distOpP->regP->regId, distOpP->httpResponseCode, distOpP->rawResponse));
+
       if ((distOpP->rawResponse != NULL) && (distOpP->rawResponse[0] != 0))
         distOpP->responseBody = kjParse(orionldState.kjsonP, distOpP->rawResponse);
 
-      LM_T(LmtDistOpResponse, ("%s: received a response for a forwarded request", distOpP->regP->regId, distOpP->httpResponseCode));
-      LM_T(LmtDistOpResponse, ("%s: response for a forwarded request: %s", distOpP->regP->regId, distOpP->rawResponse));
-
       treatFunction(distOpP, callbackParam);
+      ++responses;
     }
   }
+
+  LM_W(("********************** Expected %d responses, got %d", requestsSent, responses));
 }
 
 
@@ -211,6 +214,8 @@ static void entityMapItemAdd(const char* entityId, DistOp* distOpP)
 {
   KjNode* matchP = kjLookup(orionldEntityMap, entityId);
 
+  LM_T(LmtCount, ("entity id: '%s'", entityId));
+
   if (matchP == NULL)
   {
     //
@@ -242,11 +247,18 @@ int idListResponse(DistOp* distOpP, void* callbackParam)
 {
   if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
   {
-    LM_T(LmtEntityMapDetail, ("Entity map from registration '%s' (distOp at %p)", distOpP->regP->regId, distOpP));
-    kjTreeLog(distOpP->responseBody, "distOpP->responseBody", LmtEntityMap);
+    kjTreeLog(distOpP->responseBody, "DistOp RESPONSE", LmtCount);
     for (KjNode* eIdNodeP = distOpP->responseBody->value.firstChildP; eIdNodeP != NULL; eIdNodeP = eIdNodeP->next)
     {
-      char* entityId = eIdNodeP->value.s;
+      // FIXME: The response is supposed to be an array of entity ids
+      //        However, when 3 inter-registered brokers run, I get the second response instead of
+      //        the first - the first response seems to go missing somewhere...
+      //        This is an UGLY attempt to "make it work"
+      //
+      KjNode* eP = (eIdNodeP->type == KjObject)? kjLookup(eIdNodeP, "id") : eIdNodeP;
+      LM_T(LmtCount, ("JSON Type of array item: %s", kjValueType(eIdNodeP->type)));
+
+      char* entityId = eP->value.s;
 
       LM_T(LmtEntityMap, ("o Entity '%s', distOp '%s', registration '%s'", entityId, distOpP->id, distOpP->regP->regId));
       entityMapItemAdd(entityId, distOpP);
@@ -273,7 +285,9 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
 
   // Await all responses, if any
   if (forwards > 0)
-    distOpsReceive(distOpList, idListResponse, orionldEntityMap);
+    distOpsReceive(distOpList, idListResponse, orionldEntityMap, forwards);
+
+
 }
 
 
@@ -291,6 +305,8 @@ static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, O
   // Send requests to all matching registration-endpoints, to fill in the entity map
   //
   distOpMatchIdsRequest(distOpList);  // Not including local hits
+
+  kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtSR);
 
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request
@@ -346,6 +362,8 @@ static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, O
   }
 
   orionldEntityMapCount = kjChildCount(orionldEntityMap);
+  kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtCount);
+  LM_T(LmtCount, ("COUNT: Items in orionldEntityMap: %d", orionldEntityMapCount));
 
   // <DEBUG>
   if (lmTraceIsSet(LmtEntityMap) == true)
@@ -365,6 +383,7 @@ static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, O
       ++ix;
     }
   }
+  kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtSR);
   // </DEBUG>
 }
 
@@ -376,16 +395,27 @@ static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, O
 //
 bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
 {
-  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
   if (orionldEntityMap != NULL)
   {
     LM_T(LmtMongoc, ("Calling orionldGetEntitiesPage"));
     return orionldGetEntitiesPage();
   }
 
-  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
+  LM_T(LmtCount, ("--------------------------- Creating entity map"));
   entityMapCreate(distOpList, idPattern, qNode, geoInfoP);
-  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
+  LM_T(LmtCount, ("--------------------------- Created entity map"));
+  kjTreeLog(orionldEntityMap, "orionldEntityMap excl local entities", LmtCount);
+
+  // Must return the ID of the entity map as an HTTP header
+  uuidGenerate(orionldEntityMapId, sizeof(orionldEntityMapId), "urn:ngsi-ld:entity-map:");
+  orionldHeaderAdd(&orionldState.out.headers, HttpEntityMap, orionldEntityMapId, 0);
+
+  if (orionldState.uriParams.limit == 0)
+  {
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, orionldEntityMapCount);
+    orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
+    return true;
+  }
 
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request
@@ -402,10 +432,6 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
                                    orionldState.uriParams.geometryProperty,
                                    orionldState.uriParams.onlyIds,
                                    true);
-
-  // Must return the ID of the entity map as an HTTP header
-  uuidGenerate(orionldEntityMapId, sizeof(orionldEntityMapId), "urn:ngsi-ld:entity-map:");
-  orionldHeaderAdd(&orionldState.out.headers, HttpEntityMap, orionldEntityMapId, 0);
 
   return orionldGetEntitiesPage();
 }

@@ -71,7 +71,8 @@ payload='{
           "id": "urn:ngsi-ld:entities:E1",
           "type": "Entity"
         }
-      ]
+      ],
+      "propertyNames": ["P1", "R1"]
     }
   ],
   "endpoint": "http://localhost:'$CP1_PORT'"

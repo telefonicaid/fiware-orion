@@ -79,15 +79,15 @@ static KjNode* newerAttribute(KjNode* currentP, KjNode* pretenderP)
     {
       if (strcmp(currentModifiedAt->value.s, pretenderModifiedAt->value.s) >= 0)
         return currentP;
-      else
-        return pretenderP;
+
+      return pretenderP;
     }
     else if (currentModifiedAt != NULL)
       return currentP;
     else if (pretenderModifiedAt != NULL)
       return pretenderP;
-    else
-      return currentP;  // Just pick one ...
+
+    return currentP;  // Just pick one ...
   }
   else if (currentObservedAt == NULL)
     return pretenderP;
@@ -97,12 +97,9 @@ static KjNode* newerAttribute(KjNode* currentP, KjNode* pretenderP)
   {
     if (strcmp(currentObservedAt->value.s, pretenderObservedAt->value.s) >= 0)
       return currentP;
-    else
-      return pretenderP;
-  }
 
-  LM_W(("Not sure how we got here ... keeping the current - no replace"));
-  return currentP;
+    return pretenderP;
+  }
 }
 
 

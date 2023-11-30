@@ -52,7 +52,9 @@ bool orionldGetEntityMap(void)
   }
 
   // Cloning the entityMap - to later modify it
-  orionldState.responseTree   = kjClone(orionldState.kjsonP, orionldEntityMap);
+  // orionldState.responseTree   = kjClone(orionldState.kjsonP, orionldEntityMap);
+  orionldState.responseTree = orionldEntityMap;
+  kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtSR);
 
   // Sort all entity arrays in alphabetic order (for functests to work ...)
   // NOTE;

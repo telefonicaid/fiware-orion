@@ -119,7 +119,8 @@ typedef enum TraceLevels
   // Misc
   //
   LmtMongoc = 200,                     // Entire mongoc library
-  LmtSR,                               // Service Routine (whatever it is doing)
+  LmtSR,                               // Service Routine (whatever it is it's doing)
+  LmtCount,                            // NGSILD-Results-Count header, details for distops
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
   LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
