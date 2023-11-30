@@ -4,7 +4,7 @@
 - Fix: DateTime and geo:json types were not supported in custom notifications using ngsi patching (#4435)
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
 - Fix: improve error traces (#4387)
-- Fix: on delete attributes operation the lack of attribute in entity doesn't precule attributes which do exist (this way behaving same way as update attributes operation)
+- Fix: on delete attributes operation, the lack of attribute in entity doesn't preclude the deletion of attributes which do exist (this way behaving same way as update attributes operation)
 - Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
 - Fix: improve logs in MongoDB query logic
 - Upgrade Debian version from 11.6 to 12.1 in Dockerfile

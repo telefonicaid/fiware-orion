@@ -34,6 +34,7 @@
 #include "common/string.h"
 #include "common/RenderFormat.h"
 #include "ngsi/StringList.h"
+#include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
 
 
@@ -71,6 +72,15 @@ extern void setMetadataFilter
 *
 */
 extern RenderFormat getRenderFormat(std::map<std::string, bool>&  uriParamOptions);
+
+
+
+/* ****************************************************************************
+*
+* adaptErrorCodeForSingleEntityOperation -
+*
+*/
+extern void adaptErrorCodeForSingleEntityOperation(OrionError* oeP, bool singleAttributeCheck);
 
 #endif  // SRC_LIB_SERVICEROUTINESV2_SERVICEROUTINESCOMMON_H_
 

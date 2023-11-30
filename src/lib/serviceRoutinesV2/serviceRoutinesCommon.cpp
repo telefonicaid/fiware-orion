@@ -32,6 +32,7 @@
 
 #include "common/string.h"
 #include "common/RenderFormat.h"
+#include "common/errorMessages.h"
 #include "ngsi/StringList.h"
 #include "rest/uriParamNames.h"
 
@@ -123,4 +124,27 @@ RenderFormat getRenderFormat(std::map<std::string, bool>&  uriParamOptions)
   else if (uriParamOptions[OPT_UNIQUE_VALUES] == true)  { renderFormat = NGSI_V2_UNIQUE_VALUES; }
 
   return renderFormat;
+}
+
+
+
+/* ****************************************************************************
+*
+* adaptErrorCodeForSingleEntityOperation -
+*
+*/
+void adaptErrorCodeForSingleEntityOperation(OrionError* oeP, bool singleAttributeCheck)
+{
+  if ((oeP->code == SccContextElementNotFound) & (oeP->reasonPhrase == ERROR_NOT_FOUND))
+  {
+    // In single entity attribute operations (e.g. DELETE /v2/entities/E/attrs/A) when the entity doesn't exist
+    oeP->details = ERROR_DESC_NOT_FOUND_ENTITY;
+  }
+  else if (singleAttributeCheck && (oeP->code == SccInvalidModification) & (oeP->reasonPhrase == ERROR_UNPROCESSABLE))
+  {
+    // In single entity attribute operations (e.g. DELETE /v2/entities/E/attrs/A) when the entity exists but the attribute doesn't
+    oeP->code = SccContextElementNotFound;
+    oeP->reasonPhrase = ERROR_NOT_FOUND;
+    oeP->details = ERROR_DESC_NOT_FOUND_ATTRIBUTE;
+  }
 }
