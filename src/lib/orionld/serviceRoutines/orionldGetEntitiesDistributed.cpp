@@ -286,8 +286,6 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
   // Await all responses, if any
   if (forwards > 0)
     distOpsReceive(distOpList, idListResponse, orionldEntityMap, forwards);
-
-
 }
 
 
