@@ -190,7 +190,7 @@ bool orionldGetEntity(void)
         if (distOpP->regP != NULL)
         {
           LM_T(LmtDistOpAttributes, ("distOp::attrsParam: '%s'", distOpP->attrsParam));
-          if (distOpSend(distOpP, dateHeader, xff) == 0)
+          if (distOpSend(distOpP, dateHeader, xff, false) == 0)
           {
             ++forwards;
             distOpP->error = false;

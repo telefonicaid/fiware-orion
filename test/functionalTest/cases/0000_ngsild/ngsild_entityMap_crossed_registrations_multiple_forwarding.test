@@ -272,7 +272,7 @@ echo
 
 echo "13. Create an entity map for a GET /entities?type=T in CB"
 echo "========================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' -H "aerOS: true" 
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
@@ -287,7 +287,7 @@ echo
 
 echo "15. Create an entity map for a GET /entities?type=T in CP1"
 echo "=========================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true' --port $CP1_PORT
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true'  -H "aerOS: true" --port $CP1_PORT
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
@@ -302,7 +302,7 @@ echo
 
 echo "17. Create an entity map for a GET /entities?type=T in CP2"
 echo "=========================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true' --port $CP2_PORT
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true' -H "aerOS: true" --port $CP2_PORT
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
@@ -313,7 +313,6 @@ echo '==========================================================================
 orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --port $CP2_PORT
 echo
 echo
-
 
 
 --REGEXPECT--
@@ -655,11 +654,17 @@ Date: REGEX(.*)
         "@none"
     ],
     "urn:E5": [
+<<<<<<< HEAD
+        "urn:R2"
+    ],
+    "urn:E6": [
+=======
         "urn:R1",
         "urn:R2"
     ],
     "urn:E6": [
         "urn:R1",
+>>>>>>> feature/entityMaps
         "urn:R2"
     ]
 }
@@ -762,6 +767,17 @@ Date: REGEX(.*)
 
 {
     "urn:E1": [
+<<<<<<< HEAD
+        "urn:R1"
+    ],
+    "urn:E2": [
+        "urn:R1"
+    ],
+    "urn:E3": [
+        "urn:R2"
+    ],
+    "urn:E4": [
+=======
         "urn:R1",
         "urn:R2"
     ],
@@ -775,6 +791,7 @@ Date: REGEX(.*)
     ],
     "urn:E4": [
         "urn:R1",
+>>>>>>> feature/entityMaps
         "urn:R2"
     ],
     "urn:E5": [

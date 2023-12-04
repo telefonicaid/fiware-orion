@@ -246,6 +246,7 @@ typedef struct OrionldStateIn
   char*     tenant;
   char*     legacy;          // Use legacy mongodb driver / mongoBackend
   bool      performance;
+  bool      aerOS;           // Special treatment for aerOS specific features
 
   // Incoming payload
   char*     payload;

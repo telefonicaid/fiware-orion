@@ -433,6 +433,11 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   }
   else if (strcasecmp(key, "Performance") == 0)
     orionldState.in.performance = true;
+  else if (strcasecmp(key, "aerOS") == 0)
+  {
+    if (strcasecmp(value, "true") == 0)
+      orionldState.in.aerOS = true;
+  }
   else if (strcasecmp(key, "NGSILD-Scope") == 0)
   {
     orionldState.scopes = strSplit((char*) value, ',', orionldState.scopeV, K_VEC_SIZE(orionldState.scopeV));

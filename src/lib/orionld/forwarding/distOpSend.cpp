@@ -325,7 +325,7 @@ void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdC
 //
 // distOpSend -
 //
-bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader)
+bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader, bool local)
 {
   //
   // Figure out the @context to use for the forwarded request
@@ -408,6 +408,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     if ((distOpP->operation == DoQueryEntity) && (distOpP->entityId != NULL))
       uriParamAdd(&urlParts, "id", distOpP->entityId, -1);
 
+    if (local == true)
+      uriParamAdd(&urlParts, "local=true", NULL, 10);
+
     //
     // If we know the Entity Type, we pass that piece of information as well
     //
@@ -427,7 +430,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   if (orionldState.uriParams.qCopy != NULL)
   {
     uriParamAdd(&urlParts, "q", orionldState.uriParams.qCopy, -1);
-    LM_T(LmtDistOpRequest, ("%s: orionldState.uriParams.q: '%s'", distOpP->regP->regId, orionldState.uriParams.qCopy));
+    LM_T(LmtDistOpRequestHeaders, ("%s: orionldState.uriParams.q: '%s'", distOpP->regP->regId, orionldState.uriParams.qCopy));
   }
 
   //

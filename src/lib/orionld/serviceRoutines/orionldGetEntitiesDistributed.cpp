@@ -281,7 +281,7 @@ static void distOpMatchIdsRequest(DistOp* distOpList)
 
   distOpListDebug2(distOpList, "DistOps before sending the onlyId=true requests");
   // Send all distributed requests
-  int forwards = distOpsSend(distOpList);
+  int forwards = distOpsSend(distOpList, orionldState.in.aerOS);
 
   // Await all responses, if any
   if (forwards > 0)

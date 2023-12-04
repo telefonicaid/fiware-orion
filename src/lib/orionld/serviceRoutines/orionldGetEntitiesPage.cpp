@@ -125,12 +125,20 @@ DistOpListItem* distOpListItemCreate(const char* distOpId, char* idString)
 
   if (distOpP == NULL)
   {
+#if 0
     //
     // I think this LM_RE here is incorrect.
     // The DistOps are for one request only.
     // So, create a new DistOp if it does not exist.
     //
     LM_RE(NULL, ("Internal Error (unable to find the DistOp '%s'", distOpId));
+#else
+    RegCacheItem* rciP = regCacheItemLookup(orionldState.tenantP->regCache, distOpId);
+    distOpP = distOpCreate(DoQueryEntity, rciP, NULL, NULL, NULL);
+    // Add DistOp to the linked list of DistOps
+    distOpP->next    = orionldState.distOpList;
+    orionldState.distOpList = distOpP;
+#endif
   }
 
   DistOpListItem* itemP = (DistOpListItem*) kaAlloc(&orionldState.kalloc, sizeof(DistOpListItem));
@@ -169,18 +177,12 @@ DistOpListItem* distOpListItemAdd(DistOpListItem* distOpList, const char* distOp
 
 // -----------------------------------------------------------------------------
 //
-// queryResponse -
+// responseMerge -
 //
-// FIXME:
-//   I have a problem here with responses for requests forwarded due to Auxiliary Registrations.
-//   They can't be taken into account until AFTER all other responses have been dealt with,
-//   So, unless all other responses have been treated (merging entities), responses from Aux Regs must be delayed.
-//   They must be kept in a list and treated once no other responses are left.
-//
-static int queryResponse(DistOp* distOpP, void* callbackParam)
+static void responseMerge(DistOp* distOpP, KjNode* entityArray)
 {
-  LM_T(LmtSR, ("Got a response. status code: %d. callbackParam: %p", distOpP->httpResponseCode, callbackParam));
-  KjNode* entityArray = (KjNode*) callbackParam;
+  LM_W(("Merging entities for DistOp '%s' (aux: %s)", distOpP->id, (distOpP->regP->mode == RegModeAuxiliary)? "YES" : "NO"));
+  LM_T(LmtSR, ("Got a response. status code: %d. entityArray: %p", distOpP->httpResponseCode, entityArray));
 
   kjTreeLog(distOpP->responseBody, "Response", LmtSR);
 
@@ -214,9 +216,8 @@ static int queryResponse(DistOp* distOpP, void* callbackParam)
         }
         else
         {
-          bool auxiliary = distOpP->regP->mode == RegModeAuxiliary;
           LM_T(LmtDistOpMerge, ("Existing Entity '%s' - merging it in the entity array (reg-mode: %s)", entityId, registrationModeToString(distOpP->regP->mode)));
-          distOpEntityMerge(baseEntityP, entityP, orionldState.uriParamOptions.sysAttrs, auxiliary);
+          distOpEntityMerge(baseEntityP, entityP, orionldState.uriParamOptions.sysAttrs, distOpP->regP->mode == RegModeAuxiliary);
         }
       }
       else
@@ -225,7 +226,19 @@ static int queryResponse(DistOp* distOpP, void* callbackParam)
       entityP = next;
     }
   }
+}
 
+
+
+// -----------------------------------------------------------------------------
+//
+// queryResponse -
+//
+static int queryResponse(DistOp* distOpP, void* callbackParam)
+{
+  KjNode* entityArray = (KjNode*) callbackParam;
+
+  responseMerge(distOpP, entityArray);
   return 0;
 }
 
@@ -243,7 +256,7 @@ typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam)
 //
 // distOpsReceive2 - FIXME: move to orionld/forwarding/distOpsReceive.cpp/h
 //
-void distOpsReceive2(DistOpResponseTreatFunction treatFunction, void* callbackParam)
+void distOpsReceive2(DistOpListItem* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam)
 {
   LM_T(LmtSR, ("Receiving responses"));
   //
@@ -275,8 +288,17 @@ void distOpsReceive2(DistOpResponseTreatFunction treatFunction, void* callbackPa
       LM_T(LmtDistOpResponse, ("%s: received a response for a forwarded request", distOpP->regP->regId, distOpP->httpResponseCode));
       LM_T(LmtDistOpResponse, ("%s: response for a forwarded request: %s", distOpP->regP->regId, distOpP->rawResponse));
 
-      treatFunction(distOpP, callbackParam);
+      if (distOpP->regP->mode == RegModeAuxiliary)
+        LM_W(("%s: Aux registration - merge is delayed", distOpP->regP->regId));
+      else
+        treatFunction(distOpP, callbackParam);
     }
+  }
+
+  for (DistOp* distOpP = orionldState.distOpList; distOpP != NULL; distOpP = distOpP->next)
+  {
+    if ((distOpP->regP != NULL) && (distOpP->regP->mode == RegModeAuxiliary))
+      responseMerge(distOpP, (KjNode*) callbackParam);
   }
 }
 
@@ -294,7 +316,7 @@ static void distOpQueryRequest(DistOpListItem* distOpList, KjNode* entityArray)
 
   // Await all responses, if any
   if (forwards > 0)
-    distOpsReceive2(queryResponse, entityArray);
+    distOpsReceive2(distOpList, queryResponse, entityArray);
 }
 
 
