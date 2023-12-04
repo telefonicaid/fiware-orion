@@ -90,6 +90,7 @@ HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
 Date: REGEX(.*)
+Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 
 []
 
