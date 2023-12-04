@@ -48,6 +48,8 @@ orionldStart CP3 -experimental
 # 09. Create a registration for E1 and E2 in CP3, using 2 information array items
 # 10. Local query on CB for all entities of type T, with onlyIds=true set
 # 11. Query CB for all entities (they're all type 'T')
+# 12. See the entity map
+# 13. Query using the entity map I got from step 11
 #
 
 echo "01. Create entities E00-E09 in CB"
@@ -265,7 +267,15 @@ echo
 echo
 
 
-echo "12. Query using the entity map I got from step 11"
+
+echo "12. See the entity map"
+echo "======================"
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap
+echo
+echo
+
+
+echo "13. Query using the entity map I got from step 11"
 echo "================================================="
 orionCurl --url '/ngsi-ld/v1/entities?entityMap='$entityMap'&offset=20&limit=5' # | grep 'urn:' | grep ':entities:'
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
@@ -439,7 +449,138 @@ NGSILD-Results-Count: 40
 ]
 
 
-12. Query using the entity map I got from step 11
+12. See the entity map
+======================
+HTTP/1.1 200 OK
+Content-Length: 1401
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:cb:entities:E00": [
+        "@none"
+    ],
+    "urn:cb:entities:E01": [
+        "@none"
+    ],
+    "urn:cb:entities:E02": [
+        "@none"
+    ],
+    "urn:cb:entities:E03": [
+        "@none"
+    ],
+    "urn:cb:entities:E04": [
+        "@none"
+    ],
+    "urn:cb:entities:E05": [
+        "@none"
+    ],
+    "urn:cb:entities:E06": [
+        "@none"
+    ],
+    "urn:cb:entities:E07": [
+        "@none"
+    ],
+    "urn:cb:entities:E08": [
+        "@none"
+    ],
+    "urn:cb:entities:E09": [
+        "@none"
+    ],
+    "urn:cp1:entities:E10": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E11": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E12": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E13": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E14": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E15": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E16": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E17": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E18": [
+        "urn:Reg1"
+    ],
+    "urn:cp1:entities:E19": [
+        "urn:Reg1"
+    ],
+    "urn:cp2:entities:E20": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E21": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E22": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E23": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E24": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E25": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E26": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E27": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E28": [
+        "urn:Reg2"
+    ],
+    "urn:cp2:entities:E29": [
+        "urn:Reg2"
+    ],
+    "urn:cp3:entities:E30": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E31": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E32": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E33": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E34": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E35": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E36": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E37": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E38": [
+        "urn:Reg3"
+    ],
+    "urn:cp3:entities:E39": [
+        "urn:Reg3"
+    ]
+}
+
+
+13. Query using the entity map I got from step 11
 =================================================
 HTTP/1.1 200 OK
 Content-Length: 831

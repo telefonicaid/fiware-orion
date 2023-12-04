@@ -435,6 +435,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 NGSILD-Results-Count: 6
 
 [
+#SORT_START
     {
         "P1": {
             "type": "Property",
@@ -507,6 +508,7 @@ NGSILD-Results-Count: 6
         "id": "urn:E6",
         "type": "T"
     }
+#SORT_END
 ]
 
 
@@ -546,7 +548,7 @@ Date: REGEX(.*)
 15. Create an entity map for a GET /entities?type=T in CP1
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 781
 Content-Type: application/json
 Date: REGEX(.*)
 Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
@@ -554,6 +556,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 NGSILD-Results-Count: 6
 
 [
+#SORT_START
     {
         "P1": {
             "type": "Property",
@@ -626,12 +629,14 @@ NGSILD-Results-Count: 6
         "id": "urn:E2",
         "type": "T"
     }
+#SORT_END
 ]
+
 
 16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 137
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -649,9 +654,17 @@ Date: REGEX(.*)
         "@none"
     ],
     "urn:E5": [
+<<<<<<< HEAD
         "urn:R2"
     ],
     "urn:E6": [
+=======
+        "urn:R1",
+        "urn:R2"
+    ],
+    "urn:E6": [
+        "urn:R1",
+>>>>>>> feature/entityMaps
         "urn:R2"
     ]
 }
@@ -660,7 +673,7 @@ Date: REGEX(.*)
 17. Create an entity map for a GET /entities?type=T in CP2
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 781
 Content-Type: application/json
 Date: REGEX(.*)
 Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
@@ -668,6 +681,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 NGSILD-Results-Count: 6
 
 [
+#SORT_START
     {
         "P1": {
             "type": "Property",
@@ -740,18 +754,20 @@ NGSILD-Results-Count: 6
         "id": "urn:E2",
         "type": "T"
     }
+#SORT_END
 ]
 
 
 18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 155
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "urn:E1": [
+<<<<<<< HEAD
         "urn:R1"
     ],
     "urn:E2": [
@@ -761,6 +777,21 @@ Date: REGEX(.*)
         "urn:R2"
     ],
     "urn:E4": [
+=======
+        "urn:R1",
+        "urn:R2"
+    ],
+    "urn:E2": [
+        "urn:R1",
+        "urn:R2"
+    ],
+    "urn:E3": [
+        "urn:R1",
+        "urn:R2"
+    ],
+    "urn:E4": [
+        "urn:R1",
+>>>>>>> feature/entityMaps
         "urn:R2"
     ],
     "urn:E5": [
