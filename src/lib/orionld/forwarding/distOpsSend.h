@@ -33,7 +33,7 @@
 //
 // distOpsSend -
 //
-extern int distOpsSend(DistOp* distOpList);
+extern int distOpsSend(DistOp* distOpList, bool local);
 
 
 

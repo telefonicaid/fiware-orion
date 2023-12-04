@@ -55,7 +55,7 @@ orionldStart CP2 -experimental -forwarding
 #
 
 echo "01. In CB, create an entity urn:E1 with attributes P1+R1"
-echo "========================================================="
+echo "========================================================"
 payload='{
   "id": "urn:E1",
   "type": "T",
@@ -68,7 +68,7 @@ echo
 
 
 echo "02. In CB, create an entity urn:E2 with attributes P1+R1"
-echo "========================================================="
+echo "========================================================"
 payload='{
   "id": "urn:E2",
   "type": "T",
@@ -133,7 +133,7 @@ echo
 
 
 echo "07. Create an inclusive registration R1 in CB on entities of type T pointing to CP1"
-echo "========================================================="
+echo "==================================================================================="
 payload='{
   "id": "urn:R1",
   "type": "ContextSourceRegistration",
@@ -156,7 +156,7 @@ echo
 
 
 echo "08. Create an inclusive registration R2 in CB on entities of type T pointing to CP2"
-echo "========================================================="
+echo "==================================================================================="
 payload='{
   "id": "urn:R2",
   "type": "ContextSourceRegistration",
@@ -179,7 +179,7 @@ echo
 
 
 echo "09. Create an inclusive registration R1 in CP1 on entities of type T pointing to CB"
-echo "========================================================="
+echo "==================================================================================="
 payload='{
   "id": "urn:R1",
   "type": "ContextSourceRegistration",
@@ -202,7 +202,7 @@ echo
 
 
 echo "10. Create an inclusive registration R2 in CP1 on entities of type T pointing to CP2"
-echo "========================================================="
+echo "===================================================================================="
 payload='{
   "id": "urn:R2",
   "type": "ContextSourceRegistration",
@@ -225,7 +225,7 @@ echo
 
 
 echo "11. Create an inclusive registration R1 in CP2 on entities of type T pointing to CB"
-echo "========================================================="
+echo "==================================================================================="
 payload='{
   "id": "urn:R1",
   "type": "ContextSourceRegistration",
@@ -248,7 +248,7 @@ echo
 
 
 echo "12. Create an inclusive registration R2 in CP2 on entities of type T pointing to CP1"
-echo "========================================================="
+echo "===================================================================================="
 payload='{
   "id": "urn:R2",
   "type": "ContextSourceRegistration",
@@ -271,54 +271,53 @@ echo
 
 
 echo "13. Create an entity map for a GET /entities?type=T in CB"
-echo "==================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true'
+echo "========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' -H "aerOS: true" 
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
 
 echo '14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1'
-echo '================================================================='
-orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --noPayloadCheck
+echo '=================================================================================='
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap
 echo
 echo
 
 
 echo "15. Create an entity map for a GET /entities?type=T in CP1"
-echo "==================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' --port $CP1_PORT
+echo "=========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true'  -H "aerOS: true" --port $CP1_PORT
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
 
 echo '16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB'
-echo '================================================================='
+echo '================================================================================='
 orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --port $CP1_PORT
 echo
 echo
 
 
 echo "17. Create an entity map for a GET /entities?type=T in CP2"
-echo "==================================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' --port $CP2_PORT
+echo "=========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true' -H "aerOS: true" --port $CP2_PORT
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
 
 echo '18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB'
-echo '================================================================='
+echo '================================================================================='
 orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --port $CP2_PORT
 echo
 echo
 
 
-
 --REGEXPECT--
 01. In CB, create an entity urn:E1 with attributes P1+R1
-=========================================================
+========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -327,7 +326,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 
 02. In CB, create an entity urn:E2 with attributes P1+R1
-=========================================================
+========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -372,7 +371,7 @@ Location: /ngsi-ld/v1/entities/urn:E6
 
 
 07. Create an inclusive registration R1 in CB on entities of type T pointing to CP1
-=========================================================
+===================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -381,7 +380,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
 
 
 08. Create an inclusive registration R2 in CB on entities of type T pointing to CP2
-=========================================================
+===================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -390,7 +389,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
 
 
 09. Create an inclusive registration R1 in CP1 on entities of type T pointing to CB
-=========================================================
+===================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -399,7 +398,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
 
 
 10. Create an inclusive registration R2 in CP1 on entities of type T pointing to CP2
-=========================================================
+====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -408,7 +407,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
 
 
 11. Create an inclusive registration R1 in CP2 on entities of type T pointing to CB
-=========================================================
+===================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -417,7 +416,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
 
 
 12. Create an inclusive registration R2 in CP2 on entities of type T pointing to CP1
-=========================================================
+====================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -426,9 +425,9 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
 
 
 13. Create an entity map for a GET /entities?type=T in CB
-===================================================
+=========================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 781
 Content-Type: application/json
 Date: REGEX(.*)
 Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
@@ -512,9 +511,9 @@ NGSILD-Results-Count: 6
 
 
 14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1
-=================================================================
+==================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 155
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -526,22 +525,26 @@ Date: REGEX(.*)
         "@none"
     ],
     "urn:E3": [
-        "http://orionld-dev:9801"
+        "urn:R1",
+        "urn:R2"
     ],
     "urn:E4": [
-        "http://orionld-dev:9801"
+        "urn:R1",
+        "urn:R2"
     ],
     "urn:E5": [
-        "http://orionld-dev:9802"
+        "urn:R1",
+        "urn:R2"
     ],
     "urn:E6": [
-        "http://orionld-dev:9802"
+        "urn:R1",
+        "urn:R2"
     ]
 }
 
 
 15. Create an entity map for a GET /entities?type=T in CP1
-=================================================================
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
 Content-Type: application/json
@@ -626,7 +629,7 @@ NGSILD-Results-Count: 6
 ]
 
 16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
-===================================================
+=================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
 Content-Type: application/json
@@ -634,10 +637,10 @@ Date: REGEX(.*)
 
 {
     "urn:E1": [
-        "http://orionld-dev:9999"
+        "urn:R1"
     ],
     "urn:E2": [
-        "http://orionld-dev:9999"
+        "urn:R1"
     ],
     "urn:E3": [
         "@none"
@@ -646,16 +649,16 @@ Date: REGEX(.*)
         "@none"
     ],
     "urn:E5": [
-        "http://orionld-dev:9802"
+        "urn:R2"
     ],
     "urn:E6": [
-        "http://orionld-dev:9802"
+        "urn:R2"
     ]
 }
 
 
 17. Create an entity map for a GET /entities?type=T in CP2
-=================================================================
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
 Content-Type: application/json
@@ -741,7 +744,7 @@ NGSILD-Results-Count: 6
 
 
 18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
-=================================================================
+=================================================================================
 HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
 Content-Type: application/json
@@ -749,16 +752,16 @@ Date: REGEX(.*)
 
 {
     "urn:E1": [
-        "http://orionld-dev:9999"
+        "urn:R1"
     ],
     "urn:E2": [
-        "http://orionld-dev:9999"
+        "urn:R1"
     ],
     "urn:E3": [
-        "http://orionld-dev:9801"
+        "urn:R2"
     ],
     "urn:E4": [
-        "http://orionld-dev:9801"
+        "urn:R2"
     ],
     "urn:E5": [
         "@none"

@@ -478,7 +478,7 @@ bool orionldPostBatchDelete(void)
           char dateHeader[70];
           snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-          if (distOpSend(distReqP, dateHeader, xff) == 0)
+          if (distOpSend(distReqP, dateHeader, xff, false) == 0)
           {
             ++forwards;
             distReqP->error = false;

@@ -294,7 +294,7 @@ echo
 
 echo "13. GET /entities?type=T in CB"
 echo "=============================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' -H "aerOS: true"
 entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
