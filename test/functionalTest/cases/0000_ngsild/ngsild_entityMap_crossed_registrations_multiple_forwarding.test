@@ -51,7 +51,7 @@ orionldStart CP2 -experimental -forwarding
 # 15. Create an entity map for a GET /entities?type=T in CP1
 # 16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
 # 17. Create an entity map for a GET /entities?type=T in CP2
-# 18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
+# 18. GET the entity map - see E5 and E5 as local entities, E1+E2 in CB (Reg R1), E3+E4 in CP1 (Reg R2)
 #
 
 echo "01. In CB, create an entity urn:E1 with attributes P1+R1"
@@ -273,7 +273,7 @@ echo
 echo "13. Create an entity map for a GET /entities?type=T in CB"
 echo "========================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' -H "aerOS: true" 
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
@@ -288,7 +288,7 @@ echo
 echo "15. Create an entity map for a GET /entities?type=T in CP1"
 echo "=========================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true'  -H "aerOS: true" --port $CP1_PORT
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
@@ -303,13 +303,13 @@ echo
 echo "17. Create an entity map for a GET /entities?type=T in CP2"
 echo "=========================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true' -H "aerOS: true" --port $CP2_PORT
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
 
-echo '18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB'
-echo '================================================================================='
+echo '18. GET the entity map - see E5 and E5 as local entities, E1+E2 in CB (Reg R1), E3+E4 in CP1 (Reg R2)'
+echo '====================================================================================================='
 orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --port $CP2_PORT
 echo
 echo
@@ -430,8 +430,8 @@ HTTP/1.1 200 OK
 Content-Length: 781
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 NGSILD-Results-Count: 6
 
 [
@@ -515,7 +515,7 @@ NGSILD-Results-Count: 6
 14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -527,19 +527,15 @@ Date: REGEX(.*)
         "@none"
     ],
     "urn:E3": [
-        "urn:R1",
-        "urn:R2"
+        "urn:R1"
     ],
     "urn:E4": [
-        "urn:R1",
-        "urn:R2"
+        "urn:R1"
     ],
     "urn:E5": [
-        "urn:R1",
         "urn:R2"
     ],
     "urn:E6": [
-        "urn:R1",
         "urn:R2"
     ]
 }
@@ -551,12 +547,11 @@ HTTP/1.1 200 OK
 Content-Length: 781
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 NGSILD-Results-Count: 6
 
 [
-#SORT_START
     {
         "P1": {
             "type": "Property",
@@ -629,14 +624,13 @@ NGSILD-Results-Count: 6
         "id": "urn:E2",
         "type": "T"
     }
-#SORT_END
 ]
 
 
 16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 137
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -654,17 +648,9 @@ Date: REGEX(.*)
         "@none"
     ],
     "urn:E5": [
-<<<<<<< HEAD
         "urn:R2"
     ],
     "urn:E6": [
-=======
-        "urn:R1",
-        "urn:R2"
-    ],
-    "urn:E6": [
-        "urn:R1",
->>>>>>> feature/entityMaps
         "urn:R2"
     ]
 }
@@ -676,12 +662,11 @@ HTTP/1.1 200 OK
 Content-Length: 781
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 NGSILD-Results-Count: 6
 
 [
-#SORT_START
     {
         "P1": {
             "type": "Property",
@@ -754,20 +739,18 @@ NGSILD-Results-Count: 6
         "id": "urn:E2",
         "type": "T"
     }
-#SORT_END
 ]
 
 
-18. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
-=================================================================================
+18. GET the entity map - see E5 and E5 as local entities, E1+E2 in CB (Reg R1), E3+E4 in CP1 (Reg R2)
+=====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "urn:E1": [
-<<<<<<< HEAD
         "urn:R1"
     ],
     "urn:E2": [
@@ -777,21 +760,6 @@ Date: REGEX(.*)
         "urn:R2"
     ],
     "urn:E4": [
-=======
-        "urn:R1",
-        "urn:R2"
-    ],
-    "urn:E2": [
-        "urn:R1",
-        "urn:R2"
-    ],
-    "urn:E3": [
-        "urn:R1",
-        "urn:R2"
-    ],
-    "urn:E4": [
-        "urn:R1",
->>>>>>> feature/entityMaps
         "urn:R2"
     ],
     "urn:E5": [

@@ -34,7 +34,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // LmtMongoc
 
-#include "orionld/common/orionldState.h"                            // orionldState, orionldEntityMapCount
+#include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"           // kjEntityIdLookupInEntityArray
@@ -373,14 +373,14 @@ static void cleanupSysAttrs(void)
 //
 bool orionldGetEntitiesPage(void)
 {
-  int offset = orionldState.uriParams.offset;
-  int limit  = orionldState.uriParams.limit;
+  uint32_t  offset = orionldState.uriParams.offset;
+  uint32_t  limit  = orionldState.uriParams.limit;
 
   KjNode* entityArray = kjArray(orionldState.kjsonP, NULL);
   LM_T(LmtDistOpResponseDetail, ("entityArray at %p", entityArray));
 
-  LM_T(LmtEntityMap, ("entity map:          '%s'", orionldEntityMapId));
-  LM_T(LmtEntityMap, ("items in entity map:  %d",  orionldEntityMapCount));
+  LM_T(LmtEntityMap, ("entity map:          '%s'", orionldState.in.entityMap->id));
+  LM_T(LmtEntityMap, ("items in entity map:  %d",  orionldState.in.entityMap->count));
   LM_T(LmtEntityMap, ("offset:               %d",  offset));
   LM_T(LmtEntityMap, ("limit:                %d",  limit));
 
@@ -391,29 +391,29 @@ bool orionldGetEntitiesPage(void)
 
   if (orionldState.uriParams.count == true)
   {
-    LM_T(LmtEntityMap, ("%d entities match, in the entire federation", orionldEntityMapCount));
-    LM_T(LmtEntityMap, ("COUNT: Adding HttpResultsCount header: %d", orionldEntityMapCount));
-    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, orionldEntityMapCount);
+    LM_T(LmtEntityMap, ("%d entities match, in the entire federation", orionldState.in.entityMap->count));
+    LM_T(LmtEntityMap, ("COUNT: Adding HttpResultsCount header: %d", orionldState.in.entityMap->count));
+    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, orionldState.in.entityMap->count);
   }
 
-  if (offset >= orionldEntityMapCount)
+  if (offset >= orionldState.in.entityMap->count)
   {
-    LM_T(LmtEntityMap, ("offset (%d) >= orionldEntityMapCount (%d)", offset, orionldEntityMapCount));
+    LM_T(LmtEntityMap, ("offset (%d) >= orionldState.in.entityMap->count (%d)", offset, orionldState.in.entityMap->count));
     return true;
   }
 
   //
   // Fast forward to offset index in the KJNode array that is the entity map
   //
-  KjNode* entityMap = orionldEntityMap->value.firstChildP;
-  for (int ix = 0; ix < offset; ix++)
+  KjNode* entityMap = orionldState.in.entityMap->map->value.firstChildP;
+  for (uint32_t ix = 0; ix < offset; ix++)
   {
     entityMap = entityMap->next;
   }
 
   //
   // entityMap now points to the first entity to give back.
-  // Must extract all parts of the entities, according to their array inside orionldEntityMap,
+  // Must extract all parts of the entities, according to their array inside the Entity Map,
   // and merge them together (in case of distributed entities
   //
 
@@ -436,7 +436,7 @@ bool orionldGetEntitiesPage(void)
   //
   KjNode* sources = kjObject(orionldState.kjsonP, NULL);
 
-  for (int ix = 0; ix < limit; ix++)
+  for (uint32_t ix = 0; ix < limit; ix++)
   {
     if (entityMap == NULL)  // in case we have less than "limit"
       break;

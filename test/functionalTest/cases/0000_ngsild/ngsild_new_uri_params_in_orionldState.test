@@ -85,12 +85,12 @@ Date: REGEX(.*)
 03. GET Entities without URI params - too broad request
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 195
+Content-Length: 213
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true",
+    "detail": "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true, or an entity map",
     "title": "Too broad query",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

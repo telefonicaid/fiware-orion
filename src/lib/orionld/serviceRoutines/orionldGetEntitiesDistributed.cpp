@@ -28,24 +28,15 @@ extern "C"
 #include "kjson/kjFree.h"                                           // kjFree
 #include "kjson/kjLookup.h"                                         // kjLookup
 #include "kjson/kjBuilder.h"                                        // kjChildRemove, kjChildAdd, kjArray
-#include "kjson/kjParse.h"                                          // kjParse
-#include "kjson/kjRender.h"                                         // kjRender (for debugging purposes - LM_T)
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
-#include "logMsg/traceLevels.h"                                     // LmtMongoc
 
 #include "orionld/common/orionldState.h"                            // orionldState
-#include "orionld/common/uuidGenerate.h"                            // uuidGenerate
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                        // QNode
-#include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
-#include "orionld/dbModel/dbModelToEntityIdAndTypeObject.h"         // dbModelToEntityIdAndTypeObject
 #include "orionld/forwarding/DistOp.h"                              // DistOp
-#include "orionld/forwarding/distOpsSend.h"                         // distOpsSend
-#include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
-#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug2
-#include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
+#include "orionld/entityMaps/entityMapCreate.h"                     // entityMapCreate
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // orionldGetEntitiesPage
 #include "orionld/serviceRoutines/orionldGetEntitiesDistributed.h"  // Own interface
@@ -58,7 +49,7 @@ extern "C"
 //
 // - To be able to do pagination, we need a list of all matching entities:
 //
-//     "orionldEntityMap": {
+//     "EntityMap": {
 //       "urn:E1": [ null ],          # null indicates it was found locally
 //       "urn:E2": [ null ],
 //       "urn:E3": [ null ],
@@ -78,9 +69,9 @@ extern "C"
 // Mechanism:
 // 1. GET a list of all matching registrations.
 // 2. Query them all (locally as well) for their 'Entity Id Array'
-// 3. Merge all the reponses into one single array (orionldEntityMap)
+// 3. Merge all the reponses into one single array (orionldState,in.EntityMap)
 // 4. Now we have a list and we can do pagination.
-// 5. Just pick the start index and end index of orionldEntityMap and:
+// 5. Just pick the start index and end index of the EntityMap and:
 //    - Identify each registered endpoint to be queried (from start index to end index)
 //    - Gather all entity ids for each registered endpoint
 //    - query using (GET /entities?id=E1,E2,E3,...En)
@@ -89,60 +80,6 @@ extern "C"
 // 6. Merge all results into a single entity array, and especially merge entities of the same id
 // 7. Respond to the initial GET /entities
 //
-
-
-
-// -----------------------------------------------------------------------------
-//
-// DistOpResponseTreatFunction -
-//
-typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpsReceive - FIXME: move to orionld/forwarding/distOpsReceive.cpp/h
-//
-void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam, int requestsSent)
-{
-  LM_T(LmtCount, ("Receiving %d responses", requestsSent));
-  //
-  // Read the responses to the forwarded requests
-  //
-  CURLMsg* msgP;
-  int      msgsLeft;
-  int      responses = 0;
-
-  while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
-  {
-    if (msgP->msg != CURLMSG_DONE)
-      continue;
-
-    if (msgP->data.result == CURLE_OK)
-    {
-      DistOp* distOpP = distOpLookupByCurlHandle(distOpList, msgP->easy_handle);
-
-      if (distOpP == NULL)
-      {
-        LM_E(("Unable to find the curl handle of a message, presumably a response to a forwarded request"));
-        continue;
-      }
-
-      curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &distOpP->httpResponseCode);
-
-      LM_T(LmtDistOpResponse, ("%s: received a %d response for a forwarded request; %s", distOpP->regP->regId, distOpP->httpResponseCode, distOpP->rawResponse));
-
-      if ((distOpP->rawResponse != NULL) && (distOpP->rawResponse[0] != 0))
-        distOpP->responseBody = kjParse(orionldState.kjsonP, distOpP->rawResponse);
-
-      treatFunction(distOpP, callbackParam);
-      ++responses;
-    }
-  }
-
-  LM_W(("********************** Expected %d responses, got %d", requestsSent, responses));
-}
 
 
 
@@ -206,186 +143,6 @@ void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunctio
 // It will need to - the URL params from the first request (when the Entity Map was created) must be saved
 //
 
-// -----------------------------------------------------------------------------
-//
-// entityMapItemAdd -
-//
-static void entityMapItemAdd(const char* entityId, DistOp* distOpP)
-{
-  KjNode* matchP = kjLookup(orionldEntityMap, entityId);
-
-  LM_T(LmtCount, ("entity id: '%s'", entityId));
-
-  if (matchP == NULL)
-  {
-    //
-    // The entity ID is not present in the list - must be added
-    //
-    LM_T(LmtEntityMap, ("The entity ID '%s' is not present in the list - adding it", entityId));
-    matchP = kjArray(NULL, entityId);
-    kjChildAdd(orionldEntityMap, matchP);
-  }
-
-  //
-  // Add DistOp ID to matchP's array - remember it's a global variable, can't use kaAlloc
-  //
-  // const char*  distOpId      = (distOpP != NULL)? distOpP->id : "@none";
-  const char*  distOpId      = (distOpP != NULL)? distOpP->regP->regId : "@none";
-  KjNode*      distOpIdNodeP = kjString(NULL, NULL, distOpId);
-
-  LM_T(LmtEntityMap, ("Adding DistOp '%s' to entity '%s'", distOpId, matchP->name));
-  kjChildAdd(matchP, distOpIdNodeP);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// idListResponse - callback function for distOpMatchIdsGet
-//
-int idListResponse(DistOp* distOpP, void* callbackParam)
-{
-  if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
-  {
-    kjTreeLog(distOpP->responseBody, "DistOp RESPONSE", LmtCount);
-    for (KjNode* eIdNodeP = distOpP->responseBody->value.firstChildP; eIdNodeP != NULL; eIdNodeP = eIdNodeP->next)
-    {
-      // FIXME: The response is supposed to be an array of entity ids
-      //        However, when 3 inter-registered brokers run, I get the second response instead of
-      //        the first - the first response seems to go missing somewhere...
-      //        This is an UGLY attempt to "make it work"
-      //
-      KjNode* eP = (eIdNodeP->type == KjObject)? kjLookup(eIdNodeP, "id") : eIdNodeP;
-      LM_T(LmtCount, ("JSON Type of array item: %s", kjValueType(eIdNodeP->type)));
-
-      char* entityId = eP->value.s;
-
-      LM_T(LmtEntityMap, ("o Entity '%s', distOp '%s', registration '%s'", entityId, distOpP->id, distOpP->regP->regId));
-      entityMapItemAdd(entityId, distOpP);
-    }
-  }
-
-  return 0;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpMatchIdsRequest -
-//
-static void distOpMatchIdsRequest(DistOp* distOpList)
-{
-  if (distOpList == NULL)
-    return;
-
-  distOpListDebug2(distOpList, "DistOps before sending the onlyId=true requests");
-  // Send all distributed requests
-  int forwards = distOpsSend(distOpList, orionldState.in.aerOS);
-
-  // Await all responses, if any
-  if (forwards > 0)
-    distOpsReceive(distOpList, idListResponse, orionldEntityMap, forwards);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// entityMapCreate -
-//
-static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
-{
-  orionldEntityMap = kjObject(NULL, "orionldEntityMap");
-  LM_T(LmtDistOpList, ("Created an entity map at %p", orionldEntityMap));
-
-  //
-  // Send requests to all matching registration-endpoints, to fill in the entity map
-  //
-  distOpMatchIdsRequest(distOpList);  // Not including local hits
-
-  kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtSR);
-
-  //
-  // if there are no entity hits to the matching registrations, the request is treated as a local request
-  //
-  if (orionldEntityMap->value.firstChildP == NULL)
-    return;
-
-  char* geojsonGeometryLongName = NULL;
-  if (orionldState.out.contentType == GEOJSON)
-    geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
-
-  // Get the local matches
-  KjNode* localEntityV   = NULL;
-  LM_T(LmtMongoc, ("orionldState.in.attrList.items: %d", orionldState.in.attrList.items));
-  LM_T(LmtMongoc, ("Calling mongocEntitiesQuery"));
-
-  //
-  // Can't do any pagination in this step, and we only really need the Entity ID
-  // Need to teporarily modify the users input for that
-  //
-  int offset = orionldState.uriParams.offset;
-  int limit  = orionldState.uriParams.limit;
-
-  orionldState.uriParams.offset = 0;
-  orionldState.uriParams.limit  = 1000;
-
-  KjNode* localDbMatches = mongocEntitiesQuery(&orionldState.in.typeList,
-                                             &orionldState.in.idList,
-                                             idPattern,
-                                             &orionldState.in.attrList,
-                                             qNode,
-                                             geoInfoP,
-                                             NULL,
-                                             geojsonGeometryLongName,
-                                             true);
-
-  orionldState.uriParams.offset = offset;
-  orionldState.uriParams.limit  = limit;
-
-  kjTreeLog(localDbMatches, "localDbMatches", LmtSR);
-  if (localDbMatches != NULL)
-  {
-    localEntityV = dbModelToEntityIdAndTypeObject(localDbMatches);
-    LM_T(LmtEntityMap, ("Adding local entities to the entityMap"));
-    kjTreeLog(localEntityV, "localEntityV", LmtEntityMap);
-    for (KjNode* eidNodeP = localEntityV->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
-    {
-      const char* entityId = eidNodeP->value.s;
-
-      LM_T(LmtEntityMap, ("o Entity '%s', distOp 'local'", entityId));
-      entityMapItemAdd(entityId, NULL);
-    }
-  }
-
-  orionldEntityMapCount = kjChildCount(orionldEntityMap);
-  kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtCount);
-  LM_T(LmtCount, ("COUNT: Items in orionldEntityMap: %d", orionldEntityMapCount));
-
-  // <DEBUG>
-  if (lmTraceIsSet(LmtEntityMap) == true)
-  {
-    int ix = 0;
-
-    LM_T(LmtEntityMap, ("Entity Maps (%d):", orionldEntityMapCount));
-    kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtEntityMap);
-
-    for (KjNode* entityP = orionldEntityMap->value.firstChildP; entityP != NULL; entityP = entityP->next)
-    {
-      char rBuf[1024];
-
-      bzero(rBuf, 1024);
-      kjFastRender(entityP, rBuf);
-      LM_T(LmtEntityMap, ("  %03d '%s': %s", ix, entityP->name, rBuf));
-      ++ix;
-    }
-  }
-  kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtSR);
-  // </DEBUG>
-}
-
-
 
 // ----------------------------------------------------------------------------
 //
@@ -393,32 +150,40 @@ static void entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, O
 //
 bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP)
 {
-  if (orionldEntityMap != NULL)
-  {
-    LM_T(LmtMongoc, ("Calling orionldGetEntitiesPage"));
+  if (orionldState.in.entityMap != NULL)
     return orionldGetEntitiesPage();
-  }
 
   LM_T(LmtCount, ("--------------------------- Creating entity map"));
-  entityMapCreate(distOpList, idPattern, qNode, geoInfoP);
-  LM_T(LmtCount, ("--------------------------- Created entity map"));
-  kjTreeLog(orionldEntityMap, "orionldEntityMap excl local entities", LmtCount);
-
-  // Must return the ID of the entity map as an HTTP header
-  uuidGenerate(orionldEntityMapId, sizeof(orionldEntityMapId), "urn:ngsi-ld:entity-map:");
-  orionldHeaderAdd(&orionldState.out.headers, HttpEntityMap, orionldEntityMapId, 0);
-
-  if (orionldState.uriParams.limit == 0)
+  orionldState.in.entityMap = entityMapCreate(distOpList, idPattern, qNode, geoInfoP);
+  LM_T(LmtCount, ("--------------------------- entity map at %p", orionldState.in.entityMap));
+  if (orionldState.in.entityMap != NULL)
   {
-    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, orionldEntityMapCount);
-    orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
-    return true;
+    LM_T(LmtCount, ("--------------------------- Created entity map"));
+    kjTreeLog(orionldState.in.entityMap->map, "EntityMap excl local entities", LmtCount);
+
+    // Add the new entity map to the global list of entity maps
+    // sem-take
+    orionldState.in.entityMap->next = entityMaps;
+    entityMaps = orionldState.in.entityMap;
+    // sem-give
+
+    // Must return the ID of the entity map as an HTTP header
+    orionldHeaderAdd(&orionldState.out.headers, HttpEntityMap, orionldState.in.entityMap->id, 0);
+
+    if (orionldState.uriParams.limit == 0)
+    {
+      orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, orionldState.in.entityMap->count);
+      orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
+      return true;
+    }
   }
+  else
+    LM_E(("entityMapCreate returned NULL"));
 
   //
   // if there are no entity hits to the matching registrations, the request is treated as a local request
   //
-  if (orionldEntityMap->value.firstChildP == NULL)
+  if ((orionldState.in.entityMap == NULL) || (orionldState.in.entityMap->map->value.firstChildP == NULL))
     return orionldGetEntitiesLocal(&orionldState.in.typeList,
                                    &orionldState.in.idList,
                                    &orionldState.in.attrList,

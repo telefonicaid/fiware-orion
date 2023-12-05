@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYMAPRELEASE_H_
-#define SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYMAPRELEASE_H_
-
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -25,13 +22,42 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                                     // strcmp
+
+#include "orionld/common/orionldState.h"                                // entityMaps
+#include "orionld/types/EntityMap.h"                                    // EntityMap
+#include "orionld/entityMaps/entityMapRemove.h"                         // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldEntityMapRelease -
+// entityMapRemove -
 //
-extern void orionldEntityMapRelease(void);
+EntityMap* entityMapRemove(const char* mapId)
+{
+  EntityMap* emP  = entityMaps;
+  EntityMap* prev = NULL;
 
-#endif  // SRC_LIB_ORIONLD_COMMON_ORIONLDENTITYMAPRELEASE_H_
+  while (emP != NULL)
+  {
+    if (strcmp(emP->id, mapId) == 0)
+      break;
+    prev = emP;
+
+    emP = emP->next;
+  }
+
+  if (emP == NULL)
+    LM_RE(NULL, ("Internal Error (can't remove the entity map '%s' - not found", mapId));
+
+  // First?
+  if (emP == entityMaps)
+    entityMaps = emP->next;
+  else if (emP->next == NULL)
+    prev->next = NULL;
+  else
+    prev->next = emP->next;
+
+  return emP;
+}

@@ -22,34 +22,27 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                              // strcmp
+#include <unistd.h>                                              // NULL
 
-#include "orionld/common/orionldState.h"                         // orionldState, orionldEntityMapId
-#include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/orionldState.h"                         // entityMaps
 #include "orionld/types/EntityMap.h"                             // EntityMap
-#include "orionld/entityMaps/entityMapRemove.h"                  // entityMapRemove
 #include "orionld/entityMaps/entityMapRelease.h"                 // entityMapRelease
-#include "orionld/serviceRoutines/orionldDeleteEntityMap.h"      // Own interface
+#include "orionld/entityMaps/entityMapsRelease.h"                // Own interface
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// orionldDeleteEntityMap -
+// entityMapsRelease -
 //
-bool orionldDeleteEntityMap(void)
+void entityMapsRelease(void)
 {
-  const char* entityMapId = orionldState.wildcard[0];
-  EntityMap*  entityMap   = entityMapRemove(entityMapId);
+  EntityMap* emP = entityMaps;
 
-  if (entityMap == NULL)
+  while (emP != NULL)
   {
-    orionldError(OrionldResourceNotFound, "EntityMap Not Found", entityMapId, 404);
-    return false;
+    EntityMap* next = emP->next;
+    entityMapRelease(emP);
+    emP = next;
   }
-
-  LM_T(LmtSR, ("Deleting entity map '%s'", entityMapId));
-  entityMapRelease(entityMap);
-
-  return true;
 }

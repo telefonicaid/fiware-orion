@@ -30,8 +30,10 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjObject, kjArray, kjChildAdd, ...
 }
 
-#include "orionld/common/orionldState.h"                         // orionldState, orionldEntityMap, orionldEntityMapId
+#include "orionld/common/orionldState.h"                         // orionldState, entityMaps
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/types/EntityMap.h"                             // EntityMap
+#include "orionld/entityMaps/entityMapLookup.h"                  // entityMapLookup
 #include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/serviceRoutines/orionldGetEntityMap.h"         // Own interface
 
@@ -43,18 +45,17 @@ extern "C"
 //
 bool orionldGetEntityMap(void)
 {
-  const char* entityMapId = orionldState.wildcard[0];
+  const char*  entityMapId = orionldState.wildcard[0];
+  EntityMap*   entityMap   = entityMapLookup(entityMapId);
 
-  if (strcmp(entityMapId, orionldEntityMapId) != 0)  // For now we only have one single entity map
+  if (entityMap == NULL)
   {
     orionldError(OrionldResourceNotFound, "EntityMap Not Found", entityMapId, 404);
     return false;
   }
 
-  // Cloning the entityMap - to later modify it
-  // orionldState.responseTree   = kjClone(orionldState.kjsonP, orionldEntityMap);
-  orionldState.responseTree = orionldEntityMap;
-  kjTreeLog(orionldEntityMap, "orionldEntityMap", LmtSR);
+  orionldState.responseTree = entityMap->map;
+  kjTreeLog(entityMap->map, "EntityMap", LmtSR);
 
   // Sort all entity arrays in alphabetic order (for functests to work ...)
   // NOTE;

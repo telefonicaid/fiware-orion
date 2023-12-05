@@ -33,7 +33,6 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/orionldError.h"                            // orionldError
-#include "orionld/common/orionldEntityMapRelease.h"                 // orionldEntityMapRelease
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/legacyDriver/legacyGetEntities.h"                 // legacyGetEntities
 #include "orionld/kjTree/kjTreeLog.h"                               // kjTreeLog
@@ -89,7 +88,7 @@ static QNode* qCheck(char* qString)
 //
 // pCheckQueryParams -
 //
-bool pCheckQueryParams(char* id, char* type, char* idPattern, char* q, char* geometry, char* attrs, bool local, char* entityMap, QNode** qNodeP, OrionldGeoInfo* geoInfoP)
+bool pCheckQueryParams(char* id, char* type, char* idPattern, char* q, char* geometry, char* attrs, bool local, EntityMap* entityMap, QNode** qNodeP, OrionldGeoInfo* geoInfoP)
 {
   //
   // URI param validity check
@@ -102,11 +101,11 @@ bool pCheckQueryParams(char* id, char* type, char* idPattern, char* q, char* geo
       (attrs     == NULL)  &&
       (q         == NULL)  &&
       (local     == false) &&
-      (entityMap == NULL))
+      (orionldState.in.entityMap == NULL))
   {
     orionldError(OrionldBadRequestData,
                  "Too broad query",
-                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true",
+                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true, or an entity map",
                  400);
 
     return false;
@@ -237,7 +236,6 @@ bool orionldGetEntities(void)
   char*   geometry  = orionldState.uriParams.geometry;
   char*   attrs     = orionldState.uriParams.attrs;      // Validity checked in orionldMhdConnectionTreat.cpp (pCheckAttrsParam)
   bool    local     = orionldState.uriParams.local;
-  char*   entityMap = orionldState.uriParams.entityMap;
   QNode*  qNode     = NULL;
 
   LM_T(LmtEntityMap, ("onlyIds: %s", (orionldState.uriParams.onlyIds == true)? "TRUE" : "FALSE"));
@@ -247,29 +245,10 @@ bool orionldGetEntities(void)
     idPattern = NULL;
 
   OrionldGeoInfo geoInfo;
-  if (pCheckQueryParams(id, type, idPattern, q, geometry, attrs, local, entityMap, &qNode, &geoInfo) == false)
+  if (pCheckQueryParams(id, type, idPattern, q, geometry, attrs, local, orionldState.in.entityMap, &qNode, &geoInfo) == false)
     return false;
 
-  // Is an entity map in use?
-  if (orionldState.uriParams.entityMap != NULL)
-  {
-    if (strcmp(orionldState.uriParams.entityMap, orionldEntityMapId) != 0)
-    {
-      orionldError(OrionldResourceNotFound, "Entity Map Not Found", orionldState.uriParams.entityMap, 404);
-      return false;
-    }
-  }
-
-  if (orionldState.uriParams.reset == true)
-  {
-    LM_T(LmtSR, ("Deleting entity map '%s'", orionldEntityMapId));
-    orionldEntityMapRelease();
-    orionldEntityMap      = NULL;
-    orionldEntityMapCount = 0;
-    orionldState.uriParams.entityMap = NULL;
-    entityMap = NULL;
-  }
-  else if (orionldState.uriParams.entityMap != NULL)
+  if (orionldState.in.entityMap != NULL)
   {
     // No query params can be used when asking for pages in an entity map
     if ((id       != NULL) || (type  != NULL) || (idPattern != NULL) || (q != NULL)      ||
@@ -293,7 +272,7 @@ bool orionldGetEntities(void)
                                    orionldState.uriParams.onlyIds,
                                    false);
 
-  if (orionldState.uriParams.entityMap == NULL)
+  if (orionldState.in.entityMap == NULL)  // No prior entity map is requested - must create a new one
   {
     //
     // Find matching registrations

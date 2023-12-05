@@ -68,7 +68,6 @@ SET (SOURCES
     curlToBrokerStrerror.cpp
     fileName.cpp
     responseFix.cpp
-    orionldEntityMapRelease.cpp
 )
 
 # Include directories

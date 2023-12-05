@@ -142,7 +142,7 @@ echo
 echo "13. GET /entities?type=T in CB"
 echo "=============================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true'
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
@@ -208,8 +208,8 @@ HTTP/1.1 200 OK
 Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 NGSILD-Results-Count: 4
 
 [

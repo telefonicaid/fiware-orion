@@ -232,7 +232,7 @@ echo
 echo "10. GET /entities, only to create the entityMap"
 echo "==============================================="
 orionCurl --url "/ngsi-ld/v1/entities?type=T&limit=0&count=true"
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
@@ -314,7 +314,7 @@ echo
 echo "18. GET /entities, only to create a new entityMap"
 echo "================================================="
 orionCurl --url "/ngsi-ld/v1/entities?type=T&count=true&limit=0"
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
@@ -414,8 +414,8 @@ HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 NGSILD-Results-Count: 1
 
 []
@@ -498,8 +498,8 @@ HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 NGSILD-Results-Count: 3
 
 []

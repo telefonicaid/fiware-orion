@@ -153,7 +153,7 @@ echo
 echo "07. Query the CB with type=T, to get urn:E1+urn:E2 and the entity map"
 echo "====================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T'
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
@@ -226,8 +226,8 @@ HTTP/1.1 200 OK
 Content-Length: 376
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 
 [
     {
@@ -275,8 +275,8 @@ HTTP/1.1 200 OK
 Content-Length: 186
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 
 [
     {
