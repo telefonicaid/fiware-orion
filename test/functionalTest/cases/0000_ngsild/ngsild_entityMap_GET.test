@@ -154,7 +154,7 @@ echo
 echo "07. Create an entity map for a GET /entities?type=T"
 echo "==================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&limit=0'
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
@@ -226,8 +226,8 @@ HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 NGSILD-Results-Count: 2
 
 []

@@ -60,6 +60,7 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                         // OrionldHeaderSet
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/EntityMap.h"                             // EntityMap
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/pernot/PernotSubCache.h"                       // PernotSubCache
@@ -168,7 +169,7 @@ typedef struct OrionldUriParams
   char*     lang;
   bool      local;
   bool      onlyIds;
-  char*     entityMap;
+  bool      entityMap;
 
   double    observedAtAsDouble;
   uint64_t  mask;
@@ -263,6 +264,9 @@ typedef struct OrionldStateIn
   StringArray  idList;
   StringArray  typeList;
   StringArray  attrList;
+
+  // Entity Map
+  EntityMap* entityMap;
 
   // Processed wildcards
   char*         pathAttrExpanded;
@@ -615,12 +619,11 @@ extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
 extern uint32_t          cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 extern PernotSubCache    pernotSubCache;
-extern char              localIpAndPort[135];      // Local address for X-Forwarded-For (from orionld.cpp)
+extern EntityMap*        entityMaps;               // Used by GET /entities in the distributed case, for pagination
+
+extern char                localIpAndPort[135];    // Local address for X-Forwarded-For (from orionld.cpp)
 extern unsigned long long  inReqPayloadMaxSize;
 extern unsigned long long  outReqMsgMaxSize;
-extern char                orionldEntityMapId[64];   // Used by GET /entities in the distributed case, for pagination
-extern KjNode*             orionldEntityMap;
-extern int                 orionldEntityMapCount;
 
 
 

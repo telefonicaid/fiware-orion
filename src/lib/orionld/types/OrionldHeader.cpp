@@ -72,7 +72,7 @@ const char* orionldHeaderName[] = {
   "Access-Control-Expose-Headers",
   "Accept-Patch",
   "Performance",
-  "Entity-Map"
+  "NGSILD-EntityMap"
 };
 
 

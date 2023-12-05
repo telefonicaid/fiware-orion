@@ -53,6 +53,7 @@ extern "C"
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/entityMaps/entityMapLookup.h"                  // entityMapLookup
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
@@ -446,6 +447,12 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
       LM_W(("Bad Input (too many scopes)"));
       orionldError(OrionldBadRequestData, "Bad value for HTTP header /NGSILD-Scope/", value, 400);
     }
+  }
+  else if (strcasecmp(key, "NGSILD-EntityMap") == 0)
+  {
+    orionldState.in.entityMap = entityMapLookup(value);
+    if (orionldState.in.entityMap == NULL)
+      orionldError(OrionldResourceNotFound, "Entity-Map not found", value, 404);
   }
   else if (strcasecmp(key, "Accept") == 0)
   {
@@ -961,7 +968,8 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   }
   else if (strcmp(key, "entityMap") == 0)
   {
-    orionldState.uriParams.entityMap = (char*) value;
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.entityMap = true;
 
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_ENTITYMAP;
   }

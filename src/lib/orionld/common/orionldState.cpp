@@ -108,11 +108,7 @@ char              hostHeaderNoLF[128];
 char              hostHeader[256];             // Host: xxx
 size_t            hostHeaderLen;
 PernotSubCache    pernotSubCache;
-
-
-char              orionldEntityMapId[64];      // Used by GET /entities in the distributed case, for pagination
-KjNode*           orionldEntityMap         = NULL;
-int               orionldEntityMapCount    = 0;
+EntityMap*        entityMaps = NULL;           // Used by GET /entities in the distributed case, for pagination
 
 
 

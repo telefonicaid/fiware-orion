@@ -52,7 +52,7 @@ orionldStart CP1 -experimental
 
 echo "01. Query the CB with an entity map that doesn't exist - see error"
 echo "=================================================================="
-orionCurl --url /ngsi-ld/v1/entities?entityMap=abc
+orionCurl --url /ngsi-ld/v1/entities -H "NGSILD-EntityMap: abc"
 echo
 echo
 
@@ -112,14 +112,14 @@ echo
 echo "05. Query the CB with type=T, to get urn:E1 and the entity map"
 echo "=============================================================="
 orionCurl --url /ngsi-ld/v1/entities?type=T
-entityMap=$(echo "$_responseHeaders" | grep Entity-Map: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
 echo
 echo
 
 
 echo "06. Query the CB using the correct entity map but with offset=10 (we don't have that many entities in the map)"
 echo "=============================================================================================================="
-orionCurl --url '/ngsi-ld/v1/entities?entityMap=$entityMap&offset=10'
+orionCurl --url '/ngsi-ld/v1/entities?offset=10' -H "NGSILD-EntityMap: $entityMap"
 echo
 echo
 
@@ -134,7 +134,7 @@ Date: REGEX(.*)
 
 {
     "detail": "abc",
-    "title": "Entity Map Not Found",
+    "title": "Entity-Map not found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
@@ -172,8 +172,8 @@ HTTP/1.1 200 OK
 Content-Length: 114
 Content-Type: application/json
 Date: REGEX(.*)
-Entity-Map: urn:ngsi-ld:entity-map:REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 
 [
     {

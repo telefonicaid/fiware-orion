@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,29 +22,29 @@
 *
 * Author: Ken Zangelin
 */
-#include <strings.h>                                                // bzero
+#include <string.h>                                                     // strcmp
 
-extern "C"
-{
-#include "kjson/kjFree.h"                                           // kjFree
-}
-
-#include "orionld/common/orionldState.h"                            // orionldEntityMap
+#include "orionld/common/orionldState.h"                                // entityMaps
+#include "orionld/types/EntityMap.h"                                    // EntityMap
+#include "orionld/entityMaps/entityMapLookup.h"                         // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldEntityMapRelease -
+// entityMapLookup
 //
-void orionldEntityMapRelease(void)
+EntityMap* entityMapLookup(const char* mapId)
 {
-  if (orionldEntityMap != NULL)
-  {
-    kjFree(orionldEntityMap);
-    bzero(orionldEntityMapId, sizeof(orionldEntityMapId));
+  EntityMap* emP = entityMaps;
 
-    orionldEntityMap      = NULL;
-    orionldEntityMapCount = 0;
+  while (emP != NULL)
+  {
+    if (strcmp(emP->id, mapId) == 0)
+      return emP;
+
+    emP = emP->next;
   }
+
+  return NULL;
 }
