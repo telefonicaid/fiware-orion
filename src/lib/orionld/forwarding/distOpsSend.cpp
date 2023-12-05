@@ -51,7 +51,7 @@ int distOpsSend(DistOp* distOpList, bool local)
     {
       distOpP->onlyIds = true;
 
-      if (distOpSend(distOpP, dateHeader, xff, local) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, local, NULL) == 0)
         distOpP->error = false;
       else
         distOpP->error = true;
@@ -118,7 +118,7 @@ int distOpsSend2(DistOpListItem* distOpList)
     {
       distOpP->onlyIds = false;
 
-      if (distOpSend(distOpP, dateHeader, xff, false) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, false, doItemP->entityIds) == 0)
         distOpP->error = false;
       else
         distOpP->error = true;

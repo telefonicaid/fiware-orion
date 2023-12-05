@@ -38,10 +38,12 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "common/globals.h"                                      // NGSI_LD_V1
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/q//qRender.h"                                  // qRender
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpSend.h"                       // Own interface
 
@@ -153,7 +155,7 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
 //
 // uriParamAdd -
 //
-void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value, int totalLen)
+static void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value, int totalLen)
 {
   SList* sListP = (SList*) kaAlloc(&orionldState.kalloc, sizeof(SList));
 
@@ -170,6 +172,8 @@ void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value,
 
     sListP->sLen = snprintf(sListP->sP, sLen, "%s=%s", key, value);
   }
+
+  LM_T(LmtDistOpRequestParams, ("DistOp Request URL Param: %s", sListP->sP));
 
   sListP->next = NULL;
 
@@ -325,7 +329,7 @@ void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdC
 //
 // distOpSend -
 //
-bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader, bool local)
+bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader, bool local, const char* entityIds)
 {
   //
   // Figure out the @context to use for the forwarded request
@@ -389,6 +393,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   //
   // Add URI Params
   //
+  LM_T(LmtDistOpRequestParams, ("%s: ---- URL Parameters for %s ------------------------", distOpP->regP->regId, distOpP->id));
   if (orionldState.verb == GET)
   {
     if (distOpP->attrsParam != NULL)
@@ -405,11 +410,25 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     else
       uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
 
-    if ((distOpP->operation == DoQueryEntity) && (distOpP->entityId != NULL))
-      uriParamAdd(&urlParts, "id", distOpP->entityId, -1);
+    if (distOpP->operation == DoQueryEntity)
+    {
+      if (entityIds != NULL)
+        uriParamAdd(&urlParts, "id", entityIds, -1);
+      else if (distOpP->entityId != NULL)
+        uriParamAdd(&urlParts, "id", distOpP->entityId, -1);
+    }
 
     if (local == true)
       uriParamAdd(&urlParts, "local=true", NULL, 10);
+
+    if (distOpP->qNode != NULL)
+    {
+      char buf[256];
+      qRender(distOpP->qNode, NGSI_LD_V1, buf, sizeof(buf), NULL);
+      LM_T(LmtDistOpRequestParams, ("DistOp %s has a Q: %s", distOpP->regP->regId, buf));
+      if (orionldState.uriParams.q != NULL)
+        LM_T(LmtDistOpRequestParams, ("The initial request alsao has a 'q'"));
+    }
 
     //
     // If we know the Entity Type, we pass that piece of information as well
@@ -432,6 +451,8 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     uriParamAdd(&urlParts, "q", orionldState.uriParams.qCopy, -1);
     LM_T(LmtDistOpRequestHeaders, ("%s: orionldState.uriParams.q: '%s'", distOpP->regP->regId, orionldState.uriParams.qCopy));
   }
+
+  LM_T(LmtDistOpRequestParams, ("%s: ---- End of URL Parameters -----------------", distOpP->regP->regId));
 
   //
   // Compose the entire URL and pass it to CURL
@@ -585,7 +606,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   struct curl_slist* sP = headers;
   while (sP != NULL)
   {
-    LM_T(LmtDistOpMsgs, ("FWD: Added header '%s'", sP->data));
+    LM_T(LmtDistOpRequest, ("FWD: Added header '%s'", sP->data));
     sP = sP->next;
   }
 #endif
