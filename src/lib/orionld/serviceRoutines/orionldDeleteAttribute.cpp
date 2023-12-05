@@ -95,7 +95,7 @@ static DistOp* distributedDelete(KjNode* responseBody, char* entityId, char* ent
       char dateHeader[70];
       snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-      if (distOpSend(distOpP, dateHeader, xff, false) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, false, NULL) == 0)
       {
         ++forwards;
         distOpP->error = false;

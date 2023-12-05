@@ -138,7 +138,7 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, K
     // Send the forwarded request and await all responses
     if ((distOpP->regP != NULL) && (distOpP->error == false))
     {
-      if (distOpSend(distOpP, dateHeader, xff, false) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, false, NULL) == 0)
       {
         distOpP->error = false;
         orionldState.distOp.requests += 1;
