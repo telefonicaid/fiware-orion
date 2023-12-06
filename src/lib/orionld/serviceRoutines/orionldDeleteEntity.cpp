@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
+#include "orionld/forwarding/viaCompose.h"                       // viaCompose
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
@@ -112,6 +113,7 @@ static DistOp* distributedDelete(char* entityId, char* entityTypeExpanded, char*
   // Enqueue all forwarded requests
   // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
   char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+  char* via = viaCompose(orionldState.in.via, brokerId);
 
   int forwards = 0;
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
@@ -122,7 +124,7 @@ static DistOp* distributedDelete(char* entityId, char* entityTypeExpanded, char*
       char dateHeader[70];
       snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-      if (distOpSend(distOpP, dateHeader, xff, false, NULL) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, via, false, NULL) == 0)
       {
         ++forwards;
         distOpP->error = false;

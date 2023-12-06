@@ -36,6 +36,7 @@ extern "C"
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForGet.h"   // regMatchInformationArrayForGet
 #include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
+#include "orionld/forwarding/viaMatch.h"                         // viaMatch
 #include "orionld/forwarding/regMatchForBatchDelete.h"           // Own interface
 
 
@@ -56,17 +57,23 @@ DistOp* regMatchForBatchDelete
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-    // Loop detection
-    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
-    {
-      LM_T(LmtRegMatch, ("%s: No match due to loop detection", regP->regId));
-      continue;
-    }
-
     if ((regP->mode & regMode) == 0)
     {
        LM_T(LmtRegMatch, ("%s: No match due to regMode", regP->regId));
        continue;
+    }
+
+    // Loop detection
+    if (viaMatch(orionldState.in.via, regP->hostAlias) == true)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (Via)", regP->regId));
+      continue;
+    }
+
+    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
+    {
+      LM_T(LmtRegMatch, ("%s: No match due to loop detection", regP->regId));
+      continue;
     }
 
     if (regMatchOperation(regP, operation) == false)

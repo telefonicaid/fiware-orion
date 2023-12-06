@@ -477,6 +477,7 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   else if (strcasecmp(key, "X-Real-IP")          == 0) orionldState.in.xRealIp          = (char*) value;
   else if (strcasecmp(key, "Connection")         == 0) orionldState.in.connection       = (char*) value;
   else if (strcasecmp(key, "X-Forwarded-For")    == 0) orionldState.in.xForwardedFor    = (char*) value;
+  else if (strcasecmp(key, "Via")                == 0) orionldState.in.via              = (char*) value;
   else if (strcasecmp(key, "Content-Type")       == 0)
   {
     orionldState.in.contentType       = mimeTypeFromString(value, NULL, false, false, &orionldState.acceptMask);

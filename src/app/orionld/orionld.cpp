@@ -247,6 +247,7 @@ int             troePoolSize;
 bool            socketService;
 unsigned short  socketServicePort;
 bool            distributed;
+char            brokerId[64];
 bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
@@ -331,6 +332,7 @@ bool            triggerOperation = false;
 #define SOCKET_SERVICE_DESC    "enable the socket service - accept connections via a normal TCP socket"
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
 #define DISTRIBUTED_DESC       "turn on distributed operation"
+#define BROKER_ID_DESC         "identity of this broker instance for registrations - for the Via header"
 #define FORWARDING_DESC        "turn on distributed operation (deprecated)"
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
@@ -345,7 +347,7 @@ bool            triggerOperation = false;
 #define DBURI_DESC             "complete URI for database connection"
 #define DEBUG_CURL_DESC        "turn on debugging of libcurl - to the broker's logfile"
 #define CSUBCOUNTERS_DESC      "number of subscription counter updates before flush from sub-cache to DB (0: never, 1: always)"
-#define CORE_CONTEXT_DESC      "Core context version (v1.0|v1.3|v1.4|v1.5|v1.6|v1.7) - v1.6 is default"
+#define CORE_CONTEXT_DESC      "core context version (v1.0|v1.3|v1.4|v1.5|v1.6|v1.7) - v1.6 is default"
 
 
 
@@ -432,12 +434,13 @@ PaArgument paArgs[] =
   { "-troeUser",              troeUser,                 "TROE_USER",                 PaString,  PaOpt,  _i "postgres",   PaNL,   PaNL,             TROE_HOST_USER           },
   { "-troePwd",               troePwd,                  "TROE_PWD",                  PaString,  PaOpt,  _i "password",   PaNL,   PaNL,             TROE_HOST_PWD            },
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
-  { "-distributed",           &distributed,             "DISTRIBUTED",               PaBool,    PaOpt,  false,           false,  true,             DISTRIBUTED_DESC         },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
   { "-triggerOperation",      &triggerOperation,        "TRIGGER_OPERATION",         PaBool,    PaHid,  false,           false,  true,             TRIGGER_OPERATION_DESC   },
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaOpt,  false,           false,  true,             EXPERIMENTAL_DESC        },
   { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC          },
   { "-cSubCounters",          &cSubCounters,            "CSUB_COUNTERS",             PaInt,     PaOpt,  20,              0,      PaNL,             CSUBCOUNTERS_DESC        },
+  { "-distributed",           &distributed,             "DISTRIBUTED",               PaBool,    PaOpt,  false,           false,  true,             DISTRIBUTED_DESC         },
+  { "-brokerId",              &brokerId,                "BROKER_ID",                 PaStr,     PaOpt,  _i "",           PaNL,   PaNL,             BROKER_ID_DESC           },
   { "-forwarding",            &distributed,             "FORWARDING",                PaBool,    PaHid,  false,           false,  true,             FORWARDING_DESC          },
   { "-socketService",         &socketService,           "SOCKET_SERVICE",            PaBool,    PaHid,  false,           false,  true,             SOCKET_SERVICE_DESC      },
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
@@ -1188,6 +1191,12 @@ int main(int argC, char* argV[])
 
   // localIpAndPort - IP:port for X-Forwarded-For
   snprintf(localIpAndPort, sizeof(localIpAndPort), "%s:%d", orionldHostName, port);
+
+  // brokerId - for the Via header
+  if (brokerId[0] == 0)
+    strncpy(brokerId, localIpAndPort, sizeof(brokerId) - 1);
+  else
+    distributed = true;  // Turn on forwarding if the brokerId CLI is used
 
   orionldStateInit(NULL);
 

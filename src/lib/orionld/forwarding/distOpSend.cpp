@@ -329,7 +329,7 @@ void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdC
 //
 // distOpSend -
 //
-bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader, bool local, const char* entityIds)
+bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader, const char* viaHeader, bool local, const char* entityIds)
 {
   //
   // Figure out the @context to use for the forwarded request
@@ -483,6 +483,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
   // X-Forwarded-For
   headers = curl_slist_append(headers, xForwardedForHeader);
+
+  // Via
+  headers = curl_slist_append(headers, viaHeader);
 
   // Custom headers from Registration::contextSourceInfo
   char* infoTenant    = NULL;

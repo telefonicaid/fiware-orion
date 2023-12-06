@@ -103,6 +103,7 @@ Host: REGEX(.*)
 Accept: application/json
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 =======================================
 
 

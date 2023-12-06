@@ -36,6 +36,7 @@ extern "C"
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArray.h"         // regMatchInformationArray
 #include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
+#include "orionld/forwarding/viaMatch.h"                         // viaMatch
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // Own interface
 
 
@@ -118,16 +119,22 @@ DistOp* regMatchForEntityCreation
 
   for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
   {
-    // Loop detection
-    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
-    {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to loop detection", regP->regId));
-      continue;
-    }
-
     if ((regP->mode & regMode) == 0)
     {
       // LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode (0x%x vs 0x%x)", regP->regId, regP->mode, regMode));
+      continue;
+    }
+
+    // Loop detection
+    if (viaMatch(orionldState.in.via, regP->hostAlias) == true)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (Via)", regP->regId));
+      continue;
+    }
+
+    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to loop detection", regP->regId));
       continue;
     }
 

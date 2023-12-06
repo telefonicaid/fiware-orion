@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPSEND_H_
-#define SRC_LIB_ORIONLD_FORWARDING_DISTOPSEND_H_
+#ifndef SRC_LIB_ORIONLD_FORWARDING_VIACOMPOSE_H_
+#define SRC_LIB_ORIONLD_FORWARDING_VIACOMPOSE_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// distOpSend -
+// viaCompose -
 //
-extern bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader, const char* viaHeader, bool local, const char* entityIds);
+extern char* viaCompose(char* via, char* self);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPSEND_H_
+#endif  // SRC_LIB_ORIONLD_FORWARDING_VIACOMPOSE_H_

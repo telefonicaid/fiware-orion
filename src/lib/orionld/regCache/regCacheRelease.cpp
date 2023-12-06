@@ -60,6 +60,9 @@ void regCacheRelease(RegCache* regCacheP)
     if (rciP->ipAndPort != NULL)
       free(rciP->ipAndPort);
 
+    if ((rciP->hostAlias != NULL) && (rciP->hostAlias != rciP->ipAndPort))
+      free(rciP->hostAlias);
+
     free(rciP);
 
     rciP = next;

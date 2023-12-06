@@ -133,6 +133,7 @@ Host: localhost:9997
 Accept: application/json
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 =======================================
 
 

@@ -593,41 +593,41 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     {
         "A1": {
             "type": "Property",
-            "value": "E33:A1"
+            "value": "E21:A1"
         },
-        "id": "urn:cp3:entities:E32",
+        "id": "urn:cp2:entities:E20",
         "type": "T"
     },
     {
         "A1": {
             "type": "Property",
-            "value": "E32:A1"
+            "value": "E22:A1"
         },
-        "id": "urn:cp3:entities:E31",
+        "id": "urn:cp2:entities:E21",
         "type": "T"
     },
     {
         "A1": {
             "type": "Property",
-            "value": "E34:A1"
+            "value": "E23:A1"
         },
-        "id": "urn:cp3:entities:E33",
+        "id": "urn:cp2:entities:E22",
         "type": "T"
     },
     {
         "A1": {
             "type": "Property",
-            "value": "E31:A1"
+            "value": "E24:A1"
         },
-        "id": "urn:cp3:entities:E30",
+        "id": "urn:cp2:entities:E23",
         "type": "T"
     },
     {
         "A1": {
             "type": "Property",
-            "value": "E35:A1"
+            "value": "E25:A1"
         },
-        "id": "urn:cp3:entities:E34",
+        "id": "urn:cp2:entities:E24",
         "type": "T"
     }
 ]
