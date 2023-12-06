@@ -247,7 +247,7 @@ int             troePoolSize;
 bool            socketService;
 unsigned short  socketServicePort;
 bool            distributed;
-char            brokerId[64];
+char            brokerId[136];
 bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
