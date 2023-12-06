@@ -1,0 +1,179 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Creation of a registration with hostAlias
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+
+--SHELL--
+
+#
+# 01. Create a registration with a hostAlias
+# 02. See the registration in mongo
+# 03. GET the registration (from cache)
+# 04. GET the registration (from db)
+#
+
+echo "01. Create a registration with a hostAlias"
+echo "=========================================="
+payload='{
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Vehicle"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "hostAlias": "broker01"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. See the registration in mongo"
+echo "================================="
+mongoCmd2 ftest "db.registrations.findOne()"
+echo
+echo
+
+
+echo "03. GET the registration (from cache)"
+echo "====================================="
+orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "04. GET the registration (from db)"
+echo "=================================="
+orionCurl --url "/ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1?options=fromDb&prettyPrint=yes" --noPayloadCheck
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration with a hostAlias
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:ContextSourceRegistration:R1
+
+
+
+02. See the registration in mongo
+=================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:ContextSourceRegistration:R1",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"contextRegistration" : [
+		{
+			"entities" : [
+				{
+					"type" : "https://uri.etsi.org/ngsi-ld/default-context/Vehicle"
+				}
+			],
+			"attrs" : [ ],
+			"providingApplication" : "http://my.csource.org:1026"
+		}
+	],
+	"hostAlias" : "broker01",
+	"properties" : {
+		
+	},
+	"status" : "active"
+}
+bye
+
+
+03. GET the registration (from cache)
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 320
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Vehicle"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://my.csource.org:1026",
+  "hostAlias": "broker01",
+  "status": "active",
+  "origin": "cache"
+}
+
+
+
+04. GET the registration (from db)
+==================================
+HTTP/1.1 200 OK
+Content-Length: 323
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+  "type": "ContextSourceRegistration",
+  "id": "urn:ngsi-ld:ContextSourceRegistration:R1",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "Vehicle"
+        }
+      ]
+    }
+  ],
+  "hostAlias": "broker01",
+  "status": "active",
+  "endpoint": "http://my.csource.org:1026",
+  "origin": "database"
+}
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

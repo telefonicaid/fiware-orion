@@ -17,3 +17,4 @@ Fixed issues:
   * #1418 - Performance - Faster startup when there are GeoProperties in DB
   * #1478 - Fixed issue
   * #1479 - Fixed problem with "operations" in registrations
+  * #280  - Using Via header for loop detection (includes a new field 'hostAlias' in the registrations)

@@ -53,6 +53,8 @@ SET (SOURCES
     regMatchEntityInfoForQuery.cpp
     xForwardedForCompose.cpp
     xForwardedForMatch.cpp
+    viaCompose.cpp
+    viaMatch.cpp
 )
 
 # Include directories

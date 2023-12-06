@@ -45,7 +45,8 @@ extern "C"
 #include "orionld/forwarding/distOpRequests.h"                      // distOpRequests
 #include "orionld/forwarding/distOpListsMerge.h"                    // distOpListsMerge
 #include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
-#include "orionld/forwarding/xForwardedForMatch.h"                  // xForwardedForMatch
+#include "orionld/forwarding/xForwardedForMatch.h"                  // xForwardedForMatchº
+#include "orionld/forwarding/viaMatch.h"                            // viaMatch
 #include "orionld/forwarding/regMatchOperation.h"                   // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForQuery.h"    // regMatchInformationArrayForQuery
 #include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
@@ -162,9 +163,15 @@ DistOp* regMatchForEntitiesQuery
     }
 
     // Loop detection
+    if (viaMatch(orionldState.in.via, regP->hostAlias) == true)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (Via)", regP->regId));
+      continue;
+    }
+
     if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
     {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop", regP->regId));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (X-Forwarded-For)", regP->regId));
       continue;
     }
 

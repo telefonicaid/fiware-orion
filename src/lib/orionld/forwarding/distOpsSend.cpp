@@ -29,6 +29,8 @@
 #include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpSend.h"                          // distOpSend
 #include "orionld/forwarding/xForwardedForCompose.h"                // xForwardedForCompose
+#include "orionld/forwarding/viaCompose.h"                          // viaCompose
+#include "orionld/forwarding/distOpsSend.h"                         // Own interface
 
 
 
@@ -39,6 +41,7 @@
 int distOpsSend(DistOp* distOpList, bool local)
 {
   char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+  char* via = viaCompose(orionldState.in.via, brokerId);
 
   char dateHeader[70];
   snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);  // MOVE to orionldStateInit, for example
@@ -51,7 +54,7 @@ int distOpsSend(DistOp* distOpList, bool local)
     {
       distOpP->onlyIds = true;
 
-      if (distOpSend(distOpP, dateHeader, xff, local, NULL) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, via, local, NULL) == 0)
         distOpP->error = false;
       else
         distOpP->error = true;
@@ -104,6 +107,7 @@ int distOpsSend(DistOp* distOpList, bool local)
 int distOpsSend2(DistOpListItem* distOpList)
 {
   char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+  char* via = viaCompose(orionldState.in.via, brokerId);
 
   char dateHeader[70];
   snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);  // MOVE to orionldStateInit, for example
@@ -118,7 +122,7 @@ int distOpsSend2(DistOpListItem* distOpList)
     {
       distOpP->onlyIds = false;
 
-      if (distOpSend(distOpP, dateHeader, xff, false, doItemP->entityIds) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, via, false, doItemP->entityIds) == 0)
         distOpP->error = false;
       else
         distOpP->error = true;

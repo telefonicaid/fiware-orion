@@ -107,6 +107,7 @@ bool            mongocOnly              = false;
 bool            debugCurl               = false;
 uint32_t        cSubCounters            = 0;
 char            localIpAndPort[135];
+char            brokerId[136];
 unsigned long long  inReqPayloadMaxSize;
 unsigned long long  outReqMsgMaxSize;
 bool                triggerOperation = false;
