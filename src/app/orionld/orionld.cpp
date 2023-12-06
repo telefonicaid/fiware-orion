@@ -125,6 +125,7 @@ extern "C"
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
+#include "orionld/entityMaps/entityMapsRelease.h"             // entityMapsRelease
 #include "orionld/db/dbInit.h"                                // dbInit
 #include "orionld/mqtt/mqttRelease.h"                         // mqttRelease
 #include "orionld/regCache/regCacheInit.h"                    // regCacheInit
@@ -247,7 +248,7 @@ int             troePoolSize;
 bool            socketService;
 unsigned short  socketServicePort;
 bool            distributed;
-char            brokerId[64];
+char            brokerId[136];
 bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
@@ -629,6 +630,9 @@ void exitFunc(void)
     pgConnectionPoolsPresent();
     pgConnectionPoolsFree();
   }
+
+  if (entityMaps != NULL)
+    entityMapsRelease();
 
   kaBufferReset(&kalloc, KFALSE);
 }
