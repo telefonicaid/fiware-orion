@@ -601,7 +601,7 @@ extern char              troePwd[256];             // From orionld.cpp
 extern int               troePoolSize;             // From orionld.cpp
 extern char              pgPortString[16];
 extern bool              distributed;              // From orionld.cpp
-extern char              brokerId[64];             // From orionld.cpp
+extern char              brokerId[136];            // From orionld.cpp
 extern const char*       orionldVersion;
 extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
