@@ -149,6 +149,8 @@ PernotSubscription* pernotSubCacheAdd
   PernotSubscription* pSubP = (PernotSubscription*) malloc(sizeof(PernotSubscription));
   bzero(pSubP, sizeof(PernotSubscription));
 
+  LM_T(LmtPernot, ("Creating pernot subscription %s (at %p)", subscriptionId, pSubP));
+
   if (subscriptionId == NULL)
   {
     KjNode* idP = kjLookup(apiSubP, "id");
@@ -157,7 +159,7 @@ PernotSubscription* pernotSubCacheAdd
     subscriptionId = idP->value.s;
   }
 
-  LM_T(LmtPernot, ("Adding pernot subscription '%s' to cache", subscriptionId));
+  LM_T(LmtPernot, ("Adding pernot subscription '%s' to cache (top level name: '%s')", subscriptionId, apiSubP->name));
 
   pSubP->subscriptionId = strdup(subscriptionId);
   pSubP->timeInterval   = timeInterval;

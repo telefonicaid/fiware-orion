@@ -94,10 +94,13 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
 
   LM_T(LmtQ, ("term: '%s' (termLen: %d)", term, termLen));
 
-  if      (strcmp(&term[termLen - 10], "modifiedAt") == 0)    *lastTermIsTimestampP = true;
-  else if (strcmp(&term[termLen -  9], "createdAt")  == 0)    *lastTermIsTimestampP = true;
-  else if (strcmp(&term[termLen - 10], "observedAt") == 0)    *lastTermIsTimestampP = true;
-  else                                                        *lastTermIsTimestampP = false;
+  *lastTermIsTimestampP = false;
+  if (termLen >= 9)
+  {
+    if      (strcmp(&term[termLen - 10], "modifiedAt") == 0)    *lastTermIsTimestampP = true;
+    else if (strcmp(&term[termLen -  9], "createdAt")  == 0)    *lastTermIsTimestampP = true;
+    else if (strcmp(&term[termLen - 10], "observedAt") == 0)    *lastTermIsTimestampP = true;
+  }
 
   if (*lastTermIsTimestampP == true)
     LM_T(LmtQ, ("Pushing a Timestamp term: '%s'", term));

@@ -70,6 +70,7 @@ extern "C"
 #include "orionld/rest/orionldMhdConnectionInit.h"               // orionldMhdConnectionInit
 #include "orionld/rest/orionldMhdConnectionPayloadRead.h"        // orionldMhdConnectionPayloadRead
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // orionldMhdConnectionTreat
+#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 
 #include "rest/HttpHeaders.h"                                    // HTTP_* defines
 #include "rest/Verb.h"
@@ -427,15 +428,11 @@ static void requestCompleted
     free(orionldState.curlHeadersV);
   }
 
-  //
-  // FIXME:
-  //   Would be nice to do this here instead of in every service routine
-  //   Just, I don't have the pointer (distOpList) in orionldState.
-  //   At least I can do the call to curl_multi_cleanup
-  //
+  if (orionldState.distOpList != NULL)
+    distOpListRelease(orionldState.distOpList);
+
   if (orionldState.curlDoMultiP != NULL)
   {
-    // distOpListRelease(orionldState.distOpList);
     curl_multi_cleanup(orionldState.curlDoMultiP);
     orionldState.curlDoMultiP = NULL;
   }

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
-
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -25,21 +22,31 @@
 *
 * Author: Ken Zangelin
 */
-#include "common/RenderFormat.h"                               // RenderFormat
+extern "C"
+{
+#include "kjson/kjFree.h"                                      // kjFree
+}
 
 #include "orionld/common/orionldState.h"                       // pernotSubCache
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+#include "orionld/pernot/pernotItemRelease.h"                  // pernotItemRelease
+#include "orionld/pernot/pernotRelease.h"                      // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotSubCacheRemove -
+// pernotRelease -
 //
-extern bool pernotSubCacheRemove(PernotSubscription* pSubP);
+void pernotRelease(void)
+{
+  LM_T(LmtPernot, ("Releasing all pernot subscriptions"));
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
+  PernotSubscription* psP = pernotSubCache.head;
+  while (psP != NULL)
+  {
+    LM_T(LmtPernot, ("Releasing pernot subscription %s (at %p)", psP->subscriptionId, psP));
+    pernotItemRelease(psP);
+    psP = psP->next;
+  }
+}

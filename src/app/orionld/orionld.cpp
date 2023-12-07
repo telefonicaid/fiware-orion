@@ -125,6 +125,7 @@ extern "C"
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
 #include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
+#include "orionld/entityMaps/entityMapsRelease.h"             // entityMapsRelease
 #include "orionld/db/dbInit.h"                                // dbInit
 #include "orionld/mqtt/mqttRelease.h"                         // mqttRelease
 #include "orionld/regCache/regCacheInit.h"                    // regCacheInit
@@ -132,6 +133,7 @@ extern "C"
 #include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
 #include "orionld/pernot/pernotSubCacheInit.h"                // pernotSubCacheInit
 #include "orionld/pernot/pernotLoop.h"                        // pernotLoopStart
+#include "orionld/pernot/pernotRelease.h"                     // pernotRelease
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -629,6 +631,14 @@ void exitFunc(void)
     pgConnectionPoolsPresent();
     pgConnectionPoolsFree();
   }
+
+  // Cleanup entity maps
+  if (entityMaps != NULL)
+    entityMapsRelease();
+
+  // Cleanup periodic notifications
+  if (pernot == true)
+    pernotRelease();
 
   kaBufferReset(&kalloc, KFALSE);
 }

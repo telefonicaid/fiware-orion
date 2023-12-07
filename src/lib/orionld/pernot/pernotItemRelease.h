@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTITEMRELEASE_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTITEMRELEASE_H_
+
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -24,17 +27,19 @@
 */
 #include "common/RenderFormat.h"                               // RenderFormat
 
+#include "orionld/common/orionldState.h"                       // pernotSubCache
 #include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/pernot/PernotSubCache.h"                     // Own interface
+#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
+#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotSubCacheRemove -
+// pernotItemRelease -
 //
-bool pernotSubCacheRemove(PernotSubscription* pSubP)
-{
-  return true;
-}
+extern bool pernotItemRelease(PernotSubscription* pSubP);
+
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTITEMRELEASE_H_
