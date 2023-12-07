@@ -133,6 +133,7 @@ extern "C"
 #include "orionld/regCache/regCacheRelease.h"                 // regCacheRelease
 #include "orionld/pernot/pernotSubCacheInit.h"                // pernotSubCacheInit
 #include "orionld/pernot/pernotLoop.h"                        // pernotLoopStart
+#include "orionld/pernot/pernotRelease.h"                     // pernotRelease
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
@@ -631,8 +632,13 @@ void exitFunc(void)
     pgConnectionPoolsFree();
   }
 
+  // Cleanup entity maps
   if (entityMaps != NULL)
     entityMapsRelease();
+
+  // Cleanup periodic notifications
+  if (pernot == true)
+    pernotRelease();
 
   kaBufferReset(&kalloc, KFALSE);
 }

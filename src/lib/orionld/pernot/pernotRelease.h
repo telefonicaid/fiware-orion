@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTRELEASE_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTRELEASE_H_
+
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -22,16 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/pernotSubCacheRemove.h"               // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotSubCacheRemove -
+// pernotRelease -
 //
-bool pernotSubCacheRemove(PernotSubscription* pSubP)
-{
-  return true;
-}
+extern void pernotRelease(void);
+
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTRELEASE_H_

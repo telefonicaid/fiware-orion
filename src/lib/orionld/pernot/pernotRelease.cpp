@@ -22,19 +22,28 @@
 *
 * Author: Ken Zangelin
 */
-#include "common/RenderFormat.h"                               // RenderFormat
+extern "C"
+{
+#include "kjson/kjFree.h"                                      // kjFree
+}
 
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/pernot/PernotSubCache.h"                     // Own interface
+#include "orionld/common/orionldState.h"                       // pernotSubCache
+#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+#include "orionld/pernot/pernotItemRelease.h"                  // pernotItemRelease
+#include "orionld/pernot/pernotRelease.h"                      // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotSubCacheRemove -
+// pernotRelease -
 //
-bool pernotSubCacheRemove(PernotSubscription* pSubP)
+void pernotRelease(void)
 {
-  return true;
+  PernotSubscription* psP = pernotSubCache.head;
+  while (psP != NULL)
+  {
+    pernotItemRelease(psP);
+    psP = psP->next;
+  }
 }

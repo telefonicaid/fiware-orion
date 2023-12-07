@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTITEMRELEASE_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTITEMRELEASE_H_
 
 /*
 *
@@ -38,8 +38,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// pernotSubCacheRemove -
+// pernotItemRelease -
 //
-extern bool pernotSubCacheRemove(PernotSubscription* pSubP);
+extern bool pernotItemRelease(PernotSubscription* pSubP);
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTITEMRELEASE_H_
