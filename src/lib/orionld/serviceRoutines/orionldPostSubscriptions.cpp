@@ -49,7 +49,7 @@ extern "C"
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 #include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
 #include "orionld/pernot/pernotSubCacheAdd.h"                  // pernotSubCacheAdd
-#include "orionld/pernot/pernotSubCacheRemove.h"               // pernotSubCacheRemove
+#include "orionld/pernot/pernotItemRelease.h"                  // pernotItemRelease
 #include "orionld/pernot/pernotSubCacheLookup.h"               // pernotSubCacheLookup
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
@@ -317,7 +317,7 @@ bool orionldPostSubscriptions(void)
     if (cSubP != NULL)
       subCacheItemRemove(cSubP);
     else
-      pernotSubCacheRemove(pSubP);
+      pernotItemRelease(pSubP);
 
     if (qTree != NULL)
       qRelease(qTree);
