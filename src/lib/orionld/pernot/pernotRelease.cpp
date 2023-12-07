@@ -40,9 +40,12 @@ extern "C"
 //
 void pernotRelease(void)
 {
+  LM_T(LmtPernot, ("Releasing all pernot subscriptions"));
+
   PernotSubscription* psP = pernotSubCache.head;
   while (psP != NULL)
   {
+    LM_T(LmtPernot, ("Releasing pernot subscription %s (at %p)", psP->subscriptionId, psP));
     pernotItemRelease(psP);
     psP = psP->next;
   }
