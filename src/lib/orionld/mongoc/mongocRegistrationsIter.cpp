@@ -86,6 +86,7 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   {
     char* json = bson_as_relaxed_extended_json(mongoDocP, NULL);
     LM_T(LmtMongoc, ("Found a registration in the DB: '%s'", json));
+    bson_free(json);
 
     KjNode* dbRegP = mongocKjTreeFromBson(mongoDocP, &title, &details);
     if (dbRegP == NULL)
