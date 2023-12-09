@@ -584,7 +584,7 @@ Date: REGEX(.*)
 13. Query using the entity map I got from step 11
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 831
+Content-Length: 416
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
