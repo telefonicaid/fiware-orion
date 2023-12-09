@@ -134,7 +134,7 @@ bool orionldPostSubscriptions(void)
     //
     char* detail = NULL;
     if ((subCacheItemLookup(orionldState.tenantP->tenant, subId)   != NULL) ||
-        (pernotSubCacheLookup(orionldState.tenantP->tenant, subId) != NULL) ||
+        (pernotSubCacheLookup(subId, orionldState.tenantP->tenant) != NULL) ||
         (mongocSubscriptionExists(subId, &detail)                  == true))
     {
       if (detail == NULL)

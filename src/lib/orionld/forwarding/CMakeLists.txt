@@ -36,6 +36,7 @@ SET (SOURCES
     distOpRequests.cpp
     distOpResponses.cpp
     distOpCreate.cpp
+    distOpAttrs.cpp
     regMatchEntityInfo.cpp
     regMatchOperation.cpp
     regMatchInformationItem.cpp

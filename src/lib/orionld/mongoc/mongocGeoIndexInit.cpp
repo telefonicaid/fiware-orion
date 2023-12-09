@@ -130,6 +130,7 @@ bool mongocGeoIndexInit(void)
     {
       char* str = bson_as_relaxed_extended_json(pipeline, NULL);
       LM_T(LmtMongoc, ("%s", str));
+      bson_free(str);
     }
 
     //

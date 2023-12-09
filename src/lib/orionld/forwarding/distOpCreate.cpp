@@ -29,10 +29,11 @@
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/StringArray.h"                           // StringArray, stringArrayClone
 #include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/forwarding/distOpAttrs.h"                      // distOpAttrs
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
+#include "orionld/forwarding/distOpCreate.h"                     // Own interface
 
 
-extern void attrsParam(DistOp* distOpP, StringArray* attrList, bool permanent);
 
 // -----------------------------------------------------------------------------
 //
@@ -61,7 +62,7 @@ DistOp* distOpCreate
 
   attrList = (attrList != NULL)? stringArrayClone(attrList) : NULL;
   if ((attrList != NULL) && (attrList->items > 0))
-    attrsParam(distOpP, attrList, false);
+    distOpAttrs(distOpP, attrList);
   else
     distOpP->attrsParam = NULL;
 
