@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPATTRS_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPATTRS_H_
+
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -22,34 +25,15 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/kjFree.h"                                      // kjFree
-}
-
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/pernotItemRelease.h"                  // Own interface
+#include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotItemRelease -
+// distOpAttrs -
 //
-bool pernotItemRelease(PernotSubscription* pSubP)
-{
-  LM_T(LmtLeak, ("Releasing pernot at %p", pSubP));
-  if (pSubP->subscriptionId != NULL)
-  {
-    LM_T(LmtLeak, ("Releasing pernot id '%s'", pSubP->subscriptionId));
-    free(pSubP->subscriptionId);
-  }
+extern void distOpAttrs(DistOp* distOpP, StringArray* attrList);
 
-  if (pSubP->kjSubP != NULL)
-  {
-    LM_T(LmtLeak, ("Releasing pernot kj-tree at %p", pSubP->kjSubP));
-    kjFree(pSubP->kjSubP);
-  }
-
-  return true;
-}
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPATTRS_H_

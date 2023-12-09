@@ -140,3 +140,26 @@
    fun:curl_multi_perform
    fun:curl_easy_perform
 }
+{
+   <mongoc_client_connect>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:__libc_alloc_buffer_allocate
+   fun:alloc_buffer_allocate
+   fun:__resolv_conf_allocate
+   fun:__resolv_conf_load
+   fun:__resolv_conf_get_current
+   fun:__res_vinit
+   fun:maybe_init
+   fun:context_get
+   fun:context_get
+   fun:__resolv_context_get
+   fun:get_nss_addresses
+   fun:gaih_inet
+   fun:getaddrinfo
+   fun:mongoc_client_connect_tcp
+   fun:mongoc_client_connect
+   fun:_server_monitor_setup_connection
+   fun:_server_monitor_check_server
+}

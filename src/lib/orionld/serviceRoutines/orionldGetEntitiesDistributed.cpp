@@ -36,6 +36,7 @@ extern "C"
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/q/QNode.h"                                        // QNode
 #include "orionld/forwarding/DistOp.h"                              // DistOp
+#include "orionld/forwarding/distOpListRelease.h"                   // distOpListRelease
 #include "orionld/entityMaps/entityMapCreate.h"                     // entityMapCreate
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // orionldGetEntitiesPage
@@ -155,6 +156,8 @@ bool orionldGetEntitiesDistributed(DistOp* distOpList, char* idPattern, QNode* q
 
   LM_T(LmtCount, ("--------------------------- Creating entity map"));
   orionldState.in.entityMap = entityMapCreate(distOpList, idPattern, qNode, geoInfoP);
+  distOpListRelease(distOpList);
+
   LM_T(LmtCount, ("--------------------------- entity map at %p", orionldState.in.entityMap));
   if (orionldState.in.entityMap != NULL)
   {

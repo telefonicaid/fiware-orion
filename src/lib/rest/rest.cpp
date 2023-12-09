@@ -428,15 +428,14 @@ static void requestCompleted
     free(orionldState.curlHeadersV);
   }
 
-  if (orionldState.distOpList != NULL)
-    distOpListRelease(orionldState.distOpList);
-
   if (orionldState.curlDoMultiP != NULL)
   {
     curl_multi_cleanup(orionldState.curlDoMultiP);
     orionldState.curlDoMultiP = NULL;
   }
 
+  if (orionldState.distOpList != NULL)
+    distOpListRelease(orionldState.distOpList);
 
   lmTransactionEnd();  // Incoming REST request ends
 

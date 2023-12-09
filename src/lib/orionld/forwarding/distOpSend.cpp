@@ -370,6 +370,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   }
 
   distOpP->curlHandle = curl_easy_init();
+  LM_T(LmtLeak, ("Got a curl handle at %p", distOpP->curlHandle));
   if (distOpP->curlHandle == NULL)
   {
     curl_multi_cleanup(orionldState.curlDoMultiP);
@@ -427,7 +428,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
       qRender(distOpP->qNode, NGSI_LD_V1, buf, sizeof(buf), NULL);
       LM_T(LmtDistOpRequestParams, ("DistOp %s has a Q: %s", distOpP->regP->regId, buf));
       if (orionldState.uriParams.q != NULL)
-        LM_T(LmtDistOpRequestParams, ("The initial request alsao has a 'q'"));
+        LM_T(LmtDistOpRequestParams, ("The initial request also has a 'q'"));
     }
 
     //

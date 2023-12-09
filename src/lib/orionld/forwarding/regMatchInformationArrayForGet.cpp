@@ -35,10 +35,11 @@ extern "C"
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
+#include "orionld/forwarding/distOpAttrs.h"                      // distOpAttrs
 #include "orionld/forwarding/regMatchInformationItemForGet.h"    // Own interface
 
 
-extern void attrsParam(DistOp* distOpP, StringArray* attrList, bool permanent);
+
 // -----------------------------------------------------------------------------
 //
 // regMatchInformationArrayForGet -
@@ -58,7 +59,7 @@ DistOp* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId,
     DistOp* distOpP = distOpCreate(DoQueryEntity, regP, NULL, NULL, attrList);
 
     if ((distOpP->attrList != NULL) && (distOpP->attrList->items > 0))
-      attrsParam(distOpP, distOpP->attrList, true);
+      distOpAttrs(distOpP, distOpP->attrList);
 
     distOpP->geometryProperty  = (char*) geoProp;
 
