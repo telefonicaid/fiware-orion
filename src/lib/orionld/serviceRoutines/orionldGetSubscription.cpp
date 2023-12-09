@@ -217,7 +217,7 @@ static bool orionldGetSubscriptionFromDb(void)
   }
   else
   {
-    PernotSubscription* pSubP = pernotSubCacheLookup(orionldState.wildcard[0], orionldState.tenantP->tenant);
+    PernotSubscription* pSubP = pernotSubCacheLookup(orionldState.tenantP->tenant, orionldState.wildcard[0]);
     if (pSubP != NULL)
       orionldSubCounters(apiSubP, NULL, pSubP);
   }
@@ -265,7 +265,7 @@ bool orionldGetSubscription(void)
   }
 
   // pernot subscription?
-  PernotSubscription* pSubP = pernotSubCacheLookup(subscriptionId, orionldState.tenantP->tenant);
+  PernotSubscription* pSubP = pernotSubCacheLookup(orionldState.tenantP->tenant, subscriptionId);
   if (pSubP != NULL)
   {
     orionldState.httpStatusCode = 200;
