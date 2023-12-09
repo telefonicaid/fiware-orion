@@ -192,7 +192,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
 04. GET subs (from DB)
 ======================
 HTTP/1.1 200 OK
-Content-Length: 768
+Content-Length: 840
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -217,7 +217,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
                 "uri": "http://127.0.0.1:9997/notify"
             },
             "format": "normalized",
-            "status": "ok"
+            "lastNotification": "202REGEX(.*)Z",
+            "noMatch": 1,
+            "status": "ok",
+            "timesSent": 1
         },
         "origin": "database",
         "q": "P3==1|P3==2",

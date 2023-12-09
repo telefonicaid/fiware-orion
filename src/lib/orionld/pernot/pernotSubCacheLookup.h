@@ -35,8 +35,8 @@
 //
 extern PernotSubscription* pernotSubCacheLookup
 (
-  const char* subscriptionId,
-  const char* tenant
+  const char* tenant,
+  const char* subscriptionId
 );
 
 #endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHELOOKUP_H_

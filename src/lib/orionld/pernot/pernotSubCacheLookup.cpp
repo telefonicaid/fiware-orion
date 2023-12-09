@@ -35,8 +35,8 @@
 //
 PernotSubscription* pernotSubCacheLookup
 (
-  const char* subscriptionId,
-  const char* tenant
+  const char* tenant,
+  const char* subscriptionId
 )
 {
   for (PernotSubscription* pSubP = pernotSubCache.head; pSubP != NULL; pSubP = pSubP->next)
