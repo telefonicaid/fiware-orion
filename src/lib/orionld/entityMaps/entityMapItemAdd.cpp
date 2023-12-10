@@ -54,15 +54,15 @@ void entityMapItemAdd(EntityMap* entityMap, const char* entityId, DistOp* distOp
     //
     LM_T(LmtEntityMap, ("The entity ID '%s' is not present in the list - adding it", entityId));
     matchP = kjArray(NULL, entityId);
-    kjChildAdd(entityMap->map, matchP);
+    kjChildAddSorted(entityMap->map, matchP);
   }
 
   //
-  // Add DistOp ID to matchP's array - remember it's a global variable, can't use kaAlloc
+  // Add DistOp ID to matchP's array - remember it's global, can't use kaAlloc
   //
   const char*  distOpId      = (distOpP != NULL)? distOpP->regP->regId : "@none";
   KjNode*      distOpIdNodeP = kjString(NULL, NULL, distOpId);
 
   LM_T(LmtEntityMap, ("Adding DistOp '%s' to entity '%s'", distOpId, matchP->name));
-  kjChildAdd(matchP, distOpIdNodeP);
+  kjChildAdd(matchP, distOpIdNodeP);  // This is sorted later - in entityMapCreate
 }

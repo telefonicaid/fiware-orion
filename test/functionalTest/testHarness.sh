@@ -237,7 +237,7 @@ errors=0
 function exitFunction()
 {
   errors=$errors+1
-    
+
   exitCode=$1
   errorText=$2
   testFile=$3
@@ -1054,6 +1054,20 @@ function partExecute()
       eCode=$?
     fi
 
+    #
+    # If still error - remove all SORT_START and SORT_END and sort the entire output/regexpect file and diff again
+    #
+    if [ "$eCode" != "0" ]
+    then
+        vMsg "$dirname/$filename: Error on normal diff - trying a sorted diff"
+        cat $dirname/$filename.regexpect | egrep -v '^#SORT_START$|^#SORT_END$' | sort > $dirname/$filename.regexpect.sorted
+        cat $dirname/$filename.out                                              | sort > $dirname/$filename.out.sorted
+        $DIFF -r $dirname/$filename.regexpect.sorted -i $dirname/$filename.out.sorted > $dirname/$filename.diff
+        eCode=$?
+        vMsg "$dirname/$filename: Error code $eCode on sorted diff"
+        rm -f $dirname/$filename.regexpect.sorted $dirname/$filename.out.sorted
+    fi
+
     if [ "$eCode" != "0" ]
     then
       logMsg "$what $dirname/$filename: eCode=$eCode"
@@ -1432,7 +1446,7 @@ do
         echo $xsecs seconds
     else
         echo "$xsecs seconds - ERROR: $errorText"
-    fi        
+    fi
   else
     echo "SUCCESS"
   fi

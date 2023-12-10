@@ -37,6 +37,12 @@ SET (SOURCES
     distOpResponses.cpp
     distOpCreate.cpp
     distOpAttrs.cpp
+    distOpItemListDebug.cpp
+    distOpListItemCreate.cpp
+    distOpListItemAdd.cpp
+    distOpResponseMergeIntoEntityArray.cpp
+    distOpsReceive2.cpp
+    distOpsSendAndReceive.cpp
     regMatchEntityInfo.cpp
     regMatchOperation.cpp
     regMatchInformationItem.cpp

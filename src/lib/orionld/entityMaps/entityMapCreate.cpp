@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/forwarding/distOpsSend.h"                         // distOpsSend
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
 #include "orionld/dbModel/dbModelToEntityIdAndTypeObject.h"         // dbModelToEntityIdAndTypeObject
+#include "orionld/kjTree/kjSort.h"                                  // kjStringArraySort
 #include "orionld/entityMaps/entityMapItemAdd.h"                    // entityMapItemAdd
 #include "orionld/entityMaps/entityMapCreate.h"                     // Own interface
 
@@ -184,14 +185,6 @@ EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, Or
 
   kjTreeLog(entityMap->map, "entityMap", LmtSR);
 
-#if 0
-  //
-  // if there are no entity hits to the matching registrations, the request is treated as a local request
-  //
-  if (entityMap->map->value.firstChildP == NULL)
-    return NULL;  // leaks ...
-#endif
-
   char* geojsonGeometryLongName = NULL;
   if (orionldState.out.contentType == GEOJSON)
     geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
@@ -224,12 +217,11 @@ EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, Or
   orionldState.uriParams.offset = offset;
   orionldState.uriParams.limit  = limit;
 
-  kjTreeLog(localDbMatches, "localDbMatches", LmtSR);
   if (localDbMatches != NULL)
   {
     localEntityV = dbModelToEntityIdAndTypeObject(localDbMatches);
     LM_T(LmtEntityMap, ("Adding local entities to the entityMap"));
-    kjTreeLog(localEntityV, "localEntityV", LmtEntityMap);
+
     for (KjNode* eidNodeP = localEntityV->value.firstChildP; eidNodeP != NULL; eidNodeP = eidNodeP->next)
     {
       const char* entityId = eidNodeP->value.s;
@@ -239,11 +231,16 @@ EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, Or
     }
   }
 
-  entityMap->count = kjChildCount(entityMap->map);
-  kjTreeLog(entityMap->map, "EntityMap", LmtCount);
-  LM_T(LmtCount, ("COUNT: Items in Entity Map: %d", entityMap->count));
+  // Sort all regs of the entities
+  for (KjNode* entityP = entityMap->map->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    kjStringArraySort(entityP);
+  }
 
-  // <DEBUG>
+  entityMap->count = kjChildCount(entityMap->map);
+
+#if 0
+  // ------------------- <DEBUG>
   if (lmTraceIsSet(LmtEntityMap) == true)
   {
     int ix = 0;
@@ -262,7 +259,8 @@ EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, Or
     }
   }
   kjTreeLog(entityMap->map, "EntityMap", LmtSR);
-  // </DEBUG>
+  // ---------------- </DEBUG>
+#endif
 
   return entityMap;
 }
