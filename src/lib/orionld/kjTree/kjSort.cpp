@@ -121,7 +121,7 @@ void kjStringArraySort(KjNode* arrayP)
   //
   while (rawP->value.firstChildP != NULL)
   {
-    // Set the very first item as the smaalest one (minP)
+    // Set the very first item as the smallest one (minP)
     KjNode* minP = rawP->value.firstChildP;
 
     // Compare with all the rest and set minP accordingly

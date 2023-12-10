@@ -271,7 +271,7 @@ echo
 echo "12. See the entity map"
 echo "======================"
 echo Entity Map: $entityMap
-orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap?prettyPrint=yes --noPayloadCheck
 echo
 echo
 
@@ -414,7 +414,7 @@ Date: REGEX(.*)
 11. Query CB for all entities (they're all type 'T')
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 244
+Content-Length: 250
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -425,25 +425,25 @@ NGSILD-Results-Count: 40
     {
         "A1": {
             "type": "Property",
-            "value": "E6:A1"
+            "value": "E36:A1"
         },
-        "id": "urn:cb:entities:E05",
+        "id": "urn:cp3:entities:E35",
         "type": "T"
     },
     {
         "A1": {
             "type": "Property",
-            "value": "E7:A1"
+            "value": "E37:A1"
         },
-        "id": "urn:cb:entities:E06",
+        "id": "urn:cp3:entities:E36",
         "type": "T"
     },
     {
         "A1": {
             "type": "Property",
-            "value": "E8:A1"
+            "value": "E38:A1"
         },
-        "id": "urn:cb:entities:E07",
+        "id": "urn:cp3:entities:E37",
         "type": "T"
     }
 ]
@@ -453,132 +453,133 @@ NGSILD-Results-Count: 40
 ======================
 Entity Map: REGEX(.*)
 HTTP/1.1 200 OK
-Content-Length: 1401
+Content-Length: 1883
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "urn:cb:entities:E00": [
-        "@none"
-    ],
-    "urn:cb:entities:E01": [
-        "@none"
-    ],
-    "urn:cb:entities:E02": [
-        "@none"
-    ],
-    "urn:cb:entities:E03": [
-        "@none"
-    ],
-    "urn:cb:entities:E04": [
-        "@none"
-    ],
-    "urn:cb:entities:E05": [
-        "@none"
-    ],
-    "urn:cb:entities:E06": [
-        "@none"
-    ],
-    "urn:cb:entities:E07": [
-        "@none"
-    ],
-    "urn:cb:entities:E08": [
-        "@none"
-    ],
-    "urn:cb:entities:E09": [
-        "@none"
-    ],
-    "urn:cp1:entities:E10": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E11": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E12": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E13": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E14": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E15": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E16": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E17": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E18": [
-        "urn:Reg1"
-    ],
-    "urn:cp1:entities:E19": [
-        "urn:Reg1"
-    ],
-    "urn:cp2:entities:E20": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E21": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E22": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E23": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E24": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E25": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E26": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E27": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E28": [
-        "urn:Reg2"
-    ],
-    "urn:cp2:entities:E29": [
-        "urn:Reg2"
-    ],
-    "urn:cp3:entities:E30": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E31": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E32": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E33": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E34": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E35": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E36": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E37": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E38": [
-        "urn:Reg3"
-    ],
-    "urn:cp3:entities:E39": [
-        "urn:Reg3"
-    ]
+  "urn:cb:entities:E00": [
+    "@none"
+  ],
+  "urn:cb:entities:E01": [
+    "@none"
+  ],
+  "urn:cb:entities:E02": [
+    "@none"
+  ],
+  "urn:cb:entities:E03": [
+    "@none"
+  ],
+  "urn:cb:entities:E04": [
+    "@none"
+  ],
+  "urn:cb:entities:E05": [
+    "@none"
+  ],
+  "urn:cb:entities:E06": [
+    "@none"
+  ],
+  "urn:cb:entities:E07": [
+    "@none"
+  ],
+  "urn:cb:entities:E08": [
+    "@none"
+  ],
+  "urn:cb:entities:E09": [
+    "@none"
+  ],
+  "urn:cp1:entities:E10": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E11": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E12": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E13": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E14": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E15": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E16": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E17": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E18": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E19": [
+    "urn:Reg1"
+  ],
+  "urn:cp2:entities:E20": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E21": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E22": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E23": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E24": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E25": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E26": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E27": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E28": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E29": [
+    "urn:Reg2"
+  ],
+  "urn:cp3:entities:E30": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E31": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E32": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E33": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E34": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E35": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E36": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E37": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E38": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E39": [
+    "urn:Reg3"
+  ]
 }
+
 
 
 13. Query using the entity map I got from step 11

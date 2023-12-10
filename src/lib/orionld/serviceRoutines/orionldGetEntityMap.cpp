@@ -34,7 +34,6 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/EntityMap.h"                             // EntityMap
 #include "orionld/entityMaps/entityMapLookup.h"                  // entityMapLookup
-#include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
 #include "orionld/serviceRoutines/orionldGetEntityMap.h"         // Own interface
 
 
@@ -55,18 +54,6 @@ bool orionldGetEntityMap(void)
   }
 
   orionldState.responseTree = entityMap->map;
-  kjTreeLog(entityMap->map, "EntityMap", LmtSR);
-
-  // Sort all entity arrays in alphabetic order (for functests to work ...)
-  // NOTE;
-  //   Instead of doing that on entity map creation, it's done here, for performance reasons.
-  //   It's a valid assumption that many more entity maps will be created than queried
-  //
-  for (KjNode* eV = orionldState.responseTree->value.firstChildP; eV != NULL; eV = eV->next)
-  {
-    kjStringArraySort(eV);
-  }
-
   orionldState.httpStatusCode = 200;
   orionldState.noLinkHeader   = true;
 

@@ -59,7 +59,6 @@ KjNode* mongocKjTreeFromBson(const void* dataP, char** titleP, char** detailsP)
   else
   {
     treeP = kjParse(orionldState.kjsonP, json);
-    LM_T(LmtPernot, (""));
     if (treeP == NULL)
     {
       *titleP   = (char*) "Internal Error";

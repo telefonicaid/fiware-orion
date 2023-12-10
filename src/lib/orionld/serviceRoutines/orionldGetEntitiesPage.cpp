@@ -24,300 +24,28 @@
 */
 extern "C"
 {
+#include "kalloc/kaAlloc.h"                                         // kaAlloc
 #include "kjson/KjNode.h"                                           // KjNode
 #include "kjson/kjRender.h"                                         // kjFastRender (for debugging purposes - LM_T)
 #include "kjson/kjBuilder.h"                                        // kjArray, ...
 #include "kjson/kjLookup.h"                                         // kjLookup
-#include "kjson/kjParse.h"                                          // kjParse
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
-#include "logMsg/traceLevels.h"                                     // LmtMongoc
 
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
-#include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"           // kjEntityIdLookupInEntityArray
-#include "orionld/regCache/regCacheItemLookup.h"                    // regCacheItemLookup
 #include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpLookupByRegId.h"                 // distOpLookupByRegId
-#include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
 #include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
-#include "orionld/forwarding/distOpEntityMerge.h"                   // distOpEntityMerge
 #include "orionld/forwarding/distOpsSend.h"                         // distOpsSend2
-#include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
+#include "orionld/forwarding/distOpItemListDebug.h"                 // distOpItemListDebug
+#include "orionld/forwarding/distOpListItemAdd.h"                   // distOpListItemAdd
+#include "orionld/forwarding/distOpResponseMergeIntoEntityArray.h"  // distOpResponseMergeIntoEntityArray
+#include "orionld/forwarding/distOpsSendAndReceive.h"               // distOpsSendAndReceive
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpItemListDebug - move!
-//
-void distOpItemListDebug(DistOpListItem* distOpList, const char* msg)
-{
-  LM_T(LmtDistOpList, ("------------- %s -----------------", msg));
-  DistOpListItem* itemP = distOpList;
-  while (itemP != NULL)
-  {
-    LM_T(LmtDistOpList, ("  DistOp:   %s", itemP->distOpP->id));
-    LM_T(LmtDistOpList, ("  Entities: %s", itemP->entityIds));
-    LM_T(LmtDistOpList, ("  ------------------------------"));
-
-    itemP = itemP->next;
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// idListFix -
-//
-static void idListFix(KjNode* entityIdArray)
-{
-  int entityIds = kjChildCount(entityIdArray);
-
-  orionldState.in.idList.items = entityIds;
-  orionldState.in.idList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * entityIds);
-
-  KjNode* entityIdP = entityIdArray->value.firstChildP;
-  for (int ix = 0; ix < entityIds; ix++)
-  {
-    orionldState.in.idList.array[ix] = entityIdP->value.s;
-    entityIdP = entityIdP->next;
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpLookup -
-//
-DistOp* distOpLookup(const char* distOpId)
-{
-  DistOp* distOpP = orionldState.distOpList;
-
-  while (distOpP != NULL)
-  {
-    if (strcmp(distOpP->id, distOpId) == 0)  // This could be greatly improved.  E.g. distOpId to be the index in the array ...
-      return distOpP;
-
-    distOpP = distOpP->next;
-  }
-
-  return NULL;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpListItemCreate -
-//
-DistOpListItem* distOpListItemCreate(const char* distOpId, char* idString)
-{
-  LM_T(LmtDistOpList, ("orionldState.distOpList at %p", orionldState.distOpList));
-  DistOp* distOpP = distOpLookupByRegId(orionldState.distOpList, distOpId);
-  LM_T(LmtDistOpList, ("Response: %p", distOpP));
-
-  if (distOpP == NULL)
-  {
-#if 0
-    //
-    // I think this LM_RE here is incorrect.
-    // The DistOps are for one request only.
-    // So, create a new DistOp if it does not exist.
-    //
-    LM_RE(NULL, ("Internal Error (unable to find the DistOp '%s'", distOpId));
-#else
-    RegCacheItem* rciP = regCacheItemLookup(orionldState.tenantP->regCache, distOpId);
-    distOpP = distOpCreate(DoQueryEntity, rciP, NULL, NULL, NULL);
-    // Add DistOp to the linked list of DistOps
-    distOpP->next    = orionldState.distOpList;
-    orionldState.distOpList = distOpP;
-#endif
-  }
-
-  DistOpListItem* itemP = (DistOpListItem*) kaAlloc(&orionldState.kalloc, sizeof(DistOpListItem));
-  if (itemP == NULL)
-    LM_X(1, ("Out of memory"));
-
-  itemP->distOpP   =  distOpP;
-  itemP->next      = NULL;
-  itemP->entityIds = idString;
-
-  return itemP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpListItemAdd -
-//
-DistOpListItem* distOpListItemAdd(DistOpListItem* distOpList, const char* distOpId, char* idString)
-{
-  LM_T(LmtEntityMap, ("Creating DistOpListItem for DistOp '%s', entities '%s'", distOpId, idString));
-
-  DistOpListItem* doliP = distOpListItemCreate(distOpId, idString);
-
-  if (doliP == NULL)
-    return distOpList;
-
-  if (distOpList != NULL)
-    doliP->next = distOpList;
-
-  return doliP;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// responseMerge -
-//
-static void responseMerge(DistOp* distOpP, KjNode* entityArray)
-{
-  LM_W(("Merging entities for DistOp '%s' (aux: %s)", distOpP->id, (distOpP->regP->mode == RegModeAuxiliary)? "YES" : "NO"));
-  LM_T(LmtSR, ("Got a response. status code: %d. entityArray: %p", distOpP->httpResponseCode, entityArray));
-
-  kjTreeLog(distOpP->responseBody, "Response", LmtSR);
-
-  if ((distOpP->httpResponseCode == 200) && (distOpP->responseBody != NULL))
-  {
-    LM_T(LmtSR, ("Got a body from endpoint registered in reg '%s'", distOpP->regP->regId));
-    LM_T(LmtSR, ("Must merge these new entities with the ones already received"));
-
-    KjNode* entityP = distOpP->responseBody->value.firstChildP;
-    KjNode* next;
-    while (entityP != NULL)
-    {
-      next = entityP->next;
-      kjChildRemove(distOpP->responseBody, entityP);
-
-      // Lookup the entity in entityArray and:
-      // - Add entityP if not found in entityArray
-      // - Merge the two if found in entityArray
-      //
-      KjNode* entityIdNodeP = kjLookup(entityP, "id");
-
-      if (entityIdNodeP != NULL)
-      {
-        char*   entityId    = entityIdNodeP->value.s;
-        KjNode* baseEntityP = kjEntityIdLookupInEntityArray(entityArray, entityId);
-
-        if (baseEntityP == NULL)
-        {
-          LM_T(LmtDistOpMerge, ("New Entity '%s' - adding it to the entity array (at %p)", entityId, entityArray));
-          kjChildAdd(entityArray, entityP);
-        }
-        else
-        {
-          LM_T(LmtDistOpMerge, ("Existing Entity '%s' - merging it in the entity array (reg-mode: %s)", entityId, registrationModeToString(distOpP->regP->mode)));
-          distOpEntityMerge(baseEntityP, entityP, orionldState.uriParamOptions.sysAttrs, distOpP->regP->mode == RegModeAuxiliary);
-        }
-      }
-      else
-        LM_W(("No Entity ID in response from forwarded GET /entities request (reg %s)", distOpP->regP->regId));
-
-      entityP = next;
-    }
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// queryResponse -
-//
-static int queryResponse(DistOp* distOpP, void* callbackParam)
-{
-  KjNode* entityArray = (KjNode*) callbackParam;
-
-  responseMerge(distOpP, entityArray);
-  return 0;
-}
-
-
-
-//
-// FIXME: these two functions need to get their own modules in orionld/forwarding
-//        Move from orionldGetEntitiesDistributed.cpp
-//
-typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpsReceive2 - FIXME: move to orionld/forwarding/distOpsReceive.cpp/h
-//
-void distOpsReceive2(DistOpListItem* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam)
-{
-  LM_T(LmtSR, ("Receiving responses"));
-  //
-  // Read the responses to the forwarded requests
-  //
-  CURLMsg* msgP;
-  int      msgsLeft;
-
-  while ((msgP = curl_multi_info_read(orionldState.curlDoMultiP, &msgsLeft)) != NULL)
-  {
-    if (msgP->msg != CURLMSG_DONE)
-      continue;
-
-    if (msgP->data.result == CURLE_OK)
-    {
-      DistOp* distOpP = distOpLookupByCurlHandle(orionldState.distOpList, msgP->easy_handle);
-
-      if (distOpP == NULL)
-      {
-        LM_E(("Unable to find the curl handle of a message, presumably a response to a forwarded request"));
-        continue;
-      }
-
-      curl_easy_getinfo(msgP->easy_handle, CURLINFO_RESPONSE_CODE, &distOpP->httpResponseCode);
-
-      if ((distOpP->rawResponse != NULL) && (distOpP->rawResponse[0] != 0))
-        distOpP->responseBody = kjParse(orionldState.kjsonP, distOpP->rawResponse);
-
-      LM_T(LmtDistOpResponse, ("%s: received a response for a forwarded request", distOpP->regP->regId, distOpP->httpResponseCode));
-      LM_T(LmtDistOpResponse, ("%s: response for a forwarded request: %s", distOpP->regP->regId, distOpP->rawResponse));
-
-      if (distOpP->regP->mode == RegModeAuxiliary)
-        LM_W(("%s: Aux registration - merge is delayed", distOpP->regP->regId));
-      else
-        treatFunction(distOpP, callbackParam);
-    }
-  }
-
-  for (DistOp* distOpP = orionldState.distOpList; distOpP != NULL; distOpP = distOpP->next)
-  {
-    if ((distOpP->regP != NULL) && (distOpP->regP->mode == RegModeAuxiliary))
-      responseMerge(distOpP, (KjNode*) callbackParam);
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// distOpQueryRequest -
-//
-static void distOpQueryRequest(DistOpListItem* distOpList, KjNode* entityArray)
-{
-  // Send all distributed requests
-
-  int forwards = distOpsSend2(distOpList);
-
-  // Await all responses, if any
-  if (forwards > 0)
-    distOpsReceive2(distOpList, queryResponse, entityArray);
-}
 
 
 
@@ -334,7 +62,6 @@ static void cleanupSysAttrs(void)
     KjNode* attrP = entityP->value.firstChildP;
     KjNode* nextAttrP;
 
-    kjTreeLog(entityP, "Entity", LmtSR);
     while (attrP != NULL)
     {
       nextAttrP = attrP->next;
@@ -367,17 +94,50 @@ static void cleanupSysAttrs(void)
 
 
 
+// -----------------------------------------------------------------------------
+//
+// idListFix -
+//
+static void idListFix(KjNode* entityIdArray)
+{
+  int entityIds = kjChildCount(entityIdArray);
+
+  orionldState.in.idList.items = entityIds;
+  orionldState.in.idList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * entityIds);
+
+  KjNode* entityIdP = entityIdArray->value.firstChildP;
+  for (int ix = 0; ix < entityIds; ix++)
+  {
+    orionldState.in.idList.array[ix] = entityIdP->value.s;
+    entityIdP = entityIdP->next;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// queryResponse -
+//
+static int queryResponse(DistOp* distOpP, void* callbackParam)
+{
+  KjNode* entityArray = (KjNode*) callbackParam;
+
+  distOpResponseMergeIntoEntityArray(distOpP, entityArray);
+  return 0;
+}
+
+
+
 // ----------------------------------------------------------------------------
 //
 // orionldGetEntitiesPage -
 //
 bool orionldGetEntitiesPage(void)
 {
-  uint32_t  offset = orionldState.uriParams.offset;
-  uint32_t  limit  = orionldState.uriParams.limit;
-
-  KjNode* entityArray = kjArray(orionldState.kjsonP, NULL);
-  LM_T(LmtDistOpResponseDetail, ("entityArray at %p", entityArray));
+  uint32_t  offset      = orionldState.uriParams.offset;
+  uint32_t  limit       = orionldState.uriParams.limit;
+  KjNode*   entityArray = kjArray(orionldState.kjsonP, NULL);
 
   LM_T(LmtEntityMap, ("entity map:          '%s'", orionldState.in.entityMap->id));
   LM_T(LmtEntityMap, ("items in entity map:  %d",  orionldState.in.entityMap->count));
@@ -406,6 +166,7 @@ bool orionldGetEntitiesPage(void)
   // Fast forward to offset index in the KJNode array that is the entity map
   //
   KjNode* entityMap = orionldState.in.entityMap->map->value.firstChildP;
+
   for (uint32_t ix = 0; ix < offset; ix++)
   {
     entityMap = entityMap->next;
@@ -461,9 +222,7 @@ bool orionldGetEntitiesPage(void)
     entityMap = entityMap->next;
   }
 
-  kjTreeLog(sources, "sources", LmtEntityMapDetail);
-
-  DistOpListItem* distOpList = NULL;
+  DistOpListItem* distOpListItem = NULL;
   for (KjNode* sourceP = sources->value.firstChildP; sourceP != NULL; sourceP = sourceP->next)
   {
     if (strcmp(sourceP->name, "@none") == 0)
@@ -526,7 +285,6 @@ bool orionldGetEntitiesPage(void)
                               true);
 
       // Response comes in orionldState.responseTree - move those to entityArray
-      kjTreeLog(orionldState.responseTree, "orionldState.responseTree", LmtDistOpResponseDetail);
       if ((orionldState.responseTree != NULL) && (orionldState.responseTree->value.firstChildP != NULL))
       {
         LM_T(LmtDistOpResponseDetail, ("Adding a 'distop-response-entity' to the entityArray"));
@@ -565,14 +323,14 @@ bool orionldGetEntitiesPage(void)
       }
 
       LM_T(LmtEntityMap, ("Query '%s' with entity ids=%s", sourceP->name, idString));
-      distOpList = distOpListItemAdd(distOpList, sourceP->name, idString);
+      distOpListItem = distOpListItemAdd(distOpListItem, sourceP->name, idString);
     }
   }
 
-  if (distOpList != NULL)
+  if (distOpListItem != NULL)
   {
-    distOpItemListDebug(distOpList, "To Forward for GET /entities");
-    distOpQueryRequest(distOpList, entityArray);
+    distOpItemListDebug(distOpListItem, "To Forward for GET /entities");
+    distOpsSendAndReceive(distOpListItem, queryResponse, entityArray);
   }
 
   orionldState.responseTree = entityArray;

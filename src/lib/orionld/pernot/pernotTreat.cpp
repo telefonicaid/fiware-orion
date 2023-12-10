@@ -27,6 +27,7 @@
 extern "C"
 {
 #include "kalloc/kaBufferInit.h"                            // kaBufferInit
+#include "kalloc/kaBufferReset.h"                           // kaBufferReset
 #include "kjson/kjBufferCreate.h"                           // kjBufferCreate
 #include "kjson/KjNode.h"                                   // KjNode
 #include "kjson/kjBuilder.h"                                // kjArray, ...
@@ -123,13 +124,7 @@ static void* pernotTreat(void* vP)
   orionldState.uriParams.count  = true;   // Need the count to be able to paginate
   orionldState.tenantP          = subP->tenantP;
 
-  kjTreeLog(subP->eSelector,     "eSelector",     LmtPernotQuery);
-  kjTreeLog(subP->attrsSelector, "attrsSelector", LmtPernotQuery);
-  LM_T(LmtPernotQuery, ("qSelector at %p", subP->qSelector));
-
   dbEntityArray = mongocEntitiesQuery2(subP->eSelector, subP->attrsSelector, subP->qSelector, NULL, subP->lang, &count);
-
-  LM_T(LmtPernot, ("mongocEntitiesQuery2 gave a count of %d", count));
 
   if ((dbEntityArray == NULL) || (count == 0))
   {
@@ -193,7 +188,9 @@ static void* pernotTreat(void* vP)
 
 done:
   subP->notificationAttempts += 1;  // timesSent
+  kaBufferReset(&orionldState.kalloc, true);
   pthread_exit(0);
+
   return NULL;
 }
 
