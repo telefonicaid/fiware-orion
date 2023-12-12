@@ -255,6 +255,25 @@ bool orionldGetEntities(void)
   if (pCheckQueryParams(id, type, idPattern, q, geometry, attrs, local, orionldState.in.entityMap, &qNode, &geoInfo) == false)
     return false;
 
+  //
+  // Distributed GET /entities, using the concept "entityMaps" is disabled by default.
+  // To turn it on, please start Orion-LD with the CLI option:
+  //   -wip entityMaps
+  // Or, the env var:
+  // export ORIONLD_WIP=entityMaps
+  //
+  if (entityMapsEnabled == false)
+    orionldState.distributed = false;
+
+  //
+  // Entity Maps can be turned on using the HTTP header ORIONLD-WIP
+  //
+  if (orionldState.in.wip != NULL)
+  {
+    if (strcmp(orionldState.in.wip, "entityMaps") == 0)
+      orionldState.distributed = true;
+  }
+
   if (orionldState.in.entityMap != NULL)
   {
     // No query params can be used when asking for pages in an entity map

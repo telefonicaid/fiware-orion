@@ -28,10 +28,10 @@ dbInit CB
 dbInit CP1
 dbInit CP2
 dbInit CP3
-orionldStart CB  -experimental -forwarding
-orionldStart CP1 -experimental -forwarding
-orionldStart CP2 -experimental -forwarding
-orionldStart CP3 -experimental -forwarding
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental -forwarding -wip entityMaps
+orionldStart CP2 -experimental -forwarding -wip entityMaps
+orionldStart CP3 -experimental -forwarding -wip entityMaps
 
 --SHELL--
 

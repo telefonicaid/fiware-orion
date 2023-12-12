@@ -26,7 +26,7 @@ Issue #1466 - crash with distributed GET /entities on entity type
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
-orionldStart CB  -experimental -forwarding
+orionldStart CB  -experimental -forwarding -wip entityMaps
 orionldStart CP1 -experimental
 
 --SHELL--

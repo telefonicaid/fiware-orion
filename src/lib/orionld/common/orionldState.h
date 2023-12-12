@@ -249,6 +249,7 @@ typedef struct OrionldStateIn
   char*     legacy;          // Use legacy mongodb driver / mongoBackend
   bool      performance;
   bool      aerOS;           // Special treatment for aerOS specific features
+  char*     wip;
 
   // Incoming payload
   char*     payload;
@@ -622,6 +623,7 @@ extern bool              noCache;                  // From orionld.cpp
 extern uint32_t          cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 extern PernotSubCache    pernotSubCache;
 extern EntityMap*        entityMaps;               // Used by GET /entities in the distributed case, for pagination
+extern bool              entityMapsEnabled;
 
 extern char                localIpAndPort[135];    // Local address for X-Forwarded-For (from orionld.cpp)
 extern unsigned long long  inReqPayloadMaxSize;

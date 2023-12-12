@@ -108,7 +108,8 @@ char              hostHeaderNoLF[128];
 char              hostHeader[256];             // Host: xxx
 size_t            hostHeaderLen;
 PernotSubCache    pernotSubCache;
-EntityMap*        entityMaps = NULL;           // Used by GET /entities in the distributed case, for pagination
+EntityMap*        entityMaps        = NULL;    // Used by GET /entities in the distributed case, for pagination
+bool              entityMapsEnabled = false;
 
 
 
