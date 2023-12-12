@@ -444,7 +444,7 @@ PaArgument paArgs[] =
   { "-cSubCounters",          &cSubCounters,            "CSUB_COUNTERS",             PaInt,     PaOpt,  20,              0,      PaNL,             CSUBCOUNTERS_DESC        },
   { "-distributed",           &distributed,             "DISTRIBUTED",               PaBool,    PaOpt,  false,           false,  true,             DISTRIBUTED_DESC         },
   { "-brokerId",              &brokerId,                "BROKER_ID",                 PaStr,     PaOpt,  _i "",           PaNL,   PaNL,             BROKER_ID_DESC           },
-  { "-wip",                   wip,                      "WIP",                       PaStr,     PaOpt,  _i "",           PaNL,   PaNL,             WIP_DESC                 },
+  { "-wip",                   wip,                      "WIP",                       PaStr,     PaHid,  _i "",           PaNL,   PaNL,             WIP_DESC                 },
   { "-triggerOperation",      &triggerOperation,        "TRIGGER_OPERATION",         PaBool,    PaHid,  false,           false,  true,             TRIGGER_OPERATION_DESC   },
   { "-forwarding",            &distributed,             "FORWARDING",                PaBool,    PaHid,  false,           false,  true,             FORWARDING_DESC          },
   { "-socketService",         &socketService,           "SOCKET_SERVICE",            PaBool,    PaHid,  false,           false,  true,             SOCKET_SERVICE_DESC      },
