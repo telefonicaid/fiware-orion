@@ -118,61 +118,10 @@ typedef struct RestService
 {  
   RequestType   request;          // The type of the request  
   int           components;       // Number of components in the URL path  
-  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }  
-  std::string   payloadWord;      // No longer used, should be removed ... ?  
+  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }   
   RestTreat     treat;            // service function pointer  
 } RestService;
 ```
-
-So, to add a REST service eg. `PUT /v2/entities/{EntitId}/attrs/{AttributeName}/metadata/{MetadataName}`, the new item if the RestService vector `putServiceV` would look like this:
-
-```
-{ Metadata,  7, { "v2", "entities", "*", "attrs", "*", "metadata", "*" }, "", putMetadata }
-```
-
-NOTE:
-
-* Item 1: `Metadata` would have to be added as an enum constant in the `enum RequestType` in `src/lib/ngsi/Request.h`
-* Item 3: `"*"`. An asterisc in the component vector `RestService::compV` matches ANY string, and whenever a path including entity id, attribute name, etc is defined, `"*"` must be used.
-* Item 5: `putMetadata()` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](sourceCode.md#srclibserviceroutinesv2)).
-
-Note also that in `orionRestServices.cpp`, these `RestService` vector lines are really long, and our style guide is against too long lines. However, making the lines shorter by using definitions just make the code more difficult to understand and we don't want that.
-
-> Side-note: The [style guide](contribution_guidelines.md#s9-line-length) says a source code line **shouldn't** be longer than 120 chars.
-
-The service routine `putMetadata()` should reside in `src/lib/serviceRoutinesV2/putMetadata.h/cpp` and its signature must be as follows:  
-```
-std::string putMetadata  
-(  
-  ConnectionInfo*            ciP,  
-  int                        components,  
-  std::vector<std::string>&  compV,  
-  ParseData*                 parseDataP  
-)  
-```
-
-The `entity id`, `attribute name`, and `metadata name` (all part of the URL path), must be "extracted" from the component vector `compV`:
-
-```
-  std::string entityId      = compV[2];  
-  std::string attributeName = compV[4];  
-  std::string metadataName  = compV[6];  
-```
-
-All service routines that modify/create entities/attributes/metadata rely on the NGSIv1 service routine `postUpdateContext()`, and `putMetadata()` is no exception. So, what needs to be done in `putMetadata()` is to build a `UpdateContextRequest` object using the parameters of `putMetadata()` and call `postUpdateContext()`. Something like this:
-
-```
-  parseDataP->upcr.res.fill(entityId, attributeName, metadataName, ActionTypeAppend);
-  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPEND);    
-```
-
-`UpdateContextRequest` has a bunch of `fill()` methods (seven `fill()` methods as of March 2017) and if there is no fill-method suited for your demands in `putMetadata()`, then another fill-method must be implemented for `UpdateContextRequest`.
-
-It is easy enough, just copy from an older, similar, fill-method.
-
-Now just add `putMetadata.cpp` to the CMake file `src/lib/serviceRoutinesV2/CMakeLists.txt` and compile the broker. To test that `putMetadata()` works correctly, a new functional test case should be implemented. [The following recipe](#adding-a-functional-test-case) explains how to do that.
-
-To capture "POST/PATCH/XXX /v2/entities/*/attrs/*/metadata/*" and respond with a `405 Method Not Allowed`, please have a look at [the recipe about bad method](#catching-a-405-method-not-allowed).
 
 [Top](#top)
 
