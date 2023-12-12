@@ -27,9 +27,9 @@ GET /entities with three brokers all connected via registrations
 dbInit CB
 dbInit CP1
 dbInit CP2
-orionldStart CB  -experimental -forwarding
-orionldStart CP1 -experimental -forwarding
-orionldStart CP2 -experimental -forwarding
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental -forwarding -wip entityMaps
+orionldStart CP2 -experimental -forwarding -wip entityMaps
 
 --SHELL--
 
