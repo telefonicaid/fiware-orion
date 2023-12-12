@@ -82,8 +82,6 @@ DistOp* regMatchInformationItemForQuery
           distOpList    = distOpP;
         }
       }
-      else
-        free(distOpP);  // FIXME: Allocate AFTER calling regMatchEntityInfoForQuery, not before!
     }
 
     if (distOpList == NULL)
