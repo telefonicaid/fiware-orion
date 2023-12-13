@@ -86,7 +86,7 @@ std::string putEntityAttribute
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // Adjust error code if needed
-  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), false);
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), true);
 
   // 03. Check error
   std::string  answer = "";

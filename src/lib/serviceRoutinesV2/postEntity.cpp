@@ -76,10 +76,11 @@ std::string postEntity
     return oe.toJson();
   }
 
-  if (ciP->uriParamOptions["append"] == true)  // pure-append
+  // FIXME PR: maybe NGSIV2_FLAVOUR_ONPUREAPPEND and NGSIV2_FLAVOUR_ONAPPEND can be merged into a single one
+  if (ciP->uriParamOptions[OPT_APPEND] == true)  // pure-append
   {
     op     = ActionTypeAppendStrict;
-    flavor = NGSIV2_FLAVOUR_ONUPDATE;
+    flavor = NGSIV2_FLAVOUR_ONPUREAPPEND;
   }
   else
   {

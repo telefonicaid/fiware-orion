@@ -4188,7 +4188,8 @@ unsigned int processContextElement
     }
 
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
-    if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
+    // both for regular case (NGSIV2_FLAVOUR_ONAPPEND) and when ?options=append is used (NGSIV2_FLAVOUR_ONPUREAPPEND)
+    if ((entitiesNumber == 0) && ((ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND)||(ngsiv2Flavour == NGSIV2_FLAVOUR_ONPUREAPPEND)))
     {
       buildGeneralErrorResponse(eP, NULL, responseP, SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY);
       responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
