@@ -185,7 +185,7 @@ HttpStatusCode mongoUpdateContext
           break;
         case UC_FULL_ATTRS_FAIL:
           // If global UC is full attrs fail, we need also full attrs fail or not found entity in the processed entity to keep global full attrs fail
-          // Otherwise (success, partial, not found entity), the global UC changes to partial
+          // Otherwise (success, partial), the global UC changes to partial
           if ((entityUpdateCoverage != UC_FULL_ATTRS_FAIL) && (entityUpdateCoverage != UC_ENTITY_NOT_FOUND))
           {
             updateCoverage = UC_PARTIAL;

@@ -35,7 +35,7 @@ brokerStart CB
 #
 # ...
 # * Errors use a non-2xx code and error payload (see next subsection):
-#   * 404 Not Found if none of the entitys in the `entities` field exists in `update`, `delete` or `replace` cases
+#   * 404 Not Found if none of the entities in the `entities` field exists in `update`, `delete` or `replace` cases
 #   * 422 Unprocessable Content for other cases
 #
 # Response payload:

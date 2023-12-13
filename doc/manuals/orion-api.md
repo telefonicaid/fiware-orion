@@ -4701,8 +4701,6 @@ For action type `appendStrict`:`
     "error": "Unprocessable"
 }
 
-* If *in some (but not in all)* entities in `entities` there was a fail due to existing attributes (partial update):
-
 * If in *at least one entity* in `entities` in *at least* one attribute there was a success but not all entities in `entities` have
   a full success (partial update):
 
