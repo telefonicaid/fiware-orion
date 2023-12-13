@@ -4635,9 +4635,87 @@ Example:
 
 _**Response code**_
 
-* Successful operation uses 204 No Content.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Successful operation uses 204 No Content
+* Errors use a non-2xx code and error payload (see next subsection):
+  * 404 Not Found if none of the entities in the `entities` field exists in `update`, `delete` or `replace` cases
+  * 422 Unprocessable Content for other cases
+
+_**Response payload**_
+
+For action type `replace`:
+
+* If *none* of the entities in `entities` exist:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+* If *any (but not all)* of the entities in `entities` does not exist (partial update):
+
+```
+{
+    "description": "do not exist: G/T - [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+For action type `update` or `delete`:
+
+* If *none* of the entities in `entities` exist:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+* If at least one entity in `entities` exists and in *all* of existing entities there was a *full fail* due to missing attributes:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ], G/T [entity itself]",
+    "error": "Unprocessable"
+}
+```
+
+* If at least one entity in `entities` exists and in *at least one* of the existing entities *at least* one attribute exists
+  but not all entities exist or all entities exist but in at least one entity there is at least one missing attribute (partial update):
+
+```
+{
+    "description": "do not exist: E/T - [ D ], G/T [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+For action type `appendStrict`:`
+
+* If in *all* entities in `entities` there was a *full fail* due to existing attributes:
+
+{
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A, B ], E2/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+
+* If *in some (but not in all)* entities in `entities` there was a fail due to existing attributes (partial update):
+
+* If in *at least one entity* in `entities` in *at least* one attribute there was a success but not all entities in `entities` have
+  a full success (partial update):
+
+{
+    "description": "one or more of the attributes in the request already exist: E2/T - [ A, B ]",
+    "error": "PartialUpdate"
+}
+
+The entity type in `description` is shown only if the request includes it. Otherwise, it is omitted:
+
+```
+"description": "one or more of the attributes in the request already exist: E2 - [ A, B ]"
+```
 
 ### Query operation
 
