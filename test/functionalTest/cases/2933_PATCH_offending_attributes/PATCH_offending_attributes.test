@@ -42,6 +42,8 @@ brokerStart CB
 echo '01. POST /v2/entities, to create Room1 with temperature and pressure.'
 echo '====================================================================='
 payload='{
+  "id": "Room1",
+  "type": "Thing",
   "temperature": {
     "value": 23,
     "type": "Float"
@@ -51,7 +53,7 @@ payload='{
     "type": "Float"
   }
 }'
-orionCurl --url /v2/entities/Room1/attrs?options=append --payload "$payload"
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
@@ -105,9 +107,11 @@ echo
 --REGEXPECT--
 01. POST /v2/entities, to create Room1 with temperature and pressure.
 =====================================================================
-HTTP/1.1 204 No Content
+HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Thing
+Content-Length: 0
 
 
 
