@@ -43,7 +43,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
-
+link_directories("${Boost_LIBRARY_DIRS}")
 
 
 # Executable declaration
@@ -56,11 +56,11 @@ MESSAGE("contextBroker distro: '${DISTRO}'")
 # The following ones are distros that we have checked are built correctly
 
 IF(${DISTRO} MATCHES "CentOS_6.*")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} MATCHES "CentOS_7.*")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} MATCHES "Debian_.*")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 
 # The following ones are distros that haven't been checked since the refactoring in
 # PR #2062. They should be "promoted" as soon as we have positive feedback about
@@ -68,21 +68,21 @@ ELSEIF(${DISTRO} MATCHES "Debian_.*")
 # the aforementioned PR)
 
 ELSEIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 ELSEIF((${DISTRO} STREQUAL "Ubuntu_13.10") OR (${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.10"))    
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS") OR (${DISTRO} MATCHES "Linux_Mint_.*"))    
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")  
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 ELSEIF(${DISTRO} STREQUAL "Fedora_20")  
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 
 # Finally this is a "best effort" option to try to build on distros that don't have a
 # specify switch
 
 ELSE()  
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient ${BOOST} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmongoclient ${Boost_LIBRARIES} ${DYNAMIC_LIBS})
 ENDIF()
 
 IF (${DISTRO} MATCHES "Ubuntu.*")

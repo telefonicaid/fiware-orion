@@ -25,6 +25,7 @@ PROJECT(orionld)
 cmake_minimum_required(VERSION 3.5)
 
 find_package(PkgConfig REQUIRED)
+find_package(Boost REQUIRED COMPONENTS thread filesystem system regex)
 
 #
 # DEBUG or RELEASE build ?
@@ -252,20 +253,6 @@ SET (ORION_LIBS
     orionld_prometheus
     lm
     pa
-)
-
-SET (BOOST
-    boost_thread
-    boost_filesystem
-    boost_system
-    boost_regex
-)
-
-SET (BOOST_MT
-    boost_thread-mt
-    boost_filesystem-mt
-    boost_system-mt
-    boost_regex-mt
 )
 
 # Static libs common to orionld and unitTest binaries
