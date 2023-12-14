@@ -123,7 +123,6 @@ typedef struct RestService
 } RestService;
 ```
 
-
 So, to add a REST service eg. `PUT /v2/entities/{EntitId}/attrs/{AttributeName}/metadata/{MetadataName}`, the new item if the RestService vector `putServiceV` would look like this:
 
 ```
