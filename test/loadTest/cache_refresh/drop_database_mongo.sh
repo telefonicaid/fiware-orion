@@ -19,7 +19,7 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
-# author: 'Iv·n Arias LeÛn (ivan dot ariasleon at telefonica dot com)'
+# author: 'Iv√°n Arias Le√≥n (ivan dot ariasleon at telefonica dot com)'
 
 if [  "$1" == ""  ]
   then
@@ -41,7 +41,7 @@ fi
 
 
 
-
+# FIXME: use mongosh instead of mongo
 dbs=(`(echo 'show databases' | mongo --host $host) | grep $prefix`)
 for db in ${dbs[@]};
     do

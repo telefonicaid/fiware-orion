@@ -117,7 +117,7 @@ echo
 
 echo "07. Check attributes in DB"
 echo "=========================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E1",  "type": "Thing", "servicePath" : "/" } }, {_id:0, attrNames: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.findOne({ "_id" : { "id" : "E1",  "type": "Thing", "servicePath" : "/" } }, {_id:0, attrNames: 1})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -279,7 +279,12 @@ Content-Length: 10
 
 07. Check attributes in DB
 ==========================
-{ "attrNames" : [ "A2..y", "A3.Z" ] }
+{
+    "attrNames": [
+        "A2..y",
+        "A3.Z"
+    ]
+}
 
 
 --TEARDOWN--
