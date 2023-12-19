@@ -26,7 +26,7 @@ In the case you are installing Orion building from sources you need:
 * Operating system: Debian. The reference operating system is Debian 12.1
   but it should work also in any later Debian 12 version.
 * Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB version
-  is 4.4 (Orion may work with older versions but we don't recommend it at all!).
+  is 6.0 (Orion may work with older versions but we don't recommend it at all!).
 
 For system resources (CPUs, RAM, etc.) see [these recommendations](diagnosis.md#resource-availability).
 
