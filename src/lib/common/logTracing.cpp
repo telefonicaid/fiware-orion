@@ -37,7 +37,7 @@
 */
 inline bool isNgsiV1Url(const char* url)
 {
-  return (strstr(url, "v1") || strcasestr(url, "ngsi10") || strcasestr(url, "ngsi9"));
+  return (strstr(url, "/v1/") || strcasestr(url, "/ngsi10/") || strcasestr(url, "/ngsi9/"));
 }
 
 
