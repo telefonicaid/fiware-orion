@@ -168,7 +168,7 @@ echo
 
 echo "07. Corrupt reference in subscription (using mongo)"
 echo "==================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.update({_id: ObjectId("'$SUB_ID'")}, { $set: { "reference": "badReferenceForSubscription" }})'
+mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("'$SUB_ID'")}, { $set: { "reference": "badReferenceForSubscription" }})'
 echo
 echo
 
@@ -265,7 +265,7 @@ Releasing alarm BadInput REGEX((0.0.0.0|127.0.0.1))
 
 07. Corrupt reference in subscription (using mongo)
 ===================================================
-WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+{"acknowledged":true,"insertedId":null,"matchedCount":1,"modifiedCount":1,"upsertedCount":0}
 
 
 08. Wait six seconds to assure the subscription cache has been modified

@@ -353,8 +353,8 @@ Content-Length: 366
 
 06. Get sub password pass1 from DB
 ==================================
-user1
-pass1
+"user1"
+"pass1"
 
 
 07. PATCH sub changing password to user10 and pass10
@@ -407,8 +407,8 @@ Content-Length: 367
 
 09. Get sub password pass10 from DB
 ===================================
-user10
-pass10
+"user10"
+"pass10"
 
 
 10. PATCH sub removing auth parameters
@@ -513,8 +513,8 @@ Content-Length: 366
 
 15. Get sub password pass1 from DB
 ==================================
-user1
-pass1
+"user1"
+"pass1"
 
 
 --TEARDOWN--

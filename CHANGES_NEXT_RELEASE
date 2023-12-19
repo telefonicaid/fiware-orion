@@ -8,4 +8,5 @@
 - Fix: improve logs in MongoDB query logic
 - Upgrade Debian version from 11.6 to 12.1 in Dockerfile
 - Hardening: upgrade libmongoc dependency from 1.23.1 to 1.24.3
+- Reference MongoDB version changed from 4.4 to 6.0
 - Reference distribution changed from Debian 11 to Debian 12

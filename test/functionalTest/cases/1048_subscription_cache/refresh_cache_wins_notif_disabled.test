@@ -26,7 +26,7 @@ Cache refresh keeps newer information from cache in disabled notification scenar
 --SHELL-INIT--
 dbInit CB
 
-mongoCmd ${CB_DB_NAME} 'db.csubs.insert({
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "_id" : ObjectId("61960a51596aa2623032357d"),
         "expiration" : NumberLong("9223372036854775807"),
         "reference" : "http://localhost:9997/notify",
@@ -131,7 +131,7 @@ echo
 
 echo "05. Get doc in DB before cache refresh and see status active changed in the past and without count and without failsCounter"
 echo "==========================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -146,7 +146,7 @@ echo
 
 echo "07. Get doc in DB after cache refresh and see status inactive changed in the present and count 2, failsCounter 2"
 echo "================================================================================================================"
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 

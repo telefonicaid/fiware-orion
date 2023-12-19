@@ -24,6 +24,4 @@ then
   exit 1
 fi
 
-mongo --quiet << EOF
-  show dbs
-EOF
+mongosh --eval 'show dbs' --quiet

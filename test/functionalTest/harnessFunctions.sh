@@ -145,7 +145,7 @@ function dbInit()
   fi
 
   dMsg "database to drop: <$db>" 
-  echo 'db.dropDatabase()' | mongo mongodb://$host:$port/$db --quiet
+  mongosh mongodb://$host:$port/$db --eval 'db.dropDatabase()' --quiet
 }
 
 
@@ -186,9 +186,9 @@ function dbList
 
   if [ "$name" != "" ]
   then
-    echo show dbs | mongo mongodb://$host:$port --quiet | grep "$name" | awk '{ print $1 }'
+    mongosh mongodb://$host:$port --eval 'show dbs' --quiet | grep "$name" | awk '{ print $1 }'
   else
-    echo show dbs | mongo mongodb://$host:$port --quiet | awk '{ print $1 }'
+    mongosh mongodb://$host:$port --eval 'show dbs' --quiet | awk '{ print $1 }'
   fi
 }
 
@@ -212,7 +212,7 @@ function dbResetAll()
     port="27017"
   fi
   
-  all=$(echo show dbs | mongo mongodb://$host:$port --quiet | grep ftest | awk '{ print $1 }')
+  all=$(mongosh mongodb://$host:$port --eval 'show dbs' --quiet | grep ftest | awk '{ print $1 }')
   for db in $all
   do
     dbDrop $db
@@ -1040,17 +1040,7 @@ function valgrindSleep()
 
 # ------------------------------------------------------------------------------
 #
-# mongoCmd - 
-#
-# This functions is needed due to some problems with jenkins that seems to avoid
-# the usage of 'mongo --quiet ...' directly. Thus, we need to use mongo without
-# --quiet, but we need to get rid of some preamble lines about mongo version and
-# connection information and a final 'bye' line
-#
-# NOTE: this will no longer work with new mongosh shell. Note that legacy shell
-# (the 'mongo' command) has been deprecated in MongoDB 5.0 and removed in MongoDB 6.0.
-# This function (and many .test using mongoCmd) would need fixing after stepping to
-# MongoDB 6.0
+# mongoCmd -
 #
 function mongoCmd()
 {
@@ -1066,35 +1056,12 @@ function mongoCmd()
     port="27017"
   fi
 
-  db=$1
-  cmd=$2
-  echo $cmd | mongo mongodb://$host:$port/$db | tail -n 2 | head -n 1
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# mongoCmdLong - like mongoCmd but showing all the output, not just the last line.
-#                Meant to be used in conjunction with 'grep'
-#
-function mongoCmdLong()
-{
-  host="${CB_DATABASE_HOST}"
-  if [ "$host" == "" ]
-  then
-    host="localhost"
-  fi
-
-  port="${CB_DATABASE_PORT}"
-  if [ "$port" == "" ]
-  then
-    port="27017"
-  fi
+  # Why to use EJSON.stringfiy() instead of JSON.stringfly()?
+  # See https://stackoverflow.com/q/77678898/1485926
 
   db=$1
-  cmd=$2
-  echo $cmd | mongo mongodb://$host:$port/$db
+  cmd="EJSON.stringify($2)"
+  mongosh mongodb://$host:$port/$db --eval "$cmd" --quiet
 }
 
 
@@ -1158,7 +1125,7 @@ function dbInsertEntity()
     port="27017"
   fi
 
-  echo "$jsCode ; $ent ; $doc ; $cmd" | mongo mongodb://$host:$port/$db
+  mongosh mongodb://$host:$port/$db --eval "$jsCode ; $ent ; $doc ; $cmd" --quiet
 }
 
 
@@ -1426,7 +1393,6 @@ export -f accumulator3Reset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
-export -f mongoCmdLong
 export -f vMsg
 export -f dMsg
 export -f valgrindSleep

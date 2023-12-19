@@ -22,7 +22,7 @@
 MONGO_URI="mongodb://127.0.0.1:27017"
 #MONGO_URI="mongodb://mongodb1:27017,mongodb2:27017,mongodb3:27017/?replicaSet=cb_rs0"
 
-for db in $(echo 'show dbs' | mongo $MONGO_URI | grep '^orion' | awk -F ' ' '{print $1}')
+for db in $(mongosh $MONGO_URI --eval 'show dbs' --quiet | grep '^orion' | awk -F ' ' '{print $1}')
 do
   echo "Processing $db db"
   # Edit next line to set the script you want

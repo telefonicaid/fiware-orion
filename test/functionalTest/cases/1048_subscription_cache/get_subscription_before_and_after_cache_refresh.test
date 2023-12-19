@@ -26,7 +26,7 @@ Get subscription before and after cache refresh
 --SHELL-INIT--
 dbInit CB
 
-mongoCmd ${CB_DB_NAME} 'db.csubs.insert({
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "_id" : ObjectId("61960a51596aa2623032357d"),
         "expiration" : NumberLong("9223372036854775807"),
         "reference" : "http://localhost:1028/accumulate",
@@ -134,15 +134,15 @@ echo
 
 echo "02. Set dynamic fields in DB to set B"
 echo "====================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.update({_id: ObjectId("61960a51596aa2623032357d")}, {
+mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("61960a51596aa2623032357d")}, {
   $set: {
-    lastNotification: NumberLong(1577876400),
-    lastSuccess: NumberLong(1577876400),
-    lastFailure: NumberLong(1577872800),
-    lastSuccessCode: NumberLong(204),
+    lastNotification: NumberLong("1577876400"),
+    lastSuccess: NumberLong("1577876400"),
+    lastFailure: NumberLong("1577872800"),
+    lastSuccessCode: NumberLong("204"),
     lastFailureReason: "Timeout",
-    count: NumberLong(25),
-    failsCounter: NumberLong(8),
+    count: NumberLong("25"),
+    failsCounter: NumberLong("8"),
     status: "inactive",
     statusLastChange: 1578733200
   }
@@ -217,7 +217,7 @@ Content-Length: 551
 
 02. Set dynamic fields in DB to set B
 =====================================
-WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+{"acknowledged":true,"insertedId":null,"matchedCount":1,"modifiedCount":1,"upsertedCount":0}
 
 
 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet

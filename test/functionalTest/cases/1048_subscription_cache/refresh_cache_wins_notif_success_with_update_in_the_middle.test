@@ -26,7 +26,7 @@ Cache refresh keeps newer information from cache in successfull notification sce
 --SHELL-INIT--
 dbInit CB
 
-mongoCmd ${CB_DB_NAME} 'db.csubs.insert({
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "_id" : ObjectId("61960a51596aa2623032357d"),
         "expiration" : NumberLong("9223372036854775807"),
         "reference" : "http://localhost:9997/notify",
@@ -128,7 +128,7 @@ echo
 
 echo "04. Get doc in DB before cache refresh and see lastNotification/Success in the past and status code 211 but no count"
 echo "===================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -145,7 +145,7 @@ echo
 
 echo "06. Get doc in DB before cache refresh and see lastNotification/Success in the past and status code 211 but no count + description"
 echo "=================================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -160,7 +160,7 @@ echo
 
 echo "08. Get doc in DB after cache refresh and see lastNotification/Success in the present and status code 200 and count 1 + description"
 echo "==================================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
