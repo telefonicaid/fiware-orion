@@ -1125,7 +1125,6 @@ function dbInsertEntity()
     port="27017"
   fi
 
-  #echo "$jsCode ; $ent ; $doc ; $cmd" | mongo mongodb://$host:$port/$db
   mongosh mongodb://$host:$port/$db --eval "$jsCode ; $ent ; $doc ; $cmd" --quiet
 }
 
