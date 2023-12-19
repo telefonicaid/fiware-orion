@@ -52,7 +52,7 @@ echo "======================"
 # It seems that the ability to generate _id.type = "" was lost in some old Orion version
 # (although some DB generated with old versions could persist nowadays). Thus, we need to
 # createthis entity with a hack at MongoDB level
-mongoCmd ${CB_DB_NAME} 'db.entities.insert({
+mongoCmd ${CB_DB_NAME} 'db.entities.insertOne({
         "_id": {
                 "id": "E1",
                 "type": "",
@@ -163,7 +163,7 @@ Content-Length: 2
 
 02. Create E1/""/A1+A2
 ======================
-WriteResult({ "nInserted" : 1 })
+{"acknowledged":true,"insertedId":{"id":"E1","type":"","servicePath":"/"}}
 
 
 03. GET /v2/types?options=values and get a non-empty list

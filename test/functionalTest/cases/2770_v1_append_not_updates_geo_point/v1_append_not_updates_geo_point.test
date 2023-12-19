@@ -54,7 +54,7 @@ echo
 
 echo "02. Check location field at DB is -4.33, 36.12"
 echo "=============================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1}).toArray()'
 echo
 echo
 
@@ -84,7 +84,7 @@ echo
 
 echo "04. Check location field at DB is -11.22, 22.33"
 echo "==============================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1}).toArray()'
 echo
 echo
 
@@ -102,7 +102,7 @@ Content-Length: 0
 
 02. Check location field at DB is -4.33, 36.12
 ==============================================
-{ "location" : { "attrName" : "loc", "coords" : { "type" : "Point", "coordinates" : [ -4.33, 36.12 ] } } }
+[{"location":{"attrName":"loc","coords":{"type":"Point","coordinates":[-4.33,36.12]}}}]
 
 
 03. Update entity using v1 updateContext APPEND
@@ -139,7 +139,7 @@ Content-Length: 197
 
 04. Check location field at DB is -11.22, 22.33
 ===============================================
-{ "location" : { "attrName" : "loc", "coords" : { "type" : "Point", "coordinates" : [ -11.22, 22.33 ] } } }
+[{"location":{"attrName":"loc","coords":{"type":"Point","coordinates":[-11.22,22.33]}}}]
 
 
 --TEARDOWN--

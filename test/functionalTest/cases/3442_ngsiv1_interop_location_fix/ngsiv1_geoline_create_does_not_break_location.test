@@ -40,7 +40,7 @@ echo "===================================================="
 payload='{
   "contextElements": [
     {
-      "type": "E",
+      "type": "T",
       "isPattern": "false",
       "id": "E1",
       "attributes": [
@@ -61,7 +61,7 @@ echo
 
 echo "02. Check location field is not broken in database"
 echo "=================================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.entities.find().toArray()' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -89,7 +89,7 @@ Content-Length: 196
                 ],
                 "id": "E1",
                 "isPattern": "false",
-                "type": "E"
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -102,47 +102,49 @@ Content-Length: 196
 
 02. Check location field is not broken in database
 ==================================================
-{
-    "_id": {
-        "id": "E1",
-        "servicePath": "/",
-        "type": "E"
-    },
-    "attrNames": [
-        "position"
-    ],
-    "attrs": {
-        "position": {
-            "creDate": REGEX(\d+\.\d+),
-            "mdNames": [],
-            "modDate": REGEX(\d+\.\d+),
-            "type": "geo:line",
-            "value": [
-                "7.7, 8.8",
-                "9.9, -10.10"
-            ]
-        }
-    },
-    "creDate": REGEX(\d+\.\d+),
-    "lastCorrelator": "REGEX(.*)",
-    "location": {
-        "attrName": "position",
-        "coords": {
-            "coordinates": [
-                [
-                    8.8,
-                    7.7
-                ],
-                [
-                    -10.1,
-                    9.9
+[
+    {
+        "_id": {
+            "id": "E1",
+            "servicePath": "/",
+            "type": "T"
+        },
+        "attrNames": [
+            "position"
+        ],
+        "attrs": {
+            "position": {
+                "creDate": REGEX(\d+\.\d+),
+                "mdNames": [],
+                "modDate": REGEX(\d+\.\d+),
+                "type": "geo:line",
+                "value": [
+                    "7.7, 8.8",
+                    "9.9, -10.10"
                 ]
-            ],
-            "type": "LineString"
-        }
-    },
-    "modDate": REGEX(\d+\.\d+)
-}
+            }
+        },
+        "creDate": REGEX(\d+\.\d+),
+        "lastCorrelator": "REGEX(.*)",
+        "location": {
+            "attrName": "position",
+            "coords": {
+                "coordinates": [
+                    [
+                        8.8,
+                        7.7
+                    ],
+                    [
+                        -10.1,
+                        9.9
+                    ]
+                ],
+                "type": "LineString"
+            }
+        },
+        "modDate": REGEX(\d+\.\d+)
+    }
+]
 
 
 --TEARDOWN--

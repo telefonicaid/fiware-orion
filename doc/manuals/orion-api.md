@@ -2131,10 +2131,11 @@ For instance:
 ### Text based payload
 
 If `payload` is used in `httpCustom` or `mqttCustom` the following considerations apply.
-Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
 
 * [General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload`
-  field in the API operations, such as `POST /v2/subscription` or `GET /v2/subscriptions`. An example
+  field in the API operations, such as `POST /v2/subscription` or `GET /v2/subscriptions`. However,
+  at notification time, any URL encoded characters in `payload` is decoded. An example
   is shown below.
 * `Content-Type` header is set to `text/plain`, except if overwritten by `headers` field
 
@@ -3651,7 +3652,7 @@ A `condition` contains the following subfields:
 | Parameter    | Optional | Type  | Description                                                                                                                   |
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification. Empty list is not allowed.                                       |
-| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed |
+| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed. `georel`, `geometry` and `coords` have to be used together (i.e. "all or nothing"). Check the example using geoquery as expression [below](#create-subscription-post-v2subscriptions).|
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 | `notifyOnMetadataChange` | ✓   | boolean | If `true` then metadata is considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is triggered. If `false` then the metadata is not considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is not triggered. Default value is `true`. |
 
@@ -3862,7 +3863,7 @@ _**Request payload**_
 The payload is a JSON object containing a subscription that follows the JSON subscription representation 
 format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
 
-Example:
+Example using attribute filter:
 
 ```json
 {
@@ -3887,8 +3888,38 @@ Example:
     },
     "attrs": ["temperature", "humidity"]
   },            
-  "expires": "2025-04-05T14:00:00.00Z",
-  "throttling": 5
+  "expires": "2025-04-05T14:00:00.00Z"
+}
+```
+
+Example using geoquery as condition:
+
+```json
+{
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature" ],
+      "expression": {
+        "georel": "near;maxDistance:15000",
+        "geometry": "point",
+        "coords": "37.407804,-6.004552"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"]
+  },            
+  "expires": "2025-04-05T14:00:00.00Z"
 }
 ```
 
@@ -4375,7 +4406,7 @@ regular non-batch operations can be done:
 * `appendStrict`: maps to `POST /v2/entities` (if the entity does not already exist) or
   `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
 * `update`: maps to `PATCH /v2/entities/<id>/attrs`.
-* `delete`: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
+* `delete`: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity (in this case the actual value of the attribute is not relevant) or
   to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
 * `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 

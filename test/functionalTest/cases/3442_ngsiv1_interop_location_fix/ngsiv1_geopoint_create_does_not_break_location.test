@@ -40,7 +40,7 @@ echo "====================================================="
 payload='{
   "contextElements": [
     {
-      "type": "E",
+      "type": "T",
       "isPattern": "false",
       "id": "E1",
       "attributes": [
@@ -61,7 +61,7 @@ echo
 
 echo "02. Check location field is not broken in database"
 echo "=================================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.entities.find().toArray()' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -89,7 +89,7 @@ Content-Length: 197
                 ],
                 "id": "E1",
                 "isPattern": "false",
-                "type": "E"
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -102,38 +102,40 @@ Content-Length: 197
 
 02. Check location field is not broken in database
 ==================================================
-{
-    "_id": {
-        "id": "E1",
-        "servicePath": "/",
-        "type": "E"
-    },
-    "attrNames": [
-        "position"
-    ],
-    "attrs": {
-        "position": {
-            "creDate": REGEX(\d+\.\d+),
-            "mdNames": [],
-            "modDate": REGEX(\d+\.\d+),
-            "type": "geo:point",
-            "value": "5.5, -6.6"
-        }
-    },
-    "creDate": REGEX(\d+\.\d+),
-    "lastCorrelator": "REGEX(.*)",
-    "location": {
-        "attrName": "position",
-        "coords": {
-            "coordinates": [
-                -6.6,
-                5.5
-            ],
-            "type": "Point"
-        }
-    },
-    "modDate": REGEX(\d+\.\d+)
-}
+[
+    {
+        "_id": {
+            "id": "E1",
+            "servicePath": "/",
+            "type": "T"
+        },
+        "attrNames": [
+            "position"
+        ],
+        "attrs": {
+            "position": {
+                "creDate": REGEX(\d+\.\d+),
+                "mdNames": [],
+                "modDate": REGEX(\d+\.\d+),
+                "type": "geo:point",
+                "value": "5.5, -6.6"
+            }
+        },
+        "creDate": REGEX(\d+\.\d+),
+        "lastCorrelator": "REGEX(.*)",
+        "location": {
+            "attrName": "position",
+            "coords": {
+                "coordinates": [
+                    -6.6,
+                    5.5
+                ],
+                "type": "Point"
+            }
+        },
+        "modDate": REGEX(\d+\.\d+)
+    }
+]
 
 
 --TEARDOWN--

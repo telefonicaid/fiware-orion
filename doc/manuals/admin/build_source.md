@@ -107,13 +107,7 @@ The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tes
 
 In the case of the aarch64 architecture, install libxslt using apt-get, and run `./configure` with `--build=arm-linux` option.
 
-* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](hhttps://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) for details. Recommended version is 4.4 (it may work with previous versions, but we don't recommend it).
-    * Note that mongo legacy shell (the `mongo` command) has been deprecated in MongoDB 5 and removed in MongoDB 6 in favour of the new shell (`mongosh` command). Some functional tests (ftest) will fail due to this if you use MongoDB 6 or beyond, as they are suited to use `mongo` and not `mongosh`.
-    * Debian 12 has stepped to libssl3 but some MongoDB versions may require libssl1. In the case you get a `Depends: libssl1.1 (>= 1.1.1) but it is not installable` error, you can test the following (reference [here](https://askubuntu.com/a/1421959))
-
-        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-        rm libssl1.1_1.1.1f-1ubuntu2_amd64.deb     # optional, for cleanness
+* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](hhttps://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) for details. Recommended version is 6.0 (it may work with previous versions, but we don't recommend it).
 
 * Run unit test
 
@@ -131,7 +125,7 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
         . scripts/testEnv.sh
         python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
+        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
 
 * Run test harness in this environment (it takes some time, please be patient).
 

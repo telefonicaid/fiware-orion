@@ -118,8 +118,7 @@ typedef struct RestService
 {  
   RequestType   request;          // The type of the request  
   int           components;       // Number of components in the URL path  
-  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }  
-  std::string   payloadWord;      // No longer used, should be removed ... ?  
+  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }   
   RestTreat     treat;            // service function pointer  
 } RestService;
 ```

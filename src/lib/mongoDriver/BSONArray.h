@@ -46,6 +46,7 @@ class BSONArray
   BSONArray(const BSONArray& _ba);
   int nFields(void) const;
   std::string toString(void) const;
+  bool equal(const BSONArray& ba);
   BSONArray& operator= (const BSONArray& rhs);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)

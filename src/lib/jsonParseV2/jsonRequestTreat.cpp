@@ -102,7 +102,7 @@ std::string jsonRequestTreat
   case EntityAttributeRequest:
     releaseP->attribute = &parseDataP->attr.attribute;
     releaseP->attribute->name = compV[4];
-    answer = parseContextAttribute(ciP, &parseDataP->attr.attribute);
+    answer = parseContextAttribute(ciP, &parseDataP->attr.attribute, true);
     if (answer != "OK")
     {
       return answer;

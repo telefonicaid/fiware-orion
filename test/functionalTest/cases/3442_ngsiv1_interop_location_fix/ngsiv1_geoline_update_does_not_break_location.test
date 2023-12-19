@@ -57,12 +57,12 @@ echo "===================================================="
 payload='{
   "contextElements": [
   {
-    "type": "E",
+    "type": "T",
     "isPattern": "false",
-    "id": "E1",
+    "id": "E",
     "attributes": [
     {
-      "name": "position",
+      "name": "location",
       "type": "geo:line",
       "value": ["-3.3, 4.4", "5.5, -6.6"]
     }
@@ -78,7 +78,7 @@ echo
 
 echo "03. Check location field is not broken in database"
 echo "=================================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.entities.find().toArray()' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -88,12 +88,12 @@ echo "===================================================="
 payload='{
   "contextElements": [
   {
-    "type": "E",
+    "type": "T",
     "isPattern": "false",
-    "id": "E1",
+    "id": "E",
     "attributes": [
     {
-      "name": "position",
+      "name": "location",
       "type": "geo:line",
       "value": ["7.7, 8.8", "9.9, -10.10"]
     }
@@ -109,7 +109,7 @@ echo
 
 echo "05. Check location field is not broken in database"
 echo "=================================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.entities.find().toArray()' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -132,7 +132,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 196
+Content-Length: 195
 
 {
     "contextResponses": [
@@ -140,14 +140,14 @@ Content-Length: 196
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "position",
+                        "name": "location",
                         "type": "geo:line",
                         "value": ""
                     }
                 ],
-                "id": "E1",
+                "id": "E",
                 "isPattern": "false",
-                "type": "E"
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -160,47 +160,49 @@ Content-Length: 196
 
 03. Check location field is not broken in database
 ==================================================
-{
-    "_id": {
-        "id": "E1",
-        "servicePath": "/",
-        "type": "E"
-    },
-    "attrNames": [
-        "position"
-    ],
-    "attrs": {
-        "position": {
-            "creDate": REGEX(\d+\.\d+),
-            "mdNames": [],
-            "modDate": REGEX(\d+\.\d+),
-            "type": "geo:line",
-            "value": [
-                "-3.3, 4.4",
-                "5.5, -6.6"
-            ]
-        }
-    },
-    "creDate": REGEX(\d+\.\d+),
-    "lastCorrelator": "REGEX(.*)",
-    "location": {
-        "attrName": "position",
-        "coords": {
-            "coordinates": [
-                [
-                    4.4,
-                    -3.3
-                ],
-                [
-                    -6.6,
-                    5.5
+[
+    {
+        "_id": {
+            "id": "E",
+            "servicePath": "/",
+            "type": "T"
+        },
+        "attrNames": [
+            "location"
+        ],
+        "attrs": {
+            "location": {
+                "creDate": REGEX(\d+\.\d+),
+                "mdNames": [],
+                "modDate": REGEX(\d+\.\d+),
+                "type": "geo:line",
+                "value": [
+                    "-3.3, 4.4",
+                    "5.5, -6.6"
                 ]
-            ],
-            "type": "LineString"
-        }
-    },
-    "modDate": REGEX(\d+\.\d+)
-}
+            }
+        },
+        "creDate": REGEX(\d+\.\d+),
+        "lastCorrelator": "REGEX(.*)",
+        "location": {
+            "attrName": "location",
+            "coords": {
+                "coordinates": [
+                    [
+                        4.4,
+                        -3.3
+                    ],
+                    [
+                        -6.6,
+                        5.5
+                    ]
+                ],
+                "type": "LineString"
+            }
+        },
+        "modDate": REGEX(\d+\.\d+)
+    }
+]
 
 
 04. Update entity with geo:line with NGSIv1 (UPDATE)
@@ -209,7 +211,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 196
+Content-Length: 195
 
 {
     "contextResponses": [
@@ -217,14 +219,14 @@ Content-Length: 196
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "position",
+                        "name": "location",
                         "type": "geo:line",
                         "value": ""
                     }
                 ],
-                "id": "E1",
+                "id": "E",
                 "isPattern": "false",
-                "type": "E"
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -237,47 +239,49 @@ Content-Length: 196
 
 05. Check location field is not broken in database
 ==================================================
-{
-    "_id": {
-        "id": "E1",
-        "servicePath": "/",
-        "type": "E"
-    },
-    "attrNames": [
-        "position"
-    ],
-    "attrs": {
-        "position": {
-            "creDate": REGEX(\d+\.\d+),
-            "mdNames": [],
-            "modDate": REGEX(\d+\.\d+),
-            "type": "geo:line",
-            "value": [
-                "7.7, 8.8",
-                "9.9, -10.10"
-            ]
-        }
-    },
-    "creDate": REGEX(\d+\.\d+),
-    "lastCorrelator": "REGEX(.*)",
-    "location": {
-        "attrName": "position",
-        "coords": {
-            "coordinates": [
-                [
-                    8.8,
-                    7.7
-                ],
-                [
-                    -10.1,
-                    9.9
+[
+    {
+        "_id": {
+            "id": "E",
+            "servicePath": "/",
+            "type": "T"
+        },
+        "attrNames": [
+            "location"
+        ],
+        "attrs": {
+            "location": {
+                "creDate": REGEX(\d+\.\d+),
+                "mdNames": [],
+                "modDate": REGEX(\d+\.\d+),
+                "type": "geo:line",
+                "value": [
+                    "7.7, 8.8",
+                    "9.9, -10.10"
                 ]
-            ],
-            "type": "LineString"
-        }
-    },
-    "modDate": REGEX(\d+\.\d+)
-}
+            }
+        },
+        "creDate": REGEX(\d+\.\d+),
+        "lastCorrelator": "REGEX(.*)",
+        "location": {
+            "attrName": "location",
+            "coords": {
+                "coordinates": [
+                    [
+                        8.8,
+                        7.7
+                    ],
+                    [
+                        -10.1,
+                        9.9
+                    ]
+                ],
+                "type": "LineString"
+            }
+        },
+        "modDate": REGEX(\d+\.\d+)
+    }
+]
 
 
 --TEARDOWN--

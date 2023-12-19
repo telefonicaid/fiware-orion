@@ -123,8 +123,8 @@ command:
 # ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
-Note this script requires Flask version 2.0.2 and paho-mqtt version 1.6.1, which can be installed using
-`pip install Flask==2.0.2` and `pip install paho-mqtt==1.6.1`. In addition, it is recommended to use
+Note this script requires Flask version 2.0.2 (along with Werkzeug 2.0.2) and paho-mqtt version 1.6.1, which can be installed using
+`pip install Flask==2.0.2 Werkzeug==2.0.2` and `pip install paho-mqtt==1.6.1` respectively. In addition, it is recommended to use
 Python 3.10.x In case of conflict with your base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
 
 More information about installing the accumulator (including an alternative based in docker) can be checked

@@ -68,7 +68,7 @@ echo
 
 echo "03. Check the '=' in DB"
 echo "======================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.findOne({ "_id" : { "id" : "E",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -114,7 +114,30 @@ Content-Length: 139
 
 03. Check the '=' in DB
 =======================
-{ "attrs" : { "A" : { "value" : "foo", "type" : "T", "creDate" : REGEX(.*), "md" : { "m=x" : { "type" : "string", "value" : "black" }, "m=y" : { "type" : "double", "value" : 5 } }, "mdNames" : [ "m.x", "m.y" ] } } }
+{
+    "attrs": {
+        "A": {
+            "creDate": REGEX(.*),
+            "md": {
+                "m=x": {
+                    "type": "string",
+                    "value": "black"
+                },
+                "m=y": {
+                    "type": "double",
+                    "value": 5
+                }
+            },
+            "mdNames": [
+                "m.x",
+                "m.y"
+            ],
+            "modDate": REGEX(.*),
+            "type": "T",
+            "value": "foo"
+        }
+    }
+}
 
 
 --TEARDOWN--
