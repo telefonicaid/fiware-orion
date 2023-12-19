@@ -60,6 +60,7 @@ echo "INSTALL: python special dependencies" \
 && python3 -m venv /opt/ft_env \
 && . /opt/ft_env/bin/activate \
 && pip install Flask==2.0.2 \
+&& pip install Werkzeug==2.0.2 \
 && pip install paho-mqtt==1.6.1 \
 && pip install amqtt==0.11.0b1 \
 && deactivate

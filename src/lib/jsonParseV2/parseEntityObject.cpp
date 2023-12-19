@@ -157,7 +157,7 @@ std::string parseEntityObject
 
       ContextAttribute* caP = new ContextAttribute();
 
-      r = parseContextAttribute(ciP, iter, caP);
+      r = parseContextAttribute(ciP, iter, caP, true);
       if (r == "OK")
       {
         eP->attributeVector.push_back(caP);

@@ -194,6 +194,17 @@ void BSONObj::toElementsVector(std::vector<BSONElement>* v)
 
 /* ****************************************************************************
 *
+* BSONObj::equal -
+*/
+bool BSONObj::equal(const BSONObj& bo)
+{
+  return (bson_compare(this->b, bo.b) == 0);
+}
+
+
+
+/* ****************************************************************************
+*
 * BSONObj::operator= -
 */
 BSONObj& BSONObj::operator= (const BSONObj& rhs)

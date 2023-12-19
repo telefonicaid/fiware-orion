@@ -2125,7 +2125,8 @@ Content-Length: 0
 同時に使用できるのは、`payload`, `json` また `ngsi` のうちの1つだけであることに注意してください。
 
 -   [一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions`
-    などの API オペレーションの `httpCustom.payload` フィールドにも適用されます。以下に例を示します
+    などの API オペレーションの `httpCustom.payload` フィールドにも適用されます。ただし、通知時には、`payload`
+    内の URL エンコードされた文字はすべてデコードされます。以下に例を示します
 -   `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `text/plain` に設定されます
 
 例：
@@ -3697,7 +3698,7 @@ _**レスポンス・ペイロード**_
 | パラメータ        | オプション | タイプ | 説明                                                                                                                                                                                                                                                                               |
 |-------------------|------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`           | ✓          | array  | 通知をトリガーする属性名の配列。空のリストは許可されていません                                                                                                                                                                                                                     |
-| `expression`      | ✓          | object | `q`, `mq`, `georel`, `geometry`, `coords` で構成される式 (このフィールドについては、上記の [エンティティをリスト](#list-entities-get-v2entities)操作を参照してください)。`expression` とサブ要素 (つまり `q`) にはコンテンツが必要です。つまり、`{}` または `""` は許可されません |
+| `expression`      | ✓          | object | `q`, `mq`, `georel`, `geometry`, `coords` で構成される式 (このフィールドについては、上記の [エンティティをリスト](#list-entities-get-v2entities)操作を参照してください)。`expression` とサブ要素 (つまり `q`) にはコンテンツが必要です。つまり、`{}` または `""` は許可されません。`georel`, `geometry`, および `coords` は一緒に使用する必要があります (つまり、"全てか無しか")。 geoquery を式として使用する例は下記(#create-subscription-post-v2subscriptions) を確認してください |
 | `alterationTypes` | ✓          | array  | サブスクリプションがトリガーされる変更 (エンティティの作成、エンティティの変更など) を指定します ([変更タイプに基づくサブスクリプション](#subscriptions-based-in-alteration-type)のセクションを参照)                                                                               |
 | `notifyOnMetadataChange` | ✓   | boolean | `true` の場合、メタデータは通知のコンテキストで属性の値の一部と見なされるため、値が変更されずにメタデータが変更された場合、通知がトリガーされます。`false` の場合、メタデータは通知のコンテキストで属性の値の一部と見なされないため、値が変更されずにメタデータが変更された場合、通知はトリガーされません。デフォルト値は `true` です |
 
@@ -3926,7 +3927,7 @@ _**リクエスト・ペイロード**_
 ペイロードは、JSON サブスクリプション表現形式 ([サブスクリプション・ペイロード・データモデル](#subscription-payload-datamodel)
 セクションで説明されています) に従うサブスクリプションを含む JSON オブジェクトです。
 
-例:
+属性フィルタを使用した例:
 
 ```json
 {
@@ -3951,8 +3952,38 @@ _**リクエスト・ペイロード**_
     },
     "attrs": ["temperature", "humidity"]
   },
-  "expires": "2025-04-05T14:00:00.00Z",
-  "throttling": 5
+  "expires": "2025-04-05T14:00:00.00Z"
+}
+```
+
+条件としてジオクエリを使用する例:
+
+```json
+{
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature" ],
+      "expression": {
+        "georel": "near;maxDistance:15000",
+        "geometry": "point",
+        "coords": "37.407804,-6.004552"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"]
+  },
+  "expires": "2025-04-05T14:00:00.00Z"
 }
 ```
 
@@ -4480,7 +4511,7 @@ _**リクエスト・ペイロード**_
 -   `appendStrict`: `POST /v2/entities` (エンティティがまだ存在しない場合) または
     `POST /v2/entities/<id>/attrs?options=append` (エンティティが既に存在する場合) にマップします
 -   `update`: `PATCH /v2/entities/<id>/attrs` にマップされます
--   `delete`: エンティティに含まれているすべての属性に対して、`DELETE /v2/entities/<id>/attrs/<attrName>`
+-   `delete`: エンティティに含まれているすべての属性に対して (この場合、属性の実際の値は関係ありません)、`DELETE /v2/entities/<id>/attrs/<attrName>`
     にマッピングし、エンティティに属性が含まれていない場合は、`DELETE /v2/entities/<id>` にマッピングします
 -   `replace`: `PUT /v2/entities/<id>/attrs` にマッピングします
 
