@@ -86,7 +86,7 @@ echo
 
 echo "03. Get entity from mongodb"
 echo "==========================="
-m=$(mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
+m=$(mongoCmd ${CB_DB_NAME} 'db.entities.findOne({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
 echo $m | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
@@ -128,7 +128,7 @@ echo
 
 echo "06. Get entity from mongodb"
 echo "==========================="
-m=$(mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
+m=$(mongoCmd ${CB_DB_NAME} 'db.entities.findOne({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
 echo $m | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo

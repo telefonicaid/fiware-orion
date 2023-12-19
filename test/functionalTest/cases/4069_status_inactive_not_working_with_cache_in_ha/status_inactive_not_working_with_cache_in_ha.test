@@ -26,7 +26,7 @@ Status inactive was not working in HA scenario when cache is used
 --SHELL-INIT--
 dbInit CB
 
-mongoCmd ${CB_DB_NAME} 'db.csubs.insert({
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "_id" : ObjectId("620e0d04219c8378695c822b"),
         "expiration" : NumberLong("9223372036854775807"),
         "reference" : "http://localhost:1234",

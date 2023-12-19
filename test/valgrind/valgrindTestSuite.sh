@@ -103,7 +103,7 @@ function vMsg()
 
 # -----------------------------------------------------------------------------
 #
-# If any mongo database ftest-ftest exists, strange memory leaks appear ...
+# If any MongoDB database ftest-ftest exists, strange memory leaks appear ...
 # So, before starting, it's important to remove all ftest DBs
 #
 function dbReset()

@@ -51,7 +51,7 @@ payload='{
     "entities": [
       {
         "id": "E1",
-        "type": "E"
+        "type": "T"
       }
     ],
     "attrs": [
@@ -75,7 +75,7 @@ echo "=================================="
 payload='{
   "contextElements": [
     {
-      "type": "E",
+      "type": "T",
       "isPattern": "false",
       "id": "E1",
       "attributes": [
@@ -99,7 +99,7 @@ echo "======================"
 payload='{
   "entities": [
     {
-      "type": "E",
+      "type": "T",
       "isPattern": "false",
       "id": "E1"
     }
@@ -125,7 +125,7 @@ echo "=========================================="
 payload='{
   "contextElements": [
     {
-      "type": "E",
+      "type": "T",
       "isPattern": "false",
       "id": "E1",
       "attributes": [
@@ -190,7 +190,7 @@ Content-Length: 187
                 ],
                 "id": "E1",
                 "isPattern": "false",
-                "type": "E"
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -225,7 +225,7 @@ Content-Length: 203
                 ],
                 "id": "E1",
                 "isPattern": "false",
-                "type": "E"
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -271,7 +271,7 @@ Content-Length: 187
                 ],
                 "id": "E1",
                 "isPattern": "false",
-                "type": "E"
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -319,7 +319,7 @@ Content-Length: 148
         ]
     },
     "id": "E1",
-    "type": "E"
+    "type": "T"
 }
 
 

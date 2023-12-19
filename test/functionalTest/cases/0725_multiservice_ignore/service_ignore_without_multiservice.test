@@ -27,7 +27,7 @@ Ignoring service header when not running in multiservice mode
 dbInit CB
 dbInit ${CB_DB_NAME}-foo
 dbResetAll
-echo "show dbs" | mongo | grep ${CB_DB_NAME} | awk '{ print $1 }'
+mongosh --eval 'show dbs' | grep ${CB_DB_NAME} | awk '{ print $1 }'
 
 brokerStart CB 0-255 IPV4
 
@@ -59,14 +59,14 @@ echo
 echo "2. Check that the number of orion databases is just 1"
 echo "====================================================="
 # In this case mongoCmd helper is not used, due to we don't have
-# a particular database for mongo command and the output could be
+# a particular database for mongosh command and the output could be
 # multiline in a general case
-echo "show dbs" | mongo | grep ${CB_DB_NAME} | wc -l
-echo "show dbs" | mongo | grep ${CB_DB_NAME}-foo | wc -l
+mongosh --eval 'show dbs' | grep ${CB_DB_NAME} | wc -l
+mongosh --eval 'show dbs' | grep ${CB_DB_NAME}-foo | wc -l
 # Next line was added in PR https://github.com/telefonicaid/fiware-orion/pull/1184/files#r37738638
 # in order to help us to detect where the ftest-ftest-ftest-... problem is. It could happen that
 # after fixing #1186 this is no longer needed, but let's keep it for a while as a "quarentine" measure...
-echo "show dbs" | mongo | grep ${CB_DB_NAME} | awk '{ print $1 }'
+mongosh --eval 'show dbs' | grep ${CB_DB_NAME} | awk '{ print $1 }'
 
 --REGEXPECT--
 1. Create an entity using foo as tenant
