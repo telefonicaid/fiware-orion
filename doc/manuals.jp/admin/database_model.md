@@ -49,7 +49,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 
 `location.coordsin` については、いくつかの形式を使用することができます :
 
-* ポイントを表します (geo:point で使用されるもの) :
+* ポイントを表します:
 
 ```
 {
@@ -58,7 +58,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 }
 ```
 
-* ラインを表します (geo:line で使用されているもの) :
+* ラインを表します:
 
 ```
 {
@@ -67,7 +67,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 }
 ```
 
-* ポリゴンを表します (geo:box と geo:polygon で使用されるもの) :
+* ポリゴンを表します:
 
 ```
 {
@@ -78,7 +78,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 
 * 最後に、`location.coords` は、[GeoJSON](http://www.macwright.org/2015/03/23/geojson-second-bite.html) 形式で場所を表現する任意の JSON オブジェクトを保持できます。任意の GeoJSON は geo:json 属性型で使用でき、有効なオブジェクトを導入するのはユーザの責任です。上記3つのケースは、実際には "fixed" ケースの GeoJSON 表現です。
 
-座標ペアは、[geo-location API](../orion-api.md#simple-location-format) で使用されている順序とは反対の経度－緯度順 (longitude-latitude order) を使用することに注意してください。これは内部の [MongoDB ジオロケーション実装](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/) (GeoJSON に基づいています) が経度－緯度順を使用するためです。しかし、ユーザに近い他のシステム (Google マップなど) では、緯度－経度形式 (latitude-longitude format) を使用しているため、後者を API に使用しています。
+座標ペアでは経度-緯度 (longitude-latitude) の順序が使用されますが、これは[地理的クエリ (Geographical Queries)](../orion-api.md#geographica-queries)で使用される順序とは逆であることに注意してください。これは、[MongoDB の地理位置情報の内部実装](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/) (GeoJSON に基づく) が経度-緯度 (longitude-latitude) の順序を使用するためです。 ただし、ユーザに近い他のシステム (GoogleMaps など) は緯度経度形式 (latitude-longitude format) を使用するため、Geographical Queries API には後者を使用しました。
 
 サンプルドキュメント :
 
@@ -213,8 +213,9 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **lastNotification** : 最後の通知が送信された時刻です (整数、秒を意味します)。これは、通知が送信されるたびに更新され、スロットリング違反を回避します
 -   **throttling** : 通知の最小間隔です。0または -1 は、スロットリングがないことを意味します
 -   **reference** : 通知の URL です。HTTPまたはMQTTのいずれかを指定します
--   **mqttTopic**: MQTTトピック (MQTT 通知のみ)
--   **mqttQoS**: MQTT QoS 値 (MQTT 通知のみ)
+-   **topic**: MQTTトピック (MQTT 通知のみ)
+-   **qos**: MQTT QoS 値 (MQTT 通知のみ)
+-   **retain**: MQTT retain 値 (MQTT 通知のみ)
 -   **entities** : エンティティの配列 (必須) です。各エンティティの JSON には、**id**, **type**, **isPattern** および **isTypePattern** が含まれています。従来の理由から、**isPattern** は `"true"` または `"false"` (テキスト) で、**isTypePattern** は `true` または `false` (ブール値) であることに注意してください
 -   **attrs** : 属性名の配列 (文字列) (オプション) です
 -   **blacklist** : `attrs` をホワイトリスト (もし `blacklist` が `false` また存在しない場合) またはブラックリスト (もし `blackslist` が `true` の場合) として解釈する必要があるかどうかを指定するブール値フィールドです
@@ -224,7 +225,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **conditions** : 通知をトリガーする属性のリストです。
 -   **expression** : 更新が来たときに通知を送信するかどうかを評価するために使用される式です。 次のフィールドで構成されています : q, mq, georel, geometry and/or coords (オプション)
 -   **count** : サブスクリプションに関連付けられて送信された通知の数です
--   **format** : 通知を送信するために使用する形式。可能な値はは **JSON**  (NGSIv1 レガシー形式の JSON 通知を意味する)、**normalized**, **keyValues**, **values** (最後の3つは NGSIv2 形式で使用されます) です
+-   **format** : 通知を送信するために使用する形式。可能な値はは **JSON**  (NGSIv1 レガシー形式の JSON 通知を意味する)、**normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues**, **values** (最後の5つは NGSIv2 形式で使用されます) です
 -   **status** : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)、
     または `oneshot` ([oneshot サブスクリプション](../orion-api.md#oneshot-subscriptions) の場合) のいずれか。Orion API
     は追加の状態 (`expired`など) を考慮しますが、DB にヒットすることはありません (Orion によって管理されます)
@@ -237,6 +238,10 @@ Orion Context Broker は、データベース内で次のサブセクション�
     その値が `null` の場合、ペイロードを通知に含める必要がないことを意味します。その値が `""` の場合、
     またはフィールドが省略されている場合は、NGSIv2 正規化形式が使用されます
 -   **json** : Orion API の通知カスタマイズ機能用に生成された JSON ベースのペイロードに JSON オブジェクトまたは配列を格納するためのオプションのフィールド。この機能の詳細は、[こちら](../orion-api.md#json-payloads)です
+-   **ngsi**: Orion API の通知カスタマイズ機能用の NGSI パッチ・オブジェクトを格納するためのオプション・フィールド。
+    この機能の詳細は[こちら](../orion-api.md#ngsi-payload-patching)です。このフィールドの値は、値が
+    [エンティティ・ コレクション](#entities-collection) の `attrs` の簡略化されたバージョンである `attrs`
+    キーを持つオブジェクトです
 -   **lastFailure** : 最後の通知の失敗が発生した時刻です (整数、秒を意味します)。サブスクリプションが失敗したことがない場合は存在しません
 -   **lastFailureReason**: 最後の失敗の原因を説明するテキストです。
     サブスクリプションが一度も失敗したことがない場合は存在しません。
@@ -247,11 +252,11 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **maxFailsLimit**: 接続試行の最大制限を指定するために使用されるオプションのフィールド。これにより、失敗した通知の数に達すると、サブスクリプションは自動的に非アクティブ状態に移行します
 -   **failsCounter**: サブスクリプションに関連付けられた連続して失敗した通知の数。これは、通知の試行が失敗するたびに1つずつ増加します。通知の試行が成功すると、0にリセットされます
 -   **altTypes**: サブスクリプションに関連付けられた変更タイプ (alteration types) のリストを含む配列。フィールドが含まれていない場合は、デフォルトが想定されます ([このドキュメント](../orion-api.md#subscriptions-based-in-alteration-type)を確認してください)
-
 -   **covered**: すべての `attrs` を通知に含める必要があるか (値がtrueの場合)、トリガー・エンティティに存在するものだけを含める必要があるか
     (値がfalseの場合、またはフィールドが省略されている場合) を指定するブール・フィールド
     詳細については、Orion API 仕様の[対象サブスクリプション・セクション](../orion-api.md#covered-subscriptions)
     を参照してください。
+-   **notifyOnMetadataChange**: `true` の場合、メタデータはサブスクリプションのトリガーに関する属性の値の一部と見なされます。`false` の場合、メタデータはサブスクリプションのトリガーに関する属性の値の一部と見なされません。 デフォルトの動作 (省略された場合) は `true` の動作です。
 
 サンプルドキュメント :
 

@@ -116,40 +116,40 @@ echo
 01. Create E1/T1, with A1/TA1
 =============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. Create E2/T1, with A2/TA2
 =============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T1
+Content-Length: 0
 
 
 
 03. Create E3/T3, with A3/TA3
 =============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T3
+Content-Length: 0
 
 
 
 04. GET /v2/types
 =================
 HTTP/1.1 200 OK
-Content-Length: 138
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 138
 
 [
     {
@@ -185,10 +185,10 @@ Date: REGEX(.*)
 05. GET /v2/types?options=noAttrDetail
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 123
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 123
 
 [
     {
@@ -218,10 +218,10 @@ Date: REGEX(.*)
 06. GET /v2/types/T1
 ====================
 HTTP/1.1 200 OK
-Content-Length: 67
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 67
 
 {
     "attrs": {
@@ -243,10 +243,10 @@ Date: REGEX(.*)
 07. GET /v2/types/T1?options=noAttrDetail
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 57
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 57
 
 {
     "attrs": {

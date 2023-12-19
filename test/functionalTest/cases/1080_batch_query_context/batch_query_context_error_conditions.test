@@ -265,10 +265,10 @@ echo
 01. POST /v2/op/query, with empty payload, see error
 ====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 52
 
 {
     "description": "empty payload",
@@ -279,10 +279,10 @@ Date: REGEX(.*)
 02. POST /v2/op/query, with non-empty payload but without any of the three optional vector fields, see error
 ============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "description": "Invalid JSON payload, no relevant fields found",
@@ -293,10 +293,10 @@ Date: REGEX(.*)
 03. POST /v2/op/query, with 'entities' as an object, see error
 ==============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 55
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 55
 
 {
     "description": "not a JSON array",
@@ -307,10 +307,10 @@ Date: REGEX(.*)
 04. POST /v2/op/query, with E.* and 'attributes' as an object, not an array - see error
 =======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "the field /attributes/ must be a JSON array",
@@ -321,10 +321,10 @@ Date: REGEX(.*)
 05. POST /v2/op/query, with E.* and 'attributes' as an array of integers, not strings - see error
 =================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "only JSON Strings allowed in attributes list",
@@ -335,10 +335,10 @@ Date: REGEX(.*)
 06. POST /v2/op/query, with expression not an object - see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 66
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 66
 
 {
     "description": "expression is not an object",
@@ -349,10 +349,10 @@ Date: REGEX(.*)
 07. POST /v2/op/query, with expression empty - see error
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 58
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 58
 
 {
     "description": "expression is empty",
@@ -363,10 +363,10 @@ Date: REGEX(.*)
 08. POST /v2/op/query, with q not a string - see error
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 56
 
 {
     "description": "q is not a string",
@@ -377,10 +377,10 @@ Date: REGEX(.*)
 09. POST /v2/op/query, with q empty - see error
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 49
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 49
 
 {
     "description": "q is empty",
@@ -391,10 +391,10 @@ Date: REGEX(.*)
 10. POST /v2/op/query, with mq not a string - see error
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 57
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 57
 
 {
     "description": "mq is not a string",
@@ -405,10 +405,10 @@ Date: REGEX(.*)
 11. POST /v2/op/query, with mq empty - see error
 ================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 50
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 50
 
 {
     "description": "mq is empty",
@@ -419,10 +419,10 @@ Date: REGEX(.*)
 12. POST /v2/op/query, with georel not a string - see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 61
 
 {
     "description": "georel is not a string",
@@ -433,10 +433,10 @@ Date: REGEX(.*)
 13. POST /v2/op/query, with georel empty - see error
 ====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 54
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 54
 
 {
     "description": "georel is empty",
@@ -447,10 +447,10 @@ Date: REGEX(.*)
 14. POST /v2/op/query, with geometry not a string - see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "geometry is not a string",
@@ -461,10 +461,10 @@ Date: REGEX(.*)
 15. POST /v2/op/query, with geometry empty - see error
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 56
 
 {
     "description": "geometry is empty",
@@ -475,10 +475,10 @@ Date: REGEX(.*)
 16. POST /v2/op/query, with coords not a string - see error
 ===========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 61
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 61
 
 {
     "description": "coords is not a string",
@@ -489,10 +489,10 @@ Date: REGEX(.*)
 17. POST /v2/op/query, with coords empty - see error
 ====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 54
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 54
 
 {
     "description": "coords is empty",
@@ -503,10 +503,10 @@ Date: REGEX(.*)
 18. POST /v2/op/query, with not all geo fields - see error
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 119
 
 {
     "description": "partial geo expression: geometry, georel and coords have to be provided together",

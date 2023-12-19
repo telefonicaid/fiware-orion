@@ -133,10 +133,10 @@ echo
 01. GET /v2/types and get an empty list
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -144,20 +144,20 @@ Date: REGEX(.*)
 02. Create E1/T1/A1+A2
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. GET /v2/types and get a non-empty list
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 [
     {
@@ -182,30 +182,30 @@ Date: REGEX(.*)
 04. Create E2/T2/A1+A3
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T2
+Content-Length: 0
 
 
 
 05. Create E3/T3/A2+A4
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T3
+Content-Length: 0
 
 
 
 06. GET /v2/types and get a list of three types, each with one entity
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 251
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 251
 
 [
     {
@@ -262,21 +262,21 @@ Date: REGEX(.*)
 07. Create E4/T3/A4+A3
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T3
+Content-Length: 0
 
 
 
 08. GET /v2/types and get a list of three types, T3 now has two entities
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 275
-Content-Type: application/json
-Fiware-Total-Count: 3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 3
+Content-Type: application/json
+Content-Length: 275
 
 [
     {
@@ -338,11 +338,11 @@ Date: REGEX(.*)
 09. GET /v2/types with limit, getting 2 types but Fiware-Total-Count 3
 =================================================================
 HTTP/1.1 200 OK
-Content-Length: 168
-Content-Type: application/json
-Fiware-Total-Count: 3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 3
+Content-Type: application/json
+Content-Length: 168
 
 [
     {

@@ -59,37 +59,37 @@ The counter block provides information about counters for the times a particular
     "noPayloadRequests": 250,
     "notificationsSent": 4,
     "requests": {
-      "entities": {
+      "/v2/entities": {
         "GET": 231
       },
-      "entity": {
+      "/v2/entities/{id}": {
         "GET": 2,
         "PATCH": 1,
         "POST": 3
       },
-      "entityTypes": {
+      "/v2/types": {
         "GET": 1
       },
-      "metrics": {
+      "/admin/metrics": {
         "GET": 2
       },
-      "statistics": {
+      "/statistics": {
         "GET": 9
       },
-      "subscription": {
+      "/v2/subscriptions/{id}": {
         "GET": 1
       },
-      "subscriptions": {
+      "/v2/subscriptions/{id}": {
         "GET": 2
       }
-    },
-    "versionRequests": 0
+    }
   },
   ...
 }
 ```
 
-If a particular request type (or verb) has not been received, its corresponding counter is not shown.
+If a particular request URL (or verb) has not been received, its corresponding counter is not shown, except
+if the `fullCounters` option is used (i.e. `GET /statistics?options=fullCounters`).
 
 ### SemWait block
 

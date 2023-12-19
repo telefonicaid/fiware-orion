@@ -31,7 +31,6 @@
     - [User attributes or metadata matching builtin name](#user-attributes-or-metadata-matching-builtin-name)
     - [Datetime support](#datetime-support)
     - [Geospatial properties of entities](#geospatial-properties-of-entities)
-        - [Simple Location Format](#simple-location-format)
         - [GeoJSON](#geojson)
     - [Simple Query Language](#simple-query-language)
     - [Geographical Queries](#geographical-queries)
@@ -50,8 +49,7 @@
            - [`$unset`](#unset)
            - [Combining `$set` and `$unset`](#combining-set-and-unset)
         - [How Orion deals with operators](#how-orion-deals-with-operators)
-        - [Current limitations](#current-limitations)
-           - [Create or replace entities](#create-or-replace-entities)
+        - [Usage in create or replace entity operations](#usage-in-create-or-replace-entity-operations)
     - [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata)
     - [Metadata update semantics](#metadata-update-semantics)
       - [`overrideMetadata` option](#overridemetadata-option)
@@ -68,16 +66,19 @@
     - [Notification Messages](#notification-messages)
     - [Custom Notifications](#custom-notifications)
       - [Macro substitution](#macro-substitution)
-      - [JSON payloads](#json-payloads)
-      - [Omitting payload](#omitting-payload)
+      - [Headers special treatment](#headers-special-treatment)
       - [Remove headers](#remove-headers)
+      - [Text based payload](#text-based-payload)
+      - [JSON payloads](#json-payloads)
+      - [NGSI payload patching](#ngsi-payload-patching)
+      - [Omitting payload](#omitting-payload)
       - [Additional considerations](#additional-considerations)
-      - [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
     - [Covered Subscriptions](#covered-subscriptions)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
     - [Pagination](#pagination)
       - [Ordering Results](#ordering-results)
+      - [Ties](#ties)
 - [API Routes](#api-routes)
     - [Entities Operations](#entities-operations)
         - [Entities List](#entities-list)
@@ -98,7 +99,7 @@
             - [Get Attribute Value `GET /v2/entities/{entityId}/attrs/{attrName}/value`](#get-attribute-value-get-v2entitiesentityidattrsattrnamevalue)
             - [Update Attribute Value `PUT /v2/entities/{entityId}/attrs/{attrName}/value`](#update-attribute-value-put-v2entitiesentityidattrsattrnamevalue)
         - [Types](#types)
-            - [List Entity Types `GET /v2/type`](#list-entity-types-get-v2type)
+            - [List Entity Types `GET /v2/types`](#list-entity-types-get-v2types)
             - [Retrieve entity information for a given type `GET /v2/types/{type}`](#retrieve-entity-information-for-a-given-type-get-v2typestype)
     - [Subscriptions Operations](#subscriptions-operations)
         - [Subscription payload datamodel](#subscription-payload-datamodel)
@@ -627,7 +628,7 @@ meaning:
   operators greater-than, less-than, greater-or-equal, less-or-equal and range. For further information
   check the section [Datetime support](#datetime-support) of this documentation.
 
-* `geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`. They have special semantics
+* `geo:json`. It has special semantics
   related with entity location. Attributes with `null` value will not be taken into account in
   geo-queries and they doesn't count towards the limit of one geospatial attribute per entity.
   See [Geospatial properties of entities](#geospatial-properties-of-entities) section.
@@ -674,6 +675,8 @@ the subscriptions based in alteration type features (see [Subscription based in 
    * `entityChange` if the update that triggers the notification was an update with an actual change or not an actual change but with `forcedUpdate` in use
    * `entityDelete` if the update that triggers the notification was a entity delete operation
 
+* `servicePath` (type: `Text`): specifies the [service path](#service-path) to which the entity belongs.
+
 Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
 However, they cannot be used in resource URLs.
 
@@ -692,7 +695,7 @@ semantics associated to the attribute type. Note that Orion ignored attribute ty
 this metadata is not needed most of the cases, but there are two cases in which attribute
 type has an special semantic for Orion:
    * `DateTime`
-   * Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` and `geo:json`)
+   * `geo:json`
 
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
@@ -858,10 +861,7 @@ The geospatial properties of a context entity can be represented by means of reg
 context attributes.
 The provision of geospatial properties enables the resolution of geographical queries.
 
-Two different syntaxes are supported by Orion:
-
-* *Simple Location Format*. It is meant as a very lightweight format for developers and users to
-  quickly and easily add to their existing entities.
+The following syntax is supported by Orion:
 
 * *GeoJSON*.  [GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) is a geospatial data
   interchange format based on the JavaScript Object Notation (JSON).
@@ -919,73 +919,6 @@ If extra locations are defined in this way take, into account that the location 
 is the one without `ignoreType` set to `true` metadata (`location` attribute in the example above). All
 the locations defined with `ignoreType` set to `true` are ignored by Orion and, in this sense, doesn't take
 part in geo-queries.
-
-### Simple Location Format
-
-Simple Location Format supports basic geometries ( *point*, *line*, *box*, *polygon* ) and covers
-the typical use cases when encoding geographical locations. It has been inspired by
-[GeoRSS Simple](http://www.georss.org/simple.html).
-
-It is noteworthy that the Simple Location Format is not intended to represent complex positions on
-Earth surface.
-For instance, applications that require to capture altitude coordinates will have to use GeoJSON as
-representation format for the geospatial properties of their entities. 
-
-A context attribute representing a location encoded with the Simple Location Format
-must conform to the following syntax:
-
-* The attribute type must be one of the following values: (`geo:point`, `geo:line`, `geo:box` or 
-  `geo:polygon`).
-* The attribute value must be a list of coordinates. By default, coordinates are defined
-  using the [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-  [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) coordinate reference system (CRS),
-  with latitude and longitude units of decimal degrees. Such coordinate list allow to encode
-  the geometry specified by the `type` attribute and are encoded according to the specific
-  rules defined below:
-
-  * Type `geo:point`:   the attribute value must contain a string containing a
-    valid latitude-longitude pair, separated by comma.
-  * Type `geo:line`:    the attribute value must contain a string array of
-    valid latitude-longitude pairs. There must be at least two pairs.
-  * Type `geo:polygon`: the attribute value must contain a string array
-    of valid latitude-longitude pairs.
-    There must be at least four pairs, with the last being identical to the first
-    (so a polygon has a minimum of three actual points).
-    Coordinate pairs should be properly ordered so that the line segments
-    that compose the polygon remain on the outer edge of the defined area.
-    For instance, the following path, ```[0,0], [0,2], [2,0], [2, 2]```, is an example of an invalid
-    polygon definition. 
-    Orion should raise an error when none of the former conditions are met by input data.
-  * Type `geo:box`:     A bounding box is a rectangular region, often used to define the extents of
-    a map or a rough area of interest. A box is represented by a two-length string array of
-    latitude-longitude pairs.
-    The first pair is the lower corner, the second is the upper corner.
-
-Note: Circle geometries are not supported, as the [literature](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)
-describes different shortcomings for implementations. 
-
-The examples below illustrate the referred syntax:
-
-```
-{
-  "location": {
-    "value": "41.3763726, 2.186447514",
-    "type": "geo:point"
-  }
-}
-```
-
-```
-{
-  "location": {
-    "value": [
-      "40.63913831188419, -8.653321266174316",
-      "40.63881265804603, -8.653149604797363"
-    ],
-    "type": "geo:box"
-  }
-}
-```
 
 ### GeoJSON
 
@@ -1187,7 +1120,7 @@ provide more information about the relationship. The following values are recogn
   reference geometry. 
 
 `geometry` allows to define the reference shape to be used when resolving the query.
- The following geometries (see [Simple Location Format](#simple-location-format)) must be supported:
+ The following geometries are supported:
 
 + `geometry=point`, defines a point on the Earth surface.
 + `geometry=line`, defines a polygonal line.
@@ -1225,8 +1158,8 @@ the API implementation is responsible for determining which entity attribute
 contains the geographical location to be used for matching purposes.
 To this aim, the following rules must be followed:
 
-* If an entity has no attribute corresponding to a location (encoded as GeoJSON or the
-  Simple Location Format), then such an entity has not declared any geospatial property and will not
+* If an entity has no attribute corresponding to a location (encoded as GeoJSON),
+  then such an entity has not declared any geospatial property and will not
   match any geographical query.
 
 * If an entity only exposes one attribute corresponding to a location, then such an attribute will
@@ -1625,41 +1558,19 @@ So be careful of avoiding these situations.
 The only exception to "use only one operator" rule is the case of `$set` and
 `$unset`, that can be used together [as described above](#combining-set-and-unset).
 
-### Current limitations
+### Usage in create or replace entity operations
 
-#### Create or replace entities
+Update operators can be used in entity creation or replace operations. In particular:
 
-Update operators cannot be used in entity creation or replace operations. For instance if
-you create an entity this way:
-
-```
-POST /v2/entities
-{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-the attribute A in the just created entity will have as value (literally) this JSON object: `{ "$inc": 2 }`.
-
-However, note that the case of adding new attributes to existing entities will work. For instance if
-we already have an entity E with attributes A and B and we append C this way:
-
-```
-POST /v2/entities/E/attrs
-{
-  "C": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-then C will be created with value `2`.
+* Numeric operators takes 0 as reference. For instance, `{"$inc": 4}` results in 4,
+  `{$mul: 1000}` results in 0, etc.
+* `$set` takes the empty object (`{}`) as reference. For instance, `"$set": {"X": 1}` results in just `{"X": 1}`
+* `$push` and `$addToSet` take the empty array (`[]`) as reference. For instance, `{"$push": 4}`
+  results in `[ 4 ]`.
+* `$pull`, `$pullAll` and `$unset` are ignored. This means that the attribute in which the operator is used
+  is not created in the entity. For instance, creating an entity with 2 attributes, the first one containing an operator 
+  `"A": {"value": {"$unset": 1}, ... }"` and the second one `"B": {"value": 3, ...}`, just a normal one, will result in an
+  entity with just one attribute, `B`.
 
 ## Filtering out attributes and metadata
 
@@ -1954,7 +1865,7 @@ Notifications include two fields:
 If `attrsFormat` is `normalized` (or if `attrsFormat` is omitted) then default entity representation
 is used:
 
-```
+```json
 {
   "subscriptionId": "12345",
   "data": [
@@ -1976,6 +1887,26 @@ is used:
 }
 ```
 
+If `attrsFormat` is `simplifiedNormalized` then a simplified variant of `normalized` (ommiting `subscriptionId`
+and the `data` holder) is used:
+
+```json
+{
+  "id": "Room1",
+  "type": "Room",
+  "temperature": {
+    "value": 23,
+    "type": "Number",
+    "metadata": {}
+  },
+  "humidity": {
+    "value": 70,
+    "type": "percentage",
+    "metadata": {}
+  }
+}
+```
+
 If `attrsFormat` is `keyValues` then keyValues partial entity representation mode is used:
 
 ```json
@@ -1992,6 +1923,17 @@ If `attrsFormat` is `keyValues` then keyValues partial entity representation mod
 }
 ```
 
+If `attrsFormat` is `simplifiedKeyValues` then a simplified variant of `keyValues` (ommiting `subscriptionId`
+and the `data` holder) is used:
+
+```json
+{
+  "id": "Room1",
+  "type": "Room",
+  "temperature": 23,
+  "humidity": 70
+}
+```
 
 If `attrsFormat` is `values` then values partial entity representation mode is used:
 
@@ -2039,6 +1981,11 @@ Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` i
 HTTP header with the value of the format of the associated subscription, so that notification receivers
 are aware of the format without needing to process the notification payload.
 
+**NOTE:** note that noficiations always include exactly one entity so you may ask why the `data` array
+is really needed. In the past we have multi-entity notifications (in particular, the so called "initial
+notification" that was deprecated in Orion 3.1.0 and removed in Orion 3.2.0) and the `data` array remains as
+a legacy.
+
 ## Custom Notifications
 
 ### Macro substitution
@@ -2054,14 +2001,14 @@ In case of `httpCustom`:
   `Ngsiv2-AttrsFormat` headers cannot be overwritten in custom notifications. Any attempt of
   doing so (e.g. `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.
 * `qs` (both parameter name and value can be templatized)
-* `payload`
+* `payload`, `json` and `ngsi` (all them payload related fields)
 * `method`, lets the clients select the HTTP method to be used for delivering
 the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
 HEAD, OPTIONS, TRACE, and CONNECT.
 
 In case of `mqttCustom`:
 
-* `payload`
+* `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
 
 Macro substitution for templates is based on the syntax `${..}`. In particular:
@@ -2080,7 +2027,7 @@ Macro substitution for templates is based on the syntax `${..}`. In particular:
   then its JSON representation as string is used.
 
 In the rare case an attribute was named in the same way of the `${service}`, `${servicePath}` or
-`${authToken}`  (e.g. an attribute which name is `service`) then the attribute value takes precedence.
+`${authToken}` (e.g. an attribute which name is `service`) then the attribute value takes precedence.
 
 Example:
 
@@ -2096,7 +2043,10 @@ Let's consider the following `notification.httpCustom` object in a given subscri
   "qs": {
     "type": "${type}"
   },
-  "payload": "The temperature is ${temperature} degrees"
+  "json": {
+    "t": "${temperature}",
+    "unit": "degress"
+  }
 }
 ```
 
@@ -2107,55 +2057,53 @@ The resulting notification after applying the template would be:
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
-Content-Type: text/plain
-Content-Length: 31
+Content-Type: application/json
+Content-Length: ...
 
-The temperature is 23.4 degrees
-```
-
-### JSON payloads
-
-As alternative to `payload` field in `httpCustom` or `mqttCustom`, the `json` field can be
-used to generate JSON-based payloads. For instance:
-
-```
-"httpCustom": {
-   ...
-   "json": {
-     "t": "${temperature}",
-     "h": [ "${humidityMin}", "${humidityMax}" ],
-     "v": 4
-   }
+{
+  "t": 23.4,
+  "unit": "degress"
 }
 ```
 
-Some notes to take into account when using `json` instead of `payload`:
+### Headers special treatment
 
-* The value of the `json` field must be an array or object. Although a simple string or number is
-  also a valid JSON, these cases are not supported.
-* The macro replacement logic works the same way than in `payload` case, with the following
-  considerations:
-  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
-  * The value of the JSON object or JSON array item in which the macro is used has to match
-    exactly with the macro expression. Thus, `"t": "${temperature}"` works, but
-    `"t": "the temperature is ${temperature}"` or `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"`
-    will not work
-  * It takes into account the nature of the attribute value to be replaced. For instance,
-    `"t": "${temperature}"` resolves to `"t": 10` if temperature attribute is a number or to
-    `"t": "10"` if `temperature` attribute is a string.
-  * If the attribute doesn't exist in the entity, then `null` value is used
-* URL automatic decoding applied to `payload` and `headers` fields (described
-  [custom payload and headers special treatment](#custom-payload-and-headers-special-treatment))
-  is not applied to `json` field.
-* `payload` and `json` cannot be used at the same time
-* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.headers`
+field in the API operations, such as `POST /v2/subscription` or `GET /v2/subscriptions`.
 
-### Omitting payload
+However, at notification time, any URL encoded characters in `httpCustom.headers` is decoded.
 
-If `payload` is set to `null`, then the notifications associated to that subscription will not
-include any payload (i.e. content-length 0 notifications). Note this is not the same than using
-`payload` set to `""` or omitting the field. In that case, the notification will be sent using
-the NGSIv2 normalized format.
+Example:
+
+Let's consider the following `notification.httpCustom` object in a given subscription.
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}",
+    "t": "${temperature}"
+  },
+  "payload": null
+}
+```
+
+Note that `"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
+
+Now, let's consider that Orion triggers a notification associated to this subscription.
+Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
+`temperature` with value 23.4. The resulting notification after applying the template would be:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room&t=23.4
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json
+Content-Length: 0
+```
 
 ### Remove headers
 
@@ -2178,34 +2126,16 @@ For instance:
 * To cut the propagation of headers (from updates to notifications), such the
   aforementioned `x-auth-token`
 
-### Additional considerations
+### Text based payload
 
-Some considerations to take into account when using custom notifications:
+If `payload` is used in `httpCustom` or `mqttCustom` the following considerations apply.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
 
-* It is the client's responsibility to ensure that after substitution, the notification is a
-  correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
-  correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
-  template is malformed, then no notification is sent.
-* Due to forbidden characters restriction, Orion applies an extra decoding step to outgoing
-  custom notifications. This is described in detail in
-  [Custom payload and headers special treatment](#custom-payload-and-headers-special-treatment) section.
-* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
-  [CLI parameter](admin/cli.md). In this case:
-  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
-  * No `${...}` macro substitution is performed.
-
-Note that if a custom payload is used for the notification (the field `payload` is given in the
-corresponding subscription), then a value of `custom` is used for the `Ngsiv2-AttrsFormat` header
-in the notification.
-
-### Custom payload and headers special treatment
-
-[General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload` field in the API operations, such as
-`POST /v2/subscription` or `GET /v2/subscriptions`. The same restrictions apply to the header values
-in `httpCustom.headers`.
-
-However, at notification time, any URL encoded characters in `httpCustom.payload` or in the values
-of `httpCustom.headers` are decoded.
+* [General syntax restrictions](#general-syntax-restrictions) also apply to the `httpCustom.payload`
+  field in the API operations, such as `POST /v2/subscription` or `GET /v2/subscriptions`. However,
+  at notification time, any URL encoded characters in `payload` is decoded. An example
+  is shown below.
+* `Content-Type` header is set to `text/plain`, except if overwritten by `headers` field
 
 Example:
 
@@ -2214,10 +2144,6 @@ Let's consider the following `notification.httpCustom` object in a given subscri
 ```
 "httpCustom": {
   "url": "http://foo.com/entity/${id}",
-  "headers": {
-    "Content-Type": "text/plain",
-    "Authorization": "Basic ABC...ABC%3D%3D"
-  },
   "method": "PUT",
   "qs": {
     "type": "${type}"
@@ -2227,8 +2153,7 @@ Let's consider the following `notification.httpCustom` object in a given subscri
 ```
 
 Note that the above payload value is the URL encoded version of this string:
-`the value of the "temperature" attribute (of type Number) is ${temperature}`. Note also that
-`"Basic ABC...ABC%3D%3D"` is the URL encoded version of this string: `"Basic ABC...ABC=="`.
+`the value of the "temperature" attribute (of type Number) is ${temperature}`.
 
 Now, let's consider that Orion triggers a notification associated to this subscription.
 Notification data is for entity with id `DC_S1-D41` and type `Room`, including an attribute named
@@ -2236,12 +2161,127 @@ Notification data is for entity with id `DC_S1-D41` and type `Room`, including a
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
-Authorization: "Basic ABC...ABC=="
-Content-Type: application/json
+Content-Type: text/plain
 Content-Length: 65
 
 the value of the "temperature" attribute (of type Number) is 23.4
 ```
+
+### JSON payloads
+
+If `json` is used in `httpCustom` or `mqttCustom` the following considerations apply.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
+
+The `json` field can be used to generate arbitrary JSON-based payloads. For instance:
+
+```
+"httpCustom": {
+   ...
+   "json": {
+     "t": "${temperature}",
+     "h": [ "${humidityMin}", "${humidityMax}" ],
+     "v": 4
+   }
+}
+```
+
+Some notes to take into account when using `json`:
+
+* The value of the `json` field must be an array or object. Although a simple string or number is
+  also a valid JSON, these cases are not supported.
+* The [macro replacement logic](#macro-substitution) works as expected, with the following
+  considerations:
+  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
+  * If the macro *covers completely the string where is used*, then the JSON nature of the attribute value
+    is taken into account. For instance, `"t": "${temperature}"` resolves to `"t": 10`
+    if temperature attribute is a number or to `"t": "10"` if `temperature` attribute is a string.
+  * If the macro *is only part of string where is used*, then the attribute value is always casted
+    to string. For instance, `"t": "Temperature is: ${temperature}"` resolves to 
+    `"t": "Temperature is 10"` even if temperature attribute is a number. Note that if the
+    attribute value is a JSON array or object, it is stringfied in this case.  
+  * If the attribute doesn't exist in the entity, then `null` value is used
+* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+
+### NGSI payload patching
+
+If `ngsi` is used in `httpCustom` or `mqttCustom` the following considerations apply.
+Note that only one of the following can be used a the same time: `payload`, `json` or `ngsi`.
+
+The `ngsi` field can be used to specify an entity fragment that will *patch* the entity in
+the notification. This allows to add new attributes and/or change the value of
+existing attributes, id and type. The resulting notification uses NGSIv2 normalized format described
+in [Notification Messages](#notification-messages).
+
+For instance:
+
+```
+"httpCustom": {
+   ...
+   "ngsi": {
+     "id": "prefix:${id}",
+     "type": "newType",
+     "originalService": {
+       "value": "${service}",
+       "type": "Text"
+     },
+     "originalServicePath": {
+       "value": "${servicePath}",
+       "type": "Text"
+     }
+   }
+}
+```
+
+Some notes to take into account when using `ngsi`:
+
+* The value of the `ngsi` field must be a valid [JSON Entity Representation](#json-entity-representation),
+  with some extra considerations:
+  * `id` or `type` are not mandatory
+  * If attribute `type` is not specified, the defaults described in [Partial Representations](#partial-representations)
+    are used.
+  * Attribute `metadata` is not allowed
+  * `{}` is a valid value for the `ngsi` field, in which case no patching is done and the original
+    notification is sent
+* If `notification.attrs` is used, the attribute filtering is done *after* applyig the NGSI patching
+* The patching semantic applied is *update or append* (similar to `append` `actionType` in updates) but other
+  semantics could be added in the future.
+* The [macro replacement logic](#macro-substitution) works as expected, with the following
+  considerations:
+  * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
+  * It cannot be used in the attribute `type`. Only in the `value` macro replacements can be done.
+  * If the macro *covers completely the string where is used*, then the JSON nature of the attribute value
+    is taken into account. For instance, `"value": "${temperature}"` resolves to `"value": 10`
+    if temperature attribute is a number or to `"value": "10"` if `temperature` attribute is a string.
+  * If the macro *is only part of string where is used*, then the attribute value is always casted
+    to string. For instance, `"value": "Temperature is: ${temperature}"` resolves to 
+    `"value": "Temperature is 10"` even if temperature attribute is a number. Note that if the
+    attribute value is a JSON array or object, it is stringfied in this case.
+  * If the attribute doesn't exist in the entity, then `null` value is used
+* `Content-Type` header is set to `application/json`, except if overwritten by `headers` field
+
+### Omitting payload
+
+If `payload` is set to `null`, then the notifications associated to that subscription will not
+include any payload (i.e. content-length 0 notifications). Note this is not the same than using
+`payload` set to `""` or omitting the field. In that case, the notification will be sent using
+the NGSIv2 normalized format described in [Notification Messages](#notification-messages).
+
+### Additional considerations
+
+Some considerations to take into account when using custom notifications:
+
+* It is the client's responsibility to ensure that after substitution, the notification is a
+  correct HTTP message (e.g. if the Content-Type header is application/xml, then the payload must
+  correspond to a well-formed XML document). Specifically, if the resulting URL after applying the
+  template is malformed, then no notification is sent.
+* Orion can be configured to disable custom notifications, using the `-disableCustomNotifications`
+  [CLI parameter](admin/cli.md). In this case:
+  * `httpCustom` is interpreted as `http`, i.e. all sub-fields except `url` are ignored
+  * No `${...}` macro substitution is performed.
+* If text based or JSON payloads are used (i.e. field `payload` or `json` is used) then
+  `Ngsiv2-AttrsFormat` header is set to `custom`. However, note that if NGSI patching is used
+  (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
+  notification (given that the notification format is actually the same).
 
 ## Oneshot Subscriptions
 
@@ -2392,7 +2432,10 @@ subscription is triggered. At the present moment, the following alteration types
   and it actually changes (or if it is not an actual update, but `forcedUpdate` option is used
   in the update request)
 * `entityCreate`: notification is sent whenever a entity covered by the subscription is created
-* `entityDelete`: notification is sent whenever a entity covered by the subscription is deleted
+* `entityDelete`: notification is sent whenever a entity covered by the subscription is deleted.
+  In this case, the `attrs` field within [`condition`](#subscriptionsubjectcondition) is
+  ignored (note that usual way of deleting entities, e.g. `DELETE /v2/entities/E` doesn't include
+  any attribute).
 
 For instance:
 
@@ -2508,6 +2551,42 @@ From lowest to highest:
 4. Object
 5. Array
 6. Boolean
+
+### Ties
+
+Note that in the cases of ties, Orion doesn't guarantee that the same query using `orderBy` will result in the same
+results sequence. In other words, the tied results could be returned in different relative order when the same query is
+repeated. This is the same behaviour that MongoDB (the underlying DB used by Orion) implements (see [this MongoDB documentation](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/).
+
+Note this may be problematic in the case of pagination. Let's illustrate with the following example. Consider we have four entities (E1 to E4)
+
+* E1, with attribute `colour` set to `blue`
+* E2, with attribute `colour` set to `blue`
+* E3, with attribute `colour` set to `red`
+* E4, with attribute `colour` set to `red`
+
+A first execution of `GET /v2/entities?orderBy=colour` could return `E1, E2, E3, E4` but a second execution of the query
+could `E2, E1, E4, E3`, a third execution could return `E1, E2, E4, E3`, etc.
+
+Let's consider a typical paginated sequence of queries like this:
+
+```
+GET /v2/entities?orderBy=colour&limit=3&offset=0
+GET /v2/entities?orderBy=colour&limit=3&offset=3
+```
+
+The same sequence of results is not guaranteed among queries, so in the first query the sequence could be `E1, E2, E3, E4` (so
+client would get `E1, E2, E3`) but in the second query it could be (`E1, E2, E4, E3`) so the client will get `E3` again
+(instead of the expected `E4`).
+
+Another similar (more complex case) is described in [this issue](https://github.com/telefonicaid/fiware-orion/issues/4394)).
+
+The solution is to add an attribute to `orderBy` to guarantee that ties doesn't occur. In this sense, `dateCreated` [builtin attributes](#builtin-attributes) is a very good candidate, so the above queries could be adapted the following way:
+
+```
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=0
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=3
+```
 
 # API Routes
 
@@ -2666,8 +2745,11 @@ Example:
     "value": 60
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84"
@@ -2759,8 +2841,11 @@ Example:
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
@@ -2839,8 +2924,11 @@ Example:
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
@@ -3373,7 +3461,7 @@ _**Response code**_
 
 ### Types
 
-#### List Entity Types `GET /v2/type`
+#### List Entity Types `GET /v2/types`
 
 Retrieves a list of entity types, as described in the response payload section below.
 
@@ -3562,8 +3650,9 @@ A `condition` contains the following subfields:
 | Parameter    | Optional | Type  | Description                                                                                                                   |
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification. Empty list is not allowed.                                       |
-| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed |
+| `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed. `georel`, `geometry` and `coords` have to be used together (i.e. "all or nothing"). Check the example using geoquery as expression [below](#create-subscription-post-v2subscriptions).|
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
+| `notifyOnMetadataChange` | ✓   | boolean | If `true` then metadata is considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is triggered. If `false` then the metadata is not considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is not triggered. Default value is `true`. |
 
 Notification triggering (i.e. when a notification is triggered based on entity updates)
 is described in [this specific section](#notification-triggering).
@@ -3576,7 +3665,7 @@ A `notification` object contains the following subfields:
 |--------------------|-------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field. It must be a non-empty list.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
 | [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
-| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `keyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
 | `metadata`         | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
 | `onlyChangedAttrs` | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is omitted)) |
 | `covered`          | ✓                 | boolean | If `true` then notifications will include all the attributes defined in `attrs` field, even if they are not present in the entity (in this, case, with `null` value). (default value is false). For further information see [Covered subscriptions](#covered-subscriptions) section |
@@ -3623,6 +3712,7 @@ A `mqtt` object contains the following subfields:
 | `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
 | `topic`   |          | string | Represent the MQTT topic to use                                                                                                            |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `retain`  | ✓        | boolean | MQTT retain value to use in the notifications associated to the subscription (`true` or `false`). If omitted then retain `false` is used. |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
 | `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
 
@@ -3638,8 +3728,12 @@ A `httpCustom` object contains the following subfields.
 | `headers` | ✓        | object | A key-map of HTTP headers that are included in notification messages. Must not be empty.         |
 | `qs`      | ✓        | object | A key-map of URL query parameters that are included in notification messages. Must not be empty. |
 | `method`  | ✓        | string | The method to use when sending the notification (default is POST). Only valid HTTP methods are allowed. On specifying an invalid HTTP method, a 400 Bad Request error is returned.|
-| `payload` | ✓        | string | The payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
+| `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
+
+`payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
 If `httpCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply.
 
@@ -3652,9 +3746,14 @@ A `mqttCustom` object contains the following subfields.
 | `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
 | `topic`   |          | string | Represent the MQTT topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
 | `qos`     | ✓        | number | MQTT QoS value to use in the notifications associated to the subscription (0, 1 or 2). If omitted then QoS 0 is used.                      |
+| `retain`  | ✓        | boolean | MQTT retain value to use in the notifications associated to the subscription (`true` or `false`). If omitted then retain `false` is used. |
 | `user`    | ✓        | string | User name used to authenticate the connection with the broker.                                                                             |
 | `passwd`  | ✓        | string | Passphrase for the broker authentication. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`). |
-| `payload` | ✓        | string | The payload to be used in notifications. If omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used.|
+| `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
+| `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
+
+`payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
 If `mqttCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, 
 see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
@@ -3762,7 +3861,7 @@ _**Request payload**_
 The payload is a JSON object containing a subscription that follows the JSON subscription representation 
 format (described in ["Subscription payload datamodel](#subscription-payload-datamodel) section).
 
-Example:
+Example using attribute filter:
 
 ```json
 {
@@ -3787,8 +3886,38 @@ Example:
     },
     "attrs": ["temperature", "humidity"]
   },            
-  "expires": "2025-04-05T14:00:00.00Z",
-  "throttling": 5
+  "expires": "2025-04-05T14:00:00.00Z"
+}
+```
+
+Example using geoquery as condition:
+
+```json
+{
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature" ],
+      "expression": {
+        "georel": "near;maxDistance:15000",
+        "geometry": "point",
+        "coords": "37.407804,-6.004552"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"]
+  },            
+  "expires": "2025-04-05T14:00:00.00Z"
 }
 ```
 
@@ -4275,7 +4404,7 @@ regular non-batch operations can be done:
 * `appendStrict`: maps to `POST /v2/entities` (if the entity does not already exist) or
   `POST /v2/entities/<id>/attrs?options=append` (if the entity already exists).
 * `update`: maps to `PATCH /v2/entities/<id>/attrs`.
-* `delete`: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity or
+* `delete`: maps to `DELETE /v2/entities/<id>/attrs/<attrName>` on every attribute included in the entity (in this case the actual value of the attribute is not relevant) or
   to `DELETE /v2/entities/<id>` if no attribute were included in the entity.
 * `replace`: maps to `PUT /v2/entities/<id>/attrs`.
 

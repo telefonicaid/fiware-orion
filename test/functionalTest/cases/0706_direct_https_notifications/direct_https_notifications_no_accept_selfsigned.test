@@ -92,7 +92,7 @@ echo "04. Look in the CB log for the warning about cert not accepted"
 echo "=============================================================="
 
 # Depdending the system the message in the logs may be diferent. For instance, it has been found than in
-# CentOS8 and Debian 9 the message is "Peer certificate cannot be authenticated" but in Debian 11
+# CentOS8 and Debian 9 the message is "Peer certificate cannot be authenticated" but in Debian 11/12
 # is "Peer certificate cannot be authenticated". At the end this error message comes from the SSH library
 
 grep "Peer certificate cannot be authenticated\|SSL peer certificate or SSH remote key was not OK" /tmp/contextBroker.log | grep "notification failure" | wc -l
@@ -105,20 +105,20 @@ echo
 01. Create subscription to an HTTPS endpoint
 ============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity, triggering notification
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 

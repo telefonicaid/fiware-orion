@@ -368,6 +368,7 @@ static bool getGeoJson
     else
     {
       // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
+      // FIXME P7: boolean return value should be managed?
       caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "", true, apiVersion == V1);
       geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
     }

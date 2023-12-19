@@ -92,6 +92,7 @@
 #define DATE_MODIFIED   "dateModified"
 #define DATE_EXPIRES    "dateExpires"
 #define ALTERATION_TYPE "alterationType"
+#define SERVICE_PATH    "servicePath"
 #define ALL_ATTRS       "*"
 
 
@@ -126,7 +127,7 @@
 #define OPT_FORCEDUPDATE                "forcedUpdate"
 #define OPT_OVERRIDEMETADATA            "overrideMetadata"
 #define OPT_SKIPFORWARDING              "skipForwarding"
-
+#define OPT_FULL_COUNTERS               "fullCounters"
 
 
 /* ****************************************************************************
@@ -201,7 +202,6 @@ typedef void (*OrionExitFunction)(int exitCode, const std::string& reason);
 */
 extern char               fwdHost[];
 extern int                fwdPort;
-extern bool               ngsi9Only;
 extern bool               harakiri;
 extern int                startTime;
 extern int                statisticsTime;
@@ -231,6 +231,7 @@ extern unsigned long      fcStepDelay;
 extern unsigned long      fcMaxInterval;
 
 extern unsigned long      logInfoPayloadMaxSize;
+extern bool               logDeprecate;
 
 
 /* ****************************************************************************

@@ -29,81 +29,120 @@
 #include "common/string.h"
 #include "common/limits.h"
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
+
 
 
 /* ****************************************************************************
 *
-* attributeValue - return value of attribute as a string
+* smartStringValue -
+*
+* Returns the effective string value, taking into account replacements
 */
-static void attributeValue(std::string* valueP, const std::vector<ContextAttribute*>& vec, const char* attrName)
+std::string smartStringValue(const std::string stringValue, std::map<std::string, std::string>* replacementsP, const std::string notFoundDefault)
 {
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  // This code is pretty similar to the one in CompoundValueNode::toJson()
+  // The program logic branching is the same, but the result at the end of each if-else
+  // is different, which makes difficult to unify both them
+  if ((replacementsP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
   {
-    if (vec[ix]->name != attrName)
+    // "Full replacement" case. In this case, the result is not always a string
+    // len("${") + len("}") = 3
+    std::string macroName = stringValue.substr(2, stringValue.size() - 3);
+    std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
+    if (iter == replacementsP->end())
     {
-      continue;
-    }
-
-    if (vec[ix]->valueType == orion::ValueTypeString)
-    {
-      *valueP = vec[ix]->stringValue;
-    }
-    else if (vec[ix]->valueType == orion::ValueTypeNumber)
-    {
-      bool isDateType = ((vec[ix]->type == DATE_TYPE) || (vec[ix]->type == DATE_TYPE_ALT))? true : false;
-
-      if (isDateType)
-      {
-        *valueP = isodate2str(vec[ix]->numberValue);
-      }
-      else
-      {
-        *valueP = double2string(vec[ix]->numberValue);
-      }
-    }
-    else if (vec[ix]->valueType == orion::ValueTypeBoolean)
-    {
-      *valueP = (vec[ix]->boolValue == true)? "true" : "false";
-    }
-    else if (vec[ix]->valueType == orion::ValueTypeNull)
-    {
-      *valueP = "null";
-    }
-    else if (vec[ix]->valueType == orion::ValueTypeNotGiven)
-    {
-      LM_E(("Runtime Error (value not given for attribute)"));
-      *valueP = "";
-    }
-    else if ((vec[ix]->valueType == orion::ValueTypeObject) || (vec[ix]->valueType == orion::ValueTypeVector))
-    {
-      if (vec[ix]->compoundValueP)
-      {
-        *valueP = vec[ix]->compoundValueP->toJson();
-      }
-      else
-      {
-        LM_E(("Runtime Error (attribute is of object type but has no compound)"));
-        *valueP = "";
-      }
+      // macro doesn't exist in the replacement map, so we use null as failsafe
+      return notFoundDefault;
     }
     else
     {
-      LM_E(("Runtime Error (unknown value type for attribute)"));
-      *valueP = "";
+      return iter->second;
     }
-
-    return;
   }
-
-  *valueP = "";
+  else if (replacementsP != NULL)
+  {
+    // "Partial replacement" case. In this case, the result is always a string
+    std::string effectiveValue;
+    if (!macroSubstitute(&effectiveValue, stringValue, replacementsP, "null"))
+    {
+      // error already logged in macroSubstitute, using stringValue itself as failsafe
+      effectiveValue = stringValue;
+    }
+    // toJsonString will stringfly JSON values in macros
+    return '"' + toJsonString(effectiveValue) + '"';
+  }
+  else
+  {
+    // No replacement applied, just return the original string
+    return '"' + toJsonString(stringValue) + '"';
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* macroSubstitute - 
+* buildReplacementMap -
+*
+*/
+void buildReplacementsMap
+(
+  const Entity&                        en,
+  const std::string&                   service,
+  const std::string&                   token,
+  std::map<std::string, std::string>*  replacementsP
+)
+{
+  replacementsP->insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
+  replacementsP->insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    // Note that if some attribute is named service, servicePath or authToken (although it would be
+    // an anti-pattern), the attribute takes precedence
+    (*replacementsP)[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* stringValueOrNothing -
+*/
+static std::string stringValueOrNothing(std::map<std::string, std::string>* replacementsP, const std::string key, const std::string& notFoundDefault)
+{
+  std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
+  if (iter == replacementsP->end())
+  {
+    return notFoundDefault;
+  }
+  else
+  {
+    // replacementP contents are prepared for "full replacement" case, so string values use
+    // double quotes. But in this case we are in a "partial replacement" case, so we have
+    // to remove them if we find them
+    std::string value = iter->second;
+    if (value[0] == '"')
+    {
+      return value.substr(1, value.size()-2);
+    }
+    else
+    {
+      return value;
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* macroSubstitute -
 *
 * An old version of this function was based in char processing. However, we faced
 * weird crashing problems after fixing that implementation to support >1KB payloads.
@@ -120,13 +159,13 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 *    bug with the current implementation.
 *
 * However, the old version is still available at git repository, for the records.
-* It can be found checking out the following commit (the last one before chaning implementation):
+* It can be found checking out the following commit (the last one before changing implementation):
 *
 *   commit f8c91bf16e192388824c3786a76b203b83354d13
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, const Entity& en, const std::string& service, const std::string& authToken)
+bool macroSubstitute(std::string* to, const std::string& from, std::map<std::string, std::string>* replacementsP, const std::string& notFoundDefault)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -189,34 +228,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en,
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-
-    if (macroName == "id")
-    {
-      toAdd += en.id.length() * times;
-    }
-    else if (macroName == "type")
-    {
-      toAdd += en.type.length() * times;
-    }
-    else if (macroName == "service")
-    {
-      toAdd += service.length() * times;
-    }
-    else if (macroName == "servicePath")
-    {
-      toAdd += en.servicePath.length() * times;
-    }
-    else if (macroName == "authToken")
-    {
-      toAdd += authToken.length() * times;
-    }
-    else
-    {
-      std::string value;
-
-      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
-      toAdd += value.length() * times;
-    }
+    toAdd += stringValueOrNothing(replacementsP, macroName, notFoundDefault).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -233,54 +245,8 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en,
     std::string macroName = it->first;
     unsigned int times    = it->second;
 
-    std::string macro = "${" + it->first + "}";
-    std::string value;
-
-    if (macroName == "id")
-    {
-      value = en.id;
-    }
-    else if (macroName == "type")
-    {
-      value = en.type;
-    }
-    else if (macroName == "service")
-    {
-      if (en.attributeVector.get("service") >= 0)
-      {
-        attributeValue(&value, en.attributeVector.vec, macroName.c_str());
-      }
-      else
-      {
-        value = service;
-      }
-    }
-    else if (macroName == "servicePath")
-    {
-      if (en.attributeVector.get("servicePath") >= 0)
-      {
-        attributeValue(&value, en.attributeVector.vec, macroName.c_str());
-      }
-      else
-      {
-        value = en.servicePath;
-      }
-    }
-    else if (macroName == "authToken")
-    {
-      if (en.attributeVector.get("authToken") >= 0)
-      {
-        attributeValue(&value, en.attributeVector.vec, macroName.c_str());
-      }
-      else
-      {
-        value = authToken;
-      }
-    }
-    else
-    {
-      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
-    }
+    std::string macro = "${" + macroName + "}";
+    std::string value = stringValueOrNothing(replacementsP, macroName, notFoundDefault);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)

@@ -101,30 +101,30 @@ echo
 01. Register entity E1 for CP1 in CB
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX(.*)
+Content-Length: 0
 
 
 
 02. Create E1 in CP1
 ====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. GET /entities/E1 on CB to provoke a forwarded request to CP1, to provoke the bug
 ====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
 
 {
     "A1": {
@@ -145,10 +145,10 @@ Date: REGEX(.*)
 05. GET /entities/E1 from CP1 to make sure it-s still alive
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
 
 {
     "A1": {

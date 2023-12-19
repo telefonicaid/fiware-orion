@@ -130,20 +130,20 @@ echo
 01. Create entity E with attr A1, attr-type 'house:flat'
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
+Content-Length: 0
 
 
 
 02. Try to change A1 type to invalid 'house<flat>', with PUT /v2/entities/E/attrs/A1, see it fail
 =================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid characters in attribute type",
@@ -154,10 +154,10 @@ Date: REGEX(.*)
 03. Make sure step 2 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "A1": {
@@ -173,10 +173,10 @@ Date: REGEX(.*)
 04. Try to change A1 type to non-plain-ascii 'habitacion', with PUT /v2/entities/E/attrs/A1, see it fail
 ========================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid characters in attribute type",
@@ -187,10 +187,10 @@ Date: REGEX(.*)
 05. Make sure step 4 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "A1": {
@@ -206,10 +206,10 @@ Date: REGEX(.*)
 06. Try to change A1 type to a string that is longer than 256 chars, see it fail
 ================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "attribute type length: 262, max length supported: 256",
@@ -220,10 +220,10 @@ Date: REGEX(.*)
 07. Make sure step 5 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "A1": {
@@ -239,10 +239,10 @@ Date: REGEX(.*)
 08. Try to change A1, adding a metadata with empty name, see it fail
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "unrecognized property for context attribute",
@@ -253,10 +253,10 @@ Date: REGEX(.*)
 09. Make sure step 7 DID NOT modify E/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "A1": {

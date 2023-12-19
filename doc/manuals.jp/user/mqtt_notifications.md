@@ -27,6 +27,7 @@ HTTP 通知とは別に、Orion は MQTT を使用して通知できます。こ
 * `topic` に、使用する MQTT トピックを指定します
 * `qos`: サブスクリプションに関連付けられた通知 (0, 1 または 2) で使用する MQTTQoS 値を指定します。
    これはオプションのフィールドです。省略した場合、QoS0 が使用されます
+* `retain`: サブスクリプションに関連付けられた通知で使用する MQTT 保持値を指定します (`true` または `false`)。これはオプションのフィールドで、省略した場合は retain には `false` が使用されます
 * `user` および `passwd`: MQTT broker がユーザ/パスワードベースの認証を必要とする場合に使用される
   オプションのフィールド。使用する場合は、両方のフィールドを一緒に使用する必要があります。セキュリティ上の理由から、
   サブスクリプション情報を取得するときは常にパスワードが使用されないことに注意してください (例: `GET /v2/subscriptions`)
@@ -48,7 +49,7 @@ MQTT サブスクリプションのカスタム通知 ([Orion API 仕様のカ�
 * `httpCustom` の代わりに `mqttCustom` が使用されます
 * `mqtt` で使用されているのと同じフィールドを `mqttCustom` で使用できます
 * `headers`, `qs` と `method` は MQTT で同等ではないため、使用できません
-* マクロ置換は `topic` および `payload` フィールドで実行されます。`url`, `qos`, `user` と `passwd` は固定値です
+* マクロ置換は `topic` および `payload` フィールドで実行されます。`url`, `qos`, `retain`, `user` と `passwd` は固定値です
 
 ## 接続管理
 
@@ -57,7 +58,8 @@ MQTT 通知が最初に公開されたときに接続が行われます。
 
 接続が一度確立されると、使用中も開いたままになります。つまり、MQTT 通知が公開されます。接続が使用されていない場合 (つまり、
 MQTT が公開されていない場合)、Orion は事前定義されたキープ・アライブ時間 (`-mqttMaxAge` [CLI パラメータ](../admin/cli.md)
-で指定、デフォルトで1時間) 後に接続を閉じます。
+で指定、デフォルトで1時間) 後に接続を閉じます。Orion は、MQTT 通知エラー (MQTT broker がダウンしているなど)
+が発生した場合にも接続を閉じるため、次に MQTT 通知が正常に発行されたときに再作成されます。
 
 ## MQTT チートシート
 
@@ -81,4 +83,12 @@ TLS を使用して公開するには (Orion ではまだサポートされて�
 
 ```
 mosquitto_pub -d --insecure --cafile file.pem -h <host> -p 1883 -u <username> -P <password> -t '/topic' -m 'payload'
+```
+
+Mosquitto Broker に保持されているすべてのメッセージをクリアするには:
+
+```
+sudo service mosquitto stop
+sudo rm /var/lib/mosquitto/mosquitto.db
+sudo systemctl start mosquitto.service
 ```

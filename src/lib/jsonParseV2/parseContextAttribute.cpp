@@ -105,7 +105,8 @@ static std::string parseContextAttributeObject
 (
   const rapidjson::Value&  start,
   ContextAttribute*        caP,
-  bool*                    compoundVector
+  bool*                    compoundVector,
+  bool                     checkAttrSpecialTypes
 )
 {
   // This is NGSIv2 parsing and in NGSIv2, no value means implicit null. Note that
@@ -215,7 +216,7 @@ static std::string parseContextAttributeObject
   }
 
   // Is it a (not null) date?
-  if (((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT)) && (caP->valueType != orion::ValueTypeNull))
+  if (checkAttrSpecialTypes && ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT)) && (caP->valueType != orion::ValueTypeNull))
   {
     caP->numberValue =  parse8601Time(caP->stringValue);
 
@@ -230,7 +231,7 @@ static std::string parseContextAttributeObject
   }
 
   // It is a safe GeoJSON?
-  if (caP->type == GEO_JSON)
+  if (checkAttrSpecialTypes && caP->type == GEO_JSON)
   {
     std::string r = checkGeoJson(caP);
     if (r != "OK")
@@ -252,7 +253,8 @@ std::string parseContextAttribute
 (
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
-  ContextAttribute*                             caP
+  ContextAttribute*                             caP,
+  bool                                          checkAttrSpecialTypes
 )
 {
   std::string  name           = iter->name.GetString();
@@ -354,7 +356,7 @@ std::string parseContextAttribute
     // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
     if (iter->value.HasMember("value") || ciP->apiVersion == V2)
     {
-      std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
+      std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector, checkAttrSpecialTypes);
       if (r == "max deep reached")
       {
         alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object");
@@ -398,7 +400,7 @@ std::string parseContextAttribute
 *
 * parseContextAttribute -
 */
-std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
+std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, bool checkAttrSpecialTypes)
 {
   rapidjson::Document  document;
 
@@ -426,7 +428,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   }
 
   bool         compoundVector = false;
-  std::string  r = parseContextAttributeObject(document, caP, &compoundVector);
+  std::string  r = parseContextAttributeObject(document, caP, &compoundVector, checkAttrSpecialTypes);
 
   if (r == "max deep reached")
   {

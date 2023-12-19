@@ -38,7 +38,7 @@ Follow these steps:
 		    command: -dbhost mongo
 		
 		  mongo:
-		    image: mongo:4.4
+		    image: mongo:6.0
 		    command: --nojournal
 
 3. Using the command-line and within the directory you created type: `sudo docker-compose up`.
@@ -77,7 +77,7 @@ Check that everything works with
 ### 2B. MongoDB runs on another docker container
 In case you want to run MongoDB on another container you can launch it like this
 
-	sudo docker run --name mongodb -d mongo:4.4
+	sudo docker run --name mongodb -d mongo:6.0
 
 And then run Orion with this command
 
@@ -111,7 +111,7 @@ Steps:
 4. Run Orion...
 	* Using an automated scenario with docker-compose and building your new image: `sudo docker-compose up`. You may also modify the provided `docker-compose.yml` file if you need so.
 	* Manually, running MongoDB on another container: 
-		1. `sudo docker run --name mongodb -d mongo:4.4`
+		1. `sudo docker run --name mongodb -d mongo:6.0`
 		2. `sudo docker build -t orion .`
 		3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
 	* Manually, specifying where to find your MongoDB host:
@@ -124,18 +124,27 @@ Check that everything works with
 
 The parameter `-t orion` in the `docker build` command gives the image a name. This name could be anything, or even include an organization like `-t org/fiware-orion`. This name is later used to run the container based on the image.
 
-Two Dockerfiles are provided for step 3 above: the official one (`Dockefile` itself) based in Debian and `Dockefile.alpine`, which is not official but in can be useful as starting point if you want to use Alpine as base distribution.
+Two Dockerfiles are provided for step 3 above: the official one (`Dockefile` itself) based in Debian and `Dockefile.alpine`, which is not official but in can be useful as starting point if you want to use [Alpine](https://www.alpinelinux.org/) as base distribution.
 
 The parameter `--build-arg` in the `docker build` can be set build-time variables. 
 
 | ARG             | Description                                                         | Example                         |
 | --------------- | ------------------------------------------------------------------- | ------------------------------- |
-| IMAGE_TAG       | Specify a tag of the base image.                                    | --build-arg IMAGE_TAG=centos7   |
+| IMAGE_NAME      | Specify a name of the base image.                                   | --build-arg IMAGE_TAG=ubuntu    |
+| IMAGE_TAG       | Specify a tag of the base image.                                    | --build-arg IMAGE_TAG=22.04     |
 | GIT_NAME        | Specify a username of GitHub repository.                            | --build-arg GIT_NAME=fiware-ges |
 | GIT_REV_ORION   | Specify the Orion version you want to build.                        | --build-arg GIT_REV_ORION=2.3.0 |
 | CLEAN_DEV_TOOLS | Specify whether the development tools clear. It is remained when 0. | --build-arg CLEAN_DEV_TOOLS=0   |
 
 If you want to know more about images and the building process you can find it in [Docker's documentation](https://docs.docker.com/userguide/dockerimages/).
+
+### 3.1 Building in not official distributions
+
+As explained in the [requirements section of the installation documentation](../doc/manuals/admin/install.md#requirements), Debian 12 is the only officially supported
+distribution. However, the following commands have been tested to build Docker containers based in alternative distributions:
+
+* Ubuntu 22.04 LTS: `docker build -t orion-ubuntu22.04 --build-arg IMAGE_NAME=ubuntu --build-arg IMAGE_TAG=22.04 --build-arg CLEAN_DEV_TOOLS=0 .`
+* Alpine 3.16.0: `docker build -t orion-alpine3.16 -f Dockerfile.alpine .`
 
 ## 4. Other info
 

@@ -124,7 +124,6 @@ ContextElementResponse::ContextElementResponse
 
   //
   // Attribute vector
-  // FIXME P5: constructor for orion::BSONObj could be added to ContextAttributeVector/ContextAttribute classes, to make building more modular
   //
   orion::BSONObj         attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
@@ -295,21 +294,60 @@ std::string ContextElementResponse::toJsonV1
 
 /* ****************************************************************************
 *
+* ContextElementResponse::toJsonV1 -
+*
+* Wrapper of toJsonV1 with empty attrsFilter and metadataFilter
+*/
+std::string ContextElementResponse::toJsonV1
+(
+  bool         asJsonObject,
+  RequestType  requestType,
+  bool         blacklist,
+  bool         comma,
+  bool         omitAttributeValues
+)
+{
+  std::string out = "";
+
+  out += startTag();
+  out += entity.toJsonV1(asJsonObject, requestType, blacklist, true, omitAttributeValues);
+  out += statusCode.toJsonV1(false);
+  out += endTag(comma, false);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElementResponse::toJson - 
 */
 std::string ContextElementResponse::toJson
 (
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter
+  RenderFormat                         renderFormat,
+  const std::vector<std::string>&      attrsFilter,
+  bool                                 blacklist,
+  const std::vector<std::string>&      metadataFilter,
+  std::map<std::string, std::string>*  replacementsP
 )
 {
   std::string out;
 
-  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
+  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false, replacementsP);
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::applyUpdateOperators -
+*/
+void ContextElementResponse::applyUpdateOperators(void)
+{
+  entity.applyUpdateOperators();
 }
 
 

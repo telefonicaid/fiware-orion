@@ -164,64 +164,64 @@ echo
 01. Create subscription with POSIX regex in idPattern
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity matching regex: foo:text
 ==========================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/foo:text?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/foo:text?type=T
 
 
 
 03. Create entity matching regex: foooo
 =======================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/foooo?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/foooo?type=T
 
 
 
 04. Create entity matching regex: Fovoid
 ========================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/Fovoid?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Fovoid?type=T
 
 
 
 05. Create entity NOT matching regex: WeatherObserved:foo
 =========================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/WeatherObserved:foo?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/WeatherObserved:foo?type=T
 
 
 
 06. Create entity NOT matching regex: WeatherObservedfoo
 ========================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/WeatherObservedfoo?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/WeatherObservedfoo?type=T
 
 
 
 07. Create entity NOT matching regex: WeatherObserved
 =====================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/WeatherObserved?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/WeatherObserved?type=T
 
 
 

@@ -1556,13 +1556,19 @@ char* lmTraceGet(char* levelString, int levelStringSize)
   {
     int   prev   = levels[i - 1];
     int   diss   = levels[i];
-    int   next   = levels[i + 1];
     bool  before = (diss == (prev + 1));
-    bool  after  = (diss == (next - 1));
+    bool  after;
     char  str[12];
 
     if (i == 255)
+    {
       after = false;
+    }
+    else
+    {
+      int next = levels[i + 1];
+      after = (diss == (next - 1));
+    }
 
     if (before && after)
     {
@@ -1630,13 +1636,19 @@ char* lmTraceGet(char* levelString, int levelStringSize, char* traceV)
   {
     int   prev   = levels[i - 1];
     int   diss   = levels[i];
-    int   next   = levels[i + 1];
     bool  before = (diss == prev + 1);
-    bool  after  = (diss == next - 1);
+    bool  after;
     char  str[12];
 
     if (i == 255)
+    {
       after = false;
+    }
+    else
+    {
+      int next = levels[i + 1];
+      after = (diss == (next - 1));
+    }
 
     if (before && after)
     {

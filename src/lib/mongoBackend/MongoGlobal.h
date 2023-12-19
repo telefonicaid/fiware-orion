@@ -71,6 +71,7 @@ extern bool mongoMultitenant(void);
 */
 void mongoInit
 (
+  const char*  dbURI,
   const char*  dbHost,
   const char*  rplSet,
   std::string  dbName,
@@ -214,7 +215,7 @@ extern bool includedAttribute(const std::string& attrName, const StringList& att
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsasge = false);
+extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP);
 
 
 
@@ -302,13 +303,10 @@ extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
 */
 void subToNotifyList
 (
-  const std::vector<std::string>&  modifiedAttrs,
-  const std::vector<std::string>&  conditionVector,
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
   StringList&                      attrL,
-  const bool&                      blacklist,
-  bool&                            op
+  const bool&                      blacklist
 );
 
 
@@ -322,11 +320,8 @@ void subToNotifyList
 extern StringList subToAttributeList
 (
   const orion::BSONObj&           attrL,
-  const bool&                     onlyChanged,
   const bool&                     blacklist,
-  const std::vector<std::string>  modifiedAttrs,
-  const std::vector<std::string>  attributes,
-  bool&                           op
+  const std::vector<std::string>  attributes
 );
 
 

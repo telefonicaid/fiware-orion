@@ -1,0 +1,226 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Right JSON change evaluation in subs (GeoJson case)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription covering E-A
+# 02. Create E-A entity with geo:json (notification)
+# 03. Update E-A entity with same geo:json object (no notification)
+# 04. Update E-A entity with different geo:json (notification)
+# 05. Dump accumulator, see 2 notifications
+#
+
+echo "01. Create subscription covering E-A"
+echo "===================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {    
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E-A entity with geo:json (notification)"
+echo "=================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "type": "geo:json",
+    "value": { 
+      "type": "Point",
+      "coordinates": [10.2, 10.0]        
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update E-A entity with same geo:json (no notification)"
+echo "=========================================================="
+payload='{
+  "A": {
+    "type": "geo:json",
+    "value": { 
+      "type": "Point",
+      "coordinates": [10.2, 10.0]        
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "04. Update E-A entity with different geo:json (notification)"
+echo "============================================================"
+payload='{
+  "A": {
+    "type": "geo:json",
+    "value": { 
+      "type": "Point",
+      "coordinates": [11.2, -10.0]        
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator, see 2 notifications"
+echo "========================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription covering E-A
+====================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create E-A entity with geo:json (notification)
+==================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. Update E-A entity with same geo:json (no notification)
+==========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Update E-A entity with different geo:json (notification)
+============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Dump accumulator, see 2 notifications
+=========================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 163
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        10.2,
+                        10
+                    ],
+                    "type": "Point"
+                }
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 164
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        11.2,
+                        -10
+                    ],
+                    "type": "Point"
+                }
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

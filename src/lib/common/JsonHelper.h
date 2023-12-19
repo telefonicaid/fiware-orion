@@ -110,6 +110,35 @@ std::string vectorToJson(std::vector<T> &list)
   return ss;
 }
 
+/* ****************************************************************************
+*
+* vectorToJson -
+*
+* Similar to the former one but for pointer case
+*/
+template <class T>
+std::string vectorToJson(std::vector<T*> &list)
+{
+  typedef typename std::vector<T*>::size_type size_type;
+
+  if (list.empty())
+  {
+    return "[]";
+  }
+
+  std::string ss;
+
+  ss += '[';
+  ss += list[0]->toJson();
+  for (size_type i = 1; i != list.size(); ++i)
+  {
+    ss += ',';
+    ss += list[i]->toJson();
+  }
+  ss += ']';
+  return ss;
+}
+
 template <>
 std::string vectorToJson(std::vector<std::string> &list);
 

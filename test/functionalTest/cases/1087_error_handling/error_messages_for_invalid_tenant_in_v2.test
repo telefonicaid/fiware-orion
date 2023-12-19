@@ -65,10 +65,10 @@ echo
 01. POST /v2/entities with invalid tenant
 =========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 125
 
 {
     "description": "bad character in tenant name - only underscore and alphanumeric characters are allowed",

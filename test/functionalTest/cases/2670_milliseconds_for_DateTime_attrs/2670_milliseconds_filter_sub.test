@@ -214,60 +214,60 @@ echo
 01. Create sub1 with filter ts>2020-05-10T01:02:03Z
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Create sub2 with filter ts<2020-05-10T01:02:03.200Z
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Create sub3 with filter ts=2020-05-10T01:02:03.200Z...2020-05-10T01:02:03.600Z
 ==================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 04. Create E1 with attribute ts=2020-05-10T01:02:03.123Z, triggers sub1 and sub3
 ================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 05. Create E2 with attribute ts=2020-05-10T01:02:03.456Z, triggers sub1 and sub2
 ================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 06. Create E3 with attribute ts=2020-05-10T01:02:03.789Z, triggers sub1
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
@@ -403,10 +403,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. Gets sub1, 3 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 441
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 471
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -429,7 +429,8 @@ Date: REGEX(.*)
             "attrs": [],
             "expression": {
                 "q": "ts>2020-05-10T01:02:03Z"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -444,10 +445,10 @@ Date: REGEX(.*)
 09. Gets sub2, 1 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 445
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 475
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -470,7 +471,8 @@ Date: REGEX(.*)
             "attrs": [],
             "expression": {
                 "q": "ts<2020-05-10T01:02:03.200Z"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -485,10 +487,10 @@ Date: REGEX(.*)
 10. Gets sub3, 1 hits
 =====================
 HTTP/1.1 200 OK
-Content-Length: 472
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 502
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -511,7 +513,8 @@ Date: REGEX(.*)
             "attrs": [],
             "expression": {
                 "q": "ts==2020-05-10T01:02:03.200Z..2020-05-10T01:02:03.600Z"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

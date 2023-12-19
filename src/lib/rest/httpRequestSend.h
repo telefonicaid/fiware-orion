@@ -37,9 +37,9 @@
 
 /***************************************************************************
 *
-* httpRequestInit -
+* setHttpTimeout -
 */
-extern void httpRequestInit(long defaultTimeoutInMilliseconds);
+extern void setHttpTimeout(long defaultTimeoutInMilliseconds);
 
 
 
@@ -68,7 +68,9 @@ extern int httpRequestSend
   long long*                                 statusCodeP,
   const std::map<std::string, std::string>&  extraHeaders,
   const std::string&                         acceptFormat          = "",
-  long                                       timeoutInMilliseconds = -1
+  long                                       timeoutInMilliseconds = -1,
+  int                                        providerLimit         = -1,
+  int                                        providerOffset        = -1
 );
 
 

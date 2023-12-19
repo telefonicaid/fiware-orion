@@ -56,7 +56,7 @@ volatile SubCacheState subCacheState = ScsIdle;
 
 
 //
-// The subscription cache maintains in memory all subscriptions of type ONCHANGE.
+// The subscription cache maintains in memory all subscriptions.
 // The reason for this cache is to avoid a very slow mongo operation ... (Fermin)
 //
 // The 'mongo part' of the cache is implemented in mongoBackend/mongoSubCache.cpp/h and used in:
@@ -291,6 +291,12 @@ int subCacheItems(void)
 */
 static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::string>& attrV)
 {
+  // If the list of attributes to check is empty, then no match
+  if (attrV.size() == 0)
+  {
+    return false;
+  }
+
   if (cSubP->notifyConditionV.size() == 0)
   {
     return true;
@@ -441,7 +447,8 @@ static bool subMatch
   const char*                      entityId,
   const char*                      entityType,
   const std::vector<std::string>&  attributes,
-  const std::vector<std::string>&  modifiedAttrs,
+  const std::vector<std::string>&  attrsWithModifiedValue,
+  const std::vector<std::string>&  attrsWithModifiedMd,
   ngsiv2::SubAltType               targetAltType
 )
 {
@@ -485,13 +492,13 @@ static bool subMatch
 
 
   //
-  // If ONCHANGE and one of the attribute names in the scope vector
+  // If one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
   // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
   // case of ONANYCHANGE subscriptions).
   //
   // Depending of the alteration type, we use the list of attributes in the request or the list
-  // with effective modifications
+  // with effective modifications. Note that EntityDelete doesn't check the list
   if (targetAltType == ngsiv2::EntityUpdate)
   {
     if (!attributeMatch(cSubP, attributes))
@@ -500,9 +507,10 @@ static bool subMatch
       return false;
     }
   }
-  else
+  else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
   {
-    if (!attributeMatch(cSubP, modifiedAttrs))
+    if (!attributeMatch(cSubP, attrsWithModifiedValue) &&
+        !(cSubP->notifyOnMetadataChange && attributeMatch(cSubP, attrsWithModifiedMd)))
     {
       LM_T(LmtSubCacheMatch, ("No match due to attributes"));
       return false;
@@ -548,7 +556,7 @@ void subCacheMatch
 
     attrV.push_back(attr);
 
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, attrV, targetAltType))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, attrV, attrV, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -572,7 +580,8 @@ void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const std::vector<std::string>&    attributes,
-  const std::vector<std::string>&    modifiedAttrs,
+  const std::vector<std::string>&    attrsWithModifiedValue,
+  const std::vector<std::string>&    attrsWithModifiedMd,
   ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 )
@@ -581,7 +590,7 @@ void subCacheMatch
 
   while (cSubP != NULL)
   {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attributes, modifiedAttrs, targetAltType))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attributes, attrsWithModifiedValue, attrsWithModifiedMd, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -829,7 +838,8 @@ void subCacheItemInsert
   const std::string&                      georel,
   bool                                    blacklist,
   bool                                    onlyChanged,
-  bool                                    covered
+  bool                                    covered,
+  bool                                    notifyOnMetadataChange
 )
 {
   //
@@ -867,22 +877,19 @@ void subCacheItemInsert
   cSubP->blacklist             = blacklist;
   cSubP->onlyChanged           = onlyChanged;
   cSubP->covered               = covered;
+  cSubP->notifyOnMetadataChange= notifyOnMetadataChange;
   cSubP->notifyConditionV      = conditionAttrs;
   cSubP->subAltTypeV           = altTypes;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 
-  cSubP->httpInfo = httpInfo;
-  if (httpInfo.json != NULL)
-  {
-    cSubP->httpInfo.json = httpInfo.json->clone();
-  }
+  // empty cache entry, no relation with DB actually exists
+  // (thus validity flag set to false)
+  cSubP->failsCounterFromDb      = 0;
+  cSubP->failsCounterFromDbValid = false;
 
-  cSubP->mqttInfo = mqttInfo;
-  if (mqttInfo.json != NULL)
-  {
-    cSubP->mqttInfo.json = mqttInfo.json->clone();
-  }
+  cSubP->httpInfo.fill(httpInfo);
+  cSubP->mqttInfo.fill(mqttInfo);
 
   //
   // String filters
@@ -1275,6 +1282,11 @@ void subCacheSync(void)
 
       std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
 
+      // Note that in step 2 subCacheRefresh() sets failsCounterFromDb from DB,
+      // but that is done *before* updating the counter with mongoSubUpdateOnCacheSync()
+      // Thus, we have to do a mirror increase in the cache
+      cSubP->failsCounterFromDb += cssP->failsCounter;
+
       mongoSubUpdateOnCacheSync(tenant,
                                 cSubP->subscriptionId,
                                 cssP->count,
@@ -1442,9 +1454,11 @@ void subNotificationErrorStatus
   else
   {
     // no fails mean notification ok, thus reseting the counter
-    subP->failsCounter    = 0;
-    subP->lastSuccess     = now;
-    subP->lastSuccessCode = statusCode;
+    // in addition, DB consolidated data is marked as invalid
+    subP->failsCounter            = 0;
+    subP->lastSuccess             = now;
+    subP->lastSuccessCode         = statusCode;
+    subP->failsCounterFromDbValid = false;
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

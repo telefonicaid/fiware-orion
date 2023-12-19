@@ -148,6 +148,7 @@ char            authMech[64];
 char            authDb[64];
 bool            dbSSL;
 bool            dbDisableRetryWrites;
+char            dbURI[1024];
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -160,6 +161,7 @@ char            allowedOrigin[64];
 int             maxAge;
 long            dbTimeout;
 long            httpTimeout;
+long            mqttTimeout;
 int             dbPoolSize;
 char            reqMutexPolicy[16];
 int             writeConcern;
@@ -191,6 +193,7 @@ bool            logForHumans;
 unsigned long   logLineMaxSize;
 unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
+bool            disableNgsiv1;
 bool            disableFileLog;
 int             reqTimeout;
 bool            insecureNotif;
@@ -202,6 +205,8 @@ unsigned long   fcStepDelay;
 unsigned long   fcMaxInterval;
 
 int             mqttMaxAge;
+
+bool            logDeprecate;
 
 
 
@@ -237,7 +242,8 @@ int             mqttMaxAge;
 #define MULTISERVICE_DESC      "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
-#define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
+#define HTTP_TMO_DESC          "timeout in milliseconds for HTTP forwards and notifications"
+#define MQTT_TMO_DESC          "timeout in milliseconds for MQTT broker connection in notifications"
 #define DBPS_DESC              "database connection pool size"
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
@@ -264,11 +270,14 @@ int             mqttMaxAge;
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 #define LOG_LINE_MAX_SIZE_DESC "log line maximum size (in bytes)"
 #define LOG_INFO_PAYLOAD_MAX_SIZE_DESC  "maximum length for request or response payload in INFO log level (in bytes)"
-#define METRICS_DESC           "turn off the 'metrics' feature"
+#define DISABLE_METRICS_DESC   "turn off the 'metrics' feature"
+#define DISABLE_NGSIV1_DESC    "turn off NGSIv1 request endpoints"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
-#define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
-#define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
+#define INSECURE_NOTIF_DESC    "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
+#define NGSIV1_AUTOCAST_DESC   "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
+#define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
+#define DBURI_DESC             "complete URI for database connection"
 
 
 
@@ -285,9 +294,10 @@ PaArgument paArgs[] =
 {
   { "-fg",                          &fg,                    "FOREGROUND",               PaBool,   PaOpt, false,                           false, true,                  FG_DESC                      },
   { "-localIp",                     bindAddress,            "LOCALIP",                  PaString, PaOpt, IP_ALL,                          PaNL,  PaNL,                  LOCALIP_DESC                 },
-  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            PaNL,  PaNL,                  PORT_DESC                    },
+  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            1,    65535,                  PORT_DESC                    },
   { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,                  PIDPATH_DESC                 },
 
+  { "-dbURI",                       dbURI,                  "MONGO_URI",                PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBURI_DESC                   },
   { "-dbhost",                      dbHost,                 "MONGO_HOST",               PaString, PaOpt, LOCALHOST,                       PaNL,  PaNL,                  DBHOST_DESC                  },
   { "-rplSet",                      rplSet,                 "MONGO_REPLICA_SET",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  RPLSET_DESC                  },
   { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBUSER_DESC                  },
@@ -313,6 +323,7 @@ PaArgument paArgs[] =
   { "-multiservice",                &mtenant,               "MULTI_SERVICE",            PaBool,   PaOpt, false,                           false, true,                  MULTISERVICE_DESC            },
 
   { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_HTTP_TIMEOUT,      HTTP_TMO_DESC                },
+  { "-mqttTimeout",                 &mqttTimeout,           "MQTT_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_MQTT_TIMEOUT,      MQTT_TMO_DESC                },
   { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,                  REQ_TMO_DESC                 },
   { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,                  MUTEX_POLICY_DESC            },
   { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                     WRITE_CONCERN_DESC           },
@@ -349,13 +360,16 @@ PaArgument paArgs[] =
   { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,                  LOG_LINE_MAX_SIZE_DESC       },
   { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
 
-  { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  METRICS_DESC                 },
+  { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  DISABLE_METRICS_DESC         },
+  { "-disableNgsiv1",               &disableNgsiv1,         "DISABLE_NGSIV1",           PaBool,   PaOpt, false,                           false, true,                  DISABLE_NGSIV1_DESC          },
 
-  { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF               },
+  { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF_DESC          },
 
-  { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,                  NGSIV1_AUTOCAST              },
+  { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,                  NGSIV1_AUTOCAST_DESC         },
 
   { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 60,                              PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
+
+  { "-logDeprecate",                &logDeprecate,          "LOG_DEPRECATE",            PaBool,   PaOpt, false,                           false, true,                  LOG_DEPRECATE_DESC           },
 
   PA_END_OF_ARGS
 };
@@ -663,7 +677,7 @@ static void contextBrokerInit(void)
   setNotifier(pNotifier);
 
   /* Set HTTP timeout */
-  httpRequestInit(httpTimeout);
+  setHttpTimeout(httpTimeout);
 
   //WARN about insecureNotifications mode
   if (insecureNotif == true)
@@ -1200,9 +1214,9 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   alarmMgr.init(relogAlarms);
-  mqttMgr.init();
+  mqttMgr.init(mqttTimeout);
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  mongoInit(dbURI, dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 
@@ -1279,6 +1293,7 @@ int main(int argC, char* argV[])
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
+                          disableNgsiv1,
                           httpsPrivateServerKey,
                           httpsCertificate);
 
@@ -1297,6 +1312,7 @@ int main(int argC, char* argV[])
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
+                          disableNgsiv1,
                           NULL,
                           NULL);
   }

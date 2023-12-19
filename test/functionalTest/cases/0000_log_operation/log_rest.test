@@ -29,63 +29,63 @@ brokerStart CB 200-255
 
 --SHELL--
 echo "=== 1. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/trace" 2> /dev/null
 echo
 echo
 
 
 echo "=== 2. PUT trace level"
-orionCurl --url "/log/traceLevel/5-10" -X "PUT" 2> /dev/null
+orionCurl --url "/log/trace/5-10" -X "PUT" 2> /dev/null
 echo
 echo
 
 
 echo "=== 3. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/trace" 2> /dev/null
 echo
 echo
 
 
 echo "=== 4. POST trace level"
-orionCurl --url "/log/traceLevel/101-102,105" -X "POST" 2> /dev/null
+orionCurl --url "/log/trace/101-102,105" -X "POST" 2> /dev/null
 echo
 echo
 
 
 echo "=== 5. PUT trace level"
-orionCurl --url "/log/traceLevel/19,21-25" -X "PUT" 2> /dev/null
+orionCurl --url "/log/trace/19,21-25" -X "PUT" 2> /dev/null
 echo
 echo
 
 
 echo "=== 6. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/trace" 2> /dev/null
 echo
 echo
 
 
 echo "=== 7. DELETE trace level"
-#curl localhost:${CB_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
-# FIXME: Y U NO orionCurl --url "/log/traceLevel/23" -X "DELETE" 2> /dev/null ?
-orionCurl --url "/log/traceLevel/23" -X "DELETE" 2> /dev/null
+#curl localhost:${CB_PORT}/log/trace/23 -X DELETE  2> /dev/null
+# FIXME: Y U NO orionCurl --url "/log/trace/23" -X "DELETE" 2> /dev/null ?
+orionCurl --url "/log/trace/23" -X "DELETE" 2> /dev/null
 echo
 echo
 
 
 echo "=== 8. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/trace" 2> /dev/null
 echo
 echo
 
 
 echo "=== 9. DELETE trace level"
-orionCurl --url "/log/traceLevel" -X "DELETE" 2> /dev/null
+orionCurl --url "/log/trace" -X "DELETE" 2> /dev/null
 echo
 echo
 
 
 echo "=== 10. GET trace level"
-orionCurl --url "/log/traceLevel" 2> /dev/null
+orionCurl --url "/log/trace" 2> /dev/null
 echo
 echo
 
@@ -93,10 +93,10 @@ echo
 --REGEXPECT--
 === 1. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 25
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 25
 
 {
     "tracelevels": "200-255"
@@ -105,10 +105,10 @@ Date: REGEX(.*)
 
 === 2. PUT trace level
 HTTP/1.1 200 OK
-Content-Length: 22
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 22
 
 {
     "tracelevels": "5-10"
@@ -117,10 +117,10 @@ Date: REGEX(.*)
 
 === 3. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 22
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 22
 
 {
     "tracelevels": "5-10"
@@ -129,19 +129,19 @@ Date: REGEX(.*)
 
 === 4. POST trace level
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: PUT, DELETE
+Content-Length: 0
 
 
 
 === 5. PUT trace level
 HTTP/1.1 200 OK
-Content-Length: 26
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 26
 
 {
     "tracelevels": "19,21-25"
@@ -150,10 +150,10 @@ Date: REGEX(.*)
 
 === 6. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 27
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 27
 
 {
     "tracelevels": "19, 21-25"
@@ -162,10 +162,10 @@ Date: REGEX(.*)
 
 === 7. DELETE trace level
 HTTP/1.1 200 OK
-Content-Length: 28
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 28
 
 {
     "tracelevels_removed": "23"
@@ -174,10 +174,10 @@ Date: REGEX(.*)
 
 === 8. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 34
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 34
 
 {
     "tracelevels": "19, 21-22, 24-25"
@@ -186,10 +186,10 @@ Date: REGEX(.*)
 
 === 9. DELETE trace level
 HTTP/1.1 200 OK
-Content-Length: 38
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 38
 
 {
     "tracelevels": "all trace levels off"
@@ -198,10 +198,10 @@ Date: REGEX(.*)
 
 === 10. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 23
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 23
 
 {
     "tracelevels": "empty"

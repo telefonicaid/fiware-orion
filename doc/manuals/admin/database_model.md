@@ -89,7 +89,7 @@ Fields:
 
 Regarding `location.coords` in can use several formats:
 
-* Representing a point (the one used by geo:point):
+* Representing a point:
 
 ```
 {
@@ -98,7 +98,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a line (the one used by geo:line):
+* Representing a line:
 
 ```
 {
@@ -107,7 +107,7 @@ Regarding `location.coords` in can use several formats:
 }
 ```
 
-* Representing a polygon (the one used by geo:box and geo:polygon):
+* Representing a polygon:
 
 ```
 {
@@ -123,10 +123,10 @@ Regarding `location.coords` in can use several formats:
   "fixed" cases.
 
 Note that coordinate pairs use the longitude-latitude order, which is opposite to the order used
-in the [Simple Location Format](../orion-api.md#simple-location-format). This is due to the internal
+in the [Geographical Queries](../orion-api.md#geographica-queries). This is due to the internal
 [MongoDB geolocation implementation](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
 (which is based in GeoJSON) uses longitude-latitude order. However, other systems closer
-to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the API.
+to users (e.g. GoogleMaps) use latitude-longitude format, so we have used the latter for the Geographical Queries API.
 
 Example document:
 
@@ -283,8 +283,9 @@ Fields:
     is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications, either HTTP or MQTT
--   **mqttTopic**: MQTT topic (only in MQTT notifications)
--   **mqttQoS**: MQTT QoS value (only in MQTT notifications)
+-   **topic**: MQTT topic (only in MQTT notifications)
+-   **qos**: MQTT QoS value (only in MQTT notifications)
+-   **retain**: MQTT retain value (only in MQTT notifications)
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type**, **isPattern** and **isTypePattern**. Note that,
     due to legacy reasons, **isPattern** may be `"true"` or `"false"` (text) while
@@ -304,7 +305,7 @@ Fields:
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **JSON**
-    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues** and **values** (the last three used in NGSIv2 format).
+    (meaning JSON notifications in NGSIv1 legacy format), **normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues** and **values** (the last five used in NGSIv2 format).
 -   **status**: either `active` (for active subscriptions), `inactive` (for inactive subscriptions) or
     `oneshot` (for [oneshot subscriptions](../orion-api.md#oneshot-subscriptions)). Note that Orion API consider additional states (e.g. `expired`)
     but they never hit the DB (they are managed by Orion).
@@ -324,6 +325,10 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
     the field is omitted, then the NGSIv2 normalized format is used.
 -   **json**: optional field to store a JSON object or array to generated JSON-based payload for
     notification customization functionality in the Orion API. More detail of this functionality [here](../orion-api.md#json-payloads)
+-   **ngsi**: optional field to store a NGSI patching object for notification customization functionality
+    in the Orion API. More detail of this functionality [here](../orion-api.md#ngsi-payload-patching).
+    The value of this field is an object with a `attrs` key which value is a simplified version of
+    `attrs` in [the entities collection](#entities-collection).
 -   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.
@@ -339,6 +344,7 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
 -   **covered**: a boolean field that specifies if all `attrs` have to be included in notifications (if value is true)
     or only the ones existing in the triggering entity (if value is false or field is omitted).
     More information in [covered subscription section in Orion API specification](../orion-api.md#covered-subscriptions).
+-   **notifyOnMetadataChange**: if `true` metadata is considered part of the value of the attribute regarding subscription triggering. If `false` metadata is not considered part of the value of the attribute regarding subscription triggering. Default behaviour (if omitted) is the one for `true`.
 
 Example document:
 

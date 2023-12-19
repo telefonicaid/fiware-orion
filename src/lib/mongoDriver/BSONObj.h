@@ -59,6 +59,7 @@ class BSONObj
   bool isEmpty(void) const;
   void toStringMap(std::map<std::string, std::string>* m);
   void toElementsVector(std::vector<BSONElement>* v);
+  bool equal(const BSONObj& bo);
   BSONObj& operator= (const BSONObj& rhs);
 
   // methods to be used only by mongoDriver/ code (with references to low-level driver code)

@@ -57,8 +57,6 @@ TriggeredSubscription::TriggeredSubscription
   failsCounter(_failsCounter),
   lastNotification(_lastNotification),
   renderFormat(_renderFormat),
-  httpInfo(_httpInfo),
-  mqttInfo(_mqttInfo),
   attrL(_attrL),
   cacheSubId(_cacheSubId),
   tenant((_tenant == NULL)? "" : _tenant),
@@ -67,48 +65,8 @@ TriggeredSubscription::TriggeredSubscription
   blacklist(false),
   covered(_covered)
 {
-  // Dynamic memory must be cloned
-  if (_httpInfo.json != NULL)
-  {
-    httpInfo.json = _httpInfo.json->clone();
-  }
-  if (_mqttInfo.json != NULL)
-  {
-    mqttInfo.json = _mqttInfo.json->clone();
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* TriggeredSubscription::TriggeredSubscription -
-*
-* Constructor without throttling (for NGSI9 subscriptions)
-*/
-TriggeredSubscription::TriggeredSubscription
-(
-  RenderFormat             _renderFormat,
-  const ngsiv2::HttpInfo&  _httpInfo,
-  const ngsiv2::MqttInfo&  _mqttInfo,
-  const StringList&        _attrL
-)
-:
-  throttling(-1),
-  maxFailsLimit(-1),
-  failsCounter(-1),
-  lastNotification(-1),
-  renderFormat(_renderFormat),
-  httpInfo(_httpInfo),
-  mqttInfo(_mqttInfo),
-  attrL(_attrL),
-  cacheSubId(""),
-  tenant(""),
-  stringFilterP(NULL),
-  mdStringFilterP(NULL),
-  blacklist(false),
-  covered(false)
-{
+  httpInfo.fill(_httpInfo);
+  mqttInfo.fill(_mqttInfo);
 }
 
 

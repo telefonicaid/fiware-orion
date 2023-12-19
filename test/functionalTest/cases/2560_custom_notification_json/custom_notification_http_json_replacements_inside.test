@@ -1,0 +1,319 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification HTTP with JSON with replacements inside value
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription for E1 with custom notification with JSON object
+# 02. Create subscription for E1 with custom notification with JSON array
+# 03. GET /v2/subscriptions and see both subscriptions
+# 04. Create E1 entity to trigger both notifications
+# 05. Dump accumulator, see 2 notifications
+#
+
+echo "01. Create subscription for E1 with custom notification with JSON object"
+echo "========================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "json": {
+        "A": "ns:${text}",
+        "B": "ns:${number}",
+        "C": "ns:${bool}",
+        "D": "ns:${null}",
+        "E": "ns:${array}",
+        "F": "ns:${object}"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subscription for E1 with custom notification with JSON array"
+echo "======================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "json": [
+        "ns:${text}",
+        "ns:${number}",
+        "ns:${bool}",
+        "ns:${null}",
+        "ns:${array}",
+        "ns:${object}"
+      ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/subscriptions and see both subscriptions"
+echo "===================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Create E1 entity to trigger both notifications"
+echo "=================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "text": {
+    "value": "foo",
+    "type": "Text"
+  },
+  "number": {
+    "value": 10,
+    "type": "Number"
+  },
+  "bool": {
+    "value": true,
+    "type": "Boolean"
+  },
+  "null": {
+    "value": null,
+    "type": "None"
+  },
+  "array": {
+    "value": [
+      "22",
+       {
+         "x" : [ "x1", "x2" ],
+         "y" : 3
+       },
+       [ "z1", "z2" ]
+    ],
+    "type": "StructuredValue"
+  },
+  "object": {
+    "value": {
+      "x": {
+        "x1": "a",
+        "x2": "b"
+      },
+      "y": [ "y1", "y2" ]
+    },
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator, see 2 notifications"
+echo "========================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for E1 with custom notification with JSON object
+========================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create subscription for E1 with custom notification with JSON array
+=======================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. GET /v2/subscriptions and see both subscriptions
+====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 815
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "httpCustom": {
+                "json": {
+                    "A": "ns:${text}",
+                    "B": "ns:${number}",
+                    "C": "ns:${bool}",
+                    "D": "ns:${null}",
+                    "E": "ns:${array}",
+                    "F": "ns:${object}"
+                },
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "httpCustom": {
+                "json": [
+                    "ns:${text}",
+                    "ns:${number}",
+                    "ns:${bool}",
+                    "ns:${null}",
+                    "ns:${array}",
+                    "ns:${object}"
+                ],
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Create E1 entity to trigger both notifications
+==================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+#SORT_START
+05. Dump accumulator, see 2 notifications
+=========================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 187
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{
+    "A": "ns:foo",
+    "B": "ns:10",
+    "C": "ns:true",
+    "D": "ns:null",
+    "E": "ns:[\"22\",{\"x\":[\"x1\",\"x2\"],\"y\":3},[\"z1\",\"z2\"]]",
+    "F": "ns:{\"x\":{\"x1\":\"a\",\"x2\":\"b\"},\"y\":[\"y1\",\"y2\"]}"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 163
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+[
+    "ns:foo",
+    "ns:10",
+    "ns:true",
+    "ns:null",
+    "ns:[\"22\",{\"x\":[\"x1\",\"x2\"],\"y\":3},[\"z1\",\"z2\"]]",
+    "ns:{\"x\":{\"x1\":\"a\",\"x2\":\"b\"},\"y\":[\"y1\",\"y2\"]}"
+]
+=======================================
+#SORT_END
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

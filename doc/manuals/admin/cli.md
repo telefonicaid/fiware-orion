@@ -46,6 +46,12 @@ The list of available options is the following:
     [service/tenant database
     separation](../orion-api.md#multi-tenancy). This field is restricted to 10 characters
     max length.
+-   **-dbURI <uri>** : The URI to use the MongoDB.
+    If the URI contains the string `${PWD}`, it will be replaced with the password
+    specified in `-dbpwd` or the environment variable `ORION_MONGO_PASSWORD`.
+    This option cannot be combined with `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`,
+    `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` (if you attempt to do that
+    Orion will exit with an error on startup).
 -   **-dbhost <host>**. The MongoDB host and port to use, e.g. `-dbhost
     localhost:12345`.
 -   **-rplSet <replicat_set>**. If used, Orion CB connnects to a
@@ -115,10 +121,13 @@ The list of available options is the following:
 -   **-pidpath <pid_file>**. Specifies the file to store the PID of the
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
-    for forwarding messages and for notifications. Default timeout (if this parameter is not specified)
+    for HTTP forwarding messages and for notifications. Default timeout (if this parameter is not specified)
     is 5000 (5 seconds). Max value is 1800000 (30 minutes). This parameter can be defined individually for subscriptions. If defined on the subscription's
     JSON, the default parameter would be ignored. See section in the 
     [`subscription.notification.http`](../orion-api.md#subscriptionnotificationhttp).
+-   **-mqttTimeout <interval>**. Specifies the timeout in milliseconds
+    for connection to MQTT brokers in MQTT notifications. Default timeout (if this parameter is not specified)
+    is 5000 (5 seconds). Max value is 1800000 (30 minutes).
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
@@ -171,13 +180,17 @@ The list of available options is the following:
     * No `${...}` macro substitution is performed.
 -   **-disableFileLog**. To prevent Orion from logging into a file (default behaviour is use a log file). This option might be useful if you are running on kubernetes.
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
--   **-logLineMaxSize**. Log line maximum length (when exceeded Orion prints `LINE TOO LONG` as log trace). Minimum allowed value: 100 bytes. Default value: 32 KBytes.
--   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown in trace). Default value: 5 KBytes.
+-   **-logLineMaxSize**. Log line maximum length (when exceeded Orion prints `LINE TOO LONG` as log trace). Minimum allowed value: 100 bytes. Default value: 32 KBytes. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `lineMaxSize` field.
+-   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown in trace). Default value: 5 KBytes. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `infoPayloadMaxSize` field.
 -   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
     Use this parameter to start the broker without metrics overhead.
+-   **-disableNgsiv1**. To turn off NGSIv1 operations. Note that only API endpoints are disabled, notifications using
+    [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding to registrations
+    using [`"legacyForwarding": true`](../orion-api.md#registrationprovider) will work.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
 -   **-mqttMaxAge**. Max time (in minutes) that an unused MQTT connection is kept. Default: 60
+-   **-logDeprecate**. Log deprecation usages as warnings. More information in [this section of the documentation](../deprecated.md#log-deprecation-warnings). Default is: false. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `deprecated` field
 
 ## Configuration using environment variables
 
@@ -204,6 +217,7 @@ Two facts have to be taken into account:
 |	ORION_LOCALIP	|	localIp	|
 |	ORION_PORT	|	port	|
 |	ORION_PID_PATH	|	pidpath	|
+|	ORION_MONGO_URI	|	dbURI	|
 |	ORION_MONGO_HOST	|	dbhost	|
 |	ORION_MONGO_REPLICA_SET	|	rplSet	|
 |	ORION_MONGO_USER	|	dbuser	|
@@ -221,6 +235,7 @@ Two facts have to be taken into account:
 |	ORION_HTTPS_CERTFILE	|	cert	|
 |	ORION_MULTI_SERVICE	|	multiservice	|
 |	ORION_HTTP_TIMEOUT	|	httpTimeout	|
+|	ORION_MQTT_TIMEOUT	|	mqttTimeout	|
 |	ORION_REQ_TIMEOUT	|	reqTimeout	|
 |	ORION_MUTEX_POLICY	|	reqMutexPolicy	|
 |	ORION_MONGO_WRITE_CONCERN	|	writeConcern	|
@@ -250,6 +265,8 @@ Two facts have to be taken into account:
 |   ORION_LOG_LINE_MAX_SIZE |   logLineMaxSize  |
 |   ORION_LOG_INFO_PAYLOAD_MAX_SIZE | logInfoPayloadMaxSize |
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
+|	ORION_DISABLE_NGSIV1	|	disableNgsiv1	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
 |	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
 |       ORION_MQTT_MAX_AGE      |  mqttMaxAge  |
+|       ORION_LOG_DEPRECATE |  logDeprecate |

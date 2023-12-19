@@ -68,7 +68,7 @@ echo
 
 echo "03. Check the '=' in DB"
 echo "======================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.findOne({ "_id" : { "id" : "E",  "type": "T", "servicePath" : "/" } }, {_id:0, attrs: 1})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -77,20 +77,20 @@ echo
 01. Create entity with metadata with dot in the name
 ====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Retrieve entity
 ===================
 HTTP/1.1 200 OK
-Content-Length: 139
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 139
 
 {
     "A": {
@@ -114,7 +114,30 @@ Date: REGEX(.*)
 
 03. Check the '=' in DB
 =======================
-{ "attrs" : { "A" : { "type" : "T", "creDate" : REGEX(.*), "value" : "foo", "md" : { "m=x" : { "type" : "string", "value" : "black" }, "m=y" : { "type" : "double", "value" : 5 } }, "mdNames" : [ "m.x", "m.y" ] } } }
+{
+    "attrs": {
+        "A": {
+            "creDate": REGEX(.*),
+            "md": {
+                "m=x": {
+                    "type": "string",
+                    "value": "black"
+                },
+                "m=y": {
+                    "type": "double",
+                    "value": 5
+                }
+            },
+            "mdNames": [
+                "m.x",
+                "m.y"
+            ],
+            "modDate": REGEX(.*),
+            "type": "T",
+            "value": "foo"
+        }
+    }
+}
 
 
 --TEARDOWN--

@@ -1,0 +1,404 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+failsCounter recovers and fails within same cache refresh cycle (HTTP case)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -subCacheIval 5
+
+--SHELL--
+
+#
+# 01. POST /v2/subscriptions, to create subscription
+# 02. Upsert entity twice to trigger notification and reach failsCounter=2
+# 03. GET /v2/subscriptions/subId, and see failsCounter=2
+# 04. Recover endpoint (starting now the accumulator)
+# 05. Wait a cache cycle, and upsert one time so failsCounter=0
+# 06. Stop the acumulator and do one more upsert, so failsCounter=1
+# 07. GET /v2/subscriptions/subId, and see failsCounter=1
+# 08. Recover endpoint and do one more upsert, so failsCounter=0
+# 09. GET /v2/subscriptions/subId, and see failsCounter=0
+# 10. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0
+#
+
+
+echo "01. POST /v2/subscriptions, to create subscription"
+echo "=================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Upsert entity twice to trigger notification and reach failsCounter=2"
+echo "========================================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/subscriptions/subId, and see failsCounter=2"
+echo "======================================================="
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo "04. Recover endpoint (starting now the accumulator)"
+echo "==================================================="
+accumulatorStart
+echo
+echo
+
+
+echo "05. Wait a cache cycle, and upsert one time so failsCounter=0"
+echo "============================================================="
+sleep 3.5s
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "06. Stop the acumulator and do one more upsert, so failsCounter=1"
+echo "================================================================="
+accumulatorStop
+sleep 0.5s
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "07. GET /v2/subscriptions/subId, and see failsCounter=1"
+echo "======================================================="
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo "08. Recover endpoint and do one more upsert, so failsCounter=0"
+echo "=============================================================="
+accumulatorStart
+echo
+echo
+sleep 0.5s
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "09. GET /v2/subscriptions/subId, and see failsCounter=0"
+echo "======================================================="
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo "10. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0"
+echo "==============================================================================="
+sleep 5.5s
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/subscriptions, to create subscription
+==================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Upsert entity twice to trigger notification and reach failsCounter=2
+========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+03. GET /v2/subscriptions/subId, and see failsCounter=2
+=======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 462
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 2,
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+04. Recover endpoint (starting now the accumulator)
+===================================================
+accumulator running as PID REGEX(\d+)
+
+
+05. Wait a cache cycle, and upsert one time so failsCounter=0
+=============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+06. Stop the acumulator and do one more upsert, so failsCounter=1
+=================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+07. GET /v2/subscriptions/subId, and see failsCounter=1
+=======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 525
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 1,
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 4
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+08. Recover endpoint and do one more upsert, so failsCounter=0
+==============================================================
+accumulator running as PID REGEX(\d+)
+
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+09. GET /v2/subscriptions/subId, and see failsCounter=0
+=======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 508
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+10. Wait a new cache cycle, GET /v2/subscriptions/subId, and see failsCounter=0
+===============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 508
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:REGEX(\d+)/notify"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 5
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

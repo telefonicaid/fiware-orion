@@ -54,7 +54,7 @@ echo
 
 echo "02. Check location field at DB is -4.33, 36.12"
 echo "=============================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1}).toArray()'
 echo
 echo
 
@@ -84,7 +84,7 @@ echo
 
 echo "04. Check location field at DB is -11.22, 22.33"
 echo "==============================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.find({"_id.id": "line1"}, {_id: 0, location: 1}).toArray()'
 echo
 echo
 
@@ -93,25 +93,25 @@ echo
 01. Create entity with geo:point
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/line1?type=bus
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/line1?type=bus
+Content-Length: 0
 
 
 
 02. Check location field at DB is -4.33, 36.12
 ==============================================
-{ "location" : { "attrName" : "loc", "coords" : { "type" : "Point", "coordinates" : [ -4.33, 36.12 ] } } }
+[{"location":{"attrName":"loc","coords":{"type":"Point","coordinates":[-4.33,36.12]}}}]
 
 
 03. Update entity using v1 updateContext APPEND
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 197
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 197
 
 {
     "contextResponses": [
@@ -139,7 +139,7 @@ Date: REGEX(.*)
 
 04. Check location field at DB is -11.22, 22.33
 ===============================================
-{ "location" : { "attrName" : "loc", "coords" : { "type" : "Point", "coordinates" : [ -11.22, 22.33 ] } } }
+[{"location":{"attrName":"loc","coords":{"type":"Point","coordinates":[-11.22,22.33]}}}]
 
 
 --TEARDOWN--

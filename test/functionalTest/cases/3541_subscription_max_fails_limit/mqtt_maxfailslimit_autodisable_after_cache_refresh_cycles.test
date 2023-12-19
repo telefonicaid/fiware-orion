@@ -1,0 +1,248 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+maxFailsLimit autodisable after cache refresh cycles (MQTT case)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -subCacheIval 3
+
+--SHELL--
+
+#
+# 01. POST /v2/subscriptions, to create subscription with maxFailsLimit=3
+# 02. Upsert entity twice to trigger notification and reach failsCounter=2
+# 03. GET /v2/subscriptions/subId, and see failsCounter=2
+# 04. Wait a cache cycle, and upsert two more times so failsCounter=4 and subscription is disabled
+# 05. GET /v2/subscriptions/subId, and see failsCounter=4 and subscription inactive
+#
+
+
+echo "01. POST /v2/subscriptions, to create subscription with maxFailsLimit=3"
+echo "======================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:'${MQTT_DEBUG_PORT}'",
+      "topic": "test"
+    },
+    "maxFailsLimit": 3
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Upsert entity twice to trigger notification and reach failsCounter=2"
+echo "========================================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/subscriptions/subId, and see failsCounter=2"
+echo "======================================================="
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo "04. Wait a cache cycle, and upsert two more times so failsCounter=4 and subscription is disabled"
+echo "================================================================================================"
+sleep 3.5s
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "$payload"
+echo
+echo
+
+
+echo "05. GET /v2/subscriptions/subId, and see failsCounter=4 and subscription inactive"
+echo "================================================================================="
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/subscriptions, to create subscription with maxFailsLimit=3
+=======================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Upsert entity twice to trigger notification and reach failsCounter=2
+========================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+03. GET /v2/subscriptions/subId, and see failsCounter=2
+=======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 463
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 2,
+        "lastFailure": "REGEX(.*)",
+        "lastNotification": "REGEX(.*)",
+        "maxFailsLimit": 3,
+        "mqtt": {
+            "qos": 0,
+            "retain": false,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+04. Wait a cache cycle, and upsert two more times so failsCounter=4 and subscription is disabled
+================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+05. GET /v2/subscriptions/subId, and see failsCounter=4 and subscription inactive
+=================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 465
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 4,
+        "lastFailure": "REGEX(.*)",
+        "lastNotification": "REGEX(.*)",        
+        "maxFailsLimit": 3,
+        "mqtt": {
+            "qos": 0,
+            "retain": false,
+            "topic": "test",
+            "url": "mqtt://localhost:REGEX(\d+)"
+        },
+        "onlyChangedAttrs": false,
+        "timesSent": 4
+    },
+    "status": "inactive",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

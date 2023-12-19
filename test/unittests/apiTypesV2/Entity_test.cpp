@@ -114,9 +114,8 @@ TEST(Entity, checkV1)
   // render
   const char*               outfile1 = "ngsi.contextelement.check.middle.json";
   std::string               out;
-  std::vector<std::string>  emptyV;
 
-  out = en2P->toJsonV1(false, UpdateContextElement, emptyV, false, emptyV, false, false);
+  out = en2P->toJsonV1(false, UpdateContextElement, false, false, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

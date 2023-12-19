@@ -60,6 +60,7 @@ typedef struct SenderThreadParams
   std::string                        xauthToken;
   std::string                        resource;      // path for HTTP notifications, topic for MQTT notifications
   unsigned int                       qos;           // used only in MQTT notifications
+  unsigned int                       retain;        // used only in MQTT notifications
   std::string                        user;          // for user/pass auth connections (only MQTT at the present moment)
   std::string                        passwd;        // for user/pass auth connections (only MQTT at the present moment)
   std::string                        content_type;

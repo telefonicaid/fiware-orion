@@ -5,7 +5,8 @@
 
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
 [![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
-[![Docker badge](https://img.shields.io/docker/pulls/fiware/orion.svg)](https://hub.docker.com/r/fiware/orion/)
+[![Quay badge](https://img.shields.io/badge/quay.io-fiware%2Forion-grey?logo=red%20hat&labelColor=EE0000)](https://quay.io/repository/fiware/orion)
+[![Docker badge](https://img.shields.io/badge/docker-telefonicaiot%2Ffiware--orion-blue?logo=docker)](https://registry.hub.docker.com/r/telefonicaiot/fiware-orion)
 [![Support badge](https://img.shields.io/badge/tag-fiware--orion-orange.svg?logo=stackoverflow)](http://stackoverflow.com/questions/tagged/fiware-orion)
 [![NGSI v2](https://img.shields.io/badge/NGSI-V2-red.svg)](doc/manuals/orion-api.md)
 <br>
@@ -18,8 +19,7 @@
 
 The Orion Context Broker is an implementation of the Publish/Subscribe Context
 Broker GE, providing an
-[NGSI](https://swagger.lab.fiware.org/?url=https://raw.githubusercontent.com/Fiware/specifications/master/OpenAPI/ngsiv2/ngsiv2-openapi.json)
-interface. Using this interface, clients can do several operations:
+[NGSI interface](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/orion-api.md). Using this interface, clients can do several operations:
 
 -   Query context information. The Orion Context Broker stores context
     information updated from applications, so queries are resolved based
@@ -35,8 +35,8 @@ This project is part of [FIWARE](https://www.fiware.org/). For more information
 check the FIWARE Catalogue entry for
 [Core Context Management](https://github.com/Fiware/catalogue/tree/master/core).
 
-| :books: [Documentation](https://fiware-orion.rtfd.io) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion) | :whale: [Docker Hub](https://hub.docker.com/r/fiware/orion/) | :dart: [Roadmap](doc/roadmap.md) |
-|---|---|---|---|
+| :books: [Documentation](https://fiware-orion.rtfd.io) | :mortar_board: [Academy](https://fiware-academy.readthedocs.io/en/latest/core/orion) | <img style="height:1em" src="https://quay.io/static/img/quay_favicon.png"/> [quay.io](https://quay.io/repository/fiware/orion) | :whale: [Docker Hub](https://registry.hub.docker.com/r/telefonicaiot/fiware-orion) | :dart: [Roadmap](doc/roadmap.md) |
+|---|---|---|---|--|
 
 ## Content
 
@@ -62,7 +62,7 @@ Administration Manual on [readthedocs.io](https://fiware-orion.readthedocs.io)
 
 Any feedback on this documentation is highly welcome, including bugs, typos or
 things you think should be included but aren't. You can use
-[github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to
+[github issues](https://github.com/telefonicaid/fiware-orion/issues/new/choose) to
 provide feedback.
 
 [Top](#top)
@@ -93,11 +93,12 @@ recommended to have a look to the brief
 ### Introductory presentations
 
 -   Orion Context Broker
-    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20220526)
-    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20220526-251860297)
+    [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-20230606)
+    [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-20230606-258279602)
 -   NGSIv2 Overview for Developers That Already Know NGSIv1
     [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220523)
     [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220526)
+    (no longer maintained since Orion 3.7.0)
 
 [Top](#top)
 
@@ -261,8 +262,11 @@ tag `fiware-orion`
 Orion Context Broker is licensed under [Affero General Public License (GPL)
 version 3](./LICENSE).
 
-© 2022 Telefonica Investigación y Desarrollo, S.A.U
+© 2023 Telefonica Investigación y Desarrollo, S.A.U
 
+<details>
+<summary><strong>Further information on the use of the AGPL open source license</strong></summary>
+     
 ### Are there any legal issues with AGPL 3.0? Is it safe for me to use?
 
 There is absolutely no problem in using a product licensed under AGPL 3.0. Issues with GPL
@@ -280,3 +284,4 @@ wish to make a clarifying public statement as follows:
 > unmodified version of existing software is not considered a derivative work, and therefore
 > it does not need to be released as under the same license, or even released as open source.
 
+</details>

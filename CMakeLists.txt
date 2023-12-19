@@ -171,6 +171,12 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 #    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable")
 #endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+# Enables some some #ifdef in the code for compiling in old system
+# FIXME: cleanup OLD_SSL_VERSION_FORMAT stuff after consolidating the change to Debian 12+
+IF((${DISTRO} MATCHES "Debian_11.*") OR (${DISTRO} MATCHES "Alpine_3.16.*"))
+  ADD_DEFINITIONS(-DOLD_SSL_VERSION_FORMAT)
+ENDIF()
+
 #
 # Libraries
 #
@@ -220,8 +226,8 @@ SET (BOOST_MT
 
 # See http://mongoc.org/libmongoc/current/tutorial.html#cmake
 # This find_package() command provides the mongo::mongoc_static used in
-# SET for common static libs. We use 1.17.4 as reference version.
-find_package (mongoc-1.0 1.17.4 EXACT)
+# SET for common static libs. We use 1.24.3 as reference version.
+find_package (mongoc-1.0 1.24.3 EXACT)
 
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS

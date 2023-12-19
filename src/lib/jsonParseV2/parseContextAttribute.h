@@ -41,7 +41,8 @@ extern std::string parseContextAttribute
 (
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
-  ContextAttribute*                             caP
+  ContextAttribute*                             caP,
+  bool                                          checkAttrSpecialTypes
 );
 
 
@@ -50,6 +51,6 @@ extern std::string parseContextAttribute
 *
 * parseContextAttribute - 
 */
-extern std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP);
+extern std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, bool checkAttrSpecialTypes);
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTE_H_

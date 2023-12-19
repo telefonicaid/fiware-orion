@@ -49,7 +49,7 @@ echo "01. Create registration directly in DB"
 echo "======================================"
 doc='{
    "_id":ObjectId("5b1ff2ee49597334c9b5efc7"),
-   "expiration":NumberLong(1845053934),
+   "expiration":NumberLong("1845053934"),
    "servicePath":"/ss1",
    "format":"JSON",
    "contextRegistration":[
@@ -70,7 +70,7 @@ doc='{
       }
    ]
 }'
-mongoCmd ${CB_DB_NAME} "db.registrations.insert($doc)"
+mongoCmd ${CB_DB_NAME} "db.registrations.insertOne($doc)"
 echo
 echo
 
@@ -131,7 +131,7 @@ doc='{
         "modDate": 1528820541,
         "lastCorrelator": "c8bcef8a-6e5c-11e8-a06c-0242ac11000b"
 }'
-mongoCmd ${CB_DB_NAME} "db.entities.insert($doc)"
+mongoCmd ${CB_DB_NAME} "db.entities.insertOne($doc)"
 echo
 echo
 
@@ -222,53 +222,53 @@ echo
 --REGEXPECT--
 01. Create registration directly in DB
 ======================================
-WriteResult({ "nInserted" : 1 })
+{"acknowledged":true,"insertedId":{"$oid":"5b1ff2ee49597334c9b5efc7"}}
 
 
 02. Create entity directly in DB
 ================================
-WriteResult({ "nInserted" : 1 })
+{"acknowledged":true,"insertedId":{"id":"entity1","type":"device","servicePath":"/ss1"}}
 
 
 03. Update turn attribute using PATCH on entity
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Update turn attribute using PUT on attribute
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Update turn attribute using batch update
 ============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Update turn attribute using PUT on attribute value
 ======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. Update turn attribute using NGSIv1 update
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 200
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 200
 
 {
     "contextResponses": [

@@ -107,7 +107,7 @@ public:
 
   std::string  toJsonV1AsNameString(bool comma);
 
-  std::string  toJson(const std::vector<std::string>&  metadataFilter);
+  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, std::map<std::string, std::string>* replacementsP = NULL);
 
   std::string  toJsonValue(void);
 
@@ -122,7 +122,7 @@ public:
   std::string  getName(void);
 
   /* Used to render attribute value to BSON */
-  void valueBson(const std::string&      valueKey,
+  bool valueBson(const std::string&      valueKey,
                  orion::BSONObjBuilder*  bsonAttr,
                  const std::string&      attrType,
                  bool                    autocast,
@@ -146,6 +146,10 @@ private:
 
   bool hasIgnoreType(void) const;
 
+  bool calculateOperator(const std::string&         valueKey,
+                         orion::CompoundValueNode*  upOp,
+                         orion::BSONObjBuilder*     bsonAttr,
+                         bool                       strings2numbers) const;
 
 } ContextAttribute;
 

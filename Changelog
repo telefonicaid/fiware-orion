@@ -1,3 +1,65 @@
+3.10.0 (June 12th, 2023)
+
+- Add: option to change deprecate log setting in the REST management API
+- Fix: decimal rounding in some cases was generating wrong JSON in query responses and notifications (#4346)
+- Fix: pagination support in request query forwarding to Context Providers (#4149, #847, #1647)
+- Fix: count option not working when georel=near was in use (500 error was returned)
+- Fix: maxFailsLimit didn't work in some cases when update subscription is done just after cache refresh (only when csubs cache is enabled)
+- Fix: conditions.notifyOnMetadataChange false not working if condition.attrs is empty
+- Deprecate: `geo:json`, `geo:line`, `geo:box` and `geo:polygon` attribute types (use `geo:json` instead)
+- Remove: all NGSIv1 operations (deprecated in Orion 2.0.0) except the following ones
+    - PUT /v1/contextEntities/{id}
+    - DELETE /v1/contextEntities/{id}
+    - GET /v1/contextEntities/{id}/attributes/{name}
+    - POST /v1/updateContext
+    - POST /NGSI10/updateContext
+    - POST /v1/queryContext
+    - POST /NGSI10/queryContext
+
+3.9.0 (June 2th, 2023)
+
+- Add: new simplifiedNormalized and simplifiedKeyvalues for attrsFormat (#4286)
+- Add: subject.condition.notifyOnMetadataChange field to subscriptions, so only-metadata changes doesn't trigger notifications (#3727)
+- Add: support for update operators ($set, $addToSet, etc.) in entity creation and replace (#3814, reopnened)
+- Add: -mqttTimeout (env var ORION_MQTT_TIMEOUT) for MQTT broker connection timeout
+- Add: -disableNgsiv1 (env var ORION_DISABLE_NGSIV1) to disable NGSIv1 API requests
+- Add: -logDeprecate (env var ORION_LOG_DEPRECATE) to log deprecate usages at WARN level
+- Fix: alterationType with entityDelete not working if condition.attrs is empty (#4326)
+- Fix: $set/$unset update operator not working properly when the key has dots (#4315)
+- Fix: queue workers deadlock when MQTT broker was not responding to connection attemp
+- Fix: Ngsiv2-AttrsFormat header set to "normalized" in NGSI patching custom notification
+- Fix: memory access potential problem in GET /log/trace request when tracelevel 255 is enabled
+- Fix: Orion should return error and refuse to start when port is negative (#3875)
+- Fix: subscription autodisable based on maxFailsLimit not working when fails does not happen within the same csubs cache refresh cycle
+- Fix: incorrectly sum stale failsCounter from database when subscription has started to work again (only when csubs cache is enabled)
+- Fix: MQTT disconnection when MQTT publish fail (so re-connection is forced at next MQTT notification)
+- Fix: lineMaxSize and infoPayloadMaxSize in the log admin REST API (#3707)
+- Fix: check for service database name too long at cache sync logic (#2848)
+- Hardening: upgrade microhttpd dependency from 0.9.73 to 0.9.76
+
+3.8.0 (January 12th, 2023)
+
+- Add: json field in httpCustom and mqttCustom subscriptions to implement JSON-based payloads in notifications (#2560)
+- Add: ngsi field in httpCustom and mqttCustom subscriptions to implement NGSI payload patching in notifications (#4085)
+- Add: ${service}, ${servicePath} and ${authToken} macros in custom notifications (#4159)
+- Add: "Authorization" in CORS allowed headers (#4249)
+- Add: requestLegacy counters in GET /statistics response
+- Fix: conditions.alterationTypes not working properly when conditions.attributes is used in entityUpdate case (#1494, reopened)
+- Fix: GET /v2/types and GET /v2/types/{type} wrong attribute types result (#4216)
+- Fix: reset measuring_interval_in_secs correctly reset upon DELETE /statistics (#4233)
+- Fix: version request correctly recorded in statistics API (in "/version".GET instead than in separated versionRequests counter) (#4233)
+- Fix: GET /v2/registrations/{regId} was wrongly returning 200 OK instaed of 404 Not Found in case of non existing registration (#4235)
+- Fix: GET /statistics counters requests now use URLs intead of symbolic names
+- Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
+- Upgrade Debian version from 11.2 to 11.6 in Dockerfile
+- Hardening: upgrade microhttpd dependency from 0.9.70 to 0.9.73
+- Hardening: upgrade libmosquitto dependency from 2.0.12 to 2.0.15
+- Hardening: upgrade libmongoc dependency from 1.17.4 to 1.23.1
+- Deprecated: GET /v2 operation
+- Remove: rendundant routes in administrative REST API not aligned with documentation
+- Remove: /ngsi9 URL paths (deprecated since Orion 1.2.0)
+- Remove: RPM package stuff
+
 3.7.0 (May 26th, 2022)
 
 - Add: conditions.alterationTypes subscription fuctionality (#1494)

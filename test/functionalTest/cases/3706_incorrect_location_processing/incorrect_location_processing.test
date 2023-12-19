@@ -239,9 +239,7 @@ doc='{
   "modDate": 1603273111.6493506,
   "lastCorrelator": "2e7b6c36-1381-11eb-a1f0-0242ac110013"
 }'
-# FIXME P3: not sure why mongCmd() doesn't work this time... maybe $doc is too long?
-#mongoCmd ${CB_DB_NAME} "db.entities.insert($doc)"
-echo "db.entities.insert($doc)" | mongo mongodb://localhost:27017/${CB_DB_NAME} | tail -n 2 | head -n 1
+mongoCmd ${CB_DB_NAME} "db.entities.insertOne($doc)"
 echo
 echo
 
@@ -264,24 +262,24 @@ echo
 --REGEXPECT--
 01. Create entity directly in DB
 ================================
-WriteResult({ "nInserted" : 1 })
+{"acknowledged":true,"insertedId":{"id":"ES0021000001111111AA","type":"SupplyPoint","servicePath":"/energia"}}
 
 
 02. Update the entity as described in #3706 and check we don't get 413 error
 ============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. Get entity and check location has been set to [-4,41]
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 1807
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1807
 
 {
     "TimeInstant": {

@@ -121,16 +121,32 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->failsCounter          = 0;
   cSubP->onlyChanged           = sub.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(sub, CSUB_ONLYCHANGED)                 : false;
   cSubP->covered               = sub.hasField(CSUB_COVERED)?          getBoolFieldF(sub, CSUB_COVERED)                     : false;
+  cSubP->notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
   cSubP->next                  = NULL;
 
+  // getIntOrLongFieldAsLong() may return -1 if something goes wrong, so we add a guard to set 0 in this case
+  cSubP->failsCounterFromDb = sub.hasField(CSUB_FAILSCOUNTER)? getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER) : 0;
+  if (cSubP->failsCounterFromDb < 0)
+  {
+    cSubP->failsCounterFromDb = 0;
+  }
+
+  // set to valid at refresh time (to be invalidated if some sucess occurs before the next cache refresh cycle)
+  cSubP->failsCounterFromDbValid = true;
 
   //
   // 04.2 httpInfo & mqttInfo
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.fill(sub);
-  cSubP->mqttInfo.fill(sub);
+  if (sub.hasField(CSUB_MQTTTOPIC))
+  {
+    cSubP->mqttInfo.fill(sub);
+  }
+  else
+  {
+    cSubP->httpInfo.fill(sub);
+  }
 
 
   //
@@ -299,6 +315,8 @@ int mongoSubCacheItemInsert
   long long              lastSuccessCode,
   long long              count,
   long long              failsCounter,
+  long long              failsCounterFromDb,
+  bool                   failsCounterFromDbValid,
   long long              expirationTime,
   const std::string&     status,
   double                 statusLastChange,
@@ -394,6 +412,7 @@ int mongoSubCacheItemInsert
   cSubP->next                  = NULL;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
   cSubP->covered               = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
+  cSubP->notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
 
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastFailure;
@@ -402,6 +421,8 @@ int mongoSubCacheItemInsert
   cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->count                 = count;
   cSubP->failsCounter          = failsCounter;
+  cSubP->failsCounterFromDb    = failsCounterFromDb;
+  cSubP->failsCounterFromDbValid  = failsCounterFromDbValid;
   cSubP->status                = status;
   cSubP->statusLastChange      = statusLastChange;
 
@@ -410,9 +431,14 @@ int mongoSubCacheItemInsert
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
-  cSubP->httpInfo.fill(sub);
-  cSubP->mqttInfo.fill(sub);
-
+  if (sub.hasField(CSUB_MQTTTOPIC))
+  {
+    cSubP->mqttInfo.fill(sub);
+  }
+  else
+  {
+    cSubP->httpInfo.fill(sub);
+  }
 
   //
   // String Filters
@@ -894,3 +920,4 @@ void mongoSubUpdateOnCacheSync
     LM_E(("Runtime Error (error updating subs during cache sync: %s)", err.c_str()));
   }
 }
+

@@ -19,4 +19,5 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+# FIXME: use mongosh instead of mongo
 echo 'db.csubs.drop()' | mongo --quiet orion

@@ -40,7 +40,7 @@
 *
 * TriggeredSubscription -
 *
-* This class is thought to store the information about an ONCHANGE subscription
+* This class is thought to store the information about a subscription
 * triggered by an updateContext in order to notify, avoding a double-query on
 * the csbubs collection. Note that adding all the BSON object retrieved from the
 * csubs collection is not efficient, so we use only the needed fields-
@@ -87,11 +87,6 @@ class TriggeredSubscription
                         const std::string&       _cacheSubId,
                         const char*              _tenant,
                         bool                     _covered);
-
-  TriggeredSubscription(RenderFormat             _renderFormat,
-                        const ngsiv2::HttpInfo&  _httpInfo,
-                        const ngsiv2::MqttInfo&  _mqttInfo,
-                        const StringList&        _attrL);
 
   ~TriggeredSubscription();
 

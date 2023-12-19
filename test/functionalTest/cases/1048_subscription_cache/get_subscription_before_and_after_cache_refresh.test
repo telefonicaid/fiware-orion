@@ -26,7 +26,7 @@ Get subscription before and after cache refresh
 --SHELL-INIT--
 dbInit CB
 
-mongoCmd ${CB_DB_NAME} 'db.csubs.insert({
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "_id" : ObjectId("61960a51596aa2623032357d"),
         "expiration" : NumberLong("9223372036854775807"),
         "reference" : "http://localhost:1028/accumulate",
@@ -72,7 +72,7 @@ brokerStart CB 0 IPv4 -subCacheIval 2 --cache
 --SHELL--
 
 #
-# Dynamic fields set A
+# Dynamic fields set A (failure situation, as lastNotification==lastFailure)
 # - lastNotification:   2020-01-01T10:00:00Z (1577872800)
 # - lastSuccess:        2020-01-01T09:00:00Z (1577869200)
 # - lastFailure:        2020-01-01T10:00:00Z (1577872800)
@@ -82,7 +82,7 @@ brokerStart CB 0 IPv4 -subCacheIval 2 --cache
 # - failsCounter:       4
 # - status:             failed (last changed: 2020-01-01T10:00:00Z)
 #
-# Dynamic fields set B
+# Dynamic fields set B (success situation, as lastNotification==lastSuccess)
 # - lastNotification:   2020-01-01T11:00:00Z (1577876400)
 # - lastSuccess:        2020-01-01T11:00:00Z (1577876400)
 # - lastFailure:        2020-01-01T10:00:00Z (1577872800)
@@ -96,8 +96,28 @@ brokerStart CB 0 IPv4 -subCacheIval 2 --cache
 # 01. GET /v2/subscriptions and see dynamic fields set A
 # 02. Set dynamic fields in DB to set B
 # 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
-# 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
+# 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same, except failsCounter (see NOTE)
 #
+# NOTE:
+#
+# At step 03 the situation is:
+#
+# * cache.lastSuccess: 2020-01-01T09:00:00Z
+# * DB.lastFailure:    2020-01-01T10:00:00Z
+#
+# so cache.lastSuccess < DB.lastFailure and failsCounter is
+#
+# DB.failsCounter (8) + cache.failsCounter (0) = 8
+#
+# At step 04 cache.lastSuccess gets updated from B document and now the situation is
+#
+# * cache.lastSuccess: 2020-01-01T11:00:00Z
+# * DB.lastFailure:    2020-01-01T10:00:00Z
+#
+# so the situation reverses (cache.lastSuccess > DB.lastFailure) and now failsCounter calculation is:
+#
+# cache.failsCounter (0) = 0
+
 
 echo "00. (Done before starting context Broker) Insert crafted subscription in DB with specific dynamic fields set A"
 echo "=============================================================================================================="
@@ -114,15 +134,15 @@ echo
 
 echo "02. Set dynamic fields in DB to set B"
 echo "====================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.update({_id: ObjectId("61960a51596aa2623032357d")}, {
+mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("61960a51596aa2623032357d")}, {
   $set: {
-    lastNotification: NumberLong(1577876400),
-    lastSuccess: NumberLong(1577876400),
-    lastFailure: NumberLong(1577872800),
-    lastSuccessCode: NumberLong(204),
+    lastNotification: NumberLong("1577876400"),
+    lastSuccess: NumberLong("1577876400"),
+    lastFailure: NumberLong("1577872800"),
+    lastSuccessCode: NumberLong("204"),
     lastFailureReason: "Timeout",
-    count: NumberLong(25),
-    failsCounter: NumberLong(8),
+    count: NumberLong("25"),
+    failsCounter: NumberLong("8"),
     status: "inactive",
     statusLastChange: 1578733200
   }
@@ -137,8 +157,8 @@ orionCurl --url /v2/subscriptions
 echo
 echo
 
-echo "04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same"
-echo "==============================================================================================="
+echo "04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same, except failsCounter (see NOTE)"
+echo "==============================================================================================================================="
 sleep 2.5s
 orionCurl --url /v2/subscriptions
 echo
@@ -153,10 +173,10 @@ echo
 01. GET /v2/subscriptions and see dynamic fields set A
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 521
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 551
 
 [
     {
@@ -181,7 +201,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -196,16 +217,16 @@ Date: REGEX(.*)
 
 02. Set dynamic fields in DB to set B
 =====================================
-WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+{"acknowledged":true,"insertedId":null,"matchedCount":1,"modifiedCount":1,"upsertedCount":0}
 
 
 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 503
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 533
 
 [
     {
@@ -230,7 +251,8 @@ Date: REGEX(.*)
         "status": "inactive",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -243,13 +265,13 @@ Date: REGEX(.*)
 ]
 
 
-04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
-===============================================================================================
+04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same, except failsCounter (see NOTE)
+===============================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 503
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 516
 
 [
     {
@@ -258,7 +280,6 @@ Date: REGEX(.*)
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "failsCounter": 8,
             "http": {
                 "url": "http://localhost:1028/accumulate"
             },
@@ -274,7 +295,8 @@ Date: REGEX(.*)
         "status": "inactive",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

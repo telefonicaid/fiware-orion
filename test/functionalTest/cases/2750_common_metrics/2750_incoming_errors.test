@@ -214,10 +214,10 @@ echo
 00. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -225,10 +225,10 @@ Date: REGEX(.*)
 01. Ask for metrics and see no errors
 =====================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
     "services": {
@@ -267,10 +267,10 @@ Date: REGEX(.*)
 02. Send a request with an invalid JSON payload
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -281,10 +281,10 @@ Date: REGEX(.*)
 03. Ask for metrics and see one error
 =====================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
     "services": {
@@ -351,10 +351,10 @@ Date: REGEX(.*)
 04. Send a request with an Invalid URL
 ======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 {
     "description": "Service not found. Check your URL as probably it is wrong.",
@@ -365,10 +365,10 @@ Date: REGEX(.*)
 05. Send a request with an Invalid Service Path
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 111
 
 {
     "description": "Only /absolute/ Service Paths allowed [a service path must begin with /]",
@@ -379,10 +379,10 @@ Date: REGEX(.*)
 06. Send a request with an Invalid Content-Type
 ===============================================
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 {
     "description": "not supported content type: Invalid-Content-Type",
@@ -393,10 +393,10 @@ Date: REGEX(.*)
 07. Send a request with invalid value for URI param /options/
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "Invalid value for URI param /options/",
@@ -407,10 +407,10 @@ Date: REGEX(.*)
 08. Send a request with a component-name too long in ServicePath
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "component-name too long in ServicePath",
@@ -421,10 +421,10 @@ Date: REGEX(.*)
 09. Send a request with no acceptable mime-type in accept header
 ================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "no acceptable mime-type in accept header",
@@ -435,10 +435,10 @@ Date: REGEX(.*)
 10. Send a request with an invalid character in a URI parameter
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "invalid character in URI parameter",
@@ -449,10 +449,10 @@ Date: REGEX(.*)
 11. Send a request with too many components in ServicePath
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "too many components in ServicePath",
@@ -463,10 +463,10 @@ Date: REGEX(.*)
 12. Send a PUT /v2/entities/<id>/attrs/<attrName>/value for an non-existing entity E_NOPE
 =========================================================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -477,10 +477,10 @@ Date: REGEX(.*)
 13. Send a request with an Invalid Tenant
 =========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 125
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 125
 
 {
     "description": "bad character in tenant name - only underscore and alphanumeric characters are allowed",
@@ -491,10 +491,10 @@ Date: REGEX(.*)
 14. Ask for metrics and see 7 errors (as Service Path and Tenant errors are ignored in metrics)
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
     "services": {

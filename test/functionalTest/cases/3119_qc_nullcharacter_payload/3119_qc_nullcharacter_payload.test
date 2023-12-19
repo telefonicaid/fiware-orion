@@ -89,10 +89,10 @@ echo
 01. Request context query with inappropriate value parameter in payload.
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "errorCode": {
@@ -106,10 +106,10 @@ Date: REGEX(.*)
 02. Request context query with inappropriate value parameter in payload.
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "errorCode": {
@@ -123,10 +123,10 @@ Date: REGEX(.*)
 03. Request context query with inappropriate value parameter in payload.
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 105
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 105
 
 {
     "errorCode": {

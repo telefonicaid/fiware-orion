@@ -112,20 +112,20 @@ echo
 01. Create entity E with atribute A with metadata MD1 and MD2
 =============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. GET /v2/entities?metadata=MD1,MD1,MD1 should return MD1 only one time
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
 
 [{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}]
 
@@ -133,10 +133,10 @@ Date: REGEX(.*)
 03. GET /v2/entities/E?metadata=MD1,MD1,MD1 should return MD1 only one time
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 102
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 102
 
 {"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}
 
@@ -144,10 +144,10 @@ Date: REGEX(.*)
 04. GET /v2/entities/E/attrs?metadata=MD1,MD1,MD1 should return MD1 only one time
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {"A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}
 
@@ -155,10 +155,10 @@ Date: REGEX(.*)
 05. GET /v2/entities/E/attrs/A?metadata=MD1,MD1,MD1 should return MD1 only one time
 ===================================================================================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}
 
@@ -166,10 +166,10 @@ Date: REGEX(.*)
 06. GET /v2/op/query with metadata: MD1,MD1,MD1 should return MD1 only one time
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 104
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
 
 [{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{"MD1":{"type":"Number","value":1}}}}]
 

@@ -27,7 +27,9 @@ virtualenv --python=/usr/bin/python3 /path/to/ft_env
 
 ```
 pip install Flask==2.0.2
+pip install Werkzeug==2.0.2
 pip install paho-mqtt==1.6.1
+pip install amqtt==0.11.0b1  # Not actually an accumulator-server.py dependency, but needed by some tests
 ```
 
 次に、accumulator-server.py のスクリプト自体をインストールします:
@@ -51,10 +53,15 @@ accumulator-server.py -u
 ```
 FROM debian:stable
 RUN apt-get update -y
-RUN apt-get install -y python3
-RUN apt-get install -y python3-pip
-RUN pip install Flask==2.0.2
-RUN pip install paho-mqtt==1.6.1
+RUN apt-get install -y python3 python3-venv python3-pip
+
+# Create a virtual environment
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+# Install required packages within the virtual environment
+RUN pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1
+
 COPY . /app
 WORKDIR /app
 ENTRYPOINT [ "python3", "./accumulator-server.py"]

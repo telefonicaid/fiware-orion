@@ -31,7 +31,6 @@
     - [組み込み名に一致するユーザ属性またはメタデータ (User attributes or metadata matching builtin name)](#user-attributes-or-metadata-matching-builtin-name)
     - [Datetime サポート](#datetime-support)
     - [エンティティの地理空間プロパティ (Geospatial properties of entities)](#geospatial-properties-of-entities)
-        - [シンプル・ロケーション・フォーマット (Simple Location Format)](#simple-location-format)
         - [GeoJSON](#geojson)
     - [シンプル・クエリ言語 (Simple Query Language)](#simple-query-language)
     - [地理的クエリ (Geographical Queries)](#geographical-queries)
@@ -50,8 +49,7 @@
             - [`$unset`](#unset)
             - [`$set` と `$unset` の組み合わせ](#combining-set-and-unset)
         - [Orion が演算子を処理する方法](#how-orion-deals-with-operators)
-        - [現在の制限](#current-limitations)
-            - [エンティティの作成または置換](#create-or-replace-entities)
+        - [エンティティの作成または置換操作での使用法](#usage-in-create-or-replace-entity-operations)
     - [属性とメタデータのフィルタリング (Filtering out attributes and metadata)](#filtering-out-attributes-and-metadata)
     - [メタデータ更新のセマンティクス (Metadata update semantics)](#metadata-update-semantics)
       - [`overrideMetadata` オプション](#overridemetadata-option)
@@ -68,16 +66,19 @@
     - [通知メッセージ (Notification Messages)](#notification-messages)
     - [カスタム通知 (Custom Notifications)](#custom-notifications)
       - [マクロ置換 (Macro substitution)](#macro-substitution)
+      - [ヘッダの特別な扱い (Headers special treatment)](#headers-special-treatment)
+      - [ヘッダーの削除 (Remove headers)](#remove-headers)
+      - [テキストベースのペイロード (Text based payload)](#text-based-payload)
       - [JSON ペイロード (JSON payloads)](#json-payloads)
+      - [NGSI ペイロードのパッチ適用 (NGSI payload patching)](#ngsi-payload-patching)
       - [ペイロードの省略 (Omitting payload)](#omitting-payload)
-      - [ヘッダの削除 (Remove headers)](#remove-headers)
       - [その他の考慮事項](#additional-considerations)
-      - [カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)](#custom-payload-and-headers-special-treatment)
     - [Oneshot サブスクリプション (Oneshot Subscriptions)](#oneshot-subscriptions)
     - [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
     - [変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)](#subscriptions-based-in-alteration-type)
     - [ページネーション (Pagination)](#pagination)
         - [結果の順序付け (Ordering Results)](#ordering-results)
+        - [同値 (Ties)](#ties)
 - [API ルート (API Routes)](#api-routes)
     - [エンティティの操作 (Entities Operations)](#entities-operations)
         - [エンティティのリスト (Entities List)](#entities-list)
@@ -154,7 +155,7 @@
 に基づいて構築され、膨大な数の改善と機能強化を追加しています。
 
 Orion API は、オリジナルの NGSIv2 仕様と完全に互換性がありますが、いくつかの小さな違いについては、
-このドキュメントの最後にある[別紙]((#differences-regarding-the-original-ngsiv2-spec))で説明しています。
+このドキュメントの最後にある[別紙](#differences-regarding-the-original-ngsiv2-spec)で説明しています。
 
 <a name="specification"></a>
 
@@ -600,7 +601,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   `DateTime`: ISO8601 形式で日付を識別します。これらの属性は、クエリ演算子の greater-than, less-than,
     greater-or-equal, less-or-equal および range で使用できます。詳細については、このドキュメントの
     [Datetime サポート](#datetime-support)のセクションを確認してください
--   `geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`。それらには、エンティティの場所に関連する特別な
+-   `geo:json`。それには、エンティティの場所に関連する特別な
     セマンティクスがあります。`null` 値を持つ属性は地理クエリでは考慮されず、エンティティごとに1つの地理空間属性の制限に
     カウントされません。[エンティティの地理空間プロパティ](#geospatial-properties-of-entities)のセクションを
     参照してください
@@ -645,6 +646,8 @@ Orion は階層スコープをサポートしているため、エンティテ�
         `forcedUpdate` が使用された場合
     -   `entityDelete`: 通知をトリガーする更新がエンティティの削除操作であった場合
 
+-   `servicePath` (タイプ: `Text`): エンティティが属する[サービス・パス](#service-path)を指定します。
+
 通常の属性と同様に、`q` フィルタと `orderBy` (`alterationType` を除く) で使用できます。
 ただし、リソース URLs では使用できません。
 
@@ -662,7 +665,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
     無視します。Orion は一般的に属性タイプを無視するため、このメタデータはほとんどの場合必要ありませんが、属性タイプが
     Orion の特別なセマンティックを持つ 2 つのケースがあることに注意してください:
     -   `DateTime`
-    -   Geo-location types (`geo:point`, `geo:line`, `geo:box`, `geo:polygon` および `geo:json`)
+    -   `geo:json`
 
 現時点では、'ignoreType' は地理位置情報タイプに対してのみサポートされており、この方法により、エンティティごとに1つの
 地理位置情報のみという制限を克服するメカニズムが可能になります
@@ -829,9 +832,8 @@ Orion は常に `YYYY-MM-DDThh:mm:ss.sssZ` の形式を使用して日時属性/
 コンテキストのエンティティの地理空間プロパティは、通常のコンテキスト属性を用いて表すことができます。地理空間的
 プロパティの提供は、地理的クエリの解決を可能にします。
 
-Orion では 2 つの異なる構文がサポートされています:
+Orion では、次の構文がサポートされています:
 
--   *Simple Location Format*。これは、開発者とユーザが既存のエンティティに素早く簡単に追加できる、非常に軽量な形式です
 -   *GeoJSON*。[GeoJSON](https://tools.ietf.org/html/draft-butler-geojson-06) は、JSON (JavaScript Object Notation) に
     基づく地理空間データ交換フォーマットです。GeoJSON は、より高度な柔軟性を提供し、ポイント高度またはより複雑な
     地理空間形状、たとえば、
@@ -886,64 +888,6 @@ Orion は、バックエンド・データベースによって課されるリ�
 追加の場所 (locations) がこのように定義されている場合、地理クエリの解決に使用される場所は、`ignoreType` が `true`
 メタデータに設定されていない場所であることを考慮してください (上記の例では `location` 属性)。`ignoreType` を `true`
 に設定して定義されたすべての場所は Orion によって無視され、この意味で地理クエリには影響しません。
-
-<a name="simple-location-format"></a>
-
-### シンプル・ロケーション・フォーマット (Simple Location Format)
-
-シンプル・ロケーション・フォーマットは、基本的なジオメトリ (*point*, *line*, *box*, *polygon*) をサポートし、
-地理的位置をエンコードする際の典型的な使用例をカバーしています。[GeoRSS Simple](http://www.georss.org/simple.html)
-に触発されています。
-
-シンプル・ロケーション・フォーマットは、地球表面上の複雑な位置を表すことを意図していないことに注目してください。
-たとえば、高度座標を取得する必要のあるアプリケーションでは、GeoJSON をそのエンティティの地理空間プロパティの表現形式
-として使用する必要があります。
-
-シンプル・ロケーション・フォーマットでエンコードされたロケーションを表すコンテキスト属性は、次の構文に準拠している必要が
-あります:
-
--   属性型は、(`geo:point`, `geo:line`, `geo:box`, `geo:polygon`) のいずれかの値でなければなりません
--   属性値は座標のリストでなければなりません。既定では、座標は、
-    [WGS84 Lat Long](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84),
-    [EPSG::4326](http://www.opengis.net/def/crs/EPSG/0/4326) 座標リファレンス・システム (CRS) を使用して定義され、
-    緯度と経度の単位は小数です。このような座標リストは、`type` 属性で指定されたジオメトリをエンコードすることを可能に
-    し、以下で定義される特定の規則に従ってエンコードされます:
-    -   `geo:point` 型: 属性値には有効な緯度経度のペアをカンマで区切った文字列を含める必要があります
-    -   `geo:line` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも2つのペアが必要です
-    -   `geo:polygon` 型: 属性値に有効な緯度経度ペアの文字列配列を含める必要があります。少なくとも4つのペアが存在
-        しなければならず、最後のペアは最初のものと同一であるため、ポリゴンには最低 3つの実際のポイントがあります。
-        ポリゴンを構成する線分が定義された領域の外縁に残るように、座標ペアを適切に順序付けする必要があります。たとえば、
-        次のパス ```[0,0], [0,2], [2,0], [2, 2]``` は無効なポリゴン定義の例です。Orion は、入力データが前者の条件を
-        満たさない場合にエラーを発生させる必要があります
-    -   `geo:box` 型: バウンディング・ボックスは矩形領域であり、地図の範囲や関心のある大まかな領域を定義するためによく
-        使用されます。ボックスは、緯度経度ペアの2つの長さの文字列配列によって表現されます。最初のペアは下のコーナー、
-        2番目のペアは上のコーナーです
-
-注: [この文献](https://github.com/geojson/geojson-spec/wiki/Proposal---Circles-and-Ellipses-Geoms#discussion-notes)で、
-実装のさまざまな欠点を説明しているように、サークル・ジオメトリはサポートされていません。
-
-以下の例は、参照される構文を示しています:
-
-```
-{
-  "location": {
-    "value": "41.3763726, 2.186447514",
-    "type": "geo:point"
-  }
-}
-```
-
-```
-{
-  "location": {
-    "value": [
-      "40.63913831188419, -8.653321266174316",
-      "40.63881265804603, -8.653149604797363"
-    ],
-    "type": "geo:box"
-  }
-}
-```
 
 <a name="geojson"></a>
 
@@ -1130,8 +1074,8 @@ color を一致させます。また、`q=title=='20'` は文字列 "20" にマ�
 -   `georel=disjoint`。一致するエンティティは、リファレンス・参照ジオメトリと**交差しない**エンティティであることを
     示します
 
-`geometry` はクエリを解決する際に使われるリファレンス・シェイプを定義することを可能にします。次のジオメトリ (シンプル・
-ロケーション・フォーマットを参照) をサポートする必要があります。
+`geometry` はクエリを解決する際に使われるリファレンス・シェイプを定義することを可能にします。次のジオメトリ
+をサポートします:
 
 -   `geometry=point` は、地球表面上の点を定義します
 -   `geometry=line` は、折れ線を定義します
@@ -1167,7 +1111,7 @@ Orion が地理的なクエリを解決できない場合、レスポンスの H
 地理的クエリを解決する際には、シンプル・クエリ言語を介して、API 実装は、マッチング目的で使用される地理的位置を含む
 エンティティ属性を決定する責任があります。この目的のために、以下の規則を遵守しなければなりません。
 
--   エンティティに、GeoJSON または、シンプル・ロケーション・フォーマットとしてエンコードされた場所に対応する属性がない
+-   エンティティに、GeoJSON としてエンコードされた場所に対応する属性がない
     場合、そのようなエンティティは地理空間プロパティを宣言せず、地理的なクエリに一致しません
 -   エンティティがロケーションに対応する1つの属性のみを公開する場合、そのような属性は地理的クエリを解決する際に使用
     されます
@@ -1584,46 +1528,18 @@ PUT /v2/entities/E/attrs/A
 "1つの演算子のみを使用する" ルールの唯一の例外は、[上記のように](#combining-set-and-unset)、
 一緒に使用できる `$set` と `$unset` の場合です。
 
-<a name="current-limitations"></a>
+<a name="usage-in-create-or-replace-entity-operations"></a>
 
-### 現在の制限
+### エンティティの作成または置換操作での使用法
 
-<a name="create-or-replace-entities"></a>
+更新演算子は、エンティティの作成または置換操作で使用できます。特に:
 
-#### エンティティの作成または置換
-
-更新演算子は、エンティティの作成または置換操作では使用できません。たとえば、この方法で
-エンティティを作成する場合:
-
-```
-POST /v2/entities
-{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-作成されたばかりのエンティティの属性Aは、(文字通り) 次の JSON オブジェクトを値として持ちます
-: `{ "$inc": 2 }`
-
-ただし、既存のエンティティに新しい属性を追加する場合は機能することに注意してください。
-たとえば、属性AとBを持つエンティティEがすでにあり、この方法でCを追加する場合:
-
-```
-POST /v2/entities/E/attrs
-{
-  "C": {
-    "value": { "$inc": 2 },
-    "type": "Number"
-  }
-}
-```
-
-Cは値 `2` で作成されます。
+* 数値演算子は 0 を基準とします。たとえば、`{"$inc": 4}` の結果は 4、`{$mul: 1000}` の結果は 0 になります
+* `$set` は空のオブジェクト (`{}`) を参照として受け取ります。たとえば、`"$set": {"X": 1}` は単に `{"X": 1}` になります
+* `$push` と `$addToSet` は空の配列 (`[]`) を参照として受け取ります。たとえば、`{"$push": 4}` は `[ 4 ]` になります
+* `$pull`、`$pullAll`、および `$unset` は無視されます。これは、演算子が使用される属性がエンティティ内に作成されないことを意味します。
+   たとえば、2つの属性を持つエンティティを作成すると、最初の属性には演算子 `"A": {"value": {"$unset": 1}, ... }"` が含まれ、2番目の属性には
+  `"B" が含まれます。 {"value": 3, ...}` (通常のもの) は、属性 `B` を1つだけ持つエンティティになります
 
 <a name="filtering-out-attributes-and-metadata"></a>
 
@@ -1957,6 +1873,26 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
 }
 ```
 
+`attrsFormat` が `simplifiedNormalized` の場合、`normalized` の単純化されたバリアント (`subscriptionId` と `data`
+ホルダーを省略) が使用されます:
+
+```json
+{
+  "id": "Room1",
+  "type": "Room",
+  "temperature": {
+    "value": 23,
+    "type": "Number",
+    "metadata": {}
+  },
+  "humidity": {
+    "value": 70,
+    "type": "percentage",
+    "metadata": {}
+  }
+}
+```
+
 `attrsFormat` が `keyValues` の場合、keyValues の部分エンティティ表現モードが使用されます:
 
 ```json
@@ -1970,6 +1906,18 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
       "humidity": 70
     }
   ]
+}
+```
+
+`attrsFormat` が `simplifiedKeyValues` の場合、`keyValues` の単純化されたバリアント (`subscriptionId` と `data`
+ホルダーを省略) が使用されます:
+
+```json
+{
+  "id": "Room1",
+  "type": "Room",
+  "temperature": 23,
+  "humidity": 70
 }
 ```
 
@@ -2018,6 +1966,11 @@ NGSIv1 は非推奨であることに注意してください。したがって�
 通知には、関連するサブスクリプションの形式の値を含む `Ngsiv2-AttrsFormat` (`attrsFormat` が `legacy` の場合を想定) HTTP
 ヘッダを含める必要があります。これにより、通知受信者は通知ペイロードを処理しなくても形式を認識できます。
 
+**注:** 通知には必ず1つのエンティティが含まれることに注意してください。そのため、`data`
+配列が本当に必要なのかを疑問に思うかもしれません。過去にマルチ・エンティティ通知 (特に、Orion 3.1.0
+で廃止され、Orion 3.2.0 で削除されたいわゆる "初期通知 (initial notification)" ) があり、`data`
+配列はレガシーとして残ります。
+
 <a name="custom-notifications"></a>
 
 ## カスタム通知 (Custom Notifications)
@@ -2037,14 +1990,13 @@ NGSIv1 は非推奨であることに注意してください。したがって�
     カスタム通知で上書きできないことに注意してください。そうしようとする試み
     (例: `"httpCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` は無視されます
 -   `qs` (パラメータ名と値の両方をテンプレート化できます)
--   `payload`
+-   `payload`, `json`, `ngsi` (すべてペイロード関連のフィールド)
 -   `method` は、クライアントが通知の配信に使用する HTTP メソッドを選択できるようにしますが、有効な HTTP
     動詞のみを使用できることに注意してください: GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS, TRACE および CONNECT
 
 `mqttCustom` の場合:
 
-
--   `payload`
+-   `payload`, `json`, `ngsi` (すべてペイロード関連のフィールド)
 -   `topic`
 
 テンプレートのマクロ置換は、構文 `${..}` に基づいています。特に:
@@ -2078,7 +2030,10 @@ NGSIv1 は非推奨であることに注意してください。したがって�
   "qs": {
     "type": "${type}"
   },
-  "payload": "The temperature is ${temperature} degrees"
+  "json": {
+    "t": "${temperature}",
+    "unit": "degress"
+  }
 }
 ```
 
@@ -2088,9 +2043,120 @@ NGSIv1 は非推奨であることに注意してください。したがって�
 
 ```
 PUT http://foo.com/entity/DC_S1-D41?type=Room
+Content-Type: application/json
+Content-Length: ...
+
+{
+  "t": 23.4,
+  "unit": "degress"
+}
+```
+
+<a name="headers-special-treatment"></a>
+
+### ヘッダの特別な扱い (Headers special treatment)
+
+[一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions` などの
+API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers` のヘッダ値にも同じ制限が適用されます。
+
+ただし、通知時に、`httpCustom.payload` または `httpCustom.headers` の値に含まれる URL エンコード文字はすべてデコード
+されます。
+
+例：
+
+特定のサブスクリプションで次の `notification.httpCustom` オブジェクトを考えてみましょう。
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "headers": {
+    "Authorization": "Basic ABC...ABC%3D%3D"
+  },
+  "method": "PUT",
+  "qs": {
+    "type": "${type}",
+    "t": "${temperature}"
+  },
+  "payload": null
+}
+```
+
+`"Basic ABC...ABC%3D%3D"` は、この文字列の URL エンコード・バージョンであることに注意してください:
+`"Basic ABC...ABC=="`
+
+ここで、Orion がこのサブスクリプションに関連付けられた通知をトリガーすると考えてみましょう。
+通知データは、ID が `DC_S1-D41` でタイプが `Room` のエンティティ用で、値が 23.4 の `temperature`
+という名前の属性が含まれます。テンプレートを適用した後の結果の通知は次のようになります:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room&t=23.4
+Authorization: "Basic ABC...ABC=="
+Content-Type: application/json
+Content-Length: 0
+```
+
+<a name="remove-headers"></a>
+
+### ヘッダの削除 (Remove headers)
+
+`headers` オブジェクトのヘッダ・キーに空の文字列値を指定すると、そのヘッダが通知から削除されます。
+たとえば、次の構成です:
+
+```
+"httpCustom": {
+   ...
+   "headers": {"x-auth-token": ""}
+}
+```
+
+サブスクリプションに関連付けられた通知の `x-auth-token` ヘッダを削除します。
+
+これは、Orion が通知に自動的に含めるヘッダーを削除するのに役立ちます。
+例えば：
+
+-   通知にデフォルトで含まれるヘッダを避けるため (例: `Accept`)
+-   前述の `x-auth-token` などのヘッダの伝播 (更新から通知まで) をカットするため
+
+<a name="text-based-payload"></a>
+
+### テキストベースのペイロード (Text based payload)
+
+`payload` が `httpCustom` または `mqttCustom` で使用される場合、次の考慮事項が適用されます。
+同時に使用できるのは、`payload`, `json` また `ngsi` のうちの1つだけであることに注意してください。
+
+-   [一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions`
+    などの API オペレーションの `httpCustom.payload` フィールドにも適用されます。ただし、通知時には、`payload`
+    内の URL エンコードされた文字はすべてデコードされます。以下に例を示します
+-   `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `text/plain` に設定されます
+
+例：
+
+特定のサブスクリプションで次の `notification.httpCustom` オブジェクトを考えてみましょう
+
+```
+"httpCustom": {
+  "url": "http://foo.com/entity/${id}",
+  "method": "PUT",
+  "qs": {
+    "type": "${type}"
+  },
+  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
+}
+```
+
+上記のペイロード値は、この文字列の URL エンコード・バージョンであることに注意してください:
+`the value of the "temperature" attribute (of type Number) is ${temperature}`
+
+ここで、Orion がこのサブスクリプションに関連付けられた通知をトリガーすると考えてみましょう。
+通知データは、ID が `DC_S1-D41` でタイプが `部屋` のエンティティ用で、値が23.4の `temperature`
+という名前の属性が含まれます。テンプレートを適用した後の結果の通知は次のようになります:
+
+```
+PUT http://foo.com/entity/DC_S1-D41?type=Room
 Content-Type: text/plain
-Content-Length: 31
-The temperature is 23.4 degrees
+Content-Length: 65
+
+the value of the "temperature" attribute (of type Number) is 23.4
 ```
 
 <a name="json-payloads"></a>
@@ -2115,19 +2181,75 @@ The temperature is 23.4 degrees
 
 -   `json` フィールドの値は、配列またはオブジェクトでなければなりません。単純な文字列または数値も有効な JSON
     ですが、これらのケースはサポートされていません
--   マクロ置換ロジックは、次の点を考慮して、`payload` の場合と同じように機能します
+-   [マクロ置換ロジック](#macro-substitution)は、次の点を考慮して、`payload` の場合と同じように機能します:
     -   JSON オブジェクトのキー部分では使用できません。つまり、`"${key}": 10` は機能しません
-    -   マクロが使用される JSON オブジェクトまたは JSON 配列アイテムの値は、マクロ式と正確に一致する必要があります。
-        したがって、`"t": "${temperature}"` は機能しますが、`"t": "the temperature is ${temperature}"` または
-        `"h": "humidity ranges from ${humidityMin} to ${humidityMax}"` は機能しません
-    -   置換される属性値の性質を考慮します。たとえば、`"t": "${temperature}"` は、温度属性が数値の場合は `"t": 10`
-        に解決され、`temperature` 属性が文字列の場合は `"t": "10"` に解決されます
+    -   マクロが*使用されている文字列を完全にカバーしている場合*、属性値の JSON の性質が考慮されます。たとえば、
+        `"t": "${temperature}"` は、温度属性が数値の場合は `"t": 10` に解決され、`temperature` 属性が文字列の場合は
+        `"t": "10"` に解決されます
+    -   マクロが使用されている文字列の一部のみである場合、属性値は常に文字列にキャストされます。たとえば、
+        `"t": "Temperature is: ${temperature}"` は、温度属性が数値であっても、`"t": "Temperature is 10"`
+        に解決されます。属性値が JSON 配列またはオブジェクトの場合、この場合は文字列化されることに注意してください
     -   属性がエンティティに存在しない場合は、`null` 値が使用されます
 -   `payload` フィールドと `headers` フィールドに適用される URL 自動デコード
     ([カスタム・ペイロードとヘッダの特別な処理](#custom-payload-and-headers-special-treats) で説明) は、`json`
     フィールドには適用されません
 -   `payload` と `json` は同時に使用できません
 -    `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `application/json` に設定されます
+
+
+<a name="ngsi-payload-patching"></a>
+
+### NGSI ペイロードのパッチ適用 (NGSI payload patching)
+
+`ngsi` が `httpCustom` または `mqttCustom` で使用されている場合、次の考慮事項が適用されます。
+同時に使用できるのは、`payload`, `json` or `ngsi` のうちの1つだけであることに注意してください。
+
+`ngsi` フィールドを使用して、通知内のエンティティに*パッチ*を適用するエンティティ・フラグメントを指定できます。
+これにより、新しい属性を追加したり、既存の属性の値、ID および型 (type) を変更したりできます。結果の通知は、
+[通知メッセージ](#notification-messages)で説明されている NGSIv2 正規化形式を使用します。
+
+例えば：
+
+```
+"httpCustom": {
+   ...
+   "ngsi": {
+     "id": "prefix:${id}",
+     "type": "newType",
+     "originalService": {
+       "value": "${service}",
+       "type": "Text"
+     },
+     "originalServicePath": {
+       "value": "${servicePath}",
+       "type": "Text"
+     }
+   }
+}
+```
+
+`ngsi` を使用する際に考慮すべきいくつかの注意事項:
+
+-   `ngsi` フィールドの値は、有効な [JSON エンティティ表現](#json-entity-representation) である必要がありますが、
+    いくつかの追加の考慮事項があります:
+    -   `id` または `type` は必須ではありません
+    -   属性 `type` が指定されていない場合は、[部分表現](#partial-representations) で説明されているデフォルトが使用されます
+    -   属性 `metadata` は使用できません
+    -   `{}` は `ngsi` フィールドの有効な値です。この場合、パッチは適用されず、元の通知が送信されます
+-   `notification.attrs` が使用されている場合、属性フィルタリングは NGSI パッチを適用した*後に*行われます
+-   適用されるパッチのセマンティクスは *update または append* (更新の `append` `actionType` に似ています) ですが、
+    他のセマンティクスが将来追加される可能性があります
+-   [マクロ置換ロジック](#macro-substitution) は期待どおりに機能しますが、次の考慮事項があります:
+    -   JSON オブジェクトのキー部分では使用できません。つまり、`"${key}": 10` は機能しません
+    -   属性 `type` では使用できません。`value` マクロでのみ置換を行うことができます
+    -   マクロが *使用されている文字列を完全にカバーしている場合*、属性値の JSON の性質が考慮されます。たとえば、
+        `"value": "${temperature}"` は、温度属性が数値の場合は `"value": 10` に解決され、`temperature`
+        属性が文字列の場合は `"value": "10"` に解決されます
+    -   マクロが使用されている文字列の一部のみである場合、属性値は常に文字列にキャストされます。たとえば、
+        `"value": "Temperature is: ${temperature}"` は、温度属性が数値であっても、`"value": "Temperature is 10"`
+        に解決されます。属性値が JSON 配列またはオブジェクトの場合、この場合は文字列化されることに注意してください
+    -   属性がエンティティに存在しない場合、`null` 値が使用されます
+-   `headers` フィールドによって上書きされる場合を除き、`Content-Type` ヘッダは `application/json` に設定されます
 
 <a name="omitting-payload"></a>
 
@@ -2136,28 +2258,6 @@ The temperature is 23.4 degrees
 `payload` が `null` に設定されている場合、そのサブスクリプションに関連付けられている通知にはペイロードが含まれません
 (つまり、コンテンツ長 0 の通知)。これは、`""` に設定された `payload` を使用したり、フィールドを省略したりすることと
 同じではないことに注意してください。その場合、通知は NGSIv2 正規化形式を使用して送信されます。
-
-<a name="remove-headers"></a>
-
-### ヘッダの削除 (Remove headers)
-
-`headers` オブジェクトのヘッダ・キーに空の文字列値を指定すると、そのヘッダが通知から削除されます。
-たとえば、次の構成です:
-
-```
-"httpCustom": { 
-   ...
-   "headers": {"x-auth-token": ""}
-}
-```
-
-サブスクリプションに関連付けられた通知の `x-auth-token` ヘッダを削除します。
-
-これは、Orion が通知に自動的に含めるヘッダーを削除するのに役立ちます。
-
-例えば：
--   通知にデフォルトで含まれるヘッダを避けるため (例: `Accept`)
--   前述の `x-auth-token` などのヘッダの伝播 (更新から通知まで) をカットするため
 
 <a name="additional-considerations"></a>
 
@@ -2177,55 +2277,9 @@ The temperature is 23.4 degrees
     構成できます。この場合:
     -   `httpCustom` は `http` として解釈されます。つまり、`url` を除くすべてのサブ・フィールドは無視されます
     -   `${...}` マクロ置換は実行されません
-
-通知にカスタム・ペイロードが使用されている場合 (フィールド `payload` は対応するサブスクリプションにあります)、通知の
-`Ngsiv2-AttrsFormat` ヘッダに `custom` の値が使用されます。
-
-<a name="custom-payload-and-headers-special-treatment"></a>
-
-### カスタム・ペイロードとヘッダの特別な扱い (Custom payload and headers special treatment)
-
-[一般的な構文制限](#general-syntax-restrictions) は、`POST /v2/subscription` や `GET /v2/subscriptions` などの
-API 操作の `httpCustom.payload` フィールドにも適用されます。`httpCustom.headers` のヘッダ値にも同じ制限が適用されます。
-
-ただし、通知時に、`httpCustom.payload` または `httpCustom.headers` の値に含まれる URL エンコード文字はすべてデコード
-されます。
-
-例：
-
-特定のサブスクリプションで次の `notification.httpCustom` オブジェクトを考えてみましょう。
-
-```
-"httpCustom": {
-  "url": "http://foo.com/entity/${id}",
-  "headers": {
-    "Content-Type": "text/plain",
-    "Authorization": "Basic ABC...ABC%3D%3D"
-  },
-  "method": "PUT",
-  "qs": {
-    "type": "${type}"
-  },
-  "payload": "the value of the %22temperature%22 attribute %28of type Number%29 is ${temperature}"
-}
-```
-
-上記のペイロード値は、この文字列の URL エンコードされたバージョンであることに注意してください:
-`the value of the "temperature" attribute (of type Number) is ${temperature}`。
-`"Basic ABC...ABC%3D%3D"` は、この文字列の URL エンコードされたバージョンであることに注意してください:
-`"Basic ABC...ABC=="`.
-
-ここで、Orion がこのサブスクリプションに関連付けられた通知をトリガーすることを考えてみましょう。 通知データは、
-ID が `DC_S1-D41` でタイプが `Room` のエンティティ用で、値が 23.4 の `temperature` という名前の属性が含まれます。
-テンプレートを適用した後の結果の通知は次のようになります:
-
-```
-PUT http://foo.com/entity/DC_S1-D41?type=Room
-Authorization: "Basic ABC...ABC=="
-Content-Type: application/json 
-Content-Length: 65
-the value of the "temperature" attribute (of type Number) is 23.4
-```
+-   テキスト・ベースまたは JSON ペイロードが使用される場合 (つまり、 `payload` または `json` フィールドが使用される場合)、
+    `Ngsiv2-AttrsFormat` ヘッダは `custom` に設定されます。ただし、NGSI patch が使用される場合 (つまり、`ngsi` フィールド)、
+    通常の通知と同様に、`Ngsiv2-AttrsFormat: normalized` が使用されることに注意してください (通知形式が実際には同じである場合)
 
 <a name="oneshot-subscriptions"></a>
 
@@ -2481,6 +2535,48 @@ GET /v2/entities?orderBy=temperature,!humidity
 5. Array
 6. Boolean
 
+<a name="ties"></a>
+
+### 同値 (Ties)
+
+同値 (ties) の場合、Orion は `orderBy` を使用した同じクエリが同じ結果シーケンスをもたらすことを保証しないことに
+注意してください。つまり、同じクエリが繰り返されると、関連付けられた結果が異なる相対順序で返される可能性があります。
+これは、MongoDB (Orion によって使用される基礎となる DB) が実装する動作と同じです
+([この MongoDB ドキュメント](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/) を参照)
+
+これはページネーションの場合に問題となる可能性があることに注意してください。次の例で説明してみましょう。
+4つのエンティティ (E1～E4) があるとします:
+
+* E1, 属性 `colour` を `blue` に設定
+* E2, 属性 `colour` を `blue` に設定
+* E3, 属性 `colour` を `red` に設定
+* E4, 属性 `colour` を `red` に設定
+
+`GET /v2/entities?orderBy=colour` の最初の実行では `E1, E2, E3, E4` が返される可能性がありますが、クエリの2回目の実行では
+`E2, E1, E4, E3` が返され、3回目の実行では `E1, E2, E4, E3` などが返される可能性があります。
+
+次のような典型的なページ分割された一連のクエリを考えてみましょう:
+
+```
+GET /v2/entities?orderBy=colour&limit=3&offset=0
+GET /v2/entities?orderBy=colour&limit=3&offset=3
+```
+
+クエリ間で同じ結果の順序が保証されていないため、最初のクエリでは順序が `E1, E2, E3, E4` になる可能性があります (したがって、
+クライアントは `E1, E2, E3` を取得します)。2回目のクエリでは、シーケンスが (`E1、E2、E4、E3`) のようになる可能性があります。
+したがって、クライアントは (予期された `E4` ではなく) 再び `E3` を取得します。
+
+別の同様の (より複雑なケース) については、[この issue](https://github.com/telefonicaid/fiware-orion/issues/4394)
+で説明しています。
+
+解決策は、別の属性を `orderBy` に追加して、同値が発生しないことを保証することです。この意味で、`dateCreated`
+[組み込み属性](#builtin-attributes) は非常に良い候補であるため、上記のクエリは次のように適応できます:
+
+```
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=0
+GET /v2/entities?orderBy=colour,dateCreated&limit=3&offset=3
+```
+
 <a name="api-routes"></a>
 
 # API ルート (API Routes)
@@ -2652,8 +2748,11 @@ _**リクエスト・ペイロード**_
     "value": 60
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84"
@@ -2750,8 +2849,11 @@ _**レスポンス・ペイロード**_
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
@@ -2831,8 +2933,11 @@ _**レスポンス・ペイロード**_
     "type": "Number"
   },
   "location": {
-    "value": "41.3763726, 2.1864475",
-    "type": "geo:point",
+    "value": {
+      "type": "Point",
+      "coordinates": [2.1864475, 41.3763726]
+    },
+    "type": "geo:json",
     "metadata": {
       "crs": {
         "value": "WGS84",
@@ -3593,8 +3698,9 @@ _**レスポンス・ペイロード**_
 | パラメータ        | オプション | タイプ | 説明                                                                                                                                                                                                                                                                               |
 |-------------------|------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`           | ✓          | array  | 通知をトリガーする属性名の配列。空のリストは許可されていません                                                                                                                                                                                                                     |
-| `expression`      | ✓          | object | `q`, `mq`, `georel`, `geometry`, `coords` で構成される式 (このフィールドについては、上記の [エンティティをリスト](#list-entities-get-v2entities)操作を参照してください)。`expression` とサブ要素 (つまり `q`) にはコンテンツが必要です。つまり、`{}` または `""` は許可されません |
+| `expression`      | ✓          | object | `q`, `mq`, `georel`, `geometry`, `coords` で構成される式 (このフィールドについては、上記の [エンティティをリスト](#list-entities-get-v2entities)操作を参照してください)。`expression` とサブ要素 (つまり `q`) にはコンテンツが必要です。つまり、`{}` または `""` は許可されません。`georel`, `geometry`, および `coords` は一緒に使用する必要があります (つまり、"全てか無しか")。 geoquery を式として使用する例は下記(#create-subscription-post-v2subscriptions) を確認してください |
 | `alterationTypes` | ✓          | array  | サブスクリプションがトリガーされる変更 (エンティティの作成、エンティティの変更など) を指定します ([変更タイプに基づくサブスクリプション](#subscriptions-based-in-alteration-type)のセクションを参照)                                                                               |
+| `notifyOnMetadataChange` | ✓   | boolean | `true` の場合、メタデータは通知のコンテキストで属性の値の一部と見なされるため、値が変更されずにメタデータが変更された場合、通知がトリガーされます。`false` の場合、メタデータは通知のコンテキストで属性の値の一部と見なされないため、値が変更されずにメタデータが変更された場合、通知はトリガーされません。デフォルト値は `true` です |
 
 通知のトリガー (つまり、エンティティの更新に基づいて通知がトリガーされる場合) については、
 [この特定のセクション](#notification-triggering) で説明されています。
@@ -3609,7 +3715,7 @@ _**レスポンス・ペイロード**_
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` または `exceptAttrs`                                                                                                                                                                    |            | array   | 両方を同時に使用することはできません。<ul><li><code>attrs</code>: 通知メッセージに含まれる属性のリスト。また、<code>attrsFormat</code> <code>value</code> が使用されたときに属性が通知に表示される順序も定義します ("通知メッセージ" のセクションを参照)。空のリストは、すべての属性が通知に含まれることを意味します。詳細については、[属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)のセクションを参照してください</li><li><code>exceptAttrs</code>: 通知メッセージから除外される属性のリスト。つまり、通知メッセージには、このフィールドにリストされているものを除くすべてのエンティティ属性が含まれます。 空でないリストでなければなりません。</li><li><code>attrs</code> も <code>exceptAttrs</code> も指定されていない場合、すべての属性が通知に含まれます</li></ul> |
 | [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) または [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓          | object  | それらの1つが存在する必要がありますが、同時に1つを超えてはなりません。x トランスポート・プロトコルを介して配信される通知のパラメータを伝達するために使用されます                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `attrsFormat`                                                                                                                                                                                   | ✓          | string  | エンティティが通知でどのように表されるかを指定します。受け入れられる値は、`normalized` (デフォルト), `keyValues`, `values`, または `legacy` です。<br> `attrsFormat` がそれらとは異なる値をとると、エラーが発生します。 詳細については、[通知メッセージ](#notification-messages)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `attrsFormat`                                                                                                                                                                                   | ✓          | string  | エンティティが通知でどのように表されるかを指定します。受け入れられる値は、`normalized` (デフォルト), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, `values`, または `legacy` です。<br> `attrsFormat` がそれらとは異なる値をとると、エラーが発生します。 詳細については、[通知メッセージ](#notification-messages)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `metadata`                                                                                                                                                                                      | ✓          | string  | 通知メッセージに含まれるメタデータのリスト。詳細については、[属性とメタデータの除外](#filtering-out-attributes-and-metadata)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `onlyChangedAttrs`                                                                                                                                                                              | ✓          | boolean | `true` の場合、通知には、`attrs` または `exceptAttrs` フィールドと組み合わせて、トリガー更新リクエストで変更された属性のみが含まれます。(フィールドが省略されている場合、デフォルトは `false` です))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `covered`                                                                                                                                                                                       | ✓          | boolean | `true` の場合、通知には、エンティティに存在しない場合でも (この場合、`null` 値で) `attrs` フィールドで定義されたすべての属性が含まれます。(デフォルト値は false です)。詳細については、[対象サブスクリプション](#covered-subscriptions)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
@@ -3655,13 +3761,14 @@ time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | c
 
 `mqtt` オブジェクトには、次のサブフィールドが含まれています:
 
-| パラメータ | オプション | タイプ | 説明                                                                                                                                                   |
-|------------|------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `url`      |            | string | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます) |
-| `topic`    |            | string | 使用する MQTT トピックを表します                                                                                                                       |
-| `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                      |
-| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                   |
-| `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                   |
+| パラメータ | オプション | タイプ  | 説明                                                                                                                                                  |
+|------------|------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`      |            | string  | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます) |
+| `topic`    |            | string  | 使用する MQTT トピックを表します                                                                                                                      |
+| `qos`      | ✓          | number  | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                     |
+| `retain`   | ✓          | boolean | MQTT は、サブスクリプションに関連付けられた通知で使用する値を保持します (`true` または `false`)。 省略した場合は、retain には `false` が使用されます  |
+| `user`     | ✓          | string  | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                  |
+| `passwd`   | ✓          | string  | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                  |
 
 MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)のドキュメントを参照してください。
 
@@ -3677,8 +3784,12 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 | `headers`  | ✓          | object | 通知メッセージに含まれる HTTP ヘッダのキー・マップ。空であってはなりません                                                                                                                                                                                                                                                                          |
 | `qs`       | ✓          | object | 通知メッセージに含まれる URL クエリ・パラメータのキー・マップ。空であってはなりません                                                                                                                                                                                                                                                               |
 | `method`   | ✓          | string | 通知を送信するときに使用するメソッド (デフォルトは POST)。有効な HTTP メソッドのみが許可されます。無効な HTTP メソッドを指定すると、400 Bad Request エラーが返されます                                                                                                                                                                              |
-| `payload`  | ✓          | string | 通知で使用されるペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。`null` の場合、通知にはペイロードは含まれません                                                                                                                                     |
+| `payload`  | ✓          | string | 通知で使用されるテキスト・ベースのペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。`null` の場合、通知にはペイロードは含まれません                                                                                                                   |
+| `json`     | ✓          | object | 通知で使用される JSON ベースのペイロード。詳細については、[JSON ペイロード](#json-payloads) セクションを参照してください                                                                                                                                                                                                                            |
+| `ngsi`     | ✓          | object | 通知で使用されるペイロードの NGSI パッチ。詳細については、[NGSI ペイロードのパッチ適用](#ngsi-payload-patching) セクションを参照してください                                                                                                                                                                                                        |
 | `timeout`  | ✓          | number | サブスクリプションがレスポンスを待機する最大時間 (ミリ秒単位)。このパラメータに許可される最大値は1800000 (30分) です。`timeout` が0に定義されているか省略されている場合、`-httpTimeout` CLI パラメータとして渡された値が使用されます。詳細については、[コマンドライン・オプション](admin/cli.md#command-line-options)のセクションを参照してください |
+
+`payload`, `json` または `ngsi` は同時に使用できません。相互に排他的です。
 
 `httpCustom` を使用する場合は、[カスタム通知](#custom-notifications) のセクションで説明されている考慮事項が適用されます。
 
@@ -3688,14 +3799,19 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 
 `mqttCustom` オブジェクトには、次のサブフィールドが含まれています:
 
-| パラメータ | オプション | タイプ | 説明                                                                                                                                                   |
-|------------|------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `url`      |            | string | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます) |
-| `topic`    |            | string | 使用する MQTT トピックを表します。このフィールドに対してもマクロ置換が実行されます (つまり、属性に基づくトピック)                                      |
-| `qos`      | ✓          | number | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                      |
-| `user`     | ✓          | string | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                   |
-| `passwd`   | ✓          | string | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                   |
-| `payload`  | ✓          | string | 通知で使用されるペイロード。省略した場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます          |
+| パラメータ | オプション | タイプ  | 説明                                                                                                                                                                                                                              |
+|------------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`      |            | string  | 使用するMQTT ブローカーのエンドポイントを表します。URL は `mqtt://` で始まる必要があり、パスを含めることはできません (ホストとポートのみが含まれます)                                                                             |
+| `topic`    |            | string  | 使用する MQTT トピックを表します。このフィールドに対してもマクロ置換が実行されます (つまり、属性に基づくトピック)                                                                                                                 |
+| `qos`      | ✓          | number  | サブスクリプションに関連付けられた通知で使用する MQTT QoS 値 (0, 1, または 2)。省略した場合、QoS 0 が使用されます                                                                                                                 |
+| `retain`   | ✓          | boolean | MQTT は、サブスクリプションに関連付けられた通知で使用する値を保持します (`true` または `false`)。 省略した場合は、retain には `false` が使用されます                                                                              |
+| `user`     | ✓          | string  | ブローカーとの接続を認証するために使用されるユーザ名                                                                                                                                                                              |
+| `passwd`   | ✓          | string  | ブローカー認証のパスフレーズ。サブスクリプション情報を取得するときは常に難読化されます (例: `GET /v2/subscriptions`)                                                                                                              |
+| `payload`  | ✓          | string  | 通知で使用されるテキスト・ベースのペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。`null` の場合、通知にはペイロードは含まれません |
+| `json`     | ✓          | object  | 通知で使用される JSON ベースのペイロード。詳細については、[JSON ペイロード](#json-payloads) セクションを参照してください                                                                                                          |
+| `ngsi`     | ✓          | object  | 通知で使用されるペイロードの NGSI パッチ。詳細については、[NGSI ペイロードのパッチ適用](#ngsi-payload-patching) セクションを参照してください                                                                                      |
+
+`payload`, `json` または `ngsi` は同時に使用できません。相互に排他的です。
 
 `mqttCustom` を使用する場合は、[カスタム通知](#custom-notifications)のセクションで説明されている考慮事項が適用されます。
 MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)のドキュメントを参照してください。
@@ -3811,7 +3927,7 @@ _**リクエスト・ペイロード**_
 ペイロードは、JSON サブスクリプション表現形式 ([サブスクリプション・ペイロード・データモデル](#subscription-payload-datamodel)
 セクションで説明されています) に従うサブスクリプションを含む JSON オブジェクトです。
 
-例:
+属性フィルタを使用した例:
 
 ```json
 {
@@ -3836,8 +3952,38 @@ _**リクエスト・ペイロード**_
     },
     "attrs": ["temperature", "humidity"]
   },
-  "expires": "2025-04-05T14:00:00.00Z",
-  "throttling": 5
+  "expires": "2025-04-05T14:00:00.00Z"
+}
+```
+
+条件としてジオクエリを使用する例:
+
+```json
+{
+  "description": "One subscription to rule them all",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [ "temperature" ],
+      "expression": {
+        "georel": "near;maxDistance:15000",
+        "geometry": "point",
+        "coords": "37.407804,-6.004552"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    },
+    "attrs": ["temperature", "humidity"]
+  },
+  "expires": "2025-04-05T14:00:00.00Z"
 }
 ```
 
@@ -4365,7 +4511,7 @@ _**リクエスト・ペイロード**_
 -   `appendStrict`: `POST /v2/entities` (エンティティがまだ存在しない場合) または
     `POST /v2/entities/<id>/attrs?options=append` (エンティティが既に存在する場合) にマップします
 -   `update`: `PATCH /v2/entities/<id>/attrs` にマップされます
--   `delete`: エンティティに含まれているすべての属性に対して、`DELETE /v2/entities/<id>/attrs/<attrName>`
+-   `delete`: エンティティに含まれているすべての属性に対して (この場合、属性の実際の値は関係ありません)、`DELETE /v2/entities/<id>/attrs/<attrName>`
     にマッピングし、エンティティに属性が含まれていない場合は、`DELETE /v2/entities/<id>` にマッピングします
 -   `replace`: `PUT /v2/entities/<id>/attrs` にマッピングします
 

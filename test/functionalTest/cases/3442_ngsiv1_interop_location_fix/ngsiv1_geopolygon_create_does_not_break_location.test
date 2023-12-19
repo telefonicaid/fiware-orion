@@ -40,7 +40,7 @@ echo "======================================================="
 payload='{
   "contextElements": [
   {
-    "type": "E",
+    "type": "T",
     "isPattern": "false",
     "id": "E1",
     "attributes": [
@@ -61,7 +61,7 @@ echo
 
 echo "02. Check location field is not broken in database"
 echo "=================================================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find()' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.entities.find().toArray()' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -71,10 +71,10 @@ echo
 01. Create entity with geo:polygon with NGSIv1 (APPEND)
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 199
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 199
 
 {
     "contextResponses": [
@@ -89,7 +89,7 @@ Date: REGEX(.*)
                 ],
                 "id": "E1",
                 "isPattern": "false",
-                "type": "E"
+                "type": "T"
             },
             "statusCode": {
                 "code": "200",
@@ -102,59 +102,61 @@ Date: REGEX(.*)
 
 02. Check location field is not broken in database
 ==================================================
-{
-    "_id": {
-        "id": "E1",
-        "servicePath": "/",
-        "type": "E"
-    },
-    "attrNames": [
-        "position"
-    ],
-    "attrs": {
-        "position": {
-            "creDate": REGEX(\d+\.\d+),
-            "mdNames": [],
-            "modDate": REGEX(\d+\.\d+),
-            "type": "geo:polygon",
-            "value": [
-                "7.7, 8.8",
-                "9.9, -10.10",
-                "3.3, 2.2",
-                "7.7, 8.8"
-            ]
-        }
-    },
-    "creDate": REGEX(\d+\.\d+),
-    "lastCorrelator": "REGEX(.*)",
-    "location": {
-        "attrName": "position",
-        "coords": {
-            "coordinates": [
-                [
-                    [
-                        8.8,
-                        7.7
-                    ],
-                    [
-                        -10.1,
-                        9.9
-                    ],
-                    [
-                        2.2,
-                        3.3
-                    ],
-                    [
-                        8.8,
-                        7.7
-                    ]
+[
+    {
+        "_id": {
+            "id": "E1",
+            "servicePath": "/",
+            "type": "T"
+        },
+        "attrNames": [
+            "position"
+        ],
+        "attrs": {
+            "position": {
+                "creDate": REGEX(\d+\.\d+),
+                "mdNames": [],
+                "modDate": REGEX(\d+\.\d+),
+                "type": "geo:polygon",
+                "value": [
+                    "7.7, 8.8",
+                    "9.9, -10.10",
+                    "3.3, 2.2",
+                    "7.7, 8.8"
                 ]
-            ],
-            "type": "Polygon"
-        }
-    },
-    "modDate": REGEX(\d+\.\d+)
-}
+            }
+        },
+        "creDate": REGEX(\d+\.\d+),
+        "lastCorrelator": "REGEX(.*)",
+        "location": {
+            "attrName": "position",
+            "coords": {
+                "coordinates": [
+                    [
+                        [
+                            8.8,
+                            7.7
+                        ],
+                        [
+                            -10.1,
+                            9.9
+                        ],
+                        [
+                            2.2,
+                            3.3
+                        ],
+                        [
+                            8.8,
+                            7.7
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            }
+        },
+        "modDate": REGEX(\d+\.\d+)
+    }
+]
 
 
 --TEARDOWN--

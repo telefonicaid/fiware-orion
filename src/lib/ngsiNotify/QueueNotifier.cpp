@@ -124,14 +124,11 @@ size_t QueueNotifier::queueSize(const std::string& service)
 */
 void QueueNotifier::sendNotifyContextRequest
 (
-  NotifyContextRequest&            ncr,
+  ContextElementResponse*          notifyCerP,
   const ngsiv2::Notification&      notification,
-  const std::string&               tenant,
+  const notifStaticFields&         nsf,
   long long                        maxFailsLimit,
   long long                        failsCounter,
-  const std::string&               xauthToken,
-  const std::string&               fiwareCorrelator,
-  unsigned int                     correlatorCounter,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
@@ -139,34 +136,38 @@ void QueueNotifier::sendNotifyContextRequest
   const std::vector<std::string>&  metadataFilter
 )
 {
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
-                                                                          notification,
-                                                                          tenant,
-                                                                          maxFailsLimit,
-                                                                          failsCounter,
-                                                                          xauthToken,
-                                                                          fiwareCorrelator,
-                                                                          correlatorCounter,
-                                                                          renderFormat,
-                                                                          attrsFilter,
-                                                                          blacklist,
-                                                                          covered,
-                                                                          metadataFilter);
+  SenderThreadParams* paramsP = Notifier::buildSenderParams(notifyCerP,
+                                                            nsf.subId,
+                                                            notification,
+                                                            nsf.tenant,
+                                                            maxFailsLimit,
+                                                            failsCounter,
+                                                            nsf.xauthToken,
+                                                            nsf.fiwareCorrelator,
+                                                            nsf.correlatorCounter,
+                                                            renderFormat,
+                                                            attrsFilter,
+                                                            blacklist,
+                                                            covered,
+                                                            metadataFilter);
 
-  size_t notificationsNum = paramsV->size();
-  for (unsigned ix = 0; ix < notificationsNum; ix++)
+  // Early return if some problem occurred with params building
+  // Nothing is added to the queue in this case
+  if (paramsP == NULL)
   {
-    clock_gettime(CLOCK_REALTIME, &(((*paramsV)[ix])->timeStamp));
+    return;
   }
+
+  clock_gettime(CLOCK_REALTIME, &(paramsP->timeStamp));
 
   // Try to use per-service queue. If not found, use the default queue
   ServiceQueue* sq;
 
-  std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(tenant);
+  std::map<std::string, ServiceQueue*>::iterator iter = serviceSq.find(nsf.tenant);
   std::string queueName;
   if (iter != serviceSq.end())
   {
-    queueName = tenant;
+    queueName = nsf.tenant;
     sq = iter->second;
   }
   else
@@ -175,19 +176,15 @@ void QueueNotifier::sendNotifyContextRequest
     sq = &defaultSq;
   }
 
-  bool enqueued = sq->try_push(paramsV);
+  bool enqueued = sq->try_push(paramsP);
   if (!enqueued)
   {
-    QueueStatistics::incReject(notificationsNum);
+    QueueStatistics::incReject(1);
     LM_E(("Runtime Error (%s notification queue is full)", queueName.c_str()));
-    for (unsigned ix = 0; ix < paramsV->size(); ix++)
-    {
-      delete (*paramsV)[ix];
-    }
-    delete paramsV;
+    delete paramsP;
 
     return;
   }
 
-  QueueStatistics::incIn(notificationsNum);
+  QueueStatistics::incIn(1);
 }

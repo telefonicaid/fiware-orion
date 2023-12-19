@@ -116,9 +116,11 @@
 #define CSUB_QS                      "qs"
 #define CSUB_PAYLOAD                 "payload"
 #define CSUB_JSON                    "json"
+#define CSUB_NGSI                    "ngsi"
 #define CSUB_BLACKLIST               "blacklist"
 #define CSUB_ONLYCHANGED             "onlyChanged"
 #define CSUB_COVERED                 "covered"
+#define CSUB_NOTIFYONMETADATACHANGE  "notifyOnMetadataChange"
 #define CSUB_LASTFAILURE             "lastFailure"
 #define CSUB_LASTFAILUREASON         "lastFailureReason"
 #define CSUB_LASTSUCCESS             "lastSuccess"
@@ -126,6 +128,7 @@
 
 #define CSUB_MQTTTOPIC               "topic"
 #define CSUB_MQTTQOS                 "qos"
+#define CSUB_MQTTRETAIN              "retain"
 
 #define CSUB_USER                    "user"
 #define CSUB_PASSWD                  "passwd"
@@ -150,5 +153,20 @@
 */
 #define UPDATE_OPERATORS_NUMBER 6
 const std::string UPDATE_OPERATORS[UPDATE_OPERATORS_NUMBER] = { "$inc", "$min", "$max", "$mul", "$push", "$pull" };
+
+#define UPDATE_OPERATORS_NUMBER_ALL 10
+const std::string UPDATE_OPERATORS_ALL[UPDATE_OPERATORS_NUMBER_ALL] = { "$inc", "$min", "$max", "$mul", "$push", "$pull", "$set", "$unset", "$addToSet", "$pullAll" };
+
+inline bool isUpdateOperator(const std::string& s)
+{
+  for (unsigned ix = 0; ix < UPDATE_OPERATORS_NUMBER_ALL; ix++)
+  {
+    if (s == UPDATE_OPERATORS_ALL[ix])
+    {
+      return true;
+    }
+  }
+  return false;
+}
 
 #endif  // SRC_LIB_MONGOBACKEND_DBCONSTANTS_H_

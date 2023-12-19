@@ -69,10 +69,10 @@ echo
 01. POST /v1/updateContext
 ==========================
 HTTP/1.1 200 OK
-Content-Length: 198
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 198
 
 {
     "contextResponses": [
@@ -101,10 +101,10 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY/attrs/speed/value with Accept == plain/text
 ========================================================================
 HTTP/1.1 200 OK
-Content-Length: 5
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 5
 
 "150"
 
