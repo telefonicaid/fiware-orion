@@ -107,7 +107,7 @@ The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tes
 
 In the case of the aarch64 architecture, install libxslt using apt-get, and run `./configure` with `--build=arm-linux` option.
 
-* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](hhttps://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) for details. Recommended version is 6.0 (it may work with previous versions, but we don't recommend it).
+* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) for details. Recommended version is 6.0 (it may work with previous versions, but we don't recommend it).
 
 * Run unit test
 
