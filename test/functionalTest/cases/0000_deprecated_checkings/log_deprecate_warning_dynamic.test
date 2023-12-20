@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Disable NGSIv1 CLI with dynamic changes done by management REST API
+Log deprecate warnings with dynamic changes done by management REST API
 
 --SHELL-INIT--
 dbInit CB
