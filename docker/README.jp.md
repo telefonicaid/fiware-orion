@@ -36,7 +36,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 		    command: -dbhost mongo
 
 		  mongo:
-		    image: mongo:4.4
+		    image: mongo:6.0
 		    command: --nojournal
 
 3. コマンドラインを使用して作成したディレクトリで、`sudo docker-compose up` を実行します
@@ -75,7 +75,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 ### 2B. MongoDB が別の Docker コンテナで動作している場合
 他のコンテナで MongoDB を実行したい場合は、次のように起動することができます
 
-	 sudo docker run --name mongodb -d mongo:4.4
+	 sudo docker run --name mongodb -d mongo:6.0
 
 そして、このコマンドで Orion を実行します
 
@@ -109,7 +109,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 4. Orion を実行 ...
 	 * docker-compose で自動化されたシナリオを使用し、新しいイメージを構築する : `sudo docker-compose up`。必要に応じて、提供されている `docker-compose.yml` ファイルを変更することもできます
 	 * 手動で MongoDB を別のコンテナで実行します :
-                 1. `sudo docker run --name mongodb -d mongo:4.4`
+                 1. `sudo docker run --name mongodb -d mongo:6.0`
                  2. `sudo docker build -t orion .`
                  3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
 	 * 手動で MongoDB ホストを見つける場所を指定します :
