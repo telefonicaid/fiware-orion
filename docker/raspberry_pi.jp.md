@@ -50,7 +50,7 @@ services:
     command: -dbhost mongo
 
   mongo:
-    image: mongo:4.4
+    image: mongo:6.0
     command: --nojournal
 ```
 
