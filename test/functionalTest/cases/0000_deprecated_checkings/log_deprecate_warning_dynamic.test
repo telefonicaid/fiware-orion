@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Disable NGSIv1 CLI with dynamic changes done by management REST API
+Log deprecate warnings with dynamic changes done by management REST API
 
 --SHELL-INIT--
 dbInit CB
@@ -32,15 +32,15 @@ brokerStart CB 0 IPV4 -logDeprecate
 #
 # 00. Check deprecate is true
 # 01. Query E1-T1
-# 02. GET /v1/contextEntities/E
+# 02. GET /v1/contextEntities/E/attributes/A
 # 03. Disable logDeprecated by API
 # 04. Check deprecate is false
 # 05. Query E1-T1 (not logged)
-# 06. GET /v1/contextEntities/E (not logged)
+# 06. GET /v1/contextEntities/E/attributes/A (not logged)
 # 07. Enable logDeprecated by API
 # 08. Check deprecate is false
 # 09. Query E1-T1
-# 10. GET /v1/contextEntities/E
+# 10. GET /v1/contextEntities/E/attributes/A
 # 11. Get WARNING trace in logs (see 4 traces)
 #
 
