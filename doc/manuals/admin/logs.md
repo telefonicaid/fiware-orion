@@ -176,7 +176,7 @@ time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df
 * In the case of MQTT notifications the `msg` field of the above trace is slightly different:
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoMqttNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2, payload (123 bytes): {"subscriptionId":"5f914177334436ea590f6edb","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoMqttNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2, payload (123 bytes): {"subscriptionId":"60ffea6c1bca454f9a64c96c","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}
 ```
 
 * For each forwarded request to a [Context Provider](../user/context_providers.md) (either queries or updates),
