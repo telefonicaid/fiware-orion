@@ -44,6 +44,28 @@ inline bool isNgsiV1Url(const char* url)
 
 /* ****************************************************************************
 *
+* truncatePayload -
+*
+* NOTE: this function allocated dynamic memory, be careful with memory leaks!
+*/
+static char* truncatePayload(const char* payload)
+{
+  // +5 due to "(...)"
+  // +1 due to '\0'
+  unsigned int truncatedPayloadLengh = logInfoPayloadMaxSize + 5 + 1;
+
+  char* truncatedPayload = (char*) malloc(logInfoPayloadMaxSize + 5 + 1);
+  strncpy(truncatedPayload, payload, logInfoPayloadMaxSize);
+  strncpy(truncatedPayload + logInfoPayloadMaxSize, "(...)", 5);
+  truncatedPayload[truncatedPayloadLengh - 1] = '\0';
+
+  return truncatedPayload;
+}
+
+
+
+/* ****************************************************************************
+*
 * logInfoNotification - rc as int
 */
 void logInfoHttpNotification
@@ -52,12 +74,13 @@ void logInfoHttpNotification
   const char*  endpoint,
   const char*  verb,
   const char*  resource,
+  const char*  payload,
   int          rc
 )
 {
   char buffer[STRING_SIZE_FOR_INT];
   snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoHttpNotification(subId, endpoint, verb, resource, buffer);
+  logInfoHttpNotification(subId, endpoint, verb, resource, payload, buffer);
 }
 
 
@@ -72,10 +95,29 @@ void logInfoHttpNotification
   const char*  endpoint,
   const char*  verb,
   const char*  resource,
+  const char*  payload,
   const char*  rc
 )
 {
-  LM_I(("Notif delivered (subId: %s): %s %s%s, response code: %s", subId, verb, endpoint, resource, rc));
+  bool cleanAfterUse = false;
+  char* effectivePayload;
+
+  if (strlen(payload) > logInfoPayloadMaxSize)
+  {
+    effectivePayload = truncatePayload(payload);
+    cleanAfterUse = true;
+  }
+  else
+  {
+    effectivePayload = (char*) payload;
+  }
+
+  LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc));
+
+  if (cleanAfterUse)
+  {
+    free(effectivePayload);
+  }
 }
 
 
@@ -88,10 +130,29 @@ void logInfoMqttNotification
 (
   const char*  subId,
   const char*  endpoint,
-  const char*  resource
+  const char*  resource,
+  const char*  payload
 )
 {
-  LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s", subId, endpoint, resource));
+  bool cleanAfterUse = false;
+  char* effectivePayload;
+
+  if (strlen(payload) > logInfoPayloadMaxSize)
+  {
+    effectivePayload = truncatePayload(payload);
+    cleanAfterUse = true;
+  }
+  else
+  {
+    effectivePayload = (char*) payload;
+  }
+
+  LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s, payload (%d bytes): %s", subId, endpoint, resource, strlen(payload), effectivePayload));
+
+  if (cleanAfterUse)
+  {
+    free(effectivePayload);
+  }
 }
 
 
@@ -113,28 +174,6 @@ void logInfoRequestWithoutPayload
   {
     LM_W(("Deprecated NGSIv1 request received: %s %s, response code: %d", verb, url, rc));
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* truncatePayload -
-*
-* NOTE: this function allocated dynamic memory, be careful with memory leaks!
-*/
-static char* truncatePayload(const char* payload)
-{
-  // +5 due to "(...)"
-  // +1 due to '\0'
-  unsigned int truncatedPayloadLengh = logInfoPayloadMaxSize + 5 + 1;
-
-  char* truncatedPayload = (char*) malloc(logInfoPayloadMaxSize + 5 + 1);
-  strncpy(truncatedPayload, payload, logInfoPayloadMaxSize);
-  strncpy(truncatedPayload + logInfoPayloadMaxSize, "(...)", 5);
-  truncatedPayload[truncatedPayloadLengh - 1] = '\0';
-
-  return truncatedPayload;
 }
 
 
