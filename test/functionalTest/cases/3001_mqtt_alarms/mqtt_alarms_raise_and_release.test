@@ -162,7 +162,7 @@ echo
 
 echo "09. Check logs and see 1 raised alarm and 1 released alarm"
 echo "=========================================================="
-cat /tmp/contextBroker.log | grep -v 'corr=N/A' | awk -F 'msg=' '{print $2}'
+cat /tmp/contextBroker.log | grep -v 'corr=N/A' | awk -F 'msg=' '{print $2}' | sed -e "s/$SUB_ID/SUB_ID/g"
 echo
 echo
 
@@ -360,10 +360,10 @@ Raising alarm MqttConnectionError mqtt.flespi.io:1883: Connection Refused: bad u
 Request received: GET /v2/subscriptions, response code: 200
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
 Request received: GET /v2/subscriptions, response code: 200
-Request received: PATCH /v2/subscriptions/REGEX(.*): { "notification": { "mqtt": { "url": "mqtt://mqtt.flespi.io:1883", "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ", "passwd": "xxxx", "topic": "sub1" } } }, response code: 204
+Request received: PATCH /v2/subscriptions/SUB_ID, request payload (182 bytes): { "notification": { "mqtt": { "url": "mqtt://mqtt.flespi.io:1883", "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ", "passwd": "xxxx", "topic": "sub1" } } }, response code: 204
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
 Releasing alarm MqttConnectionError mqtt.flespi.io:1883
-MQTT Notif delivered REGEX(.*): broker: mqtt.flespi.io:1883, topic: sub1
+MQTT Notif delivered (subId: SUB_ID): broker: mqtt.flespi.io:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: GET /v2/subscriptions, response code: 200
 #SORT_END
 

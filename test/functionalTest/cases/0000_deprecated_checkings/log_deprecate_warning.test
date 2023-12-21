@@ -31,7 +31,7 @@ brokerStart CB 0 IPV4 -logDeprecate
 
 #
 # 01. Query E1-T1
-# 02. GET /v1/contextEntities/E
+# 02. GET /v1/contextEntities/E/attributes/A
 # 03. Create entity using NGSIv1 and geo:point
 # 04. Create entity using NGSIv2 and geo:point
 # 05. Get WARNING trace in logs
