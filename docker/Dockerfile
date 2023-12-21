@@ -20,7 +20,7 @@
 #
 
 ARG  IMAGE_NAME=debian
-ARG  IMAGE_TAG=12.1-slim
+ARG  IMAGE_TAG=12.4-slim
 FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
