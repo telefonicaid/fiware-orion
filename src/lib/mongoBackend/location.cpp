@@ -320,6 +320,11 @@ static bool getGeoJson
   std::vector<double>      coordLong;
   orion::BSONArrayBuilder  ba;
 
+  if ((logDeprecate) && ((caP->type == GEO_POINT) || (caP->type == GEO_LINE) || (caP->type == GEO_BOX) || (caP->type == GEO_POLYGON)))
+  {
+    LM_W(("Deprecated usage of %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
+  }
+
   if (caP->type == GEO_POINT)
   {
     double  aLat;
