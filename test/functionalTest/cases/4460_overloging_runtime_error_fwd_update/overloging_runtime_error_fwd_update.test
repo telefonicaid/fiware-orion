@@ -160,7 +160,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 05. Check no Runtime Error occur
 ================================
-1
+0
 
 
 06. Query device:wt:13 attribute profile_config in CP1 and see foobar
@@ -169,14 +169,14 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 98
+Content-Length: 104
 
 {
     "id": "device:wt:13",
     "profile_config": {
         "metadata": {},
         "type": "command",
-        "value": ""
+        "value": "foobar"
     },
     "type": "Device"
 }

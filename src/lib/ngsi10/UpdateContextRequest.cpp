@@ -332,11 +332,13 @@ ContextAttribute* UpdateContextRequest::attributeLookup(Entity* eP, const std::s
   {
     Entity* enP = entityVector[ceIx];
 
-    if ((enP->id != eP->id) || (enP->type != eP->type))
+    // empty type in request (enP) is always a match
+    if ((enP->id != eP->id) || ((enP->type != "") && (enP->type != eP->type)))
     {
       continue;
     }
 
+    // FIXME PR: eP is overriden here. Remove eP from function signature
     Entity* eP = entityVector[ceIx];
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
