@@ -338,12 +338,11 @@ ContextAttribute* UpdateContextRequest::attributeLookup(Entity* eP, const std::s
       continue;
     }
 
-    // FIXME PR: eP is overriden here. Remove eP from function signature
-    Entity* eP = entityVector[ceIx];
+    Entity* eVItemP = entityVector[ceIx];
 
-    for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0; aIx < eVItemP->attributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP = eP->attributeVector[aIx];
+      ContextAttribute* aP = eVItemP->attributeVector[aIx];
 
       if (aP->name == attributeName)
       {
