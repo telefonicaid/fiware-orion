@@ -29,7 +29,7 @@ dbInit CP1
 dbInit CP2
 dbInit CP3
 dbInit CP4
-orionldStart CB  -experimental -forwarding
+orionldStart CB  -experimental -forwarding -wip entityMaps
 orionldStart CP1 -experimental
 orionldStart CP2 -experimental
 orionldStart CP3 -experimental

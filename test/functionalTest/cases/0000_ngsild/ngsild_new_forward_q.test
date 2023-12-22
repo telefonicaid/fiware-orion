@@ -25,7 +25,7 @@ HTTP header test for forwarding of 'q'
 
 --SHELL-INIT--
 dbInit CB
-orionldStart CB -experimental -forwarding
+orionldStart CB -experimental -forwarding -wip entityMaps
 accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_PORT} 
 
 --SHELL--

@@ -21,13 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET /entities with three brokers all connected via registrations
+GET /entities with two brokers all connected via registrations
 
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
-orionldStart CB  -experimental -forwarding
-orionldStart CP1 -experimental -forwarding
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental -forwarding -wip entityMaps
 
 --SHELL--
 

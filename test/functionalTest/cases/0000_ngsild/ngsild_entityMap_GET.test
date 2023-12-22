@@ -27,7 +27,7 @@ GET /entities with Entity Map
 dbInit CB
 dbInit CP1
 #export CB_TRACELEVELS=${CB_TRACELEVELS:-31,70-79,80,110}
-orionldStart CB  -experimental -forwarding
+orionldStart CB  -experimental -forwarding -wip entityMaps
 orionldStart CP1 -experimental
 
 --SHELL--

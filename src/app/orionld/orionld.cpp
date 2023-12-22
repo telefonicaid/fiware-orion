@@ -250,6 +250,7 @@ bool            socketService;
 unsigned short  socketServicePort;
 bool            distributed;
 char            brokerId[136];
+char            wip[512];
 bool            noNotifyFalseUpdate;
 bool            idIndex;
 bool            noswap;
@@ -335,6 +336,7 @@ bool            triggerOperation = false;
 #define SOCKET_SERVICE_PORT_DESC  "port to receive new socket service connections"
 #define DISTRIBUTED_DESC       "turn on distributed operation"
 #define BROKER_ID_DESC         "identity of this broker instance for registrations - for the Via header"
+#define WIP_DESC               "Enable concepts that are 'Work In Progress' (e.g. -wip entityMaps)"
 #define FORWARDING_DESC        "turn on distributed operation (deprecated)"
 #define ID_INDEX_DESC          "automatic mongo index on _id.id"
 #define NOSWAP_DESC            "no swapping - for testing only!!!"
@@ -437,12 +439,13 @@ PaArgument paArgs[] =
   { "-troePwd",               troePwd,                  "TROE_PWD",                  PaString,  PaOpt,  _i "password",   PaNL,   PaNL,             TROE_HOST_PWD            },
   { "-troePoolSize",          &troePoolSize,            "TROE_POOL_SIZE",            PaInt,     PaOpt,  10,              0,      1000,             TROE_POOL_DESC           },
   { "-noNotifyFalseUpdate",   &noNotifyFalseUpdate,     "NO_NOTIFY_FALSE_UPDATE",    PaBool,    PaOpt,  false,           false,  true,             NO_NOTIFY_FALSE_UPDATE_DESC  },
-  { "-triggerOperation",      &triggerOperation,        "TRIGGER_OPERATION",         PaBool,    PaHid,  false,           false,  true,             TRIGGER_OPERATION_DESC   },
   { "-experimental",          &experimental,            "EXPERIMENTAL",              PaBool,    PaOpt,  false,           false,  true,             EXPERIMENTAL_DESC        },
   { "-mongocOnly",            &mongocOnly,              "MONGOCONLY",                PaBool,    PaOpt,  false,           false,  true,             MONGOCONLY_DESC          },
   { "-cSubCounters",          &cSubCounters,            "CSUB_COUNTERS",             PaInt,     PaOpt,  20,              0,      PaNL,             CSUBCOUNTERS_DESC        },
   { "-distributed",           &distributed,             "DISTRIBUTED",               PaBool,    PaOpt,  false,           false,  true,             DISTRIBUTED_DESC         },
   { "-brokerId",              &brokerId,                "BROKER_ID",                 PaStr,     PaOpt,  _i "",           PaNL,   PaNL,             BROKER_ID_DESC           },
+  { "-wip",                   wip,                      "WIP",                       PaStr,     PaHid,  _i "",           PaNL,   PaNL,             WIP_DESC                 },
+  { "-triggerOperation",      &triggerOperation,        "TRIGGER_OPERATION",         PaBool,    PaHid,  false,           false,  true,             TRIGGER_OPERATION_DESC   },
   { "-forwarding",            &distributed,             "FORWARDING",                PaBool,    PaHid,  false,           false,  true,             FORWARDING_DESC          },
   { "-socketService",         &socketService,           "SOCKET_SERVICE",            PaBool,    PaHid,  false,           false,  true,             SOCKET_SERVICE_DESC      },
   { "-ssPort",                &socketServicePort,       "SOCKET_SERVICE_PORT",       PaUShort,  PaHid,  1027,            PaNL,   PaNL,             SOCKET_SERVICE_PORT_DESC },
@@ -1066,6 +1069,12 @@ int main(int argC, char* argV[])
   {
     strncpy(paLogLevel, "DEBUG", sizeof(paLogLevel) - 1);
     lmTraceLevelSet(LmtCurl, true);
+  }
+
+  if (wip[0] != 0)
+  {
+    if (strcmp(wip, "entityMaps") == 0)
+      entityMapsEnabled = true;
   }
 
 #if 0
