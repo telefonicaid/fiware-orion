@@ -70,7 +70,7 @@ static void attrNameToSuccess(KjNode* successV, KjNode* failureV, char* attrName
 //
 // distOpSuccess -
 //
-void distOpSuccess(KjNode* responseBody, DistOp* distOpP, char* attrName)
+void distOpSuccess(KjNode* responseBody, DistOp* distOpP, const char* entityId, char* attrName)
 {
   KjNode* successV = kjLookup(responseBody, "success");
   KjNode* failureV = kjLookup(responseBody, "failure");
@@ -81,13 +81,19 @@ void distOpSuccess(KjNode* responseBody, DistOp* distOpP, char* attrName)
     kjChildAdd(responseBody, successV);
   }
 
+  if ((distOpP == NULL) && (attrName == NULL))
+  {
+    KjNode* entityIdNodeP = kjString(orionldState.kjsonP, NULL, entityId);
+    kjChildAdd(successV, entityIdNodeP);
+  }
+
   if (attrName != NULL)
     attrNameToSuccess(successV, failureV, attrName);
   else if (distOpP != NULL)
   {
     if (distOpP->attrName != NULL)
       attrNameToSuccess(successV, failureV, distOpP->attrName);
-    else
+    else if (distOpP->requestBody != NULL)
     {
       for (KjNode* attrNameP = distOpP->requestBody->value.firstChildP; attrNameP != NULL; attrNameP = attrNameP->next)
       {

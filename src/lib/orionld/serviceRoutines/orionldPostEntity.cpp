@@ -262,7 +262,7 @@ bool orionldPostEntity(void)
             kjChildRemove(orionldState.requestTree, attrP);
           }
           else
-            distOpSuccess(responseBody, NULL, attrP->name);
+            distOpSuccess(responseBody, NULL, entityId, attrP->name);
         }
       }
       else
@@ -274,7 +274,7 @@ bool orionldPostEntity(void)
           kjChildRemove(orionldState.requestTree, attrP);
         }
         else
-          distOpSuccess(responseBody, NULL, attrP->name);
+          distOpSuccess(responseBody, NULL, entityId, attrP->name);
       }
 
       attrP = next;

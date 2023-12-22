@@ -219,10 +219,15 @@ bool orionldDeleteEntity(void)
   // Delete the entity in the local DB
   // - Error if the entity is not found locally, and not subject to forwarding
   //
-  if ((dbEntityP == NULL) && (distOpList == NULL))
+  if (dbEntityP == NULL)
   {
-    orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
-    return false;
+    if (distOpList == NULL)
+    {
+      orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
+      return false;
+    }
+    else
+      distOpFailure(responseBody, NULL, "Not Found", entityId, 404, NULL);
   }
 
   //
@@ -230,15 +235,23 @@ bool orionldDeleteEntity(void)
   // Give 404 if the entity is not present locally nor triggered any forwarded requests
   //
   char* detail = NULL;
-  if ((dbEntityP != NULL) && (mongocEntityDelete(entityId, &detail) == false))
+  if (dbEntityP != NULL)
   {
-    if (distOpList == NULL)  // pure local request
+    if (mongocEntityDelete(entityId, &detail) == true)
     {
-      orionldError(OrionldInternalError, "Database Error", detail, 500);
-      return false;
+      // Add a success to the "success" member
+      distOpSuccess(responseBody, NULL, entityId, NULL);
     }
     else
-      distOpFailure(responseBody, NULL, "Database Error", detail, 500, NULL);
+    {
+      if (distOpList == NULL)  // pure local request
+      {
+        orionldError(OrionldInternalError, "Database Error", detail, 500);
+        return false;
+      }
+      else
+        distOpFailure(responseBody, NULL, "Database Error", detail, 500, NULL);
+    }
   }
 
   if (dbEntityP != NULL)
@@ -250,6 +263,7 @@ bool orionldDeleteEntity(void)
     distOpListRelease(distOpList);
   }
 
+  kjTreeLog(responseBody, "responseBody", LmtSR);
   responseFix(responseBody, DoDeleteEntity, 204, entityId);
 
   return true;

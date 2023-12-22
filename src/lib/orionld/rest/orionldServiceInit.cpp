@@ -247,6 +247,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldDeleteEntity)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
   }
   else if (serviceP->serviceRoutine == orionldPostEntity)
   {

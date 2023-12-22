@@ -234,7 +234,7 @@ bool orionldPostEntities(void)
     DistOp local;
     bzero(&local, sizeof(local));
     local.requestBody = cloneForTroeP;
-    distOpSuccess(responseBody, &local, NULL);
+    distOpSuccess(responseBody, &local, NULL, NULL);
   }
 
   //
