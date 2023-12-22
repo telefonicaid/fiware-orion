@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Overloging Runtime Error on forwarding update request case
+Update forwarding was not working when entity type is not included in the request
 
 --SHELL-INIT--
 dbInit CB
