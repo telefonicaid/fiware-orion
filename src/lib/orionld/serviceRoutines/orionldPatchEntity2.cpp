@@ -729,7 +729,7 @@ bool orionldPatchEntity2(void)
     local.requestBody = requestForLocal;
 
     if (dbUpdateResult == true)
-      distOpSuccess(responseBody, &local, NULL);
+      distOpSuccess(responseBody, &local, entityId, NULL);
   }
 
   responseFix(responseBody, DoMergeEntity, 204, entityId);

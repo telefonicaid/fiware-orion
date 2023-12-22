@@ -384,7 +384,7 @@ bool orionldPatchEntity(void)
 
     bzero(&local, sizeof(local));
     local.requestBody = orionldState.requestTree;
-    distOpSuccess(responseBody, &local, NULL);
+    distOpSuccess(responseBody, &local, entityId, NULL);
   }
 
   //

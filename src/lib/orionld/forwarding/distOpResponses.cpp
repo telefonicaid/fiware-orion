@@ -333,7 +333,7 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     if (msgP->data.result == CURLE_OK)
     {
       if ((httpResponseCode >= 200) && (httpResponseCode <= 299))
-        distOpSuccess(responseBody, distOpP, NULL);
+        distOpSuccess(responseBody, distOpP, NULL, NULL);
       else if (httpResponseCode == 404)
         distOpFailure(responseBody, distOpP, "Not Found", NULL, 404, NULL);
     }

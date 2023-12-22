@@ -266,7 +266,7 @@ bool orionldDeleteAttribute(void)
         distOpFailure(responseBody, NULL, "Database Error", "(ToDo: get error from mongoc)", 500, attrName);
     }
     else
-      distOpSuccess(responseBody, NULL, attrName);
+      distOpSuccess(responseBody, NULL, entityId, attrName);
   }
 
   if (distOpList != NULL)
