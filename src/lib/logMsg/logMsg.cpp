@@ -2066,7 +2066,7 @@ LmStatus lmFdRegister
       char  dt[128];
       int   sz;
 
-      strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
+      strftime(dt, 128, "%A %d %h %H:%M:%S %Y", &tmP);
       snprintf(startMsg, sizeof(startMsg),
                "%s log\n-----------------\nStarted %s\nCleared at ...\n",
                progName, dt);
