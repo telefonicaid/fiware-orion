@@ -32,7 +32,7 @@ extern "C"
 #include "kjson/kjRenderSize.h"                                // kjFastRenderSize
 }
 
-#include "logMsg/logMsg.h"                                     // lmOut
+#include "logMsg/logMsg.h"                                     // lmTraceIsSet, lmOut
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/fileName.h"                           // fileName
@@ -46,6 +46,9 @@ extern "C"
 //
 void kjTreeLogFunction(KjNode* tree, const char* msg, const char* path, int lineNo, const char* functionName, int traceLevel)
 {
+  if (lmTraceIsSet(traceLevel) == false)
+    return;
+
   char* fileNameOnly = fileName(path);
 
   if (tree == NULL)
