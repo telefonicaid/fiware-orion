@@ -70,8 +70,6 @@ bool orionldDeleteSubscription(void)
     // FIXME: If mqtt, we need to disconnect from MQTT broker
     //        BUT, not until Orion-LD is able to run without sub-cache
     //
-    // kjTreeLog(subP, "MQTT Subscription?");
-    //
   }
   else
   {

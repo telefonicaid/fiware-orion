@@ -31,7 +31,7 @@ extern "C"
 #include "kjson/kjRender.h"                                      // kjFastRender
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/logMsg.h"                                       // LM_*, lmTraceIsSet
 
 #include "cache/CachedSubscription.h"                            // CachedSubscription
 
@@ -466,30 +466,31 @@ static NotificationPending* notificationLookupByCurlHandle(NotificationPending* 
 //
 void orionldAlterationsTreat(OrionldAlteration* altList)
 {
-#if 1
   // <DEBUG>
-  int alterations = 0;
-  for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
+  if (lmTraceIsSet(LmtAlt))
   {
-    LM_T(LmtAlt, (" Alteration %d:", alterations));
-    LM_T(LmtAlt, ("   Entity In:      %p", aP->inEntityP));
-    LM_T(LmtAlt, ("   CompleteEntity: %p", aP->finalApiEntityP));
-    LM_T(LmtAlt, ("   Entity Id:      %s", aP->entityId));
-    LM_T(LmtAlt, ("   Entity Type:    %s", aP->entityType));
-    LM_T(LmtAlt, ("   Attributes:     %d", aP->alteredAttributes));
-
-    for (int ix = 0; ix < aP->alteredAttributes; ix++)
+    int alterations = 0;
+    for (OrionldAlteration* aP = altList; aP != NULL; aP = aP->next)
     {
-      LM_T(LmtAlt, ("   Attribute        %s", aP->alteredAttributeV[ix].attrName));
-      LM_T(LmtAlt, ("   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
-    }
+      LM_T(LmtAlt, (" Alteration %d:", alterations));
+      LM_T(LmtAlt, ("   Entity In:      %p", aP->inEntityP));
+      LM_T(LmtAlt, ("   CompleteEntity: %p", aP->finalApiEntityP));
+      LM_T(LmtAlt, ("   Entity Id:      %s", aP->entityId));
+      LM_T(LmtAlt, ("   Entity Type:    %s", aP->entityType));
+      LM_T(LmtAlt, ("   Attributes:     %d", aP->alteredAttributes));
 
-    kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);  // outdeffed
-    ++alterations;
+      for (int ix = 0; ix < aP->alteredAttributes; ix++)
+      {
+        LM_T(LmtAlt, ("   Attribute        %s", aP->alteredAttributeV[ix].attrName));
+        LM_T(LmtAlt, ("   Alteration Type: %s", orionldAlterationType(aP->alteredAttributeV[ix].alterationType)));
+      }
+
+      // kjTreeLog(aP->inEntityP, "ALT:   inEntityP", LmtAlt);  // outdeffed
+      ++alterations;
+    }
+    LM_T(LmtAlt, (" %d Alterations present", alterations));
   }
-  LM_T(LmtAlt, (" %d Alterations present", alterations));
   // </DEBUG>
-#endif
 
   OrionldAlterationMatch* matchList;
   int                     matches;
