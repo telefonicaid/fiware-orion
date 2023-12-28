@@ -1,0 +1,202 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Crash with HTTPS Subscription - issue #1495
+
+--SHELL-INIT--
+${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+dbInit CB
+dbInit CB captn
+orionldStart CB -mongocOnly -multiservice
+accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem
+
+--SHELL--
+
+#
+# New functest for #1495, according to https://github.com/FIWARE/context.Orion-LD/issues/1495#issuecomment-1864408737
+#
+# 01. Create a subscription, according to the comment 1864408737 of issue #1495
+# 02. GET the subscription
+# 03. Trigger a notification by Upserting/update one entity (that is created)
+# 04. Ping the broker to make sure it's still alive
+#
+
+echo "01. Create a subscription, according to the comment 1864408737 of issue #1495"
+echo "============================================================================="
+payload='{
+  "description": "Test Vehicle AIS",
+  "type": "Subscription",
+  "name": "Kill den ORION-LD",
+  "entities": [
+    {
+      "idPattern": "AIS",
+      "type": "Vehicle"
+    }
+  ],
+  "watchedAttributes": [ "dateObserved" ],
+  "isActive": true,
+  "notification": {
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "https://httpbin.org/post",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H  'NGSILD-Tenant: captn' -H 'Authorization: Bearer XYZ'
+subscriptionLocation=$(echo "$_responseHeaders" | grep Location: | awk -FLocation: '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. GET the subscription"
+echo "========================"
+orionCurl --url $subscriptionLocation -H  'NGSILD-Tenant: captn'
+echo
+echo
+
+
+echo "03. Trigger a notification by Upserting/update one entity (that is created)"
+echo "==========================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:Vehicle:AIS:211891460",
+    "type": "Vehicle",
+    "dateObserved": {
+      "type": "Property",
+      "value": {
+        "@type": "DateTime",
+        "@value": "2023-12-20T11:48:59.485Z"
+      }
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload" -H  'NGSILD-Tenant: captn' -H 'Authorization: Bearer XYZ' --out application/ld+json
+echo
+echo
+
+
+echo "04. Ping the broker to make sure it's still alive"
+echo "================================================="
+orionCurl --url /ngsi-ld/ex/v1/version
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription, according to the comment 1864408737 of issue #1495
+=============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:REGEX(.*)
+NGSILD-Tenant: captn
+
+
+
+02. GET the subscription
+========================
+HTTP/1.1 200 OK
+Content-Length: 511
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "description": "Test Vehicle AIS",
+    "entities": [
+        {
+            "idPattern": "AIS",
+            "type": "Vehicle"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscription:REGEX(.*)",
+    "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "https://httpbin.org/post"
+        },
+        "format": "keyValues",
+        "status": "ok"
+    },
+    "origin": "cache",
+    "status": "active",
+    "subscriptionName": "Kill den ORION-LD",
+    "type": "Subscription",
+    "watchedAttributes": [
+        "dateObserved"
+    ]
+}
+
+
+03. Trigger a notification by Upserting/update one entity (that is created)
+===========================================================================
+HTTP/1.1 201 Created
+Content-Length: 37
+Content-Type: application/json
+Date: REGEX(.*)
+NGSILD-Tenant: captn
+
+[
+    "urn:ngsi-ld:Vehicle:AIS:211891460"
+]
+
+
+04. Ping the broker to make sure it's still alive
+=================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "Core Context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
+    "Next File Descriptor": REGEX(.*),
+    "Orion-LD version": "REGEX(.*)",
+    "based on orion": "REGEX(.*)",
+    "boost version": "REGEX(.*)",
+    "branch": "REGEX(.*)",
+    "bson version": "REGEX(.*)",
+    "cached subscriptions": 1,
+    "kalloc version": "REGEX(.*)",
+    "kbase version": "REGEX(.*)",
+    "khash version": "REGEX(.*)",
+    "kjson version": "REGEX(.*)",
+    "libcurl version": "REGEX(.*)",
+    "libuuid version": "REGEX(.*)",
+    "microhttpd version": "REGEX(.*)",
+    "mongoc version": "REGEX(.*)",
+    "mongocpp version": "REGEX(.*)",
+    "mongodb server version": "REGEX(.*)",
+    "openssl version": "REGEX(.*)",
+    "rapidjson version": "REGEX(.*)"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB captn
+accumulatorStop

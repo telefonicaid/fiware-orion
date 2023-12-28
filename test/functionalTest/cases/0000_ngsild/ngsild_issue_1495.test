@@ -1,0 +1,345 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Crash with HTTPS Subscription - issue #1495
+
+--SHELL-INIT--
+${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+dbInit CB
+orionldStart CB -mongocOnly
+accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem
+
+--SHELL--
+
+#
+# 01. Create an HTTPS subscription, according to issue #1496
+# 02. Do an upsert/update creating an entity, provoking a notification (issue #1496 says crash)
+# 03. Dump/Reset the accumulator, see the entity
+# 04. Do another upsert/update modifying the entity, provoking another notification (issue #1496 says crash)
+# 05. Dump/Reset the accumulator, see the modified entity
+# 06. GET /version, to make sure the broker is still alive
+#
+
+echo "01. Create an HTTPS subscription, according to issue #1496"
+echo "=========================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscription:d6652902-99cd-11ee-9314-76803a887299",
+  "type": "Subscription",
+  "subscriptionName": "Sub:Vehicle:AIS",
+  "description": "NGSILD-Proxy Subscription for Vehicle:AIS",
+  "entities": [
+    {
+      "idPattern": "AIS",
+       "type": "Vehicle"
+     }
+  ],
+  "notification": {
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "https://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "accept": "application/json"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Do an upsert/update creating an entity, provoking a notification (issue #1496 says crash)"
+echo "============================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:AIS:owm:5419982",
+    "type": "Vehicle",
+    "dateObserved": {
+      "type": "Property",
+      "value": {
+        "@type": "DateTime",
+        "@value": "2023-12-11T15:45:45.000Z"
+      }
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 996
+    },
+    "relativeHumidity": {
+      "type": "Property",
+      "value": 98
+    },
+    "feelLikesTemperature": {
+      "type": "Property",
+      "value": 3.6
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 6.82
+    },
+    "visibility": {
+      "type": "Property",
+      "value": 10000
+    },
+    "windDirection": {
+      "type": "Property",
+      "value": 349
+    },
+    "windSpeed": {
+      "type": "Property",
+      "value": 5.02
+    },
+    "gustSpeed": {
+      "type": "Property",
+      "value": 7.97
+    },
+    "weatherType": {
+      "type": "Property",
+      "value": "Rain"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://openweathermap.org"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump/Reset the accumulator, see the entity"
+echo "=============================================="
+accumulatorDump IPV4 HTTPS
+accumulatorReset HTTPS
+echo
+echo
+
+
+echo "04. Do another upsert/update modifying the entity, provoking another notification (issue #1496 says crash)"
+echo "=========================================================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:WeatherObserved:AIS:owm:5419982",
+    "type": "Vehicle",
+    "dateObserved": {
+      "type": "Property",
+      "value": {
+        "@type": "DateTime",
+        "@value": "2023-12-11T15:45:45.000Z"
+      }
+    },
+    "atmosphericPressure": {
+      "type": "Property",
+      "value": 997
+    },
+    "relativeHumidity": {
+      "type": "Property",
+      "value": 98
+    },
+    "feelLikesTemperature": {
+      "type": "Property",
+      "value": 3.6
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 6.82
+    },
+    "visibility": {
+      "type": "Property",
+      "value": 10000
+    },
+    "windDirection": {
+      "type": "Property",
+      "value": 349
+    },
+    "windSpeed": {
+      "type": "Property",
+      "value": 5.02
+    },
+    "gustSpeed": {
+      "type": "Property",
+      "value": 7.97
+    },
+    "weatherType": {
+      "type": "Property",
+      "value": "Rain"
+    },
+    "source": {
+      "type": "Property",
+      "value": "https://openweathermap.org"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump/Reset the accumulator, see the modified entity"
+echo "======================================================="
+accumulatorDump IPV4 HTTPS
+accumulatorReset HTTPS
+echo
+echo
+
+
+echo "06. GET /version, to make sure the broker is still alive"
+echo "========================================================"
+orionCurl --url /version
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an HTTPS subscription, according to issue #1496
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:d6652902-99cd-11ee-9314-76803a887299
+
+
+
+02. Do an upsert/update creating an entity, provoking a notification (issue #1496 says crash)
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 47
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:ngsi-ld:WeatherObserved:AIS:owm:5419982"
+]
+
+
+03. Dump/Reset the accumulator, see the entity
+==============================================
+POST https://127.0.0.1/notify
+Content-Length: 590
+User-Agent: orionld/REGEX(.*)
+Host: 127.0.0.1
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "atmosphericPressure": 996,
+            "dateObserved": {
+                "@type": "DateTime",
+                "@value": "2023-12-11T15:45:45.000Z"
+            },
+            "feelLikesTemperature": 3.6,
+            "gustSpeed": 7.97,
+            "id": "urn:ngsi-ld:WeatherObserved:AIS:owm:5419982",
+            "relativeHumidity": 98,
+            "source": "https://openweathermap.org",
+            "temperature": 6.82,
+            "type": "Vehicle",
+            "visibility": 10000,
+            "weatherType": "Rain",
+            "windDirection": 349,
+            "windSpeed": 5.02
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subscription:d6652902-99cd-11ee-9314-76803a887299",
+    "type": "Notification"
+}
+=======================================
+
+
+04. Do another upsert/update modifying the entity, provoking another notification (issue #1496 says crash)
+==========================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. Dump/Reset the accumulator, see the modified entity
+=======================================================
+POST https://127.0.0.1/notify
+Content-Length: 590
+User-Agent: orionld/REGEX(.*)
+Host: 127.0.0.1
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Simplified
+
+{
+    "data": [
+        {
+            "atmosphericPressure": 997,
+            "dateObserved": {
+                "@type": "DateTime",
+                "@value": "2023-12-11T15:45:45.000Z"
+            },
+            "feelLikesTemperature": 3.6,
+            "gustSpeed": 7.97,
+            "id": "urn:ngsi-ld:WeatherObserved:AIS:owm:5419982",
+            "relativeHumidity": 98,
+            "source": "https://openweathermap.org",
+            "temperature": 6.82,
+            "type": "Vehicle",
+            "visibility": 10000,
+            "weatherType": "Rain",
+            "windDirection": 349,
+            "windSpeed": 5.02
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subscription:d6652902-99cd-11ee-9314-76803a887299",
+    "type": "Notification"
+}
+=======================================
+
+
+06. GET /version, to make sure the broker is still alive
+========================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+Fiware-Correlator: REGEX(.*)
+
+{
+    "compile_time": "REGEX(.*)",
+    "compiled_by": "REGEX(.*)",
+    "compiled_in": "REGEX(.*)",
+    "doc": "REGEX(.*)",
+    "git_hash": "REGEX(.*)",
+    "orion version": "REGEX(.*)",
+    "orionld version": "REGEX(.*)",
+    "release_date": "REGEX(.*)",
+    "uptime": "REGEX(.*)"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
