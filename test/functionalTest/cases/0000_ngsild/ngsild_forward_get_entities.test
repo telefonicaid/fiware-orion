@@ -1,0 +1,645 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI-LD Forward of GET /entities
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+orionldStart CB -forwarding -experimental -wip entityMaps
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
+orionldStart CP3 -experimental
+
+--SHELL--
+
+#
+# 01. Create entities E00-E09 in CB
+# 02. Create entities E10-E19 in CP1
+# 03. Create entities E20-E29 in CP2
+# 04. Create entities E30-E39 in CP3
+# 05. Query CB for all local entities - see E00-E09
+#
+# 06. Create a registration for all CP1 entities in CB
+# 07. Create a registration for all CP2 entities in CB
+# 08. Create a registration for all CP3 entities in CB
+# 09. Create a registration for E1 and E2 in CP3, using 2 information array items
+# 10. Local query on CB for all entities of type T, with onlyIds=true set
+# 11. Query CB for all entities (they're all type 'T')
+# 12. See the entity map
+# 13. Query using the entity map I got from step 11
+#
+
+echo "01. Create entities E00-E09 in CB"
+echo "================================="
+typeset -i eNo
+eNo=0
+
+while [ $eNo -le 9 ]
+do
+  eId=$(printf "urn:cb:entities:E%02d" $eNo)
+  eNo=$eNo+1
+
+  payload='{
+    "id": "'$eId'",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" | grep 'Location:'
+done
+echo
+echo
+
+
+echo "02. Create entities E10-E19 in CP1"
+echo "=================================="
+eNo=10
+
+while [ $eNo -le 19 ]
+do
+  eId=$(printf "urn:cp1:entities:E%02d" $eNo)
+  eNo=$eNo+1
+
+  payload='{
+    "id": "'$eId'",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT | grep 'Location:'
+done
+echo
+echo
+
+
+echo "03. Create entities E20-E29 in CP2"
+echo "=================================="
+eNo=20
+
+while [ $eNo -le 29 ]
+do
+  eId=$(printf "urn:cp2:entities:E%02d" $eNo)
+  eNo=$eNo+1
+
+  payload='{
+    "id": "'$eId'",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT | grep 'Location:'
+done
+echo
+echo
+
+
+echo "04. Create entities E30-E39 in CP3"
+echo "=================================="
+eNo=30
+
+while [ $eNo -le 39 ]
+do
+  eId=$(printf "urn:cp3:entities:E%02d" $eNo)
+  eNo=$eNo+1
+
+  payload='{
+    "id": "'$eId'",
+    "type": "T",
+    "A1": {
+      "type": "Property",
+      "value": "E'$eNo':A1"
+    }
+  }'
+  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP3_PORT | grep 'Location:'
+done
+echo
+echo
+
+
+echo "05. Query CB for all local entities - see E00-E09"
+echo "================================================="
+orionCurl --url /ngsi-ld/v1/entities?local=true | grep 'urn:' | grep ':entities:'
+echo
+echo
+
+
+echo "06. Create a registration Reg1 for all CP1 entities in CB"
+echo "========================================================="
+payload='{
+  "id": "urn:Reg1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Create a registration Reg2 for all CP2 entities in CB"
+echo "========================================================="
+payload='{
+  "id": "urn:Reg2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T",
+          "idPattern": "urn:cp2:entities:E.*"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP2_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Create a registration Reg3 for all CP3 entities in CB"
+echo "========================================================="
+payload='{
+  "id": "urn:Reg3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP3_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Create a registration for E1 and E2 in CP3, using 2 information array items"
+echo "==============================================================================="
+payload='{
+  "id": "urn:Reg4",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T",
+          "id": "urn:cp3:entities:E31"
+        },
+        {
+          "type": "T",
+          "id": "urn:cp3:entities:E33"
+        }
+      ],
+      "propertyNames": [ "P1" ]
+    },
+    {
+      "entities": [
+        {
+          "type": "T",
+          "id": "urn:cp3:entities:E32"
+        }
+      ],
+      "relationshipNames": [ "R1" ]
+    }
+  ],
+  "endpoint": "http://localhost:'$CP3_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "10. Local query on CB for all entities of type T, with onlyIds=true set"
+echo "======================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&onlyIds=true&local=true'
+echo
+echo
+
+
+echo "11. Query CB for all entities (they're all type 'T')"
+echo "===================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&offset=35&limit=3' # | grep 'urn:' | grep ':entities:'
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+
+echo "12. See the entity map"
+echo "======================"
+echo Entity Map: $entityMap
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap?prettyPrint=yes --noPayloadCheck
+echo
+echo
+
+
+echo "13. Query using the entity map I got from step 11"
+echo "================================================="
+orionCurl --url '/ngsi-ld/v1/entities?offset=20&limit=5' -H "NGSILD-EntityMap: $entityMap" # | grep 'urn:' | grep ':entities:'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entities E00-E09 in CB
+=================================
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E00
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E01
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E02
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E03
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E04
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E05
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E06
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E07
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E08
+Location: /ngsi-ld/v1/entities/urn:cb:entities:E09
+
+
+02. Create entities E10-E19 in CP1
+==================================
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E10
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E11
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E12
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E13
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E14
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E15
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E16
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E17
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E18
+Location: /ngsi-ld/v1/entities/urn:cp1:entities:E19
+
+
+03. Create entities E20-E29 in CP2
+==================================
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E20
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E21
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E22
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E23
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E24
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E25
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E26
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E27
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E28
+Location: /ngsi-ld/v1/entities/urn:cp2:entities:E29
+
+
+04. Create entities E30-E39 in CP3
+==================================
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E30
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E31
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E32
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E33
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E34
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E35
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E36
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E37
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E38
+Location: /ngsi-ld/v1/entities/urn:cp3:entities:E39
+
+
+05. Query CB for all local entities - see E00-E09
+=================================================
+        "id": "urn:cb:entities:E00",
+        "id": "urn:cb:entities:E01",
+        "id": "urn:cb:entities:E02",
+        "id": "urn:cb:entities:E03",
+        "id": "urn:cb:entities:E04",
+        "id": "urn:cb:entities:E05",
+        "id": "urn:cb:entities:E06",
+        "id": "urn:cb:entities:E07",
+        "id": "urn:cb:entities:E08",
+        "id": "urn:cb:entities:E09",
+
+
+06. Create a registration Reg1 for all CP1 entities in CB
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg1
+
+
+
+07. Create a registration Reg2 for all CP2 entities in CB
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg2
+
+
+
+08. Create a registration Reg3 for all CP3 entities in CB
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg3
+
+
+
+09. Create a registration for E1 and E2 in CP3, using 2 information array items
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg4
+
+
+
+10. Local query on CB for all entities of type T, with onlyIds=true set
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 221
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:cb:entities:E00",
+    "urn:cb:entities:E01",
+    "urn:cb:entities:E02",
+    "urn:cb:entities:E03",
+    "urn:cb:entities:E04",
+    "urn:cb:entities:E05",
+    "urn:cb:entities:E06",
+    "urn:cb:entities:E07",
+    "urn:cb:entities:E08",
+    "urn:cb:entities:E09"
+]
+
+
+11. Query CB for all entities (they're all type 'T')
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 250
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+NGSILD-Results-Count: 40
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E36:A1"
+        },
+        "id": "urn:cp3:entities:E35",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E37:A1"
+        },
+        "id": "urn:cp3:entities:E36",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E38:A1"
+        },
+        "id": "urn:cp3:entities:E37",
+        "type": "T"
+    }
+]
+
+
+12. See the entity map
+======================
+Entity Map: REGEX(.*)
+HTTP/1.1 200 OK
+Content-Length: 1883
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  "urn:cb:entities:E00": [
+    "@none"
+  ],
+  "urn:cb:entities:E01": [
+    "@none"
+  ],
+  "urn:cb:entities:E02": [
+    "@none"
+  ],
+  "urn:cb:entities:E03": [
+    "@none"
+  ],
+  "urn:cb:entities:E04": [
+    "@none"
+  ],
+  "urn:cb:entities:E05": [
+    "@none"
+  ],
+  "urn:cb:entities:E06": [
+    "@none"
+  ],
+  "urn:cb:entities:E07": [
+    "@none"
+  ],
+  "urn:cb:entities:E08": [
+    "@none"
+  ],
+  "urn:cb:entities:E09": [
+    "@none"
+  ],
+  "urn:cp1:entities:E10": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E11": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E12": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E13": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E14": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E15": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E16": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E17": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E18": [
+    "urn:Reg1"
+  ],
+  "urn:cp1:entities:E19": [
+    "urn:Reg1"
+  ],
+  "urn:cp2:entities:E20": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E21": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E22": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E23": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E24": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E25": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E26": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E27": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E28": [
+    "urn:Reg2"
+  ],
+  "urn:cp2:entities:E29": [
+    "urn:Reg2"
+  ],
+  "urn:cp3:entities:E30": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E31": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E32": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E33": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E34": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E35": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E36": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E37": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E38": [
+    "urn:Reg3"
+  ],
+  "urn:cp3:entities:E39": [
+    "urn:Reg3"
+  ]
+}
+
+
+
+13. Query using the entity map I got from step 11
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 416
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E21:A1"
+        },
+        "id": "urn:cp2:entities:E20",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E22:A1"
+        },
+        "id": "urn:cp2:entities:E21",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E23:A1"
+        },
+        "id": "urn:cp2:entities:E22",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E24:A1"
+        },
+        "id": "urn:cp2:entities:E23",
+        "type": "T"
+    },
+    {
+        "A1": {
+            "type": "Property",
+            "value": "E25:A1"
+        },
+        "id": "urn:cp2:entities:E24",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN---
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3

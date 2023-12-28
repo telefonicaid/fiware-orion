@@ -47,8 +47,10 @@ extern "C"
 #include "orionld/forwarding/distOpListsMerge.h"               // distOpListsMerge
 #include "orionld/forwarding/distOpSend.h"                     // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"       // distOpLookupByCurlHandle
+#include "orionld/forwarding/distOpListDebug.h"                // distOpListDebug2
 #include "orionld/forwarding/distOpListRelease.h"              // distOpListRelease
 #include "orionld/forwarding/xForwardedForCompose.h"           // xForwardedForCompose
+#include "orionld/forwarding/viaCompose.h"                     // viaCompose
 #include "orionld/forwarding/regMatchForBatchDelete.h"         // regMatchForBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
 
@@ -194,7 +196,7 @@ void distReqsMergeForBatchDelete(DistOp* distOpList)
     }
     else
     {
-      // Remove drP from list (just skip over it
+      // Remove drP from list (just skip over it)
       prev->next = next;
     }
 
@@ -467,8 +469,9 @@ bool orionldPostBatchDelete(void)
       // Enqueue all forwarded requests
       // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
       char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+      char* via = viaCompose(orionldState.in.via, brokerId);
 
-      int forwards = 0;
+      int   forwards = 0;
       for (DistOp* distReqP = distOpList; distReqP != NULL; distReqP = distReqP->next)
       {
         // Send the forwarded request and await all responses
@@ -477,7 +480,7 @@ bool orionldPostBatchDelete(void)
           char dateHeader[70];
           snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-          if (distOpSend(distReqP, dateHeader, xff) == 0)
+          if (distOpSend(distReqP, dateHeader, xff, via, false, NULL) == 0)
           {
             ++forwards;
             distReqP->error = false;

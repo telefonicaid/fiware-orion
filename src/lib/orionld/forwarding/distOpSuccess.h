@@ -41,8 +41,9 @@ extern "C"
 // PARAMETERS
 //   responseBody      a KjNode object with two fields: "success" and "failure"
 //   distOpP           linked list of DistOp's
+//   entityId          the id of the entity
 //   attrName          instead of 'distOp', here's the only attribute name already
 //
-extern void distOpSuccess(KjNode* responseBody, DistOp* distOpP, char* attrName);
+extern void distOpSuccess(KjNode* responseBody, DistOp* distOpP, const char* entityId, char* attrName);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPSUCCESS_H_

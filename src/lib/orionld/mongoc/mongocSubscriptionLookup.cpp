@@ -68,7 +68,7 @@ KjNode* mongocSubscriptionLookup(const char* subscriptionId)
   // Run the query
   //
   // semTake(&mongoSubscriptionsSem);
-  MONGOC_RLOG("Lookup Subscription", orionldState.tenantP->mongoDbName, "subscriptions", &mongoFilter, LmtMongoc);
+  MONGOC_RLOG("Lookup Subscription", orionldState.tenantP->mongoDbName, "subscriptions", &mongoFilter, NULL, LmtMongoc);
   if ((mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.subscriptionsP, &mongoFilter, NULL, NULL)) == NULL)
   {
     LM_E(("Internal Error (mongoc_collection_find_with_opts ERROR)"));

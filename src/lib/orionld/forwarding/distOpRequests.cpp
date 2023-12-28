@@ -39,6 +39,7 @@ extern "C"
 #include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
+#include "orionld/forwarding/viaCompose.h"                       // viaCompose
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
 
 
@@ -130,6 +131,7 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, K
 
   // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
   char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+  char* via = viaCompose(orionldState.in.via, brokerId);
 
   // Enqueue all forwarded requests
   int forwards = 0;  // Debugging purposees
@@ -138,7 +140,7 @@ DistOp* distOpRequests(char* entityId, char* entityType, DistOpType operation, K
     // Send the forwarded request and await all responses
     if ((distOpP->regP != NULL) && (distOpP->error == false))
     {
-      if (distOpSend(distOpP, dateHeader, xff) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, via, false, NULL) == 0)
       {
         distOpP->error = false;
         orionldState.distOp.requests += 1;

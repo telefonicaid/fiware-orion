@@ -25,6 +25,11 @@
 *
 * Author: Ken Zangelin
 */
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
 #include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
 #include "orionld/types/OrionldGeorel.h"                         // OrionldGeorel
 

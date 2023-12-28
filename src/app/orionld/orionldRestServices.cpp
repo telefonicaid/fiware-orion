@@ -65,6 +65,8 @@
 #include "orionld/serviceRoutines/orionldOptions.h"
 #include "orionld/serviceRoutines/orionldPutEntity.h"
 #include "orionld/serviceRoutines/orionldPutAttribute.h"
+#include "orionld/serviceRoutines/orionldGetEntityMap.h"
+#include "orionld/serviceRoutines/orionldDeleteEntityMap.h"
 
 #include "orionld/serviceRoutines/orionldGetTemporalEntities.h"
 #include "orionld/serviceRoutines/orionldGetTemporalEntity.h"
@@ -90,6 +92,7 @@ static OrionLdRestServiceSimplified getServiceV[] =
   { "/ngsi-ld/ex/v1/ping",                 orionldGetPing             },
   { "/ngsi-ld/v1/entities/*",              orionldGetEntity           },
   { "/ngsi-ld/v1/entities",                orionldGetEntities         },
+  { "/ngsi-ld/v1/entityMaps/*",            orionldGetEntityMap        },
   { "/ngsi-ld/v1/types/*",                 orionldGetEntityType       },
   { "/ngsi-ld/v1/types",                   orionldGetEntityTypes      },
   { "/ngsi-ld/v1/attributes/*",            orionldGetEntityAttribute  },
@@ -173,6 +176,7 @@ static OrionLdRestServiceSimplified deleteServiceV[] =
 {
   { "/ngsi-ld/v1/entities/*/attrs/*",             orionldDeleteAttribute                 },
   { "/ngsi-ld/v1/entities/*",                     orionldDeleteEntity                    },
+  { "/ngsi-ld/v1/entityMaps/*",                   orionldDeleteEntityMap                 },
   { "/ngsi-ld/v1/subscriptions/*",                orionldDeleteSubscription              },
   { "/ngsi-ld/v1/csourceRegistrations/*",         orionldDeleteRegistration              },
   { "/ngsi-ld/v1/jsonldContexts/*",               orionldDeleteContext                   },

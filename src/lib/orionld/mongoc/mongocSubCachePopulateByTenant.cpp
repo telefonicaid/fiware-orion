@@ -82,7 +82,7 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP, bool refresh)
   // Run the query
   //
   // semTake(&mongoSubscriptionsSem);
-  MONGOC_RLOG("Subscription for sub-cache", tenantP->mongoDbName, "subscriptions", &mongoFilter, LmtMongoc);
+  MONGOC_RLOG("Subscription for sub-cache", tenantP->mongoDbName, "subscriptions", &mongoFilter, NULL, LmtMongoc);
   if ((mongoCursorP = mongoc_collection_find_with_opts(subscriptionsP, &mongoFilter, NULL, NULL)) == NULL)
   {
     mongoc_client_pool_push(mongocPool, connectionP);

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
-
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -25,21 +22,29 @@
 *
 * Author: Ken Zangelin
 */
-#include "common/RenderFormat.h"                               // RenderFormat
+#include <string.h>                                                     // strcmp
 
-#include "orionld/common/orionldState.h"                       // pernotSubCache
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+#include "orionld/common/orionldState.h"                                // entityMaps
+#include "orionld/types/EntityMap.h"                                    // EntityMap
+#include "orionld/entityMaps/entityMapLookup.h"                         // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotSubCacheRemove -
+// entityMapLookup
 //
-extern bool pernotSubCacheRemove(PernotSubscription* pSubP);
+EntityMap* entityMapLookup(const char* mapId)
+{
+  EntityMap* emP = entityMaps;
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEREMOVE_H_
+  while (emP != NULL)
+  {
+    if (strcmp(emP->id, mapId) == 0)
+      return emP;
+
+    emP = emP->next;
+  }
+
+  return NULL;
+}

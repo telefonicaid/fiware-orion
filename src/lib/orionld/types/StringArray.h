@@ -38,4 +38,13 @@ typedef struct StringArray
   char**  array;
 } StringArray;
 
+
+
+
+// -----------------------------------------------------------------------------
+//
+// stringArrayClone -
+//
+extern StringArray* stringArrayClone(StringArray* saP);
+
 #endif  // SRC_LIB_ORIONLD_TYPES_STRINGARRAY_H_

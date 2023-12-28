@@ -33,6 +33,6 @@
 //
 // distOpSend -
 //
-extern bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader);
+extern bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader, const char* viaHeader, bool local, const char* entityIds);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPSEND_H_

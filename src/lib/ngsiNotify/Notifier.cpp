@@ -95,7 +95,7 @@ void Notifier::sendNotifyContextRequest
     bool                             blackList
 )
 {
-  pthread_t                         tid;
+  pthread_t tid;
 
   std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncrP,
                                                                           httpInfo,

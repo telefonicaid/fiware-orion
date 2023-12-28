@@ -157,7 +157,7 @@ static void* workerFunc(void* pSyncQ)
 
         if (ngsildSubscription == false)
           subscriptionId = NULL;
-
+ 
         LM_T(LmtNotificationMsg, ("Sending HTTP Notification for subscription '%s'", params->subscriptionId.c_str()));
         r = httpRequestSendWithCurl(curl,
                                     params->ip,

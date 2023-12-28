@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTITEMADD_H_
+#define SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTITEMADD_H_
+
 /*
 *
 * Copyright 2023 FIWARE Foundation e.V.
@@ -22,19 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "common/RenderFormat.h"                               // RenderFormat
-
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/pernot/PernotSubCache.h"                     // Own interface
+#include "orionld/forwarding/DistOp.h"                           // DistOpListItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pernotSubCacheRemove -
+// distOpListItemAdd -
 //
-bool pernotSubCacheRemove(PernotSubscription* pSubP)
-{
-  return true;
-}
+extern DistOpListItem* distOpListItemAdd(DistOpListItem* distOpList, const char* distOpId, char* idString);
+
+#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPLISTITEMADD_H_

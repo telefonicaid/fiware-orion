@@ -605,7 +605,7 @@ bool orionldPatchEntity2(void)
     {
       char body[1024];
       kjFastRender(distOpP->requestBody, body);
-      LM_T(LmtDistOpMsgs, ("Registration '%s': %s", distOpP->regP->regId, body));
+      LM_T(LmtSR, ("Registration '%s': %s", distOpP->regP->regId, body));
     }
 #endif
   }
@@ -729,7 +729,7 @@ bool orionldPatchEntity2(void)
     local.requestBody = requestForLocal;
 
     if (dbUpdateResult == true)
-      distOpSuccess(responseBody, &local, NULL);
+      distOpSuccess(responseBody, &local, entityId, NULL);
   }
 
   responseFix(responseBody, DoMergeEntity, 204, entityId);

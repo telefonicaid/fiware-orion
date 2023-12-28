@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
+#include "orionld/forwarding/viaCompose.h"                       // viaCompose
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
@@ -112,6 +113,7 @@ static DistOp* distributedDelete(char* entityId, char* entityTypeExpanded, char*
   // Enqueue all forwarded requests
   // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
   char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+  char* via = viaCompose(orionldState.in.via, brokerId);
 
   int forwards = 0;
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
@@ -122,7 +124,7 @@ static DistOp* distributedDelete(char* entityId, char* entityTypeExpanded, char*
       char dateHeader[70];
       snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-      if (distOpSend(distOpP, dateHeader, xff) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, via, false, NULL) == 0)
       {
         ++forwards;
         distOpP->error = false;
@@ -217,10 +219,15 @@ bool orionldDeleteEntity(void)
   // Delete the entity in the local DB
   // - Error if the entity is not found locally, and not subject to forwarding
   //
-  if ((dbEntityP == NULL) && (distOpList == NULL))
+  if (dbEntityP == NULL)
   {
-    orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
-    return false;
+    if (distOpList == NULL)
+    {
+      orionldError(OrionldResourceNotFound, "Entity not found", entityId, 404);
+      return false;
+    }
+    else
+      distOpFailure(responseBody, NULL, "Not Found", entityId, 404, NULL);
   }
 
   //
@@ -228,15 +235,23 @@ bool orionldDeleteEntity(void)
   // Give 404 if the entity is not present locally nor triggered any forwarded requests
   //
   char* detail = NULL;
-  if ((dbEntityP != NULL) && (mongocEntityDelete(entityId, &detail) == false))
+  if (dbEntityP != NULL)
   {
-    if (distOpList == NULL)  // pure local request
+    if (mongocEntityDelete(entityId, &detail) == true)
     {
-      orionldError(OrionldInternalError, "Database Error", detail, 500);
-      return false;
+      // Add a success to the "success" member
+      distOpSuccess(responseBody, NULL, entityId, NULL);
     }
     else
-      distOpFailure(responseBody, NULL, "Database Error", detail, 500, NULL);
+    {
+      if (distOpList == NULL)  // pure local request
+      {
+        orionldError(OrionldInternalError, "Database Error", detail, 500);
+        return false;
+      }
+      else
+        distOpFailure(responseBody, NULL, "Database Error", detail, 500, NULL);
+    }
   }
 
   if (dbEntityP != NULL)
@@ -248,6 +263,7 @@ bool orionldDeleteEntity(void)
     distOpListRelease(distOpList);
   }
 
+  kjTreeLog(responseBody, "responseBody", LmtSR);
   responseFix(responseBody, DoDeleteEntity, 204, entityId);
 
   return true;

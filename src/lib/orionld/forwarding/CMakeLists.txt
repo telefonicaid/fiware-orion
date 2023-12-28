@@ -24,14 +24,25 @@ SET (SOURCES
     DistOpType.cpp
     distOpInit.cpp
     distOpSend.cpp
+    distOpsSend.cpp
+    distOpListsMerge.cpp
     distOpListRelease.cpp
+    distOpListDebug.cpp
     distOpSuccess.cpp
     distOpFailure.cpp
-    distOpListsMerge.cpp
     distOpLookupByCurlHandle.cpp
+    distOpLookupByRegId.cpp
     distOpEntityMerge.cpp
     distOpRequests.cpp
     distOpResponses.cpp
+    distOpCreate.cpp
+    distOpAttrs.cpp
+    distOpItemListDebug.cpp
+    distOpListItemCreate.cpp
+    distOpListItemAdd.cpp
+    distOpResponseMergeIntoEntityArray.cpp
+    distOpsReceive2.cpp
+    distOpsSendAndReceive.cpp
     regMatchEntityInfo.cpp
     regMatchOperation.cpp
     regMatchInformationItem.cpp
@@ -43,8 +54,14 @@ SET (SOURCES
     regMatchForEntityCreation.cpp
     regMatchForEntityGet.cpp
     regMatchForBatchDelete.cpp
+    regMatchInformationArrayForQuery.cpp
+    regMatchInformationItemForQuery.cpp
+    regMatchAttributesForQuery.cpp
+    regMatchEntityInfoForQuery.cpp
     xForwardedForCompose.cpp
     xForwardedForMatch.cpp
+    viaCompose.cpp
+    viaMatch.cpp
 )
 
 # Include directories

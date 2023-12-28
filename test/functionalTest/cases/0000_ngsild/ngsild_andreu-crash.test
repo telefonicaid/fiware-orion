@@ -26,7 +26,7 @@ Subscription Deletion in HA with two brokers
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
-orionldStart CB  -experimental -forwarding -t 0-255
+orionldStart CB  -experimental -forwarding
 orionldStart CP1 -experimental
 
 --SHELL--
@@ -54,7 +54,6 @@ payload='{
   ],
   "endpoint": "localhost:'$CP1_PORT'",
   "operations": [ "createEntity", "retrieveEntity","mergeEntity" ]
-
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
 echo

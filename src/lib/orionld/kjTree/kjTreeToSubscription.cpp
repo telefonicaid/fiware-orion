@@ -177,8 +177,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   if (orionldState.payloadIdNode == NULL)
   {
     char subscriptionId[80];
-    strncpy(subscriptionId, "urn:ngsi-ld:Subscription:", sizeof(subscriptionId) - 1);
-    uuidGenerate(&subscriptionId[25], sizeof(subscriptionId) - 25, false);
+    uuidGenerate(subscriptionId, sizeof(subscriptionId), "urn:ngsi-ld:Subscription:");
     subP->id = subscriptionId;
   }
   else

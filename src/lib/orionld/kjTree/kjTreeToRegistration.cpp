@@ -184,8 +184,7 @@ bool kjTreeToRegistration(ngsiv2::Registration* regP, char** regIdPP)
   if (orionldState.payloadIdNode == NULL)
   {
     char registrationId[100];
-    strncpy(registrationId, "urn:ngsi-ld:ContextSourceRegistration:", sizeof(registrationId) - 1);
-    uuidGenerate(&registrationId[38], sizeof(registrationId) - 38, false);
+    uuidGenerate(registrationId, sizeof(registrationId), "urn:ngsi-ld:ContextSourceRegistration:");
     regP->id = registrationId;
   }
   else

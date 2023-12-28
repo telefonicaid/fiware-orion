@@ -161,8 +161,7 @@ bool orionldPostRegistrations(void)
   if (regIdP == NULL)
   {
     // Invent a registration id
-    strncpy(registrationIdV, "urn:ngsi-ld:ContextSourceRegistration:", sizeof(registrationIdV) - 1);
-    uuidGenerate(&registrationIdV[38], sizeof(registrationIdV) - 38, false);
+    uuidGenerate(registrationIdV, sizeof(registrationIdV), "urn:ngsi-ld:ContextSourceRegistration:");
     regIdP = kjString(orionldState.kjsonP, "id", registrationId);
   }
   else

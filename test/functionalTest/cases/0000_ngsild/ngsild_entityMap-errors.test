@@ -1,0 +1,209 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Error handling for entity maps
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+export CB_TRACELEVELS=${CB_TRACELEVELS:-70-79,110,200}
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental
+
+--SHELL--
+#
+# 01. Query the CB with an entity map that doesn't exist - see error
+# 02. In CB,  create an entity urn:E1 with attribute  P0
+# 03. In CP1, create an entity urn:E1 with attributes P1-P3+R1
+# 04. Create an exclusive registration R1 on urn:E1/P1 for CP1
+# 05. Query the CB with type=T, to get urn:E1 and the entity map (FIXME: shouldn't get one as all entities are returned in the very first query)
+# 06. Query the CB using the correct entity map but with offset=10 (we don't have that many entities in the map)
+#
+# Later:
+# 07. Query the CB with an entity map that doesn't exist (yes, again, but this time the broker has a valid entity map)
+# 08. Query the CB using the correct entity map AND with URL parameter 'id' - see error as the entities are already selected
+# 09. Query the CB using the correct entity map AND with URL parameter 'type' - see error as the entities are already selected
+# 10. Query the CB using the correct entity map AND with URL parameter 'idPattern' - see error as the entities are already selected
+# 11. Query the CB using the correct entity map AND with URL parameter 'q' - see error as the entities are already selected
+# 12. Query the CB using the correct entity map AND with URL parameter 'geometry' - see error as the entities are already selected
+# 13. Query the CB using the correct entity map AND with URL parameter 'attrs' - see error as the entities are already selected
+# 14. Query the CB using the correct entity map AND with URL parameter 'local=true' - see error as the entities are already selected
+#
+
+echo "01. Query the CB with an entity map that doesn't exist - see error"
+echo "=================================================================="
+orionCurl --url /ngsi-ld/v1/entities -H "NGSILD-EntityMap: abc"
+echo
+echo
+
+
+echo "02. In CB,  create an entity urn:E1 with attribute P0"
+echo "====================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P0": "In CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. In CP1, create an entity urn:E1 with attributes P1-P3+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP1",
+  "P2": "P2 in CP1",
+  "P3": "P3 in CP1",
+  "R1": { "object": "urn:in:cp1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "04. Create an exclusive registration R1 on urn:E1/P1 for CP1"
+echo "============================================================"
+payload='{
+  "id": "urn:Reg1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ]
+    }
+  ],
+  "mode": "exclusive",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "05. Query the CB with type=T, to get urn:E1 and the entity map"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "06. Query the CB using the correct entity map but with offset=10 (we don't have that many entities in the map)"
+echo "=============================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?offset=10' -H "NGSILD-EntityMap: $entityMap"
+echo
+echo
+
+
+--REGEXPECT--
+01. Query the CB with an entity map that doesn't exist - see error
+==================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "abc",
+    "title": "Entity-Map not found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+02. In CB,  create an entity urn:E1 with attribute P0
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. In CP1, create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. Create an exclusive registration R1 on urn:E1/P1 for CP1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg1
+
+
+
+05. Query the CB with type=T, to get urn:E1 and the entity map
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[
+    {
+        "P0": {
+            "type": "Property",
+            "value": "In CB"
+        },
+        "P1": {
+            "type": "Property",
+            "value": "P1 in CP1"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+06. Query the CB using the correct entity map but with offset=10 (we don't have that many entities in the map)
+==============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[]
+
+
+--TEARDOWN---
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

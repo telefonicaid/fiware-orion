@@ -35,22 +35,27 @@
 //
 // uuidGenerate -
 //
-void uuidGenerate(char* buf, int bufSize, bool uri)
+char* uuidGenerate(char* buf, int bufSize, const char* prefix)
 {
   uuid_t uuid;
   int    bufIx      = 0;
-  int    minBufSize = 37 + (uri == true)? 33 : 0;
+  int    minBufSize = 37;
+
+  if (prefix != NULL)
+    minBufSize += strlen(prefix);
 
   if (bufSize < minBufSize)
     LM_X(1, ("Implementation Error (not enough room to generate a UUID (%d bytes needed, %d supplied)", minBufSize, bufSize));
 
   uuid_generate_time_safe(uuid);
 
-  if (uri == true)
+  if (prefix != NULL)
   {
-    strncpy(buf, "urn:ngsi-ld:attribute:instance:", bufSize);
-    bufIx = 31;
+    strncpy(buf, prefix, bufSize);
+    bufIx = strlen(prefix);
   }
 
   uuid_unparse_lower(uuid, &buf[bufIx]);
+
+  return &buf[bufIx];
 }

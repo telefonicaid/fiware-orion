@@ -280,7 +280,7 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
   }
   else if (httpResponseCode == 0)
   {
-    LM_T(LmtDistOpMsgs, ("%s: Seems like the request wasn't even sent ... (%s)", distOpP->regP->regId, distOpP->regP->ipAndPort));
+    LM_T(LmtDistOpResponse, ("%s: Seems like the request wasn't even sent ... (%s)", distOpP->regP->regId, distOpP->regP->ipAndPort));
 
     int         statusCode = 500;
     const char* title      = "Unable to send distributed request";
@@ -292,9 +292,9 @@ void entityResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     distOpFailure(responseBody, distOpP, title, detail, statusCode, NULL);
   }
   else if (httpResponseCode == 200)
-    LM_T(LmtDistOpMsgs, ("Reg %s: unexpected status code %d (using the accumulator?)", distOpP->regP->regId, httpResponseCode));
+    LM_W(("%s: unexpected status code %d (using the accumulator?)", distOpP->regP->regId, httpResponseCode));
   else
-    LM_W(("Reg %s: unexpected status code %d", distOpP->regP->regId, httpResponseCode));
+    LM_W(("%s: unexpected status code %d", distOpP->regP->regId, httpResponseCode));
 }
 
 
@@ -333,7 +333,7 @@ void distOpResponseAccumulate(DistOp* distOpP, KjNode* responseBody, KjNode* suc
     if (msgP->data.result == CURLE_OK)
     {
       if ((httpResponseCode >= 200) && (httpResponseCode <= 299))
-        distOpSuccess(responseBody, distOpP, NULL);
+        distOpSuccess(responseBody, distOpP, NULL, NULL);
       else if (httpResponseCode == 404)
         distOpFailure(responseBody, distOpP, "Not Found", NULL, 404, NULL);
     }

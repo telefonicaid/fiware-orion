@@ -253,8 +253,11 @@ bool dbModelToApiRegistration(KjNode* dbRegP, bool sysAttrs, bool forCache)
       // Remove "properties" from dbRegP and link the contexts of "properties" to "dbRegP"
       kjChildRemove(dbRegP, propertiesP);
 
-      dbRegP->lastChild->next = propertiesP->value.firstChildP;
-      dbRegP->lastChild       = propertiesP->lastChild;
+      if (propertiesP->value.firstChildP != NULL)
+      {
+        dbRegP->lastChild->next = propertiesP->value.firstChildP;
+        dbRegP->lastChild       = propertiesP->lastChild;
+      }
     }
   }
 

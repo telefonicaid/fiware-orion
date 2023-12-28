@@ -1,0 +1,113 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+HTTP header test for forwarding of 'q'
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental -forwarding -wip entityMaps
+accumulatorStart --pretty-print --url /ngsi-ld/v1/entities 127.0.0.1 ${LISTENER_PORT} 
+
+--SHELL--
+#
+# 01. Create a registration (inclusive) for the accumulator
+# 02. Query the CB for entities, using 'q'
+# 03. Dump the accumulator to see the forwarded request, make sure the correct 'q' is there
+#
+
+echo "01. Create a registration (inclusive) for the accumulator"
+echo "========================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://localhost:'$LISTENER_PORT'",
+  "operations": [ "queryEntity" ],
+  "mode": "inclusive"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Query the CB for entities, using 'q'"
+echo "========================================"
+q='a>10;(b==12|c!=%2212%22)'
+orionCurl --url "/ngsi-ld/v1/entities?q=$q"
+echo
+echo
+
+
+echo "03. Dump the accumulator to see the forwarded request, make sure the correct 'q' is there"
+echo "========================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration (inclusive) for the accumulator
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Query the CB for entities, using 'q'
+========================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+NGSILD-EntityMap: REGEX(.*)
+
+[]
+
+
+03. Dump the accumulator to see the forwarded request, make sure the correct 'q' is there
+=========================================================================================
+GET http://REGEX(.*)
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Date: REGEX(.*)
+X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

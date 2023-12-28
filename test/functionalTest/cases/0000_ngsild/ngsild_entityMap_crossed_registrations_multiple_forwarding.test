@@ -1,0 +1,780 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET /entities with Entity Map using crossed registrations
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental -forwarding -wip entityMaps
+orionldStart CP2 -experimental -forwarding -wip entityMaps
+
+--SHELL--
+
+#
+# 01. In CB,  create an entity urn:E1 with attributes P1+R1
+# 02. In CB,  create an entity urn:E2 with attributes P1+R1
+# 03. In CP1, create an entity urn:E3 with attributes P1+R1
+# 04. In CP1, create an entity urn:E4 with attributes P1+R1
+# 05. In CP2, create an entity urn:E5 with attributes P1+R1
+# 06. In CP2, create an entity urn:E6 with attributes P1+R1
+# 07. Create an inclusive registration R1 in CB on entities of type T pointing to CP1
+# 08. Create an inclusive registration R2 in CB on entities of type T pointing to CP2
+# 09. Create an inclusive registration R1 in CP1 on entities of type T pointing to CB
+# 10. Create an inclusive registration R2 in CP1 on entities of type T pointing to CP2
+# 11. Create an inclusive registration R1 in CP2 on entities of type T pointing to CB
+# 12. Create an inclusive registration R2 in CP2 on entities of type T pointing to CP1
+# 13. Create an entity map for a GET /entities?type=T in CB
+# 14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1
+# 15. Create an entity map for a GET /entities?type=T in CP1
+# 16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
+# 17. Create an entity map for a GET /entities?type=T in CP2
+# 18. GET the entity map - see E5 and E5 as local entities, E1+E2 in CB (Reg R1), E3+E4 in CP1 (Reg R2)
+#
+
+echo "01. In CB, create an entity urn:E1 with attributes P1+R1"
+echo "========================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "Entity E1 in Orion A",
+  "R1": { "object": "urn:E2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. In CB, create an entity urn:E2 with attributes P1+R1"
+echo "========================================================"
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P1": "Entity E2 in Orion A",
+  "R1": { "object": "urn:E2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. In CP1, create an entity urn:E3 with attributes P1+R1"
+echo "========================================================="
+payload='{
+  "id": "urn:E3",
+  "type": "T",
+  "P1": "Entity E3 in Orion B",
+  "R1": { "object": "urn:E4" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "04. In CP1, create an entity urn:E4 with attributes P1+R1"
+echo "========================================================="
+payload='{
+  "id": "urn:E4",
+  "type": "T",
+  "P1": "Entity E4 in Orion B",
+  "R1": { "object": "urn:E3" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "05. In CP2, create an entity urn:E5 with attributes P1+R1"
+echo "========================================================="
+payload='{
+  "id": "urn:E5",
+  "type": "T",
+  "P1": "Entity E5 in Orion C",
+  "R1": { "object": "urn:E6" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "06. In CP2, create an entity urn:E6 with attributes P1+R1"
+echo "========================================================="
+payload='{
+  "id": "urn:E6",
+  "type": "T",
+  "P1": "Entity E6 in Orion C",
+  "R1": { "object": "urn:E5" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "07. Create an inclusive registration R1 in CB on entities of type T pointing to CP1"
+echo "==================================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "http://'$(hostname)':'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Create an inclusive registration R2 in CB on entities of type T pointing to CP2"
+echo "==================================================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "http://'$(hostname)':'$CP2_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Create an inclusive registration R1 in CP1 on entities of type T pointing to CB"
+echo "==================================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "http://'$(hostname)':'$CB_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "10. Create an inclusive registration R2 in CP1 on entities of type T pointing to CP2"
+echo "===================================================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "http://'$(hostname)':'$CP2_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "11. Create an inclusive registration R1 in CP2 on entities of type T pointing to CB"
+echo "==================================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "http://'$(hostname)':'$CB_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "12. Create an inclusive registration R2 in CP2 on entities of type T pointing to CP1"
+echo "===================================================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "http://'$(hostname)':'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "13. Create an entity map for a GET /entities?type=T in CB"
+echo "========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' -H "aerOS: true" 
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo '14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1'
+echo '=================================================================================='
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap
+echo
+echo
+
+
+echo "15. Create an entity map for a GET /entities?type=T in CP1"
+echo "=========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true'  -H "aerOS: true" --port $CP1_PORT
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo '16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB'
+echo '================================================================================='
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --port $CP1_PORT
+echo
+echo
+
+
+echo "17. Create an entity map for a GET /entities?type=T in CP2"
+echo "=========================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true&reset=true' -H "aerOS: true" --port $CP2_PORT
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo '18. GET the entity map - see E5 and E5 as local entities, E1+E2 in CB (Reg R1), E3+E4 in CP1 (Reg R2)'
+echo '====================================================================================================='
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap --port $CP2_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. In CB, create an entity urn:E1 with attributes P1+R1
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. In CB, create an entity urn:E2 with attributes P1+R1
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+03. In CP1, create an entity urn:E3 with attributes P1+R1
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+04. In CP1, create an entity urn:E4 with attributes P1+R1
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E4
+
+
+
+05. In CP2, create an entity urn:E5 with attributes P1+R1
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E5
+
+
+
+06. In CP2, create an entity urn:E6 with attributes P1+R1
+=========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E6
+
+
+
+07. Create an inclusive registration R1 in CB on entities of type T pointing to CP1
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+08. Create an inclusive registration R2 in CB on entities of type T pointing to CP2
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+09. Create an inclusive registration R1 in CP1 on entities of type T pointing to CB
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+10. Create an inclusive registration R2 in CP1 on entities of type T pointing to CP2
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+11. Create an inclusive registration R1 in CP2 on entities of type T pointing to CB
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+12. Create an inclusive registration R2 in CP2 on entities of type T pointing to CP1
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+13. Create an entity map for a GET /entities?type=T in CB
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 781
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+NGSILD-Results-Count: 6
+
+[
+#SORT_START
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E1 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E2 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E3 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E4",
+            "type": "Relationship"
+        },
+        "id": "urn:E3",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E4 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E4",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E5 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E6",
+            "type": "Relationship"
+        },
+        "id": "urn:E5",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E6 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E5",
+            "type": "Relationship"
+        },
+        "id": "urn:E6",
+        "type": "T"
+    }
+#SORT_END
+]
+
+
+14. GET the entity map - see E1 and E2 are local entities and E3 and E4 are in CP1
+==================================================================================
+HTTP/1.1 200 OK
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:E1": [
+        "@none"
+    ],
+    "urn:E2": [
+        "@none"
+    ],
+    "urn:E3": [
+        "urn:R1"
+    ],
+    "urn:E4": [
+        "urn:R1"
+    ],
+    "urn:E5": [
+        "urn:R2"
+    ],
+    "urn:E6": [
+        "urn:R2"
+    ]
+}
+
+
+15. Create an entity map for a GET /entities?type=T in CP1
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 781
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+NGSILD-Results-Count: 6
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E3 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E4",
+            "type": "Relationship"
+        },
+        "id": "urn:E3",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E4 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E4",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E5 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E6",
+            "type": "Relationship"
+        },
+        "id": "urn:E5",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E1 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E6 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E5",
+            "type": "Relationship"
+        },
+        "id": "urn:E6",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E2 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    }
+]
+
+
+16. GET the entity map - see E3 and E4 are local entities and E1 and E2 are in CB
+=================================================================================
+HTTP/1.1 200 OK
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:E1": [
+        "urn:R1"
+    ],
+    "urn:E2": [
+        "urn:R1"
+    ],
+    "urn:E3": [
+        "@none"
+    ],
+    "urn:E4": [
+        "@none"
+    ],
+    "urn:E5": [
+        "urn:R2"
+    ],
+    "urn:E6": [
+        "urn:R2"
+    ]
+}
+
+
+17. Create an entity map for a GET /entities?type=T in CP2
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 781
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+NGSILD-Results-Count: 6
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E5 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E6",
+            "type": "Relationship"
+        },
+        "id": "urn:E5",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E6 in Orion C"
+        },
+        "R1": {
+            "object": "urn:E5",
+            "type": "Relationship"
+        },
+        "id": "urn:E6",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E1 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E4 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E4",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E3 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E4",
+            "type": "Relationship"
+        },
+        "id": "urn:E3",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E2 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    }
+]
+
+
+18. GET the entity map - see E5 and E5 as local entities, E1+E2 in CB (Reg R1), E3+E4 in CP1 (Reg R2)
+=====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:E1": [
+        "urn:R1"
+    ],
+    "urn:E2": [
+        "urn:R1"
+    ],
+    "urn:E3": [
+        "urn:R2"
+    ],
+    "urn:E4": [
+        "urn:R2"
+    ],
+    "urn:E5": [
+        "@none"
+    ],
+    "urn:E6": [
+        "@none"
+    ]
+}
+
+
+--TEARDOWN---
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

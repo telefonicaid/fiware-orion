@@ -67,7 +67,7 @@ bool pgAttributeBuild
   KjNode* valueNodeP    = NULL;
   KjNode* subAttrV      = kjArray(orionldState.kjsonP, NULL);
 
-  uuidGenerate(instanceId, sizeof(instanceId), true);
+  uuidGenerate(instanceId, sizeof(instanceId), "urn:ngsi-ld:attribute:instance:");
 
   // Extract attribute info, call subAttributeBuild when necessary
   KjNode* nodeP = attributeNodeP->value.firstChildP;

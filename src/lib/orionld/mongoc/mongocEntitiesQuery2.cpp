@@ -249,7 +249,7 @@ static bool attributesFilter(bson_t* mongoFilterP, KjNode* attrArray, bson_t* pr
 
 // -----------------------------------------------------------------------------
 //
-// mongocEntitiesQuery2 -
+// mongocEntitiesQuery2 - needed for POST Query
 //
 // Four parameters are passed via orionldState:
 // - orionldState.uriParams.offset  (URL parameter)
@@ -380,7 +380,7 @@ KjNode* mongocEntitiesQuery2
     bson_free(optionsString);
 #endif
 
-    MONGOC_RLOG("Lookup Entities", orionldState.tenantP->mongoDbName, "entities", &mongoFilter, LmtMongoc);
+    MONGOC_RLOG("Lookup Entities", orionldState.tenantP->mongoDbName, "entities", &mongoFilter, &options, LmtMongoc);
     mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs);
     bson_destroy(&options);
 

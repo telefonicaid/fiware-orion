@@ -660,7 +660,8 @@ KjNode* mongocEntitiesQuery
   QNode*           qNode,
   OrionldGeoInfo*  geoInfoP,
   int64_t*         countP,
-  const char*      geojsonGeometry
+  const char*      geojsonGeometry,
+  bool             onlyIds
 )
 {
   if ((attrList != NULL) && (attrList->items > 99))
@@ -681,34 +682,40 @@ KjNode* mongocEntitiesQuery
   // Sort, Limit, Offset
   //
   bson_t options;
-  bson_t sortDoc;
-  int    limit       = orionldState.uriParams.limit;
-  int    offset      = orionldState.uriParams.offset;
+  bson_t projection;
 
   bson_init(&options);
-  bson_init(&sortDoc);
-
-  bson_append_int32(&sortDoc, "creDate", 7, 1);
-  bson_append_document(&options, "sort", 4, &sortDoc);
-  bson_destroy(&sortDoc);
-
-  bson_append_int32(&options, "limit", 5, limit);
-  if (offset != 0)
-    bson_append_int32(&options, "skip", 4, offset);
-
-
-  //
-  // Projection (will be added to if attrList != NULL)
-  //
-  bson_t projection;
   bson_init(&projection);
-  bson_append_bool(&projection, "_id.id",          6, true);
-  bson_append_bool(&projection, "_id.type",        8, true);
-  bson_append_bool(&projection, "attrNames",       9, true);
-  bson_append_bool(&projection, "creDate",         7, true);
-  bson_append_bool(&projection, "modDate",         7, true);
-  bson_append_bool(&projection, "lastCorrelator", 14, true);
 
+  if (onlyIds == false)
+  {
+    bson_t sortDoc;
+    int    limit       = orionldState.uriParams.limit;
+    int    offset      = orionldState.uriParams.offset;
+
+    bson_init(&sortDoc);
+
+    bson_append_int32(&sortDoc, "creDate", 7, 1);
+    bson_append_document(&options, "sort", 4, &sortDoc);
+    bson_destroy(&sortDoc);
+
+    bson_append_int32(&options, "limit", 5, limit);
+    if (offset != 0)
+      bson_append_int32(&options, "skip", 4, offset);
+
+
+    //
+    // Projection (will be added to if attrList != NULL)
+    //
+    bson_append_bool(&projection, "_id.id",          6, true);
+    bson_append_bool(&projection, "_id.type",        8, true);
+    bson_append_bool(&projection, "attrNames",       9, true);
+    bson_append_bool(&projection, "creDate",         7, true);
+    bson_append_bool(&projection, "modDate",         7, true);
+    bson_append_bool(&projection, "lastCorrelator", 14, true);
+  }
+  else
+    bson_append_bool(&projection, "_id.id", 6, true);
 
   //
   // Create the filter for the query
@@ -739,13 +746,16 @@ KjNode* mongocEntitiesQuery
   // Attribute List
   if ((attrList != NULL) && (attrList->items > 0))
   {
-    if (mongocAuxAttributesFilter(&mongoFilter, attrList, &projection, geojsonGeometry) == false)
+    if (mongocAuxAttributesFilter(&mongoFilter, attrList, &projection, geojsonGeometry, onlyIds) == false)
       return NULL;
   }
   else
   {
-    bson_append_bool(&projection, "attrs",     5, true);
-    bson_append_bool(&projection, "@datasets", 9, true);
+    if (onlyIds == false)
+    {
+      bson_append_bool(&projection, "attrs",     5, true);
+      bson_append_bool(&projection, "@datasets", 9, true);
+    }
   }
 
   // Query Language
@@ -773,7 +783,7 @@ KjNode* mongocEntitiesQuery
   // semTake(&mongoEntitiesSem);
 
   // count?
-  if (orionldState.uriParams.count == true)
+  if (countP != NULL)
   {
     bson_error_t error;
 
@@ -790,9 +800,9 @@ KjNode* mongocEntitiesQuery
   //
   KjNode* entityArray = kjArray(orionldState.kjsonP, NULL);
 
-  if (limit != 0)
+  if (orionldState.uriParams.limit != 0)
   {
-    MONGOC_RLOG("Lookup Entities", orionldState.tenantP->mongoDbName, "entities", &mongoFilter, LmtMongoc);
+    MONGOC_RLOG("Querying Entities", orionldState.tenantP->mongoDbName, "entities", &mongoFilter, &options, LmtMongoc);
     mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs);
     bson_destroy(&options);
 
@@ -805,13 +815,9 @@ KjNode* mongocEntitiesQuery
       return NULL;
     }
 
-#if 1
-    // <DEBUG>
     const bson_t* lastError = mongoc_collection_get_last_error(orionldState.mongoc.entitiesP);
     if (lastError != NULL)
       LM_E(("MongoC Error: %s", bson_as_canonical_extended_json(lastError, NULL)));
-    // </DEBUG>
-#endif
 
     int hits = 0;
     while (mongoc_cursor_next(mongoCursorP, &mongoDocP))

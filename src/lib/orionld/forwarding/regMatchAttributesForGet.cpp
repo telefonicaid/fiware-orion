@@ -24,14 +24,13 @@
 */
 extern "C"
 {
-#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/StringArray.h"                           // StringArray, stringArrayClone
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/regMatchAttributesForGet.h"         // Own interface
@@ -78,27 +77,6 @@ static bool stringArrayRemoveItem(StringArray* saP, int ix)
 
 // -----------------------------------------------------------------------------
 //
-// stringArrayClone - FIXME: Move to common/stringArrayClone.h/cpp
-//
-StringArray* stringArrayClone(StringArray* attrV)
-{
-  StringArray* clone = (StringArray*) kaAlloc(&orionldState.kalloc, sizeof(StringArray));
-
-  clone->items = attrV->items;
-  clone->array = (char**) kaAlloc(&orionldState.kalloc, attrV->items * sizeof(char*));
-
-  for (int ix = 0; ix < clone->items; ix++)
-  {
-    clone->array[ix] = kaStrdup(&orionldState.kalloc, attrV->array[ix]);
-  }
-
-  return clone;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // regMatchAttributesForGet -
 //
 // RETURN VALUE
@@ -111,37 +89,45 @@ StringArray* regMatchAttributesForGet
   RegCacheItem*  regP,
   KjNode*        propertyNamesP,
   KjNode*        relationshipNamesP,
-  StringArray*   attrV,
+  StringArray*   attrListP,
   const char*    geoProp
 )
 {
-  bool        allAttributes = (propertyNamesP == NULL) && (relationshipNamesP == NULL);
+  bool allAttributes = (propertyNamesP == NULL) && (relationshipNamesP == NULL);
+
+  LM_T(LmtDistOpAttributes, ("Creating the union of attributes GET URL-Param vs Registered Attributes"));
 
   if (allAttributes == true)
   {
     //
-    // Note, attrV can be NULL (if no 'attrs' URL param has been used)
+    // Note, attrListP can be NULL (if no 'attrs' URL param has been used)
     // However, a return value of NULL means "Nothing matches" and that's exactly what we don't want here
     //
     // So, we'll need an empty StringArray - meaning EVERYTHING matches => don't include 'attrs' URI param in the forwarded request
     // That comes a few lines down (right after allocating the StringArray, see 'if (allAttributes == true)')
     //
-    if (attrV != NULL)
-      return stringArrayClone(attrV);
+    // Now, if the query is with an "attrs" parameter, we'll create a copy of it for this DistOp
+    //
+    if (attrListP != NULL)
+    {
+      LM_T(LmtDistOpAttributes, ("Keeping the URL-Param Attributes as the registration has no attributes specified"));
+      return stringArrayClone(attrListP);
+    }
   }
 
   StringArray* sList = (StringArray*) kaAlloc(&orionldState.kalloc, sizeof(StringArray));
-  int          items;
+  int          items = 0;
 
-  if (allAttributes == true)  // We know that attrV == NULL in such case (see a few lines up)
+  if (allAttributes == true)  // We know that attrListP == NULL (otherwise it would have returned already a few lines up)
   {
     // Everything matches - return an empty array
     sList->items = 0;
     sList->array = NULL;
+    LM_T(LmtDistOpAttributes, ("Using ALL Attributes as the registration has no attributes specified and the Query also not"));
     return sList;
   }
-  else if (attrV != NULL)
-    items = attrV->items;
+  else if ((attrListP != NULL) && (attrListP->items > 0))
+    items = attrListP->items;
   else
   {
     // Count items in propertyNamesP + relationshipNamesP
@@ -152,9 +138,10 @@ StringArray* regMatchAttributesForGet
   }
 
   sList->items = items;
-  sList->array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+  if (items > 0)
+    sList->array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
 
-  if (attrV == NULL)
+  if ((attrListP == NULL) || (attrListP->items == 0))
   {
     // Just copy all propertyNames + relationshipNames to sList
     int ix = 0;
@@ -162,6 +149,7 @@ StringArray* regMatchAttributesForGet
     {
       for (KjNode* pName = propertyNamesP->value.firstChildP; pName != NULL; pName = pName->next)
       {
+        LM_T(LmtDistOpAttributes, ("Adding '%s' to the attrList of the DistOp", pName->value.s));
         sList->array[ix++] = pName->value.s;
       }
     }
@@ -170,6 +158,7 @@ StringArray* regMatchAttributesForGet
     {
       for (KjNode* rName = relationshipNamesP->value.firstChildP; rName != NULL; rName = rName->next)
       {
+        LM_T(LmtDistOpAttributes, ("Adding '%s' to the attrList of the DistOp", rName->value.s));
         sList->array[ix++] = rName->value.s;
       }
     }
@@ -179,23 +168,24 @@ StringArray* regMatchAttributesForGet
   else
   {
     int matches = 0;
-    for (int ix = 0; ix < attrV->items; ix++)
+    for (int ix = 0; ix < attrListP->items; ix++)
     {
       bool match = false;
 
       if (propertyNamesP != NULL)
-        match = (kjStringValueLookupInArray(propertyNamesP, attrV->array[ix]) != NULL);
+        match = (kjStringValueLookupInArray(propertyNamesP, attrListP->array[ix]) != NULL);
 
       if ((match == false) && (relationshipNamesP != NULL))
-        match = (kjStringValueLookupInArray(relationshipNamesP, attrV->array[ix]) != NULL);
+        match = (kjStringValueLookupInArray(relationshipNamesP, attrListP->array[ix]) != NULL);
 
       if (match == false)
         continue;
 
-      sList->array[matches++]  = attrV->array[ix];
+      LM_T(LmtDistOpAttributes, ("Adding '%s' to the attrList of the DistOp", attrListP->array[ix]));
+      sList->array[matches++]  = attrListP->array[ix];
 
       if (regP->mode == RegModeExclusive)
-        stringArrayRemoveItem(attrV, ix);
+        stringArrayRemoveItem(attrListP, ix);
     }
 
     if (matches == 0)
@@ -204,5 +194,6 @@ StringArray* regMatchAttributesForGet
     sList->items = matches;
   }
 
+  LM_T(LmtDistOpAttributes, ("Returning an attrList of %d items", sList->items));
   return sList;
 }

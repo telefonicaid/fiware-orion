@@ -33,6 +33,8 @@ extern "C"
 }
 
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
+#include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
@@ -44,19 +46,31 @@ extern "C"
 //
 typedef struct DistOp
 {
-  RegCacheItem*       regP;
-  DistOpType          operation;
+  char                id[16];            // Unique identifier for this DistOp
+  RegCacheItem*       regP;              // Pointer to the registration cache item
+  DistOpType          operation;         // Operation
   KjNode*             requestBody;       // For Create/Update Requests (also used for GET - tree of response)
 
   char*               rawResponse;       // Response buffer as raw ASCII as it was received by libcurl (parsed and stored as DistOp::body)
   uint64_t            httpResponseCode;  // Response HTTP Status Code  (64 bit due to libcurl curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE))
   KjNode*             responseBody;      // Parsed body of the response
 
-  char*               entityId;          // Used by GET /entities/{entityId} (and as intermediate result for BATCH Delete)
-  char*               entityType;        // Used by GET /entities/{entityId}
+  char*               entityId;          // Used by GET /entities/{entityId}, BATCH /delete, and GET /entities
+  char*               entityIdPattern;   // Used by GET /entities
+  char*               entityType;        // Used by GET /entities/{entityId} and GET /entities
   char*               attrName;          // Used by PATCH /entities/{entityId}/attrs/{attrName}
-  StringArray*        attrList;          // URI Param "attrs" for GET Requests
-  char*               geoProp;           // URI Param "geometryProperty" for GET Requests
+  StringArray*        attrList;          // Attribute list - for URI Param "attrs" for GET Requests
+  char*               attrsParam;        // Rendered attrs URL parameter - to do it just once
+  int                 attrsParamLen;     // Length of attrsParam to avoid a call to strlen()
+
+  StringArray*        idList;            // Used by GET /entities (unless entityId is used)
+  StringArray*        typeList;          // Used by GET /entities (unless entityType is used)
+  bool                onlyIds;           // Used to compile the list of entity ids in the preparation for GET /entities
+
+  OrionldGeoInfo      geoInfo;
+  QNode*              qNode;
+  char*               lang;
+  char*               geometryProperty;  // URI Param "geometryProperty" for GET Requests
 
   bool                error;
   char*               title;
@@ -66,5 +80,18 @@ typedef struct DistOp
   struct curl_slist*  curlHeaders;
   struct DistOp*      next;
 } DistOp;
+
+
+
+// -----------------------------------------------------------------------------
+//
+// DistOpListItem -
+//
+typedef struct DistOpListItem
+{
+  DistOp*                 distOpP;
+  char*                   entityIds;
+  struct DistOpListItem*  next;
+} DistOpListItem;
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOP_H_

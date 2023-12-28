@@ -71,7 +71,7 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   //
   // Run the query
   //
-  MONGOC_RLOG("Query for all regs", rcP->tenantP->mongoDbName, "registrations", NULL, LmtMongoc);
+  MONGOC_RLOG("Query for all regs", rcP->tenantP->mongoDbName, "registrations", NULL, NULL, LmtMongoc);
   mongoCursorP = mongoc_collection_find_with_opts(regsCollectionP, &mongoFilter, NULL, readPrefs);
   if (mongoCursorP == NULL)
   {
@@ -86,6 +86,7 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   {
     char* json = bson_as_relaxed_extended_json(mongoDocP, NULL);
     LM_T(LmtMongoc, ("Found a registration in the DB: '%s'", json));
+    bson_free(json);
 
     KjNode* dbRegP = mongocKjTreeFromBson(mongoDocP, &title, &details);
     if (dbRegP == NULL)

@@ -47,7 +47,7 @@ bool troeDeleteEntity(void)
   char*           entityId = orionldState.wildcard[0];
   char            instanceId[80];
 
-  uuidGenerate(instanceId, sizeof(instanceId), true);
+  uuidGenerate(instanceId, sizeof(instanceId), "urn:ngsi-ld:attribute:instance:");
 
   pgAppendInit(&entitiesBuffer, 512);       // Enough for deletion of a single entity
   pgAppend(&entitiesBuffer, PG_ENTITY_INSERT_START, 0);

@@ -35,10 +35,12 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
+#include "logMsg/traceLevels.h"                                // LmtRegCache
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
+#include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/types/RegistrationMode.h"                    // registrationMode
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pcheckRegistration.h"           // pcheckRegistration
@@ -48,6 +50,7 @@ extern "C"
 #include "orionld/regCache/regCacheItemLookup.h"               // regCacheItemLookup
 #include "orionld/regCache/regCacheIdPatternRegexCompile.h"    // regCacheIdPatternRegexCompile
 #include "orionld/regCache/regCacheItemRegexRelease.h"         // regCacheItemRegexRelease
+#include "orionld/regCache/regCachePresent.h"                  // regCachePresent
 #include "orionld/dbModel/dbModelFromApiRegistration.h"        // dbModelFromApiRegistration
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
@@ -769,8 +772,8 @@ bool orionldPatchRegistration(void)
       LM_X(1, ("Internal Error (if this happens it's a bug of Orion-LD - the idPattern was checked in pcheckEntityInfo and all OK"));
   }
 
-  // extern void regCachePresent(void);
-  // regCachePresent();
+  if (lmTraceIsSet(LmtRegCache))
+    regCachePresent();
 
   //
   // Return 204 if all OK

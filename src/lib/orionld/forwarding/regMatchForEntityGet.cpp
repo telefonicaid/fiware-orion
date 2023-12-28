@@ -28,6 +28,8 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/types/StringArray.h"                           // StringArray
@@ -37,6 +39,7 @@ extern "C"
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForGet.h"   // regMatchInformationArrayForGet
 #include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
+#include "orionld/forwarding/viaMatch.h"                         // viaMatch
 #include "orionld/forwarding/regMatchForEntityGet.h"             // Own interface
 
 
@@ -72,18 +75,22 @@ DistOp* regMatchForEntityGet  // FIXME: +entity-type
       regP->regId = (regIdP != NULL)? regIdP->value.s : (char*) "unknown registration";
     }
 
-    LM_T(LmtRegMatch, ("Treating registration '%s' for registrations of mode '%s'", regP->regId, registrationModeToString(regMode)));
+    if ((regP->mode & regMode) == 0)
+    {
+       LM_T(LmtRegMatch, ("%s: No match due to regMode", regP->regId));
+       continue;
+    }
 
     // Loop detection
-    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
+    if (viaMatch(orionldState.in.via, regP->hostAlias) == true)
     {
-      LM_T(LmtRegMatch, ("No Reg Match due to loop detection"));
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (Via)", regP->regId));
       continue;
     }
 
-    if ((regP->mode & regMode) == 0)
+    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
     {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to regMode", regP->regId));
+      LM_T(LmtRegMatch, ("No Reg Match due to loop detection"));
       continue;
     }
 

@@ -65,8 +65,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   {
     // id
     char notificationId[80];
-    strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId) - 1);
-    uuidGenerate(&notificationId[25], sizeof(notificationId) - 25, false);
+    uuidGenerate(notificationId, sizeof(notificationId), "urn:ngsi-ld:Notification:");
     nodeP = kjString(orionldState.kjsonP, "id", notificationId);
     kjChildAdd(rootP, nodeP);
 

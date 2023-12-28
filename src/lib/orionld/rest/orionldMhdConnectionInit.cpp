@@ -29,6 +29,8 @@ extern "C"
 {
 #include "kbase/kMacros.h"                                       // K_FT, K_VEC_SIZE
 #include "kbase/kTime.h"                                         // kTimeGet, kTimeDiff
+#include "kalloc/kaAlloc.h"                                      // kaAlloc
+#include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/kjBuilder.h"                                     // kjString, kjChildAdd
 }
 
@@ -51,6 +53,7 @@ extern "C"
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
+#include "orionld/entityMaps/entityMapLookup.h"                  // entityMapLookup
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
 #include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
@@ -190,7 +193,11 @@ static void optionsParse(const char* options)
       else if (strcmp(optionStart, "sysAttrs")      == 0)  orionldState.uriParamOptions.sysAttrs      = true;
       else if (strcmp(optionStart, "fromDb")        == 0)  orionldState.uriParamOptions.fromDb        = true;
       else if (strcmp(optionStart, "append")        == 0)  orionldState.uriParamOptions.append        = true;  // NGSIv2 compatibility
-      else if (strcmp(optionStart, "count")         == 0)  orionldState.uriParams.count               = true;  // NGSIv2 compatibility
+      else if (strcmp(optionStart, "count")         == 0)
+      {
+        orionldState.uriParams.count               = true;  // NGSIv2 compatibility
+        LM_T(LmtCount, ("Count is ON"));
+      }
       else if (strcmp(optionStart, "values")        == 0)  orionldState.uriParamOptions.values        = true;  // NGSIv2 compatibility
       else if (strcmp(optionStart, "unique")        == 0)  orionldState.uriParamOptions.uniqueValues  = true;  // NGSIv2 compatibility
       else if (strcmp(optionStart, "dateCreated")   == 0)  orionldState.uriParamOptions.dateCreated   = true;  // NGSIv2 compatibility
@@ -427,6 +434,13 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   }
   else if (strcasecmp(key, "Performance") == 0)
     orionldState.in.performance = true;
+  else if (strcasecmp(key, "ORIONLD-WIP") == 0)
+    orionldState.in.wip = (char*) value;
+  else if (strcasecmp(key, "aerOS") == 0)
+  {
+    if (strcasecmp(value, "true") == 0)
+      orionldState.in.aerOS = true;
+  }
   else if (strcasecmp(key, "NGSILD-Scope") == 0)
   {
     orionldState.scopes = strSplit((char*) value, ',', orionldState.scopeV, K_VEC_SIZE(orionldState.scopeV));
@@ -435,6 +449,12 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
       LM_W(("Bad Input (too many scopes)"));
       orionldError(OrionldBadRequestData, "Bad value for HTTP header /NGSILD-Scope/", value, 400);
     }
+  }
+  else if (strcasecmp(key, "NGSILD-EntityMap") == 0)
+  {
+    orionldState.in.entityMap = entityMapLookup(value);
+    if (orionldState.in.entityMap == NULL)
+      orionldError(OrionldResourceNotFound, "Entity-Map not found", value, 404);
   }
   else if (strcasecmp(key, "Accept") == 0)
   {
@@ -459,6 +479,7 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   else if (strcasecmp(key, "X-Real-IP")          == 0) orionldState.in.xRealIp          = (char*) value;
   else if (strcasecmp(key, "Connection")         == 0) orionldState.in.connection       = (char*) value;
   else if (strcasecmp(key, "X-Forwarded-For")    == 0) orionldState.in.xForwardedFor    = (char*) value;
+  else if (strcasecmp(key, "Via")                == 0) orionldState.in.via              = (char*) value;
   else if (strcasecmp(key, "Content-Type")       == 0)
   {
     orionldState.in.contentType       = mimeTypeFromString(value, NULL, false, false, &orionldState.acceptMask);
@@ -505,6 +526,50 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
 }
 
 
+// -----------------------------------------------------------------------------
+//
+// hyphensEncode -
+//
+static char* hyphensEncode(char* value)
+{
+  int doubleQuotes = 0;
+
+  // 1. Count the number of double quotes
+  char* cP = value;
+  while (*cP != 0)
+  {
+    if (*cP == '"')
+      ++doubleQuotes;
+    ++cP;
+  }
+
+  if (doubleQuotes == 0)
+    return kaStrdup(&orionldState.kalloc, value);
+
+  int len = strlen(value) + doubleQuotes * 2 + 1;  // 2 extra chars needed to encode " to %22
+
+  char* out    = kaAlloc(&orionldState.kalloc, len);
+  int   outIx  = 0;
+
+  while (*value != 0)
+  {
+    if (*value != '"')
+      out[outIx++] = *value;
+    else
+    {
+      out[outIx++] = '%';
+      out[outIx++] = '2';
+      out[outIx++] = '2';
+    }
+
+    ++value;
+  }
+
+  out[outIx] = 0;
+  return out;
+}
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -520,6 +585,8 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     orionldError(OrionldBadRequestData, "Empty right-hand-side for a URI parameter", key, 400);
     return MHD_YES;
   }
+
+  LM_T(LmtUriParams, ("URI Param: %s=%s", key, value));
 
   //
   // Forbidden characters in URI param value - not for NGSI-LD - for now at least ...
@@ -653,7 +720,10 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (strcmp(key, "count") == 0)
   {
     if (strcmp(value, "true") == 0)
+    {
       orionldState.uriParams.count = true;
+      LM_T(LmtCount, ("Count is ON"));
+    }
     else if (strcmp(value, "false") != 0)
     {
       orionldError(OrionldBadRequestData, "Bad value for URI parameter /count/", value, 400);
@@ -664,7 +734,13 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   }
   else if (strcmp(key, "q") == 0)
   {
-    orionldState.uriParams.q = (char*) value;
+    char* qraw = (char*) value;
+    orionldState.uriParams.q     = (char*) value;
+
+    if (strchr(qraw, '"') != NULL)
+      orionldState.uriParams.qCopy = hyphensEncode(qraw);
+    else
+      orionldState.uriParams.qCopy = kaStrdup(&orionldState.kalloc, qraw);
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_Q;
   }
   else if (strcmp(key, "mq") == 0)
@@ -893,6 +969,28 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_LOCAL;
   }
+  else if (strcmp(key, "entityMap") == 0)
+  {
+    if (strcmp(value, "true") == 0)
+      orionldState.uriParams.entityMap = true;
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_ENTITYMAP;
+  }
+  else if (strcmp(key, "onlyIds") == 0)
+  {
+    if (strcmp(value, "true") == 0)
+    {
+      orionldState.uriParams.onlyIds = true;
+      LM_T(LmtCount, ("onlyIds is ON"));
+    }
+    else if (strcmp(key, "false") != 0)
+    {
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /onlyIds/", value, 400);
+      return MHD_YES;
+    }
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_ONLYIDS;
+  }
   else if (strcmp(key, "entity::type") == 0)  // Is NGSIv1 ?entity::type=X the same as NGSIv2 ?type=X ?
   {
     orionldState.uriParams.type = (char*) value;
@@ -1006,6 +1104,7 @@ MHD_Result orionldMhdConnectionInit
   // Save URL path in ConnectionInfo
   orionldState.urlPath = (char*) url;
 
+
   //
   // Does the URL path end in a '/'?
   // If so, remove it.
@@ -1060,6 +1159,7 @@ MHD_Result orionldMhdConnectionInit
   // 5. GET URI params
   //
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
+  LM_T(LmtCount, ("orionldState.uriParams.count: %s", K_FT(orionldState.uriParams.count)));
 
   //
   // Format of response payload
@@ -1116,13 +1216,6 @@ MHD_Result orionldMhdConnectionInit
   if ((orionldState.in.contentType == JSONLD) && (orionldState.linkHttpHeaderPresent == true))
   {
     orionldError(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed", 400);
-    return MHD_YES;
-  }
-
-  // Check payload too big
-  if (orionldState.in.contentLength > 2000000)
-  {
-    orionldError(OrionldBadRequestData, "Invalid Payload", "Payload too large", 400);
     return MHD_YES;
   }
 

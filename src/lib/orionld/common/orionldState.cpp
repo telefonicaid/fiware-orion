@@ -105,9 +105,12 @@ char              pgPortString[16];
 char              mongoServerVersion[32];
 char              userAgentHeaderNoLF[64];     // "User-Agent: orionld/" + ORIONLD_VERSION - initialized in orionldServiceInit()
 char              hostHeaderNoLF[128];
-char              hostHeader[128];             // Host: xxx
+char              hostHeader[256];             // Host: xxx
 size_t            hostHeaderLen;
 PernotSubCache    pernotSubCache;
+EntityMap*        entityMaps        = NULL;    // Used by GET /entities in the distributed case, for pagination
+bool              entityMapsEnabled = false;
+
 
 
 //

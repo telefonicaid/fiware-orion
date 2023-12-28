@@ -167,6 +167,13 @@ RegCacheItem* regCacheItemAdd(RegCache* rcP, const char* registrationId, KjNode*
   rciP->ipAndPort = regIpAndPortExtract(regP);
   rciP->next      = NULL;
 
+  // Host Alias
+  KjNode* hostAliasP = kjLookup(rciP->regTree, "hostAlias");
+  if (hostAliasP != NULL)
+    rciP->hostAlias = strdup(hostAliasP->value.s);
+  else
+    rciP->hostAlias = rciP->ipAndPort;  // Fallback solution
+
   // Counters and timestamps - create if they don't exist
   if (fromDb == false)
   {

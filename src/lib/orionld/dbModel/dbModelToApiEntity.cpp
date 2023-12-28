@@ -166,7 +166,7 @@ KjNode* datasetExtract(KjNode* datasetsP, const char* attrName)
 //   Add "concise/keyValues" and "lang" treatment to "dbModelToApiEntity2()"
 //   Remove "concise/keyValues" and "lang" treatment from "kjTreeFromQueryContextResponse()"
 //
-KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, char* lang, bool compacted, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, const char* lang, bool compacted, OrionldProblemDetails* pdP)
 {
   KjNode* _idP      = NULL;
   KjNode* attrsP    = NULL;

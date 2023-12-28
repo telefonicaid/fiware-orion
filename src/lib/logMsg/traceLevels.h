@@ -72,54 +72,76 @@ typedef enum TraceLevels
   LmtRegCache = 60,                    // Registration Cache
 
   //
-  // Distributed Operations
+  // Distributed Operations - requests
   //
-  LmtDistOpMsgs = 70,                  // Distributed Operations: messages
-  LmtDistOpRequest,                    // ONLY the verb, path, and body of a distributed request
-  LmtDistOpResponse,                   // ONLY the body and status code of the response to a distributed request
-  LmtDistOp207,                        // Merging of the final 207 response
+  LmtDistOpRequest = 70,               // ONLY the verb, path, and body of a distributed request
+  LmtDistOpRequestHeaders,             // HTTP headers of distributed requests
+  LmtDistOpRequestParams,              // URL parameters of distributed requests
+
+  //
+  // Distributed Operations - responses
+  //
+  LmtDistOpResponse = 80,              // ONLY the body and status code of the response to a distributed request
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
-  LmtDistOpRequestHeaders,             // HTTP headers of request of distributed requests
-  LmtDistOpList,                       // Linked list of DistOps
+
+  //
+  // Distributed Operations - misc
+  //
+  LmtDistOpList = 90,                  // Linked list of DistOps
+  LmtDistOpAttributes,                 // The union of attributes URL-Param / Registered Attributes
+  LmtDistOpMerge,                      // Merge of responses from forwsrded requests (GET /entities)
+  LmtDistOpLoop,                       // Loop detection in forwarded messages
+  LmtDistOp207,                        // Merging of the final 207 response
 
   //
   // Context
   //
-  LmtContexts = 80,                    // Contexts
+  LmtContexts = 100,                   // Contexts
   LmtContextTree,                      // Context Tree
   LmtContextCache,                     // Context Cache
   LmtContextDownload,                  // Context Download
   LmtCoreContext,                      // Core Context
 
   // GeoJSON
-  LmtGeoJSON = 90,                     // GeoJSON ... everything (for now)
+  LmtGeoJSON = 110,                    // GeoJSON ... everything (for now)
 
   //
   // Pernot sub-cache
   //
-  LmtPernot = 100,                     // Periodic Notification Subscription cache
+  LmtPernot = 120,                     // Periodic Notification Subscription cache
   LmtPernotLoop,                       // Pernot loop, when each sub is triggered in time
   LmtPernotLoopTimes,                  // Pernot loop, details on timestamps
   LmtPernotFlush,                      // Pernot flush to DB
   LmtPernotQuery,                      // Pernot query
 
   //
+  // Pagination
+  //
+  LmtEntityMap = 130,                  // The arrays of registrations per entity - distributed GET /entities
+  LmtEntityMapRetrieve,                // Retrieval of an entity map
+  LmtEntityMapDetail,                  // Details of the entity-registration maps
+
+  //
   // Misc
   //
-  LmtMongoc = 230,                     // Entire mongoc library
-  LmtSR,                               // Service Routine (whatever it is doing)
+  LmtMongoc = 200,                     // Entire mongoc library
+  LmtSR,                               // Service Routine (whatever it is it's doing)
+  LmtCount,                            // NGSILD-Results-Count header, details for distops
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
   LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
   LmtLegacySubMatch,                   // Old code - update/subscription match for subs/notifs
   LmtLegacySubCacheRefresh,            // Old code - sub-cache-refresh
   LmtMqtt,                             // MQTT notifications
-  LmtQ,                                // Query language
+  LmtQ,                                // Query Language
+  LmtPostgres,                         // Postgres (TRoE)
   LmtSql,                              // SQL command for TRoE
   LmtPgPool,                           // Postgres Connection Pool
+  LmtTenants,                          // Well, tenants :)
   LmtSocketService,                    // Socket Service
+  LmtRegex,                            // Regular expressions - all of them
 
   LmtCurl    = 250,                    // CURL library
   LmtToDo,                             // To Do list

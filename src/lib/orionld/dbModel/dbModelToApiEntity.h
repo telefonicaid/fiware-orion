@@ -61,6 +61,6 @@ extern KjNode* dbModelToApiEntity(KjNode* attrP, bool sysAttrs, char* entityId);
 //   - orionldGetEntities  (GET /entities)
 //   - orionldPostQuery    (POST /entityOperations/query)
 //
-extern KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, char* lang, bool compacted, OrionldProblemDetails* pdP);
+extern KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, const char* lang, bool compacted, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIENTITY_H_

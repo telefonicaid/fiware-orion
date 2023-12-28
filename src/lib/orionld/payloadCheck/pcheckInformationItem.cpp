@@ -306,7 +306,7 @@ bool pCheckOverlappingEntities(KjNode* entitiesP, KjNode* propertiesP, KjNode* r
 
   if (entitiesP == NULL)
   {
-    KjNode* entityArray = mongocEntitiesQuery(NULL, NULL, NULL, &attrsV, NULL, NULL, NULL, NULL);
+    KjNode* entityArray = mongocEntitiesQuery(NULL, NULL, NULL, &attrsV, NULL, NULL, NULL, NULL, false);
     if ((entityArray != NULL) && (entityArray->value.firstChildP != NULL))
     {
       KjNode*      _idP = kjLookup(entityArray->value.firstChildP, "_id");
@@ -349,7 +349,7 @@ bool pCheckOverlappingEntities(KjNode* entitiesP, KjNode* propertiesP, KjNode* r
         entityTypeList.array = entityTypeArray;
         entityTypeArray[0]   = entityType;
 
-        KjNode* entityArray = mongocEntitiesQuery(&entityTypeList, NULL, entityIdPattern, &attrsV, NULL, NULL, NULL, NULL);
+        KjNode* entityArray = mongocEntitiesQuery(&entityTypeList, NULL, entityIdPattern, &attrsV, NULL, NULL, NULL, NULL, false);
         if ((entityArray != NULL) && (entityArray->value.firstChildP != NULL))
         {
           KjNode*      _idP = kjLookup(entityArray->value.firstChildP, "_id");

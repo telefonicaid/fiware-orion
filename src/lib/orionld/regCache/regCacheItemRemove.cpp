@@ -96,6 +96,9 @@ bool regCacheItemRemove(RegCache* rcP, const char* regId)
       if (rciP->ipAndPort != NULL)
         free(rciP->ipAndPort);
 
+      if ((rciP->hostAlias != NULL) && (rciP->hostAlias != rciP->ipAndPort))
+        free(rciP->hostAlias);
+
       // And finally, free the entire struct
       free(rciP);
 

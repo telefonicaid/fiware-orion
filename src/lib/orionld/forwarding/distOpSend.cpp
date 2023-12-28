@@ -38,10 +38,12 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "common/globals.h"                                      // NGSI_LD_V1
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/q//qRender.h"                                  // qRender
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpSend.h"                       // Own interface
 
@@ -91,7 +93,7 @@ typedef struct SList
 //
 typedef struct ForwardUrlParts
 {
-  DistOp*  distOpP;  // From here we need "op", "entityId", "attrName", ...
+  DistOp*  distOpP;      // From here we need "op", "entityId", "attrName", ...
   SList*   params;       // Linked list of strings (URI params)
   SList*   last;         // Last item in the 'params' list - used for linking in new items
 } ForwardUrlParts;
@@ -153,7 +155,7 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
 //
 // uriParamAdd -
 //
-void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value, int totalLen)
+static void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value, int totalLen)
 {
   SList* sListP = (SList*) kaAlloc(&orionldState.kalloc, sizeof(SList));
 
@@ -170,6 +172,8 @@ void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value,
 
     sListP->sLen = snprintf(sListP->sP, sLen, "%s=%s", key, value);
   }
+
+  LM_T(LmtDistOpRequestParams, ("DistOp Request URL Param: %s", sListP->sP));
 
   sListP->next = NULL;
 
@@ -230,7 +234,7 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
       snprintf(httpResponseP->buf, newSize + 1023, "%s%s", oldBuf, chunkP);
       LM_T(LmtDistOpResponseBuf, ("httpResponseP->buf: '%s'", httpResponseP->buf));
     }
-    else  // > 20k: use malloc
+    else
     {
       httpResponseP->buf = (char*) malloc(newSize + 1024);
       if (httpResponseP->buf == NULL)
@@ -254,57 +258,6 @@ static int responseSave(void* chunk, size_t size, size_t members, void* userP)
   LM_T(LmtDistOpResponseBuf, ("%s: rawResponse now points to httpResponseP->buf (%p)", httpResponseP->distOpP->regP->regId, httpResponseP->buf));
   LM_T(LmtDistOpResponseBuf, ("httpResponseP->distOpP->rawResponse at %p: %s", httpResponseP->distOpP->rawResponse, httpResponseP->distOpP->rawResponse));
   return chunkLen;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// attrsParam -
-//
-void attrsParam(OrionldContext* contextP, ForwardUrlParts* urlPartsP, StringArray* attrList)
-{
-  if (contextP == NULL)
-    contextP = orionldCoreContextP;
-
-  //
-  // The attributes are in longnames but ... should probably compact them.
-  // A registration can have its own @context, in cSourceInfo - for now, we use the @context of the original request.
-  // The attrList is always cloned, so, no problem modifying it.
-  //
-  int attrsLen = 0;
-  for (int ix = 0; ix < attrList->items; ix++)
-  {
-    attrList->array[ix]  = orionldContextItemAliasLookup(contextP, attrList->array[ix], NULL, NULL);
-    attrsLen            += strlen(attrList->array[ix]) + 1;
-  }
-
-  // Make room for "attrs=" and the string-end zero
-  attrsLen += 7;
-
-  char* attrs = kaAlloc(&orionldState.kalloc, attrsLen);
-
-  strcpy(attrs, "attrs=");
-
-  int   pos = 6;
-  for (int ix = 0; ix < attrList->items; ix++)
-  {
-    int len = strlen(attrList->array[ix]);
-    strcpy(&attrs[pos], attrList->array[ix]);
-
-    // Add comma unless it's the last attr (in which case we add a zero, just in case
-    pos += len;
-
-    if (ix != attrList->items - 1)  // Not the last attr
-    {
-      attrs[pos] = ',';
-      pos += 1;
-    }
-    else
-      attrs[pos] = 0;
-  }
-
-  uriParamAdd(urlPartsP, attrs, NULL, pos);
 }
 
 
@@ -376,7 +329,7 @@ void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdC
 //
 // distOpSend -
 //
-bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader)
+bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedForHeader, const char* viaHeader, bool local, const char* entityIds)
 {
   //
   // Figure out the @context to use for the forwarded request
@@ -417,6 +370,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   }
 
   distOpP->curlHandle = curl_easy_init();
+  LM_T(LmtLeak, ("Got a curl handle at %p", distOpP->curlHandle));
   if (distOpP->curlHandle == NULL)
   {
     curl_multi_cleanup(orionldState.curlDoMultiP);
@@ -440,16 +394,42 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   //
   // Add URI Params
   //
+  LM_T(LmtDistOpRequestParams, ("%s: ---- URL Parameters for %s ------------------------", distOpP->regP->regId, distOpP->id));
   if (orionldState.verb == GET)
   {
-    if ((distOpP->attrList != NULL) && (distOpP->attrList->items > 0))
-      attrsParam(fwdContextP, &urlParts, distOpP->attrList);
+    if (distOpP->attrsParam != NULL)
+      uriParamAdd(&urlParts, distOpP->attrsParam, NULL, distOpP->attrsParamLen);
 
     //
     // Forwarded requests are ALWAYS sent with options=sysAttrs  (normalized is already default - no need to add that)
     // They MUST be sent with NORMALIZED and SYSATTRS, as without that, there's no way to pick attributes in case we have clashes
     //
-    uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
+    // There is one exception though - when only the entity ids are wanted as output
+    //
+    if (distOpP->onlyIds == true)
+      uriParamAdd(&urlParts, "onlyIds=true", NULL, 12);
+    else
+      uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
+
+    if (distOpP->operation == DoQueryEntity)
+    {
+      if (entityIds != NULL)
+        uriParamAdd(&urlParts, "id", entityIds, -1);
+      else if (distOpP->entityId != NULL)
+        uriParamAdd(&urlParts, "id", distOpP->entityId, -1);
+    }
+
+    if (local == true)
+      uriParamAdd(&urlParts, "local=true", NULL, 10);
+
+    if (distOpP->qNode != NULL)
+    {
+      char buf[256];
+      qRender(distOpP->qNode, NGSI_LD_V1, buf, sizeof(buf), NULL);
+      LM_T(LmtDistOpRequestParams, ("DistOp %s has a Q: %s", distOpP->regP->regId, buf));
+      if (orionldState.uriParams.q != NULL)
+        LM_T(LmtDistOpRequestParams, ("The initial request also has a 'q'"));
+    }
 
     //
     // If we know the Entity Type, we pass that piece of information as well
@@ -466,6 +446,14 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
   if ((distOpP->operation == DoAppendAttrs) && (orionldState.uriParamOptions.noOverwrite == true))
     uriParamAdd(&urlParts, "options", "noOverwrite", 11);
+
+  if (orionldState.uriParams.qCopy != NULL)
+  {
+    uriParamAdd(&urlParts, "q", orionldState.uriParams.qCopy, -1);
+    LM_T(LmtDistOpRequestHeaders, ("%s: orionldState.uriParams.q: '%s'", distOpP->regP->regId, orionldState.uriParams.qCopy));
+  }
+
+  LM_T(LmtDistOpRequestParams, ("%s: ---- End of URL Parameters -----------------", distOpP->regP->regId));
 
   //
   // Compose the entire URL and pass it to CURL
@@ -494,15 +482,11 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Date
   headers = curl_slist_append(headers, dateHeader);
 
-#if 0
-  // Host
-  char hostHeader[256];
-  snprintf(hostHeader, sizeof(hostHeader), "Host: %s", ip);
-  headers = curl_slist_append(headers, hostHeader);
-#endif
-
   // X-Forwarded-For
   headers = curl_slist_append(headers, xForwardedForHeader);
+
+  // Via
+  headers = curl_slist_append(headers, viaHeader);
 
   // Custom headers from Registration::contextSourceInfo
   char* infoTenant    = NULL;
@@ -555,15 +539,8 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
         contentType = JSON;
         continue;
       }
-
       if (strcasecmp(keyP->value.s, "Accept") == 0)
-      {
         accept = valueP->value.s;
-        char  header[256];  // Assuming 256 is enough
-        snprintf(header, sizeof(header), "Accept: %s", valueP->value.s);
-        headers = curl_slist_append(headers, header);
-        continue;
-      }
 
       // None of the above, adding the header
       char  header[256];  // Assuming 256 is enough
@@ -633,7 +610,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   struct curl_slist* sP = headers;
   while (sP != NULL)
   {
-    LM_T(LmtDistOpMsgs, ("FWD: Added header '%s'", sP->data));
+    LM_T(LmtDistOpRequest, ("FWD: Added header '%s'", sP->data));
     sP = sP->next;
   }
 #endif
@@ -724,7 +701,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
 
   //
-  // Reading the response
+  // Set the callback function (responseSave) for reading the response
   //
   HttpResponse* httpResponseP = (HttpResponse*) kaAlloc(&orionldState.kalloc, sizeof(HttpResponse));
 
@@ -750,9 +727,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   curl_easy_setopt(distOpP->curlHandle, CURLOPT_HTTPHEADER, headers);
 
   //
-  // SEND (sort of)
+  // SEND (sort of - enqueue the request)
   //
-  LM_T(LmtDistOpRequest, ("%s: distributed request %s %s '%s'", distOpP->regP->regId, orionldState.verbString, url, payloadBody));
+  LM_T(LmtDistOpRequest, ("%s: distributed request '%s' %s %s '%s'", distOpP->regP->regId, distOpP->id, orionldState.verbString, url, (payloadBody == NULL)? "no body" : payloadBody));
   curl_multi_add_handle(orionldState.curlDoMultiP, distOpP->curlHandle);
 
   return 0;

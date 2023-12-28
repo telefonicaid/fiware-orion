@@ -1,0 +1,367 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI-LD Forward of GET /entities - with an entity split over various brokers
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+dbInit CP4
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
+orionldStart CP3 -experimental
+orionldStart CP4 -experimental
+
+--SHELL--
+#
+# 01. In CB,  create an entity urn:E1 with attribute  P0
+# 02. In CP1, create an entity urn:E1 with attributes P1-P3+R1
+# 03. In CP2, Create an entity urn:E1 with attributes P1-P3+R1
+# 04. In CP3, Create an entity urn:E1 with attributes P1-P3+R1
+# 05. In CP4, Create an entity urn:E1 with attributes P1-P4+R1+R4 (only P4 and R4 will be used)
+# 06. Create an exclusive registration R1 on urn:E1/P1 for CP1
+# 07. Create a  redirect  registration R2 on urn:E1/P2 for CP2
+# 08. Create an inclusive registration R3 on T/P3 for CP3
+# 09. Create an auxiliar  registration R3 on T for CP4
+# 10. GET /entities - see all properties P1-P4, each from a different broker, and relationships R1+R4 from CP4
+#
+
+echo "01. In CB,  create an entity urn:E1 with attribute P0"
+echo "====================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P0": "In CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+echo "02. In CP1, create an entity urn:E1 with attributes P1-P3+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP1",
+  "P2": "P2 in CP1",
+  "P3": "P3 in CP1",
+  "R1": { "object": "urn:in:cp1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. In CP2, Create an entity urn:E1 with attributes P1-P3+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP2",
+  "P2": "P2 in CP2",
+  "P3": "P3 in CP2",
+  "R1": { "object": "urn:in:cp2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. In CP3, Create an entity urn:E1 with attributes P1-P3+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP3",
+  "P2": "P2 in CP3",
+  "P3": "P3 in CP3",
+  "R1": { "object": "urn:in:cp3" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "05. In CP4, Create an entity urn:E1 with attributes P1-P4+R1+R4 (only P4 and R4 will be used)"
+echo "============================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP4",
+  "P2": "P2 in CP4",
+  "P3": "P3 in CP4",
+  "P4": "P4 in CP4",
+  "R1": { "object": "urn:in:cp4" },
+  "R4": { "object": "urn:in:cp4" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP4_PORT
+echo
+echo
+
+
+echo "06. Create an exclusive registration R1 on urn:E1/P1 for CP1"
+echo "============================================================"
+payload='{
+  "id": "urn:Reg1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ]
+    }
+  ],
+  "mode": "exclusive",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Create a  redirect  registration R2 on urn:E1/P2 for CP2"
+echo "============================================================"
+payload='{
+  "id": "urn:Reg2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P2" ]
+    }
+  ],
+  "mode": "redirect",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP2_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Create an inclusive registration R3 on T/P3 for CP3"
+echo "======================================================="
+payload='{
+  "id": "urn:Reg3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P3" ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP3_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Create an auxiliar  registration R3 on T/P4 for CP4"
+echo "======================================================="
+payload='{
+  "id": "urn:Reg4",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "auxiliary",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP4_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "10. GET /entities - see all properties P1-P4, each from a different broker, and relationships R1+R4 from CP4"
+echo "============================================================================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true'
+echo
+echo
+
+
+--REGEXPECT--
+01. In CB,  create an entity urn:E1 with attribute P0
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. In CP1, create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. In CP2, Create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. In CP3, Create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+05. In CP4, Create an entity urn:E1 with attributes P1-P4+R1+R4 (only P4 and R4 will be used)
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. Create an exclusive registration R1 on urn:E1/P1 for CP1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg1
+
+
+
+07. Create a  redirect  registration R2 on urn:E1/P2 for CP2
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg2
+
+
+
+08. Create an inclusive registration R3 on T/P3 for CP3
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg3
+
+
+
+09. Create an auxiliar  registration R3 on T/P4 for CP4
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg4
+
+
+
+10. GET /entities - see all properties P1-P4, each from a different broker, and relationships R1+R4 from CP4
+============================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 351
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+NGSILD-Results-Count: 1
+
+[
+    {
+        "P0": {
+            "type": "Property",
+            "value": "In CB"
+        },
+        "P1": {
+            "type": "Property",
+            "value": "P1 in CP1"
+        },
+        "P2": {
+            "type": "Property",
+            "value": "P2 in CP2"
+        },
+        "P3": {
+            "type": "Property",
+            "value": "P3 in CP3"
+        },
+        "P4": {
+            "type": "Property",
+            "value": "P4 in CP4"
+        },
+        "R1": {
+            "object": "urn:in:cp4",
+            "type": "Relationship"
+        },
+        "R4": {
+            "object": "urn:in:cp4",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN---
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+brokerStop CP4
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+dbDrop CP4

@@ -71,7 +71,8 @@ const char* orionldHeaderName[] = {
   "Access-Control-Max-Age",
   "Access-Control-Expose-Headers",
   "Accept-Patch",
-  "Performance"
+  "Performance",
+  "NGSILD-EntityMap"
 };
 
 

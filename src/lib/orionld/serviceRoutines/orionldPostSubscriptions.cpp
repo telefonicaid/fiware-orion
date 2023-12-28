@@ -49,7 +49,7 @@ extern "C"
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 #include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
 #include "orionld/pernot/pernotSubCacheAdd.h"                  // pernotSubCacheAdd
-#include "orionld/pernot/pernotSubCacheRemove.h"               // pernotSubCacheRemove
+#include "orionld/pernot/pernotItemRelease.h"                  // pernotItemRelease
 #include "orionld/pernot/pernotSubCacheLookup.h"               // pernotSubCacheLookup
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
@@ -134,7 +134,7 @@ bool orionldPostSubscriptions(void)
     //
     char* detail = NULL;
     if ((subCacheItemLookup(orionldState.tenantP->tenant, subId)   != NULL) ||
-        (pernotSubCacheLookup(orionldState.tenantP->tenant, subId) != NULL) ||
+        (pernotSubCacheLookup(subId, orionldState.tenantP->tenant) != NULL) ||
         (mongocSubscriptionExists(subId, &detail)                  == true))
     {
       if (detail == NULL)
@@ -152,9 +152,8 @@ bool orionldPostSubscriptions(void)
   }
   else
   {
-    strncpy(subscriptionId, "urn:ngsi-ld:subscription:", sizeof(subscriptionId) - 1);
-    uuidGenerate(&subscriptionId[25], sizeof(subscriptionId) - 25, false);
-
+    char subscriptionId[80];
+    uuidGenerate(subscriptionId, sizeof(subscriptionId), "urn:ngsi-ld:subscription:");
     subIdP = kjString(orionldState.kjsonP, "id", subscriptionId);
   }
 
@@ -318,7 +317,7 @@ bool orionldPostSubscriptions(void)
     if (cSubP != NULL)
       subCacheItemRemove(cSubP);
     else
-      pernotSubCacheRemove(pSubP);
+      pernotItemRelease(pSubP);
 
     if (qTree != NULL)
       qRelease(qTree);

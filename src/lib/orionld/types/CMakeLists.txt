@@ -31,6 +31,7 @@ SET (SOURCES
     OrionldResponseErrorType.cpp
     RegistrationMode.cpp
     Protocol.cpp
+    StringArray.cpp
 )
 
 # Include directories

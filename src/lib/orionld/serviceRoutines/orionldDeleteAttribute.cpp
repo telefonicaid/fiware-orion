@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
+#include "orionld/forwarding/viaCompose.h"                       // viaCompose
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // Own interface
 
 
@@ -85,6 +86,7 @@ static DistOp* distributedDelete(KjNode* responseBody, char* entityId, char* ent
   // Enqueue all forwarded requests
   // Now that we've found all matching registrations we can add ourselves to the X-forwarded-For header
   char* xff = xForwardedForCompose(orionldState.in.xForwardedFor, localIpAndPort);
+  char* via = viaCompose(orionldState.in.via, brokerId);
 
   int forwards = 0;
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
@@ -95,7 +97,7 @@ static DistOp* distributedDelete(KjNode* responseBody, char* entityId, char* ent
       char dateHeader[70];
       snprintf(dateHeader, sizeof(dateHeader), "Date: %s", orionldState.requestTimeString);
 
-      if (distOpSend(distOpP, dateHeader, xff) == 0)
+      if (distOpSend(distOpP, dateHeader, xff, via, false, NULL) == 0)
       {
         ++forwards;
         distOpP->error = false;
@@ -264,7 +266,7 @@ bool orionldDeleteAttribute(void)
         distOpFailure(responseBody, NULL, "Database Error", "(ToDo: get error from mongoc)", 500, attrName);
     }
     else
-      distOpSuccess(responseBody, NULL, attrName);
+      distOpSuccess(responseBody, NULL, entityId, attrName);
   }
 
   if (distOpList != NULL)

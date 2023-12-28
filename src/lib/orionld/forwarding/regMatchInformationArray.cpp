@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
+#include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
 #include "orionld/forwarding/regMatchInformationItem.h"          // regMatchInformationItem
 
 
@@ -77,9 +78,8 @@ DistOp* regMatchInformationArray
       }
     }
 
-    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
+    DistOp* distOpP = distOpCreate(operation, regP, NULL, NULL, NULL);
 
-    distOpP->regP        = regP;
     distOpP->requestBody = attrUnion;
 
     if (distOpList == NULL)

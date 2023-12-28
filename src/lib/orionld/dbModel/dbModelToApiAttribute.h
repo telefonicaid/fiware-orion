@@ -47,6 +47,6 @@ extern void dbModelToApiAttribute(KjNode* attrP, bool sysAttrs, bool eqsForDots)
 //
 // dbModelToApiAttribute2 -
 //
-extern KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, char* lang, bool compacted, OrionldProblemDetails* pdP);
+extern KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, const char* lang, bool compacted, OrionldProblemDetails* pdP);
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPIATTRIBUTE_H_

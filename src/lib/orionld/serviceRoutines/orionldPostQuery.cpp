@@ -63,8 +63,6 @@ bool orionldPostQuery(void)
   if (treeNodeV == NULL)
     return false;
 
-  LM_T(LmtSR, ("QNode tree at %p", treeNodeV[3].output));
-
   //
   // pCheckQuery has left us everything checked and expanded.
   // Now we need to transform stuff so that we can call mongocEntitiesQuery

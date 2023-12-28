@@ -60,6 +60,8 @@ extern "C"
 #include "orionld/types/OrionldHeader.h"                         // OrionldHeaderSet
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/EntityMap.h"                             // EntityMap
+#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/pernot/PernotSubCache.h"                       // PernotSubCache
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
@@ -131,6 +133,7 @@ typedef struct OrionldUriParams
   int       limit;
   bool      count;
   char*     q;
+  char*     qCopy;
   char*     mq;
   char*     geometry;
   char*     coordinates;
@@ -165,6 +168,8 @@ typedef struct OrionldUriParams
   char*     observedAt;
   char*     lang;
   bool      local;
+  bool      onlyIds;
+  bool      entityMap;
 
   double    observedAtAsDouble;
   uint64_t  mask;
@@ -235,6 +240,7 @@ typedef struct OrionldStateIn
   char*     host;
   char*     xRealIp;
   char*     xForwardedFor;
+  char*     via;
   char*     connection;
   char*     servicePath;
   char*     xAuthToken;
@@ -242,6 +248,8 @@ typedef struct OrionldStateIn
   char*     tenant;
   char*     legacy;          // Use legacy mongodb driver / mongoBackend
   bool      performance;
+  bool      aerOS;           // Special treatment for aerOS specific features
+  char*     wip;
 
   // Incoming payload
   char*     payload;
@@ -258,6 +266,9 @@ typedef struct OrionldStateIn
   StringArray  idList;
   StringArray  typeList;
   StringArray  attrList;
+
+  // Entity Map
+  EntityMap* entityMap;
 
   // Processed wildcards
   char*         pathAttrExpanded;
@@ -426,6 +437,8 @@ typedef struct OrionldConnectionState
   // General Behavior
   //
   bool                    distOpAttrsCompacted;
+  int                     distOpNo;
+  DistOp*                 distOpList;
   uint32_t                acceptMask;            // "1 << MimeType" mask for all accepted Mime Types, regardless of which is chosen and of weight
 
   //
@@ -589,6 +602,7 @@ extern char              troePwd[256];             // From orionld.cpp
 extern int               troePoolSize;             // From orionld.cpp
 extern char              pgPortString[16];
 extern bool              distributed;              // From orionld.cpp
+extern char              brokerId[136];            // From orionld.cpp
 extern const char*       orionldVersion;
 extern OrionldGeoIndex*  geoIndexList;
 extern OrionldPhase      orionldPhase;
@@ -608,7 +622,10 @@ extern bool              debugCurl;                // From orionld.cpp
 extern bool              noCache;                  // From orionld.cpp
 extern uint32_t          cSubCounters;             // Number of subscription counter updates before flush from sub-cache to DB
 extern PernotSubCache    pernotSubCache;
-extern char              localIpAndPort[135];      // Local address for X-Forwarded-For (from orionld.cpp)
+extern EntityMap*        entityMaps;               // Used by GET /entities in the distributed case, for pagination
+extern bool              entityMapsEnabled;
+
+extern char                localIpAndPort[135];    // Local address for X-Forwarded-For (from orionld.cpp)
 extern unsigned long long  inReqPayloadMaxSize;
 extern unsigned long long  outReqMsgMaxSize;
 

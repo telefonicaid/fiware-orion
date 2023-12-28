@@ -41,14 +41,22 @@ void distOpListRelease(DistOp* distOpList)
   while (distOpP != NULL)
   {
     if (distOpP->curlHandle != NULL)
+    {
+      LM_T(LmtLeak, ("Cleaning up a curl handle at %p", distOpP->curlHandle));
       curl_easy_cleanup(distOpP->curlHandle);
+      distOpP->curlHandle = NULL;
+    }
 
     if (distOpP->curlHeaders != NULL)
+    {
       curl_slist_free_all(distOpP->curlHeaders);
+      distOpP->curlHeaders = NULL;
+    }
 
     distOpP = distOpP->next;
   }
 
-  curl_multi_cleanup(orionldState.curlDoMultiP);
+  if (orionldState.curlDoMultiP != NULL)
+    curl_multi_cleanup(orionldState.curlDoMultiP);
   orionldState.curlDoMultiP = NULL;
 }

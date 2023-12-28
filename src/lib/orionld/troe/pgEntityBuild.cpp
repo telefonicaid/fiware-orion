@@ -60,7 +60,7 @@ bool pgEntityBuild
 {
   char instanceId[80];
 
-  uuidGenerate(instanceId, sizeof(instanceId), true);
+  uuidGenerate(instanceId, sizeof(instanceId), "urn:ngsi-ld:attribute:instance:");
 
   //
   // If entity ID and TYPE still in there - remove them!

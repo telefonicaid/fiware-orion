@@ -1,0 +1,336 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Registration ring with three cascading registrations
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental -forwarding -wip entityMaps
+orionldStart CP2 -experimental -forwarding -wip entityMaps
+
+--SHELL--
+
+#
+# 01. Create an inclusive registration for entity type IE in CB, for CP1
+# 02. Create an inclusive registration for entity type IE in CP1, for CP2
+# 03. Create an inclusive registration for entity type IE in CP2, for CB
+# 04. Create an entity urn:E1, type IE in CB
+# 05. Create an entity urn:E2, type IE in CP1
+# 06. Create an entity urn:E3, type IE in CP2
+# 07. GET all entity of type IE from CB - see all three entities
+# 08. DELETE urn:E2 via CB (forwarded message to both CP1 and CP2 - success from CP1, 404 from CP2)
+# 09. DELETE urn:E1 via CB (forwarded message to both CP1 and CP2 - 404 from both of them)
+#
+
+HOST=$(hostname)
+echo "01. Create an inclusive registration for entity type IE in CB, for CP1"
+echo "======================================================================"
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "IE"
+        }
+      ]
+    }
+  ],
+  "endpoint": "'$HOST:$CP1_PORT'",
+  "operations": [ "queryEntity", "deleteEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an inclusive registration for entity type IE in CP1, for CP2"
+echo "======================================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "IE"
+        }
+      ]
+    }
+  ],
+  "endpoint": "'$HOST:$CP2_PORT'",
+  "operations": [ "queryEntity", "deleteEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Create an inclusive registration for entity type IE in CP2, for CB"
+echo "======================================================================"
+payload='{
+  "id": "urn:R3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "IE"
+        }
+      ]
+    }
+  ],
+  "endpoint": "'$HOST:$CB_PORT'",
+  "operations": [ "queryEntity", "deleteEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Create an entity urn:E1, type IE in CB"
+echo "=========================================="
+payload='{
+  "id": "urn:E1",
+  "type": "IE",
+  "CPU": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --port $CB_PORT --payload "$payload"
+echo
+echo
+
+
+echo "05. Create an entity urn:E2, type IE in CP1"
+echo "==========================================="
+payload='{
+  "id": "urn:E2",
+  "type": "IE",
+  "CPU": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --port $CP1_PORT --payload "$payload"
+echo
+echo
+
+
+echo "06. Create an entity urn:E3, type IE in CP2"
+echo "==========================================="
+payload='{
+  "id": "urn:E3",
+  "type": "IE",
+  "CPU": {
+    "type": "Property",
+    "value": 3
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --port $CP2_PORT --payload "$payload"
+echo
+echo
+
+
+echo "07. GET all entity of type IE from CB - see all three entities"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=IE
+echo
+echo
+
+
+echo "08. DELETE urn:E2 via CB (forwarded message to both CP1 and CP2 - success from CP1, 404 from CP2)"
+echo "================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E2?type=IE -X DELETE
+echo
+echo
+
+
+echo "09. DELETE urn:E1 via CB (forwarded message to both CP1 and CP2 - 404 from both of them)"
+echo "========================================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?type=IE -X DELETE
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an inclusive registration for entity type IE in CB, for CP1
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+02. Create an inclusive registration for entity type IE in CP1, for CP2
+=======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+03. Create an inclusive registration for entity type IE in CP2, for CB
+======================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R3
+
+
+
+04. Create an entity urn:E1, type IE in CB
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+05. Create an entity urn:E2, type IE in CP1
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+06. Create an entity urn:E3, type IE in CP2
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+07. GET all entity of type IE from CB - see all three entities
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 193
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[
+    {
+        "CPU": {
+            "type": "Property",
+            "value": 1
+        },
+        "id": "urn:E1",
+        "type": "IE"
+    },
+    {
+        "CPU": {
+            "type": "Property",
+            "value": 2
+        },
+        "id": "urn:E2",
+        "type": "IE"
+    },
+    {
+        "CPU": {
+            "type": "Property",
+            "value": 3
+        },
+        "id": "urn:E3",
+        "type": "IE"
+    }
+]
+
+
+08. DELETE urn:E2 via CB (forwarded message to both CP1 and CP2 - success from CP1, 404 from CP2)
+=================================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 184
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "detail": "urn:E2",
+            "statusCode": 404,
+            "title": "Not Found"
+        },
+        {
+            "detail": "urn:E2",
+            "registrationId": "urn:R1",
+            "statusCode": 404,
+            "title": "Entity not found"
+        }
+    ],
+    "updated": [
+        "urn:E2"
+    ]
+}
+
+
+09. DELETE urn:E1 via CB (forwarded message to both CP1 and CP2 - 404 from both of them)
+========================================================================================
+HTTP/1.1 207 Multi-Status
+Content-Length: 210
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "notUpdated": [
+        {
+            "detail": "urn:E1",
+            "registrationId": "urn:R1",
+            "statusCode": 404,
+            "title": "Not Found"
+        },
+        {
+            "detail": "urn:E1",
+            "registrationId": "urn:R1",
+            "statusCode": 404,
+            "title": "Entity not found"
+        }
+    ],
+    "updated": [
+        "urn:E1"
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+dbDrop CB
+dbDrop CP1
+dbDrop CP2

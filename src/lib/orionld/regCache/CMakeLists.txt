@@ -32,6 +32,7 @@ SET (SOURCES
     regCacheIdPatternRegexCompile.cpp
     regCacheItemRegexRelease.cpp
     regCacheDebug.cpp
+    regCachePresent.cpp
 )
 
 # Include directories

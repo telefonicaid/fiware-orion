@@ -122,7 +122,7 @@ echo
 echo
 
 
-echo "06. Do the same GET, but with	a Link HTTP header, with a @context that redefines P1 and R2 => no hits and no attrs are returned"
+echo "06. Do the same GET, but with a Link HTTP header, with a @context that redefines P1 and R2 => no hits and no attrs are returned"
 echo "==============================================================================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?attrs=P1,R2 -H "Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>;"' rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
 echo
@@ -213,7 +213,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 }
 
 
-06. Do the same GET, but with	a Link HTTP header, with a @context that redefines P1 and R2 => no hits and no attrs are returned
+06. Do the same GET, but with a Link HTTP header, with a @context that redefines P1 and R2 => no hits and no attrs are returned
 ===============================================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 43

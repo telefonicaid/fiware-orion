@@ -34,7 +34,9 @@ extern "C"
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/forwarding/regMatchInformationItemForGet.h"    // regMatchInformationItemForGet
+#include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
+#include "orionld/forwarding/distOpAttrs.h"                      // distOpAttrs
+#include "orionld/forwarding/regMatchInformationItemForGet.h"    // Own interface
 
 
 
@@ -54,11 +56,12 @@ DistOp* regMatchInformationArrayForGet(RegCacheItem* regP, const char* entityId,
       continue;
 
     // If we get this far, then it's a match and we can create the DistOp item and return
-    DistOp* distOpP = (DistOp*) kaAlloc(&orionldState.kalloc, sizeof(DistOp));
+    DistOp* distOpP = distOpCreate(DoQueryEntity, regP, NULL, NULL, attrList);
 
-    distOpP->regP     = regP;
-    distOpP->attrList = attrList;
-    distOpP->geoProp  = (char*) geoProp;
+    if ((distOpP->attrList != NULL) && (distOpP->attrList->items > 0))
+      distOpAttrs(distOpP, distOpP->attrList);
+
+    distOpP->geometryProperty  = (char*) geoProp;
 
     return distOpP;
   }

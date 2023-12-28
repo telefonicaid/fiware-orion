@@ -27,6 +27,7 @@ extern "C"
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
+#include "logMsg/logMsg.h"                                       // LM*
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/orionldState.h"                         // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldContextUrlGenerate.h"           // Own interface
@@ -38,22 +39,20 @@ extern "C"
 // orionldContextUrlGenerate -
 //
 // The size used in the call to kaAlloc:
-//   - strlen("http://HOSTNAME:PORT"):         12
+//   - strlen("http://HOSTNAME:PORT"):         13 (port is max 5 chars - 65535) + orionldHostNameLen
 //   - strlen("/ngsi-ld/v1/jsonldContexts/"):  27
 //   - uuidGenerate:                           37
 //   - zero termination:                        1
-//   - orionldHostNameLen
 //
-//  => 77 + orionldHostNameLen
+//  => 78 + orionldHostNameLen
 //
 char* orionldContextUrlGenerate(char** contextIdP)
 {
-  char* url = (char*) kaAlloc(&kalloc, 77 + orionldHostNameLen);
+  int   urlSize   = 78 + orionldHostNameLen;
+  char* url       = (char*) kaAlloc(&kalloc, urlSize);
+  int   prefixLen = snprintf(url, urlSize, "http://%s:%d/ngsi-ld/v1/jsonldContexts/", orionldHostName, portNo);
 
-  snprintf(url, 77 + orionldHostNameLen, "http://%s:%d/ngsi-ld/v1/jsonldContexts/", orionldHostName, portNo);
-  uuidGenerate(&url[39 + orionldHostNameLen], 100, false);
-
-  *contextIdP = &url[39 + orionldHostNameLen];
+  *contextIdP = uuidGenerate(&url[prefixLen], urlSize - prefixLen, NULL);
 
   return url;
 }

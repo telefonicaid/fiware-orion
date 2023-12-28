@@ -177,6 +177,10 @@ char* pCheckEntityType2(KjNode* payloadTypeNode, KjNode* dbEntityP, char* entity
 
 
 
+// -----------------------------------------------------------------------------
+//
+// attributeLookup -
+//
 static bool attributeLookup(KjNode* dbAttrsP, char* attrName)
 {
   dotForEq(attrName);
@@ -193,17 +197,21 @@ static bool attributeLookup(KjNode* dbAttrsP, char* attrName)
 
 
 #if 0
+// -----------------------------------------------------------------------------
+//
+// rawResponse -
+//
 void rawResponse(DistOp* distOpList, const char* what)
 {
-  LM_T(LmtDistOpMsgs, ("=============== rawResponse: %s", what));
+  LM_T(LmtSR, ("=============== rawResponse: %s", what));
   for (DistOp* distOpP = distOpList; distOpP != NULL; distOpP = distOpP->next)
   {
     if (distOpP->rawResponse != NULL)
-      LM_T(LmtDistOpMsgs, ("%s: rawResponse: '%s'", distOpP->regP->regId, distOpP->rawResponse));
+      LM_T(LmtSR, ("%s: rawResponse: '%s'", distOpP->regP->regId, distOpP->rawResponse));
     else
-      LM_T(LmtDistOpMsgs, ("%s: rawResponse: NULL", distOpP->regP->regId));
+      LM_T(LmtSR, ("%s: rawResponse: NULL", distOpP->regP->regId));
   }
-  LM_T(LmtDistOpMsgs, ("===================================================================="));
+  LM_T(LmtSR, ("===================================================================="));
 }
 #endif
 
@@ -376,7 +384,7 @@ bool orionldPatchEntity(void)
 
     bzero(&local, sizeof(local));
     local.requestBody = orionldState.requestTree;
-    distOpSuccess(responseBody, &local, NULL);
+    distOpSuccess(responseBody, &local, entityId, NULL);
   }
 
   //

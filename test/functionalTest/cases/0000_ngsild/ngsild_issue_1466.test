@@ -1,0 +1,236 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue #1466 - crash with distributed GET /entities on entity type
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental
+
+--SHELL--
+
+#
+# 01. Create an entity urn:E1, type T in CB
+# 02. Create an entity urn:E2, type T in CB
+# 03. Create an entity urn:E3, type T in CP1
+# 04. Create an entity urn:E4, type T in CP1
+# 05. Create inclusive registration of entities of type T in CB, to forward to CP1
+# 06. GET /entities?type=T - see all four entities
+#
+
+echo "01. Create an entity urn:E1, type T in CB"
+echo "========================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "Entity E1 in Orion A",
+  "R1": { "object": "urn:E2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities?local=true --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity urn:E2, type T in CB"
+echo "========================================="
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P1": "Entity E2 in Orion A",
+  "R1": { "object": "urn:E1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities?local=true --payload "$payload"
+echo
+echo
+
+
+echo "03. Create an entity urn:E3, type T in CP1"
+echo "=========================================="
+payload='{
+  "id": "urn:E3",
+  "type": "T",
+  "P1": "Entity E3 in Orion B",
+  "R1": { "object": "urn:E4" }
+}'
+orionCurl --url /ngsi-ld/v1/entities?local=true --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "04. Create an entity urn:E4, type T in CP1"
+echo "=========================================="
+payload='{
+  "id": "urn:E4",
+  "type": "T",
+  "P1": "Entity E4 in Orion B",
+  "R1": { "object": "urn:E3" }
+}'
+orionCurl --url /ngsi-ld/v1/entities?local=true --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "05. Create inclusive registration of entities of type T in CB, to forward to CP1"
+echo "================================================================================"
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "'http://localhost:$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "06. GET /entities?type=T - see all four entities"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/entities?type=T
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:E1, type T in CB
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create an entity urn:E2, type T in CB
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+03. Create an entity urn:E3, type T in CP1
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+04. Create an entity urn:E4, type T in CP1
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E4
+
+
+
+05. Create inclusive registration of entities of type T in CB, to forward to CP1
+================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+06. GET /entities?type=T - see all four entities
+================================================
+HTTP/1.1 200 OK
+Content-Length: 521
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E1 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E2",
+            "type": "Relationship"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E2 in Orion A"
+        },
+        "R1": {
+            "object": "urn:E1",
+            "type": "Relationship"
+        },
+        "id": "urn:E2",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E3 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E4",
+            "type": "Relationship"
+        },
+        "id": "urn:E3",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E4 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E4",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

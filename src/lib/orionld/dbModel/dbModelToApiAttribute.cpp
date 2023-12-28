@@ -231,7 +231,7 @@ void dbModelToApiLangPropertySimplified(KjNode* dbAttrP, const char* lang)
 //
 // dbModelToApiAttribute2 -
 //
-KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, char* lang, bool compacted, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, const char* lang, bool compacted, OrionldProblemDetails* pdP)
 {
   if ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES))
     compacted = false;

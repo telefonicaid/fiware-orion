@@ -79,10 +79,12 @@ typedef struct RegCacheItem
   // "Shortcuts" and transformed info, all copies from the regTree - for improved performance
   RegistrationMode      mode;
   uint64_t              opMask;
-  OrionldContext*       contextP;      // Set when creating/patching registration
-  bool                  acceptJsonld;  // application/ld+json
-  char*                 ipAndPort;     // IP:port - for X-Forwarded-For
+  OrionldContext*       contextP;           // Set when creating/patching registration
+  bool                  acceptJsonld;       // application/ld+json
+  char*                 ipAndPort;          // IP:port - for X-Forwarded-For
   RegIdPattern*         idPatternRegexList;
+  char*                 hostAlias;          // Broker identity - for the Via header (replacing X-Forwarded-For)
+
   struct RegCacheItem*  next;
 } RegCacheItem;
 

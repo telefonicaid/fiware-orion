@@ -36,6 +36,6 @@ extern "C"
 //
 // distOpEntityMerge -
 //
-extern bool distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary);
+extern void distOpEntityMerge(KjNode* apiEntityP, KjNode* additionP, bool sysAttrs, bool auxiliary);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPENTITYMERGE_H_

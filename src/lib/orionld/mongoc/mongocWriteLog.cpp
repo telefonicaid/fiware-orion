@@ -84,3 +84,53 @@ void mongocWriteLog
     bson_free(request);
   }
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// mongocReadLog -
+//
+void mongocReadLog
+(
+  const char*  msg,
+  const char*  dbName,
+  const char*  collectionName,
+  bson_t*      filterP,
+  bson_t*      optionsP,
+  const char*  path,
+  int          lineNo,
+  const char*  functionName,
+  int          traceLevel
+)
+{
+  char* fileNameOnly = fileName(path);
+
+  char line[2048];
+
+  snprintf(line, sizeof(line), "---------- %s ----------", msg);
+  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+
+  snprintf(line, sizeof(line), "  * Database Name:         '%s'", dbName);
+  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+
+  snprintf(line, sizeof(line), "  * Collection Name:       '%s'", collectionName);
+  lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+
+
+  if (filterP != NULL)
+  {
+    char* filter = bson_as_json(filterP, NULL);
+    snprintf(line, sizeof(line), "  * Filter:                '%s'", filter);
+    lmOut(line,     'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+    bson_free(filter);
+  }
+
+  if (optionsP != NULL)
+  {
+    char* options = bson_as_json(optionsP, NULL);
+    snprintf(line, sizeof(line), "  * Options:             '%s'", options);
+    lmOut(line, 'T', fileNameOnly, lineNo, functionName, traceLevel, NULL);
+    bson_free(options);
+  }
+}

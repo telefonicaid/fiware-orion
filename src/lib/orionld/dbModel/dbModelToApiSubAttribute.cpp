@@ -94,7 +94,7 @@ void dbModelToApiSubAttribute(KjNode* dbSubAttrP)
 //
 // dbModelToApiSubAttribute2 - transform a sub-attribute from DB Model to API format
 //
-KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, RenderFormat renderFormat, char* lang, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, RenderFormat renderFormat, const char* lang, OrionldProblemDetails* pdP)
 {
   if (strcmp(dbSubAttributeP->name, "observedAt") == 0)
     return dbModelToObservedAt(dbSubAttributeP);

@@ -1,0 +1,191 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Loop detection in forwarding
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+orionldStart CB  -experimental -forwarding -brokerId CB
+orionldStart CP1 -experimental -forwarding -brokerId CP1
+
+--SHELL--
+#
+# 01. Create E1 on CB with attribute P1
+# 02. Create E1 on CP1 with attribute P2
+# 03. Register CP1 (E1) on CB as an Inclusive registration
+# 04. Register CB (E1) on CP1 as an Inclusive registration - this will provoke the loop
+# 05. GET E1 on CB - make sure the loop is broken and E1 comes back with P1+P2
+#
+
+#
+# Preparation: get the hostname
+#
+HOSTNAME=$(hostname)
+
+
+echo "01. Create E1 on CB with attribute P1"
+echo "====================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "For local"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 on CP1 with attribute P2"
+echo "======================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P2": "For CP1"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Register CP1 (E1) on CB as an Inclusive registration"
+echo "========================================================"
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://'$HOSTNAME':'$CP1_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive",
+  "hostAlias": "CP1"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Register CB (E1) on CP1 as an Inclusive registration - this will provoke the loop"
+echo "====================================================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://'$HOSTNAME':'$CB_PORT'",
+  "operations": [ "retrieveEntity" ],
+  "mode": "inclusive",
+  "hostAlias": "CB"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "05. GET E1 on CB - make sure the loop is broken and E1 comes back with P1+P2"
+echo "============================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 on CB with attribute P1
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Create E1 on CP1 with attribute P2
+======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Register CP1 (E1) on CB as an Inclusive registration
+========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+04. Register CB (E1) on CP1 as an Inclusive registration - this will provoke the loop
+=====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+05. GET E1 on CB - make sure the loop is broken and E1 comes back with P1+P2
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 114
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "For local"
+    },
+    "P2": {
+        "type": "Property",
+        "value": "For CP1"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

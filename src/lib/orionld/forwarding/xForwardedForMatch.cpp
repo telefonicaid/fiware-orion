@@ -24,6 +24,8 @@
 */
 #include <string.h>                                              // strstr
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 
 
 // -----------------------------------------------------------------------------
@@ -32,6 +34,9 @@
 //
 bool xForwardedForMatch(char* hostsHeader, char* host)
 {
+  LM_T(LmtDistOpLoop, ("Loop Detection: X-Forwarded-For header: '%s' (from 'forwarder')", hostsHeader));
+  LM_T(LmtDistOpLoop, ("Loop Detection: Forward to IP/port:     '%s' (next 'forwardee')", host));
+
   //
   // For example:
   //   hostsHeader == "X-Forwarded-For: host1:1026, host2:1028"
@@ -43,20 +48,35 @@ bool xForwardedForMatch(char* hostsHeader, char* host)
   //   3. The char after is either '\0', ' ', or ','
   //
   if (hostsHeader == NULL)
+  {
+    LM_T(LmtDistOpLoop, ("Loop Detection: No X-Forwarded-For header present, so no loop detected"));
     return false;
+  }
 
   char* subString = strstr(hostsHeader, host);
   if (subString == NULL)
+  {
+    LM_T(LmtDistOpLoop, ("Loop Detection: IP/port (%s) not in X-Forwarded-For header, so no loop detected", host));
     return false;
+  }
 
-  char charBefore = subString[-1];
-  char charAFter  = subString[strlen(host)];
+  char charBefore = (subString == hostsHeader)? ' ' : subString[-1];
+  char charAfter  = subString[strlen(host)];
 
+  LM_T(LmtDistOpLoop, ("Loop Detection: subString: '%s'", subString));
+  LM_T(LmtDistOpLoop, ("Loop Detection: charBefore=0x%x, charAfter=0x%x", charBefore & 0xFF, charAfter & 0xFF));
   if ((charBefore != ' ') && (charBefore != ':') && (charBefore != ','))
+  {
+    LM_T(LmtDistOpLoop, ("Loop Detection: No Match"));
     return false;
+  }
 
-  if ((charAFter != 0) && (charAFter != ',') && (charAFter != ' '))
+  if ((charAfter != 0) && (charAfter != ',') && (charAfter != ' '))
+  {
+    LM_T(LmtDistOpLoop, ("Loop Detection: No Match"));
     return false;
+  }
 
+  LM_T(LmtDistOpLoop, ("Loop Detection: Detected a loop - must stop it!"));
   return true;
 }

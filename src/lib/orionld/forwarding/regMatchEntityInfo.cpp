@@ -1,3 +1,4 @@
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -40,9 +41,9 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// regIdPatternLookup -
+// regIdPatternLookup - FIXME: Own module orionld/forwarding/regIdPatternLookup.cpp/h
 //
-static RegIdPattern* regIdPatternLookup(RegCacheItem* regP, KjNode* idPatternP)
+RegIdPattern* regIdPatternLookup(RegCacheItem* regP, KjNode* idPatternP)
 {
   RegIdPattern* ripP = regP->idPatternRegexList;
 
@@ -83,6 +84,13 @@ bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* ent
 {
   KjNode* idP         = kjLookup(entityInfoP, "id");
   KjNode* idPatternP  = kjLookup(entityInfoP, "idPattern");
+  KjNode* typeP       = kjLookup(entityInfoP, "type");
+
+  if (typeP == NULL)
+  {
+    LM_E(("%s: invalid registration (no type in information::entities)"));
+    return false;
+  }
 
   //
   // "id" is mandatory for 'exclusive' registrations

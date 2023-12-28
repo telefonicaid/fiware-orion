@@ -117,23 +117,20 @@ bool mongocGeoIndexInit(void)
                        "}");
 
     unwind = BCON_NEW("$unwind", BCON_UTF8("$attributeKeys"));
-
-    group = BCON_NEW("$group", "{",
-                     "_id", BCON_UTF8("$attributeKeys.k"),
-                     "}");
+    group  = BCON_NEW("$group", "{", "_id", BCON_UTF8("$attributeKeys.k"), "}");
 
     bson_append_document(objectArray, "0", 1, project);
     bson_append_document(objectArray, "1", 1, unwind);
     bson_append_document(objectArray, "2", 1, group);
 
-    // Append the array to the document
+    // Append the array to the pipeline
     bson_append_array(pipeline, "pipeline", 8, objectArray);
 
-    // Print the BSON document as a JSON string
     if (lmTraceIsSet(LmtMongoc))
     {
       char* str = bson_as_relaxed_extended_json(pipeline, NULL);
       LM_T(LmtMongoc, ("%s", str));
+      bson_free(str);
     }
 
     //
@@ -176,11 +173,21 @@ bool mongocGeoIndexInit(void)
       LM_T(LmtMongoc, ("Found geoProperty: '%s'", geoPropertyName));
 
       if (dbGeoIndexLookup(tenantP->tenant, geoPropertyName) == NULL)
+      {
         mongocGeoIndexCreate(tenantP, geoPropertyName);
+        LM_T(LmtMongoc, ("Creating index for property '%s'", geoPropertyName));
+      }
     }
 
     mongoc_cursor_destroy(mongoCursorP);
     mongoc_collection_destroy(mCollectionP);
+
+    bson_destroy(objectArray);
+    bson_destroy(group);
+    bson_destroy(unwind);
+    bson_destroy(project);
+    bson_destroy(pipeline);
+
     tenantP = tenantP->next;
   }
 

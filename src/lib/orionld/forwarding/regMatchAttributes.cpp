@@ -47,7 +47,7 @@ KjNode* regMatchAttributes(RegCacheItem* regP, DistOpType operation, KjNode* pro
 {
   //
   // Registration of entire entity?
-  // Only 'inclusive' registrations can do that
+  // 'exclusive' registrations can't do that
   //
   if ((propertyNamesP == NULL) && (relationshipNamesP == NULL))
   {

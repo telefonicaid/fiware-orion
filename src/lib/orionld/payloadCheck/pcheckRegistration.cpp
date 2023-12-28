@@ -96,6 +96,7 @@ bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const 
   KjNode*  contextSourceInfoP    = NULL;
   KjNode*  scopeP                = NULL;
   KjNode*  modeP                 = NULL;
+  KjNode*  hostAliasP            = NULL;
   KjNode*  operationsP           = NULL;
   KjNode*  managementP           = NULL;
   KjNode*  propertyTree          = kjObject(orionldState.kjsonP, "properties");  // Temp storage for properties
@@ -270,6 +271,12 @@ bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const 
       EMPTY_ARRAY_CHECK(contextSourceInfoP, "contextSourceInfo");
       if (pCheckKeyValueArray(contextSourceInfoP, contextPP) == false)
         return false;
+    }
+    else if (strcmp(nodeP->name, "hostAlias") == 0)
+    {
+      DUPLICATE_CHECK(hostAliasP, "hostAlias", nodeP);
+      STRING_CHECK(nodeP, "hostAlias");
+      EMPTY_STRING_CHECK(nodeP, "hostAlias");
     }
     else if (strcmp(nodeP->name, "scope") == 0)
     {

@@ -22,109 +22,37 @@
 *
 * Author: Ken Zangelin
 */
-#include <strings.h>                                             // bzero
-
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjParse.h"                                       // kjParse
-#include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
-#include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjClone.h"                                       // kjClone
+#include "kjson/KjNode.h"                                           // KjNode
+#include "kjson/kjClone.h"                                          // kjClone
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/logMsg.h"                                          // LM_*
+#include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/urlDecode.h"                            // urlDecode
-#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
-#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
-#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
-#include "orionld/legacyDriver/legacyGetEntities.h"              // legacyGetEntities
-#include "orionld/mongoc/mongocEntitiesQuery.h"                  // mongocEntitiesQuery
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
-#include "orionld/q/qLex.h"                                      // qLex
-#include "orionld/q/qParse.h"                                    // qParse
-#include "orionld/kjTree/kjChildPrepend.h"                       // kjChildPrepend
-#include "orionld/dbModel/dbModelToApiEntity.h"                  // dbModelToApiEntity2
-#include "orionld/payloadCheck/pCheckGeometry.h"                 // pCheckGeometry
-#include "orionld/payloadCheck/pCheckGeorelString.h"             // pCheckGeorelString
-#include "orionld/payloadCheck/pCheckGeoCoordinates.h"           // pCheckGeoCoordinates
-#include "orionld/serviceRoutines/orionldGetEntities.h"          // Own interface
-
-
-
-// -----------------------------------------------------------------------------
-//
-// geoCheck -
-//
-static bool geoCheck(OrionldGeoInfo* geoInfoP)
-{
-  bzero(geoInfoP, sizeof(OrionldGeoInfo));
-
-  if ((orionldState.uriParams.geometry    != NULL) ||
-      (orionldState.uriParams.georel      != NULL) ||
-      (orionldState.uriParams.coordinates != NULL) ||
-      (orionldState.uriParams.geoproperty != NULL))
-  {
-    //
-    // geometry
-    //
-    if (orionldState.uriParams.geometry == NULL)
-    {
-      orionldError(OrionldBadRequestData, "Invalid Geo-Filter", "missing: geometry", 400);
-      return false;
-    }
-    if (pCheckGeometry(orionldState.uriParams.geometry, &geoInfoP->geometry, false) == false)
-      return false;
-
-    //
-    // georel
-    //
-    if (orionldState.uriParams.georel == NULL)
-    {
-      orionldError(OrionldBadRequestData, "Invalid Geo-Filter", "missing: georel", 400);
-      return false;
-    }
-
-    if (pCheckGeorelString(orionldState.uriParams.georel, geoInfoP) == false)
-      return false;
-
-    //
-    // coordinates
-    //
-    if (orionldState.uriParams.coordinates == NULL)
-    {
-      orionldError(OrionldBadRequestData, "Invalid Geo-Filter", "missing: coordinates", 400);
-      return false;
-    }
-
-    urlDecode(orionldState.uriParams.coordinates);
-    geoInfoP->coordinates = kjParse(orionldState.kjsonP, orionldState.uriParams.coordinates);
-
-    if (geoInfoP->coordinates == NULL)
-    {
-      orionldError(OrionldBadRequestData, "Invalid Geo-Filter", "invalid coordinates", 400);
-      return false;
-    }
-
-    if (pCheckGeoCoordinates(geoInfoP->coordinates, geoInfoP->geometry) == false)
-      return false;
-
-
-    //
-    // geoproperty
-    //
-    if ((orionldState.uriParams.geoproperty != NULL) && (strcmp(orionldState.uriParams.geoproperty, "location") != 0))
-      geoInfoP->geoProperty = orionldAttributeExpand(orionldState.contextP, orionldState.uriParams.geoproperty, true, NULL);
-    else
-      geoInfoP->geoProperty = (char*) "location";
-  }
-
-  return true;
-}
+#include "orionld/common/orionldState.h"                            // orionldState
+#include "orionld/common/orionldError.h"                            // orionldError
+#include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
+#include "orionld/legacyDriver/legacyGetEntities.h"                 // legacyGetEntities
+#include "orionld/kjTree/kjTreeLog.h"                               // kjTreeLog
+#include "orionld/q/QNode.h"                                        // QNode
+#include "orionld/q/qLex.h"                                         // qLex
+#include "orionld/q/qParse.h"                                       // qParse
+#include "orionld/q/qClone.h"                                       // qClone
+#include "orionld/payloadCheck/pCheckGeo.h"                         // pCheckGeo
+#include "orionld/forwarding/DistOp.h"                              // DistOp
+#include "orionld/forwarding/distOpRequests.h"                      // distOpRequests
+#include "orionld/forwarding/distOpListsMerge.h"                    // distOpListsMerge
+#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
+#include "orionld/forwarding/xForwardedForMatch.h"                  // xForwardedForMatchº
+#include "orionld/forwarding/viaMatch.h"                            // viaMatch
+#include "orionld/forwarding/regMatchOperation.h"                   // regMatchOperation
+#include "orionld/forwarding/regMatchInformationArrayForQuery.h"    // regMatchInformationArrayForQuery
+#include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
+#include "orionld/serviceRoutines/orionldGetEntitiesDistributed.h"  // orionldGetEntitiesDistributed
+#include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
+#include "orionld/serviceRoutines/orionldGetEntities.h"             // Own interface
 
 
 
@@ -159,151 +87,26 @@ static QNode* qCheck(char* qString)
 
 // -----------------------------------------------------------------------------
 //
-// apiEntityToGeoJson - transform an API Entity into a GEOJSON Entity
+// pCheckQueryParams -
 //
-KjNode* apiEntityToGeoJson(KjNode* apiEntityP, KjNode* geometryNodeP, bool geoPropertyFromProjection)
+bool pCheckQueryParams(char* id, char* type, char* idPattern, char* q, char* geometry, char* attrs, bool local, EntityMap* entityMap, QNode** qNodeP, OrionldGeoInfo* geoInfoP)
 {
-  KjNode* propertiesP = kjObject(orionldState.kjsonP, "properties");
-
-  //
-  // 1. Find 'type' in the original entity - remove it and wait until everything is moved to 'properties' before putting 'type' back
-  //
-  KjNode* typeP = kjLookup(apiEntityP, "type");
-  if (typeP != NULL)  // Can't really be NULL, can it?
-    kjChildRemove(apiEntityP, typeP);
-
-
-  //
-  // 2. Find the 'id' in the original entity and remove it temporarily - will be put back again once 'properties' has been filled
-  //
-  KjNode* idP = kjLookup(apiEntityP, "id");
-  if (idP != NULL)  // Can't really be NULL, can it?
-    kjChildRemove(apiEntityP, idP);
-
-  // 3. In case the geometryProperty was added to the projection even though it was not part of the "attrs" URI param - just remove it
-  if ((geoPropertyFromProjection == true) && (geometryNodeP != NULL))
-    kjChildRemove(apiEntityP, geometryNodeP);
-
-  // 4. Move EVERYTHING from "apiEntityP" to "properties"
-  propertiesP->value.firstChildP = apiEntityP->value.firstChildP;
-  propertiesP->lastChild         = apiEntityP->lastChild;
-
-  // Clear out apiEntityP
-  apiEntityP->value.firstChildP  = NULL;
-  apiEntityP->lastChild          = NULL;
-
-  //
-  // Should the @context be added to the payload body?
-  //
-  if (orionldState.linkHeaderAdded == false)
-  {
-    // Only if Prefer is not set to body=json
-    if ((orionldState.preferHeader == NULL) || (strcasecmp(orionldState.preferHeader, "body=json") != 0))
-    {
-      KjNode* contextP;
-
-      if (orionldState.link == NULL)
-        contextP = kjString(orionldState.kjsonP, "@context", coreContextUrl);
-      else
-        contextP = kjString(orionldState.kjsonP, "@context", orionldState.link);
-
-      kjChildAdd(apiEntityP, contextP);
-      orionldState.noLinkHeader = true;
-    }
-  }
-
-  // 5. Put the original entity type inside 'properties'
-  if (typeP != NULL)
-    kjChildPrepend(propertiesP, typeP);
-
-  // 6. Put the original entity id inside the top level entity
-  if (idP != NULL)
-    kjChildAdd(apiEntityP, idP);
-
-  // 7. Create the new 'type' for the GEOJSON Entity and add it to the toplevel
-  typeP = kjString(orionldState.kjsonP, "type", "Feature");
-  kjChildPrepend(apiEntityP, typeP);
-
-  // 8. Create the "geometry" (key-values) top-level item
-  KjNode* geometryP = NULL;
-  if ((geometryNodeP != NULL) && (geometryNodeP->type == KjObject))
-  {
-    geometryP = kjLookup(geometryNodeP, "value");
-    if (geometryP == NULL)
-    {
-      // "value" not found ... can it be Simplified format?
-      geometryP = geometryNodeP;
-    }
-
-    if (geometryP != NULL)
-    {
-      if (geometryP->type == KjObject)  // && hasChildren type+coordinates ...
-      {
-        geometryP = kjClone(orionldState.kjsonP, geometryP);
-        geometryP->name = (char*) "geometry";
-      }
-      else
-        geometryP = NULL;
-    }
-  }
-  if (geometryP == NULL)
-    geometryP = kjNull(orionldState.kjsonP, "geometry");
-
-  kjChildAdd(apiEntityP, geometryP);
-
-  // 9. Adding all the properties to top-level
-  propertiesP->next = NULL;
-  kjChildAdd(apiEntityP, propertiesP);
-
-  return apiEntityP;
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// orionldGetEntities -
-//
-// Steal checks of URI params from legacyGetEntities
-//
-// NOTE:
-//   What if an entity id list is given, but with one single entity id?
-//   In general these two requests should be equivalent:
-//     - GET /entities?id=urn:ngsi-ld:T:E1
-//     - GET /entities/urn:ngsi-ld:T:E1
-//
-//   However, if more URI params are given, the similarities aren't that big anymore.
-//   E.g., if attrs is given:
-//     - GET /entities?id=urn:ngsi-ld:T:E1&attrs=P1  [1]
-//     - GET /entities/urn:ngsi-ld:T:E1&attrs=P1     [2]
-//
-//   Imagine that the entity urn:ngsi-ld:T:E1 doesn't have an attribute P1.
-//     - The query (1) would give back an empty arry - no match
-//     - The retrieval (2) would give back the entity withoput any attributes
-//
-//   So, perhaps better to play it safe way and NOT EVER "redirect" to GET /entities/{entityId}
-//
-bool orionldGetEntities(void)
-{
-  if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
-    return legacyGetEntities();
-
   //
   // URI param validity check
   //
-  char*                 id             = orionldState.uriParams.id;
-  char*                 type           = orionldState.uriParams.type;
-  char*                 idPattern      = orionldState.uriParams.idPattern;
-  char*                 q              = orionldState.uriParams.q;
-  char*                 attrs          = orionldState.uriParams.attrs;
-  char*                 geometry       = orionldState.uriParams.geometry;
-  bool                  local          = orionldState.uriParams.local;
 
-  if ((id == NULL) && (idPattern == NULL) && (type == NULL) && ((geometry == NULL) || (*geometry == 0)) && (attrs == NULL) && (q == NULL) && (local == false))
+  if ((id        == NULL)  &&
+      (idPattern == NULL)  &&
+      (type      == NULL)  &&
+      (geometry  == NULL)  &&
+      (attrs     == NULL)  &&
+      (q         == NULL)  &&
+      (local     == false) &&
+      (orionldState.in.entityMap == NULL))
   {
     orionldError(OrionldBadRequestData,
                  "Too broad query",
-                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true",
+                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true, or an entity map",
                  400);
 
     return false;
@@ -316,8 +119,7 @@ bool orionldGetEntities(void)
   if      (orionldState.in.typeList.items == 0) type = (char*) ".*";
   else if (orionldState.in.typeList.items == 1) type = orionldState.in.typeList.array[0];
 
-  OrionldGeoInfo geoInfo;
-  if (geoCheck(&geoInfo) == false)
+  if (pCheckGeo(geoInfoP, orionldState.uriParams.geometry, orionldState.uriParams.georel, orionldState.uriParams.coordinates, orionldState.uriParams.geoproperty) == false)
     return false;
 
   QNode* qNode = NULL;
@@ -328,81 +130,219 @@ bool orionldGetEntities(void)
       return false;
   }
 
-  // According to the spec, id takes precedence over idPattern, so, if both are present, idPattern is NULLed out
-  if ((orionldState.in.idList.items > 0) && (idPattern != NULL))
-    idPattern = NULL;
-
-  char* geojsonGeometryLongName = NULL;
-  if (orionldState.out.contentType == GEOJSON)
-    geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
-
-  int64_t       count;
-  KjNode*       dbEntityArray = mongocEntitiesQuery(&orionldState.in.typeList,
-                                                    &orionldState.in.idList,
-                                                    idPattern,
-                                                    &orionldState.in.attrList,
-                                                    qNode,
-                                                    &geoInfo,
-                                                    &count,
-                                                    geojsonGeometryLongName);
-
-  if (dbEntityArray == NULL)
-    return false;
-
-  KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
-  RenderFormat  rf              = RF_NORMALIZED;
-
-  if      (orionldState.uriParamOptions.concise   == true) rf = RF_CONCISE;
-  else if (orionldState.uriParamOptions.keyValues == true) rf = RF_KEYVALUES;
-
-  if (orionldState.out.contentType == GEOJSON)
-  {
-    KjNode* geojsonToplevelP = kjObject(orionldState.kjsonP, NULL);
-    KjNode* featuresP        = kjArray(orionldState.kjsonP, "features");  // this is where all entities go
-    KjNode* typeP            = kjString(orionldState.kjsonP, "type", "FeatureCollection");
-
-    kjChildAdd(geojsonToplevelP, typeP);
-    kjChildAdd(geojsonToplevelP, featuresP);
-
-    orionldState.responseTree = geojsonToplevelP;
-
-    KjNode* dbEntityP = dbEntityArray->value.firstChildP;
-    KjNode* next;
-
-    while (dbEntityP != NULL)
-    {
-      next = dbEntityP->next;
-
-      // Must remove dbEntityP from dbEntityArray as dbEntityP gets transformed into apiEntityP and then inserted into featuresP
-      kjChildRemove(dbEntityArray, dbEntityP);
-
-      KjNode*     apiEntityP           = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, true, &orionldState.pd);
-      const char* geometryPropertyName = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
-      KjNode*     geometryNodeP        = kjLookup(apiEntityP, geometryPropertyName);
-
-      apiEntityP = apiEntityToGeoJson(apiEntityP, geometryNodeP, orionldState.geoPropertyFromProjection);
-      kjChildAdd(featuresP, apiEntityP);
-
-      dbEntityP = next;
-    }
-  }
-  else
-  {
-    orionldState.responseTree = apiEntityArray;
-
-    for (KjNode* dbEntityP = dbEntityArray->value.firstChildP; dbEntityP != NULL; dbEntityP = dbEntityP->next)
-    {
-      KjNode* apiEntityP = dbModelToApiEntity2(dbEntityP, orionldState.uriParamOptions.sysAttrs, rf, orionldState.uriParams.lang, true, &orionldState.pd);
-      kjChildAdd(apiEntityArray, apiEntityP);
-    }
-  }
-
-  if (orionldState.uriParams.count == true)
-    orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, count);
-
-  // If empty result array, no Link header is needed
-  if (orionldState.responseTree->value.firstChildP == NULL)
-    orionldState.noLinkHeader = true;
+  *qNodeP = qNode;
 
   return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// regMatchForEntitiesQuery -  FIXME: Move to orionld/forwarding/regMatchForEntitiesQuery.cpp/h
+//
+DistOp* regMatchForEntitiesQuery
+(
+  RegistrationMode  regMode,
+  StringArray*      idListP,
+  StringArray*      typeListP,
+  StringArray*      attrListP
+)
+{
+  DistOp* distOpList = NULL;
+
+  for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
+  {
+    if ((regP->mode & regMode) == 0)
+      continue;
+
+    if (regMatchOperation(regP, DoQueryEntity) == false)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation (operation == QueryEntity)", regP->regId));
+      continue;
+    }
+
+    // Loop detection
+    if (viaMatch(orionldState.in.via, regP->hostAlias) == true)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (Via)", regP->regId));
+      continue;
+    }
+
+    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (X-Forwarded-For)", regP->regId));
+      continue;
+    }
+
+    DistOp* distOpP = regMatchInformationArrayForQuery(regP, idListP, typeListP, attrListP);
+    if (distOpP == NULL)
+    {
+      LM_T(LmtRegMatch, ("%s: No Reg Match due to Information Array", regP->regId));
+      continue;
+    }
+
+    //
+    // Add distOpP to the linked list (distOpList)
+    //
+    LM_T(LmtRegMatch, ("%s: Reg Match !", regP->regId));
+
+    distOpList = distOpListsMerge(distOpList, distOpP);
+  }
+
+  return distOpList;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// distOpRequestsForEntitiesQuery -
+//
+DistOp* distOpRequestsForEntitiesQuery(char* idPattern, QNode* qNode)
+{
+  // FIXME: idPattern, qNode also need to be taken into account inside regMatchForEntitiesQuery
+  DistOp* auxiliarList  = regMatchForEntitiesQuery(RegModeAuxiliary, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* exclusiveList = regMatchForEntitiesQuery(RegModeExclusive, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* redirectList  = regMatchForEntitiesQuery(RegModeRedirect,  &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  // FIXME: Strip off attrs, entityId, entityType, etc from URI params (regMatchForEntitiesQuery(RegModeExclusive) already does it for each match
+
+  DistOp* inclusiveList = regMatchForEntitiesQuery(RegModeInclusive, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* distOpList;
+
+  distOpList = distOpListsMerge(exclusiveList,  redirectList);
+  distOpList = distOpListsMerge(distOpList, inclusiveList);
+  distOpList = distOpListsMerge(distOpList, auxiliarList);
+
+  return distOpList;
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// orionldGetEntities -
+//
+// Steal checks of URI params from legacyGetEntities
+//
+// Three cases:
+// * legacy
+// * local query (either by setting "local=true", or by "no matching registrations
+// * distributed query (best effort, without freezing time)
+//
+//
+bool orionldGetEntities(void)
+{
+  if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
+    return legacyGetEntities();
+
+  char*   id        = orionldState.uriParams.id;         // Validity checked in orionldMhdConnectionTreat.cpp (pCheckEntityIdParam)
+  char*   type      = orionldState.uriParams.type;       // Validity checked in orionldMhdConnectionTreat.cpp (pCheckEntityTypeParam)
+  char*   idPattern = orionldState.uriParams.idPattern;  // No check
+  char*   q         = orionldState.uriParams.q;
+  char*   geometry  = orionldState.uriParams.geometry;
+  char*   attrs     = orionldState.uriParams.attrs;      // Validity checked in orionldMhdConnectionTreat.cpp (pCheckAttrsParam)
+  bool    local     = orionldState.uriParams.local;
+  QNode*  qNode     = NULL;
+
+  LM_T(LmtEntityMap, ("onlyIds: %s", (orionldState.uriParams.onlyIds == true)? "TRUE" : "FALSE"));
+
+  // According to the spec, id takes precedence over idPattern, so, if both are present, idPattern is NULLed out
+  if ((orionldState.in.idList.items > 0) && (orionldState.uriParams.idPattern != NULL))
+    idPattern = NULL;
+
+  OrionldGeoInfo geoInfo;
+  if (pCheckQueryParams(id, type, idPattern, q, geometry, attrs, local, orionldState.in.entityMap, &qNode, &geoInfo) == false)
+    return false;
+
+  //
+  // Distributed GET /entities, using the concept "entityMaps" is disabled by default.
+  // To turn it on, please start Orion-LD with the CLI option:
+  //   -wip entityMaps
+  // Or, the env var:
+  // export ORIONLD_WIP=entityMaps
+  //
+  if (entityMapsEnabled == false)
+    orionldState.distributed = false;
+
+  //
+  // Entity Maps can be turned on using the HTTP header ORIONLD-WIP
+  //
+  if (orionldState.in.wip != NULL)
+  {
+    if (strcmp(orionldState.in.wip, "entityMaps") == 0)
+      orionldState.distributed = true;
+  }
+
+  if (orionldState.in.entityMap != NULL)
+  {
+    // No query params can be used when asking for pages in an entity map
+    if ((id       != NULL) || (type  != NULL) || (idPattern != NULL) || (q != NULL)      ||
+        (geometry != NULL) || (attrs != NULL) || (orionldState.uriParams.local == true))
+    {
+      orionldError(OrionldBadRequestData, "Query parameters present", "not allowed when paginating using an entity map", 400);
+      return false;
+    }
+  }
+
+  if (orionldState.distributed == false)
+    return orionldGetEntitiesLocal(&orionldState.in.typeList,
+                                   &orionldState.in.idList,
+                                   &orionldState.in.attrList,
+                                   idPattern,
+                                   qNode,
+                                   &geoInfo,
+                                   orionldState.uriParams.lang,
+                                   orionldState.uriParamOptions.sysAttrs,
+                                   orionldState.uriParams.geometryProperty,
+                                   orionldState.uriParams.onlyIds,
+                                   false);
+
+  if (orionldState.in.entityMap == NULL)  // No prior entity map is requested - must create a new one
+  {
+    //
+    // Find matching registrations
+    //
+    orionldState.distOpList = distOpRequestsForEntitiesQuery(idPattern, qNode);
+
+    //
+    // if there are no matching registrations, the request is treated as a local request
+    //
+    if (orionldState.distOpList == NULL)
+      return orionldGetEntitiesLocal(&orionldState.in.typeList,
+                                     &orionldState.in.idList,
+                                     &orionldState.in.attrList,
+                                     idPattern,
+                                     qNode,
+                                     &geoInfo,
+                                     orionldState.uriParams.lang,
+                                     orionldState.uriParamOptions.sysAttrs,
+                                     orionldState.uriParams.geometryProperty,
+                                     orionldState.uriParams.onlyIds,
+                                     true);
+
+    // Create the "@none" DistOp
+    DistOp* local  = distOpCreate(DoQueryEntity, NULL, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+
+    // Add lang, geometryProperty, qNode, ...   to the "@none" DistOp
+    local->lang                = (orionldState.uriParams.lang != NULL)? strdup(orionldState.uriParams.lang) : NULL;
+    local->geoInfo.geometry    = geoInfo.geometry;
+    local->geoInfo.georel      = geoInfo.georel;
+    local->geoInfo.coordinates = (geoInfo.coordinates != NULL)? kjClone(NULL, geoInfo.coordinates) : NULL;
+    local->geoInfo.minDistance = geoInfo.minDistance;
+    local->geoInfo.maxDistance = geoInfo.maxDistance;
+    local->geoInfo.geoProperty = (geoInfo.geoProperty != NULL)? strdup(geoInfo.geoProperty) : NULL;
+    local->geometryProperty    = (orionldState.uriParams.geometryProperty != NULL)? strdup(orionldState.uriParams.geometryProperty) : NULL;
+    local->qNode               = (qNode != NULL)? qClone(qNode) : NULL;
+
+    // Add the "@none" DistOp to the linked list of DistOps
+    local->next    = orionldState.distOpList;
+    orionldState.distOpList = local;
+
+    // This is the DistOp list to be used over pagination - it is "malloqued" so it survives the current request
+    distOpListDebug2(orionldState.distOpList, "distOpList for Entity Query");
+    LM_T(LmtDistOpList, ("--------------- "));
+  }
+
+  return orionldGetEntitiesDistributed(orionldState.distOpList, idPattern, qNode, &geoInfo);
 }

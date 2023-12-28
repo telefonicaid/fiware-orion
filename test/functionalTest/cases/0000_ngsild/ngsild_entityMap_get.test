@@ -1,0 +1,542 @@
+# Copyright 2023 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Retrieval of an entityMap
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+dbInit CP2
+dbInit CP3
+dbInit CP4
+orionldStart CB  -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental
+orionldStart CP2 -experimental
+orionldStart CP3 -experimental
+orionldStart CP4 -experimental
+
+--SHELL--
+#
+# 01. In CB,  create an entity urn:E1 with attribute  P0
+# 02. In CP1, create an entity urn:E1 with attributes P1-P3+R1
+# 03. In CP2, Create an entity urn:E1 with attributes P1-P3+R1
+# 04. In CP3, Create an entity urn:E1 with attributes P1-P3+R1
+# 05. In CP4, Create an entity urn:E1 with attributes P1-P4+R1+R4 (only P4 and R4 will be used)
+# 06. Create an exclusive registration R1 on urn:E1/P1 for CP1  (on urn:E1 only)
+# 07. Create a  redirect  registration R2 on urn:E1/P2 for CP2  (on urn:E1 only)
+# 08. Create an inclusive registration R3 on T/P3 for CP3       (on type:T)
+# 09. Create an auxiliar  registration R4 on T for CP4          (on type:T)
+# 10. GET /entities, only to create the entityMap
+# 11. GET /entityMaps/* - see the entityMap with urn:E1 and its 4 registrations + URLs
+# 12. In CB,  create an entity urn:E2
+# 13. In CP1, create an entity urn:E3
+# 14. In CP2, Create an entity urn:E4
+# 15. In CP3, Create an entity urn:E5
+# 16. In CP4, Create an entity urn:E6
+# 17. Delete the old entity map
+# 18. GET /entities, only to create a new entityMap (finding urn:E1, urn:E5)
+# 19. GET /entityMaps/* - see the entityMap with urn:E1 - urn:E5
+#
+
+echo "01. In CB,  create an entity urn:E1 with attribute P0"
+echo "====================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P0": "In CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. In CP1, create an entity urn:E1 with attributes P1-P3+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP1",
+  "P2": "P2 in CP1",
+  "P3": "P3 in CP1",
+  "R1": { "object": "urn:in:cp1" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. In CP2, Create an entity urn:E1 with attributes P1-P3+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP2",
+  "P2": "P2 in CP2",
+  "P3": "P3 in CP2",
+  "R1": { "object": "urn:in:cp2" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "04. In CP3, Create an entity urn:E1 with attributes P1-P3+R1"
+echo "============================================================"
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP3",
+  "P2": "P2 in CP3",
+  "P3": "P3 in CP3",
+  "R1": { "object": "urn:in:cp3" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "05. In CP4, Create an entity urn:E1 with attributes P1-P4+R1+R4 (only P4 and R4 will be used)"
+echo "============================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": "P1 in CP4",
+  "P2": "P2 in CP4",
+  "P3": "P3 in CP4",
+  "P4": "P4 in CP4",
+  "R1": { "object": "urn:in:cp4" },
+  "R4": { "object": "urn:in:cp4" }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP4_PORT
+echo
+echo
+
+
+echo "06. Create an exclusive registration R1 on urn:E1/P1 for CP1"
+echo "============================================================"
+payload='{
+  "id": "urn:Reg1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P1" ]
+    }
+  ],
+  "mode": "exclusive",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "07. Create a  redirect  registration R2 on urn:E1/P2 for CP2"
+echo "============================================================"
+payload='{
+  "id": "urn:Reg2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "id": "urn:E1",
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P2" ]
+    }
+  ],
+  "mode": "redirect",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP2_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "08. Create an inclusive registration R3 on T/P3 for CP3"
+echo "======================================================="
+payload='{
+  "id": "urn:Reg3",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ],
+      "propertyNames": [ "P3" ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP3_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Create an auxiliar  registration R4 on T/P4 for CP4"
+echo "======================================================="
+payload='{
+  "id": "urn:Reg4",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "auxiliary",
+  "operations": [ "queryEntity" ],
+  "endpoint": "http://localhost:'$CP4_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "10. GET /entities, only to create the entityMap"
+echo "==============================================="
+orionCurl --url "/ngsi-ld/v1/entities?type=T&limit=0&count=true"
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "11. GET /entityMaps/* - see the entityMap with urn:E1 and its 4 registrations + URLs"
+echo "===================================================================================="
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap
+echo
+echo
+
+
+echo "12. In CB,  create an entity urn:E2"
+echo "==================================="
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P0": "In CB"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "13. In CP1, create an entity urn:E3"
+echo "==================================="
+payload='{
+  "id": "urn:E3",
+  "type": "T",
+  "P1": "P1 in CP1"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "14. In CP2, Create an entity urn:E4"
+echo "==================================="
+payload='{
+  "id": "urn:E4",
+  "type": "T",
+  "P1": "P1 in CP2"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP2_PORT
+echo
+echo
+
+
+echo "15. In CP3, Create an entity urn:E5"
+echo "==================================="
+payload='{
+  "id": "urn:E5",
+  "type": "T",
+  "P1": "P1 in CP3"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP3_PORT
+echo
+echo
+
+
+echo "16. In CP4, Create an entity urn:E6"
+echo "==================================="
+payload='{
+  "id": "urn:E6",
+  "type": "T",
+  "P1": "P1 in CP4"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP4_PORT
+echo
+echo
+
+
+echo "17. Delete the old entity map"
+echo "============================="
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap -X DELETE
+echo
+echo
+
+
+echo "18. GET /entities, only to create a new entityMap"
+echo "================================================="
+orionCurl --url "/ngsi-ld/v1/entities?type=T&count=true&limit=0"
+entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "19. GET /entityMaps/* - see the entityMap with urn:E1 - urn:E5"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/entityMaps/$entityMap
+echo
+echo
+
+
+--REGEXPECT--
+01. In CB,  create an entity urn:E1 with attribute P0
+=====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. In CP1, create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. In CP2, Create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. In CP3, Create an entity urn:E1 with attributes P1-P3+R1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+05. In CP4, Create an entity urn:E1 with attributes P1-P4+R1+R4 (only P4 and R4 will be used)
+=============================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+06. Create an exclusive registration R1 on urn:E1/P1 for CP1
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg1
+
+
+
+07. Create a  redirect  registration R2 on urn:E1/P2 for CP2
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg2
+
+
+
+08. Create an inclusive registration R3 on T/P3 for CP3
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg3
+
+
+
+09. Create an auxiliar  registration R4 on T/P4 for CP4
+=======================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:Reg4
+
+
+
+10. GET /entities, only to create the entityMap
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+NGSILD-Results-Count: 1
+
+[]
+
+
+11. GET /entityMaps/* - see the entityMap with urn:E1 and its 4 registrations + URLs
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 64
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:E1": [
+        "@none",
+        "urn:Reg1",
+        "urn:Reg2",
+        "urn:Reg3",
+        "urn:Reg4"
+    ]
+}
+
+
+12. In CB,  create an entity urn:E2
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+13. In CP1, create an entity urn:E3
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+14. In CP2, Create an entity urn:E4
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E4
+
+
+
+15. In CP3, Create an entity urn:E5
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E5
+
+
+
+16. In CP4, Create an entity urn:E6
+===================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E6
+
+
+
+17. Delete the old entity map
+=============================
+HTTP/1.1 200 OK
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+18. GET /entities, only to create a new entityMap
+=================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+NGSILD-Results-Count: 3
+
+[]
+
+
+19. GET /entityMaps/* - see the entityMap with urn:E1 - urn:E5
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 105
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "urn:E1": [
+        "@none",
+        "urn:Reg1",
+        "urn:Reg2",
+        "urn:Reg3",
+        "urn:Reg4"
+    ],
+    "urn:E2": [
+        "@none"
+    ],
+    "urn:E6": [
+        "urn:Reg4"
+    ]
+}
+
+
+--TEARDOWN---
+brokerStop CB
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+brokerStop CP4
+dbDrop CB
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+dbDrop CP4

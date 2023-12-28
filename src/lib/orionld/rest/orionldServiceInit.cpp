@@ -232,6 +232,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
     serviceP->uriParams |= ORIONLD_URIPARAM_LANG;
     serviceP->uriParams |= ORIONLD_URIPARAM_LOCAL;
+    serviceP->uriParams |= ORIONLD_URIPARAM_ONLYIDS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_ENTITYMAP;
   }
   else if (serviceP->serviceRoutine == orionldGetEntity)
   {
@@ -245,6 +247,8 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldDeleteEntity)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
   }
   else if (serviceP->serviceRoutine == orionldPostEntity)
   {

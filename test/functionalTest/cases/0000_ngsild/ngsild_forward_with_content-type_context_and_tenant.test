@@ -331,6 +331,7 @@ Accept: application/json
 Content-Type: application/json
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 
 {
     "P1": {
@@ -367,6 +368,7 @@ Host: REGEX(.*)
 Accept: application/json
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 =======================================
 
 
@@ -404,6 +406,7 @@ Ngsild-Tenant: do_t1
 Content-Type: application/json
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 
 {
     "P1": {
@@ -441,6 +444,7 @@ Accept: application/json
 Ngsild-Tenant: do_t1
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 =======================================
 
 
@@ -462,6 +466,7 @@ Ngsild-Tenant: do_t1
 Content-Type: application/ld+json
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 
 {
     "@context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
@@ -507,6 +512,7 @@ Content-Type: application/json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 
 {
     "P1": {
@@ -544,6 +550,7 @@ Accept: application/ld+json
 Link: <https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 Date: REGEX(.*)
 X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
 =======================================
 
 

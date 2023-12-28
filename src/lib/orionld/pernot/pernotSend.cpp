@@ -68,8 +68,7 @@ static KjNode* notificationTree(PernotSubscription* subP, KjNode* entityArray)
   KjNode*             notificationP = kjObject(orionldState.kjsonP, NULL);
   char                notificationId[80];
 
-  strncpy(notificationId, "urn:ngsi-ld:Notification:", sizeof(notificationId) - 1);  // notificationId, could be a thread variable ...
-  uuidGenerate(&notificationId[25], sizeof(notificationId) - 25, false);
+  uuidGenerate(notificationId, sizeof(notificationId), "urn:ngsi-ld:Notification:");
 
   char date[64];
   numberToDate(subP->lastNotificationTime, date, sizeof(date));

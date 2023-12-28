@@ -31,7 +31,7 @@ orionldStart CB
 
 #
 # This test exercises the 'wait for context download feature', implemented in the end of February 2021.
-# - Sending a request to create an entity E1 with context X, in the bacground, so another request can enter the broker simultaneously
+# - Sending a request to create an entity E1 with context X, in the background, so another request can enter the broker simultaneously
 # - Sending another request, with the same context X, to create another entity (E2)
 #
 # As the first request is already downloading context X when the second request is received, the second request will await the download of
@@ -156,4 +156,4 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbDrop C
+dbDrop CB
