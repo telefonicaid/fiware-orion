@@ -32,8 +32,8 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/troe/PgTableDefinitions.h"                   // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
-#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/types/PgTableDefinitions.h"                  // PG_ATTRIBUTE_INSERT_START, PG_SUB_ATTRIBUTE_INSERT_START
+#include "orionld/types/PgAppendBuffer.h"                      // PgAppendBuffer
 #include "orionld/troe/pgAppendInit.h"                         // pgAppendInit
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild

@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/troe/PgConnection.h"                         // PgConnection
+#include "orionld/types/PgConnection.h"                        // PgConnection
 
 
 

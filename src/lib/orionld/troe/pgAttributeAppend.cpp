@@ -34,9 +34,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/types/PgAppendBuffer.h"                      // PgAppendBuffer
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/eqForDot.h"                           // eqForDot
-#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgQuotedString.h"                       // pgQuotedString
 #include "orionld/troe/kjGeoPointExtract.h"                    // kjGeoPointExtract

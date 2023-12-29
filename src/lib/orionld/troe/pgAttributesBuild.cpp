@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/types/PgAppendBuffer.h"                      // PgAppendBuffer
 #include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild
 
 

@@ -25,7 +25,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
+#include "orionld/types/PgConnectionPool.h"                    // PgConnectionPool
 #include "orionld/troe/pgConnectionPools.h"                    // pgPoolMaster
 #include "orionld/troe/pgConnectionPoolFree.h"                 // pgConnectionPoolFree
 #include "orionld/troe/pgConnectionPoolsFree.h"                // Own interface

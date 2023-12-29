@@ -24,8 +24,8 @@
 */
 #include <stdio.h>                                             // snprintf
 
+#include "orionld/types/PgAppendBuffer.h"                      // PgAppendBuffer
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppend.h"                             // pgAppend
 #include "orionld/troe/pgEntityAppend.h"                       // pgEntityAppend
 

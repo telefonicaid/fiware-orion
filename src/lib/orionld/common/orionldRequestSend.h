@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/common/OrionldResponseBuffer.h"
+#include "orionld/types/OrionldResponseBuffer.h"
 
 
 

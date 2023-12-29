@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
+#include "orionld/types/PgConnectionPool.h"                    // PgConnectionPool
 #include "orionld/troe/pgConnectionPools.h"                    // pgPoolMaster
 #include "orionld/troe/pgConnectionPoolInsert.h"               // Own interface
 

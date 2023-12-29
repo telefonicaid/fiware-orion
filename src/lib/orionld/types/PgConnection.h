@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_TROE_PGCONNECTIONPOOL_H_
-#define SRC_LIB_ORIONLD_TROE_PGCONNECTIONPOOL_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_PGCONNECTION_H_
+#define SRC_LIB_ORIONLD_TYPES_PGCONNECTION_H_
 
 /*
 *
@@ -25,24 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include <semaphore.h>                                         // sem_t
-
-#include "orionld/troe/PgConnection.h"                         // PgConnection
+#include "orionld/common/pqHeader.h"                           // PGconn
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PgConnectionPool -
+// PgConnection -
 //
-typedef struct PgConnectionPool
+typedef struct PgConnection
 {
-  char*                     db;           // Name of the database
-  sem_t                     queueSem;     // Counting semaphore - size same as number of connections in the pool
-  sem_t                     poolSem;      // Binary semaphore - grants rights to modify the pool
-  int                       items;        // Number of connections in the pool
-  PgConnection**            connectionV;  // Allocated array of PgConnection pointers
-  struct PgConnectionPool*  next;         // Connection Pools are stored in a linked list
-} PgConnectionPool;
+  bool    busy;          // In use or free
+  PGconn* connectionP;   // the postgres connection
+  int     uses;          // Number of times the connection has been used
+} PgConnection;
 
-#endif  // SRC_LIB_ORIONLD_TROE_PGCONNECTIONPOOL_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_PGCONNECTION_H_
