@@ -29,13 +29,14 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
+#include "orionld/types/RegistrationMode.h"                     // RegistrationMode
+#include "orionld/types/RegCache.h"                             // RegCache
+#include "orionld/types/RegCacheItem.h"                         // RegCacheItem
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
-#include "orionld/types/RegistrationMode.h"                     // RegistrationMode
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/kjTree/kjStringValueLookupInArray.h"          // kjStringValueLookupInArray
-#include "orionld/regCache/RegCache.h"                          // RegCacheItem
 #include "orionld/kjTree/kjChildCount.h"                        // kjChildCount
 #include "orionld/mongoc/mongocEntitiesQuery.h"                 // mongocEntitiesQuery
 #include "orionld/mongoc/mongocEntityLookup.h"                  // mongocEntityLookup

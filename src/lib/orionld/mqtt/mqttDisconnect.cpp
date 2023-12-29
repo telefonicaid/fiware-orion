@@ -28,7 +28,7 @@
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
-#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
+#include "orionld/types/MqttConnection.h"                      // MqttConnection
 #include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
 #include "orionld/mqtt/mqttDisconnect.h"                       // Own Interface
 

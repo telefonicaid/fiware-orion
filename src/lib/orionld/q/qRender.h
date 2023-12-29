@@ -26,7 +26,8 @@
 * Author: Ken Zangelin
 */
 #include "common/globals.h"                                    // ApiVersion
-#include "orionld/q/QNode.h"                                   // QNode
+
+#include "orionld/types/QNode.h"                               // QNode
 
 
 

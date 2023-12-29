@@ -38,11 +38,11 @@ extern "C"
 
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/db/dbConfiguration.h"                          // DB_DRIVER_MONGOC
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext, ORIONLD_CORE_CONTEXT_URL_V*
 #include "orionld/troe/troe.h"                                   // TroeMode
 #include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/pernot/PernotSubCache.h"                       // PernotSubCache
 #include "orionld/common/orionldState.h"                         // Own interface

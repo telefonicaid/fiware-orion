@@ -33,12 +33,12 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
+#include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
-#include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/q/qTreeToBson.h"                               // qTreeToBson
 #include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_RLOG - FIXME: change name to mongocLog.h
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet

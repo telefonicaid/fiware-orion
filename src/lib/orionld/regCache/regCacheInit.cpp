@@ -28,6 +28,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/common/tenantList.h"                           // tenantList, tenant0
 #include "orionld/regCache/regCacheCreate.h"                     // regCacheCreate

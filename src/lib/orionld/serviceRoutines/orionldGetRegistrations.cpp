@@ -32,13 +32,14 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
+#include "orionld/types/RegCache.h"                              // RegCache
+#include "orionld/types/RegCacheItem.h"                          // RegCache, RegCacheItem
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
 #include "orionld/legacyDriver/legacyGetRegistrations.h"         // legacyGetRegistrations
 #include "orionld/mongoc/mongocRegistrationsGet.h"               // mongocRegistrationsGet
 #include "orionld/dbModel/dbModelToApiRegistration.h"            // dbModelToApiRegistration
-#include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/serviceRoutines/orionldGetRegistrations.h"     // Own Interface
 

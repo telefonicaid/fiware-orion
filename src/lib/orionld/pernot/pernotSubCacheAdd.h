@@ -33,8 +33,8 @@ extern "C"
 #include "common/RenderFormat.h"                               // RenderFormat
 
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 #include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription

@@ -31,8 +31,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
 #include "orionld/q/qVariableFix.h"                            // Own interface

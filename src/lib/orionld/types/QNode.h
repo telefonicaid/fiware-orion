@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_Q_QNODE_H_
-#define SRC_LIB_ORIONLD_Q_QNODE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_QNODE_H_
+#define SRC_LIB_ORIONLD_TYPES_QNODE_H_
 
 /*
 *
@@ -98,20 +98,4 @@ typedef struct QNode
   QNodeValue    value;
 } QNode;
 
-
-
-// ----------------------------------------------------------------------------
-//
-// qNode -
-//
-extern QNode* qNode(QNodeType type);
-
-
-
-// ----------------------------------------------------------------------------
-//
-// qNodeType -
-//
-extern const char* qNodeType(QNodeType type);
-
-#endif  // SRC_LIB_ORIONLD_Q_QNODE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_QNODE_H_

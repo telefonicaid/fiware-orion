@@ -28,9 +28,12 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "logMsg/logMsg.h"                                       // LM_T
+
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCache.h"                              // RegCache
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation

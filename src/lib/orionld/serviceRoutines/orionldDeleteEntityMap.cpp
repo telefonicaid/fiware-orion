@@ -24,6 +24,8 @@
 */
 #include <string.h>                                              // strcmp
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/common/orionldState.h"                         // orionldState, orionldEntityMapId
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/EntityMap.h"                             // EntityMap

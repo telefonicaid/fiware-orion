@@ -42,7 +42,6 @@ extern "C"
 #include "orionld/legacyDriver/legacyPostRegistrations.h"      // legacyPostRegistrations
 #include "orionld/mongoc/mongocRegistrationExists.h"           // mongocRegistrationExists
 #include "orionld/mongoc/mongocRegistrationInsert.h"           // mongocRegistrationInsert
-#include "orionld/regCache/RegCache.h"                         // RegCacheItem
 #include "orionld/regCache/regCacheItemAdd.h"                  // regCacheItemAdd
 #include "orionld/dbModel/dbModelFromApiRegistration.h"        // dbModelFromApiRegistration
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"  // Own interface

@@ -22,7 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/regCache/RegCache.h"                         // RegCacheItem
+#include <unistd.h>                                            // NULL
+#include <stdlib.h>                                            // free
+
+#include "orionld/types/RegCacheItem.h"                        // RegCacheItem
+#include "orionld/types/RegIdPattern.h"                        // RegIdPattern
 #include "orionld/regCache/regCacheItemRegexRelease.h"         // Own interface
 
 

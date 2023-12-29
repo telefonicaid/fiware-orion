@@ -34,10 +34,10 @@ extern "C"
 
 #include "mongoBackend/MongoGlobal.h"                              // getMongoConnection, releaseMongoConnection, ...
 
+#include "orionld/types/QNode.h"                                   // QNode
 #include "orionld/common/orionldState.h"                           // orionldState
 #include "orionld/common/orionldError.h"                           // orionldError
 #include "orionld/common/SCOMPARE.h"                               // SCOMPARE
-#include "orionld/q/QNode.h"                                       // QNode
 #include "orionld/q/qTreeToBsonObj.h"                              // qTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"     // mongoCppLegacyDataToKjTree

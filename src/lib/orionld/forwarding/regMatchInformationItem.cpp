@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchAttributes.h"               // regMatchAttributes
 #include "orionld/forwarding/regMatchEntityInfo.h"               // regMatchEntityInfo

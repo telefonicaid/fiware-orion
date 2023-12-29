@@ -25,7 +25,8 @@
 #include "logMsg/logMsg.h"                                       // LM_T
 #include "logMsg/traceLevels.h"                                  // LmtRegCache
 
-#include "orionld/regCache/RegCache.h"                           // RegCache
+#include "orionld/types/RegCache.h"                              // RegCache
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 
 
 

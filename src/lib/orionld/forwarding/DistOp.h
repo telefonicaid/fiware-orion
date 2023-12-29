@@ -34,9 +34,9 @@ extern "C"
 
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
-#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/types/QNode.h"                                 // QNode
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 

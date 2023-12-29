@@ -28,9 +28,9 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
 #include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge

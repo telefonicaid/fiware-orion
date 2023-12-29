@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
-#define SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_MQTTCONNECTION_H_
+#define SRC_LIB_ORIONLD_TYPES_MQTTCONNECTION_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +25,23 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+#include <MQTTClient.h>                                        // MQTT Client header
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regCacheItemRegexRelease - free any old REGEX in the rciP->idPatternRegexList
+// MqttConnection -
 //
-extern void regCacheItemRegexRelease(RegCacheItem* rciP);
+typedef struct MqttConnection
+{
+  char*           host;
+  unsigned short  port;
+  char*           username;
+  char*           password;
+  char*           version;
+  MQTTClient      client;
+  int             connections;  // When down at 0 - the connection is closed
+} MqttConnection;
 
-#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_MQTTCONNECTION_H_

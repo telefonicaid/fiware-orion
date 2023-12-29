@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_SOCKETSERVICE_SOCKETSERVICE_H_
-#define SRC_LIB_ORIONLD_SOCKETSERVICE_SOCKETSERVICE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_REGIDPATTERN_H_
+#define SRC_LIB_ORIONLD_TYPES_REGIDPATTERN_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,30 +25,24 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>                                               // regex_t
+
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
 
 
 // -----------------------------------------------------------------------------
 //
-// SsHeader -
+// RegIdPattern -
 //
-typedef struct SsHeader
+typedef struct RegIdPattern
 {
-  unsigned short msgCode;
-  unsigned short options;
-  unsigned int   dataLen;
-} SsHeader;
+  regex_t               regex;
+  KjNode*               owner;  // Reference to the 'idPattern' in the rciP->regTree that the regex belongs to
+  struct RegIdPattern*  next;
+} RegIdPattern;
 
-
-
-// -----------------------------------------------------------------------------
-//
-// SsMsgCode -
-//
-typedef enum SsMsgCode
-{
-  SsPing = 1,
-  SsGetEntity
-} SsMsgCode;
-
-#endif  // SRC_LIB_ORIONLD_SOCKETSERVICE_SOCKETSERVICE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_REGIDPATTERN_H_

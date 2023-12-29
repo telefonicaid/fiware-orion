@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_Q_QNODE_H_
+#define SRC_LIB_ORIONLD_Q_QNODE_H_
+
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,12 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/regCache/RegCache.h"                           // RegCache
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// regCacheList - head of the list of Registration Caches (one reg-cache per tenant)
+// qNode -
 //
-RegCache* regCacheList = NULL;
+extern QNode* qNode(QNodeType type);
+
+#endif  // SRC_LIB_ORIONLD_Q_QNODE_H_

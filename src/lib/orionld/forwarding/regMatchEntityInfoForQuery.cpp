@@ -22,13 +22,17 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                              // strcmp
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem, RegIdPattern
+#include "logMsg/logMsg.h"                                       // LM_T
+
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem, RegIdPattern
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery

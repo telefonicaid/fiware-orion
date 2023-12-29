@@ -38,11 +38,12 @@ extern "C"
 #include "logMsg/logMsg.h"
 
 #include "cache/subCache.h"                                    // CachedSubscription
+
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/types/MqttConnection.h"                      // MqttConnection
 #include "orionld/notifications/notificationSuccess.h"         // notificationSuccess
 #include "orionld/notifications/notificationFailure.h"         // notificationFailure
-#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 #include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
 #include "orionld/mqtt/mqttConnectionAdd.h"                    // mqttConnectionAdd
 #include "orionld/mqtt/mqttNotify.h"                           // Own interface

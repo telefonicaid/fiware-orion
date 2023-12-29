@@ -37,14 +37,14 @@ extern "C"
 #include "common/sem.h"                                        // cacheSemTake, cacheSemGive
 #include "cache/subCache.h"                                    // CachedSubscription, subCacheMatch, tenantMatch
 
+#include "orionld/types/QNode.h"                               // QNode, qNodeType
+#include "orionld/types/OrionldAlteration.h"                   // OrionldAlteration, OrionldAlterationMatch, orionldAlterationType
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/dotForEq.h"                           // dotForEq
-#include "orionld/q/QNode.h"                                   // QNode, qNodeType
-#include "orionld/q/qBuild.h"                                  // qBuild
-#include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/common/pathComponentsSplit.h"                // pathComponentsSplit
 #include "orionld/common/eqForDot.h"                           // eqForDot
-#include "orionld/types/OrionldAlteration.h"                   // OrionldAlteration, OrionldAlterationMatch, orionldAlterationType
+#include "orionld/q/qBuild.h"                                  // qBuild
+#include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/notifications/subCacheAlterationMatch.h"     // Own interface
 
 

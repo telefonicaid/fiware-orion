@@ -30,9 +30,9 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 

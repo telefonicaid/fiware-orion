@@ -29,10 +29,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/StringArray.h"                           // StringArray, stringArrayClone
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/regMatchAttributesForGet.h"         // Own interface
 
 

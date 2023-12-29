@@ -31,6 +31,8 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjArray, kljString, kjChildAdd, ...
 }
 
+#include "logMsg/logMsg.h"                                       // LM_T
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup

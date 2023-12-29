@@ -40,7 +40,7 @@ extern "C"
 #include "orionld/types/Protocol.h"                            // Protocol
 #include "orionld/types/StringArray.h"                         // StringArray
 #include "orionld/types/OrionldGeoInfo.h"                      // OrionldGeoInfo
-#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/types/QNode.h"                               // QNode
 
 
 

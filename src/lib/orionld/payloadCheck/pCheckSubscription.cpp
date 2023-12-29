@@ -33,7 +33,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "common/RenderFormat.h"                                 // RenderFormat
 
-#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/q/qBuild.h"                                    // qBuild
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload, e.g. subscriptionNotification = Subscription::notification"

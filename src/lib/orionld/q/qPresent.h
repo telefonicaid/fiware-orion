@@ -27,7 +27,7 @@
 */
 #include "logMsg/logMsg.h"                                     // TraceLevels
 
-#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/types/QNode.h"                               // QNode
 
 
 

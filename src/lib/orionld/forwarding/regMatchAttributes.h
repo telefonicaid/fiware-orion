@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
 
 
@@ -39,6 +39,13 @@ extern "C"
 //
 // regMatchAttributes -
 //
-extern KjNode* regMatchAttributes(RegCacheItem* regP, DistOpType operation, KjNode* propertyNamesP, KjNode* relationshipNamesP, KjNode* incomingP);
+extern KjNode* regMatchAttributes
+(
+  RegCacheItem*  regP,
+  DistOpType     operation,
+  KjNode*        propertyNamesP,
+  KjNode*        relationshipNamesP,
+  KjNode*        incomingP
+);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHATTRIBUTES_H_

@@ -37,6 +37,7 @@ extern "C"
 #include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "cache/subCache.h"                                    // subCacheItemLookup, CachedSubscription
 
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
@@ -54,7 +55,6 @@ extern "C"
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
 #include "orionld/mqtt/mqttDisconnect.h"                       // mqttDisconnect
-#include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qRender.h"                                 // qRender
 #include "orionld/q/qRelease.h"                                // qRelease
 #include "orionld/q/qAliasCompact.h"                           // qAliasCompact

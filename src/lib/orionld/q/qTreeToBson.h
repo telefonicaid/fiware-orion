@@ -27,7 +27,7 @@
 */
 #include <bson/bson.h>                                         // BSON
 
-#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/types/QNode.h"                               // QNode
 
 
 

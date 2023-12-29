@@ -22,13 +22,15 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                              // NULL
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
 #include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 
 
 

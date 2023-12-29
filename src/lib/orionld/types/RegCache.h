@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_ORIONLD_TYPES_REGCACHE_H_
+#define SRC_LIB_ORIONLD_TYPES_REGCACHE_H_
+
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -22,40 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
-#include <string.h>                                              // strcmp
-
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjLookup.h"                                      // kjLookup
-}
-
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/types/RegCache.h"                              // RegCache
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regCacheItemLookup -
+// RegCache -
 //
-RegCacheItem* regCacheItemLookup(RegCache* regCache, const char* regId)
+typedef struct RegCache
 {
-  if (regCache == NULL)
-    return NULL;
+  OrionldTenant* tenantP;
+  RegCacheItem*  regList;
+  RegCacheItem*  last;
+} RegCache;
 
-  RegCacheItem* rciP = regCache->regList;
-
-  while (rciP != NULL)
-  {
-    KjNode* idP = kjLookup(rciP->regTree, "id");
-    if ((idP != NULL) && (strcmp(idP->value.s, regId) == 0))
-      return rciP;
-
-    rciP = rciP->next;
-  }
-
-  return NULL;
-}
+#endif  // SRC_LIB_ORIONLD_TYPES_REGCACHE_H_

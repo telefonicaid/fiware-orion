@@ -27,6 +27,8 @@ extern "C"
 #include "kjson/kjFree.h"                                      // kjFree
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+
 #include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 #include "orionld/pernot/pernotItemRelease.h"                  // Own interface
 

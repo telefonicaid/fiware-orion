@@ -31,12 +31,13 @@ extern "C"
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
+#include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
+#include "orionld/types/QNode.h"                                    // QNode
+#include "orionld/types/RegCache.h"                                 // RegCache
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/orionldError.h"                            // orionldError
-#include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/legacyDriver/legacyGetEntities.h"                 // legacyGetEntities
 #include "orionld/kjTree/kjTreeLog.h"                               // kjTreeLog
-#include "orionld/q/QNode.h"                                        // QNode
 #include "orionld/q/qLex.h"                                         // qLex
 #include "orionld/q/qParse.h"                                       // qParse
 #include "orionld/q/qClone.h"                                       // qClone

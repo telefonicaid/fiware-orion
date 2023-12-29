@@ -29,9 +29,9 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                      // LM_*
 
+#include "orionld/types/QNode.h"                                // QNode
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
-#include "orionld/q/QNode.h"                                    // QNode
 #include "orionld/q/qLex.h"                                     // qLex
 #include "orionld/q/qParse.h"                                   // qParse
 #include "orionld/q/qPresent.h"                                 // qPresent

@@ -31,12 +31,12 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/q/qLex.h"                                      // qLex
 #include "orionld/q/qParse.h"                                    // qParse
 #include "orionld/payloadCheck/fieldPaths.h"                     // PostQueryEntitiesPath, ...

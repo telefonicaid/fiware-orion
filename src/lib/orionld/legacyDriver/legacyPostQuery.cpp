@@ -35,9 +35,9 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjEntityNormalizedToSimplified.h"     // kjEntityNormalizedToSimplified
 #include "orionld/payloadCheck/pcheckQuery.h"                  // pcheckQuery

@@ -33,10 +33,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/dotForEq.h"                           // dotForEq
-#include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qVariableFix.h"                            // qVariableFix
 #include "orionld/q/qPresent.h"                                // qListPresent
 #include "orionld/q/qLexListRender.h"                          // Own interface

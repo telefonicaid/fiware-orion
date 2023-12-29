@@ -32,9 +32,9 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                          // LM_*
 
-#include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
-#include "orionld/q/QNode.h"                                        // QNode
+#include "orionld/types/QNode.h"                                    // QNode
+#include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpListRelease.h"                   // distOpListRelease
 #include "orionld/entityMaps/entityMapCreate.h"                     // entityMapCreate

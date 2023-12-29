@@ -31,7 +31,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_T
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCache.h"                              // RegCache
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/common/tenantList.h"                           // tenant0
 
 

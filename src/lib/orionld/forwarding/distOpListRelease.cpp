@@ -24,6 +24,8 @@
 */
 #include <curl/curl.h>                                           // curl
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpListRelease.h"                // Own interface

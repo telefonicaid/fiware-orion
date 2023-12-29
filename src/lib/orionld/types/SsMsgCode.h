@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
-#define SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_SSMSGCODE_H_
+#define SRC_LIB_ORIONLD_TYPES_SSMSGCODE_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,14 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regCacheItemRegexRelease - free any old REGEX in the rciP->idPatternRegexList
+// SsMsgCode -
 //
-extern void regCacheItemRegexRelease(RegCacheItem* rciP);
+typedef enum SsMsgCode
+{
+  SsPing = 1,
+  SsGetEntity
+} SsMsgCode;
 
-#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHEITEMREGEXRELEASE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_SSMSGCODE_H_

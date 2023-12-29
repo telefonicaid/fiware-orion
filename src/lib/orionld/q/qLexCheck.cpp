@@ -24,8 +24,9 @@
 */
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/q/qNodeType.h"                               // qNodeType
 #include "orionld/q/qLexCheck.h"                               // Own interface
 
 

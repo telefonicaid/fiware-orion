@@ -34,7 +34,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem, RegIdPattern
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+#include "orionld/types/RegIdPattern.h"                          // RegIdPattern
 #include "orionld/forwarding/regMatchEntityInfo.h"               // Own interface
 
 

@@ -30,9 +30,9 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/types/RegCache.h"                              // RegCache
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 
 
 

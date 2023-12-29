@@ -32,12 +32,13 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/RegCache.h"                              // RegCache
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheIterFunc
 #include "orionld/mongoc/mongocWriteLog.h"                       // MONGOC_RLOG
 #include "orionld/mongoc/mongocConnectionGet.h"                  // mongocConnectionGet
 #include "orionld/mongoc/mongocKjTreeFromBson.h"                 // mongocKjTreeFromBson
+#include "orionld/mongoc/mongocRegistrationsIter.h"              // RegCacheIterFunc
 
 
 

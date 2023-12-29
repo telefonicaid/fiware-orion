@@ -30,8 +30,8 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjString, kjChildAdd
 }
 
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/distOpCreate.h"                     // distOpCreate

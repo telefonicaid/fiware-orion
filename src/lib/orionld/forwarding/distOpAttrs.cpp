@@ -30,6 +30,8 @@ extern "C"
 #include "kalloc/kaAlloc.h"                                      // kaAlloc
 }
 
+#include "logMsg/logMsg.h"                                       // LM_T
+
 #include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup

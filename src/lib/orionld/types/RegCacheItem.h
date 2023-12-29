@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_REGCACHE_REGCACHE_H_
-#define SRC_LIB_ORIONLD_REGCACHE_REGCACHE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_REGCACHEITEM_H_
+#define SRC_LIB_ORIONLD_TYPES_REGCACHEITEM_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,17 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include <regex.h>                                               // regex_t
+#include <stdint.h>                                              // types: uint32_t, ...
 
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
+#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/types/RegistrationMode.h"                      // RegistrationMode
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/RegIdPattern.h"                          // RegIdPattern
 
 
 
@@ -55,25 +55,12 @@ typedef struct RegDeltas
 
 // -----------------------------------------------------------------------------
 //
-// RegIdPattern -
-//
-typedef struct RegIdPattern
-{
-  regex_t               regex;
-  KjNode*               owner;  // Reference to the 'idPattern' in the rciP->regTree that the regex belongs to
-  struct RegIdPattern*  next;
-} RegIdPattern;
-
-
-
-// -----------------------------------------------------------------------------
-//
 // RegCacheItem -
 //
 typedef struct RegCacheItem
 {
   KjNode*               regTree;
-  char*                 regId;         // Set when creating registration - points inside regTree (used for debugging only)
+  char*                 regId;         // Set when creating registration - points inside regTree
   RegDeltas             deltas;
 
   // "Shortcuts" and transformed info, all copies from the regTree - for improved performance
@@ -88,33 +75,4 @@ typedef struct RegCacheItem
   struct RegCacheItem*  next;
 } RegCacheItem;
 
-
-
-// -----------------------------------------------------------------------------
-//
-// RegCache -
-//
-typedef struct RegCache
-{
-  OrionldTenant* tenantP;
-  RegCacheItem*  regList;
-  RegCacheItem*  last;
-} RegCache;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// RegCacheIterFunc -
-//
-typedef int (*RegCacheIterFunc)(RegCache* rcP, KjNode* dbRegP);
-
-
-
-// -----------------------------------------------------------------------------
-//
-// regCacheList - head of the list of Registration Caches (one reg-cache per tenant)
-//
-extern RegCache* regCacheList;
-
-#endif  // SRC_LIB_ORIONLD_REGCACHE_REGCACHE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_REGCACHEITEM_H_

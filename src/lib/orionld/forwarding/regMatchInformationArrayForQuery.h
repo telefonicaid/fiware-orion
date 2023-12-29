@@ -32,7 +32,7 @@ extern "C"
 
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 
 
 
@@ -40,6 +40,12 @@ extern "C"
 //
 // regMatchInformationArrayForQuery -
 //
-extern DistOp* regMatchInformationArrayForQuery(RegCacheItem* regP, StringArray* idListP, StringArray* typeListP, StringArray* attrListP);
+extern DistOp* regMatchInformationArrayForQuery
+(
+  RegCacheItem*  regP,
+  StringArray*   idListP,
+  StringArray*   typeListP,
+  StringArray*   attrListP
+);
 
 #endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAYFORQUERY_H_

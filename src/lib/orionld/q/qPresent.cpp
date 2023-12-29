@@ -25,7 +25,9 @@
 #include <string.h>                                            // memset
 
 #include "logMsg/logMsg.h"                                     // TraceLevels, LM_*
-#include "orionld/q/QNode.h"                                   // QNode
+
+#include "orionld/types/QNode.h"                               // QNode
+#include "orionld/q/qNodeType.h"                               // qNodeType
 #include "orionld/q/qPresent.h"                                // Own interface
 
 

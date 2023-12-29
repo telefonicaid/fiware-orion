@@ -31,7 +31,7 @@ extern "C"
 }
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCache.h"                              // RegCache
 
 
 

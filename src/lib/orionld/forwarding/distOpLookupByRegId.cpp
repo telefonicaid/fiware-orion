@@ -23,7 +23,10 @@
 * Author: Ken Zangelin
 */
 #include <unistd.h>                                              // NULL
+#include <string.h>                                              // strcmp
 #include <curl/curl.h>                                           // curl
+
+#include "logMsg/logMsg.h"                                       // LM_T
 
 #include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpLookupByRegId.h"              // Own interface

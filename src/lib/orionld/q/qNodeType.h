@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_MQTT_MQTTCONNECTION_H_
-#define SRC_LIB_ORIONLD_MQTT_MQTTCONNECTION_H_
+#ifndef SRC_LIB_ORIONLD_Q_QNODETYPE_H_
+#define SRC_LIB_ORIONLD_Q_QNODETYPE_H_
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,23 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <MQTTClient.h>                                        // MQTT Client header
 
 
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// MqttConnection -
+// qNodeType -
 //
-typedef struct MqttConnection
-{
-  char*           host;
-  unsigned short  port;
-  char*           username;
-  char*           password;
-  char*           version;
-  MQTTClient      client;
-  int             connections;  // When down at 0 - the connection is closed
-} MqttConnection;
+extern const char* qNodeType(QNodeType type);
 
-#endif  // SRC_LIB_ORIONLD_MQTT_MQTTCONNECTION_H_
+#endif  // SRC_LIB_ORIONLD_Q_QNODETYPE_H_
