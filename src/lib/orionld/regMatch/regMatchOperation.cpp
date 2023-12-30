@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHATTRIBUTESFORGET_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHATTRIBUTESFORGET_H_
-
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -28,24 +25,24 @@
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/DistOpType.h"                            // DistOpType
+#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
+#include "orionld/regMatch/regMatchOperation.h"                  // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchAttributesForGet -
+// regMatchOperation -
 //
-extern StringArray* regMatchAttributesForGet
-(
-  RegCacheItem*  regP,
-  KjNode*        propertyNamesP,
-  KjNode*        relationshipNamesP,
-  StringArray*   attrV,
-  const char*    geoProp
-);
-
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHATTRIBUTESFORGET_H_
+bool regMatchOperation(RegCacheItem* regP, DistOpType op)
+{
+  uint64_t opShifted = (1L << op);
+  return ((regP->opMask & opShifted) == opShifted);
+}

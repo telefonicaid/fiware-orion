@@ -35,8 +35,8 @@ extern "C"
 #include "orionld/types/DistOp.h"                                 // DistOp
 #include "orionld/common/orionldState.h"                          // orionldState
 #include "orionld/distOp/distOpListsMerge.h"                      // distOpListsMerge
-#include "orionld/forwarding/regMatchInformationItemForQuery.h"   // regMatchInformationItemForQuery
-#include "orionld/forwarding/regMatchInformationArrayForQuery.h"  // Own interface
+#include "orionld/regMatch/regMatchInformationItemForQuery.h"     // regMatchInformationItemForQuery
+#include "orionld/regMatch/regMatchInformationArrayForQuery.h"    // Own interface
 
 
 // -----------------------------------------------------------------------------

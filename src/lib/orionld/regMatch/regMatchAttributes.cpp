@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/forwarding/regMatchAttributes.h"               // Own interface
+#include "orionld/regMatch/regMatchAttributes.h"                 // Own interface
 
 
 

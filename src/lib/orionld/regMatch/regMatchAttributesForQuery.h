@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
+#ifndef SRC_LIB_ORIONLD_REGMATCH_REGMATCHATTRIBUTESFORQUERY_H_
+#define SRC_LIB_ORIONLD_REGMATCH_REGMATCHATTRIBUTESFORQUERY_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -30,14 +30,15 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchEntityInfo -
+// regMatchAttributesForQuery -
 //
-extern bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* entityId, const char* entityType);
+extern StringArray* regMatchAttributesForQuery(RegCacheItem* regP, KjNode* propertyNamesP, KjNode* relationshipNamesP, StringArray* attrListP);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHENTITYINFO_H_
+#endif  // SRC_LIB_ORIONLD_REGMATCH_REGMATCHATTRIBUTESFORQUERY_H_

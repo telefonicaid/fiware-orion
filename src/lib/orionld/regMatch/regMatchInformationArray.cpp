@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/distOp/distOpCreate.h"                         // distOpCreate
-#include "orionld/forwarding/regMatchInformationItem.h"          // regMatchInformationItem
+#include "orionld/regMatch/regMatchInformationItem.h"            // regMatchInformationItem
 
 
 

@@ -36,13 +36,13 @@ extern "C"
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/types/RegIdPattern.h"                          // RegIdPattern
-#include "orionld/forwarding/regMatchEntityInfo.h"               // Own interface
+#include "orionld/regMatch/regMatchEntityInfo.h"                 // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regIdPatternLookup - FIXME: Own module orionld/forwarding/regIdPatternLookup.cpp/h
+// regIdPatternLookup - FIXME: Own module orionld/regMatch/regIdPatternLookup.cpp/h
 //
 RegIdPattern* regIdPatternLookup(RegCacheItem* regP, KjNode* idPatternP)
 {

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPITEMADD_H_
-#define SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPITEMADD_H_
+#ifndef SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPITEMADD_H_
+#define SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPITEMADD_H_
 
 /*
 *
@@ -32,8 +32,8 @@
 
 // -----------------------------------------------------------------------------
 //
-// entityMapItemAdd - 
+// entityMapItemAdd -
 //
 extern void entityMapItemAdd(EntityMap* entityMap, const char* entityId, DistOp* distOpP);
 
-#endif  // SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPITEMADD_H_
+#endif  // SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPITEMADD_H_

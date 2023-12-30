@@ -45,4 +45,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_forwarding STATIC ${SOURCES})
+ADD_LIBRARY(orionld_regMatch STATIC ${SOURCES})

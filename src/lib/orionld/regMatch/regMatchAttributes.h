@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHFORENTITYCREATION_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHFORENTITYCREATION_H_
+#ifndef SRC_LIB_ORIONLD_REGMATCH_REGMATCHATTRIBUTES_H_
+#define SRC_LIB_ORIONLD_REGMATCH_REGMATCHATTRIBUTES_H_
 
 /*
 *
@@ -30,23 +30,22 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/types/DistOpType.h"                            // DistOpType
-#include "orionld/types/RegistrationMode.h"                      // registrationMode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchForEntityCreation -
+// regMatchAttributes -
 //
-extern DistOp* regMatchForEntityCreation
+extern KjNode* regMatchAttributes
 (
-  RegistrationMode regMode,
-  DistOpType       operation,
-  const char*      entityId,
-  const char*      entityType,
-  KjNode*          incomingP
+  RegCacheItem*  regP,
+  DistOpType     operation,
+  KjNode*        propertyNamesP,
+  KjNode*        relationshipNamesP,
+  KjNode*        incomingP
 );
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHFORENTITYCREATION_H_
+#endif  // SRC_LIB_ORIONLD_REGMATCH_REGMATCHATTRIBUTES_H_

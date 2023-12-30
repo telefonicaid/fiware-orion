@@ -36,7 +36,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/distOp/distOpCreate.h"                         // distOpCreate
 #include "orionld/distOp/distOpAttrs.h"                          // distOpAttrs
-#include "orionld/forwarding/regMatchInformationItemForGet.h"    // Own interface
+#include "orionld/regMatch/regMatchInformationItemForGet.h"      // Own interface
 
 
 

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHATTRIBUTES_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHATTRIBUTES_H_
+#ifndef SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONARRAYFORQUERY_H_
+#define SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONARRAYFORQUERY_H_
 
 /*
 *
@@ -30,22 +30,22 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/types/DistOpType.h"                            // DistOpType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchAttributes -
+// regMatchInformationArrayForQuery -
 //
-extern KjNode* regMatchAttributes
+extern DistOp* regMatchInformationArrayForQuery
 (
   RegCacheItem*  regP,
-  DistOpType     operation,
-  KjNode*        propertyNamesP,
-  KjNode*        relationshipNamesP,
-  KjNode*        incomingP
+  StringArray*   idListP,
+  StringArray*   typeListP,
+  StringArray*   attrListP
 );
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHATTRIBUTES_H_
+#endif  // SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONARRAYFORQUERY_H_

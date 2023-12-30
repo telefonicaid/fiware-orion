@@ -49,7 +49,7 @@ extern "C"
 #include "orionld/apiModel/ntonEntity.h"                         // ntonEntity
 #include "orionld/apiModel/ntosEntity.h"                         // ntosEntity
 #include "orionld/apiModel/ntocEntity.h"                         // ntocEntity
-#include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
+#include "orionld/regMatch/regMatchForEntityGet.h"               // regMatchForEntityGet
 #include "orionld/distOp/distOpListsMerge.h"                     // distOpListsMerge
 #include "orionld/distOp/distOpSend.h"                           // distOpSend
 #include "orionld/distOp/distOpLookupByCurlHandle.h"             // distOpLookupByCurlHandle

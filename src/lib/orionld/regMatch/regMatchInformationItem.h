@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONITEM_H_
+#define SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONITEM_H_
+
 /*
 *
 * Copyright 2022 FIWARE Foundation e.V.
@@ -22,19 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <unistd.h>                                              // NULL
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjLookup.h"                                      // kjLookup
 }
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/types/DistOpType.h"                            // DistOpType
-#include "orionld/forwarding/regMatchAttributes.h"               // regMatchAttributes
-#include "orionld/forwarding/regMatchEntityInfo.h"               // regMatchEntityInfo
-#include "orionld/forwarding/regMatchInformationItem.h"          // Own interface
 
 
 
@@ -42,29 +39,14 @@ extern "C"
 //
 // regMatchInformationItem -
 //
-KjNode* regMatchInformationItem(RegCacheItem* regP, DistOpType operation, KjNode* infoP, const char* entityId, const char* entityType, KjNode* payloadBody)
-{
-  KjNode* entities = kjLookup(infoP, "entities");
+extern KjNode* regMatchInformationItem
+(
+  RegCacheItem*  regP,
+  DistOpType     operation,
+  KjNode*        infoP,
+  const char*    entityId,
+  const char*    entityType,
+  KjNode*        incomingP
+);
 
-  if (entities != NULL)
-  {
-    bool match = false;
-    for (KjNode* entityInfoP = entities->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
-    {
-      if (regMatchEntityInfo(regP, entityInfoP, entityId, entityType) == true)
-      {
-        match = true;
-        break;
-      }
-    }
-
-    if (match == false)
-      return NULL;
-  }
-
-  KjNode* propertyNamesP     = kjLookup(infoP, "propertyNames");
-  KjNode* relationshipNamesP = kjLookup(infoP, "relationshipNames");
-  KjNode* attrUnionP         = regMatchAttributes(regP, operation, propertyNamesP, relationshipNamesP, payloadBody);
-
-  return attrUnionP;
-}
+#endif  // SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONITEM_H_

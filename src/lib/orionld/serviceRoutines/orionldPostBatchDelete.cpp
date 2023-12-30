@@ -51,7 +51,7 @@ extern "C"
 #include "orionld/distOp/distOpListRelease.h"                  // distOpListRelease
 #include "orionld/distOp/xForwardedForCompose.h"               // xForwardedForCompose
 #include "orionld/distOp/viaCompose.h"                         // viaCompose
-#include "orionld/forwarding/regMatchForBatchDelete.h"         // regMatchForBatchDelete
+#include "orionld/regMatch/regMatchForBatchDelete.h"           // regMatchForBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
 
 

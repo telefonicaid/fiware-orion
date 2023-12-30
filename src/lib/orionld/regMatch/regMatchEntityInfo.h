@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONITEMFORGET_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONITEMFORGET_H_
+#ifndef SRC_LIB_ORIONLD_REGMATCH_REGMATCHENTITYINFO_H_
+#define SRC_LIB_ORIONLD_REGMATCH_REGMATCHENTITYINFO_H_
 
 /*
 *
@@ -31,14 +31,13 @@ extern "C"
 }
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/types/StringArray.h"                           // StringArray
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchInformationItemForGet -
+// regMatchEntityInfo -
 //
-extern StringArray* regMatchInformationItemForGet(RegCacheItem* regP, KjNode* infoP, const char* entityId, const char* entityType, StringArray* attrV, const char* geoProp);
+extern bool regMatchEntityInfo(RegCacheItem* regP, KjNode* entityInfoP, const char* entityId, const char* entityType);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONITEMFORGET_H_
+#endif  // SRC_LIB_ORIONLD_REGMATCH_REGMATCHENTITYINFO_H_

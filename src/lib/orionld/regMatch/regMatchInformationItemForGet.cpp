@@ -32,9 +32,9 @@ extern "C"
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/forwarding/regMatchEntityInfo.h"               // regMatchEntityInfo
-#include "orionld/forwarding/regMatchAttributesForGet.h"         // regMatchAttributesForGet
-#include "orionld/forwarding/regMatchInformationItemForGet.h"    // Own interface
+#include "orionld/regMatch/regMatchEntityInfo.h"                 // regMatchEntityInfo
+#include "orionld/regMatch/regMatchAttributesForGet.h"           // regMatchAttributesForGet
+#include "orionld/regMatch/regMatchInformationItemForGet.h"      // Own interface
 
 
 

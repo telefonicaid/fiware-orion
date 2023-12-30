@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOPTYPE_H_
-#define SRC_LIB_ORIONLD_FORWARDING_DISTOPTYPE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_DISTOPTYPE_H_
+#define SRC_LIB_ORIONLD_TYPES_DISTOPTYPE_H_
 
 /*
 *
@@ -128,4 +128,4 @@ extern DistOpType distOpTypeAliasFromString(const char* fwdOp);
 //
 extern uint64_t distOpTypeMask(KjNode* operationsP);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOPTYPE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_DISTOPTYPE_H_

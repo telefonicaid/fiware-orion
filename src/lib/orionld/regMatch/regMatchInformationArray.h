@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONITEM_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONITEM_H_
+#ifndef SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONARRAY_H_
+#define SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONARRAY_H_
 
 /*
 *
@@ -31,22 +31,22 @@ extern "C"
 }
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/DistOpType.h"                            // DistOpType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchInformationItem -
+// regMatchInformationArray -
 //
-extern KjNode* regMatchInformationItem
+extern DistOp* regMatchInformationArray
 (
   RegCacheItem*  regP,
   DistOpType     operation,
-  KjNode*        infoP,
   const char*    entityId,
   const char*    entityType,
   KjNode*        incomingP
 );
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONITEM_H_
+#endif  // SRC_LIB_ORIONLD_REGMATCH_REGMATCHINFORMATIONARRAY_H_

@@ -176,7 +176,7 @@ EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, Or
     LM_X(1, ("Out of memory allocating a memory map"));
 
   uuidGenerate(entityMap->id, sizeof(entityMap->id), "urn:ngsi-ld:entity-map:");
-  
+
   LM_T(LmtDistOpList, ("Created an entity map at %p (%s)", entityMap, entityMap->id));
 
   //

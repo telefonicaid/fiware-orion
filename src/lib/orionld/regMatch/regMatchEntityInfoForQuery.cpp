@@ -35,7 +35,7 @@ extern "C"
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem, RegIdPattern
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/types/DistOp.h"                                // DistOp
-#include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery
+#include "orionld/regMatch/regMatchEntityInfoForQuery.h"         // regMatchEntityInfoForQuery
 
 
 

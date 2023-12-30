@@ -45,7 +45,7 @@ extern "C"
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityDelete.h"                   // mongocEntityDelete
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
-#include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
+#include "orionld/regMatch/regMatchForEntityGet.h"               // regMatchForEntityGet
 #include "orionld/distOp/distOpListsMerge.h"                     // distOpListsMerge
 #include "orionld/distOp/distOpSend.h"                           // distOpSend
 #include "orionld/distOp/distOpLookupByCurlHandle.h"             // distOpLookupByCurlHandle

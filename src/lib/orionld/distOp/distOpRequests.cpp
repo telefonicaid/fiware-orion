@@ -40,7 +40,7 @@ extern "C"
 #include "orionld/distOp/distOpSend.h"                           // distOpSend
 #include "orionld/distOp/xForwardedForCompose.h"                 // xForwardedForCompose
 #include "orionld/distOp/viaCompose.h"                           // viaCompose
-#include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
+#include "orionld/regMatch/regMatchForEntityCreation.h"          // regMatchForEntityCreation
 
 
 

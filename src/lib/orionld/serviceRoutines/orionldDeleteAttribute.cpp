@@ -41,7 +41,7 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/mongoc/mongocEntityGet.h"                      // mongocEntityGet
 #include "orionld/mongoc/mongocAttributeDelete.h"                // mongocAttributeDelete
-#include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
+#include "orionld/regMatch/regMatchForEntityGet.h"               // regMatchForEntityGet
 #include "orionld/distOp/distOpListsMerge.h"                     // distOpListsMerge
 #include "orionld/distOp/distOpSend.h"                           // distOpSend
 #include "orionld/distOp/distOpResponses.h"                      // distOpResponses

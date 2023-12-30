@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHOPERATION_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHOPERATION_H_
+#ifndef SRC_LIB_ORIONLD_REGMATCH_REGMATCHFORENTITYCREATION_H_
+#define SRC_LIB_ORIONLD_REGMATCH_REGMATCHFORENTITYCREATION_H_
 
 /*
 *
@@ -25,15 +25,28 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
+
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/DistOpType.h"                            // DistOpType
+#include "orionld/types/RegistrationMode.h"                      // registrationMode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchOperation -
+// regMatchForEntityCreation -
 //
-extern bool regMatchOperation(RegCacheItem* regP, DistOpType op);
+extern DistOp* regMatchForEntityCreation
+(
+  RegistrationMode regMode,
+  DistOpType       operation,
+  const char*      entityId,
+  const char*      entityType,
+  KjNode*          incomingP
+);
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHOPERATION_H_
+#endif  // SRC_LIB_ORIONLD_REGMATCH_REGMATCHFORENTITYCREATION_H_

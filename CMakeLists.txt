@@ -189,7 +189,7 @@ SET (ORION_LIBS
     orionld_service
     orionld_serviceRoutines
     orionld_distOp
-    orionld_forwarding
+    orionld_regMatch
     orionld_troe
     orionld_kjTree
     orionld_mqtt
@@ -231,7 +231,6 @@ SET (ORION_LIBS
     orionld_payloadCheck
     orionld_kjTree       # mongoBackend uses kjSort, that is temporarily in kjTree - to be moved to kjson
     orionld_payloadCheck
-    orionld_forwarding
     orionld_mqtt
     orionld_q
     orionld_mongoc       # subCache needs mongoc
@@ -374,7 +373,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/pernot)
   ADD_SUBDIRECTORY(src/lib/orionld/socketService)
   ADD_SUBDIRECTORY(src/lib/orionld/notifications)
-  ADD_SUBDIRECTORY(src/lib/orionld/forwarding)
+  ADD_SUBDIRECTORY(src/lib/orionld/regMatch)
   ADD_SUBDIRECTORY(src/lib/orionld/distOp)
   ADD_SUBDIRECTORY(src/lib/orionld/q)
   ADD_SUBDIRECTORY(src/lib/orionld/mhd)

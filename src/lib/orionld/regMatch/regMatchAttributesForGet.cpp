@@ -33,7 +33,7 @@ extern "C"
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/forwarding/regMatchAttributesForGet.h"         // Own interface
+#include "orionld/regMatch/regMatchAttributesForGet.h"           // Own interface
 
 
 

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBSCRIPTION_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBSCRIPTION_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_PERNOTSUBSCRIPTION_H_
+#define SRC_LIB_ORIONLD_TYPES_PERNOTSUBSCRIPTION_H_
 
 /*
 *
@@ -103,7 +103,7 @@ typedef struct PernotSubscription
   unsigned short              port;                     // port, as parsed from 'url'
   char*                       rest;                     // pointing to 'rest' part of 'url'
   Protocol                    protocol;
-  
+
   // HTTP headers for the notification
   StringArray                 headers;
 
@@ -123,4 +123,4 @@ typedef struct PernotSubscription
   struct PernotSubscription*  next;
 } PernotSubscription;
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBSCRIPTION_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_PERNOTSUBSCRIPTION_H_

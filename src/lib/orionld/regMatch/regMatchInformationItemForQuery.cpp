@@ -35,9 +35,9 @@ extern "C"
 #include "orionld/distOp/distOpCreate.h"                         // distOpCreate
 #include "orionld/distOp/distOpListsMerge.h"                     // distOpListsMerge
 #include "orionld/distOp/distOpAttrs.h"                          // distOpAttrs
-#include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery
-#include "orionld/forwarding/regMatchAttributesForGet.h"         // regMatchAttributesForGet
-#include "orionld/forwarding/regMatchInformationItemForQuery.h"  // Own interface
+#include "orionld/regMatch/regMatchEntityInfoForQuery.h"         // regMatchEntityInfoForQuery
+#include "orionld/regMatch/regMatchAttributesForGet.h"           // regMatchAttributesForGet
+#include "orionld/regMatch/regMatchInformationItemForQuery.h"    // Own interface
 
 
 

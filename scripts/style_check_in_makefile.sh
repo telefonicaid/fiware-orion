@@ -46,8 +46,12 @@ function style_check
 }
 
 
+style_check src/lib/orionld/entityMaps
+style_check src/lib/orionld/mhd
+style_check src/lib/orionld/service
 style_check src/lib/orionld/serviceRoutines
-style_check src/lib/orionld/forwarding
+style_check src/lib/orionld/regMatch
+style_check src/lib/orionld/distOp
 style_check src/lib/orionld/apiModel
 style_check src/lib/orionld/regCache
 style_check src/lib/orionld/mongoc
@@ -58,7 +62,6 @@ style_check src/lib/orionld/prometheus
 style_check src/lib/orionld/payloadCheck
 style_check src/lib/orionld/legacyDriver
 style_check src/lib/orionld/q
-style_check src/lib/orionld/rest
 style_check src/lib/orionld/db
 style_check src/lib/orionld/kjTree
 style_check src/lib/orionld/context

@@ -36,11 +36,11 @@ extern "C"
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
-#include "orionld/forwarding/regMatchInformationArray.h"         // regMatchInformationArray
 #include "orionld/distOp/xForwardedForMatch.h"                   // xForwardedForMatch
 #include "orionld/distOp/viaMatch.h"                             // viaMatch
-#include "orionld/forwarding/regMatchForEntityCreation.h"        // Own interface
+#include "orionld/regMatch/regMatchOperation.h"                  // regMatchOperation
+#include "orionld/regMatch/regMatchInformationArray.h"           // regMatchInformationArray
+#include "orionld/regMatch/regMatchForEntityCreation.h"          // Own interface
 
 
 #if 0

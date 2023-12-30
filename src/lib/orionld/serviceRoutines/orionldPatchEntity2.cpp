@@ -63,7 +63,7 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
-#include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
+#include "orionld/regMatch/regMatchForEntityCreation.h"          // regMatchForEntityCreation
 #include "orionld/distOp/distOpRequests.h"                       // distOpRequests
 #include "orionld/distOp/distOpResponses.h"                      // distOpResponses
 #include "orionld/distOp/distOpListRelease.h"                    // distOpListRelease

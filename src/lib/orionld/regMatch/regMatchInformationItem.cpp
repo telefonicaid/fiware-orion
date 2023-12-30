@@ -22,27 +22,49 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                              // NULL
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
-
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/types/DistOpType.h"                            // DistOpType
-#include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
-#include "orionld/forwarding/regMatchOperation.h"                // Own interface
+#include "orionld/regMatch/regMatchAttributes.h"                 // regMatchAttributes
+#include "orionld/regMatch/regMatchEntityInfo.h"                 // regMatchEntityInfo
+#include "orionld/regMatch/regMatchInformationItem.h"            // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchOperation -
+// regMatchInformationItem -
 //
-bool regMatchOperation(RegCacheItem* regP, DistOpType op)
+KjNode* regMatchInformationItem(RegCacheItem* regP, DistOpType operation, KjNode* infoP, const char* entityId, const char* entityType, KjNode* payloadBody)
 {
-  uint64_t opShifted = (1L << op);
-  return ((regP->opMask & opShifted) == opShifted);
+  KjNode* entities = kjLookup(infoP, "entities");
+
+  if (entities != NULL)
+  {
+    bool match = false;
+    for (KjNode* entityInfoP = entities->value.firstChildP; entityInfoP != NULL; entityInfoP = entityInfoP->next)
+    {
+      if (regMatchEntityInfo(regP, entityInfoP, entityId, entityType) == true)
+      {
+        match = true;
+        break;
+      }
+    }
+
+    if (match == false)
+      return NULL;
+  }
+
+  KjNode* propertyNamesP     = kjLookup(infoP, "propertyNames");
+  KjNode* relationshipNamesP = kjLookup(infoP, "relationshipNames");
+  KjNode* attrUnionP         = regMatchAttributes(regP, operation, propertyNamesP, relationshipNamesP, payloadBody);
+
+  return attrUnionP;
 }

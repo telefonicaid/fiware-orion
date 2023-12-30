@@ -39,7 +39,7 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// entityMapItemAdd - 
+// entityMapItemAdd -
 //
 void entityMapItemAdd(EntityMap* entityMap, const char* entityId, DistOp* distOpP)
 {
