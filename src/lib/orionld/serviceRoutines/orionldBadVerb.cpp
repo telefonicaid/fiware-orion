@@ -27,8 +27,8 @@
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
-#include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
-#include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
+#include "orionld/service/orionldServiceInit.h"                // orionldRestServiceV
+#include "orionld/service/orionldServiceLookup.h"              // orionldServiceLookup
 #include "orionld/serviceRoutines/orionldBadVerb.h"            // Own Interface
 
 

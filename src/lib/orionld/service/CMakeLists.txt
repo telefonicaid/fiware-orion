@@ -1,4 +1,4 @@
-# Copyright 2018 FIWARE Foundation e.V.
+# Copyright 2023 FIWARE Foundation e.V.
 #
 # This file is part of Orion-LD Context Broker.
 #
@@ -21,9 +21,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
-    orionldMhdConnectionInit.cpp
-    orionldMhdConnectionPayloadRead.cpp
-    orionldMhdConnectionTreat.cpp
+    orionldServiceInit.cpp
+    orionldServiceLookup.cpp
+    orionldServiceInitPresent.cpp
 )
 
 # Include directories
@@ -33,4 +33,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(orionld_rest STATIC ${SOURCES})
+ADD_LIBRARY(orionld_service STATIC ${SOURCES})

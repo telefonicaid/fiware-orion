@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINITPRESENT_H_
-#define SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINITPRESENT_H_
+#ifndef SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICELOOKUP_H_
+#define SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICELOOKUP_H_
 
 /*
 *
@@ -25,14 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionLdRestService.h"    // OrionLdRestServiceVector
+#include "orionld/types/OrionLdRestService.h"
 
 
 
-/* ****************************************************************************
-*
-* orionldServiceInitPresent - 
-*/
-extern void orionldServiceInitPresent(void);
+// -----------------------------------------------------------------------------
+//
+// orionldServiceLookup -
+//
+extern OrionLdRestService* orionldServiceLookup(OrionLdRestServiceVector* serviceV);
 
-#endif  // SRC_LIB_ORIONLD_REST_ORIONLDSERVICEINITPRESENT_H_
+#endif  // SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICELOOKUP_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTION_H_
-#define SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTION_H_
+#ifndef SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICEINITPRESENT_H_
+#define SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICEINITPRESENT_H_
 
 /*
 *
@@ -25,7 +25,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
-#include "orionld/rest/orionldServiceInit.h"        // Own Interface
+#include "orionld/types/OrionLdRestService.h"    // OrionLdRestServiceVector
 
-#endif  // SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTION_H_
+
+
+/* ****************************************************************************
+*
+* orionldServiceInitPresent - 
+*/
+extern void orionldServiceInitPresent(void);
+
+#endif  // SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICEINITPRESENT_H_

@@ -124,7 +124,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"               // ORIONLD_CORE_CONTEXT_URL_*
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
-#include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
+#include "orionld/service/orionldServiceInit.h"               // orionldServiceInit
 #include "orionld/entityMaps/entityMapsRelease.h"             // entityMapsRelease
 #include "orionld/db/dbInit.h"                                // dbInit
 #include "orionld/mqtt/mqttRelease.h"                         // mqttRelease

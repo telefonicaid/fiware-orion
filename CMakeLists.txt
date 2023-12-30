@@ -186,6 +186,7 @@ SET (ORION_LIBS
     common
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o
     orionld_rest
+    orionld_service
     orionld_serviceRoutines
     orionld_forwarding
     orionld_troe
@@ -375,6 +376,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/forwarding)
   ADD_SUBDIRECTORY(src/lib/orionld/q)
   ADD_SUBDIRECTORY(src/lib/orionld/rest)
+  ADD_SUBDIRECTORY(src/lib/orionld/service)
   ADD_SUBDIRECTORY(src/lib/orionld/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/orionld/troe)
   ADD_SUBDIRECTORY(src/lib/orionld/common)

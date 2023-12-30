@@ -52,11 +52,11 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
+#include "orionld/service/orionldServiceInit.h"                  // orionldRestServiceV
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/entityMaps/entityMapLookup.h"                  // entityMapLookup
-#include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
-#include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
+#include "orionld/service/orionldServiceLookup.h"                // orionldServiceLookup
 #include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
 
 

@@ -104,7 +104,7 @@
 #include "orionld/troe/troePostBatchUpdate.h"                        // troePostBatchUpdate
 #include "orionld/troe/troePostEntity.h"                             // troePostEntity
 #include "orionld/mqtt/mqttConnectionInit.h"                         // mqttConnectionInit
-#include "orionld/rest/orionldServiceInit.h"                         // Own Interface
+#include "orionld/service/orionldServiceInit.h"                      // Own Interface
 
 
 

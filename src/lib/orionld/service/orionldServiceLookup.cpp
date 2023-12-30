@@ -32,7 +32,7 @@ extern "C"
 
 #include "orionld/types/OrionLdRestService.h"                  // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/rest/orionldServiceLookup.h"                 // Own interface
+#include "orionld/service/orionldServiceLookup.h"              // Own interface
 
 
 

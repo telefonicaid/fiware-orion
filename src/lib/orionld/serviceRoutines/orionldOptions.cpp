@@ -27,8 +27,8 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
-#include "orionld/rest/orionldServiceLookup.h"                 // orionldServiceLookup
-#include "orionld/rest/orionldServiceInit.h"                   // orionldRestServiceV
+#include "orionld/service/orionldServiceLookup.h"              // orionldServiceLookup
+#include "orionld/service/orionldServiceInit.h"                // orionldRestServiceV
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"       // orionldPatchEntity2
 #include "orionld/serviceRoutines/orionldPutEntity.h"          // orionldPutEntity
 #include "orionld/serviceRoutines/orionldOptions.h"            // Own interface

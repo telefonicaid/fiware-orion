@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_REST_ORIONLDSERVICELOOKUP_H_
-#define SRC_LIB_ORIONLD_REST_ORIONLDSERVICELOOKUP_H_
+#ifndef SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICEINIT_H_
+#define SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICEINIT_H_
 
 /*
 *
@@ -25,14 +25,29 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionLdRestService.h"
+#include "orionld/types/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
 
 
 
 // -----------------------------------------------------------------------------
 //
-// orionldServiceLookup -
+// orionldRestServiceV -
 //
-extern OrionLdRestService* orionldServiceLookup(OrionLdRestServiceVector* serviceV);
+extern OrionLdRestServiceVector orionldRestServiceV[9];
 
-#endif  // SRC_LIB_ORIONLD_REST_ORIONLDSERVICELOOKUP_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldServiceInit -
+//
+// This function converts the RestServiceLd vectors to OrionLdRestService vectors.
+//
+// PARAMETERS
+//   restServiceVV       - vector of REST services
+//   vecItems            - number of items in  the vector
+//   defContextFromFile  - do not download Core Context nor Default Context if set to true
+//
+extern void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int vecItems);
+
+#endif  // SRC_LIB_ORIONLD_SERVICE_ORIONLDSERVICEINIT_H_

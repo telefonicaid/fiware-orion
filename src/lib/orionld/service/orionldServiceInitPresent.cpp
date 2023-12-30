@@ -22,13 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdio.h>                                   // printf
+#include <stdio.h>                                      // printf
 
-#include "rest/Verb.h"                               // Verb
+#include "rest/Verb.h"                                  // Verb
 
-#include "orionld/types/OrionLdRestService.h"        // OrionLdRestServiceVector
-#include "orionld/rest/orionldServiceInit.h"         // orionldRestServiceV
-#include "orionld/rest/orionldServiceInitPresent.h"  // Own Interface
+#include "orionld/types/OrionLdRestService.h"           // OrionLdRestServiceVector
+#include "orionld/service/orionldServiceInit.h"         // orionldRestServiceV
+#include "orionld/service/orionldServiceInitPresent.h"  // Own Interface
 
 
 

@@ -44,7 +44,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
 #include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
+#include "orionld/service/orionldServiceInit.h"                  // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
 #include "orionld/payloadCheck/pcheckEntity.h"                   // Own interface
