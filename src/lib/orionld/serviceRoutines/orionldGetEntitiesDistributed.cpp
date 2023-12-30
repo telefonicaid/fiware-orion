@@ -36,7 +36,7 @@ extern "C"
 #include "orionld/types/QNode.h"                                    // QNode
 #include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState
-#include "orionld/forwarding/distOpListRelease.h"                   // distOpListRelease
+#include "orionld/distOp/distOpListRelease.h"                       // distOpListRelease
 #include "orionld/entityMaps/entityMapCreate.h"                     // entityMapCreate
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // orionldGetEntitiesPage

@@ -43,14 +43,14 @@ extern "C"
 #include "orionld/q/qParse.h"                                       // qParse
 #include "orionld/q/qClone.h"                                       // qClone
 #include "orionld/payloadCheck/pCheckGeo.h"                         // pCheckGeo
-#include "orionld/forwarding/distOpRequests.h"                      // distOpRequests
-#include "orionld/forwarding/distOpListsMerge.h"                    // distOpListsMerge
-#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
-#include "orionld/forwarding/xForwardedForMatch.h"                  // xForwardedForMatchº
-#include "orionld/forwarding/viaMatch.h"                            // viaMatch
+#include "orionld/distOp/distOpRequests.h"                          // distOpRequests
+#include "orionld/distOp/distOpListsMerge.h"                        // distOpListsMerge
+#include "orionld/distOp/distOpListDebug.h"                         // distOpListDebug
+#include "orionld/distOp/xForwardedForMatch.h"                      // xForwardedForMatchº
+#include "orionld/distOp/viaMatch.h"                                // viaMatch
 #include "orionld/forwarding/regMatchOperation.h"                   // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForQuery.h"    // regMatchInformationArrayForQuery
-#include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
+#include "orionld/distOp/distOpCreate.h"                            // distOpCreate
 #include "orionld/serviceRoutines/orionldGetEntitiesDistributed.h"  // orionldGetEntitiesDistributed
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntities.h"             // Own interface

@@ -32,11 +32,11 @@ extern "C"
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
-#include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
-#include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
+#include "orionld/distOp/distOpCreate.h"                         // distOpCreate
+#include "orionld/distOp/distOpListsMerge.h"                     // distOpListsMerge
+#include "orionld/distOp/distOpAttrs.h"                          // distOpAttrs
 #include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery
 #include "orionld/forwarding/regMatchAttributesForGet.h"         // regMatchAttributesForGet
-#include "orionld/forwarding/distOpAttrs.h"                      // distOpAttrs
 #include "orionld/forwarding/regMatchInformationItemForQuery.h"  // Own interface
 
 

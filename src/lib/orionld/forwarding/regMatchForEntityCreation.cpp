@@ -38,8 +38,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArray.h"         // regMatchInformationArray
-#include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch
-#include "orionld/forwarding/viaMatch.h"                         // viaMatch
+#include "orionld/distOp/xForwardedForMatch.h"                   // xForwardedForMatch
+#include "orionld/distOp/viaMatch.h"                             // viaMatch
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // Own interface
 
 

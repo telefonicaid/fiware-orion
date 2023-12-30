@@ -70,7 +70,7 @@ extern "C"
 #include "orionld/mhd/orionldMhdConnectionInit.h"                // orionldMhdConnectionInit
 #include "orionld/mhd/orionldMhdConnectionPayloadRead.h"         // orionldMhdConnectionPayloadRead
 #include "orionld/mhd/orionldMhdConnectionTreat.h"               // orionldMhdConnectionTreat
-#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
+#include "orionld/distOp/distOpListRelease.h"                    // distOpListRelease
 
 #include "rest/HttpHeaders.h"                                    // HTTP_* defines
 #include "rest/Verb.h"

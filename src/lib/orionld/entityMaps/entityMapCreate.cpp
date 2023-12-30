@@ -44,9 +44,9 @@ extern "C"
 #include "orionld/common/uuidGenerate.h"                            // uuidGenerate
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
 #include "orionld/kjTree/kjSort.h"                                  // kjStringArraySort
-#include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
-#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug2
-#include "orionld/forwarding/distOpsSend.h"                         // distOpsSend
+#include "orionld/distOp/distOpLookupByCurlHandle.h"                // distOpLookupByCurlHandle
+#include "orionld/distOp/distOpListDebug.h"                         // distOpListDebug2
+#include "orionld/distOp/distOpsSend.h"                             // distOpsSend
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
 #include "orionld/dbModel/dbModelToEntityIdAndTypeObject.h"         // dbModelToEntityIdAndTypeObject
 #include "orionld/entityMaps/entityMapItemAdd.h"                    // entityMapItemAdd
@@ -64,7 +64,7 @@ typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam)
 
 // -----------------------------------------------------------------------------
 //
-// distOpsReceive - FIXME: move to orionld/forwarding/distOpsReceive.cpp/h
+// distOpsReceive - FIXME: move to orionld/distOp/distOpsReceive.cpp/h
 //
 void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam, int requestsSent)
 {

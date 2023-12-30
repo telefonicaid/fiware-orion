@@ -188,6 +188,7 @@ SET (ORION_LIBS
     orionld_mhd
     orionld_service
     orionld_serviceRoutines
+    orionld_distOp
     orionld_forwarding
     orionld_troe
     orionld_kjTree
@@ -374,6 +375,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionld/socketService)
   ADD_SUBDIRECTORY(src/lib/orionld/notifications)
   ADD_SUBDIRECTORY(src/lib/orionld/forwarding)
+  ADD_SUBDIRECTORY(src/lib/orionld/distOp)
   ADD_SUBDIRECTORY(src/lib/orionld/q)
   ADD_SUBDIRECTORY(src/lib/orionld/mhd)
   ADD_SUBDIRECTORY(src/lib/orionld/service)

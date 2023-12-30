@@ -148,7 +148,7 @@ extern "C"
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
 #include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
-#include "orionld/forwarding/distOpInit.h"                    // distOpInit
+#include "orionld/distOp/distOpInit.h"                        // distOpInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"
