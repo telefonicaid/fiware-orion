@@ -27,7 +27,7 @@
 */
 #include <curl/curl.h>                                           // CURL
 
-#include "orionld/forwarding/DistOp.h"                          // DistOp
+#include "orionld/types/DistOp.h"                               // DistOp
 
 
 

@@ -32,8 +32,8 @@ extern "C"
 
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
 #include "orionld/forwarding/distOpAttrs.h"                      // distOpAttrs
 #include "orionld/forwarding/regMatchInformationItemForGet.h"    // Own interface

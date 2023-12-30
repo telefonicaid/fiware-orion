@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
-#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_TROEMODE_H_
+#define SRC_LIB_ORIONLD_TYPES_TROEMODE_H_
 
 /*
 *
-* Copyright 2023 FIWARE Foundation e.V.
+* Copyright 2020 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,21 +25,31 @@
 *
 * Author: Ken Zangelin
 */
-#include <semaphore.h>                                         // sem_t
-
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// PernotSubCache -
+// TroeMode -
 //
-typedef struct PernotSubCache
+typedef enum TroeMode
 {
-  PernotSubscription* head;
-  PernotSubscription* tail;
-  int                 newSubs;
-} PernotSubCache;
+  TROE_ENTITY_CREATE,
+  TROE_ENTITY_UPDATE,
+  TROE_ENTITY_REPLACE,
+  TROE_ENTITY_DELETE,
+  TROE_ATTRIBUTE_APPEND,
+  TROE_ATTRIBUTE_UPDATE,
+  TROE_ATTRIBUTE_REPLACE,
+  TROE_ATTRIBUTE_DELETE
+} TroeMode;
 
-#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// troeMode -
+//
+extern const char* troeMode(TroeMode opMode);
+
+#endif  // SRC_LIB_ORIONLD_TYPES_TROEMODE_H_

@@ -26,8 +26,8 @@
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpListRelease.h"                // Own interface
 
 

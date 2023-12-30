@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_TROE_TROE_H_
-#define SRC_LIB_ORIONLD_TROE_TROE_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_DISTOPLISTITEM_H_
+#define SRC_LIB_ORIONLD_TYPES_DISTOPLISTITEM_H_
 
 /*
 *
-* Copyright 2020 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,31 +25,19 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/DistOp.h"
 
 
 
 // -----------------------------------------------------------------------------
 //
-// TroeMode -
+// DistOpListItem -
 //
-typedef enum TroeMode
+typedef struct DistOpListItem
 {
-  TROE_ENTITY_CREATE,
-  TROE_ENTITY_UPDATE,
-  TROE_ENTITY_REPLACE,
-  TROE_ENTITY_DELETE,
-  TROE_ATTRIBUTE_APPEND,
-  TROE_ATTRIBUTE_UPDATE,
-  TROE_ATTRIBUTE_REPLACE,
-  TROE_ATTRIBUTE_DELETE
-} TroeMode;
+  DistOp*                 distOpP;
+  char*                   entityIds;
+  struct DistOpListItem*  next;
+} DistOpListItem;
 
-
-
-// -----------------------------------------------------------------------------
-//
-// troeMode -
-//
-extern const char* troeMode(TroeMode opMode);
-
-#endif  // SRC_LIB_ORIONLD_TROE_TROE_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_DISTOPLISTITEM_H_

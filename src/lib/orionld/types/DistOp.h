@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_DISTOP_H_
-#define SRC_LIB_ORIONLD_FORWARDING_DISTOP_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_DISTOP_H_
+#define SRC_LIB_ORIONLD_TYPES_DISTOP_H_
 
 /*
 *
@@ -36,7 +36,7 @@ extern "C"
 #include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
 #include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
+#include "orionld/types/DistOpType.h"                            // DistOpType
 
 
 
@@ -81,17 +81,4 @@ typedef struct DistOp
   struct DistOp*      next;
 } DistOp;
 
-
-
-// -----------------------------------------------------------------------------
-//
-// DistOpListItem -
-//
-typedef struct DistOpListItem
-{
-  DistOp*                 distOpP;
-  char*                   entityIds;
-  struct DistOpListItem*  next;
-} DistOpListItem;
-
-#endif  // SRC_LIB_ORIONLD_FORWARDING_DISTOP_H_
+#endif  // SRC_LIB_ORIONLD_TYPES_DISTOP_H_

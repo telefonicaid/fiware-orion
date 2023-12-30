@@ -34,11 +34,11 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/curlToBrokerStrerror.h"                 // curlToBrokerStrerror
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure

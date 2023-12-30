@@ -32,9 +32,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldContext.h"                        // OrionldContext, OrionldContextOrigin
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/context/OrionldContext.h"                      // OrionldContext, OrionldContextOrigin
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextFromBuffer.h"            // Own interface
 

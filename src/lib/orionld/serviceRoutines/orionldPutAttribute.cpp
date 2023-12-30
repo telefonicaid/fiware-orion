@@ -34,12 +34,12 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
+#include "orionld/types/OrionLdRestService.h"                    // OrionLdRestService
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
-#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocAttributeReplace.h"               // mongocAttributeReplace
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute

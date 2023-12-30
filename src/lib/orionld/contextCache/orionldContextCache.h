@@ -27,7 +27,7 @@
 */
 #include <semaphore.h>                                           // sem_t, sem_init, sem_wait, sem_post
 
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 
 
 

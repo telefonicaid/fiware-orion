@@ -38,6 +38,8 @@ extern "C"
 #include "cache/subCache.h"                                    // subCacheItemLookup, CachedSubscription
 
 #include "orionld/types/QNode.h"                               // QNode
+#include "orionld/types/PernotSubscription.h"                  // PernotSubscription
+#include "orionld/types/PernotSubCache.h"                      // PernotSubCache
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
@@ -47,8 +49,6 @@ extern "C"
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
 #include "orionld/mongoc/mongocSubscriptionExists.h"           // mongocSubscriptionExists
 #include "orionld/mongoc/mongocSubscriptionInsert.h"           // mongocSubscriptionInsert
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
 #include "orionld/pernot/pernotSubCacheAdd.h"                  // pernotSubCacheAdd
 #include "orionld/pernot/pernotItemRelease.h"                  // pernotItemRelease
 #include "orionld/pernot/pernotSubCacheLookup.h"               // pernotSubCacheLookup

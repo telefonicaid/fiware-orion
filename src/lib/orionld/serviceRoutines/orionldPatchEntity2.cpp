@@ -39,8 +39,8 @@ extern "C"
 
 #include "common/globals.h"                                      // parse8601Time
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
-#include "orionld/mongoc/mongocEntityUpdate.h"                   // mongocEntityUpdate
-#include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
+
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
@@ -54,6 +54,8 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
 #include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
+#include "orionld/mongoc/mongocEntityUpdate.h"                   // mongocEntityUpdate
+#include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/payloadCheck/pCheckAttributeTransform.h"       // pCheckAttributeTransform
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
@@ -61,7 +63,6 @@ extern "C"
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/dbModel/dbModelToApiAttribute.h"               // dbModelToApiAttribute
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchForEntityCreation.h"        // regMatchForEntityCreation
 #include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
 #include "orionld/forwarding/distOpResponses.h"                  // distOpResponses

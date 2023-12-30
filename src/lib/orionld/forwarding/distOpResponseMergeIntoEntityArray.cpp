@@ -31,9 +31,9 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                          // LM_*
 
+#include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"           // kjEntityIdLookupInEntityArray
-#include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpEntityMerge.h"                   // distOpEntityMerge
 #include "orionld/forwarding/distOpResponseMergeIntoEntityArray.h"  // Own interface
 

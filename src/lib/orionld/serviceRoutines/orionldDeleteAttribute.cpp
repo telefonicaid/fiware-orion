@@ -31,6 +31,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/responseFix.h"                          // responseFix
@@ -40,7 +41,6 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/mongoc/mongocEntityGet.h"                      // mongocEntityGet
 #include "orionld/mongoc/mongocAttributeDelete.h"                // mongocAttributeDelete
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
 #include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend

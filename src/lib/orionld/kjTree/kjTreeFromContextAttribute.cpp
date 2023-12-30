@@ -36,9 +36,9 @@ extern "C"
 #include "common/RenderFormat.h"                               // RenderFormat
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 
+#include "orionld/types/OrionldContext.h"                      // OrionldContext
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/apiModel/langFixNormalized.h"                // langFixNormalized
 #include "orionld/apiModel/langFixSimplified.h"                // langFixSimplified

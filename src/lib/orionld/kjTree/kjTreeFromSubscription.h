@@ -27,7 +27,8 @@
 */
 #include "apiTypesV2/Subscription.h"                             // Subscription
 #include "cache/subCache.h"                                      // CachedSubscription
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 
 
 

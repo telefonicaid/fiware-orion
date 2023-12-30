@@ -35,10 +35,10 @@
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
+#include "orionld/types/OrionLdRestService.h"                        // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/common/orionldState.h"                             // orionldState, userAgentHeader
 #include "orionld/context/orionldCoreContext.h"                      // orionldCoreContext, coreContextUrl
 #include "orionld/context/orionldContextInit.h"                      // orionldContextInit
-#include "orionld/rest/OrionLdRestService.h"                         // OrionLdRestService, ORION_LD_SERVICE_PREFIX_LEN
 #include "orionld/payloadCheck/pCheckUri.h"                          // pCheckUriInit
 #include "orionld/serviceRoutines/orionldPostEntities.h"             // orionldPostEntities
 #include "orionld/serviceRoutines/orionldPostEntity.h"               // orionldPostEntity
@@ -104,7 +104,7 @@
 #include "orionld/troe/troePostBatchUpdate.h"                        // troePostBatchUpdate
 #include "orionld/troe/troePostEntity.h"                             // troePostEntity
 #include "orionld/mqtt/mqttConnectionInit.h"                         // mqttConnectionInit
-#include "orionld/rest/orionldMhdConnection.h"                       // Own Interface
+#include "orionld/rest/orionldServiceInit.h"                         // Own Interface
 
 
 

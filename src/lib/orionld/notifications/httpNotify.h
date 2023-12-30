@@ -28,7 +28,8 @@
 #include <sys/uio.h>                                             // iovec
 
 #include "cache/CachedSubscription.h"                            // CachedSubscription
-#include "orionld/pernot/PernotSubscription.h"                   // PernotSubscription
+
+#include "orionld/types/PernotSubscription.h"                    // PernotSubscription
 
 
 

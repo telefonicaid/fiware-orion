@@ -32,7 +32,7 @@ extern "C"
 
 #include "orionld/types/RegCache.h"                              // RegCache
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 
 
 

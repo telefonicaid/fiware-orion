@@ -45,6 +45,7 @@ extern "C"
 #include "rest/OrionError.h"                                     // OrionError
 #include "parse/forbiddenChars.h"                                // forbiddenChars
 
+#include "orionld/types/OrionLdRestService.h"                    // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
@@ -56,7 +57,6 @@ extern "C"
 #include "orionld/entityMaps/entityMapLookup.h"                  // entityMapLookup
 #include "orionld/rest/orionldServiceInit.h"                     // orionldRestServiceV
 #include "orionld/rest/orionldServiceLookup.h"                   // orionldServiceLookup
-#include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
 
 

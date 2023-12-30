@@ -25,8 +25,8 @@
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // LmtMongoc
 
+#include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState
-#include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpSend.h"                          // distOpSend
 #include "orionld/forwarding/xForwardedForCompose.h"                // xForwardedForCompose
 #include "orionld/forwarding/viaCompose.h"                          // viaCompose

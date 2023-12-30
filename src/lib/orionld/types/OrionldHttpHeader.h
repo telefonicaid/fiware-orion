@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDHTTPHEADER_H_
+#define SRC_LIB_ORIONLD_TYPES_ORIONLDHTTPHEADER_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2018 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,28 +25,34 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
-#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/types/DistOp.h"                                // DistOp
-#include "orionld/types/DistOpType.h"                            // DistOpType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchInformationArray -
+// OrionldHttpHeaderType -
 //
-extern DistOp* regMatchInformationArray
-(
-  RegCacheItem*  regP,
-  DistOpType     operation,
-  const char*    entityId,
-  const char*    entityType,
-  KjNode*        incomingP
-);
+typedef enum OrionldHttpHeaderType
+{
+  HttpHeaderNone,             // Marks the end of the vector
+  HttpHeaderContentType,
+  HttpHeaderAccept,
+  HttpHeaderLink,
+  HttpHeaderTenant,
+  HttpHeaderPath,
+  HttpHeaderXauth
+} OrionldHttpHeaderType;
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
+
+
+// -----------------------------------------------------------------------------
+//
+// OrionldHttpHeader -
+//
+typedef struct OrionldHttpHeader
+{
+  OrionldHttpHeaderType   type;
+  char*                   value;
+} OrionldHttpHeader;
+
+#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDHTTPHEADER_H_

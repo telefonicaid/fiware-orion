@@ -40,6 +40,7 @@ extern "C"
 
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd, httpHeaderLinkAdd
 
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // PERFORMANCE
@@ -53,7 +54,6 @@ extern "C"
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityInsert.h"                   // mongocEntityInsert
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 #include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
 #include "orionld/forwarding/distOpFailure.h"                    // distOpFailure

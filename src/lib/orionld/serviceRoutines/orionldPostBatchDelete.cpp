@@ -34,6 +34,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/DistOp.h"                              // DistOp
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/entityLookupById.h"                   // entityLookupBy_id_Id
@@ -43,7 +44,6 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/mongoc/mongocEntitiesExist.h"                // mongocEntitiesExist
 #include "orionld/mongoc/mongocEntitiesDelete.h"               // mongocEntitiesDelete
-#include "orionld/forwarding/DistOp.h"                         // DistOp
 #include "orionld/forwarding/distOpListsMerge.h"               // distOpListsMerge
 #include "orionld/forwarding/distOpSend.h"                     // distOpSend
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"       // distOpLookupByCurlHandle

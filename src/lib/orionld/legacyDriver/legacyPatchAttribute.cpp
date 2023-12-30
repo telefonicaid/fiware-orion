@@ -40,6 +40,9 @@ extern "C"
 #include "ngsi/ContextElement.h"                                 // ContextElement
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
+#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
+#include "orionld/types/OrionldHttpHeader.h"                     // OrionldHttpHeader
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
@@ -49,8 +52,6 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_STRING
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup

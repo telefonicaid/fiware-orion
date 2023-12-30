@@ -34,7 +34,7 @@ extern "C"
 #include "cache/subCache.h"                                    // CachedSubscription
 
 #include "orionld/types/QNode.h"                               // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/types/OrionldContext.h"                      // OrionldContext
 
 
 

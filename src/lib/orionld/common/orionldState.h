@@ -59,12 +59,12 @@ extern "C"
 #include "orionld/types/OrionldAlteration.h"                     // OrionldAlteration
 #include "orionld/types/StringArray.h"                           // StringArray
 #include "orionld/types/EntityMap.h"                             // EntityMap
+#include "orionld/types/PernotSubCache.h"                        // PernotSubCache
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
+#include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/TroeMode.h"                              // TroeMode
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/kjTree/kjTreeLog.h"                            // Because it is so often used but then removed again ...
-#include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/troe/troe.h"                                   // TroeMode
-#include "orionld/pernot/PernotSubCache.h"                       // PernotSubCache
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
 
 
 

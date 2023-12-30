@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
-#include "orionld/rest/orionldServiceInit.h"       // Own Interface
+#include "orionld/types/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
+#include "orionld/rest/orionldServiceInit.h"        // Own Interface
 
 #endif  // SRC_LIB_ORIONLD_REST_ORIONLDMHDCONNECTION_H_

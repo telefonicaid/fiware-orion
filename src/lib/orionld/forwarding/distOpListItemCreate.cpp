@@ -29,9 +29,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                          // LM_*
 
+#include "orionld/types/DistOp.h"                                   // DistOp
+#include "orionld/types/DistOpListItem.h"                           // DistOpListItem
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/regCache/regCacheItemLookup.h"                    // regCacheItemLookup
-#include "orionld/forwarding/DistOp.h"                              // DistOpListItem
 #include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
 #include "orionld/forwarding/distOpLookupByRegId.h"                 // distOpLookupByRegId
 

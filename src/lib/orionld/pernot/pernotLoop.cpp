@@ -34,10 +34,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                  // LM_x
 
+#include "orionld/types/PernotSubscription.h"               // PernotSubscription
+#include "orionld/types/PernotSubCache.h"                   // PernotSubCache
 #include "orionld/common/orionldState.h"                    // orionldState, pernotSubCache
 #include "orionld/mongoc/mongocSubCountersUpdate.h"         // mongocSubCountersUpdate
-#include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
-#include "orionld/pernot/PernotSubCache.h"                  // PernotSubCache
 #include "orionld/pernot/pernotTreat.h"                     // pernotTreat
 #include "orionld/pernot/pernotLoop.h"                      // Own interface
 

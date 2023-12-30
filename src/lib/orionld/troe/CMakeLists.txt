@@ -21,7 +21,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
-    troe.cpp
     troeInit.cpp
     troeDeleteAttribute.cpp
     troeDeleteEntity.cpp
@@ -78,7 +77,6 @@ SET (SOURCES
 )
 
 SET (HEADERS
-    troe.h
     troeInit.h
     troeDeleteAttribute.h
     troeDeleteEntity.h

@@ -32,7 +32,7 @@ extern "C"
 #include "kjson/kjLookup.h"                                     // kjLookup
 }
 
-#include "orionld/forwarding/DistOpType.h"                      // Own interface
+#include "orionld/types/DistOpType.h"                           // Own interface
 
 
 

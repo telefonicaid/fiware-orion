@@ -32,13 +32,13 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/PernotSubscription.h"                    // PernotSubscription
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldCoreContext.h"                  // ORIONLD_CORE_CONTEXT_URL_V1_0
 #include "orionld/notifications/httpNotify.h"                    // httpNotify
-#include "orionld/pernot/PernotSubscription.h"                   // PernotSubscription
 #include "orionld/pernot/pernotSend.h"                           // Own interface
 
 

@@ -29,11 +29,11 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionLdRestService.h"                    // OrionLdRestService
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/common/orionldState.h"                         // kalloc, orionldState
-#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"    // orionldPostSubscriptions
 #include "orionld/serviceRoutines/orionldPostRegistrations.h"    // orionldPostRegistrations
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
 #include "orionld/contextCache/orionldContextCacheInsert.h"      // Own interface
 

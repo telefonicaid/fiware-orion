@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
+#include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/forwarding/regMatchOperation.h"                // Own interface
 

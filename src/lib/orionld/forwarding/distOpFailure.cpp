@@ -33,10 +33,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_T
 
-#include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/forwarding/distOpFailure.h"                    // Own interface
 

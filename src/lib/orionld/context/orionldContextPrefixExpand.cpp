@@ -30,9 +30,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldContextPrefixExpand.h"          // Own interface
 

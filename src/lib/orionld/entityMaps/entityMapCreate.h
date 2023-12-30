@@ -26,7 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "orionld/types/EntityMap.h"                                    // EntityMap
-#include "orionld/forwarding/DistOp.h"                                  // DistOp
+#include "orionld/types/DistOp.h"                                       // DistOp
 #include "orionld/types/OrionldGeoInfo.h"                               // OrionldGeoInfo
 #include "orionld/types/QNode.h"                                        // QNode
 

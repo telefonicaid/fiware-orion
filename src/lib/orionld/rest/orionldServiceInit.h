@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
+#include "orionld/types/OrionLdRestService.h"       // OrionLdRestServiceSimplifiedVector
 
 
 

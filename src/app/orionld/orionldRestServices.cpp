@@ -78,7 +78,7 @@
 #include "orionld/serviceRoutines/orionldPatchTemporalAttributeInstance.h"   // orionldPatchTemporalAttributeInstance
 #include "orionld/serviceRoutines/orionldPostTemporalAttributes.h"           // orionldPostTemporalAttributes
 
-#include "orionld/rest/OrionLdRestService.h"       // OrionLdRestServiceSimplified
+#include "orionld/types/OrionLdRestService.h"      // OrionLdRestServiceSimplified
 #include "orionld/orionldRestServices.h"           // Own Interface
 
 

@@ -34,6 +34,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/tenantList.h"                           // tenant0
@@ -48,7 +49,6 @@ extern "C"
 #include "orionld/apiModel/ntonEntity.h"                         // ntonEntity
 #include "orionld/apiModel/ntosEntity.h"                         // ntosEntity
 #include "orionld/apiModel/ntocEntity.h"                         // ntocEntity
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
 #include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend

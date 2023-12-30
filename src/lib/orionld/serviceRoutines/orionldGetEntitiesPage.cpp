@@ -33,10 +33,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                          // LM_*
 
+#include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
-#include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpLookupByRegId.h"                 // distOpLookupByRegId
 #include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
 #include "orionld/forwarding/distOpsSend.h"                         // distOpsSend2

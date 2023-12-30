@@ -38,6 +38,8 @@ extern "C"
 
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
+#include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
@@ -45,11 +47,9 @@ extern "C"
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/attributeUpdated.h"                     // attributeUpdated
 #include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_OBJECT
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray

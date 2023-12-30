@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/rest/OrionLdRestService.h"                         // ORIONLD_URIPARAM_*
+#include "orionld/types/OrionLdRestService.h"                        // ORIONLD_URIPARAM_*
 #include "orionld/rest/uriParamName.h"                               // Own interface
 
 

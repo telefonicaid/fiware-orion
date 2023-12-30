@@ -34,11 +34,11 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/responseFix.h"                          // responseFix
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_OBJECT, PCHECK_EMPTY_OBJECT, ...
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity

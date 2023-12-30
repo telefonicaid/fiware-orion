@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/forwarding/distOpListsMerge.h"                 // Own interface
 
 

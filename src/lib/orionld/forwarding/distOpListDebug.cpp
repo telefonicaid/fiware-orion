@@ -25,7 +25,7 @@
 #include "logMsg/logMsg.h"                                       // LM_T, lmTraceIsSet
 #include "logMsg/traceLevels.h"                                  // distOpListDebug2
 
-#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/forwarding/distOpListDebug.h"                  // Own interface
 
 

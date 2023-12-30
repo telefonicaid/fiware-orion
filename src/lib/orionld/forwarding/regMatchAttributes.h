@@ -31,7 +31,7 @@ extern "C"
 }
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
+#include "orionld/types/DistOpType.h"                            // DistOpType
 
 
 

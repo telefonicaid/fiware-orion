@@ -34,10 +34,9 @@ extern "C"
 
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/types/QNode.h"                               // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
+#include "orionld/types/PernotSubscription.h"                  // PernotSubscription
+#include "orionld/types/PernotSubCache.h"                      // PernotSubCache
+#include "orionld/types/OrionldContext.h"                      // OrionldContext
 
 
 

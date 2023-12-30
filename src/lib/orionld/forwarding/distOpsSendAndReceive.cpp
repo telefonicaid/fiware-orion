@@ -22,7 +22,8 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/forwarding/DistOp.h"                              // DistOpListItem
+#include "orionld/types/DistOp.h"                                   // DistOpListItem
+#include "orionld/types/DistOpListItem.h"                           // DistOpListItem
 #include "orionld/forwarding/distOpsReceive2.h"                     // DistOpResponseTreatFunction, distOpsReceive2
 #include "orionld/forwarding/distOpsSend.h"                         // distOpsSend2
 #include "orionld/forwarding/distOpsSendAndReceive.h"               // Own interface

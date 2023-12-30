@@ -32,9 +32,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+#include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchAttributes.h"               // Own interface
 
 

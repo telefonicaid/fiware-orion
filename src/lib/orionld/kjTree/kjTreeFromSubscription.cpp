@@ -42,15 +42,15 @@ extern "C"
 #include "apiTypesV2/Subscription.h"                             // Subscription
 #include "apiTypesV2/HttpInfo.h"                                 // HttpInfo
 
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
+#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/types/OrionldGeometry.h"                       // OrionldGeometry
 #include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/dbModel/dbModelToApiGeorel.h"                  // dbModelToApiGeorel
 #include "orionld/dbModel/dbModelValueStrip.h"                   // dbModelValueStrip
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContext
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup

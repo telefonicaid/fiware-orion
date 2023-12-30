@@ -50,6 +50,7 @@ extern "C"
 #include "orionld/types/OrionldResponseErrorType.h"              // orionldResponseErrorType
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
+#include "orionld/types/OrionLdRestService.h"                    // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/common/orionldState.h"                         // orionldState, orionldHostName, coreContextUrl
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPARE
@@ -79,7 +80,6 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"          // orionldGetEntities
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // orionldPostEntities
-#include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/rest/uriParamName.h"                           // uriParamName
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // Own Interface
 

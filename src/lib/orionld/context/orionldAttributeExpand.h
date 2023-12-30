@@ -25,8 +25,8 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
+#include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 
 
 

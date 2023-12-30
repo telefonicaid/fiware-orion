@@ -23,9 +23,8 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/troe.h"                                 // Own interface
+#include "orionld/types/TroeMode.h"                            // Own interface
 
 
 

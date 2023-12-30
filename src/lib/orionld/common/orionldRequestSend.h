@@ -26,35 +26,7 @@
 * Author: Ken Zangelin
 */
 #include "orionld/types/OrionldResponseBuffer.h"
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OrionldHttpHeaderType -
-//
-typedef enum OrionldHttpHeaderType
-{
-  HttpHeaderNone,             // Marks the end of the vector
-  HttpHeaderContentType,
-  HttpHeaderAccept,
-  HttpHeaderLink,
-  HttpHeaderTenant,
-  HttpHeaderPath,
-  HttpHeaderXauth
-} OrionldHttpHeaderType;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// OrionldHttpHeader -
-//
-typedef struct OrionldHttpHeader
-{
-  OrionldHttpHeaderType   type;
-  char*                   value;
-} OrionldHttpHeader;
+#include "orionld/types/OrionldHttpHeader.h"
 
 
 

@@ -39,12 +39,12 @@ extern "C"
 #include "orionld/types/OrionldResponseErrorType.h"              // OrionldBadRequestData
 #include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType, orionldAttributeTypeName
 #include "orionld/types/OrionldGeometry.h"                       // orionldGeometryFromString, GeoNoGeometry
+#include "orionld/types/OrionLdRestService.h"                    // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
+#include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
-#include "orionld/rest/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // orionldPatchEntity2
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pcheckName.h"                     // pCheckName

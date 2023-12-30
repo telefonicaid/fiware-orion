@@ -31,8 +31,9 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                          // LM_*
 
+#include "orionld/types/DistOp.h"                                   // DistOp
+#include "orionld/types/DistOpListItem.h"                           // DistOpListItem
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
-#include "orionld/forwarding/DistOp.h"                              // DistOp, DistOpListItem
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
 #include "orionld/forwarding/distOpResponseMergeIntoEntityArray.h"  // distOpResponseMergeIntoEntityArray
 #include "orionld/forwarding/distOpsReceive2.h"                     // Own interface

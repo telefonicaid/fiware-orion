@@ -26,11 +26,11 @@
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/StringArray.h"                           // StringArray, stringArrayClone
-#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/DistOpType.h"                            // DistOpType
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/forwarding/distOpAttrs.h"                      // distOpAttrs
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/distOpCreate.h"                     // Own interface
 
 

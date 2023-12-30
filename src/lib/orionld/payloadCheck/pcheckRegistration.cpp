@@ -31,11 +31,11 @@ extern "C"
 #include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
 }
 
+#include "orionld/types/RegistrationMode.h"                     // RegistrationMode
+#include "orionld/types/OrionldContext.h"                       // OrionldContext
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/common/CHECK.h"                               // STRING_CHECK, ...
-#include "orionld/types/RegistrationMode.h"                     // RegistrationMode
-#include "orionld/context/OrionldContext.h"                     // OrionldContext
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*
 #include "orionld/payloadCheck/pCheckRegistrationMode.h"        // pCheckRegistrationMode

@@ -33,9 +33,9 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
 #include "orionld/forwarding/distOpSend.h"                       // distOpSend
 #include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose

@@ -32,10 +32,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_T
 
-#include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpAttrs.h"                      // Own interface
 
 

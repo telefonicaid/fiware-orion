@@ -33,9 +33,9 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/types/PgAppendBuffer.h"                      // PgAppendBuffer
+#include "orionld/types/TroeMode.h"                            // TroeMode, troeMode
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
-#include "orionld/troe/troe.h"                                 // TroeMode, troeMode
 #include "orionld/troe/pgAttributeBuild.h"                     // pgAttributeBuild
 #include "orionld/troe/pgSubAttributeBuild.h"                  // pgSubAttributeBuild
 #include "orionld/troe/pgEntityAppend.h"                       // pgEntityAppend

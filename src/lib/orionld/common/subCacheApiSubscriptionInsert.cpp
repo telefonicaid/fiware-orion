@@ -43,7 +43,7 @@ extern "C"
 #include "common/RenderFormat.h"                                 // RenderFormat, stringToRenderFormat
 
 #include "orionld/types/QNode.h"                                 // QNode
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/dbModel/dbModelToApiCoordinates.h"             // dbModelToApiCoordinates
 #include "orionld/mqtt/mqttParse.h"                              // mqttParse
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString

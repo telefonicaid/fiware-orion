@@ -32,7 +32,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/types/RegistrationMode.h"                      // RegistrationMode
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/types/RegIdPattern.h"                          // RegIdPattern

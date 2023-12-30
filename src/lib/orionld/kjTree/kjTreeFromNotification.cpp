@@ -37,11 +37,12 @@ extern "C"
 #include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
 
 #include "common/RenderFormat.h"                               // RenderFormat
+
+#include "orionld/types/OrionldContext.h"                      // OrionldContext
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
 #include "orionld/contextCache/orionldContextCacheLookup.h"    // orionldContextCacheLookup
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise

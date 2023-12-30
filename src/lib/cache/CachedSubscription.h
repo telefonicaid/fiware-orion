@@ -32,11 +32,12 @@
 #include "common/RenderFormat.h"
 #include "apiTypesV2/HttpInfo.h"                             // HttpInfo
 #include "apiTypesV2/SubscriptionExpression.h"
+
 #include "orionld/types/QNode.h"                             // QNode
 #include "orionld/types/Protocol.h"                          // Protocol
 #include "orionld/types/OrionldAlteration.h"                 // OrionldAlterationTypes
 #include "orionld/types/OrionldTenant.h"                     // OrionldTenant
-#include "orionld/context/OrionldContext.h"                  // OrionldContext
+#include "orionld/types/OrionldContext.h"                    // OrionldContext
 
 
 

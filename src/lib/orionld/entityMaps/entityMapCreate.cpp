@@ -38,11 +38,12 @@ extern "C"
 #include "orionld/types/EntityMap.h"                                // EntityMap
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/types/QNode.h"                                    // QNode
+#include "orionld/types/DistOp.h"                                   // DistOp
+#include "orionld/types/DistOpListItem.h"                           // DistOpListItem
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/uuidGenerate.h"                            // uuidGenerate
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
 #include "orionld/kjTree/kjSort.h"                                  // kjStringArraySort
-#include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
 #include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug2
 #include "orionld/forwarding/distOpsSend.h"                         // distOpsSend

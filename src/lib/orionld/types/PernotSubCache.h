@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
-#define SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
+#ifndef SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
+#define SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2023 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,28 +25,21 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
+#include <semaphore.h>                                         // sem_t
 
-#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
-#include "orionld/types/DistOp.h"                                // DistOp
-#include "orionld/types/DistOpType.h"                            // DistOpType
+#include "orionld/types/PernotSubscription.h"                  // PernotSubscription
 
 
 
 // -----------------------------------------------------------------------------
 //
-// regMatchInformationArray -
+// PernotSubCache -
 //
-extern DistOp* regMatchInformationArray
-(
-  RegCacheItem*  regP,
-  DistOpType     operation,
-  const char*    entityId,
-  const char*    entityType,
-  KjNode*        incomingP
-);
+typedef struct PernotSubCache
+{
+  PernotSubscription* head;
+  PernotSubscription* tail;
+  int                 newSubs;
+} PernotSubCache;
 
-#endif  // SRC_LIB_ORIONLD_FORWARDING_REGMATCHINFORMATIONARRAY_H_
+#endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHE_H_

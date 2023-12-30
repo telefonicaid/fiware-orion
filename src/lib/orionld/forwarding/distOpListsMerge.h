@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/types/DistOp.h"                                // DistOp
 
 
 

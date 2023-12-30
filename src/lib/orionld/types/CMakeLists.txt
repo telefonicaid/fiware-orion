@@ -32,6 +32,8 @@ SET (SOURCES
     RegistrationMode.cpp
     Protocol.cpp
     StringArray.cpp
+    DistOpType.cpp
+    TroeMode.cpp
 )
 
 # Include directories

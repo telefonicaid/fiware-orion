@@ -30,8 +30,8 @@ extern "C"
 
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/types/StringArray.h"                           // StringArray
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState, kjTreeLog
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpCreate.h"                     // distOpCreate
 #include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
 #include "orionld/forwarding/regMatchEntityInfoForQuery.h"       // regMatchEntityInfoForQuery

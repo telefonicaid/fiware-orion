@@ -32,7 +32,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                              // LM_*
 
 #include "orionld/types/EntityMap.h"                                    // EntityMap
-#include "orionld/forwarding/DistOp.h"                                  // DistOp
+#include "orionld/types/DistOp.h"                                       // DistOp
 #include "orionld/entityMaps/entityMapItemAdd.h"                        // Own interface
 
 

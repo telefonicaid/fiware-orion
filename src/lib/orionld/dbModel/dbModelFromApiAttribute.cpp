@@ -34,10 +34,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                        // LM_*
 
+#include "orionld/types/OrionLdRestService.h"                     // ORIONLD_SERVICE_OPTION_DATASET_SUPPORT
 #include "orionld/common/orionldState.h"                          // orionldState
 #include "orionld/common/orionldError.h"                          // orionldError
 #include "orionld/common/dotForEq.h"                              // dotForEq
-#include "orionld/rest/OrionLdRestService.h"                      // ORIONLD_SERVICE_OPTION_DATASET_SUPPORT
 #include "orionld/kjTree/kjArrayAdd.h"                            // kjArrayAdd
 #include "orionld/kjTree/kjTimestampAdd.h"                        // kjTimestampAdd
 #include "orionld/kjTree/kjTreeLog.h"                             // kjTreeLog

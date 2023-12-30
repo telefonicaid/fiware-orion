@@ -31,8 +31,8 @@ extern "C"
 }
 
 #include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
+#include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 
 

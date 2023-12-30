@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/types/QNode.h"                                    // QNode
 #include "orionld/types/RegCache.h"                                 // RegCache
+#include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/legacyDriver/legacyGetEntities.h"                 // legacyGetEntities
@@ -42,7 +43,6 @@ extern "C"
 #include "orionld/q/qParse.h"                                       // qParse
 #include "orionld/q/qClone.h"                                       // qClone
 #include "orionld/payloadCheck/pCheckGeo.h"                         // pCheckGeo
-#include "orionld/forwarding/DistOp.h"                              // DistOp
 #include "orionld/forwarding/distOpRequests.h"                      // distOpRequests
 #include "orionld/forwarding/distOpListsMerge.h"                    // distOpListsMerge
 #include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug

@@ -33,9 +33,9 @@ extern "C"
 #include "orionld/types/RegistrationMode.h"                      // registrationMode
 #include "orionld/types/RegCache.h"                              // RegCache
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
+#include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/forwarding/DistOpType.h"                       // DistOpType
 #include "orionld/forwarding/regMatchOperation.h"                // regMatchOperation
 #include "orionld/forwarding/regMatchInformationArrayForGet.h"   // regMatchInformationArrayForGet
 #include "orionld/forwarding/xForwardedForMatch.h"               // xForwardedForMatch

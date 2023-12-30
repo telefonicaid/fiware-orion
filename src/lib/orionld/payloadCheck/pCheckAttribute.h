@@ -31,7 +31,7 @@ extern "C"
 }
 
 #include "orionld/types/OrionldAttributeType.h"               // OrionldAttributeType
-#include "orionld/context/OrionldContextItem.h"               // OrionldContextItem
+#include "orionld/types/OrionldContextItem.h"                 // OrionldContextItem
 
 
 

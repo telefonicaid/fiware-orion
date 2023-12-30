@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/context/OrionldContext.h"                      // OrionldContextOrigin
+#include "orionld/types/OrionldContext.h"                        // OrionldContextOrigin
 
 
 

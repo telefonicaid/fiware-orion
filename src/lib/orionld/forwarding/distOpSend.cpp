@@ -39,12 +39,13 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "common/globals.h"                                      // NGSI_LD_V1
+
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/q//qRender.h"                                  // qRender
-#include "orionld/forwarding/DistOp.h"                           // DistOp
 #include "orionld/forwarding/distOpSend.h"                       // Own interface
 
 

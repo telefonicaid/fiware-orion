@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/kjLookup.h"                                      // kjLookup
 }
 
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
