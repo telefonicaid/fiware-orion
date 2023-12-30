@@ -27,8 +27,8 @@ extern "C"
 #include "kjson/KjNode.h"                                       // KjNode
 }
 
+#include "orionld/types/OrionldContext.h"                       // OrionldContext
 #include "orionld/common/orionldError.h"                        // orionldError
-#include "orionld/context/OrionldContext.h"                     // OrionldContext
 #include "orionld/kjTree/kjLookupInKvList.h"                    // kjLookupInKvList
 #include "orionld/regCache/regCacheItemContextCheck.h"          // regCacheItemContextCheck
 #include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_*

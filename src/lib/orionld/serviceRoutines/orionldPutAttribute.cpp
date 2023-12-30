@@ -34,12 +34,12 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
+#include "orionld/types/OrionLdRestService.h"                    // OrionLdRestService
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/responseFix.h"                          // responseFix
 #include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
-#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocAttributeReplace.h"               // mongocAttributeReplace
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
@@ -49,11 +49,11 @@ extern "C"
 #include "orionld/dbModel/dbModelAttributeCreatedAtSet.h"        // dbModelAttributeCreatedAtSet
 #include "orionld/dbModel/dbModelAttributeLookup.h"              // dbModelAttributeLookup
 #include "orionld/dbModel/dbModelEntityTypeLookup.h"             // dbModelEntityTypeLookup
-#include "orionld/forwarding/distOpRequests.h"                   // distOpRequests
-#include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
-#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
-#include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
-#include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
+#include "orionld/distOp/distOpRequests.h"                       // distOpRequests
+#include "orionld/distOp/distOpResponses.h"                      // distOpResponses
+#include "orionld/distOp/distOpListRelease.h"                    // distOpListRelease
+#include "orionld/distOp/distOpFailure.h"                        // distOpFailure
+#include "orionld/distOp/distOpSuccess.h"                        // distOpSuccess
 #include "orionld/notifications/alteration.h"                    // alteration
 #include "orionld/notifications/previousValuePopulate.h"         // previousValuePopulate
 #include "orionld/notifications/sysAttrsStrip.h"                 // sysAttrsStrip

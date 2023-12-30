@@ -27,7 +27,7 @@
 */
 #include "mongo/client/dbclient.h"                             // mongo::BSONObj
 
-#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/types/QNode.h"                               // QNode
 
 
 

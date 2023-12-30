@@ -25,7 +25,7 @@
 #include <unistd.h>                                              // NULL
 #include <semaphore.h>                                           // sem_t
 
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/contextCache/orionldContextCache.h"            // Own interface
 
 

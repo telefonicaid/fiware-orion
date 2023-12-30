@@ -25,9 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
-#include "orionld/mqtt/mqttConnectionList.h"                   // mqttConnectionList
-#include "orionld/mqtt/mqttRelease.h"                          // Own Interface
 
 
 

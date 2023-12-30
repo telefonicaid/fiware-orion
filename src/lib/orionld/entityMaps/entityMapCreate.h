@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPCREATE_H_
-#define SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPCREATE_H_
+#ifndef SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPCREATE_H_
+#define SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPCREATE_H_
 
 /*
 *
@@ -26,9 +26,9 @@
 * Author: Ken Zangelin
 */
 #include "orionld/types/EntityMap.h"                                    // EntityMap
-#include "orionld/forwarding/DistOp.h"                                  // DistOp
+#include "orionld/types/DistOp.h"                                       // DistOp
 #include "orionld/types/OrionldGeoInfo.h"                               // OrionldGeoInfo
-#include "orionld/q/QNode.h"                                            // QNode
+#include "orionld/types/QNode.h"                                        // QNode
 
 
 
@@ -38,4 +38,4 @@
 //
 extern EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, OrionldGeoInfo* geoInfoP);
 
-#endif  // SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPCREATE_H_
+#endif  // SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPCREATE_H_

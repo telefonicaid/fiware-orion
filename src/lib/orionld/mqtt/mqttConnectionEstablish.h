@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
 
 
 

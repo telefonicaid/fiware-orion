@@ -33,8 +33,8 @@ extern "C"
 #include "common/RenderFormat.h"                               // RenderFormat
 #include "cache/subCache.h"                                    // CachedSubscription
 
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
+#include "orionld/types/QNode.h"                               // QNode
+#include "orionld/types/OrionldContext.h"                      // OrionldContext
 
 
 

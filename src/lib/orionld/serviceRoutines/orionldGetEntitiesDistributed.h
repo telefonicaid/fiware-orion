@@ -26,8 +26,8 @@
 * Author: Ken Zangelin
 */
 #include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
-#include "orionld/q/QNode.h"                                     // QNode
-#include "orionld/forwarding/DistOp.h"                           // DistOp
+#include "orionld/types/QNode.h"                                 // QNode
+#include "orionld/types/DistOp.h"                                // DistOp
 
 
 

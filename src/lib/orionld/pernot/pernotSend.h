@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                   // KjNode
 }
 
-#include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
+#include "orionld/types/PernotSubscription.h"               // PernotSubscription
 
 
 

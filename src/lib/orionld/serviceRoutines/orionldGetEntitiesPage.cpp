@@ -33,17 +33,17 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                          // LM_*
 
+#include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
-#include "orionld/forwarding/DistOp.h"                              // DistOp
-#include "orionld/forwarding/distOpLookupByRegId.h"                 // distOpLookupByRegId
-#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
-#include "orionld/forwarding/distOpsSend.h"                         // distOpsSend2
-#include "orionld/forwarding/distOpItemListDebug.h"                 // distOpItemListDebug
-#include "orionld/forwarding/distOpListItemAdd.h"                   // distOpListItemAdd
-#include "orionld/forwarding/distOpResponseMergeIntoEntityArray.h"  // distOpResponseMergeIntoEntityArray
-#include "orionld/forwarding/distOpsSendAndReceive.h"               // distOpsSendAndReceive
+#include "orionld/distOp/distOpLookupByRegId.h"                     // distOpLookupByRegId
+#include "orionld/distOp/distOpListDebug.h"                         // distOpListDebug
+#include "orionld/distOp/distOpsSend.h"                             // distOpsSend2
+#include "orionld/distOp/distOpItemListDebug.h"                     // distOpItemListDebug
+#include "orionld/distOp/distOpListItemAdd.h"                       // distOpListItemAdd
+#include "orionld/distOp/distOpResponseMergeIntoEntityArray.h"      // distOpResponseMergeIntoEntityArray
+#include "orionld/distOp/distOpsSendAndReceive.h"                   // distOpsSendAndReceive
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntitiesPage.h"         // Own interface
 

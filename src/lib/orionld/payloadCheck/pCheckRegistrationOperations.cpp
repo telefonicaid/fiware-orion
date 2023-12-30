@@ -30,7 +30,7 @@ extern "C"
 }
 
 #include "orionld/common/orionldError.h"                        // orionldError
-#include "orionld/forwarding/DistOpType.h"                      // distOpTypeFromString, distOpTypeAliasFromString, DoNone
+#include "orionld/types/DistOpType.h"                           // distOpTypeFromString, distOpTypeAliasFromString, DoNone
 #include "orionld/payloadCheck/pCheckRegistrationOperations.h"  // Own interface
 
 

@@ -27,10 +27,10 @@
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/urlDecode.h"                          // urlDecode
-#include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qLex.h"                                    // qLex
 #include "orionld/q/qParse.h"                                  // qParse
 #include "orionld/q/qListRelease.h"                            // qListRelease

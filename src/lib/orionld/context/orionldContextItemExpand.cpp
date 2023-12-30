@@ -27,8 +27,8 @@
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
+#include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextPrefixExpand.h"          // orionldContextPrefixExpand

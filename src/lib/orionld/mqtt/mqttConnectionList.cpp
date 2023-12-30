@@ -24,7 +24,7 @@
 */
 #include <semaphore.h>                                         // sem_t
 
-#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
+#include "orionld/types/MqttConnection.h"                      // MqttConnection
 
 
 

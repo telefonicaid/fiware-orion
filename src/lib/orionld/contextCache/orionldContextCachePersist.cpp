@@ -31,10 +31,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextOriginName.h"            // orionldContextOriginName
 #include "orionld/mongoc/mongocContextCachePersist.h"            // mongocContextCachePersist - FIXME: Use dbContextCachePersist
 #include "orionld/contextCache/orionldContextCachePersist.h"     // Own interface

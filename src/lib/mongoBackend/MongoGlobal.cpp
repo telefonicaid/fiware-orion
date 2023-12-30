@@ -71,7 +71,7 @@ extern "C"
 #include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/common/performance.h"                        // REQUEST_PERFORMANCE, PERFORMANCE*, performanceTimestamps
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
+#include "orionld/types/OrionLdRestService.h"                  // OrionLdRestService
 #include "orionld/serviceRoutines/orionldPostSubscriptions.h"  // orionldPostSubscriptions
 #endif
 

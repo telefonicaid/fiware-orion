@@ -32,11 +32,11 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "common/RenderFormat.h"                                 // RenderFormat
 
+#include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/q/QNode.h"                                     // QNode
 #include "orionld/q/qAliasCompact.h"                             // qAliasCompact
 #include "orionld/dbModel/dbModelValueStrip.h"                   // dbModelValueStrip
 #include "orionld/dbModel/dbModelToApiGeoQ.h"                    // dbModelToApiGeoQ

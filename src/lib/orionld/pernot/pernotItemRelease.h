@@ -27,12 +27,11 @@
 */
 #include "common/RenderFormat.h"                               // RenderFormat
 
+#include "orionld/types/QNode.h"                               // QNode
+#include "orionld/types/PernotSubscription.h"                  // PernotSubscription
+#include "orionld/types/PernotSubCache.h"                      // PernotSubCache
+#include "orionld/types/OrionldContext.h"                      // OrionldContext
 #include "orionld/common/orionldState.h"                       // pernotSubCache
-#include "orionld/q/QNode.h"                                   // QNode
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
 
 
 

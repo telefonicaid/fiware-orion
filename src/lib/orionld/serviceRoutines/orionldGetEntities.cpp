@@ -31,25 +31,26 @@ extern "C"
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
+#include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
+#include "orionld/types/QNode.h"                                    // QNode
+#include "orionld/types/RegCache.h"                                 // RegCache
+#include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/orionldError.h"                            // orionldError
-#include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/legacyDriver/legacyGetEntities.h"                 // legacyGetEntities
 #include "orionld/kjTree/kjTreeLog.h"                               // kjTreeLog
-#include "orionld/q/QNode.h"                                        // QNode
 #include "orionld/q/qLex.h"                                         // qLex
 #include "orionld/q/qParse.h"                                       // qParse
 #include "orionld/q/qClone.h"                                       // qClone
 #include "orionld/payloadCheck/pCheckGeo.h"                         // pCheckGeo
-#include "orionld/forwarding/DistOp.h"                              // DistOp
-#include "orionld/forwarding/distOpRequests.h"                      // distOpRequests
-#include "orionld/forwarding/distOpListsMerge.h"                    // distOpListsMerge
-#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug
-#include "orionld/forwarding/xForwardedForMatch.h"                  // xForwardedForMatchº
-#include "orionld/forwarding/viaMatch.h"                            // viaMatch
-#include "orionld/forwarding/regMatchOperation.h"                   // regMatchOperation
-#include "orionld/forwarding/regMatchInformationArrayForQuery.h"    // regMatchInformationArrayForQuery
-#include "orionld/forwarding/distOpCreate.h"                        // distOpCreate
+#include "orionld/distOp/distOpRequests.h"                          // distOpRequests
+#include "orionld/distOp/distOpListsMerge.h"                        // distOpListsMerge
+#include "orionld/distOp/distOpListDebug.h"                         // distOpListDebug
+#include "orionld/distOp/xForwardedForMatch.h"                      // xForwardedForMatchº
+#include "orionld/distOp/viaMatch.h"                                // viaMatch
+#include "orionld/distOp/distOpCreate.h"                            // distOpCreate
+#include "orionld/regMatch/regMatchOperation.h"                     // regMatchOperation
+#include "orionld/regMatch/regMatchInformationArrayForQuery.h"      // regMatchInformationArrayForQuery
 #include "orionld/serviceRoutines/orionldGetEntitiesDistributed.h"  // orionldGetEntitiesDistributed
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntities.h"             // Own interface

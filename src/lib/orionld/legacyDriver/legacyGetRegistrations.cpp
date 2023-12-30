@@ -32,11 +32,9 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                    // LM_*
-#include "logMsg/traceLevels.h"                               // Lmt*
 
 #include "common/defaultValues.h"
 #include "common/string.h"                                    // toString
-#include "rest/uriParamNames.h"                               // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 
 #include "orionld/common/orionldState.h"                      // orionldState
 #include "orionld/common/orionldError.h"                      // orionldError

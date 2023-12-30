@@ -24,6 +24,8 @@
 */
 #include <string.h>                                                     // strcmp
 
+#include "logMsg/logMsg.h"                                              // LM_*
+
 #include "orionld/common/orionldState.h"                                // entityMaps
 #include "orionld/types/EntityMap.h"                                    // EntityMap
 #include "orionld/entityMaps/entityMapRemove.h"                         // Own interface

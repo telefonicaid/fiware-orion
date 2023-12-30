@@ -32,7 +32,8 @@ extern "C"
 
 #include "common/RenderFormat.h"                               // RenderFormat
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
+
+#include "orionld/types/OrionldContext.h"                      // OrionldContext
 
 
 

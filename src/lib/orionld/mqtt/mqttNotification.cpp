@@ -38,7 +38,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
+#include "orionld/types/MqttConnection.h"                      // MqttConnection
 #include "orionld/mqtt/mqttConnectionLookup.h"                 // mqttConnectionLookup
 #include "orionld/mqtt/mqttConnectionAdd.h"                    // mqttConnectionAdd
 #include "orionld/mqtt/mqttNotification.h"                     // Own interface

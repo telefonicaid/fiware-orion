@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/troe/PgAppendBuffer.h"                            // PgAppendBuffer
+#include "orionld/types/PgAppendBuffer.h"                           // PgAppendBuffer
 
 
 

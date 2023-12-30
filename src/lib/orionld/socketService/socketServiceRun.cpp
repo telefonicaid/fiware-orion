@@ -33,7 +33,8 @@
 #include "orionld/common/orionldState.h"                     // troe
 #include "orionld/mongoc/mongocServerVersionGet.h"           // mongocServerVersionGet
 #include "orionld/troe/pgVersionGet.h"                       // pgVersionGet
-#include "orionld/socketService/socketService.h"             // SsHeader, SsMsgCode
+#include "orionld/types/SsHeader.h"                          // SsHeader
+#include "orionld/types/SsMsgCode.h"                         // SsMsgCode
 #include "orionld/socketService/socketServiceRun.h"          // Own interface
 
 
@@ -42,7 +43,7 @@
 //
 // ssAccept -
 //
-int ssAccept(int listenFd)
+static int ssAccept(int listenFd)
 {
   struct sockaddr_in  sa;
   socklen_t           saLen = sizeof(struct sockaddr_in);

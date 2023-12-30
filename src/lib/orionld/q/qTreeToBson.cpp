@@ -26,9 +26,10 @@
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/mongoc/mongocIndexString.h"                  // mongocIndexString
-#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/q/qNodeType.h"                               // qNodeType
 #include "orionld/q/qPresent.h"                                // qPresent
 #include "orionld/q/qTreeToBson.h"                             // Own interface
 

@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/forwarding/DistOp.h"                           // DistOpType
+#include "orionld/types/DistOp.h"                                // DistOpType
 
 
 

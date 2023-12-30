@@ -30,8 +30,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/PgConnection.h"                         // PgConnection
-#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
+#include "orionld/types/PgConnectionPool.h"                    // PgConnectionPool
+#include "orionld/types/PgConnection.h"                        // PgConnection
 #include "orionld/troe/pgConnectionPools.h"                    // pgPoolMaster
 
 

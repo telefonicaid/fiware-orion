@@ -29,7 +29,7 @@
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
+#include "orionld/types/PgAppendBuffer.h"                      // PgAppendBuffer
 #include "orionld/troe/pgAppend.h"                             // Own interface
 
 

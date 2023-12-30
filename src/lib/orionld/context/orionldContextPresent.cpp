@@ -30,8 +30,8 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
-#include "orionld/context/OrionldContextItem.h"                  // OrionldContextItem
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
+#include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
 #include "orionld/contextCache/orionldContextCache.h"            // ORIONLD_CONTEXT_CACHE_HASH_ARRAY_SIZE
 #include "orionld/context/orionldContextPresent.h"               // Own interface
 

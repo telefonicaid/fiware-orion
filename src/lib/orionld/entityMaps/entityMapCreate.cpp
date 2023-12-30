@@ -35,19 +35,20 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                          // LM_*
 
-#include "orionld/common/orionldState.h"                            // orionldState
-#include "orionld/common/uuidGenerate.h"                            // uuidGenerate
 #include "orionld/types/EntityMap.h"                                // EntityMap
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
-#include "orionld/q/QNode.h"                                        // QNode
+#include "orionld/types/QNode.h"                                    // QNode
+#include "orionld/types/DistOp.h"                                   // DistOp
+#include "orionld/types/DistOpListItem.h"                           // DistOpListItem
+#include "orionld/common/orionldState.h"                            // orionldState
+#include "orionld/common/uuidGenerate.h"                            // uuidGenerate
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
-#include "orionld/forwarding/DistOp.h"                              // DistOp
-#include "orionld/forwarding/distOpLookupByCurlHandle.h"            // distOpLookupByCurlHandle
-#include "orionld/forwarding/distOpListDebug.h"                     // distOpListDebug2
-#include "orionld/forwarding/distOpsSend.h"                         // distOpsSend
+#include "orionld/kjTree/kjSort.h"                                  // kjStringArraySort
+#include "orionld/distOp/distOpLookupByCurlHandle.h"                // distOpLookupByCurlHandle
+#include "orionld/distOp/distOpListDebug.h"                         // distOpListDebug2
+#include "orionld/distOp/distOpsSend.h"                             // distOpsSend
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
 #include "orionld/dbModel/dbModelToEntityIdAndTypeObject.h"         // dbModelToEntityIdAndTypeObject
-#include "orionld/kjTree/kjSort.h"                                  // kjStringArraySort
 #include "orionld/entityMaps/entityMapItemAdd.h"                    // entityMapItemAdd
 #include "orionld/entityMaps/entityMapCreate.h"                     // Own interface
 
@@ -63,7 +64,7 @@ typedef int (*DistOpResponseTreatFunction)(DistOp* distOpP, void* callbackParam)
 
 // -----------------------------------------------------------------------------
 //
-// distOpsReceive - FIXME: move to orionld/forwarding/distOpsReceive.cpp/h
+// distOpsReceive - FIXME: move to orionld/distOp/distOpsReceive.cpp/h
 //
 void distOpsReceive(DistOp* distOpList, DistOpResponseTreatFunction treatFunction, void* callbackParam, int requestsSent)
 {
@@ -175,7 +176,7 @@ EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, Or
     LM_X(1, ("Out of memory allocating a memory map"));
 
   uuidGenerate(entityMap->id, sizeof(entityMap->id), "urn:ngsi-ld:entity-map:");
-  
+
   LM_T(LmtDistOpList, ("Created an entity map at %p (%s)", entityMap, entityMap->id));
 
   //

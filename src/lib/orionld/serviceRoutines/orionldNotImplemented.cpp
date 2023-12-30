@@ -22,9 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionLdRestService.h"                    // OrionLdRestService
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/rest/OrionLdRestService.h"                     // OrionLdRestService
 #include "orionld/serviceRoutines/orionldNotImplemented.h"       // Own Interface
 
 

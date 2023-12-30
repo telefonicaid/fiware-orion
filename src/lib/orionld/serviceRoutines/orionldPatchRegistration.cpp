@@ -37,16 +37,17 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // LmtRegCache
 
+#include "orionld/types/RegistrationMode.h"                    // registrationMode
+#include "orionld/types/RegCacheItem.h"                        // RegCacheItem
+#include "orionld/types/OrionLdRestService.h"                  // OrionLdRestService
+#include "orionld/types/DistOpType.h"                          // distOpTypeMask
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
 #include "orionld/common/tenantList.h"                         // tenant0
-#include "orionld/types/RegistrationMode.h"                    // registrationMode
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pcheckRegistration.h"           // pcheckRegistration
-#include "orionld/rest/OrionLdRestService.h"                   // OrionLdRestService
 #include "orionld/legacyDriver/legacyPatchRegistration.h"      // legacyPatchRegistration
-#include "orionld/regCache/RegCache.h"                         // RegCacheItem
 #include "orionld/regCache/regCacheItemLookup.h"               // regCacheItemLookup
 #include "orionld/regCache/regCacheIdPatternRegexCompile.h"    // regCacheIdPatternRegexCompile
 #include "orionld/regCache/regCacheItemRegexRelease.h"         // regCacheItemRegexRelease
@@ -55,7 +56,6 @@ extern "C"
 #include "orionld/dbModel/dbModelToApiRegistration.h"          // dbModelToApiRegistration
 #include "orionld/mongoc/mongocRegistrationGet.h"              // mongocRegistrationGet
 #include "orionld/mongoc/mongocRegistrationReplace.h"          // mongocRegistrationReplace
-#include "orionld/forwarding/DistOpType.h"                     // distOpTypeMask
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"  // Own Interface
 
 

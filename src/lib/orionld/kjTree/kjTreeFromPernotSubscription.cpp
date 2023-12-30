@@ -32,13 +32,13 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/types/PernotSubscription.h"                    // PernotSubscription
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/dbModel/dbModelValueStrip.h"                   // dbModelValueStrip
 #include "orionld/q/qAliasCompact.h"                             // qAliasCompact
-#include "orionld/pernot/PernotSubscription.h"                   // PernotSubscription
 
 
 

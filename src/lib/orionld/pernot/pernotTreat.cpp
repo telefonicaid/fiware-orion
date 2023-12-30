@@ -36,11 +36,12 @@ extern "C"
 #include "logMsg/logMsg.h"                                  // LM_x
 
 #include "common/RenderFormat.h"                            // RenderFormat
+
+#include "orionld/types/PernotSubscription.h"               // PernotSubscription
 #include "orionld/common/orionldState.h"                    // orionldState, pernotSubCache
 #include "orionld/types/OrionldGeoInfo.h"                   // OrionldGeoInfo
 #include "orionld/mongoc/mongocEntitiesQuery2.h"            // mongocEntitiesQuery2
 #include "orionld/dbModel/dbModelToApiEntity.h"             // dbModelToApiEntity2
-#include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
 #include "orionld/pernot/pernotSend.h"                      // pernotSend
 #include "orionld/pernot/pernotTreat.h"                     // Own interface
 

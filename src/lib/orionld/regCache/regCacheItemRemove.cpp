@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>                                              // strcmp
+#include <unistd.h>                                              // NULL
 #include <regex.h>                                               // regfree
 
 extern "C"
@@ -31,7 +33,9 @@ extern "C"
 #include "kjson/kjFree.h"                                        // kjFree
 }
 
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "logMsg/logMsg.h"                                       // LM_*
+
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/regCache/regCacheItemRegexRelease.h"           // regCacheItemRegexRelease
 #include "orionld/regCache/regCacheItemRemove.h"                 // Own interface
 

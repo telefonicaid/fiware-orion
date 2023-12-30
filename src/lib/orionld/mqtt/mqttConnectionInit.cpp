@@ -24,7 +24,7 @@
 */
 #include <stdlib.h>                                            // calloc
 
-#include "orionld/mqtt/MqttConnection.h"                       // MqttConnection
+#include "orionld/types/MqttConnection.h"                      // MqttConnection
 #include "orionld/mqtt/mqttConnectionList.h"                   // Mqtt Connection List
 #include "orionld/mqtt/mqttConnectionInit.h"                   // Own interface
 

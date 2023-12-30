@@ -35,10 +35,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                          // LM_*
 
-#include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/types/OrionldHeader.h"                            // orionldHeaderAdd, HttpResultsCount
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
-#include "orionld/q/QNode.h"                                        // QNode
+#include "orionld/types/QNode.h"                                    // QNode
+#include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/context/orionldContextItemExpand.h"               // orionldContextItemExpand
 #include "orionld/mongoc/mongocEntitiesQuery.h"                     // mongocEntitiesQuery
 #include "orionld/kjTree/kjChildPrepend.h"                          // kjChildPrepend

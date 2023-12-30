@@ -34,6 +34,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/DistOp.h"                              // DistOp
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/tenantList.h"                         // tenant0
 #include "orionld/common/entityLookupById.h"                   // entityLookupBy_id_Id
@@ -43,15 +44,14 @@ extern "C"
 #include "orionld/kjTree/kjStringValueLookupInArray.h"         // kjStringValueLookupInArray
 #include "orionld/mongoc/mongocEntitiesExist.h"                // mongocEntitiesExist
 #include "orionld/mongoc/mongocEntitiesDelete.h"               // mongocEntitiesDelete
-#include "orionld/forwarding/DistOp.h"                         // DistOp
-#include "orionld/forwarding/distOpListsMerge.h"               // distOpListsMerge
-#include "orionld/forwarding/distOpSend.h"                     // distOpSend
-#include "orionld/forwarding/distOpLookupByCurlHandle.h"       // distOpLookupByCurlHandle
-#include "orionld/forwarding/distOpListDebug.h"                // distOpListDebug2
-#include "orionld/forwarding/distOpListRelease.h"              // distOpListRelease
-#include "orionld/forwarding/xForwardedForCompose.h"           // xForwardedForCompose
-#include "orionld/forwarding/viaCompose.h"                     // viaCompose
-#include "orionld/forwarding/regMatchForBatchDelete.h"         // regMatchForBatchDelete
+#include "orionld/distOp/distOpListsMerge.h"                   // distOpListsMerge
+#include "orionld/distOp/distOpSend.h"                         // distOpSend
+#include "orionld/distOp/distOpLookupByCurlHandle.h"           // distOpLookupByCurlHandle
+#include "orionld/distOp/distOpListDebug.h"                    // distOpListDebug2
+#include "orionld/distOp/distOpListRelease.h"                  // distOpListRelease
+#include "orionld/distOp/xForwardedForCompose.h"               // xForwardedForCompose
+#include "orionld/distOp/viaCompose.h"                         // viaCompose
+#include "orionld/regMatch/regMatchForBatchDelete.h"           // regMatchForBatchDelete
 #include "orionld/serviceRoutines/orionldPostBatchDelete.h"    // Own interface
 
 

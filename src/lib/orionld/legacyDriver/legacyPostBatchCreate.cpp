@@ -45,7 +45,6 @@ extern "C"
 #include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
-#include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection()
 
 #include "orionld/common/orionldState.h"                         // orionldState
@@ -60,7 +59,7 @@ extern "C"
 #include "orionld/common/removeArrayEntityLookup.h"              // removeArrayEntityLookup
 #include "orionld/common/typeCheckForNonExistingEntities.h"      // typeCheckForNonExistingEntities
 #include "orionld/common/tenantList.h"                           // tenant0
-#include "orionld/rest/orionldServiceInit.h"                     // orionldHostName, orionldHostNameLen
+#include "orionld/service/orionldServiceInit.h"                  // orionldHostName, orionldHostNameLen
 #include "orionld/context/orionldCoreContext.h"                  // orionldDefaultUrl, orionldCoreContext
 #include "orionld/context/orionldContextPresent.h"               // orionldContextPresent
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup

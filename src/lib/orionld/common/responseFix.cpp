@@ -31,10 +31,10 @@ extern "C"
 
 #include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd, httpHeaderLinkAdd
 
+#include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjChildCount.h"                         // kjChildCount
 #include "orionld/kjTree/kjSort.h"                               // kjStringArraySort
-#include "orionld/forwarding/DistOp.h"                           // DistOpType
 #include "orionld/common/responseFix.h"                          // Own interface
 
 

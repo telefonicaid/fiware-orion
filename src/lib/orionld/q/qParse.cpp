@@ -30,12 +30,14 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
+#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
-#include "orionld/q/QNode.h"                                   // QNode
 #include "orionld/q/qVariableFix.h"                            // qVariableFix
 #include "orionld/q/qClone.h"                                  // qClone
+#include "orionld/q/qNodeType.h"                               // qNodeType
+#include "orionld/q/qNode.h"                                   // qNode
 #include "orionld/q/qRelease.h"                                // qRelease
 #include "orionld/q/qListRelease.h"                            // qListRelease
 #include "orionld/q/qPresent.h"                                // qListPresent, qTreePresent

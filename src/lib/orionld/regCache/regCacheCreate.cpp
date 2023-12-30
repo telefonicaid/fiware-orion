@@ -30,11 +30,11 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+#include "orionld/types/RegCache.h"                              // RegCache
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/mongoc/mongocRegistrationsIter.h"              // mongocRegistrationsIter
 #include "orionld/dbModel/dbModelToApiRegistration.h"            // dbModelToApiRegistration
-#include "orionld/regCache/RegCache.h"                           // RegCache
 #include "orionld/regCache/regCacheItemAdd.h"                    // regCacheItemAdd
 #include "orionld/regCache/regCacheItemContextCheck.h"           // regCacheItemContextCheck
 #include "orionld/regCache/regCacheCreate.h"                     // Own interface

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPITEMADD_H_
-#define SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPITEMADD_H_
+#ifndef SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPITEMADD_H_
+#define SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPITEMADD_H_
 
 /*
 *
@@ -26,14 +26,14 @@
 * Author: Ken Zangelin
 */
 #include "orionld/types/EntityMap.h"                                    // EntityMap
-#include "orionld/forwarding/DistOp.h"                                  // DistOp
+#include "orionld/types/DistOp.h"                                       // DistOp
 
 
 
 // -----------------------------------------------------------------------------
 //
-// entityMapItemAdd - 
+// entityMapItemAdd -
 //
 extern void entityMapItemAdd(EntityMap* entityMap, const char* entityId, DistOp* distOpP);
 
-#endif  // SRC_LIB_ORIONLD_ENTITYMAP_ENTITYMAPITEMADD_H_
+#endif  // SRC_LIB_ORIONLD_ENTITYMAPS_ENTITYMAPITEMADD_H_

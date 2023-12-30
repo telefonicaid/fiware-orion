@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 

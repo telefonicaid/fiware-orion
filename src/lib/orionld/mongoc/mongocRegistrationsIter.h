@@ -25,8 +25,21 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheIterFunc
+extern "C"
+{
+#include "kjson/KjNode.h"                                        // KjNode
+}
 
+#include "orionld/types/RegCache.h"                              // RegCache
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// RegCacheIterFunc -
+//
+typedef int (*RegCacheIterFunc)(RegCache* rcP, KjNode* dbRegP);
 
 
 

@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
+#include "orionld/types/PgConnectionPool.h"                    // PgConnectionPool
 #include "orionld/troe/pgConnectionPools.h"                    // pgPoolMaster
 #include "orionld/troe/pgConnectionPoolCreate.h"               // pgConnectionPoolCreate
 #include "orionld/troe/pgConnectionPoolInsert.h"               // pgConnectionPoolInsert

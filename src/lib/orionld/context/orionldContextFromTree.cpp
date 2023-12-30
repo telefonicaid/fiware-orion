@@ -32,10 +32,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/common/orionldState.h"                         // orionldState, kalloc, coreContextUrl
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
-#include "orionld/context/OrionldContext.h"                      // OrionldContext
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/orionldContextSimplify.h"              // orionldContextSimplify
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl

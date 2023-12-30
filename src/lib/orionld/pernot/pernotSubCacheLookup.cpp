@@ -22,9 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/PernotSubscription.h"                  // PernotSubscription
+#include "orionld/types/PernotSubCache.h"                      // PernotSubCache
 #include "orionld/common/orionldState.h"                       // pernotSubCache
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
 #include "orionld/pernot/pernotSubCacheLookup.h"               // Own interface
 
 

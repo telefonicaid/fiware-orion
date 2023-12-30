@@ -35,6 +35,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
+#include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/responseFix.h"                          // responseFix
@@ -44,17 +45,16 @@ extern "C"
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityDelete.h"                   // mongocEntityDelete
 #include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
-#include "orionld/forwarding/DistOp.h"                           // DistOp
-#include "orionld/forwarding/regMatchForEntityGet.h"             // regMatchForEntityGet
-#include "orionld/forwarding/distOpListsMerge.h"                 // distOpListsMerge
-#include "orionld/forwarding/distOpSend.h"                       // distOpSend
-#include "orionld/forwarding/distOpLookupByCurlHandle.h"         // distOpLookupByCurlHandle
-#include "orionld/forwarding/xForwardedForCompose.h"             // xForwardedForCompose
-#include "orionld/forwarding/viaCompose.h"                       // viaCompose
-#include "orionld/forwarding/distOpResponses.h"                  // distOpResponses
-#include "orionld/forwarding/distOpSuccess.h"                    // distOpSuccess
-#include "orionld/forwarding/distOpFailure.h"                    // distOpFailure
-#include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
+#include "orionld/regMatch/regMatchForEntityGet.h"               // regMatchForEntityGet
+#include "orionld/distOp/distOpListsMerge.h"                     // distOpListsMerge
+#include "orionld/distOp/distOpSend.h"                           // distOpSend
+#include "orionld/distOp/distOpLookupByCurlHandle.h"             // distOpLookupByCurlHandle
+#include "orionld/distOp/distOpResponses.h"                      // distOpResponses
+#include "orionld/distOp/distOpSuccess.h"                        // distOpSuccess
+#include "orionld/distOp/distOpFailure.h"                        // distOpFailure
+#include "orionld/distOp/distOpListRelease.h"                    // distOpListRelease
+#include "orionld/distOp/xForwardedForCompose.h"                 // xForwardedForCompose
+#include "orionld/distOp/viaCompose.h"                           // viaCompose
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"         // Own Interface
 
 

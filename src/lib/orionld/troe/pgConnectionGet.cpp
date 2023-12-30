@@ -25,10 +25,10 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
+#include "orionld/types/PgConnectionPool.h"                    // PgConnectionPool
+#include "orionld/types/PgConnection.h"                        // PgConnection
 #include "orionld/common/orionldState.h"                       // troeHost, pgPortString, troeUser, troePwd
 #include "orionld/troe/pgConnect.h"                            // pgConnect
-#include "orionld/troe/PgConnection.h"                         // PgConnection
-#include "orionld/troe/PgConnectionPool.h"                     // PgConnectionPool
 #include "orionld/troe/pgConnectionPoolGet.h"                  // pgConnectionPoolGet
 #include "orionld/troe/pgConnectionGet.h"                      // Own interface
 

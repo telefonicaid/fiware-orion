@@ -37,16 +37,16 @@ extern "C"
 
 #include "common/RenderFormat.h"                               // RenderFormat
 
-#include "orionld/common/orionldState.h"                       // orionldState, pernotSubCache
-#include "orionld/common/urlParse.h"                           // urlParse
 #include "orionld/types/Protocol.h"                            // Protocol, protocolFromString
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
-#include "orionld/q/QNode.h"                                   // QNode
+#include "orionld/types/QNode.h"                               // QNode
+#include "orionld/types/PernotSubscription.h"                  // PernotSubscription
+#include "orionld/types/PernotSubCache.h"                      // PernotSubCache
+#include "orionld/types/OrionldContext.h"                      // OrionldContext
+#include "orionld/common/orionldState.h"                       // orionldState, pernotSubCache
+#include "orionld/common/urlParse.h"                           // urlParse
 #include "orionld/payloadCheck/pcheckGeoQ.h"                   // pcheckGeoQ
 #include "orionld/kjTree/kjChildCount.h"                       // kjChildCount
-#include "orionld/context/OrionldContext.h"                    // OrionldContext
-#include "orionld/pernot/PernotSubscription.h"                 // PernotSubscription
-#include "orionld/pernot/PernotSubCache.h"                     // PernotSubCache
 
 
 

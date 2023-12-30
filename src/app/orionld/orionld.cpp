@@ -124,7 +124,7 @@ extern "C"
 #include "orionld/context/orionldCoreContext.h"               // ORIONLD_CORE_CONTEXT_URL_*
 #include "orionld/context/orionldContextFromUrl.h"            // contextDownloadListInit, contextDownloadListRelease
 #include "orionld/contextCache/orionldContextCacheRelease.h"  // orionldContextCacheRelease
-#include "orionld/rest/orionldServiceInit.h"                  // orionldServiceInit
+#include "orionld/service/orionldServiceInit.h"               // orionldServiceInit
 #include "orionld/entityMaps/entityMapsRelease.h"             // entityMapsRelease
 #include "orionld/db/dbInit.h"                                // dbInit
 #include "orionld/mqtt/mqttRelease.h"                         // mqttRelease
@@ -148,7 +148,7 @@ extern "C"
 #include "orionld/troe/pgVersionGet.h"                        // pgVersionGet
 #include "orionld/troe/pgConnectionPoolsFree.h"               // pgConnectionPoolsFree
 #include "orionld/troe/pgConnectionPoolsPresent.h"            // pgConnectionPoolsPresent
-#include "orionld/forwarding/distOpInit.h"                    // distOpInit
+#include "orionld/distOp/distOpInit.h"                        // distOpInit
 
 #include "orionld/version.h"
 #include "orionld/orionRestServices.h"

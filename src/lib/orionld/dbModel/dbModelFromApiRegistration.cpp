@@ -31,9 +31,11 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjChildAdd, kjChildRemove, kjString, kjObject, ...
 }
 
+#include "logMsg/logMsg.h"                                       // LM_*
+
 #include "common/globals.h"                                      // parse8601Time
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/dbModel/dbModelFromApiRegistration.h"          // Own interface
 
 

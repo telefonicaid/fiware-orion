@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
 #include "orionld/types/StringArray.h"                           // StringArray
 

@@ -30,10 +30,10 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/common/orionldState.h"                         // orionldState, contextDownloadAttempts, ...
 #include "orionld/types/OrionldResponseErrorType.h"              // OrionldResponseErrorType
+#include "orionld/types/OrionldHttpHeader.h"
+#include "orionld/common/orionldState.h"                         // orionldState, contextDownloadAttempts, ...
 #include "orionld/common/urlParse.h"                             // urlParse
 #include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
 #include "orionld/context/orionldContextDownload.h"              // Own interface

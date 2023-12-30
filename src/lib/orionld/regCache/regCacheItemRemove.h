@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/regCache/RegCache.h"                           // RegCache, RegCacheItem
+#include "orionld/types/RegCache.h"                              // RegCache
 
 
 

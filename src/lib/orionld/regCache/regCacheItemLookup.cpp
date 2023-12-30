@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <unistd.h>                                              // NULL
+#include <string.h>                                              // strcmp
+
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode
@@ -29,7 +32,8 @@ extern "C"
 }
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
-#include "orionld/regCache/RegCache.h"                           // RegCacheItem
+#include "orionld/types/RegCache.h"                              // RegCache
+#include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 
 
 

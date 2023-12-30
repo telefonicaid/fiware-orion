@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/pernot/PernotSubscription.h"              // PernotSubscription
+#include "orionld/types/PernotSubscription.h"               // PernotSubscription
 
 
 

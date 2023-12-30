@@ -27,8 +27,8 @@ extern "C"
 #include "kalloc/kaAlloc.h"                                    // kaAlloc
 }
 
+#include "orionld/types/PgAppendBuffer.h"                      // PgAppendBuffer
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/troe/PgAppendBuffer.h"                       // PgAppendBuffer
 #include "orionld/troe/pgAppendInit.h"                         // Own interface
 
 

@@ -32,7 +32,7 @@ extern "C"
 
 #include "common/RenderFormat.h"                                 // RenderFormat
 
-#include "orionld/q/QNode.h"                                     // QNode
+#include "orionld/types/QNode.h"                                 // QNode
 
 
 
