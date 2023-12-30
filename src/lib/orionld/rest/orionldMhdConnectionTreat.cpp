@@ -80,8 +80,49 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"          // orionldGetEntities
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // orionldPostEntities
-#include "orionld/rest/uriParamName.h"                           // uriParamName
 #include "orionld/rest/orionldMhdConnectionTreat.h"              // Own Interface
+
+
+
+// -----------------------------------------------------------------------------
+//
+// uriParamName -
+//
+static const char* uriParamName(uint32_t bit)
+{
+  switch (bit)
+  {
+  case ORIONLD_URIPARAM_OPTIONS:             return "options";
+  case ORIONLD_URIPARAM_LIMIT:               return "limit";
+  case ORIONLD_URIPARAM_OFFSET:              return "offset";
+  case ORIONLD_URIPARAM_COUNT:               return "count";
+  case ORIONLD_URIPARAM_IDLIST:              return "id";
+  case ORIONLD_URIPARAM_TYPELIST:            return "type";
+  case ORIONLD_URIPARAM_IDPATTERN:           return "idPattern";
+  case ORIONLD_URIPARAM_ATTRS:               return "attrs";
+  case ORIONLD_URIPARAM_Q:                   return "q";
+  case ORIONLD_URIPARAM_GEOREL:              return "georel";
+  case ORIONLD_URIPARAM_GEOMETRY:            return "geometry";
+  case ORIONLD_URIPARAM_COORDINATES:         return "coordinates";
+  case ORIONLD_URIPARAM_GEOPROPERTY:         return "geoproperty";
+  case ORIONLD_URIPARAM_GEOMETRYPROPERTY:    return "geometryProperty";
+  case ORIONLD_URIPARAM_CSF:                 return "csf";
+  case ORIONLD_URIPARAM_DATASETID:           return "datasetId";
+  case ORIONLD_URIPARAM_TIMEPROPERTY:        return "timeproperty";
+  case ORIONLD_URIPARAM_TIMEREL:             return "timerel";
+  case ORIONLD_URIPARAM_TIMEAT:              return "timeAt";
+  case ORIONLD_URIPARAM_ENDTIMEAT:           return "endTimeAt";
+  case ORIONLD_URIPARAM_DETAILS:             return "details";
+  case ORIONLD_URIPARAM_PRETTYPRINT:         return "prettyPrint";
+  case ORIONLD_URIPARAM_SPACES:              return "spaces";
+  case ORIONLD_URIPARAM_SUBSCRIPTION_ID:     return "subscriptionId";
+  case ORIONLD_URIPARAM_LOCATION:            return "location";
+  case ORIONLD_URIPARAM_URL:                 return "url";
+  case ORIONLD_URIPARAM_RELOAD:              return "reload";
+  }
+
+  return "unknown URI parameter";
+}
 
 
 

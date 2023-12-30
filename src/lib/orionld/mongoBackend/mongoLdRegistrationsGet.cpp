@@ -34,7 +34,6 @@
 #include "common/statistics.h"                                   // TIME_STAT_MONGO_READ_WAIT_START, ...
 #include "rest/OrionError.h"                                     // OrionError
 #include "apiTypesV2/Registration.h"                             // ngsiv2::Registration
-#include "rest/uriParamNames.h"                                  // URI_PARAM_PAGINATION_OFFSET, ...
 #include "mongoBackend/MongoGlobal.h"                            // getMongoConnection
 #include "mongoBackend/safeMongo.h"                              // moreSafe
 #include "mongoBackend/connectionOperations.h"                   // collectionRangedQuery

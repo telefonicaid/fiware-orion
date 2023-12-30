@@ -46,7 +46,6 @@ extern "C"
 #include "ngsi10/UpdateContextRequest.h"                       // UpdateContextRequest
 #include "ngsi10/UpdateContextResponse.h"                      // UpdateContextResponse
 #include "mongoBackend/mongoUpdateContext.h"                   // mongoUpdateContext
-#include "rest/uriParamNames.h"                                // URI_PARAM_PAGINATION_OFFSET, URI_PARAM_PAGINATION_LIMIT
 #include "mongoBackend/MongoGlobal.h"                          // getMongoConnection()
 
 #include "orionld/common/orionldState.h"                       // orionldState
