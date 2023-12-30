@@ -67,9 +67,9 @@ extern "C"
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/notifications/orionldAlterationsTreat.h"       // orionldAlterationsTreat
-#include "orionld/rest/orionldMhdConnectionInit.h"               // orionldMhdConnectionInit
-#include "orionld/rest/orionldMhdConnectionPayloadRead.h"        // orionldMhdConnectionPayloadRead
-#include "orionld/rest/orionldMhdConnectionTreat.h"              // orionldMhdConnectionTreat
+#include "orionld/mhd/orionldMhdConnectionInit.h"                // orionldMhdConnectionInit
+#include "orionld/mhd/orionldMhdConnectionPayloadRead.h"         // orionldMhdConnectionPayloadRead
+#include "orionld/mhd/orionldMhdConnectionTreat.h"               // orionldMhdConnectionTreat
 #include "orionld/forwarding/distOpListRelease.h"                // distOpListRelease
 
 #include "rest/HttpHeaders.h"                                    // HTTP_* defines

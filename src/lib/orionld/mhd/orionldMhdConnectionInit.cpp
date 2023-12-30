@@ -57,7 +57,7 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/entityMaps/entityMapLookup.h"                  // entityMapLookup
 #include "orionld/service/orionldServiceLookup.h"                // orionldServiceLookup
-#include "orionld/rest/orionldMhdConnectionInit.h"               // Own interface
+#include "orionld/mhd/orionldMhdConnectionInit.h"                // Own interface
 
 
 

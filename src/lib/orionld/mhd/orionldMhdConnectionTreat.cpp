@@ -80,7 +80,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"          // orionldGetEntities
 #include "orionld/serviceRoutines/orionldPostEntities.h"         // orionldPostEntities
-#include "orionld/rest/orionldMhdConnectionTreat.h"              // Own Interface
+#include "orionld/mhd/orionldMhdConnectionTreat.h"               // Own Interface
 
 
 

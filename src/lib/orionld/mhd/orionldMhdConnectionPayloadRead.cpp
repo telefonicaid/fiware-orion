@@ -31,7 +31,7 @@ extern "C"
 #include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/rest/orionldMhdConnectionPayloadRead.h"      // Own interface
+#include "orionld/mhd/orionldMhdConnectionPayloadRead.h"       // Own interface
 
 
 
