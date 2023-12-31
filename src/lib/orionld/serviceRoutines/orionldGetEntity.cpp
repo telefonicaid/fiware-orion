@@ -361,7 +361,7 @@ bool orionldGetEntity(void)
   if ((apiEntityP != NULL) && (sysAttrs == false))
     kjSysAttrsRemove(apiEntityP, 2);
 
-  if (orionldState.out.contentType == GEOJSON)
+  if (orionldState.out.contentType == MT_GEOJSON)
   {
     apiEntityP = kjGeojsonEntityTransform(apiEntityP,
                                           orionldState.geoPropertyNode,

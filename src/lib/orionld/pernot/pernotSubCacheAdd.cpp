@@ -212,12 +212,12 @@ PernotSubscription* pernotSubCacheAdd
 
   // Mime Type for notifications
   KjNode*  acceptP  = kjLookup(endpointP, "accept");
-  pSubP->mimeType = JSON;  // Default setting
+  pSubP->mimeType = MT_JSON;  // Default setting
   if (acceptP != NULL)
   {
-    if      (strcmp(acceptP->value.s, "application/json")     == 0) pSubP->mimeType = JSON;
-    else if (strcmp(acceptP->value.s, "application/ld+json")  == 0) pSubP->mimeType = JSONLD;
-    else if (strcmp(acceptP->value.s, "application/geo+json") == 0) pSubP->mimeType = GEOJSON;
+    if      (strcmp(acceptP->value.s, "application/json")     == 0) pSubP->mimeType = MT_JSON;
+    else if (strcmp(acceptP->value.s, "application/ld+json")  == 0) pSubP->mimeType = MT_JSONLD;
+    else if (strcmp(acceptP->value.s, "application/geo+json") == 0) pSubP->mimeType = MT_GEOJSON;
   }
 
   // HTTP headers from receiverInfo

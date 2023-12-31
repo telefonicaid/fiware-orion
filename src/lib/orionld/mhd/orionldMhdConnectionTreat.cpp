@@ -212,7 +212,7 @@ static bool contentTypeCheck(void)
   char* errorTitle           = NULL;
   char* errorDetails         = NULL;
 
-  if (orionldState.in.contentType == JSONLD)
+  if (orionldState.in.contentType == MT_JSONLD)
   {
     if (orionldState.linkHttpHeaderPresent == true)
     {
@@ -819,7 +819,7 @@ static bool pCheckUriParamGeometryProperty()
 {
   if (orionldState.uriParams.geometryProperty == NULL)
   {
-    if (orionldState.out.contentType == GEOJSON)
+    if (orionldState.out.contentType == MT_GEOJSON)
     {
       orionldState.uriParams.geometryProperty  = (char*) "location";
       orionldState.in.geometryPropertyExpanded = (char*) "location";
@@ -1233,7 +1233,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   if ((serviceRoutineResult == true) && (orionldState.noLinkHeader == false) && (orionldState.responseTree != NULL))
   {
-    if ((orionldState.out.contentType != JSONLD) && (orionldState.httpStatusCode != 204))
+    if ((orionldState.out.contentType != MT_JSONLD) && (orionldState.httpStatusCode != 204))
       httpHeaderLinkAdd(orionldState.link);
   }
 
@@ -1249,7 +1249,7 @@ MHD_Result orionldMhdConnectionTreat(void)
     bool addContext = ((orionldState.serviceP        != NULL)    &&
                        (orionldState.linkHeaderAdded == false)   &&
                        ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD) == 0) &&
-                       (orionldState.out.contentType == JSONLD)  &&
+                       (orionldState.out.contentType == MT_JSONLD)  &&
                        (orionldState.httpStatusCode   < 300));
 
     if (addContext)

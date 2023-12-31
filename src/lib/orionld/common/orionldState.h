@@ -44,7 +44,6 @@ extern "C"
 
 #include "common/globals.h"                                      // ApiVersion
 #include "common/limits.h"                                       // IP_LENGTH_MAX, STATIC_BUFFER_SIZE
-#include "common/MimeType.h"                                     // MimeType
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
 #include "rest/Verb.h"                                           // Verb
 #include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
@@ -63,6 +62,7 @@ extern "C"
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/TroeMode.h"                              // TroeMode
 #include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
+#include "orionld/types/OrionldMimeType.h"                       // MimeType
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/kjTree/kjTreeLog.h"                            // Because it is so often used but then removed again ...
 

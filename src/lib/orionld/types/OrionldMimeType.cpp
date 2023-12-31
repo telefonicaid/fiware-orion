@@ -26,11 +26,10 @@
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/MimeType.h"                                     // MimeType
 #include "common/wsStrip.h"                                      // wsStrip
 
 #include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/mimeTypeFromString.h"                   // Own interface
+#include "orionld/types/OrionldMimeType.h"                       // Own interface
 
 
 
@@ -60,42 +59,65 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
     if (strcmp(cP, "*/*") == 0)
     {
       *acceptMaskP = 0xFFFFFFFF;  // Accept anything, prefer JSON!
-      return JSON;
+      return MT_JSON;
     }
     else if (strcmp(cP, "application/*") == 0)
     {
       if (orionldState.apiVersion == NGSI_LD_V1)
-        *acceptMaskP = (1 << JSON) | (1 << JSONLD) | (1 << GEOJSON) | (1 << MERGEPATCHJSON);
+        *acceptMaskP = (1 << MT_JSON) | (1 << MT_JSONLD) | (1 << MT_GEOJSON) | (1 << MT_MERGEPATCHJSON);
       else
-        *acceptMaskP = (1 << JSON) | (1 << HTML);
+        *acceptMaskP = (1 << MT_JSON) | (1 << MT_HTML);
 
-      return JSON;
+      return MT_JSON;
     }
     else if (strcmp(cP, "text/*") == 0)
     {
       if (orionldState.apiVersion != NGSI_LD_V1)
       {
-        *acceptMaskP = (1 << TEXT);
-        return TEXT;
+        *acceptMaskP = (1 << MT_TEXT);
+        return MT_TEXT;
       }
     }
   }
 
-  if      (strcmp(cP, "application/json")             == 0)  return JSON;
-  else if (strcmp(cP, "application/ld+json")          == 0)  return JSONLD;
-  else if (strcmp(cP, "application/geo+json")         == 0)  return GEOJSON;
-  else if (strcmp(cP, "application/merge-patch+json") == 0)  return MERGEPATCHJSON;
+  if      (strcmp(cP, "application/json")             == 0)  return MT_JSON;
+  else if (strcmp(cP, "application/ld+json")          == 0)  return MT_JSONLD;
+  else if (strcmp(cP, "application/geo+json")         == 0)  return MT_GEOJSON;
+  else if (strcmp(cP, "application/merge-patch+json") == 0)  return MT_MERGEPATCHJSON;
 
   if (orionldState.apiVersion != NGSI_LD_V1)
   {
-    if (strcmp(cP, "application/html")  == 0)  return HTML;
+    if (strcmp(cP, "application/html")  == 0)  return MT_HTML;
 
     if (textOk)
     {
-      if      (strcmp(cP, "text/json")  == 0)  return JSON;
-      else if (strcmp(cP, "text/plain") == 0)  return TEXT;
+      if      (strcmp(cP, "text/json")  == 0)  return MT_JSON;
+      else if (strcmp(cP, "text/plain") == 0)  return MT_TEXT;
     }
   }
 
-  return NOMIMETYPE;
+  return MT_NONE;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// mimeType -
+//
+const char* mimeType(MimeType mimeType)
+{
+  switch (mimeType)
+  {
+  case MT_NONE:             return "None";
+  case MT_NOTGIVEN:         return "NotGiven";
+  case MT_JSON:             return "application/json";
+  case MT_JSONLD:           return "application/ld+json";
+  case MT_GEOJSON:          return "application/geo+json";
+  case MT_TEXT:             return "text/plain";
+  case MT_HTML:             return "application/html";
+  case MT_MERGEPATCHJSON:   return "application/merge-patch+json";
+  }
+
+  return "NotFound";
 }

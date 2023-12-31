@@ -537,7 +537,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
       if (strcasecmp(keyP->value.s, "jsonldContext") == 0)
       {
         jsonldContext = valueP->value.s;
-        contentType = JSON;
+        contentType = MT_JSON;
         continue;
       }
       if (strcasecmp(keyP->value.s, "Accept") == 0)
@@ -567,9 +567,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // OR: if jsonldContext is present in "contextSourceInfo"
   //
   if (orionldState.verb == GET)
-    contentType = JSON;
+    contentType = MT_JSON;
 
-  if (contentType == JSON)
+  if (contentType == MT_JSON)
   {
     // Link header to be added if present in Registration::contextSourceInfo OR if not Core Context
     if (distOpP->regP->contextP != NULL)
@@ -639,10 +639,10 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     // Content-Type (for now we maintain the original Content-Type in the forwarded request
     // First we remove it from the "headers" curl_slist, so that we can formulate it ourselves
     //
-    const char* contentTypeString = (contentType == JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
+    const char* contentTypeString = (contentType == MT_JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
     headers = curl_slist_append(headers, contentTypeString);
 
-    if (contentType == JSONLD)
+    if (contentType == MT_JSONLD)
     {
       //
       // Add the context to the body if not there already

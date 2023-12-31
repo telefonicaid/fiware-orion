@@ -113,14 +113,14 @@ void restReply(ConnectionInfo* ciP, const char* answer)
     char* contentType = (char*) "application/json";
     if (orionldState.apiVersion == NGSI_LD_V1)
     {
-      if      (answerLen <= 2)                          contentType = (char*) "application/json";
-      else if (orionldState.httpStatusCode  >= 400)     contentType = (char*) "application/json";
-      else if (orionldState.out.contentType == JSONLD)  contentType = (char*) "application/ld+json";
-      else if (orionldState.out.contentType == GEOJSON) contentType = (char*) "application/geo+json";
+      if      (answerLen <= 2)                             contentType = (char*) "application/json";
+      else if (orionldState.httpStatusCode  >= 400)        contentType = (char*) "application/json";
+      else if (orionldState.out.contentType == MT_JSONLD)  contentType = (char*) "application/ld+json";
+      else if (orionldState.out.contentType == MT_GEOJSON) contentType = (char*) "application/geo+json";
     }
     else
     {
-      if (orionldState.out.contentType == TEXT)
+      if (orionldState.out.contentType == MT_TEXT)
         contentType = (char*) "text/plain";
     }
 
@@ -225,7 +225,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, int statusCode, const std::string& d
   else if (ciP->restServiceP->request == QueryContext)
   {
     QueryContextResponse  qcr(errorCode);
-    bool                  asJsonObject = (orionldState.in.attributeFormatAsObject == true) && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
+    bool                  asJsonObject = (orionldState.in.attributeFormatAsObject == true) && ((orionldState.out.contentType == MT_JSON) || (orionldState.out.contentType == MT_JSONLD));
     *outStringP = qcr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == SubscribeContext)
@@ -246,7 +246,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, int statusCode, const std::string& d
   else if (ciP->restServiceP->request == UpdateContext)
   {
     UpdateContextResponse ucr(errorCode);
-    bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && ((orionldState.out.contentType == JSON) || (orionldState.out.contentType == JSONLD));
+    bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && ((orionldState.out.contentType == MT_JSON) || (orionldState.out.contentType == MT_JSONLD));
     *outStringP = ucr.render(orionldState.apiVersion, asJsonObject);
   }
   else if (ciP->restServiceP->request == NotifyContext)

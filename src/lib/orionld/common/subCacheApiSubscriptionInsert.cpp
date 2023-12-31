@@ -44,9 +44,9 @@ extern "C"
 #include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
+#include "orionld/types/OrionldMimeType.h"                       // mimeTypeFromString
 #include "orionld/dbModel/dbModelToApiCoordinates.h"             // dbModelToApiCoordinates
 #include "orionld/mqtt/mqttParse.h"                              // mqttParse
-#include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/common/urlParse.h"                             // urlParse
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/subCacheApiSubscriptionInsert.h"        // Own interface
@@ -349,7 +349,7 @@ static void subCacheItemFill
         cSubP->httpInfo.mimeType = mimeTypeFromString(acceptP->value.s, NULL, true, false, &acceptMask);
       }
       else
-        cSubP->httpInfo.mimeType = JSON;
+        cSubP->httpInfo.mimeType = MT_JSON;
 
       if (receiverInfoP != NULL)
       {

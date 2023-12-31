@@ -37,7 +37,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "common/wsStrip.h"                                      // wsStrip
-#include "common/MimeType.h"                                     // MimeType
 #include "common/string.h"                                       // toLowercase
 #include "common/globals.h"                                      // parse8601Time
 #include "alarmMgr/alarmMgr.h"                                   // alarmMgr
@@ -46,11 +45,11 @@ extern "C"
 #include "parse/forbiddenChars.h"                                // forbiddenChars
 
 #include "orionld/types/OrionLdRestService.h"                    // ORIONLD_URIPARAM_LIMIT, ...
+#include "orionld/types/OrionldMimeType.h"                       // mimeTypeFromString
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
-#include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/service/orionldServiceInit.h"                  // orionldRestServiceV
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
@@ -312,7 +311,7 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
   while (*accept == ' ')
   {
     if (*accept == 0)
-      return NOMIMETYPE;
+      return MT_NOTGIVEN;
 
     ++accept;
   }
@@ -331,7 +330,7 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
   }
 
   //
-  MimeType winner        = NOMIMETYPE;
+  MimeType winner        = MT_NOTGIVEN;
   float    winningWeight = 0;
 
   for (int ix = 0; ix < mimes; ix++)
@@ -354,9 +353,9 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
     mimeType                 = mimeTypeFromString(mimeV[ix], NULL, true, textOk, &orionldState.acceptMask);
     orionldState.acceptMask |= (1 << mimeType);  // It's OK to include "NOMIMETYPE"
 
-    if (mimeType > NOMIMETYPE)
+    if (mimeType > MT_NONE)
     {
-      if (winner == NOMIMETYPE)
+      if (winner == MT_NONE)
       {
         winner        = mimeType;
         winningWeight = weight;
@@ -366,7 +365,7 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
         winner        = mimeType;
         winningWeight = weight;
       }
-      else if ((weight == winningWeight) && (mimeType == JSON) && (orionldState.apiVersion == NGSI_LD_V1))
+      else if ((weight == winningWeight) && (mimeType == MT_JSON) && (orionldState.apiVersion == NGSI_LD_V1))
       {
         winner        = mimeType;
         winningWeight = weight;
@@ -460,7 +459,7 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   {
     orionldState.out.contentType = acceptHeaderParse((char*) value, false);
 
-    if (orionldState.out.contentType == NOMIMETYPE)
+    if ((orionldState.out.contentType == MT_NONE) || (orionldState.out.contentType == MT_NOTGIVEN))
     {
       const char* details = "HTTP Header /Accept/ contains none of 'application/json', 'application/ld+json', or 'application/geo+json'";
 
@@ -1213,7 +1212,7 @@ MHD_Result orionldMhdConnectionInit
   else if (tenantCheck(orionldState.tenantName) == false)  // tenantCheck calls orionldError
     return MHD_YES;
 
-  if ((orionldState.in.contentType == JSONLD) && (orionldState.linkHttpHeaderPresent == true))
+  if ((orionldState.in.contentType == MT_JSONLD) && (orionldState.linkHttpHeaderPresent == true))
   {
     orionldError(OrionldBadRequestData, "invalid combination of HTTP headers Content-Type and Link", "Content-Type is 'application/ld+json' AND Link header is present - not allowed", 400);
     return MHD_YES;
@@ -1226,11 +1225,11 @@ MHD_Result orionldMhdConnectionInit
   // Check URL path is OK
 
   // Check Content-Type is accepted
-  if ((orionldState.verb == PATCH) && (orionldState.in.contentType == MERGEPATCHJSON))
-    orionldState.in.contentType = JSON;
+  if ((orionldState.verb == PATCH) && (orionldState.in.contentType == MT_MERGEPATCHJSON))
+    orionldState.in.contentType = MT_JSON;
   else if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
   {
-    if ((orionldState.in.contentType != JSON) && (orionldState.in.contentType != JSONLD))
+    if ((orionldState.in.contentType != MT_JSON) && (orionldState.in.contentType != MT_JSONLD))
     {
       LM_W(("Bad Input (invalid Content-Type: '%s')", orionldState.in.contentTypeString));
       orionldError(OrionldBadRequestData, "unsupported format of payload", "only application/json and application/ld+json are supported", 415);

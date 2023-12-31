@@ -195,7 +195,7 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
   char*   detail;
 
   // Set default values
-  httpInfoP->mimeType = JSON;
+  httpInfoP->mimeType = MT_JSON;
 
   for (KjNode* itemP = kNodeP->value.firstChildP; itemP != NULL; itemP = itemP->next)
   {
@@ -235,11 +235,11 @@ bool kjTreeToEndpoint(KjNode* kNodeP, ngsiv2::HttpInfo* httpInfoP)
       // Already accepted the first 12 chars (application/), step over them
       mimeType = &mimeType[12];
       if (SCOMPARE5(mimeType, 'j', 's', 'o', 'n', 0))
-        httpInfoP->mimeType = JSON;
+        httpInfoP->mimeType = MT_JSON;
       else if (SCOMPARE8(mimeType, 'l', 'd', '+', 'j', 's', 'o', 'n', 0))
-        httpInfoP->mimeType = JSONLD;
+        httpInfoP->mimeType = MT_JSONLD;
       else if (SCOMPARE9(mimeType, 'g', 'e', 'o', '+', 'j', 's', 'o', 'n', 0))
-        httpInfoP->mimeType = GEOJSON;
+        httpInfoP->mimeType = MT_GEOJSON;
       else
       {
         orionldError(OrionldBadRequestData, "Invalid Endpoint::accept value", itemP->value.s, 400);

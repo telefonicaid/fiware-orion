@@ -287,7 +287,7 @@ std::string postQueryContext
   long long                   count = 0;
   long long*                  countP = NULL;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   //
   // 00. Count or not count? That is the question ...

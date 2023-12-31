@@ -42,12 +42,12 @@ extern "C"
 #include "cache/subCache.h"                                    // CachedSubscription, subCacheItemLookup
 #include "common/globals.h"                                    // parse8601Time
 
+#include "orionld/types/OrionldMimeType.h"                     // mimeTypeFromString
+#include "orionld/types/KeyValue.h"                            // KeyValue, keyValueLookup, keyValueAdd
+#include "orionld/types/MqttInfo.h"                            // MqttInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/urlParse.h"                           // urlParse
-#include "orionld/common/mimeTypeFromString.h"                 // mimeTypeFromString
-#include "orionld/types/KeyValue.h"                            // KeyValue, keyValueLookup, keyValueAdd
-#include "orionld/types/MqttInfo.h"                            // MqttInfo
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription

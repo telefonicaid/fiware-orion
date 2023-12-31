@@ -176,7 +176,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->resource         = uriPath;
     params->content_type     = content_type;
     params->content          = payload;
-    params->mimeType         = JSON;
+    params->mimeType         = MT_JSON;
     params->fiwareCorrelator = fiwareCorrelator;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->registration     = true;
@@ -393,7 +393,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->resource         = uri;
     params->content_type     = mimeType;
     params->content          = payload;
-    params->mimeType         = JSON;
+    params->mimeType         = MT_JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
@@ -522,7 +522,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         return paramsV;
       }
 
-      if (httpInfo.mimeType == GEOJSON)
+      if (httpInfo.mimeType == MT_GEOJSON)
       {
         char*        attrs            = NULL;
         char*        preferHeader     = NULL;
@@ -573,9 +573,9 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     /* Set Content-Type */
     char* contentType;
 
-    if      (httpInfo.mimeType == JSONLD)   contentType = (char*) "application/ld+json";
-    else if (httpInfo.mimeType == GEOJSON)  contentType = (char*) "application/geo+json";
-    else                                    contentType = (char*) "application/json";
+    if      (httpInfo.mimeType == MT_JSONLD)   contentType = (char*) "application/ld+json";
+    else if (httpInfo.mimeType == MT_GEOJSON)  contentType = (char*) "application/geo+json";
+    else                                       contentType = (char*) "application/json";
 
     SenderThreadParams*  params = new SenderThreadParams();
 
@@ -605,7 +605,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     if (httpInfo.mqtt.password[0] != 0)
       strncpy(params->mqttPassword, httpInfo.mqtt.password, sizeof(params->mqttPassword) - 1);
 #else
-    params->mimeType         = JSON;
+    params->mimeType         = MT_JSON;
 #endif
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
@@ -638,7 +638,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (subP != NULL)
     {
-      if ((httpInfo.mimeType       == JSON)                      &&
+      if ((httpInfo.mimeType       == MT_JSON)                   &&
           (renderFormat            != RF_CROSS_APIS_NORMALIZED)  &&
           (renderFormat            != RF_CROSS_APIS_SIMPLIFIED)  &&
           (orionldState.apiVersion == NGSI_LD_V1))

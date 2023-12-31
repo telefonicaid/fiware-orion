@@ -79,7 +79,7 @@ std::string putIndividualContextEntity
   UpdateContextElementResponse  response;
   std::string                   entityType;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   // 01. Take care of URI params
   entityType = orionldState.uriParams.type? orionldState.uriParams.type : "";

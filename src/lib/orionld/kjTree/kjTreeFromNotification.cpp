@@ -78,7 +78,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
   kjChildAdd(rootP, nodeP);
 
   // context - if JSONLD
-  if ((mimeType == JSONLD) && (crossNotification == false))
+  if ((mimeType == MT_JSONLD) && (crossNotification == false))
   {
     if (context == NULL)
       nodeP = kjString(orionldState.kjsonP, "@context", coreContextUrl);

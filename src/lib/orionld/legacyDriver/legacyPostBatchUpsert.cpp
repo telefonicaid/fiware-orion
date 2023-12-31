@@ -188,7 +188,7 @@ bool legacyPostBatchUpsert(void)
   orionldState.noLinkHeader = true;
 
   // The response is never JSON-LD
-  orionldState.out.contentType = JSON;
+  orionldState.out.contentType = MT_JSON;
 
   //
   // Prerequisites for URI params:

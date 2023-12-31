@@ -167,7 +167,7 @@ static KjNode* idArrayGet(KjNode* treeP, KjNode* errorsArrayP)
 bool legacyPostBatchCreate(void)
 {
   orionldState.noLinkHeader    = true;
-  orionldState.out.contentType = JSON;
+  orionldState.out.contentType = MT_JSON;
 
   ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
   EMPTY_ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
@@ -376,13 +376,13 @@ bool legacyPostBatchCreate(void)
   {
     orionldState.httpStatusCode  = 201;
     orionldState.responseTree    = successArrayP;
-    orionldState.out.contentType = JSON;
+    orionldState.out.contentType = MT_JSON;
   }
   else
   {
     orionldState.httpStatusCode  = 207;
     orionldState.responseTree    = kjObject(orionldState.kjsonP, NULL);
-    orionldState.out.contentType = JSON;
+    orionldState.out.contentType = MT_JSON;
 
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);

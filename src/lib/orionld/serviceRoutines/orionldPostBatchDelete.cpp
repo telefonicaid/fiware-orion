@@ -589,7 +589,7 @@ bool orionldPostBatchDelete(void)
     }
   }
 
-  orionldState.out.contentType = JSON;
+  orionldState.out.contentType = MT_JSON;
   orionldState.noLinkHeader    = true;
 
   return true;

@@ -188,7 +188,7 @@ void kjTreeToUpdateContextRequest(UpdateContextRequest* ucrP, KjNode* treeP, KjN
 
     entityFieldsExtractSimple(entityP, &entityId, &entityType, &contextNodeP);
 
-    if (orionldState.in.contentType == JSONLD)
+    if (orionldState.in.contentType == MT_JSONLD)
     {
       if (contextNodeP == NULL)
       {

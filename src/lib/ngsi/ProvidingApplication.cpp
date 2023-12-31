@@ -42,7 +42,7 @@ ProvidingApplication::ProvidingApplication()
 {
   /* It is better to have a default constructor than leave mimeType with a random value */
   string   = "";
-  mimeType = NOMIMETYPE;
+  mimeType = MT_NONE;
 }
 
 

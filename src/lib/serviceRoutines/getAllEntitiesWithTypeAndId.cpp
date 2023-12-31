@@ -85,7 +85,7 @@ std::string getAllEntitiesWithTypeAndId
   EntityTypeInfo          typeInfo                = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   // 00. Default value for response: OK
   response.statusCode.fill(SccOk);

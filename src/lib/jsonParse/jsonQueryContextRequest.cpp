@@ -770,7 +770,7 @@ void jsonQcrRelease(ParseData* reqDataP)
 */
 std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   return reqDataP->qcr.res.check(orionldState.apiVersion, asJsonObject, reqDataP->errorString);
 }

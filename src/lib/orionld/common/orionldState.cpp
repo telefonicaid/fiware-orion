@@ -179,7 +179,7 @@ void orionldStateInit(MHD_Connection* connection)
   //
   // Outgoing HTTP headers
   //
-  orionldState.out.contentType    = JSON;              // Default response Content-Type is "application/json"
+  orionldState.out.contentType    = MT_JSON;           // Default response Content-Type is "application/json"
   orionldHeaderSetInit(&orionldState.out.headers, 5);  // 5 response headers, to start with
 
   //

@@ -49,7 +49,6 @@ SET (SOURCES
     duplicatedInstances.cpp
     troeIgnored.cpp
     tenantList.cpp
-    mimeTypeFromString.cpp
     attributeTypeFromUriParam.cpp
     orionldError.cpp
     orionldPatchApply.cpp

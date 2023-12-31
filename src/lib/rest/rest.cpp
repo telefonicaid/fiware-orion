@@ -58,14 +58,14 @@ extern "C"
 #include "parse/forbiddenChars.h"
 #include "serviceRoutinesV2/getEntityAttributeValue.h"           // getEntityAttributeValue
 
-#include "orionld/mongoc/mongocConnectionRelease.h"              // Own interface
+#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/types/OrionldMimeType.h"                       // mimeTypeFromString
 #include "orionld/common/orionldState.h"                         // orionldState, multitenancy, ...
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/tenantList.h"                           // tenant0
-#include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
-#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
+#include "orionld/mongoc/mongocConnectionRelease.h"              // Own interface
 #include "orionld/notifications/orionldAlterationsTreat.h"       // orionldAlterationsTreat
 #include "orionld/mhd/orionldMhdConnectionInit.h"                // orionldMhdConnectionInit
 #include "orionld/mhd/orionldMhdConnectionPayloadRead.h"         // orionldMhdConnectionPayloadRead
@@ -321,7 +321,7 @@ static MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
   else if (strcasecmp(key, HTTP_ACCEPT) == 0)
   {
     orionldState.out.contentType = acceptHeaderParse((char*) value, true);
-    if (orionldState.out.contentType == NOMIMETYPE)
+    if (orionldState.out.contentType == MT_NONE)
     {
       orionldState.httpStatusCode = 406;
       orionldState.pd.detail      = (char*) "no acceptable mime-type in accept header";
@@ -828,7 +828,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 2
-  if (orionldState.in.contentType == NOMIMETYPEGIVEN)
+  if (orionldState.in.contentType == MT_NOTGIVEN)
   {
     std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -839,7 +839,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   }
 
   // Case 3
-  if ((orionldState.apiVersion == V1) && (orionldState.in.contentType != JSON))
+  if ((orionldState.apiVersion == V1) && (orionldState.in.contentType != MT_JSON))
   {
     std::string details = std::string("not supported content type: ") + orionldState.in.contentTypeString;
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -850,7 +850,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((orionldState.apiVersion == V2) && (orionldState.in.contentType != JSON) && (orionldState.in.contentType != TEXT))
+  if ((orionldState.apiVersion == V2) && (orionldState.in.contentType != MT_JSON) && (orionldState.in.contentType != MT_TEXT))
   {
     std::string details = std::string("not supported content type: ") + orionldState.in.contentTypeString;
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -1177,16 +1177,16 @@ ConnectionInfo* connectionTreatInit
   // This algorithm would be better if we knew this beforehand - before calling acceptHeaderParse.
   // So, could be better ...
   //
-  if (orionldState.out.contentType == TEXT)
+  if (orionldState.out.contentType == MT_TEXT)
   {
-    if ((orionldState.acceptMask & (1 << JSON)) == 0)
+    if ((orionldState.acceptMask & (1 << MT_JSON)) == 0)
     {
       if (ciP->restServiceP->treat != getEntityAttributeValue)
       {
         OrionError oe(SccNotAcceptable, "Invalid Mime Type");
         ciP->answer = oe.smartRender(orionldState.apiVersion);
         orionldState.httpStatusCode  = 406;
-        orionldState.out.contentType = JSON;  // JSON output for the error?
+        orionldState.out.contentType = MT_JSON;  // JSON output for the error?
       }
     }
   }
@@ -1467,11 +1467,11 @@ static MHD_Result connectionTreat
   //
   // Check that Accept Header values are valid
   //
-  if (orionldState.out.contentType == NOMIMETYPE)
+  if (orionldState.out.contentType == MT_NONE)
   {
     OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");
 
-    if ((orionldState.acceptMask & (1 << TEXT)) == 0)
+    if ((orionldState.acceptMask & (1 << MT_TEXT)) == 0)
     {
       oe.details = "acceptable MIME types: application/json";
     }
@@ -1482,11 +1482,11 @@ static MHD_Result connectionTreat
     return MHD_YES;
   }
 
-  if (orionldState.out.contentType == NOMIMETYPE)
+  if (orionldState.out.contentType == MT_NONE)
   {
     OrionError oe(SccNotAcceptable, "acceptable MIME types: application/json, text/plain");
 
-    if ((orionldState.acceptMask & (1 << TEXT)) == 0)
+    if ((orionldState.acceptMask & (1 << MT_TEXT)) == 0)
     {
       oe.details = "acceptable MIME types: application/json";
     }
@@ -1501,7 +1501,8 @@ static MHD_Result connectionTreat
   //
   // Check Content-Type and Content-Length for GET/DELETE requests
   //
-  if ((orionldState.in.contentType != NOMIMETYPEGIVEN) && (orionldState.in.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
+  LM_W(("orionldState.in.contentType: %s", mimeType(orionldState.in.contentType)));
+  if ((orionldState.in.contentType != MT_NOTGIVEN) && (orionldState.in.contentType != MT_NONE) && (orionldState.in.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
   {
     const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
     OrionError   oe(SccBadRequest, details);

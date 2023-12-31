@@ -216,7 +216,7 @@ ContextAttribute::ContextAttribute()
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -313,7 +313,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -346,7 +346,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -378,7 +378,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -410,7 +410,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -441,7 +441,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -947,11 +947,11 @@ std::string ContextAttribute::toJsonAsValue
 
   if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (orionldState.acceptMask & (1 << TEXT))
+    if (orionldState.acceptMask & (1 << MT_TEXT))
     {
       char buf[64];
 
-      *outContentTypeP = TEXT;
+      *outContentTypeP = MT_TEXT;
 
       switch (valueType)
       {
@@ -1006,7 +1006,7 @@ std::string ContextAttribute::toJsonAsValue
   }
   else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
   {
-    if ((orionldState.acceptMask & ((1 << TEXT) | (1 << JSON))) == 0)
+    if ((orionldState.acceptMask & ((1 << MT_TEXT) | (1 << MT_JSON))) == 0)
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
       *scP = SccNotAcceptable;

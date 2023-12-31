@@ -258,7 +258,7 @@ bool orionldGetSubscription(void)
   {
     orionldState.httpStatusCode = 200;
 
-    orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+    orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == MT_JSONLD);
     orionldSubCounters(orionldState.responseTree, cSubP, NULL);
 
     return true;
@@ -270,7 +270,7 @@ bool orionldGetSubscription(void)
   {
     orionldState.httpStatusCode = 200;
 
-    orionldState.responseTree   = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+    orionldState.responseTree   = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == MT_JSONLD);
     orionldSubCounters(orionldState.responseTree, NULL, pSubP);
 
     return true;

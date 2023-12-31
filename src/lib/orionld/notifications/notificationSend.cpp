@@ -593,7 +593,7 @@ static KjNode* notificationTree(OrionldAlterationMatch* matchList)
     kjChildAdd(dataNodeP, apiEntityP);
   }
 
-  if (subP->httpInfo.mimeType == JSONLD)  // Add @context to the entity
+  if (subP->httpInfo.mimeType == MT_JSONLD)  // Add @context to the entity
   {
     KjNode* contextNodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);  // FIXME: use context from subscription!
     kjChildAdd(notificationP, contextNodeP);
@@ -658,7 +658,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   KjNode* notificationP = (ngsiv2 == false)? notificationTree(mAltP) : notificationTreeForNgsiV2(mAltP);
   char*   preferHeader  = NULL;
 
-  if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == GEOJSON))
+  if ((ngsiv2 == false) && (mAltP->subP->httpInfo.mimeType == MT_GEOJSON))
   {
     char*       geometryProperty = (char*) mAltP->subP->expression.geoproperty.c_str();
     char*       attrs            = NULL;
@@ -769,13 +769,13 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
       addLinkHeader = false;
   }
 
-  if (mAltP->subP->httpInfo.mimeType == JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
+  if (mAltP->subP->httpInfo.mimeType == MT_JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
   {
     ioVec[2].iov_base = (void*) contentTypeHeaderJsonLd;  // REPLACE "application/json" with "application/ld+json"
     ioVec[2].iov_len  = 35;
     addLinkHeader     = false;
   }
-  else if (mAltP->subP->httpInfo.mimeType == GEOJSON)
+  else if (mAltP->subP->httpInfo.mimeType == MT_GEOJSON)
   {
     ioVec[2].iov_base = (void*) contentTypeHeaderGeoJson;  // REPLACE "application/json" with "application/geo+json"
     ioVec[2].iov_len  = 36;

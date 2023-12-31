@@ -410,7 +410,7 @@ bool legacyGetEntity(void)
     attrsMandatory = true;
 
   char* geometryProperty = NULL;
-  if (orionldState.out.contentType == GEOJSON)
+  if (orionldState.out.contentType == MT_GEOJSON)
   {
     if (orionldState.uriParams.geometryProperty != NULL)
     {
@@ -475,7 +475,7 @@ bool legacyGetEntity(void)
     orionldForwardGetEntity(eId, regArray, orionldState.responseTree, needEntityType, orionldState.in.attrList.array, orionldState.in.attrList.items);
   }
 
-  if (orionldState.out.contentType == GEOJSON)
+  if (orionldState.out.contentType == MT_GEOJSON)
     orionldState.responseTree = kjGeojsonEntityTransform(orionldState.responseTree,
                                                          orionldState.geoPropertyNode,
                                                          orionldState.link,

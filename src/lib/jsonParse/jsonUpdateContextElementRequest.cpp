@@ -218,7 +218,7 @@ void jsonUcerRelease(ParseData* reqData)
 */
 std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   return reqData->ucer.res.check(orionldState.apiVersion, asJsonObject, UpdateContextElement, reqData->errorString);
 }

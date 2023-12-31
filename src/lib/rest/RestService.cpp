@@ -183,7 +183,7 @@ std::string payloadParse
 {
   std::string result = "NONE";
 
-  if (orionldState.in.contentType == JSON)
+  if (orionldState.in.contentType == MT_JSON)
   {
     if (orionldState.apiVersion == V2)
     {
@@ -200,7 +200,7 @@ std::string payloadParse
       result = jsonTreat(orionldState.in.payload, ciP, parseDataP, service->request, jsonPP);
     }
   }
-  else if (orionldState.in.contentType == TEXT)
+  else if (orionldState.in.contentType == MT_TEXT)
   {
     result = textRequestTreat(ciP, parseDataP, service->request);
   }
@@ -585,7 +585,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   if (orionldState.in.payloadSize == 0)
   {
-    orionldState.in.contentType = NOMIMETYPE;
+    orionldState.in.contentType = MT_NONE;
   }
   statisticsUpdate(ciP->restServiceP->request, orionldState.in.contentType);
 

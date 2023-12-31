@@ -55,7 +55,7 @@ namespace ngsiv2
 * HttpInfo::HttpInfo -
 */
 #ifdef ORIONLD
-HttpInfo::HttpInfo() : verb(NOVERB), custom(false), mimeType(DEFAULT_MIMETYPE)
+HttpInfo::HttpInfo() : verb(NOVERB), custom(false), mimeType(MT_DEFAULT)
 #else
 HttpInfo::HttpInfo() : verb(NOVERB), custom(false)
 #endif
@@ -72,7 +72,7 @@ HttpInfo::HttpInfo() : verb(NOVERB), custom(false)
 * HttpInfo::HttpInfo -
 */
 #ifdef ORIONLD
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false), mimeType(DEFAULT_MIMETYPE)
+HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false), mimeType(MT_DEFAULT)
 #else
 HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false)
 #endif

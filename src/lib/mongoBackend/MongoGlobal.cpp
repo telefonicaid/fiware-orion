@@ -1927,7 +1927,7 @@ bool registrationsQuery
     }
     docs++;
 
-    MimeType                  mimeType = JSON;
+    MimeType                  mimeType = MT_JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(&r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
@@ -2589,8 +2589,8 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
     /* Search for some CPr in crrV */
     std::string  perEntPa;
     std::string  perAttrPa;
-    MimeType     perEntPaMimeType  = NOMIMETYPE;
-    MimeType     perAttrPaMimeType = NOMIMETYPE;
+    MimeType     perEntPaMimeType  = MT_NONE;
+    MimeType     perAttrPaMimeType = MT_NONE;
 
     cprLookupByAttribute(cer->contextElement.entityId,
                          ca->name,

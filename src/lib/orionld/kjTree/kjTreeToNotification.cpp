@@ -61,7 +61,7 @@ static bool pcheckSubscriptionAcceptAndFormat(OrionldRenderFormat format, MimeTy
   case RF_NORMALIZED:
   case RF_SIMPLIFIED:
   case RF_CONCISE:
-    if ((accept != JSON) && (accept != JSONLD) && (accept != GEOJSON))
+    if ((accept != MT_JSON) && (accept != MT_JSONLD) && (accept != MT_GEOJSON))
     {
       LM_W(("Bad Input (invalid notification-accept MimeType for an NGSI-LD notification) - '%s'", mimeTypeToLongString(accept)));
       return false;
@@ -75,7 +75,7 @@ static bool pcheckSubscriptionAcceptAndFormat(OrionldRenderFormat format, MimeTy
   case RF_CROSS_APIS_NORMALIZED_COMPACT:
   case RF_CROSS_APIS_SIMPLIFIED_COMPACT:
   case RF_CROSS_APIS_CONCISE_COMPACT:
-    if (accept != JSON)
+    if (accept != MT_JSON)
     {
       LM_W(("Bad Input (invalid notification-accept MimeType for a cross NGSI-LD to NGSIv2 notification) - '%s'", mimeTypeToLongString(accept)));
       return false;

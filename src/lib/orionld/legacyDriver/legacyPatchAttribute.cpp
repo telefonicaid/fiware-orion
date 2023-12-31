@@ -419,7 +419,7 @@ static bool orionldForwardPatchAttribute
   if (regInfoOk == false)
     return false;
 
-  const char*  contentType = (orionldState.in.contentType == JSONLD)? "application/ld+json" : "application/json";
+  const char*  contentType = (orionldState.in.contentType == MT_JSONLD)? "application/ld+json" : "application/json";
   int          payloadLen  = strlen(orionldState.in.payloadCopy);
   bool         tryAgain;
   bool         downloadFailed;

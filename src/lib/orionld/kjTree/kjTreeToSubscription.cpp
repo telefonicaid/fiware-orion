@@ -164,7 +164,7 @@ bool kjTreeToSubscription(ngsiv2::Subscription* subP, char** subIdPP, KjNode** e
   subP->notification.lastSuccess           = 0;
   subP->notification.httpInfo.verb         = POST;
   subP->notification.httpInfo.custom       = false;
-  subP->notification.httpInfo.mimeType     = JSON;
+  subP->notification.httpInfo.mimeType     = MT_JSON;
 
 
   //

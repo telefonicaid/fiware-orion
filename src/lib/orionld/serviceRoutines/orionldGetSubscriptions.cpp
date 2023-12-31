@@ -132,7 +132,7 @@ static bool orionldGetSubscriptionsFromDb(void)
       continue;
     }
 
-    if (orionldState.out.contentType == JSONLD)
+    if (orionldState.out.contentType == MT_JSONLD)
     {
       KjNode* nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
       if (nodeP == NULL)
@@ -224,7 +224,7 @@ bool orionldGetSubscriptions(void)
       {
         if (pSubP->tenantP == orionldState.tenantP)
         {
-          KjNode* subP = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+          KjNode* subP = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == MT_JSONLD);
 
           if (subP == NULL)
           {
@@ -256,7 +256,7 @@ bool orionldGetSubscriptions(void)
           continue;
         }
 
-        KjNode* subP = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+        KjNode* subP = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == MT_JSONLD);
 
         if (subP == NULL)
         {

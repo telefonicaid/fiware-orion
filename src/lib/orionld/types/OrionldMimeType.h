@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
-#define SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
+#ifndef SRC_LIB_ORIONLD_TYPES_ORIONLDMIMETYPE_H_
+#define SRC_LIB_ORIONLD_TYPES_ORIONLDMIMETYPE_H_
 
 /*
 *
-* Copyright 2018 FIWARE Foundation e.V.
+* Copyright 2019 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,17 +25,33 @@
 *
 * Author: Ken Zangelin
 */
-#include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
-
-#include "orionld/types/OrionldRenderFormat.h"                 // OrionldRenderFormat
-#include "orionld/types/OrionldMimeType.h"                     // MimeType
 
 
 
 // -----------------------------------------------------------------------------
 //
-// kjTreeFromNotification -
+// Mimetype -
 //
-extern KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, OrionldRenderFormat renderFormat, const char* lang, char** detailsP);
+typedef enum MimeType
+{
+  MT_NONE           = 0,
+  MT_NOTGIVEN       = 1,
+  MT_JSON           = 2,
+  MT_TEXT           = 3,
+  MT_HTML           = 4,
+  MT_JSONLD         = 5,
+  MT_GEOJSON        = 6,
+  MT_MERGEPATCHJSON = 7
+} MimeType;
 
-#endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_
+#define MT_DEFAULT         MT_JSON
+#define MT_DEFAULT_STRING  "JSON"
+
+
+
+extern const char* mimeType(MimeType mimeType);
+extern const char* mimeTypeLong(MimeType mimeType);
+extern MimeType    mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcardsAccepted, bool textOk, uint32_t* acceptMaskP);
+extern MimeType	   mimeTypeFromLongString(const char* mimeType);
+
+#endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDMIMETYPE_H_

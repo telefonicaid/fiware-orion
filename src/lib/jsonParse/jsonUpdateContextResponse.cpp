@@ -447,7 +447,7 @@ void jsonUpcrsRelease(ParseData* reqDataP)
 */
 std::string jsonUpcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   return reqDataP->upcrs.res.check(orionldState.apiVersion, asJsonObject, reqDataP->errorString);
 }

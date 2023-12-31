@@ -332,7 +332,7 @@ void jsonAcerRelease(ParseData* reqData)
 */
 std::string jsonAcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   return reqData->acer.res.check(orionldState.apiVersion, asJsonObject, AppendContextElement, reqData->errorString);
 }

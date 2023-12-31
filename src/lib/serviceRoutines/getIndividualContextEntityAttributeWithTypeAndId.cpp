@@ -83,7 +83,7 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
   EntityTypeInfo            typeInfo                = EntityTypeEmptyOrNotEmpty;
   ContextAttributeResponse  response;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
 
   // 01. Get values from URL (entityId::type, esist, !exist)

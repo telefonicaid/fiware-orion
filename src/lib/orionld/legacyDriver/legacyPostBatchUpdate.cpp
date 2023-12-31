@@ -110,7 +110,7 @@ bool legacyPostBatchUpdate(void)
   orionldState.noLinkHeader = true;
 
   // The response is never JSON-LD
-  orionldState.out.contentType = JSON;
+  orionldState.out.contentType = MT_JSON;
 
   //
   // Prerequisites for the payload in orionldState.requestTree:
@@ -158,7 +158,7 @@ bool legacyPostBatchUpdate(void)
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);
 
-    orionldState.out.contentType = JSON;
+    orionldState.out.contentType = MT_JSON;
     orionldState.httpStatusCode  = 207;
 
     return true;
@@ -344,7 +344,7 @@ bool legacyPostBatchUpdate(void)
   else if (errorsArrayP->value.firstChildP != NULL)  // There are entities in error
   {
     orionldState.httpStatusCode  = 207;   // Multi-Status
-    orionldState.out.contentType = JSON;  // restReply already sets it to JSON is 207 ...
+    orionldState.out.contentType = MT_JSON;  // restReply already sets it to JSON is 207 ...
   }
   else
   {

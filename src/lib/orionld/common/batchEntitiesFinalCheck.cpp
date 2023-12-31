@@ -142,7 +142,7 @@ int batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* d
     // If Content-Type is application/ld+json, then every entity must have an @context
     // If instead the Content-Type is application/json then an @context cannot be present
     //
-    if (orionldState.in.contentType == JSONLD)
+    if (orionldState.in.contentType == MT_JSONLD)
     {
       if (contextNodeP == NULL)
       {

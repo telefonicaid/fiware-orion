@@ -537,7 +537,7 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
   }
 
   // FIXME: This is not how it is meant ...
-  if (orionldState.out.contentType == JSONLD)
+  if (orionldState.out.contentType == MT_JSONLD)
   {
     if (subscriptionP->ldContext != "")
       nodeP = kjString(orionldState.kjsonP, "@context", subscriptionP->ldContext.c_str());

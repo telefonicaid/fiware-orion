@@ -187,7 +187,7 @@ EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, Or
   kjTreeLog(entityMap->map, "entityMap", LmtSR);
 
   char* geojsonGeometryLongName = NULL;
-  if (orionldState.out.contentType == GEOJSON)
+  if (orionldState.out.contentType == MT_GEOJSON)
     geojsonGeometryLongName = orionldState.in.geometryPropertyExpanded;
 
   // Get the local matches

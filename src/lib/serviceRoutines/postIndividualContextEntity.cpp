@@ -100,7 +100,7 @@ std::string postIndividualContextEntity
   std::string                   answer;
   std::string                   out;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   //
   // 01. Check that total input in consistent and correct

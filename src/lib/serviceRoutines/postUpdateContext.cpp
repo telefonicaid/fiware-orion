@@ -110,7 +110,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   int              port;
   std::string      prefix;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
@@ -137,7 +137,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string  payload;
   char*        cleanPayload;
 
-  orionldState.out.contentType  = JSON;
+  orionldState.out.contentType  = MT_JSON;
 
   //
   // FIXME: Forwards are done using NGSIv1 only, for now
@@ -449,7 +449,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   //
   // 01. Check service-path consistency

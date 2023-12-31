@@ -88,7 +88,7 @@ std::string postAllEntitiesWithTypeAndId
   std::string                   answer;
   AppendContextElementResponse  response;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   // FIXME P1: AttributeDomainName skipped
   // FIXME P1: domainMetadataVector skipped
