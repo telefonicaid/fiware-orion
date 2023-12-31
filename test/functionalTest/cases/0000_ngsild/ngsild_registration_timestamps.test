@@ -110,7 +110,7 @@ payload='{
     "startAt": "2021-12-31T10:00:00.798",
     "endAt": "2022-12-31T10:00:00.120"
   },
-  "expiresAt": "2023-12-31T10:00:01.234Z"
+  "expiresAt": "2029-12-31T10:00:01.234Z"
 }'
 orionCurl --url /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registrations:R1 --payload "$payload" -X PATCH
 echo
@@ -306,7 +306,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "createdAt": "REGEX(.*\.\d\d\d)Z",
     "description": "Description of R1",
     "endpoint": "http://my.csource.org:1026",
-    "expiresAt": "2023-12-31T10:00:01.234Z",
+    "expiresAt": "2029-12-31T10:00:01.234Z",
     "id": "urn:ngsi-ld:registrations:R1",
     "information": [
         {

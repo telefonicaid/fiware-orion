@@ -35,14 +35,13 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
-#include "common/RenderFormat.h"                               // RenderFormat
-
 #include "orionld/types/Protocol.h"                            // Protocol, protocolFromString
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/types/QNode.h"                               // QNode
 #include "orionld/types/PernotSubscription.h"                  // PernotSubscription
 #include "orionld/types/PernotSubCache.h"                      // PernotSubCache
 #include "orionld/types/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldRenderFormat.h"                 // OrionldRenderFormat
 #include "orionld/common/orionldState.h"                       // orionldState, pernotSubCache
 #include "orionld/common/urlParse.h"                           // urlParse
 #include "orionld/payloadCheck/pcheckGeoQ.h"                   // pcheckGeoQ
@@ -133,17 +132,17 @@ static void timestampFromDb(KjNode* apiSubP, double* tsP, const char* fieldName)
 //
 PernotSubscription* pernotSubCacheAdd
 (
-  char*            subscriptionId,
-  KjNode*          apiSubP,
-  KjNode*          endpointP,
-  QNode*           qTree,
-  KjNode*          geoCoordinatesP,
-  OrionldContext*  contextP,
-  OrionldTenant*   tenantP,
-  KjNode*          showChangesP,
-  KjNode*          sysAttrsP,
-  RenderFormat     renderFormat,
-  double           timeInterval
+  char*                subscriptionId,
+  KjNode*              apiSubP,
+  KjNode*              endpointP,
+  QNode*               qTree,
+  KjNode*              geoCoordinatesP,
+  OrionldContext*      contextP,
+  OrionldTenant*       tenantP,
+  KjNode*              showChangesP,
+  KjNode*              sysAttrsP,
+  OrionldRenderFormat  renderFormat,
+  double               timeInterval
 )
 {
   PernotSubscription* pSubP = (PernotSubscription*) malloc(sizeof(PernotSubscription));

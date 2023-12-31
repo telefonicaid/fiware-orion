@@ -46,7 +46,7 @@ typedef struct NotifyContextRequest
   ContextElementResponseVector  contextElementResponseVector;  // Optional
 
   std::string   render(ApiVersion apiVersion, bool asJsonObject);
-  std::string   toJson(RenderFormat                     renderFormat,
+  std::string   toJson(OrionldRenderFormat              renderFormat,
                        const std::vector<std::string>&  attrsFilter,
                        const std::vector<std::string>&  metadataFilter,
                        bool                             blacklist = false);

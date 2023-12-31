@@ -27,6 +27,7 @@ SET (SOURCES
     OrionldGeometry.cpp
     OrionldGeorel.cpp
     OrionldAlteration.cpp
+    OrionldRenderFormat.cpp
     KeyValue.cpp
     OrionldResponseErrorType.cpp
     RegistrationMode.cpp

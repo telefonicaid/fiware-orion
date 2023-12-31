@@ -55,7 +55,7 @@ class TriggeredSubscription
  public:
   double                    throttling;
   double                    lastNotification;
-  RenderFormat              renderFormat;
+  OrionldRenderFormat       renderFormat;
   ngsiv2::HttpInfo          httpInfo;
   StringList                attrL;
   std::string               cacheSubId;
@@ -74,13 +74,13 @@ class TriggeredSubscription
 
   TriggeredSubscription(double                   _throttling,
                         double                   _lastNotification,
-                        RenderFormat             _renderFormat,
+                        OrionldRenderFormat      _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
                         OrionldTenant*           _tenant);
 
-  TriggeredSubscription(RenderFormat             _renderFormat,
+  TriggeredSubscription(OrionldRenderFormat      _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
                         const StringList&        _attrL);
 

@@ -43,7 +43,7 @@ TriggeredSubscription::TriggeredSubscription
 (
   double                   _throttling,
   double                   _lastNotification,
-  RenderFormat             _renderFormat,
+  OrionldRenderFormat      _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
   const StringList&        _attrL,
   const std::string&       _cacheSubId,
@@ -73,7 +73,7 @@ TriggeredSubscription::TriggeredSubscription
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  RenderFormat             _renderFormat,
+  OrionldRenderFormat      _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
   const StringList&        _attrL
 )

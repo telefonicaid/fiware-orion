@@ -47,7 +47,7 @@ typedef struct ContextElementResponseVector
                                   bool         comma               = false,
                                   bool         omitAttributeValues = false);
 
-  std::string              toJson(RenderFormat                     renderFormat,
+  std::string              toJson(OrionldRenderFormat              renderFormat,
                                   const std::vector<std::string>&  attrsFilter,
                                   const std::vector<std::string>&  metadataFilter,
                                   bool                             blacklist = false);

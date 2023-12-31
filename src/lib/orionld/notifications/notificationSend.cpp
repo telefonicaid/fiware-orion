@@ -234,7 +234,7 @@ static void attributeToNormalized(KjNode* attrP, const char* lang)
 //
 static void attributeFix(KjNode* attrP, CachedSubscription* subP)
 {
-  bool simplified = (subP->renderFormat == RF_KEYVALUES);
+  bool simplified = (subP->renderFormat == RF_SIMPLIFIED);
   bool concise    = (subP->renderFormat == RF_CONCISE);
 
   // Never mind "location", "observationSpace", and "operationSpace"
@@ -274,8 +274,8 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
     // Here we're "in subAttributeFix"
     //
 
-    // Add the "previousValue", unless RF_KEYVALUES
-    if ((subP->renderFormat != RF_KEYVALUES) && (subP->showChanges == true))
+    // Add the "previousValue", unless RF_SIMPLIFIED
+    if ((subP->renderFormat != RF_SIMPLIFIED) && (subP->showChanges == true))
       previousValueAdd(attrP, attrLongName);
 
     LM_T(LmtPatchEntity, ("Fixing attribute '%s' (JSON type: %s)", attrP->name, kjValueType(attrP->type)));
@@ -291,7 +291,7 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
 
       if (saP->type == KjObject)
       {
-        if (subP->renderFormat == RF_KEYVALUES)
+        if (subP->renderFormat == RF_SIMPLIFIED)
           attributeToSimplified(saP, subP->lang.c_str());
         else if (subP->renderFormat == RF_CONCISE)
           attributeToConcise(saP, &asSimplified, subP->lang.c_str());  // asSimplified is not used down here
@@ -512,10 +512,10 @@ static KjNode* notificationTreeForNgsiV2(OrionldAlterationMatch* matchP)
   if (subP->attributes.size() > 0)
     apiEntityP = attributeFilter(apiEntityP, matchP);
 
-  if ((subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
+  if ((subP->renderFormat == RF_CROSS_APIS_SIMPLIFIED) || (subP->renderFormat == RF_CROSS_APIS_SIMPLIFIED_COMPACT))
     keyValues = true;
 
-  if ((subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT) || (subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
+  if ((subP->renderFormat == RF_CROSS_APIS_NORMALIZED_COMPACT) || (subP->renderFormat == RF_CROSS_APIS_SIMPLIFIED_COMPACT))
     compact = true;
 
   KjNode* ngsiv2EntityP = orionldEntityToNgsiV2(subP->contextP, apiEntityP, keyValues, compact);
@@ -801,7 +801,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
     ioVec[6].iov_base = (void*) conciseHeader;
     ioVec[6].iov_len  = 34;
   }
-  else if (mAltP->subP->renderFormat == RF_KEYVALUES)
+  else if (mAltP->subP->renderFormat == RF_SIMPLIFIED)
   {
     ioVec[6].iov_base = (void*) simplifiedHeader;
     ioVec[6].iov_len  = 37;
@@ -811,7 +811,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
     ioVec[6].iov_base = (void*) normalizedHeaderNgsiV2;
     ioVec[6].iov_len  = 32;
   }
-  else if ((mAltP->subP->renderFormat == RF_CROSS_APIS_KEYVALUES) || (mAltP->subP->renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
+  else if ((mAltP->subP->renderFormat == RF_CROSS_APIS_SIMPLIFIED) || (mAltP->subP->renderFormat == RF_CROSS_APIS_SIMPLIFIED_COMPACT))
   {
     ioVec[6].iov_base = (void*) keyValuesHeaderNgsiV2;
     ioVec[6].iov_len  = 31;

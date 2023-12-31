@@ -35,8 +35,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/RenderFormat.h"                                 // RenderFormat
-
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
@@ -166,12 +165,12 @@ KjNode* datasetExtract(KjNode* datasetsP, const char* attrName)
 //   Add "concise/keyValues" and "lang" treatment to "dbModelToApiEntity2()"
 //   Remove "concise/keyValues" and "lang" treatment from "kjTreeFromQueryContextResponse()"
 //
-KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, RenderFormat renderFormat, const char* lang, bool compacted, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiEntity2(KjNode* dbEntityP, bool sysAttrs, OrionldRenderFormat renderFormat, const char* lang, bool compacted, OrionldProblemDetails* pdP)
 {
   KjNode* _idP      = NULL;
   KjNode* attrsP    = NULL;
   KjNode* datasetsP = kjLookup(dbEntityP, "@datasets");
-  bool    longNames = (compacted == false) || ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES));
+  bool    longNames = (compacted == false) || ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_SIMPLIFIED));
 
   if (datasetsP != NULL)
     kjChildRemove(dbEntityP, datasetsP);

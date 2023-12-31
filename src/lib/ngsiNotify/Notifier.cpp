@@ -89,7 +89,7 @@ void Notifier::sendNotifyContextRequest
     const std::string&               tenant,
     const char*                      xauthToken,
     const std::string&               fiwareCorrelator,
-    RenderFormat                     renderFormat,
+    OrionldRenderFormat              renderFormat,
     const std::vector<std::string>&  attrsOrder,
     const std::vector<std::string>&  metadataFilter,
     bool                             blackList
@@ -141,7 +141,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
   const std::string&                 url,
   const std::string&                 tenant,
   const std::string&                 fiwareCorrelator,
-  RenderFormat                       renderFormat
+  OrionldRenderFormat                renderFormat
 )
 {
     /* Render NotifyContextAvailabilityRequest */
@@ -210,7 +210,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const std::string&                   tenant,
     const char*                          xauthToken,
     const std::string&                   fiwareCorrelator,
-    RenderFormat                         renderFormat,
+    OrionldRenderFormat                  renderFormat,
     const std::vector<std::string>&      attrsOrder,
     const std::vector<std::string>&      metadataFilter
 )
@@ -419,7 +419,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   const std::string&               tenant,
   const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  attrsOrder,
   const std::vector<std::string>&  metadataFilter,
   bool                             blackList
@@ -638,9 +638,9 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (subP != NULL)
     {
-      if ((httpInfo.mimeType       == JSON)                     &&
-          (renderFormat            != RF_CROSS_APIS_NORMALIZED) &&
-          (renderFormat            != RF_CROSS_APIS_KEYVALUES)  &&
+      if ((httpInfo.mimeType       == JSON)                      &&
+          (renderFormat            != RF_CROSS_APIS_NORMALIZED)  &&
+          (renderFormat            != RF_CROSS_APIS_SIMPLIFIED)  &&
           (orionldState.apiVersion == NGSI_LD_V1))
       {
         if (subP->ldContext != "")

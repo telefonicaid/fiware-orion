@@ -185,13 +185,13 @@ static bool orionldGetSubscriptionFromDb(void)
   }
   kjTreeLog(dbSubP, "DB Sub", LmtSubCacheStats);
 
-  KjNode*      coordinatesNodeP = NULL;           // Not needed here, but dbModelToApiSubscription requires it
-  KjNode*      contextNodeP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
-  KjNode*      showChangesP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
-  KjNode*      sysAttrsP        = NULL;           // Not needed here, but dbModelToApiSubscription requires it
-  RenderFormat renderFormat     = RF_NORMALIZED;  // Not needed here, but dbModelToApiSubscription requires it
-  double       timeInterval     = 0;
-  KjNode*      apiSubP          = dbModelToApiSubscription(dbSubP,
+  KjNode*             coordinatesNodeP = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*             contextNodeP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*             showChangesP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*             sysAttrsP        = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  OrionldRenderFormat renderFormat     = RF_NORMALIZED;  // Not needed here, but dbModelToApiSubscription requires it
+  double              timeInterval     = 0;
+  KjNode*             apiSubP          = dbModelToApiSubscription(dbSubP,
                                                            orionldState.tenantP->tenant,
                                                            false,
                                                            NULL,

@@ -99,7 +99,7 @@ public:
   std::string  renderAsJsonObject(ApiVersion apiVersion, RequestType request, bool comma, bool omitValue = false);
   std::string  renderAsNameString(bool comma);
   std::string  toJson(bool                             isLastElement,
-                      RenderFormat                     renderFormat,
+                      OrionldRenderFormat              renderFormat,
                       const std::vector<std::string>&  metadataFilter,
                       RequestType                      requestType = NoRequest);
   std::string  toJsonAsValue(ApiVersion       apiVersion,

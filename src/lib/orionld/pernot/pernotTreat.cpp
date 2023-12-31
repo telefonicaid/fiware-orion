@@ -35,8 +35,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                  // LM_x
 
-#include "common/RenderFormat.h"                            // RenderFormat
-
+#include "orionld/types/OrionldRenderFormat.h"              // OrionldRenderFormat
 #include "orionld/types/PernotSubscription.h"               // PernotSubscription
 #include "orionld/common/orionldState.h"                    // orionldState, pernotSubCache
 #include "orionld/types/OrionldGeoInfo.h"                   // OrionldGeoInfo
@@ -51,7 +50,7 @@ extern "C"
 //
 // dbModelToApiEntities - FIXME: Move to orionld/dbModel
 //
-KjNode* dbModelToApiEntities(KjNode* dbEntityArray, bool sysAttrs, RenderFormat renderFormat, char* lang)
+KjNode* dbModelToApiEntities(KjNode* dbEntityArray, bool sysAttrs, OrionldRenderFormat renderFormat, char* lang)
 {
   KjNode* apiEntityArray = kjArray(orionldState.kjsonP, NULL);
 

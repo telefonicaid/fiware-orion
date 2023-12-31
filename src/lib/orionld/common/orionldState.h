@@ -45,7 +45,6 @@ extern "C"
 #include "common/globals.h"                                      // ApiVersion
 #include "common/limits.h"                                       // IP_LENGTH_MAX, STATIC_BUFFER_SIZE
 #include "common/MimeType.h"                                     // MimeType
-#include "common/RenderFormat.h"                                 // RenderFormat
 #include "rest/HttpStatusCode.h"                                 // HttpStatusCode
 #include "rest/Verb.h"                                           // Verb
 #include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
@@ -63,6 +62,7 @@ extern "C"
 #include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/TroeMode.h"                              // TroeMode
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/kjTree/kjTreeLog.h"                            // Because it is so often used but then removed again ...
 
@@ -213,14 +213,14 @@ typedef enum OrionldPhase
 typedef struct OrionldStateOut
 {
   // Outgoing HTTP headers
-  OrionldHeaderSet headers;
-  MimeType         contentType;  // Content-Type is "special" - not part of OrionldHeaderSet
+  OrionldHeaderSet     headers;
+  MimeType             contentType;  // Content-Type is "special" - not part of OrionldHeaderSet
 
   // Rendering info
-  RenderFormat    format;
+  OrionldRenderFormat  format;
 
   // Errors
-  char*     acceptErrorDetail;  // FIXME: Use OrionldProblemDetails for this
+  char*                acceptErrorDetail;  // FIXME: Use OrionldProblemDetails for this
 } OrionldStateOut;
 
 

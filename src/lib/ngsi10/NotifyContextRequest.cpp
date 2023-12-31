@@ -66,7 +66,7 @@ std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
 */
 std::string NotifyContextRequest::toJson
 (
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist

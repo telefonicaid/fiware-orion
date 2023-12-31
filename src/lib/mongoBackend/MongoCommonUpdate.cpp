@@ -1684,12 +1684,12 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      double            throttling         = getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING, true);
-      double            lastNotification   = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION, true);
-      const char*       renderFmt          = getStringFieldF(&sub, CSUB_FORMAT);
-      const char*       renderFormatString = (renderFmt[0] == 0)? "legacy" : renderFmt;
-      RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
-      ngsiv2::HttpInfo  httpInfo;
+      double               throttling         = getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING, true);
+      double               lastNotification   = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION, true);
+      const char*          renderFmt          = getStringFieldF(&sub, CSUB_FORMAT);
+      const char*          renderFormatString = (renderFmt[0] == 0)? "legacy" : renderFmt;
+      OrionldRenderFormat  renderFormat       = stringToRenderFormat(renderFormatString);
+      ngsiv2::HttpInfo     httpInfo;
 
 
       httpInfo.fill(&sub);
@@ -1840,7 +1840,7 @@ static bool processOnChangeConditionForUpdateContext
   const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   std::string                      subId,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   OrionldTenant*                   tenantP,
   const char*                      xauthToken,
   const char*                      fiwareCorrelator,

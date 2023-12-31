@@ -31,8 +31,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/TreeNode.h"                              // TreeNode
+#include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/legacyDriver/legacyPostQuery.h"                // legacyPostQuery
 #include "orionld/payloadCheck/pCheckQuery.h"                    // pCheckQuery
 #include "orionld/mongoc/mongocEntitiesQuery2.h"                 // mongocEntitiesQuery2
@@ -94,11 +94,11 @@ bool orionldPostQuery(void)
   if (dbEntityArray == NULL)
     return false;
 
-  KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
-  RenderFormat  rf              = RF_NORMALIZED;
+  KjNode*              apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
+  OrionldRenderFormat  rf              = RF_NORMALIZED;
 
   if      (orionldState.uriParamOptions.concise   == true) rf = RF_CONCISE;
-  else if (orionldState.uriParamOptions.keyValues == true) rf = RF_KEYVALUES;
+  else if (orionldState.uriParamOptions.keyValues == true) rf = RF_SIMPLIFIED;
 
   if (orionldState.out.contentType == GEOJSON)
   {

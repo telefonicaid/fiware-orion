@@ -33,10 +33,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "common/RenderFormat.h"                               // RenderFormat
 #include "ngsi/ContextAttribute.h"                             // ContextAttribute
 
 #include "orionld/types/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldRenderFormat.h"                 // OrionldRenderFormat
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldContextItemAliasLookup.h"     // orionldContextItemAliasLookup
@@ -64,7 +64,7 @@ extern "C"
 //
 // kjTreeFromContextAttribute -
 //
-KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, RenderFormat renderFormat, const char* lang, char** detailsP)
+KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contextP, OrionldRenderFormat renderFormat, const char* lang, char** detailsP)
 {
   char*    attrName  = (char*) caP->name.c_str();
   KjNode*  nodeP     = NULL;
@@ -72,7 +72,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   //
   // We want shortnames unless it's Cross API and not COMPACT
   //
-  if ((renderFormat != RF_CROSS_APIS_NORMALIZED) && (renderFormat != RF_CROSS_APIS_KEYVALUES))
+  if ((renderFormat != RF_CROSS_APIS_NORMALIZED) && (renderFormat != RF_CROSS_APIS_SIMPLIFIED))
   {
     char* alias = orionldContextItemAliasLookup(contextP, attrName, NULL, NULL);
 
@@ -84,7 +84,7 @@ KjNode* kjTreeFromContextAttribute(ContextAttribute* caP, OrionldContext* contex
   //
   // keyValues?
   //
-  if ((renderFormat == RF_KEYVALUES) || (renderFormat == RF_CROSS_APIS_KEYVALUES) || (renderFormat == RF_CROSS_APIS_KEYVALUES_COMPACT))
+  if ((renderFormat == RF_SIMPLIFIED) || (renderFormat == RF_CROSS_APIS_SIMPLIFIED) || (renderFormat == RF_CROSS_APIS_SIMPLIFIED_COMPACT))
   {
     //
     // FIXME: This almost identical switch is in many places. Time to unite ...

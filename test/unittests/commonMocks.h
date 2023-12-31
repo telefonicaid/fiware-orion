@@ -228,7 +228,7 @@ class NotifierMock : public Notifier
                                               const std::string&               tenant,
                                               const std::string&               xauthToken,
                                               const std::string&               fiwareCorrelator,
-                                              RenderFormat                     renderFormat,
+                                              OrionldRenderFormat              renderFormat,
                                               const std::vector<std::string>&  attrsFilter,
                                               const std::vector<std::string>&  metadataFilter,
                                               bool                             blacklist));
@@ -237,7 +237,7 @@ class NotifierMock : public Notifier
                                                             const std::string&                 url,
                                                             const std::string&                 tenant,
                                                             const std::string&                 fiwareCorrelator,
-                                                            RenderFormat                       renderFormat));
+                                                            OrionldRenderFormat                renderFormat));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
     void parent_sendNotifyContextRequest(NotifyContextRequest*            ncr,
@@ -245,7 +245,7 @@ class NotifierMock : public Notifier
                                          const std::string&               tenant,
                                          const std::string&               xauthToken,
                                          const std::string&               fiwareCorrelator,
-                                         RenderFormat                     renderFormat,
+                                         OrionldRenderFormat              renderFormat,
                                          const std::vector<std::string>&  attrsFilter,
                                          const std::vector<std::string>&  metadataFilter,
                                          bool                             blacklist = false)
@@ -257,7 +257,7 @@ class NotifierMock : public Notifier
                                                      const std::string&                 url,
                                                      const std::string&                 tenant,
                                                      const std::string&                 fiwareCorrelator,
-                                                     RenderFormat                       renderFormat)
+                                                     OrionldRenderFormat                renderFormat)
     {
       Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, fiwareCorrelator, renderFormat);
     }

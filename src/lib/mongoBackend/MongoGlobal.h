@@ -355,7 +355,7 @@ extern mongo::BSONArray processConditionVector
   const std::string&                 subId,
   const ngsiv2::HttpInfo&            httpInfo,
   bool*                              notificationDone,
-  RenderFormat                       renderFormat,
+  OrionldRenderFormat                renderFormat,
   OrionldTenant*                     tenantP,
   const char*                        xauthToken,
   const std::vector<std::string>&    servicePathV,
@@ -377,7 +377,7 @@ extern bool processAvailabilitySubscription(
     const StringList&     attrL,
     const std::string&    subId,
     const std::string&    notifyUrl,
-    RenderFormat          renderFormat,
+    OrionldRenderFormat   renderFormat,
     OrionldTenant*        tenantP,
     const std::string&    fiwareCorrelator
 );

@@ -99,16 +99,16 @@ struct Subject
 */
 struct Subscription
 {
-  std::string   id;
-  std::string   description;
-  bool          descriptionProvided;
-  Subject       subject;
-  double        expires;
-  std::string   status;
-  Notification  notification;
-  double        throttling;
-  RenderFormat  attrsFormat;
-  Restriction   restriction;
+  std::string          id;
+  std::string          description;
+  bool                 descriptionProvided;
+  Subject              subject;
+  double               expires;
+  std::string          status;
+  Notification         notification;
+  double               throttling;
+  OrionldRenderFormat  attrsFormat;
+  Restriction          restriction;
 
   double        createdAt;
   double        modifiedAt;

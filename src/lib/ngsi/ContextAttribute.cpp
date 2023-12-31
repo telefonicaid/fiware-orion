@@ -737,7 +737,7 @@ std::string ContextAttribute::render
 std::string ContextAttribute::toJson
 (
   bool                             isLastElement,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  metadataFilter,
   RequestType                      requestType
 )

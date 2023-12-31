@@ -40,10 +40,10 @@ extern "C"
 
 #include "cache/CachedSubscription.h"                            // CachedSubscription
 #include "cache/subCache.h"                                      // subCacheItemInsert
-#include "common/RenderFormat.h"                                 // RenderFormat, stringToRenderFormat
 
 #include "orionld/types/QNode.h"                                 // QNode
 #include "orionld/types/OrionldContext.h"                        // OrionldContext
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/dbModel/dbModelToApiCoordinates.h"             // dbModelToApiCoordinates
 #include "orionld/mqtt/mqttParse.h"                              // mqttParse
 #include "orionld/common/mimeTypeFromString.h"                   // mimeTypeFromString
@@ -67,7 +67,7 @@ static void subCacheItemFill
   const char*          tenant,
   KjNode*              showChangesP,
   KjNode*              sysAttrsP,
-  RenderFormat         renderFormat
+  OrionldRenderFormat  rFormat
 )
 {
   kjTreeLog(apiSubscriptionP, "apiSubscriptionP", LmtSubCacheSync);
@@ -80,7 +80,7 @@ static void subCacheItemFill
   cSubP->geoCoordinatesP     = NULL;
   cSubP->showChanges         = (showChangesP != NULL)? showChangesP->value.b : false;
   cSubP->sysAttrs            = (sysAttrsP != NULL)? sysAttrsP->value.b : false;
-  cSubP->renderFormat        = renderFormat;
+  cSubP->renderFormat        = rFormat;
 
   LM_T(LmtSysAttrs, ("sysAttrs: %s", (cSubP->sysAttrs == true)? "true" : "false"));
 
@@ -284,14 +284,11 @@ static void subCacheItemFill
       }
     }
 
-     // FIXME: pCheckSubscription has already found the "notificatrion::format" field. Can be removed
+    // FIXME: pCheckSubscription has already found the "notification::format" field. Can be removed
     if (formatP != NULL)
-    {
-      cSubP->renderFormat = stringToRenderFormat(formatP->value.s, true);
-      if (cSubP->renderFormat == RF_NONE)
-        cSubP->renderFormat = RF_NORMALIZED;
-    }
-    else
+      cSubP->renderFormat = renderFormat(formatP->value.s);
+
+    if (cSubP->renderFormat == RF_NONE)
       cSubP->renderFormat = RF_NORMALIZED;
 
     if (endpointP != NULL)  // pCheckSubscription already ensures "endpoint" is present !!!
@@ -420,14 +417,14 @@ static void subCacheItemFill
 //
 static CachedSubscription* subCacheApiSubscriptionCreate
 (
-  KjNode*         apiSubscriptionP,
-  QNode*          qTree,
-  KjNode*         geoCoordinatesP,
-  OrionldContext* contextP,
-  const char*     tenant,
-  KjNode*         showChangesP,
-  KjNode*         sysAttrsP,
-  RenderFormat    renderFormat
+  KjNode*              apiSubscriptionP,
+  QNode*               qTree,
+  KjNode*              geoCoordinatesP,
+  OrionldContext*      contextP,
+  const char*          tenant,
+  KjNode*              showChangesP,
+  KjNode*              sysAttrsP,
+  OrionldRenderFormat  renderFormat
 )
 {
   CachedSubscription* cSubP = new CachedSubscription();
@@ -453,7 +450,7 @@ static CachedSubscription* subCacheApiSubscriptionUpdate
   const char*          tenant,
   KjNode*              showChangesP,
   KjNode*              sysAttrsP,
-  RenderFormat         renderFormat
+  OrionldRenderFormat  renderFormat
 )
 {
   LM_T(LmtSubCacheSync, ("Updating Cached Subscription (%p) from DB", cSubP));
@@ -499,14 +496,14 @@ static CachedSubscription* subCacheApiSubscriptionUpdate
 //
 CachedSubscription* subCacheApiSubscriptionInsert
 (
-  KjNode*         apiSubscriptionP,
-  QNode*          qTree,
-  KjNode*         geoCoordinatesP,
-  OrionldContext* contextP,
-  const char*     tenant,
-  KjNode*         showChangesP,
-  KjNode*         sysAttrsP,
-  RenderFormat    renderFormat
+  KjNode*              apiSubscriptionP,
+  QNode*               qTree,
+  KjNode*              geoCoordinatesP,
+  OrionldContext*      contextP,
+  const char*          tenant,
+  KjNode*              showChangesP,
+  KjNode*              sysAttrsP,
+  OrionldRenderFormat  renderFormat
 )
 {
   KjNode* subIdNodeP = kjLookup(apiSubscriptionP, "id");

@@ -30,7 +30,7 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "common/RenderFormat.h"                               // RenderFormat
+#include "orionld/types/OrionldRenderFormat.h"                 // OrionldRenderFormat
 
 
 
@@ -40,14 +40,14 @@ extern "C"
 //
 extern bool pCheckNotification
 (
-  KjNode*        notificationP,
-  bool           patch,
-  KjNode**       uriPP,
-  KjNode**       notifierInfoPP,
-  bool*          mqttChangeP,
-  KjNode**       showChangesOutP,
-  KjNode**       sysAttrsOutP,
-  RenderFormat*  renderFormatP
+  KjNode*               notificationP,
+  bool                  patch,
+  KjNode**              uriPP,
+  KjNode**              notifierInfoPP,
+  bool*                 mqttChangeP,
+  KjNode**              showChangesOutP,
+  KjNode**              sysAttrsOutP,
+  OrionldRenderFormat*  renderFormatP
 );
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKNOTIFICATION_H_

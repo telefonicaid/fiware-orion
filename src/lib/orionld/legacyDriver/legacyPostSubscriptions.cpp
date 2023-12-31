@@ -70,7 +70,7 @@ bool legacyPostSubscriptions(void)
   // FIXME: attrsFormat etc. should be set to default by constructor
   //        only ... there is no constructor ...
   //
-  sub.attrsFormat = DEFAULT_RENDER_FORMAT;
+  sub.attrsFormat         = RF_DEFAULT;
   sub.expires             = -1;  // 0?
   sub.throttling          = -1;  // 0?
   sub.timeInterval        = -1;  // 0?

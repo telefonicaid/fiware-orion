@@ -63,7 +63,7 @@ typedef struct ContextAttributeVector
                             bool         omitValue   = false,
                             bool         attrsAsName = false);
 
-  std::string        toJson(RenderFormat                     renderFormat,
+  std::string        toJson(OrionldRenderFormat              renderFormat,
                             const std::vector<std::string>&  attrsFilter,
                             const std::vector<std::string>&  metadataV,
                             bool                             blacklist) const;

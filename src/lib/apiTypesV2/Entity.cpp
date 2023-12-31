@@ -82,7 +82,7 @@ std::string Entity::render(bool comma)
     return oe.toJson();
   }
 
-  RenderFormat  renderFormat = RF_NORMALIZED;
+  OrionldRenderFormat  renderFormat = RF_NORMALIZED;
 
   if      (orionldState.uriParamOptions.keyValues    == true)  { renderFormat = RF_KEYVALUES;     }
   else if (orionldState.uriParamOptions.values       == true)  { renderFormat = RF_VALUES;        }

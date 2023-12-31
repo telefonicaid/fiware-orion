@@ -119,13 +119,13 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP, bool refresh)
       continue;
     }
 
-    QNode*       qTree         = NULL;
-    KjNode*      contextNodeP  = NULL;
-    KjNode*      coordinatesP  = NULL;
-    KjNode*      showChangesP  = NULL;
-    KjNode*      sysAttrsP     = NULL;
-    RenderFormat renderFormat  = RF_NORMALIZED;
-    double       timeInterval  = 0;
+    QNode*              qTree         = NULL;
+    KjNode*             contextNodeP  = NULL;
+    KjNode*             coordinatesP  = NULL;
+    KjNode*             showChangesP  = NULL;
+    KjNode*             sysAttrsP     = NULL;
+    OrionldRenderFormat renderFormat  = RF_NORMALIZED;
+    double              timeInterval  = 0;
 
     kjTreeLog(dbSubP, "dbSubP", LmtPernot);
     KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,

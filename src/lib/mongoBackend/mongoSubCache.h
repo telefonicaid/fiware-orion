@@ -66,7 +66,7 @@ extern int mongoSubCacheItemInsert
   const std::string&     georel,
   StringFilter*          stringFilterP,
   StringFilter*          mdStringFilterP,
-  RenderFormat           renderFormat
+  OrionldRenderFormat    renderFormat
 );
 
 

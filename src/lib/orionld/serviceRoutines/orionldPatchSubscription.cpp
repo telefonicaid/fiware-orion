@@ -807,25 +807,25 @@ bool orionldPatchSubscription(void)
 {
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Subscription ID must be a valid URI", orionldState.wildcard[0], 400);
 
-  char*         subscriptionId         = orionldState.wildcard[0];
-  KjNode*       qP                     = NULL;
-  KjNode*       geoqP                  = kjLookup(orionldState.requestTree, "geoQ");
-  KjNode*       geoCoordinatesP        = NULL;
-  bool          mqttChange             = false;
-  KjNode*       subTree                = orionldState.requestTree;
-  KjNode*       idNode                 = orionldState.payloadIdNode;
-  KjNode*       typeNode               = orionldState.payloadTypeNode;
-  QNode*        qNodeP                 = NULL;
-  char*         qRenderedForDb         = NULL;
-  bool          qValidForV2            = false;
-  bool          qIsMq                  = false;
-  KjNode*       uriP                   = NULL;
-  KjNode*       notifierInfoP          = NULL;
-  KjNode*       showChangesP           = NULL;
-  KjNode*       sysAttrsP              = NULL;
-  double        timeInterval           = 0;
-  RenderFormat  renderFormat           = RF_NORMALIZED;
-  bool          r;
+  char*                subscriptionId         = orionldState.wildcard[0];
+  KjNode*              qP                     = NULL;
+  KjNode*              geoqP                  = kjLookup(orionldState.requestTree, "geoQ");
+  KjNode*              geoCoordinatesP        = NULL;
+  bool                 mqttChange             = false;
+  KjNode*              subTree                = orionldState.requestTree;
+  KjNode*              idNode                 = orionldState.payloadIdNode;
+  KjNode*              typeNode               = orionldState.payloadTypeNode;
+  QNode*               qNodeP                 = NULL;
+  char*                qRenderedForDb         = NULL;
+  bool                 qValidForV2            = false;
+  bool                 qIsMq                  = false;
+  KjNode*              uriP                   = NULL;
+  KjNode*              notifierInfoP          = NULL;
+  KjNode*              showChangesP           = NULL;
+  KjNode*              sysAttrsP              = NULL;
+  double               timeInterval           = 0;
+  OrionldRenderFormat  renderFormat           = RF_NORMALIZED;
+  bool                 r;
 
   r = pCheckSubscription(subTree,
                          false,

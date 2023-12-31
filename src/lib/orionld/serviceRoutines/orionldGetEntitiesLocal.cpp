@@ -202,11 +202,11 @@ bool orionldGetEntitiesLocal
   }
   else
   {
-    KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
-    RenderFormat  rf              = RF_NORMALIZED;
+    KjNode*              apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
+    OrionldRenderFormat  rf              = RF_NORMALIZED;
 
     if      (orionldState.uriParamOptions.concise   == true) rf = RF_CONCISE;
-    else if (orionldState.uriParamOptions.keyValues == true) rf = RF_KEYVALUES;
+    else if (orionldState.uriParamOptions.keyValues == true) rf = RF_SIMPLIFIED;
 
     if (orionldState.out.contentType == GEOJSON)
     {

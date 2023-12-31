@@ -50,7 +50,7 @@ std::string Attribute::render
   bool                comma                // in parameter
 )
 {
-  RenderFormat renderFormat = (keyValues == true)? RF_KEYVALUES : RF_NORMALIZED;
+  OrionldRenderFormat renderFormat = (keyValues == true)? RF_KEYVALUES : RF_NORMALIZED;
 
   if (pcontextAttribute)
   {

@@ -327,7 +327,7 @@ void setCondsAndInitialNotify
   const std::vector<std::string>&  metadataV,
   const HttpInfo&                  httpInfo,
   bool                             blacklist,
-  RenderFormat                     attrsFormat,
+  OrionldRenderFormat              attrsFormat,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const char*                      xauthToken,

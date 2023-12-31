@@ -25,13 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "common/RenderFormat.h"                               // RenderFormat
-
-#include "orionld/types/QNode.h"                               // QNode
 #include "orionld/types/PernotSubscription.h"                  // PernotSubscription
-#include "orionld/types/PernotSubCache.h"                      // PernotSubCache
-#include "orionld/types/OrionldContext.h"                      // OrionldContext
-#include "orionld/common/orionldState.h"                       // pernotSubCache
 
 
 

@@ -148,7 +148,7 @@ std::string ContextAttributeVector::toJsonTypes(void)
 */
 std::string ContextAttributeVector::toJson
 (
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist

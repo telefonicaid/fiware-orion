@@ -27,7 +27,7 @@
 */
 #include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
 #include "common/MimeType.h"                                   // MimeType
-#include "common/RenderFormat.h"                               // RenderFormat
+#include "orionld/types/OrionldRenderFormat.h"                 // OrionldRenderFormat
 
 
 
@@ -35,6 +35,6 @@
 //
 // kjTreeFromNotification -
 //
-extern KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, RenderFormat renderFormat, const char* lang, char** detailsP);
+extern KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, OrionldRenderFormat renderFormat, const char* lang, char** detailsP);
 
 #endif  // SRC_LIB_ORIONLD_KJTREE_KJTREEFROMNOTIFICATION_H_

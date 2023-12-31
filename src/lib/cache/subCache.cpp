@@ -851,7 +851,7 @@ bool subCacheItemInsert
   const char*                        subscriptionId,
   double                             expirationTime,
   double                             throttling,
-  RenderFormat                       renderFormat,
+  OrionldRenderFormat                renderFormat,
   bool                               notificationDone,
   double                             lastNotificationTime,
   double                             lastNotificationSuccessTime,

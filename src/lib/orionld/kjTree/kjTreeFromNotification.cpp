@@ -32,13 +32,11 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // Lmt*
 
 #include "ngsi10/NotifyContextRequest.h"                       // NotifyContextRequest
 
-#include "common/RenderFormat.h"                               // RenderFormat
-
 #include "orionld/types/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldRenderFormat.h"                 // OrionldRenderFormat
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/numberToDate.h"                       // numberToDate
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
@@ -55,7 +53,7 @@ extern "C"
 //
 // kjTreeFromNotification -
 //
-KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, RenderFormat renderFormat, const char* lang, char** detailsP)
+KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, MimeType mimeType, OrionldRenderFormat renderFormat, const char* lang, char** detailsP)
 {
   KjNode*          nodeP;
   KjNode*          rootP             = kjObject(orionldState.kjsonP, NULL);
@@ -128,7 +126,7 @@ KjNode* kjTreeFromNotification(NotifyContextRequest* ncrP, const char* context, 
     kjChildAdd(objectP, nodeP);
 
     // entity type - Mandatory URI
-    if ((renderFormat != RF_CROSS_APIS_NORMALIZED) && (renderFormat != RF_CROSS_APIS_KEYVALUES))
+    if ((renderFormat != RF_CROSS_APIS_NORMALIZED) && (renderFormat != RF_CROSS_APIS_SIMPLIFIED))
     {
       alias = orionldContextItemAliasLookup(contextP, ceP->entityId.type.c_str(), NULL, NULL);
       nodeP = kjString(orionldState.kjsonP, "type", alias);

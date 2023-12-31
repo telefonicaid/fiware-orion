@@ -30,9 +30,8 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "common/RenderFormat.h"                                 // RenderFormat
-
 #include "orionld/types/QNode.h"                                 // QNode
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 
 
 
@@ -42,16 +41,16 @@ extern "C"
 //
 extern KjNode* dbModelToApiSubscription
 (
-  KjNode*        dbSubP,
-  const char*    tenant,
-  bool           forSubCache,
-  QNode**        qNodePP,
-  KjNode**       coordinatesPP,
-  KjNode**       contextNodePP,
-  KjNode**       showChangesP,
-  KjNode**       sysAttrsP,
-  RenderFormat*  renderFormatP,
-  double*        timeIntervalP
+  KjNode*               dbSubP,
+  const char*           tenant,
+  bool                  forSubCache,
+  QNode**               qNodePP,
+  KjNode**              coordinatesPP,
+  KjNode**              contextNodePP,
+  KjNode**              showChangesP,
+  KjNode**              sysAttrsP,
+  OrionldRenderFormat*  renderFormatP,
+  double*               timeIntervalP
 );
 
 #endif  // SRC_LIB_ORIONLD_DBMODEL_DBMODELTOAPISUBSCRIPTION_H_

@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
+#include "orionld/types/OrionldRenderFormat.h"
 
 
 
@@ -39,31 +39,9 @@
 
 /* ****************************************************************************
 *
-* RenderFormat - 
-*/
-typedef enum RenderFormat
-{
-  RF_NONE                           = 0,   // Invalid
-  RF_LEGACY                         = 1,   // NGSIv1 only
-  RF_NORMALIZED                     = 2,   // DEFAULT
-  RF_CONCISE                        = 3,   // NGSI-LD Only - Concise format - as compact as possible while still lossless
-  RF_KEYVALUES                      = 4,   // keyValues/Simplified
-  RF_VALUES                         = 5,   // NGSIv2 only  - just the value, not even the key
-  RF_UNIQUE_VALUES                  = 6,   // NGSIv2 only  - just the value, not even the key, and no repetition of values
-  RF_CUSTOM                         = 7,   // NGSIv2 only  - custom format
-  RF_CROSS_APIS_NORMALIZED          = 12,  // NGSI-LD Only - x-ngsiv2-normalized
-  RF_CROSS_APIS_KEYVALUES           = 13,  // NGSI-LD Only - x-ngsiv2-keyValues
-  RF_CROSS_APIS_NORMALIZED_COMPACT  = 22,  // NGSI-LD Only - x-ngsiv2-normalized-compacted
-  RF_CROSS_APIS_KEYVALUES_COMPACT   = 23   // NGSI-LD Only - x-ngsiv2-keyValues-compacted
-} RenderFormat;
-
-
-
-/* ****************************************************************************
-*
 * renderFormatToString - 
 */
-extern const char* renderFormatToString(RenderFormat format, bool noDefault = true, bool userLegacyWord = false);
+extern const char* renderFormatToString(OrionldRenderFormat format, bool noDefault = true, bool userLegacyWord = false);
 
 
 
@@ -71,6 +49,6 @@ extern const char* renderFormatToString(RenderFormat format, bool noDefault = tr
 *
 * stringToRenderFormat
 */
-extern RenderFormat stringToRenderFormat(const char* s, bool noDefault = false);
+extern OrionldRenderFormat stringToRenderFormat(const char* s, bool noDefault = false);
 
 #endif  // SRC_LIB_COMMON_RENDERFORMAT_H_
