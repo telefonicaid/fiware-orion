@@ -59,7 +59,7 @@ bool legacyGetSubscription(void)
   }
 
   // Transform to KjNode tree
-  orionldState.httpStatusCode = SccOk;
+  orionldState.httpStatusCode = 200;
   orionldState.responseTree   = kjTreeFromSubscription(&subscription, cSubP, orionldState.contextP);
 
   return true;

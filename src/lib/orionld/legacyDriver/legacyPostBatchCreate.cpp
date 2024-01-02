@@ -333,7 +333,7 @@ bool legacyPostBatchCreate(void)
       {
         const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
 
-        if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
+        if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == 200)
           entitySuccessPush(successArrayP, entityId);
         else
           entityErrorPush(errorsArrayP,

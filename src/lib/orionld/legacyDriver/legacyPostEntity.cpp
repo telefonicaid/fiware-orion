@@ -297,12 +297,12 @@ bool legacyPostEntity(void)
     if (notUpdatedP->value.firstChildP == NULL)  // Empty array of "not updated attributes" - All OK
     {
       orionldState.responseTree   = NULL;
-      orionldState.httpStatusCode = SccNoContent;
+      orionldState.httpStatusCode = 204;
     }
     else
     {
       orionldState.responseTree   = responseP;
-      orionldState.httpStatusCode = SccMultiStatus;
+      orionldState.httpStatusCode = 207;
     }
 
     return true;
@@ -456,7 +456,6 @@ bool legacyPostEntity(void)
   // 10.2. Call mongoBackend to do the Update - if there are any attributes without datasetId
   if (notOnlyDatasets == true)
   {
-    HttpStatusCode            status;
     UpdateContextResponse     ucResponse;
     std::vector<std::string>  servicePathV;
 
@@ -467,19 +466,19 @@ bool legacyPostEntity(void)
     if (attrNameIx > 0)
       mongoCppLegacyEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
 
-    status = mongoUpdateContext(&ucr,
-                                &ucResponse,
-                                orionldState.tenantP,
-                                servicePathV,
-                                orionldState.in.xAuthToken,
-                                orionldState.correlator,
-                                orionldState.attrsFormat,
-                                orionldState.apiVersion,
-                                NGSIV2_NO_FLAVOUR);
+    int status = (int) mongoUpdateContext(&ucr,
+                                          &ucResponse,
+                                          orionldState.tenantP,
+                                          servicePathV,
+                                          orionldState.in.xAuthToken,
+                                          orionldState.correlator,
+                                          orionldState.attrsFormat,
+                                          orionldState.apiVersion,
+                                          NGSIV2_NO_FLAVOUR);
 
     PERFORMANCE(dbEnd);
 
-    if (status != SccOk)
+    if (status != 200)
       LM_E(("mongoUpdateContext: %d", status));
   }
 
@@ -489,12 +488,12 @@ bool legacyPostEntity(void)
   if (notUpdatedP->value.firstChildP == NULL)  // Empty array of "not updated attributes" - All OK
   {
     orionldState.responseTree   = NULL;
-    orionldState.httpStatusCode = SccNoContent;
+    orionldState.httpStatusCode = 204;
   }
   else
   {
     orionldState.responseTree   = responseP;
-    orionldState.httpStatusCode = SccMultiStatus;
+    orionldState.httpStatusCode = 207;
   }
 
   ucr.release();

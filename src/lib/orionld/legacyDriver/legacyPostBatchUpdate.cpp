@@ -299,7 +299,7 @@ bool legacyPostBatchUpdate(void)
                                                    NGSIV2_NO_FLAVOUR);
   PERFORMANCE(mongoBackendEnd);
 
-  if (orionldState.httpStatusCode == SccOk)
+  if (orionldState.httpStatusCode == 200)
   {
     orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
 
@@ -307,7 +307,7 @@ bool legacyPostBatchUpdate(void)
     {
       const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
 
-      if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
+      if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == 200)
         entitySuccessPush(successArrayP, entityId);
       else
       {
@@ -330,13 +330,13 @@ bool legacyPostBatchUpdate(void)
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);
 
-    orionldState.httpStatusCode = SccOk;
+    orionldState.httpStatusCode = 200;
   }
 
   mongoRequest.release();
   mongoResponse.release();
 
-  if (orionldState.httpStatusCode != SccOk)
+  if (orionldState.httpStatusCode != 200)
   {
     orionldError(OrionldBadRequestData, "Internal Error", "Database Error", 500);
     return false;

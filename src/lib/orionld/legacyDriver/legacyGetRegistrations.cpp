@@ -90,7 +90,7 @@ bool legacyGetRegistrations(void)
     kjChildAdd(orionldState.responseTree, registrationNodeP);
   }
 
-  orionldState.httpStatusCode = SccOk;
+  orionldState.httpStatusCode = 200;
 
   return true;
 }

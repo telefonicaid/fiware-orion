@@ -67,6 +67,7 @@ SET (SOURCES
     curlToBrokerStrerror.cpp
     fileName.cpp
     responseFix.cpp
+    lowercase.cpp
 )
 
 # Include directories

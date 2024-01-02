@@ -376,7 +376,7 @@ bool legacyGetEntities(void)
   //
   // Transform QueryContextResponse to KJ-Tree
   //
-  orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
+  orionldState.httpStatusCode = 200;  // FIXME: What about the response from mongoQueryContext???
 
   orionldState.responseTree = kjTreeFromQueryContextResponse(false, keyValues, concise, lang, &mongoResponse);
 

@@ -49,7 +49,7 @@ bool kjTreeToGeoLocation(KjNode* geoLocationNodeP, OrionldGeoLocation* locationP
   {
     LM_E(("pcheckGeoProperty failed"));
     // pcheckGeoProperty sets the Error Response
-    orionldState.httpStatusCode = SccBadRequest;
+    orionldState.httpStatusCode = 400;
     return false;
   }
 

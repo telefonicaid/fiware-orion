@@ -37,10 +37,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 
 #include "common/wsStrip.h"                                      // wsStrip
-#include "common/string.h"                                       // toLowercase
 #include "common/globals.h"                                      // parse8601Time
-#include "alarmMgr/alarmMgr.h"                                   // alarmMgr
-#include "rest/OrionError.h"                                     // OrionError
 #include "parse/forbiddenChars.h"                                // forbiddenChars
 
 #include "orionld/types/OrionLdRestService.h"                    // ORIONLD_URIPARAM_LIMIT, ...
@@ -51,6 +48,7 @@ extern "C"
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
+#include "orionld/common/lowercase.h"                            // lowercase
 #include "orionld/service/orionldServiceInit.h"                  // orionldRestServiceV
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -496,7 +494,7 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
       if (pCheckTenantName(value) == false)
         return MHD_YES;
 
-      toLowercase((char*) value);  // All tenants are lowercase - mongo decides that
+      lowercase((char*) value);  // All tenants are lowercase - mongo decides that
 
       // Tenant already given?
       if (orionldState.tenantName != NULL)
@@ -603,15 +601,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
     if (containsForbiddenChars == true)
     {
-      OrionError  error(SccBadRequest, "invalid character in a URI parameter");
-      char        details[256];
-
-      snprintf(details, sizeof(details), "invalid character in URI param '%s'", key);
       orionldError(OrionldBadRequestData, "invalid character in a URI parameter", key, 400);
-
-      alarmMgr.badInput(clientIp, details);
-
-      LM_W(("Bad Input (forbidden character in URI parameter value: %s=%s)", key, value));
       return MHD_YES;
     }
   }
@@ -1020,7 +1010,7 @@ static OrionLdRestService* serviceLookup(void)
   if (serviceP == NULL)
   {
     if (orionldBadVerb() == true)
-      orionldState.httpStatusCode = 405;  // SccBadVerb
+      orionldState.httpStatusCode = 405;  // 405: Bad Verb
     else
       orionldError(OrionldResourceNotFound, "Service Not Found", orionldState.urlPath, 404);
   }

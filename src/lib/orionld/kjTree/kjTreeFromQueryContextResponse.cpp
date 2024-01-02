@@ -129,8 +129,8 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
   //
   if ((oneHit == false) && (responseP->contextElementResponseVector.size() == 0))
   {
-    orionldState.responseTree = kjArray(orionldState.kjsonP, NULL);
-    orionldState.httpStatusCode = SccOk;
+    orionldState.responseTree   = kjArray(orionldState.kjsonP, NULL);
+    orionldState.httpStatusCode = 200;
 
     return orionldState.responseTree;
   }
@@ -139,17 +139,17 @@ KjNode* kjTreeFromQueryContextResponse(bool oneHit, bool keyValues, bool concise
   //
   // Error?
   //
-  if (responseP->errorCode.code == SccNone)
+  if (responseP->errorCode.code == 0)
     responseP->errorCode.code = SccOk;
 
-  if (responseP->errorCode.code != SccOk)
+  if (responseP->errorCode.code != 200)
   {
     LM_E(("Error %d from mongoBackend", responseP->errorCode.code));
     OrionldResponseErrorType errorType = httpStatusCodeToOrionldErrorType(responseP->errorCode.code);
 
     orionldError(errorType, responseP->errorCode.reasonPhrase.c_str(), responseP->errorCode.details.c_str(), 400);
 
-    if (responseP->errorCode.code == SccContextElementNotFound)
+    if (responseP->errorCode.code == 404)
       orionldState.httpStatusCode = 404;
 
     return orionldState.responseTree;

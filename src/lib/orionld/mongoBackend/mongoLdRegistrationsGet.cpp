@@ -248,7 +248,7 @@ bool mongoLdRegistrationsGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      orionldState.httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = 500;
       return false;
     }
 
@@ -257,7 +257,7 @@ bool mongoLdRegistrationsGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      orionldState.httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = 500;
       return false;
     }
 
@@ -266,7 +266,7 @@ bool mongoLdRegistrationsGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, detail));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      orionldState.httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = 500;
       return false;
     }
 
@@ -275,7 +275,7 @@ bool mongoLdRegistrationsGet
       LM_E(("Internal Error (mongoSetLdProperties: %s: %s)", title, detail));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      orionldState.httpStatusCode = SccReceiverInternalError;
+      orionldState.httpStatusCode = 500;
       return false;
     }
 

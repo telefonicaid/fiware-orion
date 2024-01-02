@@ -678,7 +678,7 @@ bool legacyPatchRegistration(void)
   mongoCppLegacyRegistrationReplace(registrationId, dbRegistrationP);
 
   // All OK? 204
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
 
   return true;
 }

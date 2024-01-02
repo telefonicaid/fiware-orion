@@ -46,7 +46,7 @@ bool legacyGetRegistration(void)
   }
 
   // Transform to KjNode tree
-  orionldState.httpStatusCode  = SccOk;
+  orionldState.httpStatusCode  = 200;
   orionldState.responseTree    = kjTreeFromRegistration(&registration);
 
   return true;

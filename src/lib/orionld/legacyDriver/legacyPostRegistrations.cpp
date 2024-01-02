@@ -101,7 +101,7 @@ bool legacyPostRegistrations(void)
                           &oError);
 
   // FIXME: Check oError for failure!
-  orionldState.httpStatusCode = SccCreated;
+  orionldState.httpStatusCode = 201;
 
   httpHeaderLocationAdd("/ngsi-ld/v1/csourceRegistrations/", regIdP, orionldState.tenantP->tenant);
 

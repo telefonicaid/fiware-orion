@@ -82,7 +82,7 @@ bool orionldDeleteSubscription(void)
     subCacheItemRemove(cSubP);
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
 
   return true;
 }

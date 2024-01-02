@@ -66,7 +66,7 @@ bool legacyDeleteSubscription(void)
       LM_W(("The subscription '%s' was successfully removed from DB but does not exist in sub-cache ... (sub-cache is enabled)"));
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
 
   return true;
 }

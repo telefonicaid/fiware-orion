@@ -467,13 +467,13 @@ bool legacyPostBatchUpsert(void)
   // bool partialUpdate = (orionldState.errorAttributeArrayP[0] == 0)? false : true;
   // bool retValue      = true;
   //
-  if (orionldState.httpStatusCode == SccOk)
+  if (orionldState.httpStatusCode == 200)
   {
     for (unsigned int ix = 0; ix < mongoResponse.contextElementResponseVector.vec.size(); ix++)
     {
       const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
 
-      if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
+      if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == 200)
       {
         // Creation or Update?
         KjNode* dbEntityP = entityLookupInDb(idTypeAndCreDateFromDb, entityId);

@@ -226,7 +226,7 @@ bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const 
 
       if (pcheckGeoPropertyValue(locationP, NULL, NULL, nodeP->name) == false)
       {
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
     }
@@ -237,7 +237,7 @@ bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const 
       EMPTY_OBJECT_CHECK(nodeP, nodeP->name);
       if (pcheckGeoPropertyValue(observationSpaceP, NULL, NULL, nodeP->name) == false)
       {
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
     }
