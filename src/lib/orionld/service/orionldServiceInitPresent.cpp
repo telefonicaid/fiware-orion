@@ -24,8 +24,7 @@
 */
 #include <stdio.h>                                      // printf
 
-#include "rest/Verb.h"                                  // Verb
-
+#include "orionld/types/Verb.h"                         // Verb
 #include "orionld/types/OrionLdRestService.h"           // OrionLdRestServiceVector
 #include "orionld/service/orionldServiceInit.h"         // orionldRestServiceV
 #include "orionld/service/orionldServiceInitPresent.h"  // Own Interface
@@ -42,7 +41,7 @@ void orionldServiceInitPresent(void)
   {
     OrionLdRestServiceVector* serviceV = &orionldRestServiceV[svIx];
 
-    printf("%d REST Services for %s\n", serviceV->services, verbName((Verb) svIx));
+    printf("%d REST Services for %s\n", serviceV->services, verbToString((Verb) svIx));
 
     if (serviceV->services == 0)
       continue;
@@ -51,7 +50,7 @@ void orionldServiceInitPresent(void)
     {
       OrionLdRestService* serviceP = &serviceV->serviceV[sIx];
 
-      printf("  %s %s\n", verbName((Verb) svIx), serviceP->url);
+      printf("  %s %s\n", verbToString((Verb) svIx), serviceP->url);
       printf("  Service routine at:           %p\n", serviceP->serviceRoutine);
       printf("  Wildcards:                    %d\n", serviceP->wildcards);
       printf("  charsBeforeFirstWildcard:     %d\n", serviceP->charsBeforeFirstWildcard);

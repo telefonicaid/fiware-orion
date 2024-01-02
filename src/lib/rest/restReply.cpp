@@ -133,7 +133,7 @@ void restReply(ConnectionInfo* ciP, const char* answer)
     if ((corsEnabled == true) && (orionldState.in.origin != NULL) && (orionldState.httpStatusCode != SccBadVerb))
     {
       // Only GET method is supported for V1 API
-      if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && orionldState.verb == GET))
+      if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && orionldState.verb == HTTP_GET))
       {
         //
         // If any origin is allowed, the header is sent always with "any" as value
@@ -150,7 +150,7 @@ void restReply(ConnectionInfo* ciP, const char* answer)
           MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN,   allowOrigin);
           MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
 
-          if (orionldState.verb == OPTIONS)
+          if (orionldState.verb == HTTP_OPTIONS)
           {
             char maxAge[16];
             snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);

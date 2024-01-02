@@ -30,10 +30,10 @@
 #include <map>
 
 #include "mongo/client/dbclient.h"
-#include "rest/Verb.h"
 
 #include "common/MimeType.h"              // MimeType
 #include "orionld/types/KeyValue.h"       // KeyValue
+#include "orionld/types/Verb.h"           // Verb
 #include "orionld/types/MqttInfo.h"       // MqttInfo
 
 

@@ -190,7 +190,7 @@ KjNode* errorTree
 //
 static bool contentTypeCheck(void)
 {
-  if ((orionldState.verb != POST) && (orionldState.verb != PATCH))
+  if ((orionldState.verb != HTTP_POST) && (orionldState.verb != HTTP_PATCH))
     return true;
 
   if (orionldState.requestTree == NULL)
@@ -997,7 +997,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   }
 
   // If OPTIONS verb, we skip all checks, go straight to the service routine
-  if (orionldState.verb == OPTIONS)
+  if (orionldState.verb == HTTP_OPTIONS)
     goto serviceRoutine;
 
   //
@@ -1006,9 +1006,9 @@ MHD_Result orionldMhdConnectionTreat(void)
   if (orionldState.httpStatusCode != 200)
     goto respond;
 
-  if ((orionldState.in.contentLength > 0) && (orionldState.verb != POST) && (orionldState.verb != PATCH) && (orionldState.verb != PUT))
+  if ((orionldState.in.contentLength > 0) && (orionldState.verb != HTTP_POST) && (orionldState.verb != HTTP_PATCH) && (orionldState.verb != HTTP_PUT))
   {
-    orionldError(OrionldBadRequestData, "Unexpected payload body", verbName(orionldState.verb), 400);
+    orionldError(OrionldBadRequestData, "Unexpected payload body", verbToString(orionldState.verb), 400);
     goto respond;
   }
 
@@ -1016,7 +1016,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   // Any URI param given but not supported?
   // No validity check if OPTIONS verb is used
   //
-  if (orionldState.verb != OPTIONS)
+  if (orionldState.verb != HTTP_OPTIONS)
   {
     char* detail = (char*) "no detail";
     if (uriParamSupport(orionldState.serviceP->uriParams, orionldState.uriParams.mask, &detail) == false)
@@ -1067,7 +1067,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   // 03. Check for empty payload for POST/PATCH/PUT
   //
-  if (((orionldState.verb == POST) || (orionldState.verb == PATCH) || (orionldState.verb == PUT)) && (payloadEmptyCheck() == false))
+  if (((orionldState.verb == HTTP_POST) || (orionldState.verb == HTTP_PATCH) || (orionldState.verb == HTTP_PUT)) && (payloadEmptyCheck() == false))
     goto respond;
 
 
@@ -1337,7 +1337,7 @@ MHD_Result orionldMhdConnectionTreat(void)
         //
         bool invokeTroe = false;
 
-        if (orionldState.verb == DELETE)                                                                  invokeTroe = true;
+        if (orionldState.verb == HTTP_DELETE)                                                             invokeTroe = true;
         if (orionldState.serviceP->serviceRoutine == orionldPostEntities)                                 invokeTroe = true;
         if ((orionldState.requestTree != NULL) && (orionldState.requestTree->value.firstChildP != NULL))  invokeTroe = true;
 

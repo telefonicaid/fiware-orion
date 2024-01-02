@@ -182,7 +182,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   ParseData parseData;
 
   // Overriding original verb to be a POST, now that this service routine has been invoked
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
 
   //

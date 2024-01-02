@@ -409,14 +409,14 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         verb = str2Verb(methodOpt.value);
 
-        if (verb == UNKNOWNVERB)
+        if (verb == HTTP_UNKNOWNVERB)
         {
           return badInput(ciP, "unknown method httpCustom notification");
         }
       }
       else  // not given by user, the default one will be used
       {
-        verb = NOVERB;
+        verb = HTTP_NOVERB;
       }
 
       subsP->notification.httpInfo.verb = verb;

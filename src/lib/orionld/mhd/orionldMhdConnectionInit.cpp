@@ -40,12 +40,12 @@ extern "C"
 #include "common/string.h"                                       // toLowercase
 #include "common/globals.h"                                      // parse8601Time
 #include "alarmMgr/alarmMgr.h"                                   // alarmMgr
-#include "rest/Verb.h"                                           // Verb
 #include "rest/OrionError.h"                                     // OrionError
 #include "parse/forbiddenChars.h"                                // forbiddenChars
 
 #include "orionld/types/OrionLdRestService.h"                    // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/types/OrionldMimeType.h"                       // mimeTypeFromString
+#include "orionld/types/Verb.h"                                  // Verb
 #include "orionld/common/orionldState.h"                         // orionldState, orionldStateInit
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
@@ -84,7 +84,7 @@ Verb verbGet(const char* method)
   int sLen = strlen(method);
 
   if (sLen < 3)
-    return NOVERB;
+    return HTTP_NOVERB;
 
   char c0   = method[0];
   char c1   = method[1];
@@ -94,16 +94,16 @@ Verb verbGet(const char* method)
   if (sLen == 3)
   {
     if ((c0 == 'G') && (c1 == 'E') && (c2 == 'T') && (c3 == 0))
-      return GET;
+      return HTTP_GET;
     if ((c0 == 'P') && (c1 == 'U') && (c2 == 'T') && (c3 == 0))
-      return PUT;
+      return HTTP_PUT;
   }
   else if (sLen == 4)
   {
     char c4 = method[4];
 
     if ((c0 == 'P') && (c1 == 'O') && (c2 == 'S') && (c3 == 'T') && (c4 == 0))
-      return POST;
+      return HTTP_POST;
   }
   else if (sLen == 6)
   {
@@ -112,7 +112,7 @@ Verb verbGet(const char* method)
     char c6 = method[6];
 
     if ((c0 == 'D') && (c1 == 'E') && (c2 == 'L') && (c3 == 'E') && (c4 == 'T') && (c5 == 'E') && (c6 == 0))
-      return DELETE;
+      return HTTP_DELETE;
   }
   else if (sLen == 5)
   {
@@ -120,7 +120,7 @@ Verb verbGet(const char* method)
     char c5 = method[5];
 
     if ((c0 == 'P') && (c1 == 'A') && (c2 == 'T') && (c3 == 'C') && (c4 == 'H') && (c5 == 0))
-      return PATCH;
+      return HTTP_PATCH;
   }
   else if (sLen == 7)
   {
@@ -130,10 +130,10 @@ Verb verbGet(const char* method)
     char c7 = method[7];
 
     if ((c0 == 'O') && (c1 == 'P') && (c2 == 'T') && (c3 == 'I') && (c4 == 'O') && (c5 == 'N') && (c6 == 'S') && (c7 == 0))
-      return OPTIONS;
+      return HTTP_OPTIONS;
   }
 
-  return NOVERB;
+  return HTTP_NOVERB;
 }
 
 
@@ -1135,7 +1135,7 @@ MHD_Result orionldMhdConnectionInit
   orionldState.verbString = (char*) method;
   orionldState.verb       = verbGet(method);
 
-  if (orionldState.verb == NOVERB)
+  if (orionldState.verb == HTTP_NOVERB)
   {
     orionldError(OrionldBadRequestData, "not a valid verb", method, 400);  // FIXME: do this after setting prettyPri, 400nt
     return MHD_YES;
@@ -1177,12 +1177,12 @@ MHD_Result orionldMhdConnectionInit
   // NGSI-LD only accepts the verbs POST, GET, DELETE, PATCH, PUT, and OPTIONS (if CORS is enabled)
   // If any other verb is used, even if a valid REST Verb, like HEAD, a generic error will be returned
   //
-  if ((orionldState.verb != POST)    &&
-      (orionldState.verb != GET)     &&
-      (orionldState.verb != DELETE)  &&
-      (orionldState.verb != PATCH)   &&
-      (orionldState.verb != PUT)     &&
-      (orionldState.verb != OPTIONS))
+  if ((orionldState.verb != HTTP_POST)    &&
+      (orionldState.verb != HTTP_GET)     &&
+      (orionldState.verb != HTTP_DELETE)  &&
+      (orionldState.verb != HTTP_PATCH)   &&
+      (orionldState.verb != HTTP_PUT)     &&
+      (orionldState.verb != HTTP_OPTIONS))
   {
     orionldError(OrionldBadRequestData, "Verb not supported by NGSI-LD", method, 400);
   }
@@ -1225,9 +1225,9 @@ MHD_Result orionldMhdConnectionInit
   // Check URL path is OK
 
   // Check Content-Type is accepted
-  if ((orionldState.verb == PATCH) && (orionldState.in.contentType == MT_MERGEPATCHJSON))
+  if ((orionldState.verb == HTTP_PATCH) && (orionldState.in.contentType == MT_MERGEPATCHJSON))
     orionldState.in.contentType = MT_JSON;
-  else if ((orionldState.verb == POST) || (orionldState.verb == PATCH))
+  else if ((orionldState.verb == HTTP_POST) || (orionldState.verb == HTTP_PATCH))
   {
     if ((orionldState.in.contentType != MT_JSON) && (orionldState.in.contentType != MT_JSONLD))
     {

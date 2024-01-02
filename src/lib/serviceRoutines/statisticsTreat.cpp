@@ -301,7 +301,7 @@ std::string statisticsTreat
 
   JsonHelper js;
 
-  if (orionldState.verb == DELETE)
+  if (orionldState.verb == HTTP_DELETE)
   {
     resetStatistics();
     js.addString("message", "All statistics counter reset");
@@ -358,7 +358,7 @@ std::string statisticsCacheTreat
 
   JsonHelper js;
 
-  if (orionldState.verb == DELETE)
+  if (orionldState.verb == HTTP_DELETE)
   {
     subCacheStatisticsReset("statisticsTreat::DELETE");
     js.addString("message", "All statistics counter reset");

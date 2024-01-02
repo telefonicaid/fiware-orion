@@ -44,8 +44,6 @@ extern "C"
 
 #include "common/globals.h"                                      // ApiVersion
 #include "common/limits.h"                                       // IP_LENGTH_MAX, STATIC_BUFFER_SIZE
-#include "rest/HttpStatusCode.h"                                 // HttpStatusCode
-#include "rest/Verb.h"                                           // Verb
 #include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
 
 #include "orionld/types/OrionldResponseBuffer.h"                 // OrionldResponseBuffer
@@ -61,6 +59,7 @@ extern "C"
 #include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/TroeMode.h"                              // TroeMode
+#include "orionld/types/Verb.h"                                  // Verb
 #include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/types/OrionldMimeType.h"                       // MimeType
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE

@@ -548,7 +548,7 @@ void orionldServiceInit(OrionLdRestServiceSimplifiedVector* restServiceVV, int v
   int svIx;    // Service Vector Index
   for (svIx = 0; svIx < vecItems; svIx++)
   {
-    // svIx is really the Verb (GET=0, POST=2, up to NOVERB=9. See src/lib/rest/Verb.h)
+    // svIx is really the Verb (GET=0, POST=2, up to NOVERB=9. See src/lib/orionld/types/Verb.h)
 
     if (restServiceVV[svIx].serviceV == NULL)
       continue;

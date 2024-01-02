@@ -396,7 +396,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Add URI Params
   //
   LM_T(LmtDistOpRequestParams, ("%s: ---- URL Parameters for %s ------------------------", distOpP->regP->regId, distOpP->id));
-  if (orionldState.verb == GET)
+  if (orionldState.verb == HTTP_GET)
   {
     if (distOpP->attrsParam != NULL)
       uriParamAdd(&urlParts, distOpP->attrsParam, NULL, distOpP->attrsParamLen);
@@ -566,7 +566,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Link header must be added if "Content-Type" is "application/json" in original request
   // OR: if jsonldContext is present in "contextSourceInfo"
   //
-  if (orionldState.verb == GET)
+  if (orionldState.verb == HTTP_GET)
     contentType = MT_JSON;
 
   if (contentType == MT_JSON)

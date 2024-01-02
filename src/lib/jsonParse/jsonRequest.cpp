@@ -63,8 +63,14 @@
 
 #include "parse/compoundValue.h"
 #include "rest/restReply.h"
+#include "orionld/types/Verb.h"                   // Verb, verbToString
 
 
+
+// -----------------------------------------------------------------------------
+//
+// FUNCS -
+//
 #define FUNCS(prefix) json##prefix##ParseVector, json##prefix##Init,    \
                       json##prefix##Check,       json##prefix##Release
 
@@ -143,7 +149,7 @@ static JsonRequest jsonRequest[] =
 */
 static JsonRequest* jsonRequestGet(RequestType request, Verb verb)
 {
-  std::string method = verbName(verb);
+  std::string method = verbToString(verb);
 
   for (unsigned int ix = 0; ix < sizeof(jsonRequest) / sizeof(jsonRequest[0]); ++ix)
   {

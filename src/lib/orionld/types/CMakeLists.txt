@@ -36,6 +36,7 @@ SET (SOURCES
     StringArray.cpp
     DistOpType.cpp
     TroeMode.cpp
+    Verb.cpp
 )
 
 # Include directories

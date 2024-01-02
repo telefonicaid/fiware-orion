@@ -89,13 +89,13 @@ RestService* restServiceVectorGet(Verb verb)
 {
   switch (verb)
   {
-  case POST:       return postServiceV;
-  case PUT:        return putServiceV;
-  case GET:        return getServiceV;
-  case PATCH:      return patchServiceV;
-  case DELETE:     return deleteServiceV;
-  case OPTIONS:    return (optionsServiceV == NULL)? restBadVerbV : optionsServiceV;
-  default:         return restBadVerbV;
+  case HTTP_POST:       return postServiceV;
+  case HTTP_PUT:        return putServiceV;
+  case HTTP_GET:        return getServiceV;
+  case HTTP_PATCH:      return patchServiceV;
+  case HTTP_DELETE:     return deleteServiceV;
+  case HTTP_OPTIONS:    return (optionsServiceV == NULL)? restBadVerbV : optionsServiceV;
+  default:              return restBadVerbV;
   }
 }
 
@@ -664,12 +664,12 @@ namespace orion
 */
 std::string requestServe(ConnectionInfo* ciP)
 {
-  if      ((orionldState.verb == GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
-  else if ((orionldState.verb == POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
-  else if ((orionldState.verb == PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
-  else if ((orionldState.verb == PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
-  else if ((orionldState.verb == DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
-  else if ((orionldState.verb == OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
+  if      ((orionldState.verb == HTTP_GET)     && (getServiceV     != NULL))    return restService(ciP, getServiceV);
+  else if ((orionldState.verb == HTTP_POST)    && (postServiceV    != NULL))    return restService(ciP, postServiceV);
+  else if ((orionldState.verb == HTTP_PUT)     && (putServiceV     != NULL))    return restService(ciP, putServiceV);
+  else if ((orionldState.verb == HTTP_PATCH)   && (patchServiceV   != NULL))    return restService(ciP, patchServiceV);
+  else if ((orionldState.verb == HTTP_DELETE)  && (deleteServiceV  != NULL))    return restService(ciP, deleteServiceV);
+  else if ((orionldState.verb == HTTP_OPTIONS) && (optionsServiceV != NULL))    return restService(ciP, optionsServiceV);
   else                                                             return restService(ciP, restBadVerbV);
 }
 

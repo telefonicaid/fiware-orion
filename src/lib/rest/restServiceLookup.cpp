@@ -41,7 +41,7 @@
 */
 RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
 {
-  Verb          verb      = (*badVerbP == false)? orionldState.verb : NOVERB;
+  Verb          verb      = (*badVerbP == false)? orionldState.verb : HTTP_NOVERB;
   RestService*  serviceV  = restServiceVectorGet(verb);
   int           serviceIx = 0;
   bool          match     = false;

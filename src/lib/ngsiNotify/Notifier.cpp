@@ -26,8 +26,16 @@
 
 #include <curl/curl.h>
 
+extern "C"
+{
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
+#include "kjson/kjRender.h"                                    // kjFastRender
+#include "kjson/kjson.h"                                       // Kjson
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
+}
+
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
 #include "common/string.h"
 #include "common/statistics.h"
@@ -40,23 +48,13 @@
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
 #include "rest/httpHeaderAdd.h"
-
-#ifdef ORIONLD
-extern "C"
-{
-#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
-#include "kjson/kjRender.h"                                    // kjFastRender
-#include "kjson/kjson.h"                                       // Kjson
-#include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
-}
-
 #include "cache/subCache.h"                                    // CachedSubscription
+
+#include "orionld/types/Verb.h"                                // Verb, verbToString
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "orionld/notifications/notificationDataToGeoJson.h"   // notificationDataToGeoJson
-#endif
 
 #include "ngsiNotify/Notifier.h"
 
@@ -236,12 +234,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 1. Verb/Method
     //
-    if (verb == NOVERB)
+    if (verb == HTTP_NOVERB)
     {
       // Default verb/method is POST
-      verb = POST;
+      verb = HTTP_POST;
     }
-    method = verbName(verb);
+    method = verbToString(verb);
 
 
     //
@@ -430,10 +428,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     CachedSubscription*               subP    = NULL;
     char*                             toFree  = NULL;
 
-    if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
+    if ((verb == HTTP_NOVERB) || (verb == HTTP_UNKNOWNVERB) || disableCusNotif)
     {
       // Default verb/method (or the one in case of disabled custom notifications) is POST
-      verb = POST;
+      verb = HTTP_POST;
     }
 
     //
@@ -582,7 +580,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
-    params->verb             = verbName(verb);
+    params->verb             = verbToString(verb);
     params->tenant           = tenant;
     params->servicePath      = spathList;
     params->xauthToken       = (xauthToken == NULL)? "" : xauthToken;

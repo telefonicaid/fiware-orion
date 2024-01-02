@@ -28,7 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "orionld/common/orionldState.h"                    // orionldState
+#include "orionld/common/orionldState.h"                     // orionldState
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
@@ -37,7 +37,8 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/orionLogReply.h"
 #include "rest/OrionError.h"
-#include "serviceRoutines/logTraceTreat.h"
+#include "orionld/types/Verb.h"                              // verbToString
+#include "serviceRoutines/logTraceTreat.h"                   // Own interface
 
 
 
@@ -64,12 +65,12 @@ std::string logTraceTreat
       path += "/";
   }
 
-  if ((components == 2) && (orionldState.verb == DELETE))
+  if ((components == 2) && (orionldState.verb == HTTP_DELETE))
   {
     lmTraceSet(NULL);
     out = orionLogReply(ciP, "tracelevels", "all trace levels off");
   }
-  else if ((components == 3) && (orionldState.verb == DELETE))
+  else if ((components == 3) && (orionldState.verb == HTTP_DELETE))
   {
     if (strspn(compV[2].c_str(), "0123456789-,'") != strlen(compV[2].c_str()))
     {
@@ -80,13 +81,13 @@ std::string logTraceTreat
     lmTraceSub(compV[2].c_str());
     out = orionLogReply(ciP, "tracelevels_removed", compV[2]);
   }
-  else if ((components == 2) && (orionldState.verb == GET))
+  else if ((components == 2) && (orionldState.verb == HTTP_GET))
   {
     char tLevels[256];
     lmTraceGet(tLevels, sizeof(tLevels));
     out = orionLogReply(ciP, "tracelevels", tLevels);
   }
-  else if ((components == 3) && (orionldState.verb == PUT))
+  else if ((components == 3) && (orionldState.verb == HTTP_PUT))
   {
     if (strspn(compV[2].c_str(), "0123456789-,'") != strlen(compV[2].c_str()))
     {
@@ -100,7 +101,7 @@ std::string logTraceTreat
   }
   else
   {
-    OrionError error(SccBadRequest, std::string("bad URL/Verb: ") + verbName(orionldState.verb) + " " + path);
+    OrionError error(SccBadRequest, std::string("bad URL/Verb: ") + verbToString(orionldState.verb) + " " + path);
 
     TIMED_RENDER(out = error.render());
   }

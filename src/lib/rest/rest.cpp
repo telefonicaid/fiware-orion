@@ -1152,7 +1152,7 @@ ConnectionInfo* connectionTreatInit
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
   //
   else if ((orionldState.in.contentLength == 0) &&
-           ((orionldState.verb == POST) || (orionldState.verb == PUT) || (orionldState.verb == PATCH )) &&
+           ((orionldState.verb == HTTP_POST) || (orionldState.verb == HTTP_PUT) || (orionldState.verb == HTTP_PATCH )) &&
            (strncasecmp(orionldState.urlPath, "/log/", 5) != 0) &&
            (strncasecmp(orionldState.urlPath, "/admin/log", 10) != 0))
   {
@@ -1502,7 +1502,7 @@ static MHD_Result connectionTreat
   // Check Content-Type and Content-Length for GET/DELETE requests
   //
   LM_W(("orionldState.in.contentType: %s", mimeType(orionldState.in.contentType)));
-  if ((orionldState.in.contentType != MT_NOTGIVEN) && (orionldState.in.contentType != MT_NONE) && (orionldState.in.contentLength == 0) && ((orionldState.verb == GET) || (orionldState.verb == DELETE)))
+  if ((orionldState.in.contentType != MT_NOTGIVEN) && (orionldState.in.contentType != MT_NONE) && (orionldState.in.contentLength == 0) && ((orionldState.verb == HTTP_GET) || (orionldState.verb == HTTP_DELETE)))
   {
     const char*  details = "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden";
     OrionError   oe(SccBadRequest, details);
