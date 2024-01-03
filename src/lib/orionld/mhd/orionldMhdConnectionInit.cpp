@@ -36,7 +36,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/wsStrip.h"                                      // wsStrip
 #include "common/globals.h"                                      // parse8601Time
 #include "parse/forbiddenChars.h"                                // forbiddenChars
 
@@ -49,6 +48,7 @@ extern "C"
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/lowercase.h"                            // lowercase
+#include "orionld/common/stringStrip.h"                          // stringStrip
 #include "orionld/service/orionldServiceInit.h"                  // orionldRestServiceV
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -263,7 +263,7 @@ static int strSplit(char* s, char delimiter, char** outV, int outMaxItems)
     if (*s == delimiter)
     {
       *s = 0;
-      outV[outIx] = wsStrip(start);
+      outV[outIx] = stringStrip(start);
       start = &s[1];
 
       // Check that the scope starts with a slash, etc ...
@@ -276,7 +276,7 @@ static int strSplit(char* s, char delimiter, char** outV, int outMaxItems)
     ++s;
   }
 
-  outV[outIx] = wsStrip(start);
+  outV[outIx] = stringStrip(start);
 
   ++outIx;
 

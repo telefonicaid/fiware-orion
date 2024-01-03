@@ -68,6 +68,7 @@ SET (SOURCES
     fileName.cpp
     responseFix.cpp
     lowercase.cpp
+    stringStrip.cpp
 )
 
 # Include directories

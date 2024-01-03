@@ -28,7 +28,6 @@
 
 #include "logMsg/logMsg.h"
 
-#include "common/wsStrip.h"
 #include "orionld/types/OrionldRenderFormat.h"
 #include "common/RenderFormat.h"
 

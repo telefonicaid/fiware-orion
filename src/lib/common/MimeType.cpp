@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/MimeType.h"
-#include "common/wsStrip.h"
 
 
 

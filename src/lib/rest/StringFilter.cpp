@@ -35,7 +35,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"
 
-#include "common/wsStrip.h"
 #include "common/string.h"
 #include "common/errorMessages.h"
 #include "parse/forbiddenChars.h"
@@ -45,12 +44,14 @@ extern "C"
 #include "ngsi/Metadata.h"
 #include "mongoBackend/dbConstants.h"
 
-#ifdef ORIONLD
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/eqForDot.h"                             // eqForDot
+#include "orionld/common/stringStrip.h"                          // stringStrip
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
-#endif
-#include "rest/StringFilter.h"
+
+#include "rest/StringFilter.h"                                   // Own interface
+
+
 
 using namespace mongo;
 
@@ -203,8 +204,8 @@ bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
   *dotdot  = 0;
   toString = &dotdot[2];
 
-  toString   = wsStrip(toString);
-  fromString = wsStrip(fromString);
+  toString   = stringStrip(toString);
+  fromString = stringStrip(fromString);
 
   if ((*toString == 0) || (*fromString == 0))
   {
@@ -275,7 +276,7 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   std::string            str;
   bool                   b;
 
-  s = wsStrip(s);
+  s = stringStrip(s);
   if (*s == 0)
   {
     *errorStringP = "empty item in list";
@@ -351,7 +352,7 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
     return false;
   }
 
-  char* itemStart = wsStrip(s);
+  char* itemStart = stringStrip(s);
   char* cP        = itemStart;
   bool  inString  = false;
 
@@ -584,7 +585,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
 
   type = _type;
 
-  s = wsStrip(s);
+  s = stringStrip(s);
   if (*s == 0)
   {
     free(toFree);
@@ -611,8 +612,8 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   // 1. Find operator (which also gives up LHS and RHS)
   //
   op   = opFind(s, &lhs, &rhs);
-  lhs  = wsStrip(lhs);
-  rhs  = wsStrip(rhs);
+  lhs  = stringStrip(lhs);
+  rhs  = stringStrip(rhs);
 
   //
   // Check for invalid LHS
@@ -1894,7 +1895,7 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
   char* str         = strdup(q);
   char* toFree      = str;
   char* saver;
-  char* s           = wsStrip(str);
+  char* s           = stringStrip(str);
   int   len         = strlen(s);
 
   if (s[len - 1] == ';')
@@ -1910,7 +1911,7 @@ bool StringFilter::parse(const char* q, std::string* errorStringP)
   //
   while ((s = strtok_r(str, ";", &saver)) != NULL)
   {
-    s = wsStrip(s);
+    s = stringStrip(s);
 
     if (*s == 0)
     {

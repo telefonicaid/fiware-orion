@@ -40,7 +40,6 @@
 #include "common/globals.h"
 #include "common/sem.h"
 #include "common/string.h"
-#include "common/wsStrip.h"
 #include "common/statistics.h"
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"

@@ -26,9 +26,8 @@
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/wsStrip.h"                                      // wsStrip
-
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/stringStrip.h"                          // stringStrip
 #include "orionld/types/OrionldMimeType.h"                       // Own interface
 
 
@@ -46,13 +45,13 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
   {
     *s = 0;
     ++s;
-    s = wsStrip(s);
+    s = stringStrip(s);
 
     if ((charsetP != NULL) && (strncmp(s, "charset=", 8) == 0))
       *charsetP = &s[8];
   }
 
-  cP = wsStrip(cP);
+  cP = stringStrip(cP);
 
   if (wildcardsAccepted == true)
   {

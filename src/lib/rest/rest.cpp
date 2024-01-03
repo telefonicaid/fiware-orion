@@ -44,7 +44,6 @@ extern "C"
 
 #include "common/limits.h"
 #include "common/string.h"
-#include "common/wsStrip.h"
 #include "common/globals.h"
 #include "common/errorMessages.h"
 #include "common/defaultValues.h"
@@ -65,6 +64,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/common/stringStrip.h"                          // stringStrip
 #include "orionld/mongoc/mongocConnectionRelease.h"              // Own interface
 #include "orionld/notifications/orionldAlterationsTreat.h"       // orionldAlterationsTreat
 #include "orionld/mhd/orionldMhdConnectionInit.h"                // orionldMhdConnectionInit
@@ -760,7 +760,7 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {
-    char* stripped = wsStrip((char*) ciP->servicePathV[ix].c_str());
+    char* stripped = stringStrip((char*) ciP->servicePathV[ix].c_str());
 
     ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
