@@ -35,8 +35,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
-
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError

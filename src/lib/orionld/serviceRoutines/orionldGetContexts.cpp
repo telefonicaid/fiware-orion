@@ -30,9 +30,7 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
-#include "mongoBackend/mongoQueryContext.h"                      // mongoQueryContext
-
+#include "orionld/http/httpHeaderLocationAdd.h"                  // httpHeaderLocationAdd
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/contextCache/orionldContextCacheGet.h"         // orionldContextCacheGet

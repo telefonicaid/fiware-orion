@@ -34,7 +34,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "cache/subCache.h"                                    // subCacheItemLookup, CachedSubscription
 
 #include "orionld/types/QNode.h"                               // QNode
@@ -44,6 +43,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/common/subCacheApiSubscriptionInsert.h"      // subCacheApiSubscriptionInsert
+#include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
 #include "orionld/legacyDriver/legacyPostSubscriptions.h"      // legacyPostSubscriptions
 #include "orionld/kjTree/kjChildPrepend.h"                     // kjChildPrepend
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription

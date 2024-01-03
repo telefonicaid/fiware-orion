@@ -30,10 +30,9 @@ extern "C"
 #include "logMsg/logMsg.h"                                          // LM_*
 #include "logMsg/traceLevels.h"                                     // Lmt*
 
-#include "rest/httpHeaderAdd.h"                                     // httpHeaderLocationAdd
-
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/numberToDate.h"                            // numberToDate
+#include "orionld/http/httpHeaderLocationAdd.h"                     // httpHeaderLocationAdd
 #include "orionld/payloadCheck/PCHECK.h"                            // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                    // pCheckEntityId
 #include "orionld/payloadCheck/pCheckEntityType.h"                  // pCheckEntityType

@@ -22,65 +22,64 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                              // strncpy
-#include <semaphore.h>                                           // sem_wait, sem_post
+#include <string.h>                                                // strncpy
+#include <semaphore.h>                                             // sem_wait, sem_post
 
 extern "C"
 {
-#include "kbase/kTime.h"                                         // kTimeGet
-#include "kbase/kStringSplit.h"                                  // kStringSplit
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBufferCreate.h"                                // kjBufferCreate
-#include "kjson/kjParse.h"                                       // kjParse
-#include "kjson/kjRenderSize.h"                                  // kjRenderSize, kjFastRenderSize
-#include "kjson/kjRender.h"                                      // kjRender, kjFastRender
-#include "kjson/kjClone.h"                                       // kjClone
-#include "kjson/kjFree.h"                                        // kjFree
-#include "kjson/kjBuilder.h"                                     // kjString, ...
-#include "kjson/kjLookup.h"                                      // kjLookup
-#include "kalloc/kaStrdup.h"                                     // kaStrdup
+#include "kbase/kTime.h"                                           // kTimeGet
+#include "kbase/kStringSplit.h"                                    // kStringSplit
+#include "kjson/KjNode.h"                                          // KjNode
+#include "kjson/kjBufferCreate.h"                                  // kjBufferCreate
+#include "kjson/kjParse.h"                                         // kjParse
+#include "kjson/kjRenderSize.h"                                    // kjRenderSize, kjFastRenderSize
+#include "kjson/kjRender.h"                                        // kjRender, kjFastRender
+#include "kjson/kjClone.h"                                         // kjClone
+#include "kjson/kjFree.h"                                          // kjFree
+#include "kjson/kjBuilder.h"                                       // kjString, ...
+#include "kjson/kjLookup.h"                                        // kjLookup
+#include "kalloc/kaStrdup.h"                                       // kaStrdup
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/logMsg.h"                                         // LM_*
 
-#include "rest/ConnectionInfo.h"                                 // ConnectionInfo
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
-#include "rest/restReply.h"                                      // restReply
+#include "rest/restReply.h"                                        // restReply
 
-#include "orionld/types/OrionldResponseErrorType.h"              // orionldResponseErrorType
-#include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
-#include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
-#include "orionld/types/OrionLdRestService.h"                    // ORIONLD_URIPARAM_LIMIT, ...
-#include "orionld/common/orionldState.h"                         // orionldState, orionldHostName, coreContextUrl
-#include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/SCOMPARE.h"                             // SCOMPARE
-#include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/uuidGenerate.h"                         // uuidGenerate
-#include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/common/orionldTenantCreate.h"                  // orionldTenantCreate
-#include "orionld/common/orionldTenantGet.h"                     // orionldTenantGet
-#include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/common/performance.h"                          // PERFORMANCE
-#include "orionld/common/tenantList.h"                           // tenant0
-#include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
-#include "orionld/prometheus/promCounterIncrease.h"              // promCounterIncrease
-#include "orionld/mongoc/mongocTenantExists.h"                   // mongocTenantExists
-#include "orionld/mongoc/mongocGeoIndexCreate.h"                 // mongocGeoIndexCreate
-#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"  // mongoCppLegacyGeoIndexCreate
-#include "orionld/db/dbGeoIndexLookup.h"                         // dbGeoIndexLookup
-#include "orionld/kjTree/kjNodeDecouple.h"                       // kjNodeDecouple
-#include "orionld/payloadCheck/pcheckName.h"                     // pcheckName
-#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
-#include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
-#include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
-#include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
-#include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
-#include "orionld/serviceRoutines/orionldPatchAttribute.h"       // orionldPatchAttribute
-#include "orionld/serviceRoutines/orionldGetEntity.h"            // orionldGetEntity
-#include "orionld/serviceRoutines/orionldGetEntities.h"          // orionldGetEntities
-#include "orionld/serviceRoutines/orionldPostEntities.h"         // orionldPostEntities
-#include "orionld/mhd/orionldMhdConnectionTreat.h"               // Own Interface
+#include "orionld/types/OrionldResponseErrorType.h"                // orionldResponseErrorType
+#include "orionld/types/OrionldProblemDetails.h"                   // OrionldProblemDetails
+#include "orionld/types/OrionldGeoIndex.h"                         // OrionldGeoIndex
+#include "orionld/types/OrionLdRestService.h"                      // ORIONLD_URIPARAM_LIMIT, ...
+#include "orionld/types/OrionldHeader.h"                           // orionldHeaderAdd
+#include "orionld/common/orionldState.h"                           // orionldState, orionldHostName, coreContextUrl
+#include "orionld/common/orionldError.h"                           // orionldError
+#include "orionld/common/SCOMPARE.h"                               // SCOMPARE
+#include "orionld/common/CHECK.h"                                  // CHECK
+#include "orionld/common/uuidGenerate.h"                           // uuidGenerate
+#include "orionld/common/dotForEq.h"                               // dotForEq
+#include "orionld/common/orionldTenantCreate.h"                    // orionldTenantCreate
+#include "orionld/common/orionldTenantGet.h"                       // orionldTenantGet
+#include "orionld/common/numberToDate.h"                           // numberToDate
+#include "orionld/common/performance.h"                            // PERFORMANCE
+#include "orionld/common/tenantList.h"                             // tenant0
+#include "orionld/http/httpHeaderLinkAdd.h"                        // httpHeaderLinkAdd
+#include "orionld/prometheus/promCounterIncrease.h"                // promCounterIncrease
+#include "orionld/mongoc/mongocTenantExists.h"                     // mongocTenantExists
+#include "orionld/mongoc/mongocGeoIndexCreate.h"                   // mongocGeoIndexCreate
+#include "orionld/mongoCppLegacy/mongoCppLegacyGeoIndexCreate.h"   // mongoCppLegacyGeoIndexCreate
+#include "orionld/db/dbGeoIndexLookup.h"                           // dbGeoIndexLookup
+#include "orionld/kjTree/kjNodeDecouple.h"                         // kjNodeDecouple
+#include "orionld/payloadCheck/pcheckName.h"                       // pcheckName
+#include "orionld/context/orionldCoreContext.h"                    // orionldCoreContextP
+#include "orionld/context/orionldContextFromUrl.h"                 // orionldContextFromUrl
+#include "orionld/context/orionldContextFromTree.h"                // orionldContextFromTree
+#include "orionld/context/orionldContextUrlGenerate.h"             // orionldContextUrlGenerate
+#include "orionld/context/orionldContextItemExpand.h"              // orionldContextItemExpand
+#include "orionld/context/orionldAttributeExpand.h"                // orionldAttributeExpand
+#include "orionld/serviceRoutines/orionldPatchAttribute.h"         // orionldPatchAttribute
+#include "orionld/serviceRoutines/orionldGetEntity.h"              // orionldGetEntity
+#include "orionld/serviceRoutines/orionldGetEntities.h"            // orionldGetEntities
+#include "orionld/serviceRoutines/orionldPostEntities.h"           // orionldPostEntities
+#include "orionld/mhd/orionldMhdConnectionTreat.h"                 // Own Interface
 
 
 

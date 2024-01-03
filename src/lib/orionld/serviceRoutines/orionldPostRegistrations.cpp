@@ -31,11 +31,10 @@ extern "C"
 #include "kjson/kjBuilder.h"                                   // kjString, kjFloat, ...
 }
 
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
-
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
+#include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_OBJECT
 #include "orionld/payloadCheck/pcheckRegistration.h"           // pcheckRegistration
 #include "orionld/payloadCheck/pCheckUri.h"                    // pcheckUri

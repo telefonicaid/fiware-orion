@@ -31,13 +31,11 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
-
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/http/httpHeaderLocationAdd.h"                  // httpHeaderLocationAdd
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/contextCache/orionldContextCachePersist.h"     // orionldContextCachePersist

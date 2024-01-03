@@ -47,11 +47,11 @@ extern "C"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
-#include "rest/httpHeaderAdd.h"
 #include "cache/subCache.h"                                    // CachedSubscription
 
 #include "orionld/types/Verb.h"                                // Verb, verbToString
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
+#include "orionld/http/http.h"                                 // LINK_REL_AND_TYPE
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "orionld/notifications/notificationDataToGeoJson.h"   // notificationDataToGeoJson

@@ -38,13 +38,12 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd, httpHeaderLinkAdd
-
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/responseFix.h"                          // responseFix
+#include "orionld/http/httpHeaderLocationAdd.h"                  // httpHeaderLocationAdd
 #include "orionld/legacyDriver/legacyPostEntities.h"             // legacyPostEntities
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                 // pCheckEntityId

@@ -32,7 +32,6 @@ extern "C"
 }
 
 #include "common/globals.h"                                      // parse8601Time
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 #include "orionTypes/OrionValueType.h"                           // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                         // ActionType
 #include "parse/CompoundValueNode.h"                             // CompoundValueNode

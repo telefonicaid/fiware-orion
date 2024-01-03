@@ -36,7 +36,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 #include "orionTypes/OrionValueType.h"                           // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                         // ActionType
 #include "parse/CompoundValueNode.h"                             // CompoundValueNode
@@ -49,6 +48,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/CHECK.h"                                // CHECK_*    FIXME: Use PCHECK_* instead
+#include "orionld/http/httpHeaderLocationAdd.h"                  // httpHeaderLocationAdd
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                 // pCheckEntityId
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType

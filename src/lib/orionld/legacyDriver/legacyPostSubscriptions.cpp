@@ -38,12 +38,12 @@ extern "C"
 
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "rest/OrionError.h"                                   // OrionError
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
 
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
 #include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish

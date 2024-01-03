@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "rest/OrionError.h"                                   // OrionError
 #include "apiTypesV2/Registration.h"                           // Registration
 #include "mongoBackend/mongoRegistrationGet.h"                 // mongoRegistrationGet
@@ -36,6 +35,7 @@
 
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
 #include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
 #include "orionld/legacyDriver/legacyPostRegistrations.h"      // Own Interface

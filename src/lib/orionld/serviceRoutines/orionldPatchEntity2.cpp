@@ -37,9 +37,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/globals.h"                                      // parse8601Time
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
-
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
