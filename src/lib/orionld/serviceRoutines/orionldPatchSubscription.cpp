@@ -40,7 +40,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "cache/subCache.h"                                    // CachedSubscription, subCacheItemLookup
-#include "common/globals.h"                                    // parse8601Time
 
 #include "orionld/types/OrionldMimeType.h"                     // mimeTypeFromString
 #include "orionld/types/KeyValue.h"                            // KeyValue, keyValueLookup, keyValueAdd
@@ -48,6 +47,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/urlParse.h"                           // urlParse
+#include "orionld/common/dateTime.h"                           // dateTimeFromString
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
@@ -681,7 +681,7 @@ static bool subCacheItemUpdate
     else if ((strcmp(itemP->name, "expires") == 0) || (strcmp(itemP->name, "expiresAt") == 0))
     {
       // Give error for expires/expiresAt and version of NGSI-LD ?
-      cSubP->expirationTime = parse8601Time(itemP->value.s);
+      cSubP->expirationTime = dateTimeFromString(itemP->value.s);
     }
     else if (strcmp(itemP->name, "throttling") == 0)
     {

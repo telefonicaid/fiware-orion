@@ -32,8 +32,6 @@ extern "C"
 #include "kjson/kjClone.h"                                     // kjClone
 }
 
-#include "common/globals.h"                                    // parse8601Time
-
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/serviceRoutines/orionldPostBatchUpsert.h"    // orionldPostBatchUpsert

@@ -35,6 +35,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/mongoc/mongocEntityLookup.h"                   // mongocEntityLookup
 #include "orionld/mongoc/mongocEntityReplace.h"                  // mongocEntityReplace
 #include "orionld/dbModel/dbModelFromApiEntity.h"                // dbModelFromApiEntity
@@ -175,7 +176,7 @@ KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, const char
 
       if (strcmp(saP->name, "observedAt") == 0)
       {
-        double  dateTime = parse8601Time(saP->value.s);
+        double  dateTime = dateTimeFromString(saP->value.s);
         KjNode* oaP      = kjFloat(orionldState.kjsonP, "observedAt", dateTime);
 
         saP->type = KjObject;

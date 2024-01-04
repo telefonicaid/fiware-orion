@@ -36,7 +36,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/globals.h"                                      // parse8601Time
 #include "parse/forbiddenChars.h"                                // forbiddenChars
 
 #include "orionld/types/OrionLdRestService.h"                    // ORIONLD_URIPARAM_LIMIT, ...
@@ -49,6 +48,7 @@ extern "C"
 #include "orionld/common/orionldTenantLookup.h"                  // orionldTenantLookup
 #include "orionld/common/lowercase.h"                            // lowercase
 #include "orionld/common/stringStrip.h"                          // stringStrip
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/service/orionldServiceInit.h"                  // orionldRestServiceV
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -328,13 +328,13 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
   }
 
   //
-  MimeType winner        = MT_NOTGIVEN;
+  MimeType winner        = (mimes == 0)? MT_NOTGIVEN : MT_NONE;
   float    winningWeight = 0;
 
   for (int ix = 0; ix < mimes; ix++)
   {
-    MimeType  mimeType;
-    float     weight = 1;  // Default weight is 1 - q=xxx can modify that
+    MimeType  mimeType = MT_NOTGIVEN;
+    float     weight   = 1;  // Default weight is 1 - q=xxx can modify that
 
     // Extract weight, if there
     char* q = strstr(mimeV[ix], ";q=");
@@ -348,7 +348,9 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
     // GET the MIME type, check for new winner
     // REMEMBER:  JSON is the default Mime Type and if equal weight, JSON wins
     //
+    LM_T(LmtMimeType, ("mimeV[%d]: '%s'", ix, mimeV[ix]));
     mimeType                 = mimeTypeFromString(mimeV[ix], NULL, true, textOk, &orionldState.acceptMask);
+    LM_T(LmtMimeType, ("mimeType:   %d", mimeType));
     orionldState.acceptMask |= (1 << mimeType);  // It's OK to include "NOMIMETYPE"
 
     if (mimeType > MT_NONE)
@@ -371,6 +373,7 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
     }
   }
 
+  LM_T(LmtMimeType, ("winner: %d (%s)", winner, mimeType(winner)));
   return winner;
 }
 
@@ -842,9 +845,9 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   }
   else if (strcmp(key, "observedAt") == 0)
   {
-    orionldState.uriParams.observedAtAsDouble = parse8601Time((char*) value);
+    orionldState.uriParams.observedAtAsDouble = dateTimeFromString(value);
 
-    if (orionldState.uriParams.observedAtAsDouble == -1)
+    if (orionldState.uriParams.observedAtAsDouble < 0)
     {
       orionldError(OrionldBadRequestData, "Invalid value for uri parameter /observedAt/ (not a valid ISO8601 timestamp)", value, 400);
       return MHD_YES;

@@ -69,6 +69,7 @@ SET (SOURCES
     responseFix.cpp
     lowercase.cpp
     stringStrip.cpp
+    dateTime.cpp
 )
 
 # Include directories

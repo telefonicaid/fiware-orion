@@ -49,6 +49,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_STRING
@@ -580,7 +581,7 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
       metadataP->valueType   = orion::ValueTypeNumber;
 
       if (mdP->type == KjString)
-        metadataP->numberValue = parse8601Time(mdP->value.s);
+        metadataP->numberValue = dateTimeFromString(mdP->value.s);
       else
       {
         KjNode* valueP         = mdP->value.firstChildP;

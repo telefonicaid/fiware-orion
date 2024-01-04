@@ -272,7 +272,7 @@ MongoDB server version: REGEX(.*)
 	},
 	"managementInterval" : {
 		"endAt" : 1830247200.12,
-		"startAt" : 1514714400.7979999
+		"startAt" : 1514714400.798
 	},
 	"location" : {
 		"type" : "Polygon",

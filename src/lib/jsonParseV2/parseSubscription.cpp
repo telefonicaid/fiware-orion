@@ -32,6 +32,7 @@
 #include "rapidjson/document.h"
 
 #include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/common/dateTime.h"                 // dateTimeFromString
 
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
@@ -194,7 +195,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     }
     else
     {
-      eT = (uint64_t) parse8601Time((char*) expires.c_str());
+      eT = (uint64_t) dateTimeFromString(expires.c_str());
       if (eT == -1)
       {
         return badInput(ciP, "expires has an invalid format");

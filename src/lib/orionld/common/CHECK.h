@@ -30,6 +30,7 @@
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 
 
@@ -293,7 +294,7 @@ do                                                                              
 #define DATETIME_CHECK(stringValue, dateTimeValue, fieldName)                                                \
 do                                                                                                           \
 {                                                                                                            \
-  if ((dateTimeValue = parse8601Time(stringValue)) < 0)                                                      \
+  if ((dateTimeValue = dateTimeFromString(stringValue)) < 0)                                                 \
   {                                                                                                          \
     orionldError(OrionldBadRequestData, "Invalid DateTime value", fieldName, 400);                           \
     return false;                                                                                            \

@@ -33,8 +33,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/globals.h"                                      // parse8601Time
 #include "orionld/common/orionldState.h"                         // orionldState, coreContextUrl
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/types/RegCacheItem.h"                          // RegCacheItem
 #include "orionld/dbModel/dbModelFromApiRegistration.h"          // Own interface
 
@@ -182,14 +182,14 @@ void dbModelFromApiTimeInterval(KjNode* intervalP)
 
   if ((startAtP != NULL) && (startAtP->type == KjString))
   {
-    ts = parse8601Time(startAtP->value.s);
+    ts = dateTimeFromString(startAtP->value.s);
     startAtP->type    = KjFloat;
     startAtP->value.f = ts;
   }
 
   if ((endAtP != NULL) && (endAtP->type == KjString))
   {
-    ts = parse8601Time(endAtP->value.s);
+    ts = dateTimeFromString(endAtP->value.s);
     endAtP->type    = KjFloat;
     endAtP->value.f = ts;
   }
@@ -244,7 +244,7 @@ bool dbModelFromApiRegistration(KjNode* apiRegistration, RegCacheItem* rciP)
   if (expiresAtP != NULL)
   {
     expiresAtP->name    = (char*) "expiration";
-    expiresAtP->value.f = parse8601Time(expiresAtP->value.s);
+    expiresAtP->value.f = dateTimeFromString(expiresAtP->value.s);
     expiresAtP->type    = KjFloat;
   }
 

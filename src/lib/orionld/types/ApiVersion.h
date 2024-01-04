@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_TYPES_APIVERSION_H_
+#define SRC_LIB_ORIONLD_TYPES_APIVERSION_H_
+
 /*
 *
 * Copyright 2024 FIWARE Foundation e.V.
@@ -22,29 +25,20 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strlen
-
-#include "orionld/common/stringStrip.h"                        // Own interface
 
 
 
-// -----------------------------------------------------------------------------
-//
-// stringStrip -
-//
-char* stringStrip(char* s)
+/* ****************************************************************************
+*
+*  API version -
+*/
+typedef enum ApiVersion
 {
-  // Remove all whitespace before
-  while ((*s == ' ') || (*s == '\t') || (*s == '\n'))
-    ++s;
+  API_VERSION_NONE       = -1,
+  API_VERSION_ADMIN      =  0,
+  API_VERSION_NGSI_V1    =  1,
+  API_VERSION_NGSI_V2    =  2,
+  API_VERSION_NGSILD_V1  =  3
+} ApiVersion;
 
-  // Remove all whitespace after
-  char* sEnd = &s[strlen(s) - 1];
-  while ((*sEnd == ' ') || (*sEnd == '\t') || (*sEnd == '\n'))
-  {
-    *sEnd = 0;
-    --sEnd;
-  }
-
-  return s;
-}
+#endif  // SRC_LIB_ORIONLD_TYPES_APIVERSION_H_

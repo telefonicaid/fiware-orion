@@ -47,6 +47,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/stringStrip.h"                          // stringStrip
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 
 #include "rest/StringFilter.h"                                   // Own interface
@@ -438,7 +439,7 @@ bool StringFilterItem::valueGet
   {
     *valueTypeP = SfvtNumber;
   }
-  else if ((*doubleP = parse8601Time(s)) != -1)
+  else if ((*doubleP = dateTimeFromString(s)) >= 0)
   {
     *valueTypeP = SfvtDate;
   }

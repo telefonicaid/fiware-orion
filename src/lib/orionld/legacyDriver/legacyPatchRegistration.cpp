@@ -24,27 +24,26 @@
 */
 extern "C"
 {
-#include "kalloc/kaStrdup.h"                                    // kaStrdup
-#include "kjson/kjLookup.h"                                     // kjLookup
-#include "kjson/kjBuilder.h"                                    // kjChildAdd, ...
-#include "kjson/kjRender.h"                                     // kjRender (DEBUG)
+#include "kalloc/kaStrdup.h"                                           // kaStrdup
+#include "kjson/kjLookup.h"                                            // kjLookup
+#include "kjson/kjBuilder.h"                                           // kjChildAdd, ...
+#include "kjson/kjRender.h"                                            // kjRender (DEBUG)
 }
 
-#include "logMsg/logMsg.h"                                      // LM_*
-#include "logMsg/traceLevels.h"                                 // Lmt*
+#include "logMsg/logMsg.h"                                             // LM_*
+#include "logMsg/traceLevels.h"                                        // Lmt*
 
-#include "common/globals.h"                                     // parse8601Time
-
-#include "orionld/common/orionldState.h"                        // orionldState
-#include "orionld/common/orionldError.h"                        // orionldError
-#include "orionld/common/numberToDate.h"                        // numberToDate
-#include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
+#include "orionld/common/orionldState.h"                               // orionldState
+#include "orionld/common/orionldError.h"                               // orionldError
+#include "orionld/common/numberToDate.h"                               // numberToDate
+#include "orionld/common/dateTime.h"                                   // dateTimeFromString
+#include "orionld/context/orionldAttributeExpand.h"                    // orionldAttributeExpand
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationGet.h"      // mongoCppLegacyRegistrationGet
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationReplace.h"  // mongoCppLegacyRegistrationReplace
-#include "orionld/payloadCheck/PCHECK.h"                        // PCHECK_URI
-#include "orionld/payloadCheck/pcheckRegistration.h"            // pcheckRegistration
-#include "orionld/kjTree/kjChildAddOrReplace.h"                 // kjChildAddOrReplace
-#include "orionld/legacyDriver/legacyPatchRegistration.h"       // Own Interface
+#include "orionld/payloadCheck/PCHECK.h"                               // PCHECK_URI
+#include "orionld/payloadCheck/pcheckRegistration.h"                   // pcheckRegistration
+#include "orionld/kjTree/kjChildAddOrReplace.h"                        // kjChildAddOrReplace
+#include "orionld/legacyDriver/legacyPatchRegistration.h"              // Own Interface
 
 
 
@@ -251,11 +250,11 @@ void ngsildTimeIntervalToAPIv1Datamodel(KjNode* tiP)
   KjNode* endP   = kjLookup(tiP, "endAt");
   double  dateTime;
 
-  dateTime        = parse8601Time(startP->value.s);
+  dateTime        = dateTimeFromString(startP->value.s);
   startP->type    = KjFloat;
   startP->value.f = dateTime;
 
-  dateTime        = parse8601Time(endP->value.s);
+  dateTime        = dateTimeFromString(endP->value.s);
   endP->type      = KjFloat;
   endP->value.f   = dateTime;
 }
@@ -268,7 +267,7 @@ void ngsildTimeIntervalToAPIv1Datamodel(KjNode* tiP)
 //
 void dbModelFromApiExpires(KjNode* expiresP)
 {
-  expiresP->value.f  = parse8601Time(expiresP->value.s);
+  expiresP->value.f  = dateTimeFromString(expiresP->value.s);
   expiresP->type     = KjFloat;
 
   expiresP->name = (char*) "expiration";

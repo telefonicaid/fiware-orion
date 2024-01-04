@@ -39,6 +39,8 @@
 #include "rest/RestService.h"
 #include "rest/OrionError.h"
 
+#include "orionld/common/dateTime.h"
+
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseMetadataVector.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
@@ -159,7 +161,7 @@ static std::string parseContextAttributeObject
   // Is it a date?
   if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
   {
-    caP->numberValue =  parse8601Time((char*) caP->stringValue.c_str());
+    caP->numberValue =  dateTimeFromString(caP->stringValue.c_str());
 
     if (caP->numberValue == -1)
     {

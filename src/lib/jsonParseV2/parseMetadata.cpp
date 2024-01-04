@@ -34,6 +34,8 @@
 #include "parse/CompoundValueNode.h"
 #include "rest/OrionError.h"
 
+#include "orionld/common/dateTime.h"
+
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseMetadataCompoundValue.h"
 #include "jsonParseV2/parseMetadata.h"
@@ -123,7 +125,7 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
   // Is it a date?
   if ((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT))
   {
-    mdP->numberValue =  parse8601Time((char*) mdP->stringValue.c_str());
+    mdP->numberValue =  dateTimeFromString(mdP->stringValue.c_str());
 
     if (mdP->numberValue == -1)
     {

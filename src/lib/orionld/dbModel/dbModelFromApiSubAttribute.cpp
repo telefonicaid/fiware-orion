@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // Own interface
 
@@ -87,7 +88,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     //
     if (saP->type == KjString)
     {
-      double timestamp = parse8601Time(saP->value.s);
+      double timestamp = dateTimeFromString(saP->value.s);
 
       if (timestamp < 0)
       {

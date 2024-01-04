@@ -131,17 +131,23 @@ typedef enum TraceLevels
   LmtCount,                            // NGSILD-Results-Count header, details for distops
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
-  LmtLegacy,                           // Old code (mongoBackend, json parsers, etc)
-  LmtLegacySubMatch,                   // Old code - update/subscription match for subs/notifs
-  LmtLegacySubCacheRefresh,            // Old code - sub-cache-refresh
   LmtMqtt,                             // MQTT notifications
   LmtQ,                                // Query Language
   LmtPostgres,                         // Postgres (TRoE)
   LmtSql,                              // SQL command for TRoE
   LmtPgPool,                           // Postgres Connection Pool
-  LmtTenants,                          // Well, tenants :)
+  LmtTenants = 210,                    // Well, tenants :)
   LmtSocketService,                    // Socket Service
   LmtRegex,                            // Regular expressions - all of them
+  LmtDateTime,                         // DateTime (ISO8601) conversion
+  LmtMimeType,                         // MimeType
+
+  //
+  // Legacy
+  //
+  LmtLegacy  = 220,                    // Old code (mongoBackend, json parsers, etc)
+  LmtLegacySubMatch,                   // Old code - update/subscription match for subs/notifs
+  LmtLegacySubCacheRefresh,            // Old code - sub-cache-refresh
 
   LmtCurl    = 250,                    // CURL library
   LmtToDo,                             // To Do list

@@ -38,6 +38,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/metadataAdd.h"                          // metadataAdd
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pcheckGeoPropertyValue.h"         // pcheckGeoPropertyValue
@@ -104,7 +105,7 @@ static bool specialCompoundCheck(KjNode* compoundValueP)
     {
       STRING_CHECK(valueNodeP, "@value of DateTime @type");
 
-      if (parse8601Time(valueNodeP->value.s) == -1)
+      if (dateTimeFromString(valueNodeP->value.s) < 0)
       {
         orionldError(OrionldBadRequestData, "DateTime value of @value/@type compound must be a valid ISO8601", valueNodeP->value.s, 400);
         return false;
@@ -356,7 +357,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       double dateTime;
 
       // Check for valid ISO8601
-      if ((dateTime = parse8601Time(nodeP->value.s)) == -1)
+      if ((dateTime = dateTimeFromString(nodeP->value.s)) < 0)
         ATTRIBUTE_ERROR("The 'observedAt' attribute must have a valid ISO8601 as value", nodeP->name);
 
       // Change to Number
@@ -533,9 +534,9 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       {
         double dateTime;
 
-        if ((dateTime = parse8601Time(valueP->value.s)) == -1)
+        if ((dateTime = dateTimeFromString(valueP->value.s)) < 0)
         {
-          *detailP = (char*) "parse8601Time failed";
+          *detailP = (char*) "dateTimeFromString failed";
           ATTRIBUTE_ERROR("temporal property must have a valid ISO8601 as value", kNodeP->name);
         }
 
@@ -593,7 +594,7 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
         cValueNodeP->name        = "@value";
         cValueNodeP->valueType   = orion::ValueTypeNumber;
-        cValueNodeP->numberValue = parse8601Time(atValueNodeP->value.s);  // FIXME: Assuming "DateTime" - "Date"/"Time" ...
+        cValueNodeP->numberValue = dateTimeFromString(atValueNodeP->value.s);  // FIXME: Assuming "DateTime" - "Date"/"Time" ...
         cNodeP->childV.push_back(cValueNodeP);
 
         if (atTypeNodeP != NULL)

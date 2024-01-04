@@ -49,6 +49,7 @@ extern "C"
 #include "orionld/mqtt/mqttParse.h"                              // mqttParse
 #include "orionld/common/urlParse.h"                             // urlParse
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/common/subCacheApiSubscriptionInsert.h"        // Own interface
 
 
@@ -173,7 +174,7 @@ static void subCacheItemFill
     // "expiresAt" has already been translated to double?
     double ts;
     if (expiresAtP->type == KjString)
-      ts = parse8601Time(expiresAtP->value.s);
+      ts = dateTimeFromString(expiresAtP->value.s);
     else
       ts = expiresAtP->value.f;
 

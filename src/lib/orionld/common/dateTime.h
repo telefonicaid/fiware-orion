@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_ORIONLD_COMMON_DATETIME_H_
+#define SRC_LIB_ORIONLD_COMMON_DATETIME_H_
+
 /*
 *
 * Copyright 2024 FIWARE Foundation e.V.
@@ -22,29 +25,21 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                            // strlen
-
-#include "orionld/common/stringStrip.h"                        // Own interface
 
 
 
 // -----------------------------------------------------------------------------
 //
-// stringStrip -
+// dateTimeToString -
 //
-char* stringStrip(char* s)
-{
-  // Remove all whitespace before
-  while ((*s == ' ') || (*s == '\t') || (*s == '\n'))
-    ++s;
+extern char* dateTimeToString(double timestamp);
 
-  // Remove all whitespace after
-  char* sEnd = &s[strlen(s) - 1];
-  while ((*sEnd == ' ') || (*sEnd == '\t') || (*sEnd == '\n'))
-  {
-    *sEnd = 0;
-    --sEnd;
-  }
 
-  return s;
-}
+
+// -----------------------------------------------------------------------------
+//
+// dateTimeFromString -
+//
+extern double dateTimeFromString(const char* iso8601);
+
+#endif  // SRC_LIB_ORIONLD_COMMON_DATETIME_H_

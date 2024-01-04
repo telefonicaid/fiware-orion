@@ -32,9 +32,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                    // LM_*
 
+#include "orionld/types/OrionldAttributeType.h"               // NoAttributeType, Property
 #include "orionld/common/orionldState.h"                      // orionldState
 #include "orionld/common/orionldError.h"                      // orionldError
-#include "orionld/types/OrionldAttributeType.h"               // NoAttributeType, Property
+#include "orionld/common/dateTime.h"                          // dateTimeFromString
 #include "orionld/payloadCheck/pCheckUri.h"                   // pCheckUri
 
 
@@ -342,7 +343,7 @@ do                                                                              
   int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                       \
   const char* title = (_title == NULL)? "Invalid ISO8601"     : _title;                      \
                                                                                              \
-  if ((iso8601Var = parse8601Time(iso8601String)) == -1)                                     \
+  if ((iso8601Var = dateTimeFromString(iso8601String)) < 0)                                  \
   {                                                                                          \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
     return false;                                                                            \

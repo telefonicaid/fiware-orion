@@ -35,7 +35,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                     // LM_*
-#include "logMsg/traceLevels.h"                                // LmtRegCache
 
 #include "orionld/types/RegistrationMode.h"                    // registrationMode
 #include "orionld/types/RegCacheItem.h"                        // RegCacheItem
@@ -45,6 +44,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // STRING_CHECK, ...
 #include "orionld/common/tenantList.h"                         // tenant0
+#include "orionld/common/dateTime.h"                           // dateTimeFromString
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pcheckRegistration.h"           // pcheckRegistration
 #include "orionld/legacyDriver/legacyPatchRegistration.h"      // legacyPatchRegistration
@@ -196,7 +196,7 @@ static void kjCompoundPatch(KjNode* container, const char* fieldName, KjNode* rh
 static void kjDateTimePatch(KjNode* container, const char* fieldName, char* dateTime)
 {
   KjNode* nodeP  = kjLookup(container, fieldName);
-  double  dValue = parse8601Time(dateTime);
+  double  dValue = dateTimeFromString(dateTime);
 
   if (nodeP != NULL)
   {

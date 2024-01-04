@@ -46,6 +46,7 @@
 #include "mongo/client/dbclient.h"
 #include "mongoBackend/dbConstants.h"
 #include "orionld/common/eqForDot.h"
+#include "orionld/common/dateTime.h"
 #include "mongoBackend/compoundValueBson.h"
 
 
@@ -96,12 +97,10 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
     }
     if ((attrType == DATE_TYPE) || (attrType == DATE_TYPE_ALT))
     {
-      effectiveNumberValue = parse8601Time(effectiveStringValue);
-      if (effectiveNumberValue != -1)
-      {
+      effectiveNumberValue = dateTimeFromString(effectiveStringValue);
+      if (effectiveNumberValue >= 0)
         effectiveValueType = ValueTypeNumber;
-      }
-      // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
+      // Note that if dateTimeFromString() fails, we keep ValueTypeString and everything works like without autocast
     }
   }
 

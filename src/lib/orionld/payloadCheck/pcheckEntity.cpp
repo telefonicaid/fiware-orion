@@ -31,13 +31,8 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 }
 
-#include "common/globals.h"                                      // parse8601Time
 #include "orionTypes/OrionValueType.h"                           // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                         // ActionType
-#include "parse/CompoundValueNode.h"                             // CompoundValueNode
-#include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
-#include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError

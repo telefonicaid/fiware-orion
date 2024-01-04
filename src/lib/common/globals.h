@@ -305,17 +305,6 @@ extern int64_t parse8601(const std::string& s);
 
 
 
-/*****************************************************************************
-*
-* parse8601Time -
-*
-* This is common code for Duration and Throttling (at least)
-*
-*/
-extern double parse8601Time(char* ss);
-
-
-
 /* ****************************************************************************
 *
 * transactionIdGet - 

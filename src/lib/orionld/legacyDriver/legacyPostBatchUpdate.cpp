@@ -37,7 +37,6 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "common/globals.h"                                    // parse8601Time
 #include "orionTypes/OrionValueType.h"                         // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                       // ActionType
 #include "parse/CompoundValueNode.h"                           // CompoundValueNode

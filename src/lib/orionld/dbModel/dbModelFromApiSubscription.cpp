@@ -34,6 +34,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
+#include "orionld/common/dateTime.h"                           // dateTimeFromString
 #include "orionld/context/orionldCoreContext.h"                // orionldCoreContextP
 #include "orionld/context/orionldContextSimplify.h"            // orionldContextSimplify
 #include "orionld/dbModel/dbModelFromApiKeyValues.h"           // dbModelFromApiKeyValues
@@ -247,7 +248,7 @@ bool dbModelFromApiSubscription(KjNode* apiSubscriptionP, bool patch)
     {
       fragmentP->name    = (char*) "expiration";
       fragmentP->type    = KjFloat;
-      fragmentP->value.f = parse8601Time(fragmentP->value.s);
+      fragmentP->value.f = dateTimeFromString(fragmentP->value.s);
     }
     else if (strcmp(fragmentP->name, "throttling") == 0)
       throttlingP = fragmentP;
