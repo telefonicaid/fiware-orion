@@ -1,0 +1,126 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue #1519 - loooooong valuews of http headers in distops
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental -distributed -wip entityMaps
+accumulatorStart --pretty-print --url /ngsi-ld/v1/entities/urn:E1
+
+--SHELL--
+
+#
+# 01. Create a registration for the accumulator, entity type T
+# 02. Attempt to DELETE the entity urn:E1, with an Authorization header with a very long value"
+# 03. Dump the accumulator and see the long Authorization header
+#
+
+echo "01. Create a registration for the accumulator, entity type T"
+echo "============================================================"
+payload='{
+  "id": "urn:ngsi-ld:registration:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T",
+          "id": "urn:E1"
+        }
+      ]
+    }
+  ],
+  "contextSourceInfo": [
+    {
+      "key": "Authorization",
+      "value": "urn:ngsi-ld:request"
+    }
+  ],
+  "operations": [ "mergeEntity", "deleteEntity" ],
+  "endpoint": "http://localhost:'$LISTENER_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Attempt to DELETE the entity urn:E1, with an Authorization header with a very long value"
+echo "============================================================================================"
+Authorization="Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJCT0JsSEliWlV1ZHFydmpPQjZXbktBaHlFdU1IdWViZ2RkOXNKS3U5RWNFIn0.eyJleHAiOjE3ODk0OTE4MjEsImlhdCI6MTcwMzE3ODIyMSwianRpIjoiODFlNmVmNTktZTExZC00YjI1LWE5ZTAtZWNhNDQzNDkxYTBlIiwiaXNzIjoiaHR0cDovLzE1OC40Mi4xNjEuMTc3OjMxNTUxL2F1dGgvcmVhbG1zL21hc3RlciIsImF1ZCI6WyJtYXN0ZXItcmVhbG0iLCJhY2NvdW50Il0sInN1YiI6IjU2NjAwOWQ3LWJlMWUtNGYxZC05OWY2LTdiMjBkZmVlMDAyZiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFlcm9zIiwic2Vzc2lvbl9zdGF0ZSI6ImNkZTk5OTQ2LTUwM2UtNDY2OS04NDU2LTdlMjhhODQ2MzdhOSIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiY3JlYXRlLXJlYWxtIiwiZGVmYXVsdC1yb2xlcy1tYXN0ZXIiLCJvZmZsaW5lX2FjY2VzcyIsImFkbWluIiwiZG9tYWluX2FkbWlucyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWVyb3MiOnsicm9sZXMiOlsidXB2X3JvbGVfMSJdfSwibWFzdGVyLXJlYWxtIjp7InJvbGVzIjpbInZpZXctcmVhbG0iLCJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiJjZGU5OTk0Ni01MDNlLTQ2NjktODQ1Ni03ZTI4YTg0NjM3YTkiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6ImFlcm9zX3VzZXJfMiIsImdpdmVuX25hbWUiOiIiLCJmYW1pbHlfbmFtZSI6IiJ9.VDnNuP497t7SjYlXzCWaWUw33e3OPwLpB0xqCsOgekgwBySuaUpqJ6xaCssrmdgx8WYg3EE76GdcvnKSkC1oeTiR49AeKXK3D-UE8uj60zZKwXwQVapP7LhowraQpGeiwirGDZc9DV5at8pMR2gH3c88KSVtudxJQUcwm7wt0qvlX0M1eDJOo4YYjs41mIQiBWmIxantt3qXapk7ZzyByp3sp2Kzo6wJVAcJRlkoIsXBxAh6n5D1gerJzwh0f5OZMpxgjwCF3Jjps4Wjkh0je-CHFF-x0cSIS_LsqbPgys--mmuxyeXUF4W1wI2WyW36glEkCDdnZpbGhQXqtpFlxg"
+payload='{
+  "A1": 12
+}'
+orionCurl --url "/ngsi-ld/v1/entities/urn:E1" -X DELETE -H "Authorization: $Authorization"
+echo
+echo
+
+
+echo "03. Dump the accumulator and see the long Authorization header"
+echo "=============================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a registration for the accumulator, entity type T
+============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:ngsi-ld:registration:R1
+
+
+
+02. Attempt to DELETE the entity urn:E1, with an Authorization header with a very long value
+============================================================================================
+HTTP/1.1 404 Not Found
+Content-Length: 39
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "detail": "urn:E1",
+    "title": "Not Found"
+}
+
+
+03. Dump the accumulator and see the long Authorization header
+==============================================================
+DELETE http://REGEX(.*)/ngsi-ld/v1/entities/urn:E1
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJCT0JsSEliWlV1ZHFydmpPQjZXbktBaHlFdU1IdWViZ2RkOXNKS3U5RWNFIn0.eyJleHAiOjE3ODk0OTE4MjEsImlhdCI6MTcwMzE3ODIyMSwianRpIjoiODFlNmVmNTktZTExZC00YjI1LWE5ZTAtZWNhNDQzNDkxYTBlIiwiaXNzIjoiaHR0cDovLzE1OC40Mi4xNjEuMTc3OjMxNTUxL2F1dGgvcmVhbG1zL21hc3RlciIsImF1ZCI6WyJtYXN0ZXItcmVhbG0iLCJhY2NvdW50Il0sInN1YiI6IjU2NjAwOWQ3LWJlMWUtNGYxZC05OWY2LTdiMjBkZmVlMDAyZiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFlcm9zIiwic2Vzc2lvbl9zdGF0ZSI6ImNkZTk5OTQ2LTUwM2UtNDY2OS04NDU2LTdlMjhhODQ2MzdhOSIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiY3JlYXRlLXJlYWxtIiwiZGVmYXVsdC1yb2xlcy1tYXN0ZXIiLCJvZmZsaW5lX2FjY2VzcyIsImFkbWluIiwiZG9tYWluX2FkbWlucyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWVyb3MiOnsicm9sZXMiOlsidXB2X3JvbGVfMSJdfSwibWFzdGVyLXJlYWxtIjp7InJvbGVzIjpbInZpZXctcmVhbG0iLCJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctYXV0aG9yaXphdGlvbiIsInF1ZXJ5LWNsaWVudHMiLCJxdWVyeS11c2VycyIsIm1hbmFnZS1ldmVudHMiLCJtYW5hZ2UtcmVhbG0iLCJ2aWV3LWV2ZW50cyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJtYW5hZ2UtYXV0aG9yaXphdGlvbiIsIm1hbmFnZS1jbGllbnRzIiwicXVlcnktZ3JvdXBzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiJjZGU5OTk0Ni01MDNlLTQ2NjktODQ1Ni03ZTI4YTg0NjM3YTkiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6ImFlcm9zX3VzZXJfMiIsImdpdmVuX25hbWUiOiIiLCJmYW1pbHlfbmFtZSI6IiJ9.VDnNuP497t7SjYlXzCWaWUw33e3OPwLpB0xqCsOgekgwBySuaUpqJ6xaCssrmdgx8WYg3EE76GdcvnKSkC1oeTiR49AeKXK3D-UE8uj60zZKwXwQVapP7LhowraQpGeiwirGDZc9DV5at8pMR2gH3c88KSVtudxJQUcwm7wt0qvlX0M1eDJOo4YYjs41mIQiBWmIxantt3qXapk7ZzyByp3sp2Kzo6wJVAcJRlkoIsXBxAh6n5D1gerJzwh0f5OZMpxgjwCF3Jjps4Wjkh0je-CHFF-x0cSIS_LsqbPgys--mmuxyeXUF4W1wI2WyW36glEkCDdnZpbGhQXqtpFlxg
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Date: 202REGEX(.*)
+X-Forwarded-For: REGEX(.*)
+Via: 1.1 REGEX(.*)
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
