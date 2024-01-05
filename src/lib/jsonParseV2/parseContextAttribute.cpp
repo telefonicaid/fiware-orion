@@ -28,6 +28,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"                // ApiVersion
 #include "orionld/common/orionldState.h"             // orionldState
 
 #include "common/errorMessages.h"
@@ -264,7 +265,7 @@ std::string parseContextAttribute
     }
 
     // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
-    if (iter->value.HasMember("value") || orionldState.apiVersion == V2)
+    if (iter->value.HasMember("value") || orionldState.apiVersion == API_VERSION_NGSI_V2)
     {
       std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
       if (r != "OK")

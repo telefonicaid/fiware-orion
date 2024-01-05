@@ -953,7 +953,7 @@ bool subCacheItemInsert
 
   if (q != "")
   {
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
     {
       // FIXME: Instead of calling qBuild here, I should pass the pointer from pCheckSubscription
       if (cSubP->qP != NULL)

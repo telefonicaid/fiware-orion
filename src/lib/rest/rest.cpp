@@ -59,6 +59,7 @@ extern "C"
 
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd
 #include "orionld/types/OrionldMimeType.h"                       // mimeTypeFromString
+#include "orionld/types/ApiVersion.h"                            // ApiVersion
 #include "orionld/common/orionldState.h"                         // orionldState, multitenancy, ...
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -160,13 +161,13 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
 
-    if (orionldState.apiVersion == V2)
+    if (orionldState.apiVersion == API_VERSION_NGSI_V2)
     {
       OrionError error(SccBadRequest, errorString);
       orionldState.httpStatusCode = error.code;
       ciP->answer                 = error.smartRender(orionldState.apiVersion);
     }
-    else if (orionldState.apiVersion == ADMIN_API)
+    else if (orionldState.apiVersion == API_VERSION_ADMIN)
     {
       orionldState.httpStatusCode = SccBadRequest;
       ciP->answer                 = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
@@ -238,7 +239,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
     else if (limit == 0)
     {
-      if (orionldState.apiVersion != NGSI_LD_V1)
+      if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
       {
         OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
         orionldState.httpStatusCode = error.code;
@@ -342,7 +343,7 @@ static MHD_Result httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* k
     else
     {
       // Tenant used when tenant is not supported by the broker - silently ignored for NGSIv2/v2, error for NGSI-LD
-      if (orionldState.apiVersion == NGSI_LD_V1)
+      if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
         orionldError(OrionldBadRequestData, "Tenants not supported", "tenant in use but tenant support is not enabled for the broker", 400);
     }
   }
@@ -371,7 +372,7 @@ static void requestCompleted
   PERFORMANCE(requestCompletedStart);
 
   ConnectionInfo*  ciP      = (ConnectionInfo*) *con_cls;
-  const char*      spath    = ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))? ciP->servicePathV[0].c_str() : "";
+  const char*      spath    = ((orionldState.apiVersion != API_VERSION_NGSILD_V1) && (ciP->servicePathV.size() > 0))? ciP->servicePathV[0].c_str() : "";
   struct timespec  reqEndTime;
 
   //
@@ -482,7 +483,7 @@ static void requestCompleted
   //
   // Metrics
   //
-  if ((orionldState.apiVersion != NGSI_LD_V1) && (metricsMgr.isOn()))
+  if ((orionldState.apiVersion != API_VERSION_NGSILD_V1) && (metricsMgr.isOn()))
   {
     metricsMgr.add(orionldState.tenantP->tenant, spath, METRIC_TRANS_IN, 1);
 
@@ -511,7 +512,7 @@ static void requestCompleted
   extern void delayedReleaseExecute(void);
   delayedReleaseExecute();
 
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
     delete(ciP);
 
   kaBufferReset(&orionldState.kalloc, false);  // 'false': it's reused, but in a different thread ...
@@ -839,7 +840,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   }
 
   // Case 3
-  if ((orionldState.apiVersion == V1) && (orionldState.in.contentType != MT_JSON))
+  if ((orionldState.apiVersion == API_VERSION_NGSI_V1) && (orionldState.in.contentType != MT_JSON))
   {
     std::string details = std::string("not supported content type: ");
 
@@ -856,7 +857,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 
   // Case 4
-  if ((orionldState.apiVersion == V2) && (orionldState.in.contentType != MT_JSON) && (orionldState.in.contentType != MT_TEXT))
+  if ((orionldState.apiVersion == API_VERSION_NGSI_V2) && (orionldState.in.contentType != MT_JSON) && (orionldState.in.contentType != MT_TEXT))
   {
     std::string details = std::string("not supported content type: ") + orionldState.in.contentTypeString;
     orionldState.httpStatusCode = SccUnsupportedMediaType;
@@ -909,45 +910,45 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
 * This function returns the version of the API for the incoming message,
 * based on the URL according to:
 *
-*  V2:         for URLs in the /v2 path
-*  V1:         for URLs in the /v1 or with an equivalence (e.g. /ngi10, /log, etc.)
-*  ADMIN_API:  admin operations without /v1 alias
-*  NO_VERSION: others (invalid paths)
+*  API_VERSION_NGSI_V2:  for URLs in the /v2 path
+*  API_VERSION_NGSI_V1:  for URLs in the /v1 or with an equivalence (e.g. /ngi10, /log, etc.)
+*  API_VERSION_ADMIN:    admin operations without /v1 alias
+*  API_VERSION_NONE:     others (invalid paths)
 *
 */
 static ApiVersion apiVersionGet(const char* path)
 {
   if ((path[1] == 'v') && (path[2] == '2'))
   {
-    return V2;
+    return API_VERSION_NGSI_V2;
   }
 
   // Unlike v2, v1 is case-insensitive (see case/2057 test)
   if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
   {
-    return V1;
+    return API_VERSION_NGSI_V1;
   }
 
   if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
       (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0))
   {
-    return V1;
+    return API_VERSION_NGSI_V1;
   }
 
   if ((strncasecmp("/log",        path, strlen("/log"))        == 0)  ||
       (strncasecmp("/cache",      path, strlen("/cache"))      == 0)  ||
       (strncasecmp("/statistics", path, strlen("/statistics")) == 0))
   {
-    return V1;
+    return API_VERSION_NGSI_V1;
   }
 
   if ((strncmp("/admin",   path, strlen("/admin"))   == 0) ||
       (strncmp("/version", path, strlen("/version")) == 0))
   {
-    return ADMIN_API;
+    return API_VERSION_ADMIN;
   }
 
-  return NO_VERSION;
+  return API_VERSION_NONE;
 }
 
 
@@ -1068,7 +1069,7 @@ ConnectionInfo* connectionTreatInit
 
   orionldHeaderAdd(&orionldState.out.headers, HttpCorrelator, orionldState.correlator, 0);
 
-  if (((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize) && (orionldState.apiVersion == V2))
+  if (((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize) && (orionldState.apiVersion == API_VERSION_NGSI_V2))
   {
     char details[256];
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", orionldState.in.contentLength, inReqPayloadMaxSize);
@@ -1541,7 +1542,7 @@ static MHD_Result connectionTreat
     ciP->answer = ciP->restServiceP->treat(ciP, ciP->urlComponents, ciP->urlCompV, NULL);
 
     // Bad Verb in API v1 should have empty payload
-    if ((orionldState.apiVersion == V1) && (orionldState.httpStatusCode == SccBadVerb))
+    if ((orionldState.apiVersion == API_VERSION_NGSI_V1) && (orionldState.httpStatusCode == SccBadVerb))
     {
       ciP->answer = "";
     }

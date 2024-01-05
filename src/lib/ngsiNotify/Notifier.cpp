@@ -37,6 +37,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"                          // ApiVersion
+#include "orionld/types/Verb.h"                                // Verb, verbToString
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
+
 #include "common/string.h"
 #include "common/statistics.h"
 #include "common/limits.h"
@@ -49,8 +53,6 @@ extern "C"
 #include "rest/uriParamNames.h"
 #include "cache/subCache.h"                                    // CachedSubscription
 
-#include "orionld/types/Verb.h"                                // Verb, verbToString
-#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/http/http.h"                                 // LINK_REL_AND_TYPE
 #include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
@@ -267,7 +269,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
       if (renderFormat == RF_LEGACY)
       {
-        payload = ncr.render(V1, false);
+        payload = ncr.render(API_VERSION_NGSI_V1, false);
       }
       else
       {
@@ -498,8 +500,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string payloadString;
 
     if (renderFormat == RF_LEGACY)
-      payloadString = ncrP->render(V2, false);
-    else if (orionldState.apiVersion != NGSI_LD_V1)
+      payloadString = ncrP->render(API_VERSION_NGSI_V2, false);
+    else if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
     else
     {
@@ -639,7 +641,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
       if ((httpInfo.mimeType       == MT_JSON)                   &&
           (renderFormat            != RF_CROSS_APIS_NORMALIZED)  &&
           (renderFormat            != RF_CROSS_APIS_SIMPLIFIED)  &&
-          (orionldState.apiVersion == NGSI_LD_V1))
+          (orionldState.apiVersion == API_VERSION_NGSILD_V1))
       {
         if (subP->ldContext != "")
           params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;

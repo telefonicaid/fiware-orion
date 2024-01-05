@@ -32,6 +32,7 @@
 #include "mongo/client/dbclient.h"
 
 #include "orionld/types/OrionldTenant.h"                           // OrionldTenant
+#include "orionld/types/ApiVersion.h"                              // ApiVersion
 #include "orionTypes/UpdateActionType.h"
 #include "ngsi10/UpdateContextResponse.h"
 
@@ -51,7 +52,7 @@ extern void processContextElement
   const char*                          xauthToken,
   const char*                          fiwareCorrelator,
   const std::string&                   ngsiV2AttrsFormat,
-  ApiVersion                           apiVersion       = V1,
+  ApiVersion                           apiVersion       = API_VERSION_NGSI_V1,
   Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR
 );
 

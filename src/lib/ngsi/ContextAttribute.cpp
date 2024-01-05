@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/ApiVersion.h"                // ApiVersion
 #include "orionld/common/orionldState.h"             // orionldState
 
 #include "common/string.h"
@@ -471,7 +472,7 @@ const char* ContextAttribute::getMetadataId() const
 */
 std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 {
-  if (apiVersion == V1)
+  if (apiVersion == API_VERSION_NGSI_V1)
   {
     // Deprecated way, but still supported
     for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
@@ -955,7 +956,7 @@ std::string ContextAttribute::toJsonAsValue
       switch (valueType)
       {
       case orion::ValueTypeString:
-        if (apiVersion == V2)
+        if (apiVersion == API_VERSION_NGSI_V2)
         { 
           out = '"' + stringValue + '"';
         }
@@ -1041,7 +1042,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   size_t len;
   char errorMsg[128];
 
-  if (((apiVersion == V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  if (((apiVersion == API_VERSION_NGSI_V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -1074,7 +1075,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   }
 
 
-  if (apiVersion == V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == API_VERSION_NGSI_V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);

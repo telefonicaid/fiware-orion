@@ -163,21 +163,6 @@ typedef enum Ngsiv2Flavour
 
 /* ****************************************************************************
 *
-*  NGSI API version -
-*/
-typedef enum ApiVersion
-{
-  NO_VERSION  = -1,
-  ADMIN_API   = 0,
-  V1          = 1,
-  V2          = 2,
-  NGSI_LD_V1  = 3
-} ApiVersion;
-
-
-
-/* ****************************************************************************
-*
 * PERMANENT_EXPIRES_DATETIME - date for permanent subscriptions/registrations
 */
 #define PERMANENT_EXPIRES_DATETIME  LLONG_MAX

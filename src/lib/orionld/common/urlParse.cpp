@@ -200,7 +200,7 @@ bool urlParse(char* url, char** protocolP, char** ipP, unsigned short* portP, ch
   LM_T(LmtAlt, ("URL:      '%s'", url));
 
   // Check for custom url, e.g. "${abc}" - only if NGSIv2
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
   {
     if (strncmp(url, "${", 2) == 0)
     {

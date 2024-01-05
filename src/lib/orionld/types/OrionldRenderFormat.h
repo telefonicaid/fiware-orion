@@ -63,7 +63,7 @@ typedef enum OrionldRenderFormat
 
 // -----------------------------------------------------------------------------
 //
-// renderFormat - 
+// renderFormat -
 //
 extern const char* renderFormat(OrionldRenderFormat renderFormat);
 
@@ -71,7 +71,7 @@ extern const char* renderFormat(OrionldRenderFormat renderFormat);
 
 // -----------------------------------------------------------------------------
 //
-// renderFormatFromString - 
+// renderFormatFromString -
 //
 extern OrionldRenderFormat renderFormat(const char* renderFormat);
 

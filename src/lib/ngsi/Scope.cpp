@@ -30,14 +30,14 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+
+#include "orionld/types/ApiVersion.h"                              // ApiVersion
 
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/string.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
-
 #include "ngsi/Scope.h"
 #include "parse/forbiddenChars.h"
 #include "orionld/common/orionldState.h"
@@ -120,7 +120,7 @@ int Scope::fill
   char*                       coordsString2 = (coordsString != NULL)? kaStrdup(&orionldState.kalloc, coordsString) : NULL;
   char*                       georelString2 = (georelString != NULL)? kaStrdup(&orionldState.kalloc, georelString) : NULL;
 
-  type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
+  type = (apiVersion == API_VERSION_NGSI_V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
 
   //
   // The syntaxis of a polygon in APIv2 is:
@@ -134,7 +134,7 @@ int Scope::fill
   //
   char convertedCoordsString[512];  // Simply HAS to be enough!
 
-  if ((apiVersion == NGSI_LD_V1) && (strcmp(geometryString, "Polygon") == 0))
+  if ((apiVersion == API_VERSION_NGSILD_V1) && (strcmp(geometryString, "Polygon") == 0))
   {
     char* cP    = (char*) coordsString2;
     char* in    = cP;
@@ -358,7 +358,7 @@ int Scope::fill
       //
       bool error = false;
 
-      if (orionldState.apiVersion == NGSI_LD_V1)
+      if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
       {
         if ((coords != 2) && (coords != 3))
           error = true;
@@ -402,7 +402,7 @@ int Scope::fill
       return -1;
     }
 
-    if (apiVersion == NGSI_LD_V1)  // SWAP
+    if (apiVersion == API_VERSION_NGSILD_V1)  // SWAP
     {
       // Swapping longitude and latitude
       double saved = longitude;
@@ -417,7 +417,7 @@ int Scope::fill
 
   if (geometry.areaType == "circle")
   {
-    if (apiVersion == V2)
+    if (apiVersion == API_VERSION_NGSI_V2)
     {
       *errorStringP = (char*) "circle geometry is not supported by Orion API v2";
       LM_E(("geometry.parse: %s", *errorStringP));
@@ -450,7 +450,7 @@ int Scope::fill
   {
     areaType = orion::PolygonType;
 
-    if ((apiVersion == V1) && (pointV.size() < 3))
+    if ((apiVersion == API_VERSION_NGSI_V1) && (pointV.size() < 3))
     {
       *errorStringP = (char*) "Too few coordinates for polygon";
       LM_E(("geometry.parse: %s", *errorStringP));
@@ -458,7 +458,7 @@ int Scope::fill
       pointV.clear();
       return -1;
     }
-    else if ((apiVersion == V2) && (pointV.size() < 4))
+    else if ((apiVersion == API_VERSION_NGSI_V2) && (pointV.size() < 4))
     {
       *errorStringP = (char*) "Too few coordinates for polygon";
       LM_E(("geometry.parse: %s", *errorStringP));
@@ -470,7 +470,7 @@ int Scope::fill
     //
     // If v2, first and last point must be identical
     //
-    if ((apiVersion == V2) && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
+    if ((apiVersion == API_VERSION_NGSI_V2) && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
     {
       *errorStringP = (char*) "First and last point in polygon not the same";
       LM_E(("geometry.parse: %s", *errorStringP));

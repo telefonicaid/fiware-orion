@@ -30,7 +30,7 @@
 
 // -----------------------------------------------------------------------------
 //
-// renderFormat - 
+// renderFormat -
 //
 const char* renderFormat(OrionldRenderFormat rf)
 {
@@ -59,7 +59,7 @@ const char* renderFormat(OrionldRenderFormat rf)
 
 // -----------------------------------------------------------------------------
 //
-// renderFormatFromString - 
+// renderFormatFromString -
 //
 OrionldRenderFormat renderFormat(const char* rf)
 {

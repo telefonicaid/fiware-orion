@@ -26,6 +26,9 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"                          // ApiVersion
+#include "orionld/common/orionldState.h"                       // orionldState
+
 #include "common/MimeType.h"
 #include "common/limits.h"
 #include "ngsi/StatusCode.h"
@@ -54,11 +57,6 @@
 #include "rest/OrionError.h"
 #include "rest/restReply.h"
 
-#ifdef ORIONLD
-#include "orionld/common/orionldState.h"                       // orionldState
-#endif
-#include "logMsg/traceLevels.h"
-
 
 
 /* ****************************************************************************
@@ -71,14 +69,14 @@ void restReply(ConnectionInfo* ciP, const char* answer)
   int            answerLen = (answer != NULL)? strlen(answer) : 0;
   char*          spath     = NULL;
 
-  if ((orionldState.apiVersion != NGSI_LD_V1) && (ciP->servicePathV.size() > 0))
+  if ((orionldState.apiVersion != API_VERSION_NGSILD_V1) && (ciP->servicePathV.size() > 0))
     spath = (char*) ciP->servicePathV[0].c_str();
 
   LM_T(LmtResponse, ("Response Body: '%s'", (answer != NULL)? answer : "None" ));
   LM_T(LmtResponse, ("Response Code:  %d", orionldState.httpStatusCode));
 
   response = MHD_create_response_from_buffer(answerLen, (char*) answer, MHD_RESPMEM_MUST_COPY);
-  bool metrics = (orionldState.apiVersion != NGSI_LD_V1) && metricsMgr.isOn();
+  bool metrics = (orionldState.apiVersion != API_VERSION_NGSILD_V1) && metricsMgr.isOn();
   if (!response)
   {
     if (metrics == true)
@@ -111,7 +109,7 @@ void restReply(ConnectionInfo* ciP, const char* answer)
   if ((answer != NULL) && (*answer != 0))
   {
     char* contentType = (char*) "application/json";
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
     {
       if      (answerLen <= 2)                             contentType = (char*) "application/json";
       else if (orionldState.httpStatusCode  >= 400)        contentType = (char*) "application/json";
@@ -128,12 +126,12 @@ void restReply(ConnectionInfo* ciP, const char* answer)
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
   {
     if ((corsEnabled == true) && (orionldState.in.origin != NULL) && (orionldState.httpStatusCode != SccBadVerb))
     {
       // Only GET method is supported for V1 API
-      if ((orionldState.apiVersion == V2) || (orionldState.apiVersion == V1 && orionldState.verb == HTTP_GET))
+      if ((orionldState.apiVersion == API_VERSION_NGSI_V2) || (orionldState.apiVersion == API_VERSION_NGSI_V1 && orionldState.verb == HTTP_GET))
       {
         //
         // If any origin is allowed, the header is sent always with "any" as value

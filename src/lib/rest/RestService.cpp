@@ -27,9 +27,9 @@
 #include "jsonParse/jsonRequest.h"
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
-#include "orionld/common/orionldState.h"
+#include "orionld/types/ApiVersion.h"                          // ApiVersion
+#include "orionld/common/orionldState.h"                       // orionldState
 
 #include "common/limits.h"
 #include "common/globals.h"
@@ -185,7 +185,7 @@ std::string payloadParse
 
   if (orionldState.in.contentType == MT_JSON)
   {
-    if (orionldState.apiVersion == V2)
+    if (orionldState.apiVersion == API_VERSION_NGSI_V2)
     {
       //
       // FIXME #3151: jsonRequestTreat should return 'bool' and accept an output parameter 'OrionError* oeP'.
@@ -461,7 +461,7 @@ static bool compErrorDetect
 {
   std::string  details;
 
-  if ((apiVersion == V2) && (compV[1] == "entities"))
+  if ((apiVersion == API_VERSION_NGSI_V2) && (compV[1] == "entities"))
   {
     if ((components == 4) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs
     {
@@ -574,7 +574,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       if (jsonReqP != NULL)
         jsonReqP->release(&parseData);
 
-      if (orionldState.apiVersion == V2)
+      if (orionldState.apiVersion == API_VERSION_NGSI_V2)
       {
         delayedRelease(&jsonRelease);
       }
@@ -612,7 +612,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       jsonReqP->release(&parseData);
     }
 
-    if (orionldState.apiVersion == V2)
+    if (orionldState.apiVersion == API_VERSION_NGSI_V2)
     {
       delayedRelease(&jsonRelease);
     }
@@ -640,7 +640,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     jsonReqP->release(&parseData);
   }
 
-  if (orionldState.apiVersion == V2)
+  if (orionldState.apiVersion == API_VERSION_NGSI_V2)
   {
     delayedRelease(&jsonRelease);
   }

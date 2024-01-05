@@ -384,7 +384,7 @@ KjNode* dbModelToApiSubscription
     if (v2mqP)
       kjChildRemove(dbExpressionP, v2mqP);
 
-    if (orionldState.apiVersion != NGSI_LD_V1)  // FIXME: When taking from DB at startup, this won't work ...
+    if (orionldState.apiVersion != API_VERSION_NGSILD_V1)  // FIXME: When taking from DB at startup, this won't work ...
     {
       if ((v2qP != NULL) && (v2qP->value.s[0] != 0))
         kjChildAdd(apiSubP, v2qP);

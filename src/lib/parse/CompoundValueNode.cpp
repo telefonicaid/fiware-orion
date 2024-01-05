@@ -25,14 +25,14 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+
+#include "orionld/types/ApiVersion.h"
 
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
-
 #include "orionTypes/OrionValueType.h"
 #include "parse/CompoundValueNode.h"
 
@@ -653,7 +653,7 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
   if (noComma == true)
     jsonComma = false;
 
-  if (apiVersion == V2)
+  if (apiVersion == API_VERSION_NGSI_V2)
     return toJson(true, false); // FIXME P8: The info on comma-after-or-not is not available here ...
 
 

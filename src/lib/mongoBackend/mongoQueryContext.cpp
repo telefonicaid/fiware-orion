@@ -394,7 +394,7 @@ HttpStatusCode mongoQueryContext
   //
   // NGSI-LD doesn't use NGSIv1/2 forwarding so all these strange lookups in the registration collection can be avoided
   //
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
   {
     ContextRegistrationResponseVector crrV;
 

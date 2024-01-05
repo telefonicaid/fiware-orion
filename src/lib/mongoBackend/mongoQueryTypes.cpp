@@ -28,8 +28,8 @@
 #include <set>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
+#include "orionld/types/ApiVersion.h"                    // ApiVersion
 #include "orionld/common/orionldState.h"                 // orionldState
 
 #include "common/sem.h"
@@ -558,7 +558,7 @@ HttpStatusCode mongoEntityTypes
           entityType->contextAttributeVector.push_back(ca);
 
           // For backward compability, NGSIv1 only accepts one element
-          if (apiVersion == V1)
+          if (apiVersion == API_VERSION_NGSI_V1)
             break;
         }
       }
@@ -612,7 +612,7 @@ HttpStatusCode mongoAttributesForEntityType
   bool           count          = false;
 
   // Count only makes sense for this operation in the case of NGSIv1
-  if (apiVersion == V1)
+  if (apiVersion == API_VERSION_NGSI_V1)
     count = orionldState.uriParams.details;
 
   // Setting the name of the entity type for the response
@@ -734,7 +734,7 @@ HttpStatusCode mongoAttributesForEntityType
         responseP->entityType.contextAttributeVector.push_back(ca);
 
         // For backward compability, NGSIv1 only accepts one element
-        if (apiVersion == V1)
+        if (apiVersion == API_VERSION_NGSI_V1)
         {
           break;
         }

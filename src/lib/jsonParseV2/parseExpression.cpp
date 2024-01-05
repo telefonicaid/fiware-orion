@@ -25,8 +25,9 @@
 
 #include <string>
 
-#include "jsonParseV2/parseExpression.h"
+#include "orionld/types/ApiVersion.h"                              // ApiVersion
 
+#include "jsonParseV2/parseExpression.h"
 #include "jsonParseV2/utilsParse.h"
 #include "common/errorMessages.h"
 
@@ -226,7 +227,7 @@ std::string parseExpression
     Scope*  scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     char*   err;
 
-    if (scopeP->fill(V2, geometry.c_str(), coords.c_str(), georel.c_str(), &err) != 0)
+    if (scopeP->fill(API_VERSION_NGSI_V2, geometry.c_str(), coords.c_str(), georel.c_str(), &err) != 0)
     {
       delete scopeP;
       return std::string("error parsing geo-query fields: ") + err;

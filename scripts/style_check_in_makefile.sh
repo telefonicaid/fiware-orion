@@ -47,7 +47,6 @@ function style_check
 
 
 style_check src/lib/orionld/entityMaps
-style_check src/lib/orionld/rest
 style_check src/lib/orionld/mhd
 style_check src/lib/orionld/service
 style_check src/lib/orionld/serviceRoutines

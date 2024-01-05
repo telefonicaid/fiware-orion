@@ -30,6 +30,7 @@
 #include <map>
 
 #include "orionld/types/OrionldTenant.h"             // OrionldTenant
+#include "orionld/types/ApiVersion.h"                // ApiVersion, API_VERSION_NGSI_V1
 
 #include "rest/HttpStatusCode.h"
 #include "ngsi10/UpdateContextRequest.h"
@@ -50,7 +51,7 @@ extern HttpStatusCode mongoUpdateContext
   const char*                           xauthToken,
   const char*                           fiwareCorrelator,
   const char*                           ngsiV2AttrsFormat,
-  ApiVersion                            apiVersion       = V1,
+  ApiVersion                            apiVersion       = API_VERSION_NGSI_V1,
   Ngsiv2Flavour                         ngsiv2Flavour    = NGSIV2_NO_FLAVOUR
 );
 

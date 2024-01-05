@@ -35,6 +35,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"
+
 #include "rest/uriParamNames.h"                // Default values for URI parameters
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
@@ -278,7 +280,7 @@ extern bool entitiesQuery
   bool*                            limitReached   = NULL,
   long long*                       countP         = NULL,
   char*                            sortOrderList  = NULL,
-  ApiVersion                       apiVersion     = V1
+  ApiVersion                       apiVersion     = API_VERSION_NGSI_V1
 );
 
 

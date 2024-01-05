@@ -26,13 +26,13 @@
 
 #include "rapidjson/document.h"
 
+#include "orionld/types/ApiVersion.h"                              // ApiVersion
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseScope.h"
-
 #include "common/errorMessages.h"
 
 
@@ -138,7 +138,7 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
   }
 
   char* result;
-  scopeP->fill(V2, geometry.c_str(), coords.c_str(), georel.c_str(), &result);
+  scopeP->fill(API_VERSION_NGSI_V2, geometry.c_str(), coords.c_str(), georel.c_str(), &result);
 
   return result;
 }

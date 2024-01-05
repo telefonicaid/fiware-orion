@@ -62,7 +62,7 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
     }
     else if (strcmp(cP, "application/*") == 0)
     {
-      if (orionldState.apiVersion == NGSI_LD_V1)
+      if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
         *acceptMaskP = (1 << MT_JSON) | (1 << MT_JSONLD) | (1 << MT_GEOJSON) | (1 << MT_MERGEPATCHJSON);
       else
         *acceptMaskP = (1 << MT_JSON) | (1 << MT_HTML);
@@ -71,7 +71,7 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
     }
     else if (strcmp(cP, "text/*") == 0)
     {
-      if (orionldState.apiVersion != NGSI_LD_V1)
+      if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
       {
         *acceptMaskP = (1 << MT_TEXT);
         return MT_TEXT;
@@ -84,7 +84,7 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
   else if (strcmp(cP, "application/geo+json")         == 0)  return MT_GEOJSON;
   else if (strcmp(cP, "application/merge-patch+json") == 0)  return MT_MERGEPATCHJSON;
 
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
   {
     if (strcmp(cP, "application/html")  == 0)  return MT_HTML;
 

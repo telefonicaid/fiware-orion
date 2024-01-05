@@ -50,8 +50,6 @@ typedef enum MimeType
 
 
 extern const char* mimeType(MimeType mimeType);
-extern const char* mimeTypeLong(MimeType mimeType);
 extern MimeType    mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcardsAccepted, bool textOk, uint32_t* acceptMaskP);
-extern MimeType	   mimeTypeFromLongString(const char* mimeType);
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDMIMETYPE_H_

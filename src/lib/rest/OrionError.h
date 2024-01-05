@@ -27,8 +27,8 @@
 */
 #include <string>
 
+#include "orionld/types/ApiVersion.h"                // ApiVersion
 #include "common/globals.h"
-
 #include "ngsi/StatusCode.h"
 #include "rest/HttpStatusCode.h"
 

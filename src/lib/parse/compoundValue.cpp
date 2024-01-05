@@ -59,7 +59,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   {
     orionldState.httpStatusCode = SccBadRequest;
 
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
       orionldState.responsePayload = (char*) "{\"ERROR\": \"in compoundValueEnd\"}";
     else
     {
@@ -84,7 +84,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   // ContextAttribute to point to by lastContextAttribute, as the whole payload
   // is a part of a ContextAttribute.
   //
-  RequestType requestType = (orionldState.apiVersion != NGSI_LD_V1)? ciP->restServiceP->request : NoRequest;
+  RequestType requestType = (orionldState.apiVersion != API_VERSION_NGSILD_V1)? ciP->restServiceP->request : NoRequest;
   
   if ((requestType == AttributeValueInstance)                           ||
       (requestType == AttributeValueInstanceWithTypeAndId)              ||

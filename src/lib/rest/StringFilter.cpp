@@ -527,7 +527,7 @@ static StringFilterOp opFind(char* expression, char** lhsP, char** rhsP)
       else   if (*eP == '>') { *rhsP = &eP[1]; op = SfopGreaterThan;        }
       else   if (*eP == ':')
       {
-        if ((orionldState.apiVersion != NGSI_LD_V1) && (eP[1] != '/') && (eP[2] != '/'))  // Don't if xxx://
+        if ((orionldState.apiVersion != API_VERSION_NGSILD_V1) && (eP[1] != '/') && (eP[2] != '/'))  // Don't if xxx://
         {
           *rhsP = &eP[1];
           op = SfopEquals;
@@ -659,7 +659,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   // URI-expand the attribute name
   //
-  if (orionldState.apiVersion == NGSI_LD_V1)
+  if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
   {
     char* expanded = orionldAttributeExpand(orionldState.contextP, (char*) attributeName.c_str(), true, NULL);  // NGSIv2 'q'
 

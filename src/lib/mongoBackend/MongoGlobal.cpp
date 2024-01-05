@@ -1222,7 +1222,7 @@ bool entitiesQuery
   /* The result of orEnt is appended to the final query */
   finalQuery.append("$or", orEnt.arr());
 
-  if (apiVersion != NGSI_LD_V1)
+  if (apiVersion != API_VERSION_NGSILD_V1)
   {
     /* Part 2: service path */
     const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
@@ -1288,7 +1288,7 @@ bool entitiesQuery
 
         if (result == true)
         {
-          if (orionldState.apiVersion == NGSI_LD_V1)
+          if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
           {
             char  dbAttrValuePath[512];
 
@@ -2158,7 +2158,7 @@ static bool processOnChangeConditionForSubscription
   // Special case: no entity/attribute found.
   //               If this happens, we'll notify with only entity info
   //
-  if (orionldState.apiVersion == NGSI_LD_V1)
+  if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
   {
     if (rawCerV.size() == 0)
     {

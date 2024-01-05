@@ -28,6 +28,7 @@
 #include "common/tag.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/StatusCode.h"
+#include "orionld/types/ApiVersion.h"                        // ApiVersion
 #include "rest/OrionError.h"
 
 
@@ -103,7 +104,7 @@ void OrionError::fill(const StatusCode& sc)
 */
 std::string OrionError::smartRender(ApiVersion apiVersion)
 {
-  if (apiVersion == V1 || apiVersion == NO_VERSION)
+  if (apiVersion == API_VERSION_NGSI_V1 || apiVersion == API_VERSION_NONE)
   {
     return render();
   }
@@ -122,7 +123,7 @@ std::string OrionError::smartRender(ApiVersion apiVersion)
 */
 std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, int* scP)
 {
-  if ((apiVersion == V2) || (apiVersion == ADMIN_API))
+  if ((apiVersion == API_VERSION_NGSI_V2) || (apiVersion == API_VERSION_ADMIN))
   {
     *scP = (HttpStatusCode) code;
   }

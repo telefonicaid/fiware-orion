@@ -30,6 +30,8 @@
 #include <map>
 
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+#include "orionld/types/ApiVersion.h"                          // ApiVersion
+
 #include "common/globals.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -48,7 +50,7 @@ extern HttpStatusCode mongoQueryContext
   OrionldTenant*                        tenantP,
   const std::vector<std::string>&       servicePathV,
   long long*                            countP        = NULL,
-  ApiVersion                            apiVersion    = V1
+  ApiVersion                            apiVersion    = API_VERSION_NGSI_V1
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOQUERYCONTEXT_H_

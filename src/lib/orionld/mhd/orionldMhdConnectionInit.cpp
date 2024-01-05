@@ -365,7 +365,7 @@ MimeType acceptHeaderParse(char* accept, bool textOk)
         winner        = mimeType;
         winningWeight = weight;
       }
-      else if ((weight == winningWeight) && (mimeType == MT_JSON) && (orionldState.apiVersion == NGSI_LD_V1))
+      else if ((weight == winningWeight) && (mimeType == MT_JSON) && (orionldState.apiVersion == API_VERSION_NGSILD_V1))
       {
         winner        = mimeType;
         winningWeight = weight;
@@ -591,7 +591,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   //
   // Forbidden characters in URI param value - not for NGSI-LD - for now at least ...
   //
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
   {
     bool containsForbiddenChars = false;
 
@@ -1075,7 +1075,7 @@ MHD_Result orionldMhdConnectionInit
   // 2. Prepare orionldState
   //
   orionldStateInit(connection);
-  orionldState.apiVersion  = NGSI_LD_V1;
+  orionldState.apiVersion  = API_VERSION_NGSILD_V1;
   orionldState.httpVersion = (char*) version;
 
   // IP Address and port of caller

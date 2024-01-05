@@ -38,9 +38,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/globals.h"                                      // NGSI_LD_V1
-
 #include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/ApiVersion.h"                            // API_VERSION_NGSILD_V1
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
@@ -426,7 +425,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     if (distOpP->qNode != NULL)
     {
       char buf[256];
-      qRender(distOpP->qNode, NGSI_LD_V1, buf, sizeof(buf), NULL);
+      qRender(distOpP->qNode, API_VERSION_NGSILD_V1, buf, sizeof(buf), NULL);
       LM_T(LmtDistOpRequestParams, ("DistOp %s has a Q: %s", distOpP->regP->regId, buf));
       if (orionldState.uriParams.q != NULL)
         LM_T(LmtDistOpRequestParams, ("The initial request also has a 'q'"));

@@ -25,7 +25,10 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+
+#include "orionld/types/ApiVersion.h"                   // ApiVersion
+#include "orionld/common/orionldState.h"                // orionldState
+#include "orionld/common/eqForDot.h"                    // eqForDot
 
 #include "common/tag.h"
 #include "common/RenderFormat.h"
@@ -37,9 +40,6 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/compoundResponses.h"
-
-#include "orionld/common/orionldState.h"                // orionldState
-#include "orionld/common/eqForDot.h"                    // eqForDot
 
 using namespace mongo;
 
@@ -267,7 +267,7 @@ ContextElementResponse::ContextElementResponse
       caP->metadataVector.push_back(md);
     }
 
-    if (apiVersion == V1)
+    if (apiVersion == API_VERSION_NGSI_V1)
     {
       /* Setting location metadata (if found) */
       if ((locAttr == ca.name) && (ca.type != GEO_POINT))

@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/ApiVersion.h"
+
 #include "common/RenderFormat.h"
 #include "common/globals.h"
 #include "orionTypes/OrionValueType.h"
@@ -89,7 +91,7 @@ public:
 
   /* Grabbers for metadata to which CB gives a special semantic */
   const char*  getMetadataId() const;
-  std::string  getLocation(ApiVersion apiVersion = V1) const;
+  std::string  getLocation(ApiVersion apiVersion = API_VERSION_NGSI_V1) const;
 
   std::string  render(ApiVersion   apiVersion,
                       bool         asJsonObject,
