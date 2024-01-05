@@ -35,6 +35,14 @@ extern "C"
 
 
 
+// -----------------------------------------------------------------------------
+//
+// static_buffer - defined in src/lib/rest/rest.cpp
+//
+extern __thread char static_buffer[32 * 1024];
+
+
+
 /* ****************************************************************************
 *
 * orionldMhdConnectionPayloadRead - 
@@ -78,7 +86,7 @@ MHD_Result orionldMhdConnectionPayloadRead
   //
   if (orionldState.in.payloadSize == 0)  // First call with payload
   {
-    if (orionldState.in.contentLength > STATIC_BUFFER_SIZE)
+    if (orionldState.in.contentLength >= (int) sizeof(static_buffer))
     {
       orionldState.in.payload = (char*) malloc(orionldState.in.contentLength + 1);
       if (orionldState.in.payload == NULL)

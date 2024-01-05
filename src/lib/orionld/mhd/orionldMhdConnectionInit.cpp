@@ -138,6 +138,14 @@ Verb verbGet(const char* method)
 
 // -----------------------------------------------------------------------------
 //
+// clientIp - defined in src/lib/rest/rest.cpp
+//
+extern __thread char clientIp[17];
+
+
+
+// -----------------------------------------------------------------------------
+//
 // ipAddressAndPort -
 //
 static void ipAddressAndPort(void)

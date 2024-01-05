@@ -26,7 +26,6 @@
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
-#include "common/globals.h"                                    // ApiVersion
 #include "orionld/types/QNode.h"                               // QNode
 #include "orionld/q/qRender.h"                                 // Own interface
 

@@ -25,7 +25,6 @@
 #include "logMsg/logMsg.h"                             // LM_*
 #include "logMsg/traceLevels.h"                        // Lmt*
 
-#include "common/globals.h"                            // noCache
 #include "cache/subCache.h"                            // CachedSubscription, subCacheItemLookup, ...
 
 #include "orionld/common/orionldState.h"               // orionldState

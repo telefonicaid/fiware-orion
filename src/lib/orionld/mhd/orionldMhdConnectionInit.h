@@ -27,7 +27,8 @@
 */
 #include <microhttpd.h>
 
-extern "C" {
+extern "C"
+{
 #include "kjson/kjson.h"                            // Kjson
 }
 
