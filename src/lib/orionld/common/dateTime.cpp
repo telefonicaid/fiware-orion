@@ -174,9 +174,9 @@ double dateTimeFromString(const char* timeString)
     LM_RE(-1, ("Invalid timezone: '%s'", timeString));
 
   if (sign == '+')
-    timestamp = timestamp + dHours * 3600 + dMinutes * 60;
-  else
     timestamp = timestamp - dHours * 3600 - dMinutes * 60;
+  else
+    timestamp = timestamp + dHours * 3600 + dMinutes * 60;
 
   if (timestamp < 0)
     LM_RE(-1, ("timestamp before epoch is not allowed: '%s'", timeString));

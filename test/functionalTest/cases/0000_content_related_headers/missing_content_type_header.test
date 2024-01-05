@@ -70,7 +70,7 @@ orionCurl --url "$url" --payload "$payload" --in "application/json; charset=UTF-
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 160
+Content-Length: 101
 Content-Type: application/json
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -78,7 +78,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 {
     "errorCode": {
         "code": "415",
-        "details": "Content-Type header not used, default application/octet-stream is not supported",
+        "details": "content type missing",
         "reasonPhrase": "Unsupported Media Type"
     }
 }

@@ -841,7 +841,13 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   // Case 3
   if ((orionldState.apiVersion == V1) && (orionldState.in.contentType != MT_JSON))
   {
-    std::string details = std::string("not supported content type: ") + orionldState.in.contentTypeString;
+    std::string details = std::string("not supported content type: ");
+
+    if (orionldState.in.contentTypeString == NULL)
+      details = "content type missing";
+    else
+      details += orionldState.in.contentTypeString;
+
     orionldState.httpStatusCode = SccUnsupportedMediaType;
     restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
     orionldState.httpStatusCode = SccUnsupportedMediaType;
