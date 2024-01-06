@@ -305,7 +305,7 @@ int64_t toSeconds(int value, char what, bool dayPart)
 
   if (result == -1)
   {
-    alarmMgr.badInput(clientIp, "ERROR in duration string");
+    alarmMgr.badInput(orionldState.clientIp, "ERROR in duration string");
   }
 
   return result;
@@ -368,7 +368,7 @@ int64_t parse8601(const std::string& s)
       if ((value == 0) && (*start != '0'))
       {
         std::string details = std::string("parse error for duration '") + start + "'";
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(orionldState.clientIp, details);
 
         free(toFree);
         return -1;

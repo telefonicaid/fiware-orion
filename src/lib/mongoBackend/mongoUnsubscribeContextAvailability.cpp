@@ -79,7 +79,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability
     {
       // FIXME: doubt: invalid OID format? Or, subscription not found?
       std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
     else  // SccReceiverInternalError
     {

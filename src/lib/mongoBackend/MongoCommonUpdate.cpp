@@ -2712,7 +2712,7 @@ static bool updateContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     // oe->fill() not used, as this is done internally in processLocationAtUpdateAttribute()
 
-    alarmMgr.badInput(clientIp, err);
+    alarmMgr.badInput(orionldState.clientIp, err);
     return false;
   }
 
@@ -2760,7 +2760,7 @@ static bool appendContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     oe->fill(SccInvalidModification, details, "Unprocessable");
 
-    alarmMgr.badInput(clientIp, "attribute cannot be appended");
+    alarmMgr.badInput(orionldState.clientIp, "attribute cannot be appended");
     return false;
   }
 
@@ -2781,7 +2781,7 @@ static bool appendContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     // oe->fill() is not used here as it is managed by processLocationAtAppendAttribute()
 
-    alarmMgr.badInput(clientIp, err);
+    alarmMgr.badInput(orionldState.clientIp, err);
     return false;
   }
 
@@ -2834,7 +2834,7 @@ static bool deleteContextAttributeItem
       cerP->statusCode.fill(SccInvalidParameter, details);
       oe->fill(SccInvalidModification, details, "Unprocessable");
 
-      alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
+      alarmMgr.badInput(orionldState.clientIp, "location attribute has to be defined at creation time");
       return false;
     }
 
@@ -2868,7 +2868,7 @@ static bool deleteContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
-    alarmMgr.badInput(clientIp, "attribute to be deleted is not found");
+    alarmMgr.badInput(orionldState.clientIp, "attribute to be deleted is not found");
     ca->found = false;
 
     return false;
@@ -3522,7 +3522,7 @@ static void updateEntity
     {
       if (howManyAttrs(&attrs, ceP->contextAttributeVector[ix]->name.c_str()) != 0)
       {
-        alarmMgr.badInput(clientIp, "attribute already exists");
+        alarmMgr.badInput(orionldState.clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
 
         //
@@ -3827,7 +3827,7 @@ static bool contextElementPreconditionsCheck
         else
           snprintf(details, sizeof(details), "duplicated attribute name: '%s' (metadata id:'%s')", name, id);
 
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(orionldState.clientIp, details);
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification, "duplicated attribute /" + std::string(name) + "/");
         responseP->oe.fill(SccBadRequest, std::string("duplicated attribute /") + name + "/", "BadRequest");
         return false;  // Error already in responseP
@@ -3867,7 +3867,7 @@ static bool contextElementPreconditionsCheck
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification, details);
         responseP->oe.fill(SccBadRequest, details, "BadRequest");
 
-        alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
+        alarmMgr.badInput(orionldState.clientIp, "empty attribute not allowed in APPEND or UPDATE");
         return false;  // Error already in responseP
       }
     }

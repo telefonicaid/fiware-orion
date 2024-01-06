@@ -138,14 +138,6 @@ Verb verbGet(const char* method)
 
 // -----------------------------------------------------------------------------
 //
-// clientIp - defined in src/lib/rest/rest.cpp
-//
-extern __thread char clientIp[17];
-
-
-
-// -----------------------------------------------------------------------------
-//
 // ipAddressAndPort -
 //
 static void ipAddressAndPort(void)
@@ -156,14 +148,14 @@ static void ipAddressAndPort(void)
   {
     struct sockaddr* addr = (struct sockaddr*) mciP->client_addr;
 
-    snprintf(clientIp, sizeof(clientIp), "%d.%d.%d.%d",
+    snprintf(orionldState.clientIp, sizeof(orionldState.clientIp), "%d.%d.%d.%d",
              addr->sa_data[2] & 0xFF,
              addr->sa_data[3] & 0xFF,
              addr->sa_data[4] & 0xFF,
              addr->sa_data[5] & 0xFF);
   }
   else
-    strncpy(clientIp, "IP unknown", sizeof(clientIp) - 1);
+    strncpy(orionldState.clientIp, "IP unknown", sizeof(orionldState.clientIp) - 1);
 }
 
 

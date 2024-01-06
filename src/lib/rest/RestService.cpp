@@ -206,7 +206,7 @@ std::string payloadParse
   }
   else
   {
-    alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
+    alarmMgr.badInput(orionldState.clientIp, "payload mime-type is not JSON");
     return "Bad Input";
   }
 
@@ -240,7 +240,7 @@ std::string tenantCheck(const std::string& tenant)
     snprintf(numV2, sizeof(numV2), "%zu", strlen(name));
 
     std::string details = std::string("a tenant name can be max ") + numV1 + " characters long. Length: " + numV2;
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     return "bad length - a tenant name can be max " SERVICE_NAME_MAX_LEN_STRING " characters long";
   }
@@ -251,7 +251,7 @@ std::string tenantCheck(const std::string& tenant)
     {
       std::string details = std::string("bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: ") + *name;
 
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
       return "bad character in tenant name - only underscore and alphanumeric characters are allowed";
     }
 
@@ -536,7 +536,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string response = error.render();
 
     orionldState.httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
+    alarmMgr.badInput(orionldState.clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
     restReply(ciP, response.c_str());
 
     return std::string("Empty URL");
@@ -548,7 +548,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     if (compErrorDetect(orionldState.apiVersion, ciP->urlComponents, ciP->urlCompV, &oe))
     {
-      alarmMgr.badInput(clientIp, oe.details);
+      alarmMgr.badInput(orionldState.clientIp, oe.details);
       orionldState.httpStatusCode = SccBadRequest;
       restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
       return "URL PATH component error";
@@ -568,7 +568,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     if (response != "OK")
     {
-      alarmMgr.badInput(clientIp, response);
+      alarmMgr.badInput(orionldState.clientIp, response);
       restReply(ciP, response.c_str());
 
       if (jsonReqP != NULL)
@@ -603,7 +603,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     std::string  response = oe.setStatusCodeAndSmartRender(orionldState.apiVersion, &orionldState.httpStatusCode);
 
-    alarmMgr.badInput(clientIp, result);
+    alarmMgr.badInput(orionldState.clientIp, result);
 
     restReply(ciP, response.c_str());
 
@@ -629,7 +629,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   //
   // So, the 'Bad Input' alarm is cleared for this client.
   //
-  alarmMgr.badInputReset(clientIp);
+  alarmMgr.badInputReset(orionldState.clientIp);
 
   std::string response = ciP->restServiceP->treat(ciP, ciP->urlComponents, ciP->urlCompV, &parseData);
 

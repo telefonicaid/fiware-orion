@@ -79,7 +79,7 @@ HttpStatusCode mongoUnsubscribeContext
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
     responseP->statusCode.fill(SccContextElementNotFound);
     responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
-    alarmMgr.badInput(clientIp, "no subscriptionId");
+    alarmMgr.badInput(orionldState.clientIp, "no subscriptionId");
 
     return SccOk;
   }
@@ -98,7 +98,7 @@ HttpStatusCode mongoUnsubscribeContext
       std::string details = std::string("invalid OID format: '") + requestP->subscriptionId.get() + "'";
 
       responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
     else  // SccReceiverInternalError
     {

@@ -589,7 +589,7 @@ std::string CompoundValueNode::check(void)
         rootP->error =
           std::string("bad tag-name of vector item: /") + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
 
-        alarmMgr.badInput(clientIp, rootP->error);
+        alarmMgr.badInput(orionldState.clientIp, rootP->error);
         return rootP->error;
       }
     }
@@ -608,7 +608,7 @@ std::string CompoundValueNode::check(void)
         if (childV[ix]->name == childV[ix2]->name)
         {
           rootP->error = std::string("duplicated tag-name: /") + childV[ix]->name + "/ in path: " + path;
-          alarmMgr.badInput(clientIp, rootP->error);
+          alarmMgr.badInput(orionldState.clientIp, rootP->error);
 
           return rootP->error;
         }
@@ -619,7 +619,7 @@ std::string CompoundValueNode::check(void)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the value of an attribute");
       return "Invalid characters in attribute value";
     }
   }

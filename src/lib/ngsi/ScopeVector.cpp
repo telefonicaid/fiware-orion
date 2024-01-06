@@ -77,7 +77,7 @@ std::string ScopeVector::check(void)
       char ixV[STRING_SIZE_FOR_INT];
       snprintf(ixV, sizeof(ixV), "%d", ix);
       std::string details = std::string("error in scope ") + ixV + ": " + res;
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
       return res;
     }
   }

@@ -171,7 +171,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
   }
   else if ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK")
   {
-    alarmMgr.badInput(clientIp, res);
+    alarmMgr.badInput(orionldState.clientIp, res);
     errorCode.fill(SccBadRequest, res);
   }
   else

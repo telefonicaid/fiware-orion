@@ -53,7 +53,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON Parse Error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -62,7 +62,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
   if (!document.IsObject())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON Parse Error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -70,7 +70,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   }
   else if (document.ObjectEmpty())
   {
-    alarmMgr.badInput(clientIp, "Empty JSON payload");
+    alarmMgr.badInput(orionldState.clientIp, "Empty JSON payload");
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -80,7 +80,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   {
     std::string  details = "Invalid JSON payload, mandatory field /entities/ not found";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     oe.fill(SccBadRequest, details, "BadRequest");
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -90,7 +90,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
   {
     std::string  details = "Invalid JSON payload, mandatory field /actionType/ not found";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     oe.fill(SccBadRequest, details, "BadRequest");
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -108,7 +108,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r);
+        alarmMgr.badInput(orionldState.clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         orionldState.httpStatusCode = SccBadRequest;
         r = oe.toJson();
@@ -122,7 +122,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
       {
         std::string details = "invalid update action type: right ones are: append, appendStric, delete, replace, update";
 
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(orionldState.clientIp, details);
         oe.fill(SccBadRequest, details, "BadRequest");
         orionldState.httpStatusCode = SccBadRequest;
 
@@ -134,7 +134,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     {
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
 
-      alarmMgr.badInput(clientIp, description);
+      alarmMgr.badInput(orionldState.clientIp, description);
       oe.fill(SccBadRequest, description, "BadRequest");
       orionldState.httpStatusCode = SccBadRequest;
 

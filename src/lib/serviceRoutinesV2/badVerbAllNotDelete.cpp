@@ -65,7 +65,7 @@ std::string badVerbAllNotDelete
 
   orionldHeaderAdd(&orionldState.out.headers, HttpAllow, allowed, 0);
   orionldState.httpStatusCode = SccBadVerb;
-  alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInput(orionldState.clientIp, details);
 
   if (orionldState.apiVersion == API_VERSION_NGSI_V1 || orionldState.apiVersion == API_VERSION_NONE)
     return "";

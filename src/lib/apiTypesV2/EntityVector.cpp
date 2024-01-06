@@ -79,7 +79,7 @@ std::string EntityVector::check(RequestType requestType)
 
     if ((res = vec[ix]->check(requestType)) != "OK")
     {
-      alarmMgr.badInput(clientIp, "invalid vector of Entity");
+      alarmMgr.badInput(orionldState.clientIp, "invalid vector of Entity");
       return res;
     }
   }

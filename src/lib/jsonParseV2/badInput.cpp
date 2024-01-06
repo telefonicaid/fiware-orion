@@ -38,7 +38,7 @@
 */
 std::string badInput(ConnectionInfo* ciP, const std::string& msg)
 {
-  alarmMgr.badInput(clientIp, msg);
+  alarmMgr.badInput(orionldState.clientIp, msg);
   OrionError oe(SccBadRequest, msg, "BadRequest");
 
   orionldState.httpStatusCode = oe.code;

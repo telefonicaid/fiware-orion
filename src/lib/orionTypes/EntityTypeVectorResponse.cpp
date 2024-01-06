@@ -88,7 +88,7 @@ std::string EntityTypeVectorResponse::check
   }
   else if ((res = entityTypeVector.check(apiVersion, predetectedError)) != "OK")
   {
-    alarmMgr.badInput(clientIp, res);
+    alarmMgr.badInput(orionldState.clientIp, res);
     statusCode.fill(SccBadRequest, res);
   }
   else

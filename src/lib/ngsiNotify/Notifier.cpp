@@ -156,7 +156,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       std::string details = std::string("sending NotifyContextAvailabilityRequest: malformed URL: '") + url + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
 
       return;
     }

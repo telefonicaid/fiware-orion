@@ -119,7 +119,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   {
     std::string details = std::string("invalid providing application '") + upcrP->contextProvider + "'";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
@@ -462,7 +462,7 @@ std::string postUpdateContext
   if (ciP->servicePathV.size() > 1)
   {
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
-    alarmMgr.badInput(clientIp, "more than one service path for an update request");
+    alarmMgr.badInput(orionldState.clientIp, "more than one service path for an update request");
 
     TIMED_RENDER(answer = upcrsP->render(orionldState.apiVersion, asJsonObject));
     upcrP->release();

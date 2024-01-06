@@ -30,7 +30,6 @@
 
 #include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 
-#include "common/string.h"                                       // stringSplit
 #include "common/statistics.h"                                   // TIME_STAT_MONGO_READ_WAIT_START, ...
 #include "rest/OrionError.h"                                     // OrionError
 #include "apiTypesV2/Registration.h"                             // ngsiv2::Registration

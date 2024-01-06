@@ -154,7 +154,7 @@ static std::string duration(const std::string& path, const std::string& value, P
   if ((s = reqDataP->scar.res.duration.check()) != "OK")
   {
     std::string details = std::string("error parsing duration '") + reqDataP->scar.res.duration.get() + "': " + s;
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     return s;
   }

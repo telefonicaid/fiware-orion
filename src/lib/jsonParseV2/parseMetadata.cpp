@@ -63,7 +63,7 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
     {
       if (type != "String")
       {
-        alarmMgr.badInput(clientIp, "ContextAttribute::Metadata::type must be a String");
+        alarmMgr.badInput(orionldState.clientIp, "ContextAttribute::Metadata::type must be a String");
         return "invalid JSON type for attribute metadata type";
       }
 
@@ -104,20 +104,20 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
 
         if (r != "OK")
         {
-          alarmMgr.badInput(clientIp, "json parse error in Metadata compound value");
+          alarmMgr.badInput(orionldState.clientIp, "json parse error in Metadata compound value");
           return "json parse error in Metadata compound value";
         }
       }
       else
       {
         std::string details = std::string("ContextAttribute::Metadata::type is '") + type + "'";
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(orionldState.clientIp, details);
         return "invalid JSON type for attribute metadata value";
       }
     }
     else
     {
-      alarmMgr.badInput(clientIp, "invalid JSON field for attribute metadata");
+      alarmMgr.badInput(orionldState.clientIp, "invalid JSON field for attribute metadata");
       return "invalid JSON field for attribute metadata";
     }
   }
@@ -129,7 +129,7 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
 
     if (mdP->numberValue == -1)
     {
-      alarmMgr.badInput(clientIp, "date has invalid format");
+      alarmMgr.badInput(orionldState.clientIp, "date has invalid format");
       return "date has invalid format";
     }
 

@@ -87,7 +87,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     if (responseP->errorCode.code == SccContextElementNotFound)
     {
       std::string details = std::string("invalid OID mimeType: '") + requestP->subscriptionId.get() + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
     else  // SccReceiverInternalError
     {

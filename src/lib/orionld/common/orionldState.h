@@ -315,12 +315,14 @@ typedef struct OrionldMongoC
 typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
-  bool                    distributed;            // Depends on a URI param, but can be modified (to false) via an HTTP header
+  bool                    distributed;               // Depends on a URI param, but can be modified (to false) via an HTTP header
   MHD_Connection*         mhdConnection;
-  struct timeval          transactionStart;       // For metrics
-  struct timespec         timestamp;              // The time when the request entered
-  double                  requestTime;            // Same same (timestamp), but at a floating point
-  char                    requestTimeString[64];  // ISO8601 representation of 'requestTime'
+  char                    clientIp[64];              // IP address of the requester
+  char                    preallocReqBuf[4 * 1024];  // Buffer of incoming payload body - no need to call malloc for "small" requests
+  struct timeval          transactionStart;          // For metrics
+  struct timespec         timestamp;                 // The time when the request entered
+  double                  requestTime;               // Same same (timestamp), but at a floating point
+  char                    requestTimeString[64];     // ISO8601 representation of 'requestTime'
   int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
@@ -420,7 +422,7 @@ typedef struct OrionldConnectionState
   // mongoc_uri_t*           mongoUri;
   // mongoc_client_t*        mongoClient;
   // mongoc_database_t*      mongoDatabase;
-
+  //
   OrionldMongoC           mongoc;
 
   //

@@ -87,7 +87,7 @@ std::string deleteAttributeValueInstanceWithTypeAndId
   // 02. Check validity of URI params
   if ((entityTypeFromUriParam != "") && (entityTypeFromUriParam != entityTypeFromPath))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(orionldState.clientIp, "non-matching entity::types in URL");
 
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 

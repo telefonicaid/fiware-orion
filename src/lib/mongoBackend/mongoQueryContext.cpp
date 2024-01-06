@@ -326,7 +326,7 @@ HttpStatusCode mongoQueryContext
   /* FIXME: restriction not supported for the moment */
   if (!requestP->restriction.attributeExpression.isEmpty())
   {
-    alarmMgr.badInput(clientIp, "restriction found, but restrictions are not supported by mongo backend");
+    alarmMgr.badInput(orionldState.clientIp, "restriction found, but restrictions are not supported by mongo backend");
   }
 
   std::string                  err;

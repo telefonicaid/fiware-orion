@@ -93,7 +93,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON parse error");
     orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -103,7 +103,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON parse error");
     orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();

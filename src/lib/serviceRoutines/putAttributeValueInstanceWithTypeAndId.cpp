@@ -83,7 +83,7 @@ std::string putAttributeValueInstanceWithTypeAndId
   // 02. Check validity of URI params VS URI path components
   if ((entityTypeFromUriParam != "") && (entityTypeFromUriParam != entityType))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(orionldState.clientIp, "non-matching entity::types in URL");
     response.fill(SccBadRequest, "non-matching entity::types in URL");
 
     TIMED_RENDER(answer = response.render(false, false));

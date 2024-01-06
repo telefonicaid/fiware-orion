@@ -82,7 +82,7 @@ std::string ContextAttributeResponse::check
   else if ((res = contextAttributeVector.check(apiVersion, requestType)) != "OK")
   {
     std::string details = std::string("contextAttributeVector: '") + res + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     statusCode.fill(SccBadRequest, res);
 
     //
@@ -177,7 +177,7 @@ void ContextAttributeResponse::fill
   //
   if (qcrP->contextElementResponseVector.size() > 1)
   {
-    alarmMgr.badInput(clientIp, "more than one context element found in this query - selecting the first one");
+    alarmMgr.badInput(orionldState.clientIp, "more than one context element found in this query - selecting the first one");
   }
 
   //

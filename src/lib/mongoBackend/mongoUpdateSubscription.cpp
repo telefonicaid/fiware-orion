@@ -870,7 +870,7 @@ std::string mongoUpdateSubscription
     if (sc.code == SccContextElementNotFound)
     {
       details = std::string("invalid OID mimeType: '") + subUp.id + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
     else  // SccReceiverInternalError
     {

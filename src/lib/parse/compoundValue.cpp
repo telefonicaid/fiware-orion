@@ -64,7 +64,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
     else
     {
       ciP->answer = std::string("compound value error: ") + status;
-      alarmMgr.badInput(clientIp, ciP->answer);
+      alarmMgr.badInput(orionldState.clientIp, ciP->answer);
     }
   }
 

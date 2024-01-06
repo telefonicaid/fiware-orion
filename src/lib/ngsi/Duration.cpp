@@ -68,7 +68,7 @@ std::string Duration::check(void)
   if (parse() == -1)
   {
     valid = false;
-    alarmMgr.badInput(clientIp, "syntax error in duration string");
+    alarmMgr.badInput(orionldState.clientIp, "syntax error in duration string");
 
     return "syntax error in duration string";
   }

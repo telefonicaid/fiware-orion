@@ -53,7 +53,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON Parse Error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -62,7 +62,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
   if (!document.IsObject())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON Parse Error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -70,7 +70,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   }
   else if (document.ObjectEmpty())
   {
-    alarmMgr.badInput(clientIp, "Empty JSON payload");
+    alarmMgr.badInput(orionldState.clientIp, "Empty JSON payload");
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -79,7 +79,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   else if (!document.HasMember("entities") && !document.HasMember("attributes")
            && !document.HasMember("attrs") && !document.HasMember("expression"))
   {
-    alarmMgr.badInput(clientIp, "Invalid JSON payload, no relevant fields found");
+    alarmMgr.badInput(orionldState.clientIp, "Invalid JSON payload, no relevant fields found");
     oe.fill(SccBadRequest, "Invalid JSON payload, no relevant fields found", "BadRequest");
     orionldState.httpStatusCode = SccBadRequest;
 
@@ -97,7 +97,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r);
+        alarmMgr.badInput(orionldState.clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         orionldState.httpStatusCode = SccBadRequest;
 
@@ -111,7 +111,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r);
+        alarmMgr.badInput(orionldState.clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         orionldState.httpStatusCode = SccBadRequest;
 
@@ -124,7 +124,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r);
+        alarmMgr.badInput(orionldState.clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         orionldState.httpStatusCode = SccBadRequest;
 
@@ -137,7 +137,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r);
+        alarmMgr.badInput(orionldState.clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         orionldState.httpStatusCode = SccBadRequest;
 
@@ -150,7 +150,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, r);
+        alarmMgr.badInput(orionldState.clientIp, r);
         oe.fill(SccBadRequest, r, "BadRequest");
         orionldState.httpStatusCode = SccBadRequest;
 
@@ -161,7 +161,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     {
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
 
-      alarmMgr.badInput(clientIp, description);
+      alarmMgr.badInput(orionldState.clientIp, description);
       oe.fill(SccBadRequest, description, "BadRequest");
       orionldState.httpStatusCode = SccBadRequest;
 

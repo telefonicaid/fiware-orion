@@ -37,16 +37,8 @@ extern "C"
 
 // -----------------------------------------------------------------------------
 //
-// static_buffer - defined in src/lib/rest/rest.cpp
+// orionldMhdConnectionPayloadRead -
 //
-extern __thread char static_buffer[32 * 1024];
-
-
-
-/* ****************************************************************************
-*
-* orionldMhdConnectionPayloadRead - 
-*/
 MHD_Result orionldMhdConnectionPayloadRead
 (
   size_t*          upload_data_size,
@@ -78,7 +70,7 @@ MHD_Result orionldMhdConnectionPayloadRead
   }
 
   //
-  // First call with payload - use the thread variable "static_buffer" if possible,
+  // First call with payload - use the pre-allocated  "orionldState.preallocReqBuf" if possible,
   // otherwise allocate a bigger buffer
   //
   // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
@@ -86,7 +78,7 @@ MHD_Result orionldMhdConnectionPayloadRead
   //
   if (orionldState.in.payloadSize == 0)  // First call with payload
   {
-    if (orionldState.in.contentLength >= (int) sizeof(static_buffer))
+    if (orionldState.in.contentLength >= (int) sizeof(orionldState.preallocReqBuf))
     {
       orionldState.in.payload = (char*) malloc(orionldState.in.contentLength + 1);
       if (orionldState.in.payload == NULL)
@@ -96,7 +88,7 @@ MHD_Result orionldMhdConnectionPayloadRead
       }
     }
     else
-      orionldState.in.payload = static_buffer;
+      orionldState.in.payload = orionldState.preallocReqBuf;
   }
 
   // Copy the chunk

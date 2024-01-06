@@ -592,7 +592,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if ((str2double(number1, &newLatitude) == false) || (newLatitude > 90) || (newLatitude < -90))
   {
     std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     free(initial);
     return false;
@@ -601,7 +601,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if ((str2double(number2, &newLongitude) == false) || (newLongitude > 180) || (newLongitude < -180))
   {
     std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     free(initial);
     return false;
@@ -860,7 +860,7 @@ std::string servicePathCheck(const char* servicePath)
     else
     {
       std::string details = std::string("Invalid character '") + *servicePath + "' in Service-Path";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
 
       return "Bad Character in Service-Path";
     }

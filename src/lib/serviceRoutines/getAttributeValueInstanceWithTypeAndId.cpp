@@ -105,12 +105,12 @@ std::string getAttributeValueInstanceWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     response.statusCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(orionldState.clientIp, "entity::type cannot be empty for this request");
   }
   else if ((entityTypeFromParam != "") && (entityTypeFromParam != entityTypeFromPath))
   {
     response.statusCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(orionldState.clientIp, "non-matching entity::types in URL");
   }
   else
   {

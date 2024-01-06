@@ -73,7 +73,7 @@ HttpStatusCode mongoUpdateContext
     snprintf(lenV, sizeof(lenV) - 1, "%lu", (unsigned long) servicePathV.size());
 
     std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     responseP->errorCode.fill(SccBadRequest, "service path length greater than the one in update");
     responseP->oe.fill(SccBadRequest, "service path length greater than the one in update", "BadRequest");
   }

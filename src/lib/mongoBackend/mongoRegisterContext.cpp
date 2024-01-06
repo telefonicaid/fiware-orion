@@ -107,7 +107,7 @@ HttpStatusCode mongoRegisterContext
     {
       // FIXME: doubt: invalid OID format?
       std::string details = std::string("invalid OID format: '") + requestP->registrationId.get() + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
     else  // SccReceiverInternalError
     {

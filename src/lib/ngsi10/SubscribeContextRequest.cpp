@@ -60,7 +60,7 @@ std::string SubscribeContextRequest::check(const std::string& predetectedError, 
       ((res = notifyConditionVector.check(SubscribeContext, predetectedError, counter)) != "OK") ||
       ((res = throttling.check())                                                       != "OK"))
   {
-    alarmMgr.badInput(clientIp, res);
+    alarmMgr.badInput(orionldState.clientIp, res);
     response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
     return response.render();
   }

@@ -162,7 +162,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
   if (value == "")
   {
-    alarmMgr.badInput(clientIp, "empty attribute expression");
+    alarmMgr.badInput(orionldState.clientIp, "empty attribute expression");
     return "Empty attribute expression";
   }
 

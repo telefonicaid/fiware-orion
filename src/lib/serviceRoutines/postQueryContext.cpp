@@ -94,7 +94,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   {
     std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...

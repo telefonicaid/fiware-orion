@@ -346,33 +346,33 @@ std::string Metadata::check(ApiVersion apiVersion)
   if (apiVersion == API_VERSION_NGSI_V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if (name == "")
   {
-    alarmMgr.badInput(clientIp, "missing metadata name");
+    alarmMgr.badInput(orionldState.clientIp, "missing metadata name");
     return "missing metadata name";
   }
 
   if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if (forbiddenIdChars(apiVersion , name.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
+    alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
   }
 
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
@@ -380,13 +380,13 @@ std::string Metadata::check(ApiVersion apiVersion)
   if (apiVersion == API_VERSION_NGSI_V2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if (forbiddenIdChars(apiVersion, type.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
+    alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the type of a Metadata");
     return "Invalid characters in metadata type";
   }
 
@@ -394,13 +394,13 @@ std::string Metadata::check(ApiVersion apiVersion)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a Metadata");
+      alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the value of a Metadata");
       return "Invalid characters in metadata value";
     }
 
     if (apiVersion == API_VERSION_NGSI_V1 && stringValue == "")
     {
-      alarmMgr.badInput(clientIp, "missing metadata value");
+      alarmMgr.badInput(orionldState.clientIp, "missing metadata value");
       return "missing metadata value";
     }
   }

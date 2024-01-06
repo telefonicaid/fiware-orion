@@ -115,8 +115,6 @@ static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
-__thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
-__thread char                    clientIp[IP_LENGTH_MAX + 1];
 static unsigned int              connMemory;
 static unsigned int              maxConns;
 static unsigned int              threadPoolSize;
@@ -288,7 +286,7 @@ MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     std::string details = std::string("found a forbidden character in URI param '") + key + "'";
     OrionError error(SccBadRequest, "invalid character in URI parameter");
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     orionldState.httpStatusCode = error.code;
     ciP->answer                 = error.smartRender(orionldState.apiVersion);
     LM_W(("Bad Input (forbidden character in URI parameter value: %s=%s)", key.c_str(), val));
@@ -385,7 +383,7 @@ static void requestCompleted
     PERFORMANCE(notifEnd);
   }
 
-  if ((orionldState.in.payload != NULL) && (orionldState.in.payload != static_buffer))
+  if ((orionldState.in.payload != NULL) && (orionldState.in.payload != orionldState.preallocReqBuf))
   {
     free(orionldState.in.payload);
     orionldState.in.payload = NULL;
@@ -1017,7 +1015,7 @@ ConnectionInfo* connectionTreatInit
              addr->sa_data[3] & 0xFF,
              addr->sa_data[4] & 0xFF,
              addr->sa_data[5] & 0xFF);
-    snprintf(clientIp, sizeof(clientIp), "%s", ip);
+    snprintf(orionldState.clientIp, sizeof(orionldState.clientIp), "%s", ip);
   }
   else
   {
@@ -1040,11 +1038,6 @@ ConnectionInfo* connectionTreatInit
 
   //
   // ConnectionInfo
-  //
-  // FIXME P1: ConnectionInfo could be a thread variable (like the static_buffer),
-  // as long as it is properly cleaned up between calls.
-  // We would save the call to new/free for each and every request.
-  // Once we *really* look to scratch some efficiency, this change should be made.
   //
   if ((ciP = new ConnectionInfo(connection)) == NULL)
   {
@@ -1074,7 +1067,7 @@ ConnectionInfo* connectionTreatInit
     char details[256];
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", orionldState.in.contentLength, inReqPayloadMaxSize);
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     OrionError oe(SccRequestEntityTooLarge, details);
 
     orionldState.httpStatusCode = oe.code;
@@ -1145,15 +1138,15 @@ ConnectionInfo* connectionTreatInit
 
   if (urlCheck(ciP, orionldState.urlPath) == false)
   {
-    alarmMgr.badInput(clientIp, "error in URI path");
+    alarmMgr.badInput(orionldState.clientIp, "error in URI path");
   }
   else if (servicePathSplit(ciP) != 0)
   {
-    alarmMgr.badInput(clientIp, "error in ServicePath http-header");
+    alarmMgr.badInput(orionldState.clientIp, "error in ServicePath http-header");
   }
   else if (contentTypeCheck(ciP) != 0)
   {
-    alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header");
+    alarmMgr.badInput(orionldState.clientIp, "invalid mime-type in Content-Type http-header");
   }
   //
   // Requests of verb POST, PUT or PATCH are considered erroneous if no payload is present - with the exception of log requests.
@@ -1168,7 +1161,7 @@ ConnectionInfo* connectionTreatInit
     restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
     orionldState.httpStatusCode  = SccContentLengthRequired;
     restReply(ciP, errorMsg.c_str());  // OK to respond as no payload
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
   }
   else if (orionldState.badVerb == true)
   {
@@ -1234,7 +1227,7 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   }
 
   //
-  // First call with payload - use the thread variable "static_buffer" if possible,
+  // First call with payload - use "orionldState.preallocReqBuf" if possible,
   // otherwise allocate a bigger buffer
   //
   // FIXME P1: This could be done in "Part I" instead, saving an "if" for each "Part II" call
@@ -1242,13 +1235,13 @@ static MHD_Result connectionTreatDataReceive(ConnectionInfo* ciP, size_t* upload
   //
   if (orionldState.in.payloadSize == 0)  // First call with payload
   {
-    if (orionldState.in.contentLength > STATIC_BUFFER_SIZE)
+    if (orionldState.in.contentLength >= (int) sizeof(orionldState.preallocReqBuf))
     {
       orionldState.in.payload = (char*) malloc(orionldState.in.contentLength + 1);
     }
     else
     {
-      orionldState.in.payload = static_buffer;
+      orionldState.in.payload = orionldState.preallocReqBuf;
     }
   }
 
@@ -1450,7 +1443,7 @@ static MHD_Result connectionTreat
     char details[256];
 
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", orionldState.in.contentLength, inReqPayloadMaxSize);
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
 
     orionldState.httpStatusCode = SccRequestEntityTooLarge;
@@ -1465,7 +1458,7 @@ static MHD_Result connectionTreat
     OrionError oe(SccBadRequest, (orionldState.out.acceptErrorDetail == NULL)? "no detail" : orionldState.out.acceptErrorDetail);
 
     orionldState.httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, orionldState.out.acceptErrorDetail);
+    alarmMgr.badInput(orionldState.clientIp, orionldState.out.acceptErrorDetail);
     restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
     return MHD_YES;
   }
@@ -1484,7 +1477,7 @@ static MHD_Result connectionTreat
     }
 
     orionldState.httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, oe.details);
+    alarmMgr.badInput(orionldState.clientIp, oe.details);
     restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
     return MHD_YES;
   }
@@ -1499,7 +1492,7 @@ static MHD_Result connectionTreat
     }
 
     orionldState.httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, oe.details);
+    alarmMgr.badInput(orionldState.clientIp, oe.details);
     restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
     return MHD_YES;
   }
@@ -1515,7 +1508,7 @@ static MHD_Result connectionTreat
     OrionError   oe(SccBadRequest, details);
 
     orionldState.httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     restReply(ciP, oe.smartRender(orionldState.apiVersion).c_str());
 
     return MHD_YES;
@@ -1527,7 +1520,7 @@ static MHD_Result connectionTreat
   //
   if (ciP->answer != "")
   {
-    alarmMgr.badInput(clientIp, ciP->answer);
+    alarmMgr.badInput(orionldState.clientIp, ciP->answer);
     restReply(ciP, ciP->answer.c_str());
 
     return MHD_YES;
