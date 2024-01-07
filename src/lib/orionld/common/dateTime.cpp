@@ -175,18 +175,22 @@ static bool dateParse(const char* dateTime, char* dateString, int* yearP, int* m
 // HH:mm
 // HH:mm:SS
 // HH:mm:SS.sss
+// HHmm
+// HHmmSS
+// HHmmSS.sss
 //
 static bool timeParse(const char* dateTime, char* timeString, int* hourP, int* minuteP, double* secondP, char* errorString, int errorStringLen)
 {
   if (timeString[0] == 0)
     return true;
 
-  int     len    = strlen(timeString);
-  int     hour   = 0;
-  int     minute = 0;
-  double  second = 0;
+  int          len      = strlen(timeString);
+  int          hour     = 0;
+  int          minute   = 0;
+  double       second   = 0;
+  bool         extended = timeString[2] == ':';
+  const char*  format = (extended == true)? "dd:dd:dd.dddddd" : "dddddd.dddddd";
 
-  const char* format = "dd:dd:dd.dddddd";
   for (int ix = 0; ix < len; ix++)
   {
     if ((format[ix] == 'd') && (timeString[ix] < '0' || timeString[ix] > '9'))
@@ -212,35 +216,66 @@ static bool timeParse(const char* dateTime, char* timeString, int* hourP, int* m
   }
 
   if (len ==  2)
-  {
     hour = atoi(timeString);
-  }
-  else if (len == 5)
+  else if (extended == true)
   {
-    timeString[2] = 0;
-    hour   = atoi(timeString);
-    minute = atoi(&timeString[3]);
-  }
-  else if (len == 8)
-  {
-    timeString[2] = 0;
-    timeString[5] = 0;
-    hour   = atoi(timeString);
-    minute = atoi(&timeString[3]);
-    second = atoi(&timeString[6]);
-  }
-  else if (len >= 10)
-  {
-    timeString[2] = 0;
-    timeString[5] = 0;
-    hour   = atoi(timeString);
-    minute = atoi(&timeString[3]);
-    second = strtod(&timeString[6], NULL);
+    if (len == 5)  // HH:mm
+    {
+      timeString[2] = 0;
+      hour   = atoi(timeString);
+      minute = atoi(&timeString[3]);
+    }
+    else if (len == 8)  // HH:mm:SS
+    {
+      timeString[2] = 0;
+      timeString[5] = 0;
+      hour   = atoi(timeString);
+      minute = atoi(&timeString[3]);
+      second = atoi(&timeString[6]);
+    }
+    else if (len >= 10)  // HH:mm:SS.ssssss
+    {
+      timeString[2] = 0;
+      timeString[5] = 0;
+      hour   = atoi(timeString);
+      minute = atoi(&timeString[3]);
+      second = strtod(&timeString[6], NULL);
+    }
+    else
+    {
+      snprintf(errorString, errorStringLen, "invalid DateTime: '%s' (error in 'date' part)", dateTime);
+      return false;
+    }
   }
   else
   {
-    snprintf(errorString, errorStringLen, "invalid DateTime: '%s' (error in 'date' part)", dateTime);
-    return false;
+    if (len == 4)  // HHmm
+    {
+      minute = atoi(&timeString[2]);
+      timeString[2] = 0;
+      hour   = atoi(timeString);
+    }
+    else if (len == 6)  // HHmmSS
+    {
+      second = atoi(&timeString[4]);
+      timeString[4] = 0;
+      minute = atoi(&timeString[2]);
+      timeString[2] = 0;
+      hour   = atoi(timeString);
+    }
+    else if (len > 7)  // HHmmSS.ssssss
+    {
+      second = strtod(&timeString[4], NULL);
+      timeString[4] = 0;
+      minute = atoi(&timeString[2]);
+      timeString[2] = 0;
+      hour   = atoi(timeString);
+    }
+    else
+    {
+      snprintf(errorString, errorStringLen, "invalid DateTime: '%s' (error in 'date' part)", dateTime);
+      return false;
+    }
   }
 
   if (hour > 23)
