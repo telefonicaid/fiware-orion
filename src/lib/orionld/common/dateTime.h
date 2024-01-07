@@ -40,6 +40,6 @@ extern char* dateTimeToString(double timestamp);
 //
 // dateTimeFromString -
 //
-extern double dateTimeFromString(const char* iso8601);
+extern double dateTimeFromString(const char* iso8601, char* errorString, int errorStringLen);
 
 #endif  // SRC_LIB_ORIONLD_COMMON_DATETIME_H_

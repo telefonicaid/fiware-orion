@@ -98,7 +98,9 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
     }
     if ((attrType == DATE_TYPE) || (attrType == DATE_TYPE_ALT))
     {
-      effectiveNumberValue = dateTimeFromString(effectiveStringValue);
+      char errorString[256];
+
+      effectiveNumberValue = dateTimeFromString(effectiveStringValue, errorString, sizeof(errorString));
       if (effectiveNumberValue >= 0)
         effectiveValueType = ValueTypeNumber;
       // Note that if dateTimeFromString() fails, we keep ValueTypeString and everything works like without autocast

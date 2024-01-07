@@ -845,11 +845,13 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   }
   else if (strcmp(key, "observedAt") == 0)
   {
-    orionldState.uriParams.observedAtAsDouble = dateTimeFromString(value);
+    char errorString[256];
+
+    orionldState.uriParams.observedAtAsDouble = dateTimeFromString(value, errorString, sizeof(errorString));
 
     if (orionldState.uriParams.observedAtAsDouble < 0)
     {
-      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /observedAt/ (not a valid ISO8601 timestamp)", value, 400);
+      orionldError(OrionldBadRequestData, "Invalid value for uri parameter /observedAt/ (not a valid ISO8601 timestamp)", errorString, 400);
       return MHD_YES;
     }
     else

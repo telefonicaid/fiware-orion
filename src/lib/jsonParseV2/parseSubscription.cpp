@@ -31,6 +31,8 @@
 
 #include "rapidjson/document.h"
 
+#include "logMsg/logMsg.h"
+
 #include "orionld/common/orionldState.h"             // orionldState
 #include "orionld/common/dateTime.h"                 // dateTimeFromString
 
@@ -195,9 +197,12 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     }
     else
     {
-      eT = (uint64_t) dateTimeFromString(expires.c_str());
+      char errorString[256];
+
+      eT = (uint64_t) dateTimeFromString(expires.c_str(), errorString, sizeof(errorString));
       if (eT == -1)
       {
+        LM_E(("dateTimeFromString: %s", errorString));
         return badInput(ciP, "expires has an invalid format");
       }
     }

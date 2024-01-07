@@ -415,6 +415,8 @@ bool StringFilterItem::valueGet
   std::string*            errorStringP
 )
 {
+  char errorString[256];
+
   if (*s == '\'')
   {
     ++s;
@@ -439,7 +441,7 @@ bool StringFilterItem::valueGet
   {
     *valueTypeP = SfvtNumber;
   }
-  else if ((*doubleP = dateTimeFromString(s)) >= 0)
+  else if ((*doubleP = dateTimeFromString(s, errorString, sizeof(errorString))) >= 0)
   {
     *valueTypeP = SfvtDate;
   }

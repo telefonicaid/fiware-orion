@@ -442,12 +442,12 @@ payload='[
     ],
     "id": "urn:ngsi-ld:WeatherObserved:BMP180:18219",
     "temperature": {
-      "observedAt": "2020-04-09T14:33:30.0Z",
+      "observedAt": "2020-04-09T14:33:30.000Z",
       "type": "Property",
       "value": 33.9
     },
     "atmosphericPressure": {
-      "observedAt": "2020-04-09T14:33:30.7Z",
+      "observedAt": "2020-04-09T14:33:30.700Z",
       "type": "Property",
       "value": 980.56
     }

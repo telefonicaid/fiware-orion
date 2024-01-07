@@ -249,12 +249,19 @@ void ngsildTimeIntervalToAPIv1Datamodel(KjNode* tiP)
   KjNode* startP = kjLookup(tiP, "startAt");
   KjNode* endP   = kjLookup(tiP, "endAt");
   double  dateTime;
+  char    errorString[256];
 
-  dateTime        = dateTimeFromString(startP->value.s);
+  dateTime = dateTimeFromString(startP->value.s, errorString, sizeof(errorString));
+  if (dateTime < 0)
+    LM_E(("startAt error: %s", errorString));
+
   startP->type    = KjFloat;
   startP->value.f = dateTime;
 
-  dateTime        = dateTimeFromString(endP->value.s);
+  dateTime = dateTimeFromString(endP->value.s, errorString, sizeof(errorString));
+  if (dateTime < 0)
+    LM_E(("endAt error: %s", errorString));
+
   endP->type      = KjFloat;
   endP->value.f   = dateTime;
 }
@@ -267,7 +274,14 @@ void ngsildTimeIntervalToAPIv1Datamodel(KjNode* tiP)
 //
 void dbModelFromApiExpires(KjNode* expiresP)
 {
-  expiresP->value.f  = dateTimeFromString(expiresP->value.s);
+  char errorString[256];
+
+  double timestamp = dateTimeFromString(expiresP->value.s, errorString, sizeof(errorString));
+
+  if (timestamp < 0)
+    LM_W(("expiresAt: %s", errorString));
+
+  expiresP->value.f  = timestamp;
   expiresP->type     = KjFloat;
 
   expiresP->name = (char*) "expiration";

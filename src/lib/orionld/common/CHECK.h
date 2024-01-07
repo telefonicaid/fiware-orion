@@ -294,9 +294,12 @@ do                                                                              
 #define DATETIME_CHECK(stringValue, dateTimeValue, fieldName)                                                \
 do                                                                                                           \
 {                                                                                                            \
-  if ((dateTimeValue = dateTimeFromString(stringValue)) < 0)                                                 \
+  char errorString[512];                                                                                     \
+                                                                                                             \
+  if ((dateTimeValue = dateTimeFromString(stringValue, errorString, sizeof(errorString))) < 0)               \
   {                                                                                                          \
-    orionldError(OrionldBadRequestData, "Invalid DateTime value", fieldName, 400);                           \
+    orionldError(OrionldBadRequestData, "Invalid DateTime value", errorString, 400);                         \
+    pdField(fieldName);                                                                                      \
     return false;                                                                                            \
   }                                                                                                          \
 } while (0)

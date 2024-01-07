@@ -114,7 +114,8 @@ static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContext
         return false;
       }
 
-      if (dateTimeFromString(attrP->value.s) < 0)
+      char errorString[256];
+      if (dateTimeFromString(attrP->value.s, errorString, sizeof(errorString)) < 0)
       {
         //
         // Deletion?
@@ -126,10 +127,9 @@ static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContext
           return true;
         }
 
-        orionldError(OrionldBadRequestData,
-                     "Invalid ISO8601 timestamp",
-                     attrP->name,
-                     400);
+        orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", errorString, 400);
+        pdField(attrP->name);
+
         return false;
       }
     }
@@ -579,7 +579,8 @@ bool timestampCheck(KjNode* fieldP)
     return false;
   }
 
-  if (dateTimeFromString(fieldP->value.s) < 0)
+  char errorString[256];
+  if (dateTimeFromString(fieldP->value.s, errorString, sizeof(errorString)) < 0)
   {
     orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", fieldP->name, 400);
     return false;

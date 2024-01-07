@@ -581,7 +581,19 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
       metadataP->valueType   = orion::ValueTypeNumber;
 
       if (mdP->type == KjString)
-        metadataP->numberValue = dateTimeFromString(mdP->value.s);
+      {
+        char errorString[256];
+
+        double timestamp = dateTimeFromString(mdP->value.s, errorString, sizeof(errorString));
+
+        if (timestamp < 0)
+        {
+          *detailP = errorString;
+          return false;
+        }
+        else
+          metadataP->numberValue = timestamp;
+      }
       else
       {
         KjNode* valueP         = mdP->value.firstChildP;

@@ -183,10 +183,11 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     {
       LM_T(LmtQ, ("'%s' might be a DateTime", term));
 
-      double dTime = dateTimeFromString(term);
+      char   errorString[256];
+      double dTime = dateTimeFromString(term, errorString, sizeof(errorString));
 
       if (dTime < 0)
-        LM_W(("Invalid DateTime: '%s'", term));
+        LM_W(("Invalid DateTime: '%s': %s", term, errorString));
       else
       {
         LM_T(LmtQ, ("term: '%s', dTime: %f", term, dTime));
@@ -413,10 +414,11 @@ QNode* qLex(char* s, bool timestampToFloat, char** titleP, char** detailsP)
       LM_T(LmtQ, ("timestampToFloat: %s", (timestampToFloat == true)? "true" : "false"));
       if (timestampToFloat == true)
       {
+        char      errorString[256];
         double    dateTime;
         uint64_t  sLen = (uint64_t) (sP - start - 2);
 
-        if ((sLen >= 9) && (start[4] == '-') && ((dateTime = dateTimeFromString(start)) > 0))
+        if ((sLen >= 9) && (start[4] == '-') && ((dateTime = dateTimeFromString(start, errorString, sizeof(errorString))) > 0))
         {
           if (lastTermIsTimestamp)
             current = qDateTimePush(current, dateTime);

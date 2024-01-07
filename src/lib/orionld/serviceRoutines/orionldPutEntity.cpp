@@ -176,7 +176,16 @@ KjNode* apiEntityToDbEntity(KjNode* apiEntityP, KjNode* oldDbEntityP, const char
 
       if (strcmp(saP->name, "observedAt") == 0)
       {
-        double  dateTime = dateTimeFromString(saP->value.s);
+        char errorString[256];
+
+        double  dateTime = dateTimeFromString(saP->value.s, errorString, sizeof(errorString));
+
+        if (dateTime < 0)
+        {
+          orionldError(OrionldBadRequestData, "Invalid ISO8601 for 'observedAt'", errorString, 400);
+          return NULL;
+        }
+
         KjNode* oaP      = kjFloat(orionldState.kjsonP, "observedAt", dateTime);
 
         saP->type = KjObject;

@@ -195,10 +195,13 @@ static void kjCompoundPatch(KjNode* container, const char* fieldName, KjNode* rh
 //
 static void kjDateTimePatch(KjNode* container, const char* fieldName, char* dateTime)
 {
+  char    errorString[256];
   KjNode* nodeP  = kjLookup(container, fieldName);
-  double  dValue = dateTimeFromString(dateTime);
+  double  dValue = dateTimeFromString(dateTime, errorString, sizeof(errorString));
 
-  if (nodeP != NULL)
+  if (dValue < 0)
+    LM_E(("dateTimeFromString: %s", errorString));
+  else if (nodeP != NULL)
   {
     nodeP->type    = KjFloat;
     nodeP->value.f = dValue;

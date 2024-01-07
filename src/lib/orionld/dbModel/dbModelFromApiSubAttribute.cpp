@@ -88,11 +88,12 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     //
     if (saP->type == KjString)
     {
-      double timestamp = dateTimeFromString(saP->value.s);
+      char   errorString[256];
+      double timestamp = dateTimeFromString(saP->value.s, errorString, sizeof(errorString));
 
       if (timestamp < 0)
       {
-        orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", saP->value.s, 400);
+        orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", errorString, 400);
         LM_W(("Bad Request (Invalid ISO8601 timestamp: %s)", saP->value.s));
         return false;
       }

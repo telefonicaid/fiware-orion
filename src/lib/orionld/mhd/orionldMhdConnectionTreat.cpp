@@ -46,7 +46,7 @@ extern "C"
 #include "rest/restReply.h"                                        // restReply
 
 #include "orionld/types/OrionldResponseErrorType.h"                // orionldResponseErrorType
-#include "orionld/types/OrionldProblemDetails.h"                   // OrionldProblemDetails
+#include "orionld/types/OrionldProblemDetails.h"                   // OrionldProblemDetails, pdTreeCreate
 #include "orionld/types/OrionldGeoIndex.h"                         // OrionldGeoIndex
 #include "orionld/types/OrionLdRestService.h"                      // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/types/OrionldHeader.h"                           // orionldHeaderAdd
@@ -121,52 +121,6 @@ static const char* uriParamName(uint32_t bit)
   }
 
   return "unknown URI parameter";
-}
-
-
-
-// ----------------------------------------------------------------------------
-//
-// errorTree -
-//
-KjNode* errorTree
-(
-  OrionldResponseErrorType  errorType,
-  const char*               title,
-  const char*               detail
-)
-{
-  orionldState.pd.title  = (char*) title;
-  orionldState.pd.detail = (char*) detail;
-
-  if ((title  != NULL) && (detail != NULL))
-  {
-    snprintf(orionldState.pd.titleAndDetailBuffer, sizeof(orionldState.pd.titleAndDetailBuffer), "%s: %s", title, detail);
-    orionldState.pd.titleAndDetail = orionldState.pd.titleAndDetailBuffer;
-  }
-  else if (title != NULL)
-    orionldState.pd.titleAndDetail = (char*) title;
-  else if (detail != NULL)
-    orionldState.pd.titleAndDetail = (char*) detail;
-  else
-    orionldState.pd.titleAndDetail = (char*) "no error info available";
-
-  KjNode* typeP     = kjString(orionldState.kjsonP, "type",    orionldResponseErrorType(errorType));
-  KjNode* titleP    = kjString(orionldState.kjsonP, "title",   title);
-  KjNode* detailP;
-
-  if ((detail != NULL) && (detail[0] != 0))
-    detailP = kjString(orionldState.kjsonP, "detail", detail);
-  else
-    detailP = kjString(orionldState.kjsonP, "detail", "no detail");
-
-  orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
-
-  kjChildAdd(orionldState.responseTree, typeP);
-  kjChildAdd(orionldState.responseTree, titleP);
-  kjChildAdd(orionldState.responseTree, detailP);
-
-  return orionldState.responseTree;
 }
 
 
@@ -1201,7 +1155,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   if ((orionldState.pd.status >= 400) && (orionldState.responseTree == NULL) && (orionldState.pd.status != 405))
   {
-    errorTree(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
+    pdTreeCreate(orionldState.pd.type, orionldState.pd.title, orionldState.pd.detail);
     orionldState.httpStatusCode = orionldState.pd.status;
   }
 

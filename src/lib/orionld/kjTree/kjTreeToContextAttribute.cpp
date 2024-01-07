@@ -53,10 +53,11 @@ extern "C"
 //
 // ATTRIBUTE_ERROR -
 //
-#define ATTRIBUTE_ERROR(errorString, details)                                \
+#define ATTRIBUTE_ERROR(title, details, attrName)                            \
 do                                                                           \
 {                                                                            \
-  orionldError(OrionldBadRequestData, errorString, details, 400);            \
+  orionldError(OrionldBadRequestData, title, details, 400);                  \
+  pdField(attrName);                                                         \
   return false;                                                              \
 } while (0)
 
@@ -66,11 +67,13 @@ do                                                                           \
 //
 // specialCompoundCheck -
 //
-static bool specialCompoundCheck(KjNode* compoundValueP)
+static bool specialCompoundCheck(const char* attrName, KjNode* compoundValueP)
 {
   KjNode*  typeNodeP  = NULL;
   KjNode*  valueNodeP = NULL;
   KjNode*  otherNodeP = NULL;
+
+  LM_W(("Attr name: '%s'", attrName));
 
   for (KjNode* nodeP = compoundValueP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
   {
@@ -105,9 +108,12 @@ static bool specialCompoundCheck(KjNode* compoundValueP)
     {
       STRING_CHECK(valueNodeP, "@value of DateTime @type");
 
-      if (dateTimeFromString(valueNodeP->value.s) < 0)
+      char errorString[256];
+      if (dateTimeFromString(valueNodeP->value.s, errorString, sizeof(errorString)) < 0)
       {
-        orionldError(OrionldBadRequestData, "DateTime value of @value/@type compound must be a valid ISO8601", valueNodeP->value.s, 400);
+        orionldError(OrionldBadRequestData, "DateTime value of @value/@type compound must be a valid ISO8601", errorString, 400);
+        LM_W(("Attr name: '%s'", attrName));
+        pdAttribute(attrName);
         return false;
       }
     }
@@ -156,7 +162,8 @@ static bool attributeValueSet(ContextAttribute* caP, KjNode* valueP)
 
   if (valueP->type == KjObject)
   {
-    if (specialCompoundCheck(valueP) == false)
+    LM_W(("Attr name: '%s'", caP->name.c_str()));
+    if (specialCompoundCheck(caP->name.c_str(), valueP) == false)
       return false;
   }
 
@@ -197,7 +204,10 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 {
   char* attributeName = kNodeP->name;
 
-  *detailP = (char*) "unknown error";
+  caP->name    = attributeName;
+  *detailP     = (char*) "unknown error";
+
+  LM_W(("attributeName: '%s'", caP->name.c_str()));
 
   if (contextP == NULL)
     contextP = orionldCoreContextP;
@@ -357,8 +367,9 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       double dateTime;
 
       // Check for valid ISO8601
-      if ((dateTime = dateTimeFromString(nodeP->value.s)) < 0)
-        ATTRIBUTE_ERROR("The 'observedAt' attribute must have a valid ISO8601 as value", nodeP->name);
+      char errorString[256];
+      if ((dateTime = dateTimeFromString(nodeP->value.s, errorString, sizeof(errorString))) < 0)
+        ATTRIBUTE_ERROR("Invalid ISO8601", errorString, "observedAt");
 
       // Change to Number
       nodeP->type    = KjFloat;
@@ -533,11 +544,12 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       if (valueP->type == KjString)
       {
         double dateTime;
+        char   errorString[256];
 
-        if ((dateTime = dateTimeFromString(valueP->value.s)) < 0)
+        if ((dateTime = dateTimeFromString(valueP->value.s, errorString, sizeof(errorString))) < 0)
         {
-          *detailP = (char*) "dateTimeFromString failed";
-          ATTRIBUTE_ERROR("temporal property must have a valid ISO8601 as value", kNodeP->name);
+          *detailP = (char*) errorString;
+          ATTRIBUTE_ERROR("temporal property must have a valid ISO8601 as value", errorString, kNodeP->name);
         }
 
         caP->numberValue = dateTime;
@@ -594,7 +606,17 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
 
         cValueNodeP->name        = "@value";
         cValueNodeP->valueType   = orion::ValueTypeNumber;
-        cValueNodeP->numberValue = dateTimeFromString(atValueNodeP->value.s);  // FIXME: Assuming "DateTime" - "Date"/"Time" ...
+
+        char   errorString[256];
+        double dateTime = dateTimeFromString(atValueNodeP->value.s, errorString, sizeof(errorString));
+        if (dateTime < 0)
+        {
+          orionldError(OrionldBadRequestData, "Invalid ISO8601", errorString, 400);
+          *detailP =  errorString;
+          return false;
+        }
+
+        cValueNodeP->numberValue = dateTime;  // FIXME: Assuming "DateTime" - "Date"/"Time" ...
         cNodeP->childV.push_back(cValueNodeP);
 
         if (atTypeNodeP != NULL)
@@ -614,11 +636,12 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       else
       {
         *detailP = (char*) "temporal-property attribute must have a value of type JSON String or a JSON object with @value and @type";
-        ATTRIBUTE_ERROR("temporal-property attribute must have a value of type JSON String or a JSON object with @value and @type", kjValueType(valueP->type));
+        ATTRIBUTE_ERROR("temporal-property attribute must have a value of type JSON String or a JSON object with @value and @type", kjValueType(valueP->type), caP->name.c_str());
       }
     }
     else
     {
+      LM_W(("Calling attributeValueSet for attribute '%s'", caP->name.c_str()));
       if (attributeValueSet(caP, valueP) == false)
       {
         // attributeValueSet calls orionldError
@@ -630,12 +653,12 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
   else if (isRelationship == true)
   {
     if (objectP == NULL)
-      ATTRIBUTE_ERROR("relationship attribute without 'object' field", attributeName);
+      ATTRIBUTE_ERROR("Invalid attribute", "relationship without 'object'", attributeName);
 
     if (objectP->type == KjString)
     {
       if (pCheckUri(objectP->value.s, "object", true) == false)
-        ATTRIBUTE_ERROR("relationship attribute with 'object' field having invalid URI", objectP->value.s);
+        ATTRIBUTE_ERROR("Relationship attribute with 'object' field having invalid URI", objectP->value.s, attributeName);
 
       caP->valueType   = orion::ValueTypeString;
       caP->stringValue = objectP->value.s;
@@ -645,19 +668,18 @@ bool kjTreeToContextAttribute(OrionldContext* contextP, KjNode* kNodeP, ContextA
       for (KjNode* nodeP = objectP->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
       {
         if (nodeP->type != KjString)
-          ATTRIBUTE_ERROR("relationship attribute with 'object' array item not being a JSON string", kjValueType(nodeP->type));
+          ATTRIBUTE_ERROR("Relationship attribute with 'object' array item not being a JSON string", kjValueType(nodeP->type), attributeName);
 
         char* uri = nodeP->value.s;
         if (pCheckUri(uri, "object array item", true) == false)
-          ATTRIBUTE_ERROR("relationship attribute with 'object array' field having invalid URI", uri);
+          ATTRIBUTE_ERROR("Relationship attribute with 'object array' field having invalid URI", uri, attributeName);
       }
       caP->valueType      = orion::ValueTypeVector;
       caP->compoundValueP = kjTreeToCompoundValue(objectP, NULL, 0);
     }
     else
-      ATTRIBUTE_ERROR("relationship attribute with 'object' field of invalid type (must be a String or an Array or Strings)", attributeName);
+      ATTRIBUTE_ERROR("Invalid attribute", "relationship with 'object' field of invalid type (must be a String or an Array or Strings)", attributeName);
   }
 
-  caP->name    = kNodeP->name;
   return true;
 }

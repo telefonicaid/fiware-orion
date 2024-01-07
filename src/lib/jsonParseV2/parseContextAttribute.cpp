@@ -162,10 +162,12 @@ static std::string parseContextAttributeObject
   // Is it a date?
   if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
   {
-    caP->numberValue =  dateTimeFromString(caP->stringValue.c_str());
+    char errorString[256];
+    caP->numberValue =  dateTimeFromString(caP->stringValue.c_str(), errorString, sizeof(errorString));
 
-    if (caP->numberValue == -1)
+    if (caP->numberValue < 0)
     {
+      LM_E(("dateTimeFromString: %s", errorString));
       return "date has invalid format";
     }
 

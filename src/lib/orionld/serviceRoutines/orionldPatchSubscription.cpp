@@ -680,8 +680,18 @@ static bool subCacheItemUpdate
     }
     else if ((strcmp(itemP->name, "expires") == 0) || (strcmp(itemP->name, "expiresAt") == 0))
     {
+      char errorString[256];
+
       // Give error for expires/expiresAt and version of NGSI-LD ?
-      cSubP->expirationTime = dateTimeFromString(itemP->value.s);
+      double expiresAt = dateTimeFromString(itemP->value.s, errorString, sizeof(errorString));
+
+      if (expiresAt > 0)
+        cSubP->expirationTime = expiresAt;
+      else
+      {
+        orionldError(OrionldBadRequestData, "Invalid ISO8601 for 'expiresAt'", errorString, 400);
+        r = false;
+      }
     }
     else if (strcmp(itemP->name, "throttling") == 0)
     {

@@ -572,9 +572,14 @@ static bool qRangeCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
 
   if (isTimestamp)
   {
-    double lhsTimestamp  = dateTimeFromString(lhsNode->value.s);
-    double lowTimestamp  = (low->type == QNodeFloatValue)? low->value.f :  dateTimeFromString(low->value.s);
-    double highTimestamp = dateTimeFromString(high->value.s);
+    char errorString[256];
+
+    double lhsTimestamp  = dateTimeFromString(lhsNode->value.s, errorString, sizeof(errorString));
+    double lowTimestamp  = (low->type == QNodeFloatValue)? low->value.f :  dateTimeFromString(low->value.s, errorString, sizeof(errorString));
+    double highTimestamp = dateTimeFromString(high->value.s, errorString, sizeof(errorString));
+
+    if ((lhsTimestamp < 0) || (lowTimestamp < 0) || (highTimestamp < 0))
+      LM_RE(false, ("Invalid ISO8601 timestamp: %s", errorString));
 
     if ((lhsTimestamp >= lowTimestamp) && (lhsTimestamp <= highTimestamp))
       return true;
@@ -697,7 +702,8 @@ bool floatComparison(KjNode* lhsP, QNode* rhs, bool isTimestamp)
 
   if (rhs->type == QNodeStringValue)
   {
-    double rhsTimestamp = dateTimeFromString(rhs->value.s);
+    char   errorString[256];
+    double rhsTimestamp = dateTimeFromString(rhs->value.s, errorString, sizeof(errorString));
 
     if (lhsP->value.f == rhsTimestamp)
       return true;
@@ -735,7 +741,8 @@ bool stringComparison(KjNode* lhsP, QNode* rhs, bool isTimestamp)
 
   if (isTimestamp)  // Then LHS is a Float?
   {
-    double rhsTimestamp = dateTimeFromString(rhs->value.s);
+    char   errorString[256];
+    double rhsTimestamp = dateTimeFromString(rhs->value.s, errorString, sizeof(errorString));
 
     return (lhsP->value.f == rhsTimestamp);
   }
@@ -757,11 +764,12 @@ bool qCommaListCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
   if (isTimestamp == true)  // The first in the list id a FLOAT, the rest need to be converted to float
   {
     double timestamp;
+    char   errorString[256];
 
     if (lhsNode->type == KjFloat)
       timestamp = lhsNode->value.f;
     else if (lhsNode->type == KjString)
-      timestamp = dateTimeFromString(lhsNode->value.s);
+      timestamp = dateTimeFromString(lhsNode->value.s, errorString, sizeof(errorString));
     else
       return false;
 
@@ -782,7 +790,8 @@ bool qCommaListCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
       }
       else if (rhP->type == QNodeStringValue)
       {
-        double rhsTimestamp = dateTimeFromString(rhP->value.s);
+        char   errorString[256];
+        double rhsTimestamp = dateTimeFromString(rhP->value.s, errorString, sizeof(errorString));
 
         if (rhsTimestamp == timestamp)
           return true;
@@ -825,7 +834,8 @@ bool qEqCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
     if (lhsNode->type != KjString)
       return false;
 
-    double timestamp = dateTimeFromString(lhsNode->value.s);
+    char   errorString[256];
+    double timestamp = dateTimeFromString(lhsNode->value.s, errorString, sizeof(errorString));
 
     if (rhs->type == QNodeIntegerValue)
     {
@@ -895,7 +905,8 @@ bool qGtCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
     if (lhsNode->type != KjString)
       return false;
 
-    double timestamp = dateTimeFromString(lhsNode->value.s);
+    char   errorString[256];
+    double timestamp = dateTimeFromString(lhsNode->value.s, errorString, sizeof(errorString));
 
     if (rhs->type == QNodeIntegerValue)
     {
@@ -955,7 +966,8 @@ bool qLtCompare(KjNode* lhsNode, QNode* rhs, bool isTimestamp)
     if (lhsNode->type != KjString)
       return false;
 
-    double timestamp = dateTimeFromString(lhsNode->value.s);
+    char   errorString[256];
+    double timestamp = dateTimeFromString(lhsNode->value.s, errorString, sizeof(errorString));
 
     if (rhs->type == QNodeIntegerValue)
     {

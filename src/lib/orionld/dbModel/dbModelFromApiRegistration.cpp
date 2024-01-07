@@ -178,18 +178,25 @@ void dbModelFromApiTimeInterval(KjNode* intervalP)
 {
   KjNode* startAtP = kjLookup(intervalP, "startAt");
   KjNode* endAtP   = kjLookup(intervalP, "endAt");
+  char    errorString[256];
   double  ts;
 
   if ((startAtP != NULL) && (startAtP->type == KjString))
   {
-    ts = dateTimeFromString(startAtP->value.s);
+    ts = dateTimeFromString(startAtP->value.s, errorString, sizeof(errorString));
+    if (ts < 0)
+      LM_E(("startAt: %s", errorString));
+
     startAtP->type    = KjFloat;
     startAtP->value.f = ts;
   }
 
   if ((endAtP != NULL) && (endAtP->type == KjString))
   {
-    ts = dateTimeFromString(endAtP->value.s);
+    ts = dateTimeFromString(endAtP->value.s, errorString, sizeof(errorString));
+    if (ts < 0)
+      LM_E(("startAt: %s", errorString));
+
     endAtP->type    = KjFloat;
     endAtP->value.f = ts;
   }
@@ -243,9 +250,14 @@ bool dbModelFromApiRegistration(KjNode* apiRegistration, RegCacheItem* rciP)
 
   if (expiresAtP != NULL)
   {
+    char errorString[256];
+
     expiresAtP->name    = (char*) "expiration";
-    expiresAtP->value.f = dateTimeFromString(expiresAtP->value.s);
+    expiresAtP->value.f = dateTimeFromString(expiresAtP->value.s, errorString, sizeof(errorString));
     expiresAtP->type    = KjFloat;
+
+    if (expiresAtP->value.f < 0)
+      LM_W(("expiration/expiresAt: %s", errorString));
   }
 
   kjChildAdd(apiRegistration, statusP);

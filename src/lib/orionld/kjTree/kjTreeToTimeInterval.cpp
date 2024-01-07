@@ -73,15 +73,16 @@ bool kjTreeToTimeInterval(KjNode* kNodeP, OrionldTimeInterval* intervalP)
     return false;
   }
 
-  if ((intervalP->start = dateTimeFromString(startP->value.s)) < 0)
+  char errorString[256];
+  if ((intervalP->start = dateTimeFromString(startP->value.s, errorString, sizeof(errorString))) < 0)
   {
-    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", startP->value.s, 400);
+    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", errorString, 400);
     return false;
   }
 
-  if ((intervalP->end = dateTimeFromString(endP->value.s)) < 0)
+  if ((intervalP->end = dateTimeFromString(endP->value.s, errorString, sizeof(errorString))) < 0)
   {
-    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", endP->value.s, 400);
+    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", errorString, 400);
     return false;
   }
 

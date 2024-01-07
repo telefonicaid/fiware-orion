@@ -125,10 +125,13 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
   // Is it a date?
   if ((mdP->type == DATE_TYPE) || (mdP->type == DATE_TYPE_ALT))
   {
-    mdP->numberValue =  dateTimeFromString(mdP->stringValue.c_str());
+    char errorString[256];
+
+    mdP->numberValue =  dateTimeFromString(mdP->stringValue.c_str(), errorString, sizeof(errorString));
 
     if (mdP->numberValue == -1)
     {
+      LM_E(("dateTimeFromString: %s", errorString));
       alarmMgr.badInput(orionldState.clientIp, "date has invalid format");
       return "date has invalid format";
     }

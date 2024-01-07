@@ -250,12 +250,13 @@ Date: REGEX(.*)
 06. Attempt to create an entity with an attribute observedAt that is a String, but not a DateTime - see error
 =============================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
+Content-Length: 184
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "observedAt",
+    "detail": "invalid DateTime: '2022' (error in 'date' part '2022')",
+    "field": "observedAt",
     "title": "Invalid ISO8601 timestamp",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

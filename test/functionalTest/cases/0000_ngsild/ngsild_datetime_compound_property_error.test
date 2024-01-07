@@ -120,12 +120,13 @@ Date: REGEX(.*)
 03. Attempt to create a DateTime Property whose @value is not a a valid ISO8601
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 173
+Content-Length: 308
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Not a valid ISO8601 string",
+    "attribute": "https://uri.etsi.org/ngsi-ld/default-context/TP1",
+    "detail": "invalid DateTime: 'Not a valid ISO8601 string' (error in 'date' part 'Not a valid ISO8601 string')",
     "title": "DateTime value of @value/@type compound must be a valid ISO8601",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

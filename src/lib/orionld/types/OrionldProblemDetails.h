@@ -25,7 +25,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionld/types/OrionldResponseErrorType.h"           // OrionldResponseErrorType
+extern "C"
+{
+#include "kjson/KjNode.h"                                         // KjNode
+}
+
+#include "orionld/types/OrionldResponseErrorType.h"               // OrionldResponseErrorType
 
 
 
@@ -41,6 +46,8 @@ typedef struct OrionldProblemDetails
   int                       status;
   char                      titleAndDetailBuffer[256];
   char*                     titleAndDetail;
+  char*                     field;
+  char*                     attribute;
 } OrionldProblemDetails;
 
 
@@ -56,6 +63,35 @@ void orionldProblemDetailsFill
   const char*              title,
   const char*              detail,
   int                      status
+);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pdField - add value for OrionldProblemDetails::field
+//
+extern void pdField(const char* fieldName);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// pdAttribute - add value for OrionldProblemDetails::attribute
+//
+extern void pdAttribute(const char* attrName);
+
+
+
+// ----------------------------------------------------------------------------
+//
+// pdTreeCreate -
+//
+extern KjNode* pdTreeCreate
+(
+  OrionldResponseErrorType  errorType,
+  const char*               title,
+  const char*               detail
 );
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDPROBLEMDETAILS_H_

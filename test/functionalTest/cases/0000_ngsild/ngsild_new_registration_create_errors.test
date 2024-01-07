@@ -3559,12 +3559,13 @@ Date: REGEX(.*)
 54. Attempt to create a registration with an 'observationInterval' with a 'startAt' field that is not a valid DateTime - see failure
 ===================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 176
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "startAt",
+    "detail": "invalid DateTime: '123' (error in 'date' part '123')",
+    "field": "startAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -3601,12 +3602,13 @@ Date: REGEX(.*)
 57. Attempt to create a registration with an 'observationInterval' with an 'endAt' field that is not a valid DateTime - see failure
 ===================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 174
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "endAt",
+    "detail": "invalid DateTime: '123' (error in 'date' part '123')",
+    "field": "endAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -3769,12 +3771,13 @@ Date: REGEX(.*)
 69. Attempt to create a registration with an 'managementInterval' with a 'startAt' field that is not a valid DateTime - see failure
 ===================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 176
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "startAt",
+    "detail": "invalid DateTime: '123' (error in 'date' part '123')",
+    "field": "startAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -3811,12 +3814,13 @@ Date: REGEX(.*)
 72. Attempt to create a registration with an 'managementInterval' with an 'endAt' field that is not a valid DateTime - see failure
 ==================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 174
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "endAt",
+    "detail": "invalid DateTime: '123' (error in 'date' part '123')",
+    "field": "endAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -4469,12 +4473,13 @@ Date: REGEX(.*)
 118. Attempt to create a registration with an 'expiresAt' that is not a valid DateTime - see failure
 ====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 115
+Content-Length: 178
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "expiresAt",
+    "detail": "invalid DateTime: 'abc' (error in 'date' part 'abc')",
+    "field": "expiresAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -4483,12 +4488,13 @@ Date: REGEX(.*)
 118. Attempt to create a registration with an 'expiresAt' that is in the past - see failure
 ===========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 127
+Content-Length: 147
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/expiresAt/ in the past",
+    "field": "expiresAt",
     "title": "Invalid Registration",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

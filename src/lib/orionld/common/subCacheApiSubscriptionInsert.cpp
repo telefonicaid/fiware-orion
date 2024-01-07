@@ -173,8 +173,10 @@ static void subCacheItemFill
   {
     // "expiresAt" has already been translated to double?
     double ts;
+    char   errorString[256];
+
     if (expiresAtP->type == KjString)
-      ts = dateTimeFromString(expiresAtP->value.s);
+      ts = dateTimeFromString(expiresAtP->value.s, errorString, sizeof(errorString));
     else
       ts = expiresAtP->value.f;
 

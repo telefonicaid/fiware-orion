@@ -76,7 +76,7 @@ payload='{
   "speed": {
     "type": "Property",
     "value": 22,
-    "observedAt": "2022-01-31T13:14:15.0123456789Z"
+    "observedAt": "2022-01-31T13:14:15.012345Z"
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities -X POST --payload "$payload"
