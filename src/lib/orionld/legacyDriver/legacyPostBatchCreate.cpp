@@ -66,7 +66,7 @@ extern "C"
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // kjTreeToUpdateContextRequest
+#include "orionld/legacyDriver/kjTreeToUpdateContextRequest.h"   // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityArrayErrorPurge.h"              // kjEntityArrayErrorPurge
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"   // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/legacyDriver/legacyPostBatchCreate.h"          // Own Interface

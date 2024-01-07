@@ -63,7 +63,6 @@ SET (SOURCES
     batchCreateEntity.cpp
     batchUpdateEntity.cpp
     batchReplaceEntity.cpp
-    metadataAdd.cpp
     curlToBrokerStrerror.cpp
     fileName.cpp
     responseFix.cpp

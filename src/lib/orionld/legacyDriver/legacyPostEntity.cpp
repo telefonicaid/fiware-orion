@@ -61,7 +61,7 @@ extern "C"
 #include "orionld/payloadCheck/pCheckAttribute.h"                         // pCheckAttribute
 #include "orionld/context/orionldAttributeExpand.h"                       // orionldAttributeExpand
 #include "orionld/context/orionldContextItemAliasLookup.h"                // orionldContextItemAliasLookup
-#include "orionld/kjTree/kjTreeToContextAttribute.h"                      // kjTreeToContextAttribute
+#include "orionld/legacyDriver/kjTreeToContextAttribute.h"                // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"                    // kjStringValueLookupInArray
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"            // mongoCppLegacyEntityLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"  // mongoCppLegacyEntityAttributesDelete

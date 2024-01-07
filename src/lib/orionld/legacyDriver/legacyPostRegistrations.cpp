@@ -36,8 +36,8 @@
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
-#include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
+#include "orionld/legacyDriver/kjTreeToRegistration.h"         // kjTreeToRegistration
 #include "orionld/legacyDriver/legacyPostRegistrations.h"      // Own Interface
 
 

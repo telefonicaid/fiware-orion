@@ -22,40 +22,40 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>                                                // std::string
-#include <vector>                                                // std::vector
+#include <string>                                                 // std::string
+#include <vector>                                                 // std::vector
 
 extern "C"
 {
-#include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
-#include "kbase/kStringSplit.h"                                  // kStringSplit
-#include "kbase/kStringArrayJoin.h"                              // kStringArrayJoin
-#include "kbase/kStringArrayLookup.h"                            // kStringArrayLookup
-#include "kbase/kTime.h"                                         // kTimeGet
-#include "kalloc/kaStrdup.h"                                     // kaStrdup
-#include "kjson/KjNode.h"                                        // KjNode
-#include "kjson/kjBuilder.h"                                     // kjObject, ...
-#include "kjson/kjParse.h"                                       // kjParse
+#include "kbase/kMacros.h"                                        // K_VEC_SIZE, K_FT
+#include "kbase/kStringSplit.h"                                   // kStringSplit
+#include "kbase/kStringArrayJoin.h"                               // kStringArrayJoin
+#include "kbase/kStringArrayLookup.h"                             // kStringArrayLookup
+#include "kbase/kTime.h"                                          // kTimeGet
+#include "kalloc/kaStrdup.h"                                      // kaStrdup
+#include "kjson/KjNode.h"                                         // KjNode
+#include "kjson/kjBuilder.h"                                      // kjObject, ...
+#include "kjson/kjParse.h"                                        // kjParse
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
+#include "logMsg/logMsg.h"                                        // LM_*
 
-#include "orionld/types/OrionldHttpHeader.h"                     // OrionldHttpHeader
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/orionldRequestSend.h"                   // orionldRequestSend
-#include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/common/performance.h"                          // PERFORMANCE
-#include "orionld/common/tenantList.h"                           // tenant0
-#include "orionld/mongoc/mongocRegistrationLookup.h"             // mongocRegistrationLookup
-#include "orionld/mongoc/mongocEntityRetrieve.h"                 // mongocEntityRetrieve
-#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_URI
-#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/kjTree/kjTreeFromQueryContextResponse.h"       // kjTreeFromQueryContextResponse
-#include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
-#include "orionld/kjTree/kjGeojsonEntityTransform.h"             // kjGeojsonEntityTransform
-#include "orionld/legacyDriver/legacyGetEntity.h"                // Own Interface
+#include "orionld/types/OrionldHttpHeader.h"                      // OrionldHttpHeader
+#include "orionld/common/orionldState.h"                          // orionldState
+#include "orionld/common/orionldError.h"                          // orionldError
+#include "orionld/common/SCOMPARE.h"                              // SCOMPAREx
+#include "orionld/common/orionldRequestSend.h"                    // orionldRequestSend
+#include "orionld/common/dotForEq.h"                              // dotForEq
+#include "orionld/common/performance.h"                           // PERFORMANCE
+#include "orionld/common/tenantList.h"                            // tenant0
+#include "orionld/mongoc/mongocRegistrationLookup.h"              // mongocRegistrationLookup
+#include "orionld/mongoc/mongocEntityRetrieve.h"                  // mongocEntityRetrieve
+#include "orionld/payloadCheck/PCHECK.h"                          // PCHECK_URI
+#include "orionld/context/orionldContextItemAliasLookup.h"        // orionldContextItemAliasLookup
+#include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"         // kjTreeRegistrationInfoExtract
+#include "orionld/kjTree/kjGeojsonEntityTransform.h"              // kjGeojsonEntityTransform
+#include "orionld/legacyDriver/kjTreeFromQueryContextResponse.h"  // kjTreeFromQueryContextResponse
+#include "orionld/legacyDriver/legacyGetEntity.h"                 // Own Interface
 
 
 

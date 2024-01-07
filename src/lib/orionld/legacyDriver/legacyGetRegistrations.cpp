@@ -40,7 +40,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                      // orionldError
 #include "orionld/types/OrionldHeader.h"                      // orionldHeaderAdd
 #include "orionld/mongoBackend/mongoLdRegistrationsGet.h"     // mongoLdRegistrationsGet
-#include "orionld/kjTree/kjTreeFromRegistration.h"            // kjTreeFromRegistration
+#include "orionld/legacyDriver/kjTreeFromRegistration.h"      // kjTreeFromRegistration
 #include "orionld/legacyDriver/legacyGetRegistrations.h"      // Own Interface
 
 

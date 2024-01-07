@@ -53,12 +53,12 @@ extern "C"
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/common/langStringExtract.h"                  // langValueFix
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
-#include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity2
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesAttributeLookup.h"  // mongoCppLegacyEntitiesAttributeLookup
-#include "orionld/legacyDriver/legacyGetEntities.h"            // Own Interface
+#include "orionld/legacyDriver/kjTreeFromQueryContextResponse.h"           // kjTreeFromQueryContextResponse
+#include "orionld/legacyDriver/legacyGetEntities.h"                        // Own Interface
 
 
 

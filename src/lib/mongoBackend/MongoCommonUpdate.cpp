@@ -70,7 +70,7 @@ extern "C"
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"     // mongoCppLegacyDataToKjTree
 #include "orionld/kjTree/kjSort.h"                                 // kjSort
-#include "orionld/kjTree/kjTreeFromCompoundValue.h"                // kjTreeFromCompoundValue
+#include "orionld/legacyDriver/kjTreeFromCompoundValue.h"          // kjTreeFromCompoundValue
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"

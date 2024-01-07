@@ -44,9 +44,9 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
-#include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
+#include "orionld/legacyDriver/kjTreeToSubscription.h"         // kjTreeToSubscription
 #include "orionld/legacyDriver/legacyPostSubscriptions.h"      // Own interface
 
 

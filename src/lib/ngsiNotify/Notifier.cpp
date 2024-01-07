@@ -54,7 +54,7 @@ extern "C"
 #include "cache/subCache.h"                                    // CachedSubscription
 
 #include "orionld/http/http.h"                                 // LINK_REL_AND_TYPE
-#include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
+#include "orionld/legacyDriver/kjTreeFromNotification.h"       // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "orionld/notifications/notificationDataToGeoJson.h"   // notificationDataToGeoJson
 

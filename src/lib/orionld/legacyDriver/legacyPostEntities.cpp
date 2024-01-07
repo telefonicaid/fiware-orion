@@ -54,7 +54,7 @@ extern "C"
 #include "orionld/payloadCheck/pCheckEntityType.h"               // pCheckEntityType
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/mongoBackend/mongoEntityExists.h"              // mongoEntityExists
-#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
+#include "orionld/legacyDriver/kjTreeToContextAttribute.h"       // kjTreeToContextAttribute
 #include "orionld/legacyDriver/legacyPostEntities.h"             // Own interface
 
 

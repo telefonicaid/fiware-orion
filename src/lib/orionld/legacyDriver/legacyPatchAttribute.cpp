@@ -58,12 +58,12 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
-#include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeLookup.h"   // mongoCppLegacyEntityAttributeLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"      // mongoCppLegacyEntityFieldReplace
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationLookup.h"      // mongoCppLegacyRegistrationLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyDatasetGet.h"              // mongoCppLegacyDatasetGet
-#include "orionld/legacyDriver/legacyPatchAttribute.h"           // Own Interface
+#include "orionld/legacyDriver/kjTreeToCompoundValue.h"                   // kjTreeToCompoundValue
+#include "orionld/legacyDriver/legacyPatchAttribute.h"                    // Own Interface
 
 
 

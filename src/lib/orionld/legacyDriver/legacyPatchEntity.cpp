@@ -51,7 +51,7 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
-#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
+#include "orionld/legacyDriver/kjTreeToContextAttribute.h"       // kjTreeToContextAttribute
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"   // mongoCppLegacyEntityLookup
 #include "orionld/legacyDriver/legacyPatchEntity.h"              // Own Interface
