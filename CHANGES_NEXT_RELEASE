@@ -6,7 +6,7 @@
 - Fix: improve error traces (#4387)
 - Fix: on delete attributes operation, the lack of attribute in entity doesn't preclude the deletion of attributes which do exist (this way behaving same way as update attributes operation)
 - Fix: POST /v2/entities/E/attrs?options=append was wrongly creating entities
-- Fix: provide more inforamtive error description in some error responses in update/delete operations
+- Fix: provide more informative error description in some error responses in update/delete operations
 - Fix: proper use of "PartialUpdate" (instead of "Unprocessed") in responses in the case of partial updates/deletions (#3499)
 - Fix: response 404 Not Found "NotFound" errors instead of 422 Unprocessable Content "Unprocessed" in the case of missing attribute in existing entity in attribute update operations
 - Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
