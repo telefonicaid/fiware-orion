@@ -93,7 +93,7 @@ std::string putEntityAttribute
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    alarmMgr.badInput(clientIp, parseDataP->upcrs.res.oe.details);
+    alarmMgr.badInput(clientIp, parseDataP->upcrs.res.oe.description);
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else

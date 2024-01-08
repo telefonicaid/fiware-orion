@@ -424,7 +424,7 @@ static bool queryForward
 
     if (b == false)
     {
-      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.details);
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
       parseData.qcr.res.release();
       parseData.qcrs.res.release();
       return false;

@@ -222,7 +222,7 @@ HttpStatusCode mongoUpdateContext
     if (updateCoverage == UC_PARTIAL)
     {
       responseP->oe.code         = SccInvalidModification;
-      responseP->oe.reasonPhrase = ERROR_PARTIAL_UPDATE;
+      responseP->oe.error = ERROR_PARTIAL_UPDATE;
     }
 
     LM_T(LmtNotifier, ("total notifications sent during update: %d", notifSent));

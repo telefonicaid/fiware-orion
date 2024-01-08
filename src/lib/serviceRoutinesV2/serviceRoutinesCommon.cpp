@@ -135,16 +135,16 @@ RenderFormat getRenderFormat(std::map<std::string, bool>&  uriParamOptions)
 */
 void adaptErrorCodeForSingleEntityOperation(OrionError* oeP, bool singleAttributeCheck)
 {
-  if ((oeP->code == SccContextElementNotFound) & (oeP->reasonPhrase == ERROR_NOT_FOUND))
+  if ((oeP->code == SccContextElementNotFound) & (oeP->error == ERROR_NOT_FOUND))
   {
     // In single entity attribute operations (e.g. DELETE /v2/entities/E/attrs/A) when the entity doesn't exist
-    oeP->details = ERROR_DESC_NOT_FOUND_ENTITY;
+    oeP->description = ERROR_DESC_NOT_FOUND_ENTITY;
   }
-  else if (singleAttributeCheck && (oeP->code == SccInvalidModification) & (oeP->reasonPhrase == ERROR_UNPROCESSABLE))
+  else if (singleAttributeCheck && (oeP->code == SccInvalidModification) & (oeP->error == ERROR_UNPROCESSABLE))
   {
     // In single entity attribute operations (e.g. DELETE /v2/entities/E/attrs/A) when the entity exists but the attribute doesn't
     oeP->code = SccContextElementNotFound;
-    oeP->reasonPhrase = ERROR_NOT_FOUND;
-    oeP->details = ERROR_DESC_NOT_FOUND_ATTRIBUTE;
+    oeP->error = ERROR_NOT_FOUND;
+    oeP->description = ERROR_DESC_NOT_FOUND_ATTRIBUTE;
   }
 }

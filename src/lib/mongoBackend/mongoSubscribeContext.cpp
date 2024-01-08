@@ -70,7 +70,7 @@ HttpStatusCode mongoSubscribeContext
   else
   {
     // Check OrionError
-    responseP->subscribeError.errorCode.fill(oe.code, oe.details);
+    responseP->subscribeError.errorCode.fill(oe.code, oe.description);
   }
 
   // free sub memory associated to subscription

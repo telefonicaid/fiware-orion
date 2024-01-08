@@ -1555,15 +1555,15 @@ static MHD_Result connectionTreat
 
     if (textAccepted)
     {
-      oe.details = "acceptable MIME types: application/json, text/plain";
+      oe.description = "acceptable MIME types: application/json, text/plain";
     }
     else
     {
-      oe.details = "acceptable MIME types: application/json";
+      oe.description = "acceptable MIME types: application/json";
     }
 
     ciP->httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, oe.details);
+    alarmMgr.badInput(clientIp, oe.description);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
@@ -1581,15 +1581,15 @@ static MHD_Result connectionTreat
 
     if (textAccepted)
     {
-      oe.details = "acceptable MIME types: application/json, text/plain";
+      oe.description = "acceptable MIME types: application/json, text/plain";
     }
     else
     {
-      oe.details = "acceptable MIME types: application/json";
+      oe.description = "acceptable MIME types: application/json";
     }
 
     ciP->httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, oe.details);
+    alarmMgr.badInput(clientIp, oe.description);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
