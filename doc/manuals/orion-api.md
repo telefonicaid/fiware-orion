@@ -2816,8 +2816,9 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -2909,8 +2910,9 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -3024,9 +3026,10 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity
-  * 422 Unprocessable Content for existing attributes when `append` options is used
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * 422 Unprocessable Content for existing attributes when `append` options is used (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response payload**_
 
@@ -3123,9 +3126,10 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity
-  * 422 Unprocessable Content for non existing attributes
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * 422 Unprocessable Content for non existing attributes (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response payload**_
 
@@ -3221,8 +3225,9 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response payload**_
 
@@ -3263,8 +3268,9 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response payload**_
 
@@ -3400,8 +3406,9 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity or not found attribute
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response payload**_
 
@@ -3452,8 +3459,9 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity or not found attribute
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response payload**_
 
@@ -3513,9 +3521,10 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx code and error payload (see next subsection):
-   * 404 Not Found for not found entity or not found attribute
-   * 406 Not Acceptable in the case of not acceptable content
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * 406 Not Acceptable in the case of not acceptable content (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -3631,8 +3640,9 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found for not found entity or not found attribute
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response payload**_
 
@@ -4636,9 +4646,10 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx code and error payload (see next subsection):
-  * 404 Not Found if none of the entities in the `entities` field exists in `update`, `delete` or `replace` cases
-  * 422 Unprocessable Content for other cases
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found if none of the entities in the `entities` field exists in `update`, `delete` or `replace` cases (see next subsection)
+  * 422 Unprocessable Content for other cases (see next subsection)
+  * Check addicional cases in [Error Responses](#error-responses) general documentation
 
 _**Response payload**_
 
