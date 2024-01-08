@@ -221,7 +221,7 @@ HttpStatusCode mongoUpdateContext
     // Other cases follow the usual response processing flow (whatever it is :)
     if (updateCoverage == UC_PARTIAL)
     {
-      responseP->oe.code         = SccInvalidModification;
+      responseP->oe.code  = SccInvalidModification;
       responseP->oe.error = ERROR_PARTIAL_UPDATE;
     }
 

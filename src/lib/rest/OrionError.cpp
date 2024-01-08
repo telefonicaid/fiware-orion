@@ -39,10 +39,10 @@
 */
 OrionError::OrionError()
 {
-  code         = SccNone;
-  error = "";
-  description      = "";
-  filled       = false;
+  code        = SccNone;
+  error       = "";
+  description = "";
+  filled      = false;
 }
 
 
@@ -194,13 +194,13 @@ std::string OrionError::toJsonV1(void)
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
   //
-  out += startTag("orionError", false);
-  out += valueTag("code",          code, true);
-  out += valueTag("reasonPhrase",  error, !description.empty());
+  out += startTag("orionError",   false);
+  out += valueTag("code",         code, true);
+  out += valueTag("reasonPhrase", error, !description.empty());
 
   if (!description.empty())
   {
-    out += valueTag("details",       description);
+    out += valueTag("details",    description);
   }
 
   out += endTag();
