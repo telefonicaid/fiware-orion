@@ -31,9 +31,6 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjString, kjObject, ...
 }
 
-#include "orionTypes/OrionValueType.h"                           // orion::ValueType
-#include "orionTypes/UpdateActionType.h"                         // ActionType
-
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/SCOMPARE.h"                             // SCOMPAREx

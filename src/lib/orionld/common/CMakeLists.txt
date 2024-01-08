@@ -69,6 +69,7 @@ SET (SOURCES
     lowercase.cpp
     stringStrip.cpp
     dateTime.cpp
+    forbidden.cpp
 )
 
 # Include directories

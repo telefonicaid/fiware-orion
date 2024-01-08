@@ -36,8 +36,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "parse/forbiddenChars.h"                                // forbiddenChars
-
 #include "orionld/types/OrionLdRestService.h"                    // ORIONLD_URIPARAM_LIMIT, ...
 #include "orionld/types/OrionldMimeType.h"                       // mimeTypeFromString
 #include "orionld/types/Verb.h"                                  // Verb
@@ -49,6 +47,7 @@ extern "C"
 #include "orionld/common/lowercase.h"                            // lowercase
 #include "orionld/common/stringStrip.h"                          // stringStrip
 #include "orionld/common/dateTime.h"                             // dateTimeFromString
+#include "orionld/common/forbidden.h"                            // forbidden
 #include "orionld/service/orionldServiceInit.h"                  // orionldRestServiceV
 #include "orionld/serviceRoutines/orionldBadVerb.h"              // orionldBadVerb
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
@@ -596,11 +595,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     bool containsForbiddenChars = false;
 
     if ((strcmp(key, "geometry") == 0) || (strcmp(key, "georel") == 0))
-      containsForbiddenChars = forbiddenChars(value, "=;");
+      containsForbiddenChars = forbidden(value, "=;");
     else if (strcmp(key, "coords") == 0)
-      containsForbiddenChars = forbiddenChars(value, ";");
+      containsForbiddenChars = forbidden(value, ";");
     else if ((strcmp(key, "q") != 0) && (strcmp(key, "mq") != 0) && (strcmp(key, "idPattern") != 0) && (strcmp(key, "typePattern") != 0))
-      containsForbiddenChars = forbiddenChars(key) || forbiddenChars(value);
+      containsForbiddenChars = forbidden(key, NULL) || forbidden(value, NULL);
 
     if (containsForbiddenChars == true)
     {
