@@ -34,6 +34,7 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/patchEntity.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "rest/OrionError.h"
 
@@ -84,6 +85,9 @@ std::string patchEntity
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
+
+  // Adjust error code if needed
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), false);
 
   // 03. Check output from mongoBackend - any errors?
   if (parseDataP->upcrs.res.oe.code != SccNone )

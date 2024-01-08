@@ -44,6 +44,7 @@ public:
   HttpStatusCode  code;
   std::string     reasonPhrase;
   std::string     details;
+  bool            filled;
 
   OrionError();
   OrionError(StatusCode& statusCode);
@@ -55,6 +56,8 @@ public:
   std::string  toJsonV1(void);
   void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
   void         fill(const StatusCode& sc);
+  void         fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _reasonPhrase);
+
 
 private:
   void         shrinkReasonPhrase(void);

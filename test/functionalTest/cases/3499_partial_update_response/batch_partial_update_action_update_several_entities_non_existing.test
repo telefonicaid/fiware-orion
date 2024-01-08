@@ -1,0 +1,320 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PartialUpdate response for update case for several entities one of them non existing in batch operation
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1-A=1, E3-A=1/B=2/C=3
+# 02. POST /v2/op/update update E1/E2/E3 A=10, B=20, C=30, get error about entity does not have attribute B and C in E1 and E2 does not exist
+# 03. Get entities, E1-A=10, E3-A=10/B=20/C=30
+# 04. POST /v2/op/update update E1/E2/E3 A=100 B=200, get error about entity does not have attribute B in E1 and E2 does not exist
+# 05. Get entities, E1-A=100, E3-A=100/B=200/C=30
+#
+
+echo "01. Create entity E1-A=1, E3-A=1/B=2/C=3"
+echo "========================================"
+payload='{
+  "actionType": "appendStrict",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E3",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      },
+      "C": {
+         "value": 3,
+         "type": "Number"
+      }      
+    }       
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /v2/op/update update E1/E2/E3 A=10, B=20, C=30, get error about entity does not have attribute B and C in E1 and E2 does not exist"
+echo "==========================================================================================================================================="
+payload='{
+  "actionType": "update",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 10,
+         "type": "Number"
+      },
+      "B": {
+         "value": 20,
+         "type": "Number"
+      },
+      "C": {
+         "value": 30,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E2",
+      "A": {
+         "value": 10,
+         "type": "Number"
+      },
+      "B": {
+         "value": 20,
+         "type": "Number"
+      },
+      "C": {
+         "value": 30,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E3",
+      "A": {
+         "value": 10,
+         "type": "Number"
+      },
+      "B": {
+         "value": 20,
+         "type": "Number"
+      },
+      "C": {
+         "value": 30,
+         "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "03. Get entities, E1-A=10, E3-A=10/B=20/C=30"
+echo "============================================"
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "04. POST /v2/op/update update E1/E2/E3 A=100 B=200, get error about entity does not have attribute B in E1 and E2 does not exist"
+echo "================================================================================================================================"
+payload='{
+  "actionType": "update",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E1",
+      "A": {
+         "value": 100,
+         "type": "Number"
+      },
+      "B": {
+         "value": 200,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E2",
+      "A": {
+         "value": 100,
+         "type": "Number"
+      },
+      "B": {
+         "value": 200,
+         "type": "Number"
+      }
+    },
+    {
+      "type": "T",
+      "id":   "E3",
+      "A": {
+         "value": 100,
+         "type": "Number"
+      },
+      "B": {
+         "value": 200,
+         "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "05. Get entities, E1-A=100, E3-A=100/B=200/C=30"
+echo "==============================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1-A=1, E3-A=1/B=2/C=3
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+02. POST /v2/op/update update E1/E2/E3 A=10, B=20, C=30, get error about entity does not have attribute B and C in E1 and E2 does not exist
+===========================================================================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
+
+{
+    "description": "do not exist: E1/T - [ B, C ], E2/T [entity itself]",
+    "error": "PartialUpdate"
+}
+
+
+03. Get entities, E1-A=10, E3-A=10/B=20/C=30
+============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 235
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Number",
+            "value": 10
+        },
+        "id": "E1",
+        "type": "T"
+    },
+    {
+        "A": {
+            "metadata": {},
+            "type": "Number",
+            "value": 10
+        },
+        "B": {
+            "metadata": {},
+            "type": "Number",
+            "value": 20
+        },
+        "C": {
+            "metadata": {},
+            "type": "Number",
+            "value": 30
+        },
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+04. POST /v2/op/update update E1/E2/E3 A=100 B=200, get error about entity does not have attribute B in E1 and E2 does not exist
+================================================================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 90
+
+{
+    "description": "do not exist: E1/T - [ B ], E2/T [entity itself]",
+    "error": "PartialUpdate"
+}
+
+
+05. Get entities, E1-A=100, E3-A=100/B=200/C=30
+===============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 238
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Number",
+            "value": 100
+        },
+        "id": "E1",
+        "type": "T"
+    },
+    {
+        "A": {
+            "metadata": {},
+            "type": "Number",
+            "value": 100
+        },
+        "B": {
+            "metadata": {},
+            "type": "Number",
+            "value": 200
+        },
+        "C": {
+            "metadata": {},
+            "type": "Number",
+            "value": 30
+        },
+        "id": "E3",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

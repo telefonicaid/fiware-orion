@@ -2816,7 +2816,9 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -2824,7 +2826,16 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-The response is an object representing the entity identified by the ID. The object follows
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+If the entity is found, the response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
 side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections).
 
@@ -2899,8 +2910,9 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -2908,7 +2920,16 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+If the entity is found, the payload is an object representing the entity identified by the ID in the URL parameter. The object follows
 the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
 side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
 but omitting `id` and `type` fields.
@@ -3005,8 +3026,45 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * 422 Unprocessable Content for existing attributes when `append` options is used (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of *all* attributes exist when `append` options is used:
+
+```
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+```
+
+In the case of *some* (but not all) attributes exist when `append` options is used (partial update):
+
+```
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ B ]",
+    "error": "PartialUpdate"
+}
+```
+
+The entity type in `description` is shown only if the request includes it. Otherwise, it is omitted:
+
+```
+"description": "one or more of the attributes in the request already exist: E - [ B ]",
+```
 
 #### Update Existing Entity Attributes `PATCH /v2/entities/{entityId}/attrs`
 
@@ -3068,8 +3126,45 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * 422 Unprocessable Content for non existing attributes (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of *none* of the attributes in the request exist:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ]",
+    "error": "Unprocessable"
+}
+```
+
+In the case of *some* (but not all) attributes does not exist (partial update):
+
+```
+{
+    "description": "do not exist: E/T - [ C ]",
+    "error": "PartialUpdate"
+}
+```
+
+The entity type in `description` is shown only if the request includes it. Otherwise, it is omitted:
+
+```
+"description": "do not exist: E - [ C ]",
+```
 
 #### Replace all entity attributes `PUT /v2/entities/{entityId}/attrs`
 
@@ -3130,8 +3225,20 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
 
 #### Remove Entity `DELETE /v2/entities/{entityId}`
 
@@ -3161,8 +3268,20 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
 
 ### Attributes
 
@@ -3287,8 +3406,29 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of not found attribute:
+
+```
+{
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
+}
+```
 
 #### Remove a Single Attribute `DELETE /v2/entities/{entityId}/attrs/{attrName}`
 
@@ -3319,8 +3459,29 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of not found attribute:
+
+```
+{
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
+}
+```
 
 ### Attribute Value
 
@@ -3359,9 +3520,11 @@ _**Request headers**_
 
 _**Response code**_
 
-* Successful operation uses 200 OK.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Successful operation uses 200 OK
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * 406 Not Acceptable in the case of not acceptable content (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -3369,7 +3532,26 @@ _**Response headers**_
 
 _**Response payload**_
 
-The response payload can be an object, array, string, number, boolean or null with the value of the attribute.
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of not found attribute:
+
+```
+{
+   "description": "The entity does not have such an attribute",
+   "error": "NotFound"
+}
+```
+
+In the case of entity and attribute both are found, the response payload can be an object, array, string,
+number, boolean or null with the value of the attribute.
 
 * If attribute value is JSON Array or Object:
   * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
@@ -3458,8 +3640,29 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of not found attribute:
+
+```
+{
+   "description": "The entity does not have such an attribute",
+   "error": "NotFound"
+}
+```
 
 ### Types
 
@@ -4442,9 +4645,86 @@ Example:
 
 _**Response code**_
 
-* Successful operation uses 204 No Content.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Successful operation uses 204 No Content
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found if none of the entities in the `entities` field exists in `update`, `delete` or `replace` cases (see next subsection)
+  * 422 Unprocessable Content for other cases (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+For action type `replace`:
+
+* If *none* of the entities in `entities` exist:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+* If *any (but not all)* of the entities in `entities` does not exist (partial update):
+
+```
+{
+    "description": "do not exist: G/T - [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+For action type `update` or `delete`:
+
+* If *none* of the entities in `entities` exist:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+* If at least one entity in `entities` exists and in *all* of existing entities there was a *full fail* due to missing attributes:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ], G/T [entity itself]",
+    "error": "Unprocessable"
+}
+```
+
+* If at least one entity in `entities` exists and in *at least one* of the existing entities *at least* one attribute exists
+  but not all entities exist or all entities exist but in at least one entity there is at least one missing attribute (partial update):
+
+```
+{
+    "description": "do not exist: E/T - [ D ], G/T [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+For action type `appendStrict`:`
+
+* If in *all* entities in `entities` there was a *full fail* due to existing attributes:
+
+{
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A, B ], E2/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+
+* If in *at least one entity* in `entities` in *at least* one attribute there was a success but not all entities in `entities` have
+  a full success (partial update):
+
+{
+    "description": "one or more of the attributes in the request already exist: E2/T - [ A, B ]",
+    "error": "PartialUpdate"
+}
+
+The entity type in `description` is shown only if the request includes it. Otherwise, it is omitted:
+
+```
+"description": "one or more of the attributes in the request already exist: E2 - [ A, B ]"
+```
 
 ### Query operation
 

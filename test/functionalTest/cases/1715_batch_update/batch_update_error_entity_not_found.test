@@ -90,10 +90,10 @@ HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 95
+Content-Length: 72
 
 {
-    "description": "The requested entity has not been found. Check type and id",
+    "description": "do not exist: E/T - [entity itself]",
     "error": "NotFound"
 }
 
@@ -104,10 +104,10 @@ HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 95
+Content-Length: 72
 
 {
-    "description": "The requested entity has not been found. Check type and id",
+    "description": "do not exist: E/T - [entity itself]",
     "error": "NotFound"
 }
 
@@ -118,10 +118,10 @@ HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 95
+Content-Length: 72
 
 {
-    "description": "The requested entity has not been found. Check type and id",
+    "description": "do not exist: E/T - [entity itself]",
     "error": "NotFound"
 }
 
