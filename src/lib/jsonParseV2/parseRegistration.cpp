@@ -58,8 +58,8 @@ static bool dataProvidedParse
   {
     ciP->httpStatusCode = SccBadRequest;
     oeP->code           = SccBadRequest;
-    oeP->error   = ERROR_BAD_REQUEST;
-    oeP->description        = "/dataProvided/ must be a JSON object";
+    oeP->error          = ERROR_BAD_REQUEST;
+    oeP->description    = "/dataProvided/ must be a JSON object";
 
     return false;
   }
@@ -68,8 +68,8 @@ static bool dataProvidedParse
   {
     ciP->httpStatusCode = SccBadRequest;
     oeP->code           = SccBadRequest;
-    oeP->error   = ERROR_BAD_REQUEST;
-    oeP->description        = "/dataProvided/ is empty";
+    oeP->error          = ERROR_BAD_REQUEST;
+    oeP->description    = "/dataProvided/ is empty";
 
     return false;
   }
@@ -81,7 +81,7 @@ static bool dataProvidedParse
     {
       ciP->httpStatusCode = SccBadRequest;
       oeP->code           = SccBadRequest;
-      oeP->error   = ERROR_BAD_REQUEST;
+      oeP->error          = ERROR_BAD_REQUEST;
 
       return false;
     }
@@ -99,8 +99,8 @@ static bool dataProvidedParse
     {
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
-      oeP->error   = ERROR_NOTIMPLEMENTED;
-      oeP->description        = ERROR_DESC_IDPATTERN_NOTSUPPORTED;
+      oeP->error          = ERROR_NOTIMPLEMENTED;
+      oeP->description    = ERROR_DESC_IDPATTERN_NOTSUPPORTED;
 
       return false;
     }
@@ -109,8 +109,8 @@ static bool dataProvidedParse
     {
       ciP->httpStatusCode = SccNotImplemented;
       oeP->code           = SccNotImplemented;
-      oeP->error   = ERROR_NOTIMPLEMENTED;
-      oeP->description        = ERROR_DESC_TYPEPATTERN_NOTIMPLEMENTED;
+      oeP->error          = ERROR_NOTIMPLEMENTED;
+      oeP->description    = ERROR_DESC_TYPEPATTERN_NOTIMPLEMENTED;
 
       return false;
     }
@@ -122,7 +122,7 @@ static bool dataProvidedParse
     {
       ciP->httpStatusCode = SccBadRequest;
       oeP->code           = SccBadRequest;
-      oeP->error   = ERROR_BAD_REQUEST;
+      oeP->error          = ERROR_BAD_REQUEST;
 
       return false;
     }
