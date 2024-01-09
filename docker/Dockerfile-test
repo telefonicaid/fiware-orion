@@ -14,7 +14,7 @@ WORKDIR lcov-1.14
 RUN make install
 WORKDIR ${PATH_TO_SRC}
 
-RUN yum-config-manager --disable pgdg10
+#RUN yum-config-manager --disable pgdg10
 
 RUN  yum install -y gnupg
 
