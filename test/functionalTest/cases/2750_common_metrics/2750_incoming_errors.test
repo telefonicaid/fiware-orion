@@ -176,7 +176,7 @@ echo
 echo "10. Send a request with an invalid character in a URI parameter"
 echo "==============================================================="
 payload='{ "id": "E1", "type": "T1" }'
-orionCurl --url '/v2/entities?ic====' --payload "$payload"
+orionCurl --url '/v2/entities?ic=12>5' --payload "$payload"
 echo
 echo
 

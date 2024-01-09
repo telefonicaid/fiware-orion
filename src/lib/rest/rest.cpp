@@ -1303,9 +1303,14 @@ static MHD_Result connectionTreat
       *con_cls = &cls;  // to "acknowledge" the first call
 
 #ifdef REQUEST_PERFORMANCE
-        bzero(&performanceTimestamps, sizeof(performanceTimestamps));
-        kTimeGet(&performanceTimestamps.reqStart);
+      bzero(&performanceTimestamps, sizeof(performanceTimestamps));
+      kTimeGet(&performanceTimestamps.reqStart);
 #endif
+      // Reset the Compound stuff
+      compoundInfo.compoundValueRoot = NULL;
+      compoundInfo.compoundValueP    = NULL;
+      compoundInfo.inCompoundValue   = false;
+
       return orionldMhdConnectionInit(connection, url, method, version, con_cls);
     }
     else if (*upload_data_size != 0)
@@ -1333,6 +1338,11 @@ static MHD_Result connectionTreat
 
     ++requestNo;
     LM_K(("------------------------- Servicing NGSIv2 request %03d: %s %s --------------------------", requestNo, method, url));
+
+    // Reset the Compound stuff
+    compoundInfo.compoundValueRoot = NULL;
+    compoundInfo.compoundValueP    = NULL;
+    compoundInfo.inCompoundValue   = false;
 
     //
     // Setting crucial fields of orionldState - those that are used for non-ngsi-ld requests

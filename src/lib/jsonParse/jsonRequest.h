@@ -26,17 +26,32 @@
 * Author: Ken Zangelin
 */
 #include <string>
+
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
 #include "jsonParse/JsonNode.h"
+#include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
 
 class ConnectionInfo;
 
 
 
+/* *****************************************************************************
+*
+* CompoundInfo -
+*/
+typedef struct CompoundInfo
+{
+  bool                                      inCompoundValue;
+  orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
+  orion::CompoundValueNode*                 compoundValueRoot;    // Points to the root of the tree
+} CompoundInfo;
+
+
+
 /* ****************************************************************************
 *
-* JsonRequest - 
+* JsonRequest -
 */
 typedef struct JsonRequest
 {
@@ -53,7 +68,15 @@ typedef struct JsonRequest
 
 /* ****************************************************************************
 *
-* jsonTreat - 
+* compoundInfo -
+*/
+extern __thread CompoundInfo compoundInfo;
+
+
+
+/* ****************************************************************************
+*
+* jsonTreat -
 */
 extern std::string jsonTreat
 (

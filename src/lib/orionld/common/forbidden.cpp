@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"                                // LM_RE
+
+#include "orionld/common/orionldState.h"                  // orionldState
 
 
 
@@ -31,16 +34,25 @@
 //
 bool forbidden(const char* s, const char* exceptions)
 {
+  bool bad = false;
+
   while (*s != 0)
   {
-    if      (*s == '<')  return true;
-    else if (*s == '>')  return true;
-    else if (*s == '"')  return true;
-    else if (*s == '\'') return true;
-    else if (*s == '=')  return true;
-    else if (*s == ';')  return true;
-    else if (*s == '(')  return true;
-    else if (*s == ')')  return true;
+    if      (*s == '<')  bad = true;
+    else if (*s == '>')  bad = true;
+    else if (*s == '"')  bad = true;
+    else if (*s == '\'') bad = true;
+    else if (*s == '(')  bad = true;
+    else if (*s == ')')  bad = true;
+
+    if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
+    {
+      if      (*s == ';')  bad = true;
+      else if (*s == '=')  bad = true;
+    }
+
+    if (bad == true)
+      LM_RE(true, ("Invalid character: 0x%x '%c'", *s & 0xFF, *s));
 
     ++s;
   }

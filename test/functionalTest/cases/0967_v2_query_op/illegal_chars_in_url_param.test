@@ -79,20 +79,6 @@ echo
 echo
 
 
-echo "05. GET /v2/entities/E1 with illegal char 5 in URI param 'w5' - error"
-echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w5=a='
-echo
-echo
-
-
-echo "06. GET /v2/entities/E1 with illegal char 6 in URI param 'w6' - error"
-echo "====================================================================="
-orionCurl --url '/v2/entities/E1?w6=a;'
-echo
-echo
-
-
 echo "07. GET /v2/entities/E1 with illegal char 7 in URI param 'w7' - error"
 echo "====================================================================="
 orionCurl --url '/v2/entities/E1?w7=a('
@@ -158,34 +144,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 04. GET /v2/entities/E1 with illegal char 4 in URI param 'w4' - error
-=====================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "description": "invalid character in a URI parameter",
-    "error": "BadRequest"
-}
-
-
-05. GET /v2/entities/E1 with illegal char 5 in URI param 'w5' - error
-=====================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-{
-    "description": "invalid character in a URI parameter",
-    "error": "BadRequest"
-}
-
-
-06. GET /v2/entities/E1 with illegal char 6 in URI param 'w6' - error
 =====================================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 75

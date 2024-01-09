@@ -76,6 +76,10 @@
 
 
 
+__thread CompoundInfo compoundInfo;
+
+
+
 /* ****************************************************************************
 *
 * jsonRequest -
@@ -253,13 +257,13 @@ std::string jsonTreat
     return answer;
   }
 
-  if (orionldState.inCompoundValue == true)
+  if (compoundInfo.inCompoundValue == true)
   {
     orion::compoundValueEnd(ciP, parseDataP);
   }
-  if ((lmTraceIsSet(LmtLegacy)) && (orionldState.compoundValueP != NULL))
+  if ((lmTraceIsSet(LmtLegacy)) && (compoundInfo.compoundValueP != NULL))
   {
-    orionldState.compoundValueP->shortShow("after parse: ");
+    compoundInfo.compoundValueP->shortShow("after parse: ");
   }
 
   res = reqP->check(parseDataP, ciP);

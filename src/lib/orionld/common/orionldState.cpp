@@ -287,12 +287,6 @@ void orionldStateRelease(void)
 
   if (orionldState.qMongoFilterP != NULL)
     delete orionldState.qMongoFilterP;
-
-  if (orionldState.compoundValueRoot != NULL)
-  {
-    delete orionldState.compoundValueRoot;
-    orionldState.compoundValueRoot = NULL;
-  }
 }
 
 

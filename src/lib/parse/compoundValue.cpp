@@ -51,7 +51,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   LM_T(LmtLegacy, ("Compound END"));
 
   // Finish the compound value - error check included
-  std::string status = orionldState.compoundValueRoot->finish();
+  std::string status = compoundInfo.compoundValueRoot->finish();
 
   // Any problems in 'finish'?
   // If so, mark as erroneous
@@ -76,7 +76,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   //
 
   LM_T(LmtLegacy, ("Set compoundValueP (%p) for attribute at %p",
-                   orionldState.compoundValueRoot,
+                   compoundInfo.compoundValueRoot,
                    parseDataP->lastContextAttribute));
 
   //
@@ -91,17 +91,17 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
       (requestType == IndividualContextEntityAttribute)                 ||
       (requestType == IndividualContextEntityAttributeWithTypeAndId))
   {
-    parseDataP->upcar.res.compoundValueP = orionldState.compoundValueRoot;
+    parseDataP->upcar.res.compoundValueP = compoundInfo.compoundValueRoot;
   }
   else
   {
-    parseDataP->lastContextAttribute->compoundValueP = orionldState.compoundValueRoot;
+    parseDataP->lastContextAttribute->compoundValueP = compoundInfo.compoundValueRoot;
   }
 
-  // Reset the Compound stuff in orionldState
-  orionldState.compoundValueRoot = NULL;
-  orionldState.compoundValueP    = NULL;
-  orionldState.inCompoundValue   = false;
+  // Reset the Compound stuff
+  compoundInfo.compoundValueRoot = NULL;
+  compoundInfo.compoundValueP    = NULL;
+  compoundInfo.inCompoundValue   = false;
 }
 
 }

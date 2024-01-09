@@ -42,8 +42,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
-
 #include "orionld/types/OrionldResponseBuffer.h"                 // OrionldResponseBuffer
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
@@ -60,6 +58,7 @@ extern "C"
 #include "orionld/types/Verb.h"                                  // Verb
 #include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/types/OrionldMimeType.h"                       // MimeType
+#include "orionld/types/ApiVersion.h"                            // ApiVersion
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/kjTree/kjTreeLog.h"                            // Because it is so often used but then removed again ...
 
@@ -484,13 +483,6 @@ typedef struct OrionldConnectionState
 
   // Previous Values
   KjNode* previousValues;
-
-  //
-  // Compounds
-  //
-  bool                                      inCompoundValue;
-  orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
-  orion::CompoundValueNode*                 compoundValueRoot;    // Points to the root of the tree
 
   //
   // Error Handling

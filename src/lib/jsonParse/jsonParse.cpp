@@ -58,6 +58,7 @@
 #include "parse/CompoundValueNode.h"
 #include "parse/forbiddenChars.h"
 
+#include "jsonParse/jsonRequest.h"                               //  compoundInfo
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonParse.h"
 
@@ -268,7 +269,7 @@ void eatCompound
   {
     LM_T(LmtLegacy, ("COMPOUND: '%s'", nodeName.c_str()));
     containerP = new CompoundValueNode(ValueTypeObject);
-    orionldState.compoundValueRoot = containerP;
+    compoundInfo.compoundValueRoot = containerP;
   }
   else
   {
@@ -358,7 +359,7 @@ static std::string jsonParse
     // This detects whether we are trying to use an object within an object instead of an one-item array.
     // We don't allow the first case, hence the exception thrown.
     // However, this restriction is not valid inside Compound Values.
-    if ((nodeName != arrayElementName) || (orionldState.inCompoundValue == true))
+    if ((nodeName != arrayElementName) || (compoundInfo.inCompoundValue == true))
     {
       path = path + "/" + nodeName;
     }
