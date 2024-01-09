@@ -72,7 +72,7 @@ void mhdReply(KjNode* body)
     PERFORMANCE(renderEnd);
   }
 
-  PERFORMANCE(restReplyStart);
+  PERFORMANCE(mhdReplyStart);
 
   LM_T(LmtResponse, ("Response Body: '%s'", (body != NULL)? orionldState.responsePayload : "None"));
   LM_T(LmtResponse, ("Response Code:  %d", orionldState.httpStatusCode));
@@ -118,5 +118,5 @@ void mhdReply(KjNode* body)
 
   MHD_queue_response(orionldState.mhdConnection, orionldState.httpStatusCode, response);
   MHD_destroy_response(response);
-  PERFORMANCE(restReplyEnd);
+  PERFORMANCE(mhdReplyEnd);
 }

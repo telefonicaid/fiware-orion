@@ -1214,8 +1214,6 @@ MHD_Result orionldMhdConnectionTreat(void)
   mhdReply(orionldState.responseTree);    // orionldState.responsePayload freed and NULLed by mhdReply()
 
 
-  PERFORMANCE(restReplyEnd);
-
   //
   // FIXME: Delay until requestCompleted. The call to orionldStateRelease as well
   //

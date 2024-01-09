@@ -521,8 +521,8 @@ typedef struct Timestamps
   struct timespec distOpDbEnd;            // End of            DB query for Distributed Operation
   struct timespec renderStart;            // Start of          Resonse Payload body render JSON
   struct timespec renderEnd;              // End of            Resonse Payload body render JSON
-  struct timespec restReplyStart;         // Start of          REST Reply
-  struct timespec restReplyEnd;           // End of            REST Reply
+  struct timespec mhdReplyStart;          // Start of          MHD Reply
+  struct timespec mhdReplyEnd;            // End of            MHD  Reply
   struct timespec troeStart;              // Start of          TRoE processing
   struct timespec troeEnd;                // End of            TRoE processing
   struct timespec requestPartEnd;         // End of            MHD-1-2-3 processing
