@@ -18,7 +18,7 @@ RUN yum-config-manager --disable pgdg10
 
 #RUN  yum install -y gnupg
 RUN wget https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-9-x86_64/pgdg-redhat-repo-42.0-38PGDG.noarch.rpm
-RUN yum install pgdg-redhat-repo-42.0-38PGDG.noarch.rpm
+RUN rpm -i pgdg-redhat-repo-42.0-38PGDG.noarch.rpm
 
 RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-database-tools-100.4.1.x86_64.rpm
 RUN yum install -y https://repo.mongodb.org/yum/redhat/8Server/mongodb-org/4.4/x86_64/RPMS/mongodb-org-database-tools-extra-4.4.9-1.el8.x86_64.rpm
