@@ -43,8 +43,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                         // LM_*
 
-#include "rest/restReply.h"                                        // restReply
-
 #include "orionld/types/OrionldResponseErrorType.h"                // orionldResponseErrorType
 #include "orionld/types/OrionldProblemDetails.h"                   // OrionldProblemDetails, pdTreeCreate
 #include "orionld/types/OrionldGeoIndex.h"                         // OrionldGeoIndex
@@ -79,6 +77,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntity.h"              // orionldGetEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"            // orionldGetEntities
 #include "orionld/serviceRoutines/orionldPostEntities.h"           // orionldPostEntities
+#include "orionld/mhd/mhdReply.h"                                  // mhdReply
 #include "orionld/mhd/orionldMhdConnectionTreat.h"                 // Own Interface
 
 
@@ -1167,7 +1166,7 @@ MHD_Result orionldMhdConnectionTreat(void)
     promCounterIncrease(promNgsildRequestsFailed);
     orionldState.noLinkHeader  = true;   // We don't want the Link header for erroneous requests
     serviceRoutineResult       = false;  // Just in case ...
-    // MimeType handled in restReply()
+    // MimeType handled in mhdReply()
   }
 
   //
@@ -1207,58 +1206,13 @@ MHD_Result orionldMhdConnectionTreat(void)
 
     if (addContext)
       contextToPayload();
-
-    //
-    // Render the payload to get a string for restReply to send the response
-    //
-    // Smart allocation of the response buffer
-    //
-    // If there is room in the current kalloc buffer (no extra malloc needed), then use it.
-    // If not, then it's better to do a separate call to malloc, as:
-    //   - the rest of the kalloc buffer isn't thrown away
-    //   - the entire logic of kalloc is avoided (not much, but still ...)
-    //
-    PERFORMANCE(renderStart);
-
-    unsigned int responsePayloadSize;
-
-    if (orionldState.uriParams.prettyPrint == false)
-      responsePayloadSize = kjFastRenderSize(orionldState.responseTree);
-    else
-      responsePayloadSize = kjRenderSize(orionldState.kjsonP, orionldState.responseTree);
-
-    if (responsePayloadSize < orionldState.kalloc.bytesLeft + 8)
-      orionldState.responsePayload = kaAlloc(&orionldState.kalloc, responsePayloadSize);
-    else
-    {
-      orionldState.responsePayload = (char*) malloc(responsePayloadSize);
-
-      if (orionldState.responsePayload == NULL)
-      {
-        LM_E(("Out of memory"));
-        orionldState.responsePayload = (char*) "{ \"error\": \"Out of memory\"}";
-      }
-      else
-        orionldStateDelayedFreeEnqueue(orionldState.responsePayload);
-    }
-
-    if (orionldState.uriParams.prettyPrint == false)
-      kjFastRender(orionldState.responseTree, orionldState.responsePayload);
-    else
-      kjRender(orionldState.kjsonP, orionldState.responseTree, orionldState.responsePayload, responsePayloadSize);
-
-    PERFORMANCE(renderEnd);
   }
-
-  PERFORMANCE(restReplyStart);
 
   //
   // Enqueue response
   //
-  if (orionldState.responsePayload != NULL)
-    restReply(NULL, orionldState.responsePayload);    // orionldState.responsePayload freed and NULLed by restReply()
-  else
-    restReply(NULL, NULL);
+  mhdReply(orionldState.responseTree);    // orionldState.responsePayload freed and NULLed by mhdReply()
+
 
   PERFORMANCE(restReplyEnd);
 

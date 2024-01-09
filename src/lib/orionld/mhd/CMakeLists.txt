@@ -24,6 +24,7 @@ SET (SOURCES
     orionldMhdConnectionInit.cpp
     orionldMhdConnectionPayloadRead.cpp
     orionldMhdConnectionTreat.cpp
+    mhdReply.cpp
 )
 
 # Include directories
