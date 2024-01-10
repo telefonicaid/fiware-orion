@@ -78,7 +78,7 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntities.h"            // orionldGetEntities
 #include "orionld/serviceRoutines/orionldPostEntities.h"           // orionldPostEntities
 #include "orionld/mhd/mhdReply.h"                                  // mhdReply
-#include "orionld/mhd/orionldMhdConnectionTreat.h"                 // Own Interface
+#include "orionld/mhd/mhdConnectionTreat.h"                        // Own Interface
 
 
 
@@ -882,7 +882,7 @@ static void performanceHeader(void)
 
 // -----------------------------------------------------------------------------
 //
-// orionldMhdConnectionTreat -
+// mhdConnectionTreat -
 //
 // The @context is completely taken care of here in this function.
 // Service routines will only use the @context for lookups, everything else is done here, once and for all
@@ -926,7 +926,7 @@ static void performanceHeader(void)
 //   25. Cleanup
 //   26. DONE
 //
-MHD_Result orionldMhdConnectionTreat(void)
+MHD_Result mhdConnectionTreat(void)
 {
   bool     contextToBeCashed    = false;
   bool     serviceRoutineResult = false;
@@ -953,7 +953,7 @@ MHD_Result orionldMhdConnectionTreat(void)
     goto serviceRoutine;
 
   //
-  // Predetected Error from orionldMhdConnectionInit?
+  // Predetected Error from mhdConnectionInit?
   //
   if (orionldState.httpStatusCode != 200)
     goto respond;
@@ -1048,7 +1048,7 @@ MHD_Result orionldMhdConnectionTreat(void)
   //
   // 07. Check the @context in HTTP Header, if present
   //
-  // NOTE: orionldState.link is set by orionldHttpHeaderReceive() called by orionldMhdConnectionInit()
+  // NOTE: orionldState.link is set by orionldHttpHeaderReceive() called by mhdConnectionInit()
   //
   // NOTE: Some requests don't use the context and thus should simply ignore the Link header
   //

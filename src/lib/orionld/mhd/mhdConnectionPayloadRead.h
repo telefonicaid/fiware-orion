@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MHD_ORIONLDMHDCONNECTIONTREAT_H_
-#define SRC_LIB_ORIONLD_MHD_ORIONLDMHDCONNECTIONTREAT_H_
+#ifndef SRC_LIB_ORIONLD_MHD_MHDCONNECTIONPAYLOADREAD_H_
+#define SRC_LIB_ORIONLD_MHD_MHDCONNECTIONPAYLOADREAD_H_
 
 /*
 *
@@ -30,8 +30,12 @@
 
 /* ****************************************************************************
 *
-* orionldMhdConnectionTreat - 
+* mhdConnectionPayloadRead - 
 */
-extern MHD_Result orionldMhdConnectionTreat(void);
+extern MHD_Result mhdConnectionPayloadRead
+(
+  size_t*          upload_data_size,
+  const char*      upload_data
+);
 
-#endif  // SRC_LIB_ORIONLD_MHD_ORIONLDMHDCONNECTIONTREAT_H_
+#endif  // SRC_LIB_ORIONLD_MHD_MHDCONNECTIONPAYLOADREAD_H_

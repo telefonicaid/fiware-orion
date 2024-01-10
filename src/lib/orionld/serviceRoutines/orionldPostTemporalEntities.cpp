@@ -105,9 +105,9 @@ bool orionldPostTemporalEntities(void)
 
   //
   // NOTE
-  //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  //   payloadParseAndExtractSpecialFields() from mhdConnectionTreat() decouples the entity id and type
   //   from the payload body, so, the entity type is not expanded by pCheckEntity()
-  //   The expansion is instead done by payloadTypeNodeFix, called by orionldMhdConnectionTreat
+  //   The expansion is instead done by payloadTypeNodeFix, called by mhdConnectionTreat
   //
 
 
@@ -150,7 +150,7 @@ bool orionldPostTemporalEntities(void)
 
   //
   // Nothing is sent to mongo, only TRoE is updated
-  // And, the TRoE function is invoked by orionldMhdConnectionTreat
+  // And, the TRoE function is invoked by mhdConnectionTreat
   //
   numberToDate(orionldState.requestTime, orionldState.requestTimeString, sizeof(orionldState.requestTimeString));
   orionldState.troeOpMode = TROE_ENTITY_REPLACE;

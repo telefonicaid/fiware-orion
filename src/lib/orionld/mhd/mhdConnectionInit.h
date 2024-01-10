@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONLD_MHD_ORIONLDMHDCONNECTIONPAYLOADREAD_H_
-#define SRC_LIB_ORIONLD_MHD_ORIONLDMHDCONNECTIONPAYLOADREAD_H_
+#ifndef SRC_LIB_ORIONLD_MHD_MHDCONNECTIONINIT_H_
+#define SRC_LIB_ORIONLD_MHD_MHDCONNECTIONINIT_H_
 
 /*
 *
@@ -25,17 +25,26 @@
 *
 * Author: Ken Zangelin
 */
+#include <microhttpd.h>
+
+extern "C"
+{
+#include "kjson/kjson.h"                            // Kjson
+}
 
 
 
 /* ****************************************************************************
 *
-* orionldMhdConnectionPayloadRead - 
+* mhdConnectionInit -
 */
-extern MHD_Result orionldMhdConnectionPayloadRead
+extern MHD_Result mhdConnectionInit
 (
-  size_t*          upload_data_size,
-  const char*      upload_data
+  MHD_Connection*  connection,
+  const char*      url,
+  const char*      method,
+  const char*      version,
+  void**           con_cls
 );
 
-#endif  // SRC_LIB_ORIONLD_MHD_ORIONLDMHDCONNECTIONPAYLOADREAD_H_
+#endif  // SRC_LIB_ORIONLD_MHD_MHDCONNECTIONINIT_H_

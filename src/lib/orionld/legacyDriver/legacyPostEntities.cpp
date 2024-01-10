@@ -171,9 +171,9 @@ bool legacyPostEntities(void)
 
   //
   // NOTE
-  //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  //   payloadParseAndExtractSpecialFields() from mhdConnectionTreat() decouples the entity id and type
   //   from the payload body, so, the entity type is not expanded by pCheckEntity()
-  //   The expansion is instead done by payloadTypeNodeFix, called by orionldMhdConnectionTreat
+  //   The expansion is instead done by payloadTypeNodeFix, called by mhdConnectionTreat
   //
 
   //

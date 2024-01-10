@@ -53,7 +53,7 @@ extern "C"
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/entityMaps/entityMapLookup.h"                  // entityMapLookup
 #include "orionld/service/orionldServiceLookup.h"                // orionldServiceLookup
-#include "orionld/mhd/orionldMhdConnectionInit.h"                // Own interface
+#include "orionld/mhd/mhdConnectionInit.h"                       // Own interface
 
 
 
@@ -1003,7 +1003,7 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 //
 // serviceLookup - lookup the Service
 //
-// orionldMhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
+// mhdConnectionInit guarantees that a valid verb is used. I.e. POST, GET, DELETE or PATCH
 // orionldServiceLookup makes sure the URL supprts the verb
 //
 static OrionLdRestService* serviceLookup(void)
@@ -1056,9 +1056,9 @@ static bool tenantCheck(char* tenantName)
 
 // -----------------------------------------------------------------------------
 //
-// orionldMhdConnectionInit -
+// mhdConnectionInit -
 //
-MHD_Result orionldMhdConnectionInit
+MHD_Result mhdConnectionInit
 (
   MHD_Connection*  connection,
   const char*      url,

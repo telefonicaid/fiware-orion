@@ -252,7 +252,7 @@ void orionldStateRelease(void)
 
 #if 0
   //
-  // This was added to fix a leak in contextToPayload(), orionldMhdConnectionTreat.cpp, calling kjClone(). a number of times
+  // This was added to fix a leak in contextToPayload(), mhdConnectionTreat.cpp, calling kjClone(). a number of times
   // It happens for responses to GET that contain more than one item in the entity array.
   // Each item in the entity array needs a cloned context
   //

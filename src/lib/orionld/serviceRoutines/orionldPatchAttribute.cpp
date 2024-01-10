@@ -306,7 +306,7 @@ bool orionldPatchAttribute(void)
 
 
   //
-  // orionldMhdConnectionTreat() expands the attribute name for us.
+  // mhdConnectionTreat() expands the attribute name for us.
   // Here we save it in the orionldState.wildcard array, so that TRoE won't have to expand it
   //
   orionldState.wildcard[1] = orionldState.in.pathAttrExpanded;

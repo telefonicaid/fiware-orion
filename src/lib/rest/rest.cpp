@@ -68,9 +68,9 @@ extern "C"
 #include "orionld/common/stringStrip.h"                          // stringStrip
 #include "orionld/mongoc/mongocConnectionRelease.h"              // Own interface
 #include "orionld/notifications/orionldAlterationsTreat.h"       // orionldAlterationsTreat
-#include "orionld/mhd/orionldMhdConnectionInit.h"                // orionldMhdConnectionInit
-#include "orionld/mhd/orionldMhdConnectionPayloadRead.h"         // orionldMhdConnectionPayloadRead
-#include "orionld/mhd/orionldMhdConnectionTreat.h"               // orionldMhdConnectionTreat
+#include "orionld/mhd/mhdConnectionInit.h"                       // mhdConnectionInit
+#include "orionld/mhd/mhdConnectionPayloadRead.h"                // mhdConnectionPayloadRead
+#include "orionld/mhd/mhdConnectionTreat.h"                      // mhdConnectionTreat
 #include "orionld/distOp/distOpListRelease.h"                    // distOpListRelease
 
 #include "rest/HttpHeaders.h"                                    // HTTP_* defines
@@ -1311,10 +1311,10 @@ static MHD_Result connectionTreat
       compoundInfo.compoundValueP    = NULL;
       compoundInfo.inCompoundValue   = false;
 
-      return orionldMhdConnectionInit(connection, url, method, version, con_cls);
+      return mhdConnectionInit(connection, url, method, version, con_cls);
     }
     else if (*upload_data_size != 0)
-      return orionldMhdConnectionPayloadRead(upload_data_size, upload_data);
+      return mhdConnectionPayloadRead(upload_data_size, upload_data);
 
     //
     // The entire message has been read, we're allowed to respond.
@@ -1324,7 +1324,7 @@ static MHD_Result connectionTreat
     *upload_data_size = 0;
 
     // Then treat the request
-    return orionldMhdConnectionTreat();
+    return mhdConnectionTreat();
   }
 
   //
@@ -1428,7 +1428,7 @@ static MHD_Result connectionTreat
 
   //
   // As older (non NGSI-LD) requests also need orionldState.tenantP, this piece of code has been copied
-  // from orionldMhdConnectionTreat(). Had to be a little simplified though ...
+  // from mhdConnectionTreat(). Had to be a little simplified though ...
   //
   if (orionldState.tenantName != NULL)
     orionldState.tenantP = orionldTenantGet(orionldState.tenantName);

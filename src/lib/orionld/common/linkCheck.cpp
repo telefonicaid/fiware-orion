@@ -37,7 +37,7 @@
 //   <https://fiware.github.io/X/Y/Z.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
 //
 // NOTE
-//   The initial '<' is stepped over before clling this function, by linkHeaderCheck() in orionldMhdConnectionTreat.cpp
+//   The initial '<' is stepped over before clling this function, by linkHeaderCheck() in mhdConnectionTreat.cpp
 //
 bool linkCheck(char* link, char** detailsP)
 {

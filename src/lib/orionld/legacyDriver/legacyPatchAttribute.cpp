@@ -91,7 +91,7 @@ do {                                                                  \
 // 5. Merge - use kjAttributeMerge (will need some altering for datasetId)
 // 6. Replace db.entities.entityId.attrs.attrNameExpandedEq with the merged attribute
 //
-//    orionldMhdConnectionTreat takes care of TRoE
+//    mhdConnectionTreat takes care of TRoE
 //
 bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, char* attrName, char* attrNameExpandedEq, const char* datasetId)
 {

@@ -57,7 +57,7 @@ extern "C"
 // orionldContextFromTree() needs the value of the @context as the input tree, so, in case the "@context" member is
 // present, like in cases 3 and 4, then it will have to be extracted and its value used for orionldContextFromTree().
 //
-// orionldMhdConnectionTreat already finds and extracts the @context member if present, stores it in orionldState.payloadContextNode
+// mhdConnectionTreat already finds and extracts the @context member if present, stores it in orionldState.payloadContextNode
 //
 bool orionldPostContexts(void)
 {
