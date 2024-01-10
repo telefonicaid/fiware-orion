@@ -4703,7 +4703,7 @@ For action type `update` or `delete`:
 }
 ```
 
-For action type `appendStrict`:`
+For action type `appendStrict`:
 
 * If in *all* entities in `entities` there was a *full fail* due to existing attributes:
 
