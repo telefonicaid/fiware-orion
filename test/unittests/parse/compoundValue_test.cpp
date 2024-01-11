@@ -29,6 +29,8 @@
 #include "rest/RestService.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -51,7 +53,7 @@ TEST(compoundValue, updateNoCompoundValue)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType = JSON;
+  orionldState.in.contentType = MT_JSON;
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
   EXPECT_STREQ("OK", result.c_str());
   caP = reqData.upcr.res.contextElementVector[0]->contextAttributeVector[0];
@@ -82,7 +84,7 @@ TEST(compoundValue, updateUnknownPath)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFileJson)) << "Error getting test data from '" << outFileJson << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ciJson.restServiceP = &restService;
 
   result = jsonTreat(testBuf, &ciJson, &reqData, UpdateContext, NULL);
@@ -113,7 +115,7 @@ TEST(compoundValue, updateOneStringJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -181,7 +183,7 @@ TEST(compoundValue, updateTwoStringsJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -262,7 +264,7 @@ TEST(compoundValue, updateTwoItemsSameNameInStructJson)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -294,7 +296,7 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -361,7 +363,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -432,7 +434,7 @@ TEST(compoundValue, updateTwoStructsJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -585,7 +587,7 @@ TEST(compoundValue, sixLevelsJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -903,7 +905,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   ci.restServiceP = &restService;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);

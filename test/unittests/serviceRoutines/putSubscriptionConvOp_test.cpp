@@ -34,6 +34,8 @@
 #include "rest/RestService.h"
 #include "rest/rest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittests/unittest.h"
 
 
@@ -67,7 +69,7 @@ TEST(putSubscriptionConvOp, put)
 
   utInit();
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
   orionldState.in.payload      = NULL;
   orionldState.in.payloadSize  = 0;
   ci1.restServiceP             = &restService;

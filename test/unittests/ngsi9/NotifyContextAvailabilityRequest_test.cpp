@@ -29,6 +29,8 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -47,7 +49,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
   utInit();
 
   orionldState.verb = HTTP_POST;
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 

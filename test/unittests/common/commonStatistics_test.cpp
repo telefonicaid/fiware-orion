@@ -27,6 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/statistics.h"
+#include "orionld/types/OrionldMimeType.h"
 
 
 
@@ -60,28 +61,28 @@ TEST(commonStatistics, statisticsUpdate)
   noOfRtUnsubscribeContextAvailabilityResponse        = 0;
   noOfRtSubscribeResponse                             = 0;
 
-  statisticsUpdate(DiscoverContextAvailability, JSON);
-  statisticsUpdate(UpdateContextAvailabilitySubscription, JSON);
-  statisticsUpdate(NotifyContextAvailability, JSON);
-  statisticsUpdate(SubscribeContext, JSON);
-  statisticsUpdate(UnsubscribeContext, JSON);
-  statisticsUpdate(UpdateContext, JSON);
-  statisticsUpdate(RtQueryContextResponse, JSON);
+  statisticsUpdate(DiscoverContextAvailability, MT_JSON);
+  statisticsUpdate(UpdateContextAvailabilitySubscription, MT_JSON);
+  statisticsUpdate(NotifyContextAvailability, MT_JSON);
+  statisticsUpdate(SubscribeContext, MT_JSON);
+  statisticsUpdate(UnsubscribeContext, MT_JSON);
+  statisticsUpdate(UpdateContext, MT_JSON);
+  statisticsUpdate(RtQueryContextResponse, MT_JSON);
 
-  statisticsUpdate(ContextEntityAttributes, JSON);
-  statisticsUpdate(IndividualContextEntity, JSON);
-  statisticsUpdate(AttributeValueInstance, JSON);
-  statisticsUpdate(IndividualContextEntityAttribute, JSON);
-  statisticsUpdate(UpdateContextElement, JSON);
-  statisticsUpdate(UpdateContextAttribute, JSON);
-  statisticsUpdate(Ngsi10ContextEntityTypesAttributeContainer, JSON);
-  statisticsUpdate(Ngsi10SubscriptionsConvOp, JSON);
-  statisticsUpdate(VersionRequest, JSON);
-  statisticsUpdate(LeakRequest, JSON);
-  statisticsUpdate(InvalidRequest, JSON);
-  statisticsUpdate(RtSubscribeContextAvailabilityResponse, JSON);
-  statisticsUpdate(RtUnsubscribeContextAvailabilityResponse, JSON);
-  statisticsUpdate(RtSubscribeResponse, JSON);
+  statisticsUpdate(ContextEntityAttributes, MT_JSON);
+  statisticsUpdate(IndividualContextEntity, MT_JSON);
+  statisticsUpdate(AttributeValueInstance, MT_JSON);
+  statisticsUpdate(IndividualContextEntityAttribute, MT_JSON);
+  statisticsUpdate(UpdateContextElement, MT_JSON);
+  statisticsUpdate(UpdateContextAttribute, MT_JSON);
+  statisticsUpdate(Ngsi10ContextEntityTypesAttributeContainer, MT_JSON);
+  statisticsUpdate(Ngsi10SubscriptionsConvOp, MT_JSON);
+  statisticsUpdate(VersionRequest, MT_JSON);
+  statisticsUpdate(LeakRequest, MT_JSON);
+  statisticsUpdate(InvalidRequest, MT_JSON);
+  statisticsUpdate(RtSubscribeContextAvailabilityResponse, MT_JSON);
+  statisticsUpdate(RtUnsubscribeContextAvailabilityResponse, MT_JSON);
+  statisticsUpdate(RtSubscribeResponse, MT_JSON);
 
   EXPECT_EQ(1, noOfDiscoveries);
   EXPECT_EQ(1, noOfAvailabilitySubscriptionUpdates);

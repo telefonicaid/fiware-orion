@@ -26,7 +26,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/MimeType.h"
+#include "orionld/types/OrionldMimeType.h"
+
 
 
 /* ****************************************************************************
@@ -37,7 +38,7 @@ TEST(commonMimeType, mimeTypeToString)
 {
    char* mimeType;
 
-   mimeType = (char*) mimeTypeToString(JSON);
+   mimeType = (char*) mimeTypeToString(MT_JSON);
    EXPECT_STREQ("JSON", mimeType) << "bad string translation for JSON mimeType";
 
    mimeType = (char*) mimeTypeToString(TEXT);
@@ -64,7 +65,7 @@ TEST(commonMimeType, stringTomimeType)
   MimeType mimeType;
 
   mimeType = stringToMimeType("JSON");
-  EXPECT_EQ(JSON, mimeType);
+  EXPECT_EQ(MT_JSON, mimeType);
 
   mimeType = stringToMimeType("noMimeType");
   EXPECT_EQ(NOMIMETYPE, mimeType);
@@ -82,19 +83,19 @@ TEST(commonMimeType, mimeTypeParse)
    MimeType mimeType;
 
    mimeType = contentTypeParse("*/*", NULL);
-   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (*/*)";
+   EXPECT_EQ(MT_JSON, mimeType) << "bad translation for JSON mimeType (*/*)";
 
    mimeType = contentTypeParse("text/json", NULL);
-   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (text/json)";
+   EXPECT_EQ(MT_JSON, mimeType) << "bad translation for JSON mimeType (text/json)";
 
    mimeType = contentTypeParse("application/json", NULL);
-   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (application/json)";
+   EXPECT_EQ(MT_JSON, mimeType) << "bad translation for JSON mimeType (application/json)";
 
    mimeType = contentTypeParse("XXX", NULL);
-   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (XXX - unknown )";
+   EXPECT_EQ(MT_JSON, mimeType) << "bad translation for JSON mimeType (XXX - unknown )";
 
    char* charset;
    mimeType = contentTypeParse("application/json; charset=CHSET", &charset);
-   EXPECT_EQ(JSON, mimeType) << "bad translation for JSON mimeType (application/json)";
+   EXPECT_EQ(MT_JSON, mimeType) << "bad translation for JSON mimeType (application/json)";
    EXPECT_STREQ("CHSET", charset);
 }

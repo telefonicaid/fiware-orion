@@ -38,6 +38,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
+#include "orionld/types/OrionldMimeType.h"
 
 #include "unittests/unittest.h"
 
@@ -105,7 +106,7 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  orionldState.in.contentType     = JSON;
+  orionldState.in.contentType     = MT_JSON;
   orionldState.in.payload         = testBuf;
   orionldState.in.payloadSize     = strlen(testBuf);
 
@@ -159,7 +160,7 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   orionldState.in.payload       = testBuf;
   orionldState.in.payloadSize   = strlen(testBuf);
   ci.restServiceP               = &restService;
@@ -176,7 +177,7 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile2)) << "Error getting test data from '" << outfile2 << "'";
 
-  orionldState.in.contentType    = JSON;
+  orionldState.in.contentType    = MT_JSON;
   orionldState.in.payload        = testBuf;
   orionldState.in.payloadSize    = strlen(testBuf);
 

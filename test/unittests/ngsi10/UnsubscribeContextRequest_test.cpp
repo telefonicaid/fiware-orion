@@ -30,6 +30,8 @@
 #include "ngsi/ParseData.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -50,7 +52,7 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, NULL);
   EXPECT_STREQ("OK", out.c_str());

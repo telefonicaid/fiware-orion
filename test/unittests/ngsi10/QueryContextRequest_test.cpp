@@ -30,6 +30,8 @@
 #include "jsonParse/jsonRequest.h"
 #include "serviceRoutines/postQueryContext.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -79,7 +81,7 @@ TEST(QueryContextRequest, ok_json)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, NULL);
 
@@ -117,7 +119,7 @@ TEST(QueryContextRequest, badIsPattern_json)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -144,7 +146,7 @@ TEST(QueryContextRequest, emptyAttribute_json)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -171,7 +173,7 @@ TEST(QueryContextRequest, emptyAttributeExpression_json)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -198,7 +200,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleOkJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
@@ -224,7 +226,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, NULL);
@@ -251,7 +253,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -279,7 +281,7 @@ TEST(QueryContextRequest, scopeGeolocationCircleZeroRadiusJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -306,7 +308,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOkJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
@@ -332,7 +334,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, QueryContext, NULL);
@@ -359,7 +361,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -388,7 +390,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonNoVerticesJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -417,7 +419,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonOneVertexJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -446,7 +448,7 @@ TEST(QueryContextRequest, scopeGeolocationPolygonTwoVerticesJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

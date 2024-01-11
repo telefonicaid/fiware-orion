@@ -32,6 +32,8 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -55,7 +57,7 @@ TEST(NotifyContextRequest, json_ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_EQ("OK", result);
@@ -92,7 +94,7 @@ TEST(NotifyContextRequest, json_badIsPattern)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());

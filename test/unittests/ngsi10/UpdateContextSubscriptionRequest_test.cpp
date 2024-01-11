@@ -28,6 +28,8 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -62,7 +64,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   out = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, NULL);
@@ -107,7 +109,7 @@ TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -132,7 +134,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOkJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, NULL);
@@ -158,7 +160,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, NULL);
@@ -185,7 +187,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJso
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -214,7 +216,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -242,7 +244,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOkJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, NULL);
@@ -268,7 +270,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, NULL);
@@ -295,7 +297,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJs
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -324,7 +326,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -353,7 +355,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -382,7 +384,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVerticesJson)
 
   orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

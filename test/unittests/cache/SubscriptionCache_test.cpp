@@ -35,6 +35,8 @@
 #include "cache/SubscriptionCache.h"
 #include "cache/subCache.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittests/unittest.h"
 #include "unittests/testInit.h"
 
@@ -94,7 +96,7 @@ TEST(cache, SubscriptionCache)
                           nv,
                           "REFERENCE",
                           0,
-                          JSON);
+                          MT_JSON);
 
   subCache->insert(subP);
 
@@ -141,7 +143,7 @@ TEST(cache, SubscriptionCache)
                           nv,
                           "REFERENCE",
                           0,
-                          JSON);
+                          MT_JSON);
 
   subCache->insert(subP);
 
