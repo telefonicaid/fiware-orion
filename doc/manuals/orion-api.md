@@ -2253,8 +2253,10 @@ Some notes to take into account when using `ngsi`:
   * It cannot be used in the key part of JSON objects, i.e. `"${key}": 10` will not work
   * It cannot be used in the attribute `type`. Only in the `value` macro replacements can be done.
   * If the macro *covers completely the string where is used*, then the JSON nature of the attribute value
-    is taken into account. For instance, `"value": "${temperature}"` resolves to `"value": 10`
+    is taken into account. For instance, `"value": "${temperature}"` resolves to `"value": 10`.
     if temperature attribute is a number or to `"value": "10"` if `temperature` attribute is a string.
+    * Exception to this is `id` and `type`. Given that entity id and type must be a string (as decribed
+      in [this section](#identifiers-syntax-restrictions)) the attribute value is always casted to string in this case.
   * If the macro *is only part of string where is used*, then the attribute value is always casted
     to string. For instance, `"value": "Temperature is: ${temperature}"` resolves to 
     `"value": "Temperature is 10"` even if temperature attribute is a number. Note that if the
