@@ -14,8 +14,6 @@ WORKDIR lcov-1.14
 RUN make install
 WORKDIR ${PATH_TO_SRC}
 
-RUN rpm -qa
-
 RUN yum-config-manager --disable pgdg10 pgdg11 pgdg-common
 
 ## Workaround to refresh the repo key that was baked into the base image
