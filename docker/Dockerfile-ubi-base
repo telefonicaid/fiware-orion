@@ -1,7 +1,5 @@
 FROM registry.access.redhat.com/ubi8/ubi:8.5
 
-# dummy change to trigger rebuild of fiware/orion-ld-base with new keys
-
 ENV ROOT_FOLDER='/opt'
 ENV PAHO_VERSION='v1.3.1'
 
