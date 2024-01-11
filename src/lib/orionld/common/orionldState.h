@@ -42,14 +42,6 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
-#include "common/globals.h"                                      // ApiVersion
-#include "common/limits.h"                                       // IP_LENGTH_MAX, STATIC_BUFFER_SIZE
-#include "common/MimeType.h"                                     // MimeType
-#include "common/RenderFormat.h"                                 // RenderFormat
-#include "rest/HttpStatusCode.h"                                 // HttpStatusCode
-#include "rest/Verb.h"                                           // Verb
-#include "parse/CompoundValueNode.h"                             // orion::CompoundValueNode
-
 #include "orionld/types/OrionldResponseBuffer.h"                 // OrionldResponseBuffer
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
 #include "orionld/types/OrionldGeoIndex.h"                       // OrionldGeoIndex
@@ -63,6 +55,10 @@ extern "C"
 #include "orionld/types/OrionldContext.h"                        // OrionldContext
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/TroeMode.h"                              // TroeMode
+#include "orionld/types/Verb.h"                                  // Verb
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
+#include "orionld/types/OrionldMimeType.h"                       // MimeType
+#include "orionld/types/ApiVersion.h"                            // ApiVersion
 #include "orionld/common/performance.h"                          // REQUEST_PERFORMANCE
 #include "orionld/kjTree/kjTreeLog.h"                            // Because it is so often used but then removed again ...
 
@@ -213,14 +209,14 @@ typedef enum OrionldPhase
 typedef struct OrionldStateOut
 {
   // Outgoing HTTP headers
-  OrionldHeaderSet headers;
-  MimeType         contentType;  // Content-Type is "special" - not part of OrionldHeaderSet
+  OrionldHeaderSet     headers;
+  MimeType             contentType;  // Content-Type is "special" - not part of OrionldHeaderSet
 
   // Rendering info
-  RenderFormat    format;
+  OrionldRenderFormat  format;
 
   // Errors
-  char*     acceptErrorDetail;  // FIXME: Use OrionldProblemDetails for this
+  char*                acceptErrorDetail;  // FIXME: Use OrionldProblemDetails for this
 } OrionldStateOut;
 
 
@@ -318,12 +314,14 @@ typedef struct OrionldMongoC
 typedef struct OrionldConnectionState
 {
   OrionldPhase            phase;
-  bool                    distributed;            // Depends on a URI param, but can be modified (to false) via an HTTP header
+  bool                    distributed;               // Depends on a URI param, but can be modified (to false) via an HTTP header
   MHD_Connection*         mhdConnection;
-  struct timeval          transactionStart;       // For metrics
-  struct timespec         timestamp;              // The time when the request entered
-  double                  requestTime;            // Same same (timestamp), but at a floating point
-  char                    requestTimeString[64];  // ISO8601 representation of 'requestTime'
+  char                    clientIp[64];              // IP address of the requester
+  char                    preallocReqBuf[4 * 1024];  // Buffer of incoming payload body - no need to call malloc for "small" requests
+  struct timeval          transactionStart;          // For metrics
+  struct timespec         timestamp;                 // The time when the request entered
+  double                  requestTime;               // Same same (timestamp), but at a floating point
+  char                    requestTimeString[64];     // ISO8601 representation of 'requestTime'
   int                     httpStatusCode;
   Kjson                   kjson;
   Kjson*                  kjsonP;
@@ -423,7 +421,7 @@ typedef struct OrionldConnectionState
   // mongoc_uri_t*           mongoUri;
   // mongoc_client_t*        mongoClient;
   // mongoc_database_t*      mongoDatabase;
-
+  //
   OrionldMongoC           mongoc;
 
   //
@@ -487,13 +485,6 @@ typedef struct OrionldConnectionState
   KjNode* previousValues;
 
   //
-  // Compounds
-  //
-  bool                                      inCompoundValue;
-  orion::CompoundValueNode*                 compoundValueP;       // Points to current node in the tree
-  orion::CompoundValueNode*                 compoundValueRoot;    // Points to the root of the tree
-
-  //
   // Error Handling
   //
   OrionldProblemDetails   pd;
@@ -530,8 +521,8 @@ typedef struct Timestamps
   struct timespec distOpDbEnd;            // End of            DB query for Distributed Operation
   struct timespec renderStart;            // Start of          Resonse Payload body render JSON
   struct timespec renderEnd;              // End of            Resonse Payload body render JSON
-  struct timespec restReplyStart;         // Start of          REST Reply
-  struct timespec restReplyEnd;           // End of            REST Reply
+  struct timespec mhdReplyStart;          // Start of          MHD Reply
+  struct timespec mhdReplyEnd;            // End of            MHD  Reply
   struct timespec troeStart;              // Start of          TRoE processing
   struct timespec troeEnd;                // End of            TRoE processing
   struct timespec requestPartEnd;         // End of            MHD-1-2-3 processing
@@ -552,15 +543,6 @@ extern __thread Timestamps performanceTimestamps;
 // orionldState -
 //
 extern __thread OrionldConnectionState orionldState;
-
-
-
-// -----------------------------------------------------------------------------
-//
-// Thread variables from rest/rest.cpp
-//
-extern __thread char  clientIp[IP_LENGTH_MAX + 1];
-extern __thread char  static_buffer[STATIC_BUFFER_SIZE + 1];
 
 
 

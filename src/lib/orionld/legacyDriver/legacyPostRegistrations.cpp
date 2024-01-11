@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"                                     // LM_*
 #include "logMsg/traceLevels.h"                                // Lmt*
 
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "rest/OrionError.h"                                   // OrionError
 #include "apiTypesV2/Registration.h"                           // Registration
 #include "mongoBackend/mongoRegistrationGet.h"                 // mongoRegistrationGet
@@ -36,8 +35,9 @@
 
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/kjTree/kjTreeToRegistration.h"               // kjTreeToRegistration
+#include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
+#include "orionld/legacyDriver/kjTreeToRegistration.h"         // kjTreeToRegistration
 #include "orionld/legacyDriver/legacyPostRegistrations.h"      // Own Interface
 
 
@@ -101,7 +101,7 @@ bool legacyPostRegistrations(void)
                           &oError);
 
   // FIXME: Check oError for failure!
-  orionldState.httpStatusCode = SccCreated;
+  orionldState.httpStatusCode = 201;
 
   httpHeaderLocationAdd("/ngsi-ld/v1/csourceRegistrations/", regIdP, orionldState.tenantP->tenant);
 

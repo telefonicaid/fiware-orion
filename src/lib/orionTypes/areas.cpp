@@ -30,6 +30,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"                              // ApiVersion
+
 #include "common/string.h"
 #include "orionTypes/areas.h"
 
@@ -635,15 +637,15 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, char** errorStringP)
   for (unsigned int ix = 0; ix < items.size(); ++ix)
   {
 #ifdef ORIONLD
-    if (apiVersion == NGSI_LD_V1)
+    if (apiVersion == API_VERSION_NGSILD_V1)
     {
       if (items[ix] == "Point")
         items[ix] = "point";
       else if (items[ix] == "Polygon")
         items[ix] = "polygon";
     }
-#endif    
-    if ((apiVersion == V1) && ((items[ix] == "polygon") || (items[ix] == "circle")))
+#endif
+    if ((apiVersion == API_VERSION_NGSI_V1) && ((items[ix] == "polygon") || (items[ix] == "circle")))
     {
       if (areaType != "")
       {
@@ -652,7 +654,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, char** errorStringP)
       }
       areaType = items[ix];
     }
-    else if ((apiVersion != V1) && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
+    else if ((apiVersion != API_VERSION_NGSI_V1) && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
     {
       if (areaType != "")
       {

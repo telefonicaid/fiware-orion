@@ -95,14 +95,14 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
   // 02. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(orionldState.clientIp, "entity::type cannot be empty for this request");
     response.fill(SccBadRequest, "entity::type cannot be empty for this request");
     TIMED_RENDER(answer = response.render(false, false));
     return answer;
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(orionldState.clientIp, "non-matching entity::types in URL");
     response.fill(SccBadRequest, "non-matching entity::types in URL");
     TIMED_RENDER(answer = response.render(false, false));
     return answer;

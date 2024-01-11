@@ -29,6 +29,8 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -56,9 +58,9 @@ TEST(UpdateContextRequest, ok_json)
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-   orionldState.verb = POST;
+   orionldState.verb = HTTP_POST;
 
-   orionldState.in.contentType  = JSON;
+   orionldState.in.contentType  = MT_JSON;
 
    std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
 
@@ -89,8 +91,8 @@ TEST(UpdateContextRequest, badIsPattern_json)
 
    utInit();
 
-   orionldState.verb = POST;
-   orionldState.in.contentType  = JSON;
+   orionldState.verb = HTTP_POST;
+   orionldState.in.contentType  = MT_JSON;
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile;

@@ -29,12 +29,11 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "common/globals.h"                                    // parse8601Time
-
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/CHECK.h"                              // CHECKx()
 #include "orionld/common/SCOMPARE.h"                           // SCOMPAREx
+#include "orionld/common/dateTime.h"                           // dateTimeFromString
 #include "orionld/types/OrionldTimeInterval.h"                 // OrionldTimeInterval
 
 
@@ -74,15 +73,16 @@ bool kjTreeToTimeInterval(KjNode* kNodeP, OrionldTimeInterval* intervalP)
     return false;
   }
 
-  if ((intervalP->start = parse8601Time(startP->value.s)) == -1)
+  char errorString[256];
+  if ((intervalP->start = dateTimeFromString(startP->value.s, errorString, sizeof(errorString))) < 0)
   {
-    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", startP->value.s, 400);
+    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", errorString, 400);
     return false;
   }
 
-  if ((intervalP->end = parse8601Time(endP->value.s)) == -1)
+  if ((intervalP->end = dateTimeFromString(endP->value.s, errorString, sizeof(errorString))) < 0)
   {
-    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", endP->value.s, 400);
+    orionldError(OrionldBadRequestData, "Invalid ISO8601 time string", errorString, 400);
     return false;
   }
 

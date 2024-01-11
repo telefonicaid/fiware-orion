@@ -108,13 +108,13 @@ Location: /ngsi-ld/v1/entities/urn:E1
 02. PATCH E1, attempting to add an invalid observedAt sub-attr and another sub-attr named 'valid', whose RHS is a NGSI-LD null - see error
 ==========================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 122
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "observedAt",
-    "title": "Not a valid ISO8601 DateTime",
+    "title": "Invalid ISO8601 timestamp",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

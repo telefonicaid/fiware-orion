@@ -53,15 +53,15 @@ ConnectionInfo::ConnectionInfo(MHD_Connection* _connection):
 {
   orionldState.mhdConnection = _connection;
 
-  if ((orionldState.verb != POST)    &&
-      (orionldState.verb != PUT)     &&
-      (orionldState.verb != GET)     &&
-      (orionldState.verb != DELETE)  &&
-      (orionldState.verb != PATCH)   &&
-      (orionldState.verb != OPTIONS))
+  if ((orionldState.verb != HTTP_POST)    &&
+      (orionldState.verb != HTTP_PUT)     &&
+      (orionldState.verb != HTTP_GET)     &&
+      (orionldState.verb != HTTP_DELETE)  &&
+      (orionldState.verb != HTTP_PATCH)   &&
+      (orionldState.verb != HTTP_OPTIONS))
   {
     orionldState.badVerb = true;
-    orionldState.verb    = NOVERB;
+    orionldState.verb    = HTTP_NOVERB;
   }
 }
 

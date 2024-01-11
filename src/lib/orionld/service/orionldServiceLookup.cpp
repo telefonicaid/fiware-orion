@@ -85,7 +85,7 @@ static void requestPrepare(char* url, int* cSumV, int* cSumsP, int* sLenP)
 // orionldServiceLookup -
 //
 // The Verb must be a valid verb before calling this function (GET | POST | DELETE).
-// This is assured by the function orionldMhdConnectionTreat()
+// This is assured by the function mhdConnectionTreat()
 //
 OrionLdRestService* orionldServiceLookup(OrionLdRestServiceVector* serviceV)
 {

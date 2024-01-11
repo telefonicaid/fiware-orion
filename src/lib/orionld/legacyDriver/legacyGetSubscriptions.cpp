@@ -38,7 +38,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
-#include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
+#include "orionld/legacyDriver/kjTreeFromSubscription.h"         // kjTreeFromSubscription
 #include "orionld/legacyDriver/legacyGetSubscriptions.h"         // Own interface
 
 

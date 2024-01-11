@@ -127,7 +127,7 @@ std::string UpdateContextResponse::check
   }  
   else if (contextElementResponseVector.check(apiVersion, UpdateContext, predetectedError, 0) != "OK")
   {
-    alarmMgr.badInput(clientIp, res);
+    alarmMgr.badInput(orionldState.clientIp, res);
     errorCode.fill(SccBadRequest, res);
   }
   else

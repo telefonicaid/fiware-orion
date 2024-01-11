@@ -28,6 +28,7 @@
 
 #include <string>
 
+#include "orionld/types/ApiVersion.h"                // ApiVersion
 #include "common/globals.h"
 
 

@@ -32,7 +32,6 @@ SET (SOURCES
     ConnectionInfo.cpp
     StringFilter.cpp
     restServiceLookup.cpp
-    httpHeaderAdd.cpp
 )
 
 SET (HEADERS
@@ -49,7 +48,6 @@ SET (HEADERS
     HttpStatusCode.h
     StringFilter.h
     restServiceLookup.h
-    httpHeaderAdd.h
 )
 
 

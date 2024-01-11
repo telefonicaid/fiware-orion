@@ -52,7 +52,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON parse error");
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     orionldState.httpStatusCode = SccBadRequest;
     return oe.toJson();
@@ -61,7 +61,7 @@ std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
 
   if (!document.IsObject() && !document.IsArray())
   {
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON parse error");
     oe.fill(SccBadRequest, "Neither JSON Object nor JSON Array for attribute::value", "BadRequest");
     orionldState.httpStatusCode = SccBadRequest;
     return oe.toJson();

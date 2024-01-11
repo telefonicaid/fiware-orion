@@ -43,6 +43,7 @@ extern "C"
 #include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"           // orionldSubAttributeExpand
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"         // orionldPatchEntity2
@@ -113,7 +114,8 @@ static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContext
         return false;
       }
 
-      if (parse8601Time(attrP->value.s) == -1)
+      char errorString[256];
+      if (dateTimeFromString(attrP->value.s, errorString, sizeof(errorString)) < 0)
       {
         //
         // Deletion?
@@ -125,10 +127,9 @@ static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContext
           return true;
         }
 
-        orionldError(OrionldBadRequestData,
-                     "Not a valid ISO8601 DateTime",
-                     attrP->name,
-                     400);
+        orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", errorString, 400);
+        pdField(attrP->name);
+
         return false;
       }
     }
@@ -578,9 +579,10 @@ bool timestampCheck(KjNode* fieldP)
     return false;
   }
 
-  if (parse8601Time(fieldP->value.s) == -1)
+  char errorString[256];
+  if (dateTimeFromString(fieldP->value.s, errorString, sizeof(errorString)) < 0)
   {
-    orionldError(OrionldBadRequestData, "Not a valid ISO8601 DateTime", fieldP->name, 400);
+    orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", fieldP->name, 400);
     return false;
   }
 

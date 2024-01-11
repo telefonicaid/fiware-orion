@@ -26,6 +26,7 @@
 #include <string>
 #include <string.h>
 
+#include "orionld/types/ApiVersion.h"                // ApiVersion
 #include "common/globals.h"
 #include "orionTypes/UpdateActionType.h"
 
@@ -37,7 +38,7 @@
 */
 std::string actionTypeString(ApiVersion apiVersion, ActionType action)
 {
-  if (apiVersion == V2)
+  if (apiVersion == API_VERSION_NGSI_V2)
   {
     switch (action)
     {

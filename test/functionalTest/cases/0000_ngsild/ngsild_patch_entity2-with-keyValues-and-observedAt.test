@@ -125,12 +125,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 04. PATCH E1, with key-values and an INVALID observedAt as URL params - see error
 =================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 164
+Content-Length: 214
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "2022",
+    "detail": "invalid DateTime: '2022' (error in 'date' part '2022')",
     "title": "Invalid value for uri parameter /observedAt/ (not a valid ISO8601 timestamp)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

@@ -21,33 +21,16 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
-    kjTreeFromQueryContextResponse.cpp
-    kjTreeFromContextAttribute.cpp
-    kjTreeFromCompoundValue.cpp
-    kjTreeFromSubscription.cpp
-    kjTreeFromNotification.cpp
-    kjTreeFromRegistration.cpp
-    kjTreeToEntIdVector.cpp
-    kjTreeToStringList.cpp
-    kjTreeToSubscriptionExpression.cpp
-    kjTreeToEndpoint.cpp
-    kjTreeToNotification.cpp
-    kjTreeToSubscription.cpp
-    kjTreeToRegistration.cpp
     kjTreeToTimeInterval.cpp
     kjTreeToGeoLocation.cpp
     kjStringValueLookupInArray.cpp
     kjEntityIdLookupInEntityArray.cpp
-    kjTreeToUpdateContextRequest.cpp
-    kjTreeToMetadata.cpp
-    kjTreeToContextAttribute.cpp
     kjTreeRegistrationInfoExtract.cpp
     kjEntityIdArrayExtract.cpp
     kjChildAddOrReplace.cpp
     kjGeojsonEntityTransform.cpp
     kjGeojsonEntitiesTransform.cpp
     kjEntityArrayErrorPurge.cpp
-    kjTreeToCompoundValue.cpp
     kjStringArraySortedInsert.cpp
     kjSort.cpp
     kjChildCount.cpp

@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/ApiVersion.h"                // ApiVersion
 #include "orionld/common/orionldState.h"             // orionldState
 
 #include "common/string.h"
@@ -46,6 +47,7 @@
 #include "mongo/client/dbclient.h"
 #include "mongoBackend/dbConstants.h"
 #include "orionld/common/eqForDot.h"
+#include "orionld/common/dateTime.h"
 #include "mongoBackend/compoundValueBson.h"
 
 
@@ -96,12 +98,12 @@ void ContextAttribute::bsonAppendAttrValue(BSONObjBuilder& bsonAttr, const std::
     }
     if ((attrType == DATE_TYPE) || (attrType == DATE_TYPE_ALT))
     {
-      effectiveNumberValue = parse8601Time(effectiveStringValue);
-      if (effectiveNumberValue != -1)
-      {
+      char errorString[256];
+
+      effectiveNumberValue = dateTimeFromString(effectiveStringValue, errorString, sizeof(errorString));
+      if (effectiveNumberValue >= 0)
         effectiveValueType = ValueTypeNumber;
-      }
-      // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
+      // Note that if dateTimeFromString() fails, we keep ValueTypeString and everything works like without autocast
     }
   }
 
@@ -216,7 +218,7 @@ ContextAttribute::ContextAttribute()
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -313,7 +315,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -346,7 +348,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -378,7 +380,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -410,7 +412,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -441,7 +443,7 @@ ContextAttribute::ContextAttribute
   modDate = 0;
 
   providingApplication.set("");
-  providingApplication.setMimeType(NOMIMETYPE);
+  providingApplication.setMimeType(MT_NONE);
 }
 
 
@@ -472,7 +474,7 @@ const char* ContextAttribute::getMetadataId() const
 */
 std::string ContextAttribute::getLocation(ApiVersion apiVersion) const
 {
-  if (apiVersion == V1)
+  if (apiVersion == API_VERSION_NGSI_V1)
   {
     // Deprecated way, but still supported
     for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
@@ -737,7 +739,7 @@ std::string ContextAttribute::render
 std::string ContextAttribute::toJson
 (
   bool                             isLastElement,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  metadataFilter,
   RequestType                      requestType
 )
@@ -947,16 +949,16 @@ std::string ContextAttribute::toJsonAsValue
 
   if (compoundValueP == NULL)  // Not a compound - text/plain must be accepted
   {
-    if (orionldState.acceptMask & (1 << TEXT))
+    if (orionldState.acceptMask & (1 << MT_TEXT))
     {
       char buf[64];
 
-      *outContentTypeP = TEXT;
+      *outContentTypeP = MT_TEXT;
 
       switch (valueType)
       {
       case orion::ValueTypeString:
-        if (apiVersion == V2)
+        if (apiVersion == API_VERSION_NGSI_V2)
         { 
           out = '"' + stringValue + '"';
         }
@@ -1006,7 +1008,7 @@ std::string ContextAttribute::toJsonAsValue
   }
   else if (compoundValueP != NULL)  // Compound: application/json OR text/plain must be accepted
   {
-    if ((orionldState.acceptMask & ((1 << TEXT) | (1 << JSON))) == 0)
+    if ((orionldState.acceptMask & ((1 << MT_TEXT) | (1 << MT_JSON))) == 0)
     {
       OrionError oe(SccNotAcceptable, "accepted MIME types: application/json, text/plain", "NotAcceptable");
       *scP = SccNotAcceptable;
@@ -1042,10 +1044,10 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   size_t len;
   char errorMsg[128];
 
-  if (((apiVersion == V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  if (((apiVersion == API_VERSION_NGSI_V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
@@ -1057,34 +1059,34 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if (forbiddenIdChars(apiVersion, name.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute");
+    alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the name of an attribute");
     return "Invalid characters in attribute name";
   }
 
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
 
-  if (apiVersion == V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == API_VERSION_NGSI_V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute");
+    alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the type of an attribute");
     return "Invalid characters in attribute type";
   }
 
@@ -1097,7 +1099,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the value of an attribute");
       return "Invalid characters in attribute value";
     }
   }

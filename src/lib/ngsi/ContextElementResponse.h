@@ -27,12 +27,13 @@
 */
 #include <string>
 
+#include "orionld/types/ApiVersion.h"
+
 #include "common/RenderFormat.h"
 #include "common/globals.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/StringList.h"
-
 #include "mongo/client/dbclient.h"
 
 
@@ -62,7 +63,7 @@ typedef struct ContextElementResponse
   ContextElementResponse(const mongo::BSONObj*  entityDocP,
                          const StringList&      attrL,
                          bool                   includeEmpty = true,
-                         ApiVersion             apiVersion   = V1);
+                         ApiVersion             apiVersion   = API_VERSION_NGSI_V1);
   ContextElementResponse(ContextElement* ceP, bool useDefaultType = false);
 
   std::string  render(ApiVersion   apiVersion,
@@ -70,7 +71,7 @@ typedef struct ContextElementResponse
                       RequestType  requestType,
                       bool         comma               = false,
                       bool         omitAttributeValues = false);
-  std::string  toJson(RenderFormat                     renderFormat,
+  std::string  toJson(OrionldRenderFormat              renderFormat,
                       const std::vector<std::string>&  attrsFilter,
                       const std::vector<std::string>&  metadataFilter,
                       bool blacklist = false);

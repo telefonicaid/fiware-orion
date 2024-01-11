@@ -99,7 +99,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   if (!isTrue(value) && !isFalse(value))
   {
     std::string details = std::string("invalid isPattern value: '") + value + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     reqDataP->errorString = "invalid isPattern value for entity: /" + value + "/";
     return "invalid isPattern value for entity: /" + value + "/";

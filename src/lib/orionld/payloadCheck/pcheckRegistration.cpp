@@ -80,8 +80,8 @@ extern "C"
 //
 bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const char* currentRegId, bool idCanBePresent, bool creation, KjNode**  propertyTreeP, OrionldContext** contextPP)
 {
-  KjNode*  idP                   = NULL;  // Optional but already extracted by orionldMhdConnectionInit
-  KjNode*  typeP                 = NULL;  // Mandatory but already extracted by orionldMhdConnectionInit
+  KjNode*  idP                   = NULL;  // Optional but already extracted in mhdConnectionInit
+  KjNode*  typeP                 = NULL;  // Mandatory but already extracted in mhdConnectionInit
   KjNode*  nameP                 = NULL;
   KjNode*  descriptionP          = NULL;
   KjNode*  informationP          = NULL;
@@ -226,7 +226,7 @@ bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const 
 
       if (pcheckGeoPropertyValue(locationP, NULL, NULL, nodeP->name) == false)
       {
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
     }
@@ -237,7 +237,7 @@ bool pcheckRegistration(const char* regModeString, KjNode* registrationP, const 
       EMPTY_OBJECT_CHECK(nodeP, nodeP->name);
       if (pcheckGeoPropertyValue(observationSpaceP, NULL, NULL, nodeP->name) == false)
       {
-        orionldState.httpStatusCode = SccBadRequest;
+        orionldState.httpStatusCode = 400;
         return false;
       }
     }

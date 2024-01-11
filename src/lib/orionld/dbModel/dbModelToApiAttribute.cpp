@@ -34,14 +34,13 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/RenderFormat.h"                                 // RenderFormat
-
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/langStringExtract.h"                    // langValueFix
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/kjTree/kjTreeLog.h"                            // kjTreeLog
 #include "orionld/kjTree/kjAttributeNormalizedToSimplified.h"    // kjAttributeNormalizedToSimplified
@@ -231,9 +230,9 @@ void dbModelToApiLangPropertySimplified(KjNode* dbAttrP, const char* lang)
 //
 // dbModelToApiAttribute2 -
 //
-KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, RenderFormat renderFormat, const char* lang, bool compacted, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs, OrionldRenderFormat renderFormat, const char* lang, bool compacted, OrionldProblemDetails* pdP)
 {
-  if ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_KEYVALUES))
+  if ((renderFormat == RF_CROSS_APIS_NORMALIZED) || (renderFormat == RF_CROSS_APIS_SIMPLIFIED))
     compacted = false;
 
   if (datasetP != NULL)
@@ -270,7 +269,7 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
     {
       if (renderFormat == RF_CONCISE)
         kjAttributeNormalizedToConcise(datasetP, orionldState.uriParams.lang);
-      else if (renderFormat == RF_KEYVALUES)
+      else if (renderFormat == RF_SIMPLIFIED)
         kjAttributeNormalizedToSimplified(datasetP, orionldState.uriParams.lang);
 
       kjChildAdd(attrArray, datasetP);  // Was removed from @datasets by caller (
@@ -299,7 +298,7 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
 
         if (renderFormat == RF_CONCISE)
           kjAttributeNormalizedToConcise(dbAttrP, orionldState.uriParams.lang);
-        else if (renderFormat == RF_KEYVALUES)
+        else if (renderFormat == RF_SIMPLIFIED)
           kjAttributeNormalizedToSimplified(dbAttrP, orionldState.uriParams.lang);
 
         dbAttrP = next;
@@ -352,7 +351,7 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
     }
   }
 
-  if ((renderFormat == RF_KEYVALUES) || (conciseAsKeyValues == true))
+  if ((renderFormat == RF_SIMPLIFIED) || (conciseAsKeyValues == true))
   {
     if (attrTypeNodeP == NULL)
       attrTypeNodeP = kjLookup(dbAttrP, "type");

@@ -23,6 +23,7 @@
 * Author: Fermin Galan
 */
 #include "orionTypes/EntityTypeResponse.h"
+#include "orionld/types/OrionldMimeType.h"
 #include "unittests/unittest.h"
 
 
@@ -41,9 +42,9 @@ TEST(EntityTypeResponse, check)
   etR1.entityType.type = "myType";
   etR2.entityType.type = "";
 
-  EXPECT_EQ("OK", etR1.check(V1, false, false, false, ""));
-  EXPECT_NE("OK", etR2.check(V1, false, false, false, ""));
-  EXPECT_NE("OK", etR1.check(V1, false, false, false, "foo"));
+  EXPECT_EQ("OK", etR1.check(API_VERSION_NGSI_V1, false, false, false, ""));
+  EXPECT_NE("OK", etR2.check(API_VERSION_NGSI_V1, false, false, false, ""));
+  EXPECT_NE("OK", etR1.check(API_VERSION_NGSI_V1, false, false, false, "foo"));
 
   utExit();
 }

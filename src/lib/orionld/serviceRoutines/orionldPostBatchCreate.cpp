@@ -210,7 +210,7 @@ bool orionldPostBatchCreate(void)
     orionldState.responseTree = response;
   }
 
-  orionldState.out.contentType = JSON;
+  orionldState.out.contentType = MT_JSON;
   orionldState.noLinkHeader    = true;
 
   if ((orionldState.tenantP != &tenant0) && (orionldState.httpStatusCode != 204))

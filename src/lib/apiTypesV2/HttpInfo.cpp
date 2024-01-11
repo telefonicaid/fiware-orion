@@ -31,11 +31,14 @@
 #include "common/JsonHelper.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
+#include "rest/Verb.h"                                         // verb2str
+
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/types/KeyValue.h"                            // KeyValue, keyValueAdd
+#include "orionld/types/Verb.h"                                // Verb
 
-#include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/HttpInfo.h"                               // Own interface
 
 
 
@@ -55,9 +58,9 @@ namespace ngsiv2
 * HttpInfo::HttpInfo -
 */
 #ifdef ORIONLD
-HttpInfo::HttpInfo() : verb(NOVERB), custom(false), mimeType(DEFAULT_MIMETYPE)
+HttpInfo::HttpInfo() : verb(HTTP_NOVERB), custom(false), mimeType(MT_DEFAULT)
 #else
-HttpInfo::HttpInfo() : verb(NOVERB), custom(false)
+HttpInfo::HttpInfo() : verb(HTTP_NOVERB), custom(false)
 #endif
 {
 #ifdef ORIONLD
@@ -72,9 +75,9 @@ HttpInfo::HttpInfo() : verb(NOVERB), custom(false)
 * HttpInfo::HttpInfo -
 */
 #ifdef ORIONLD
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false), mimeType(DEFAULT_MIMETYPE)
+HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(HTTP_NOVERB), custom(false), mimeType(MT_DEFAULT)
 #else
-HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(NOVERB), custom(false)
+HttpInfo::HttpInfo(const std::string& _url) : url(_url), verb(HTTP_NOVERB), custom(false)
 #endif
 {
 #ifdef ORIONLD
@@ -101,9 +104,9 @@ std::string HttpInfo::toJson()
       jh.addString("payload", this->payload);
     }
 
-    if (this->verb != NOVERB)
+    if (this->verb != HTTP_NOVERB)
     {
-      jh.addString("method", verbName(this->verb));
+      jh.addString("method", verbToString(this->verb));
     }
 
     if (qs.size() != 0)

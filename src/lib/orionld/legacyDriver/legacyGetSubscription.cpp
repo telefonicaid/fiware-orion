@@ -30,7 +30,7 @@
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheItemLookup
-#include "orionld/kjTree/kjTreeFromSubscription.h"               // kjTreeFromSubscription
+#include "orionld/legacyDriver/kjTreeFromSubscription.h"         // kjTreeFromSubscription
 #include "orionld/legacyDriver/legacyGetSubscription.h"          // Own Interface
 
 
@@ -59,7 +59,7 @@ bool legacyGetSubscription(void)
   }
 
   // Transform to KjNode tree
-  orionldState.httpStatusCode = SccOk;
+  orionldState.httpStatusCode = 200;
   orionldState.responseTree   = kjTreeFromSubscription(&subscription, cSubP, orionldState.contextP);
 
   return true;

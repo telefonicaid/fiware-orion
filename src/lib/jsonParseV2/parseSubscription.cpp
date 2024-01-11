@@ -31,7 +31,10 @@
 
 #include "rapidjson/document.h"
 
+#include "logMsg/logMsg.h"
+
 #include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/common/dateTime.h"                 // dateTimeFromString
 
 #include "alarmMgr/alarmMgr.h"
 #include "common/globals.h"
@@ -92,7 +95,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON parse error");
     orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -102,7 +105,7 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON parse error");
     orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -194,9 +197,12 @@ std::string parseSubscription(ConnectionInfo* ciP, SubscriptionUpdate* subsP, bo
     }
     else
     {
-      eT = (uint64_t) parse8601Time((char*) expires.c_str());
+      char errorString[256];
+
+      eT = (uint64_t) dateTimeFromString(expires.c_str(), errorString, sizeof(errorString));
       if (eT == -1)
       {
+        LM_E(("dateTimeFromString: %s", errorString));
         return badInput(ciP, "expires has an invalid format");
       }
     }
@@ -409,14 +415,14 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         verb = str2Verb(methodOpt.value);
 
-        if (verb == UNKNOWNVERB)
+        if (verb == HTTP_UNKNOWNVERB)
         {
           return badInput(ciP, "unknown method httpCustom notification");
         }
       }
       else  // not given by user, the default one will be used
       {
-        verb = NOVERB;
+        verb = HTTP_NOVERB;
       }
 
       subsP->notification.httpInfo.verb = verb;
@@ -552,8 +558,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   }
   else if (attrsFormatOpt.given)
   {
-    const char*   attrsFormatString = attrsFormatOpt.value.c_str();
-    RenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
+    const char*          attrsFormatString = attrsFormatOpt.value.c_str();
+    OrionldRenderFormat  nFormat           = stringToRenderFormat(attrsFormatString, true);
 
     if (nFormat == RF_NONE)
       return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT);

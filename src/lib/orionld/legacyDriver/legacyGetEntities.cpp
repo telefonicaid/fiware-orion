@@ -53,12 +53,12 @@ extern "C"
 #include "orionld/common/dotForEq.h"                           // dotForEq
 #include "orionld/common/langStringExtract.h"                  // langValueFix
 #include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
-#include "orionld/kjTree/kjTreeFromQueryContextResponse.h"     // kjTreeFromQueryContextResponse
 #include "orionld/kjTree/kjEntityNormalizedToConcise.h"        // kjEntityNormalizedToConcise
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "orionld/dbModel/dbModelToApiEntity.h"                // dbModelToApiEntity2
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntitiesAttributeLookup.h"  // mongoCppLegacyEntitiesAttributeLookup
-#include "orionld/legacyDriver/legacyGetEntities.h"            // Own Interface
+#include "orionld/legacyDriver/kjTreeFromQueryContextResponse.h"           // kjTreeFromQueryContextResponse
+#include "orionld/legacyDriver/legacyGetEntities.h"                        // Own Interface
 
 
 
@@ -376,7 +376,7 @@ bool legacyGetEntities(void)
   //
   // Transform QueryContextResponse to KJ-Tree
   //
-  orionldState.httpStatusCode = SccOk;  // FIXME: What about the response from mongoQueryContext???
+  orionldState.httpStatusCode = 200;  // FIXME: What about the response from mongoQueryContext???
 
   orionldState.responseTree = kjTreeFromQueryContextResponse(false, keyValues, concise, lang, &mongoResponse);
 
@@ -399,7 +399,7 @@ bool legacyGetEntities(void)
   //     "geometry": null
   //   with whatever was found in this second query to mongo
   //
-  if ((orionldState.out.contentType == GEOJSON) && (orionldState.in.attrList.items > 0) && (orionldState.responseTree->type == KjArray))
+  if ((orionldState.out.contentType == MT_GEOJSON) && (orionldState.in.attrList.items > 0) && (orionldState.responseTree->type == KjArray))
   {
     const char* geoPropertyName        = (orionldState.uriParams.geometryProperty == NULL)? "location" : orionldState.uriParams.geometryProperty;
     bool        geoPropertyNameInAttrs = geoPropertyInAttrs(orionldState.in.attrList.array, orionldState.in.attrList.items, geoPropertyName);
@@ -488,7 +488,7 @@ bool legacyGetEntities(void)
 
   mongoRequest.release();
 
-  if (orionldState.out.contentType == GEOJSON)
+  if (orionldState.out.contentType == MT_GEOJSON)
     orionldState.responseTree = kjGeojsonEntitiesTransform(orionldState.responseTree,
                                                            orionldState.uriParams.attrs,
                                                            orionldState.uriParams.geometryProperty,

@@ -33,9 +33,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
-#include "common/wsStrip.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
+#include "orionld/common/stringStrip.h"
 
 
 
@@ -573,7 +573,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   double newLatitude;
   double newLongitude;
 
-  cP    = wsStrip(cP);
+  cP    = stringStrip(cP);
 
   comma = strchr(cP, ',');
   if (comma == NULL)
@@ -586,13 +586,13 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 
   number1 = cP;
   number2 = comma;
-  number1 = wsStrip(number1);
-  number2 = wsStrip(number2);
+  number1 = stringStrip(number1);
+  number2 = stringStrip(number2);
 
   if ((str2double(number1, &newLatitude) == false) || (newLatitude > 90) || (newLatitude < -90))
   {
     std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     free(initial);
     return false;
@@ -601,7 +601,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if ((str2double(number2, &newLongitude) == false) || (newLongitude > 180) || (newLongitude < -180))
   {
     std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     free(initial);
     return false;
@@ -623,7 +623,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 bool versionParse(const std::string& version, int& mayor, int& minor, std::string& bugFix)
 {
   char*  copy = strdup(version.c_str());
-  char*  s    = wsStrip(copy);
+  char*  s    = stringStrip(copy);
   char*  dotP;
 
 
@@ -640,7 +640,7 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
   *dotP = 0;
   ++dotP;
 
-  s = wsStrip(s);
+  s = stringStrip(s);
   mayor = atoi(s);
   if (strspn(s, "0123456789") != strlen(s))
   {
@@ -669,7 +669,7 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
     bugFixEmpty = true;
   }
 
-  s = wsStrip(s);
+  s = stringStrip(s);
   minor = atoi(s);
   if (strspn(s, "0123456789") != strlen(s))
   {
@@ -690,7 +690,7 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
   //
   // bugfix
   //
-  s = wsStrip(s);
+  s = stringStrip(s);
   bugFix = s;
 
   free(copy);
@@ -860,7 +860,7 @@ std::string servicePathCheck(const char* servicePath)
     else
     {
       std::string details = std::string("Invalid character '") + *servicePath + "' in Service-Path";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
 
       return "Bad Character in Service-Path";
     }

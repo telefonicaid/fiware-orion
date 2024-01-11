@@ -87,7 +87,7 @@ std::string getAttributeValueInstanceWithTypeAndId
   std::string              entityTypeFromParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
   EntityTypeInfo           typeInfo             = EntityTypeEmptyOrNotEmpty;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
 
   // 01. Get values from URL (entityId::type, exist, !exist)
@@ -105,12 +105,12 @@ std::string getAttributeValueInstanceWithTypeAndId
   if (typeInfo == EntityTypeEmpty)
   {
     response.statusCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(orionldState.clientIp, "entity::type cannot be empty for this request");
   }
   else if ((entityTypeFromParam != "") && (entityTypeFromParam != entityTypeFromPath))
   {
     response.statusCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(orionldState.clientIp, "non-matching entity::types in URL");
   }
   else
   {

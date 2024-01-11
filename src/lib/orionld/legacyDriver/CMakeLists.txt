@@ -42,6 +42,24 @@ SET (SOURCES
     legacyDeleteRegistration.cpp
     legacyPatchRegistration.cpp
     legacyGetEntity.cpp
+    metadataAdd.cpp
+    kjTreeToContextAttribute.cpp
+    kjTreeToUpdateContextRequest.cpp
+    kjTreeFromCompoundValue.cpp
+    kjTreeFromQueryContextResponse.cpp
+    kjTreeFromContextAttribute.cpp
+    kjTreeFromRegistration.cpp
+    kjTreeFromSubscription.cpp
+    kjTreeToRegistration.cpp
+    kjTreeToEntIdVector.cpp
+    kjTreeToSubscription.cpp
+    kjTreeToSubscriptionExpression.cpp
+    kjTreeToMetadata.cpp
+    kjTreeToEndpoint.cpp
+    kjTreeToNotification.cpp
+    kjTreeFromNotification.cpp
+    kjTreeToStringList.cpp
+    kjTreeToCompoundValue.cpp
 )
 
 # Include directories

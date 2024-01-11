@@ -49,6 +49,7 @@ extern "C"
 #include "orionld/common/dotForEq.h"                             // dotForEq
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/tenantList.h"                           // tenant0
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
 #include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_STRING
@@ -57,12 +58,12 @@ extern "C"
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
 #include "orionld/kjTree/kjTreeRegistrationInfoExtract.h"        // kjTreeRegistrationInfoExtract
-#include "orionld/kjTree/kjTreeToCompoundValue.h"                // kjTreeToCompoundValue
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributeLookup.h"   // mongoCppLegacyEntityAttributeLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"      // mongoCppLegacyEntityFieldReplace
 #include "orionld/mongoCppLegacy/mongoCppLegacyRegistrationLookup.h"      // mongoCppLegacyRegistrationLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyDatasetGet.h"              // mongoCppLegacyDatasetGet
-#include "orionld/legacyDriver/legacyPatchAttribute.h"           // Own Interface
+#include "orionld/legacyDriver/kjTreeToCompoundValue.h"                   // kjTreeToCompoundValue
+#include "orionld/legacyDriver/legacyPatchAttribute.h"                    // Own Interface
 
 
 
@@ -90,7 +91,7 @@ do {                                                                  \
 // 5. Merge - use kjAttributeMerge (will need some altering for datasetId)
 // 6. Replace db.entities.entityId.attrs.attrNameExpandedEq with the merged attribute
 //
-//    orionldMhdConnectionTreat takes care of TRoE
+//    mhdConnectionTreat takes care of TRoE
 //
 bool orionldPatchAttributeWithDatasetId(KjNode* inAttribute, char* entityId, char* attrName, char* attrNameExpandedEq, const char* datasetId)
 {
@@ -419,7 +420,7 @@ static bool orionldForwardPatchAttribute
   if (regInfoOk == false)
     return false;
 
-  const char*  contentType = (orionldState.in.contentType == JSONLD)? "application/ld+json" : "application/json";
+  const char*  contentType = (orionldState.in.contentType == MT_JSONLD)? "application/ld+json" : "application/json";
   int          payloadLen  = strlen(orionldState.in.payloadCopy);
   bool         tryAgain;
   bool         downloadFailed;
@@ -580,7 +581,19 @@ bool kjAttributeToNgsiContextAttribute(ContextAttribute* caP, KjNode* inAttribut
       metadataP->valueType   = orion::ValueTypeNumber;
 
       if (mdP->type == KjString)
-        metadataP->numberValue = parse8601Time(mdP->value.s);
+      {
+        char errorString[256];
+
+        double timestamp = dateTimeFromString(mdP->value.s, errorString, sizeof(errorString));
+
+        if (timestamp < 0)
+        {
+          *detailP = errorString;
+          return false;
+        }
+        else
+          metadataP->numberValue = timestamp;
+      }
       else
       {
         KjNode* valueP         = mdP->value.firstChildP;

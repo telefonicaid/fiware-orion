@@ -173,7 +173,7 @@ bool orionldGetEntitiesLocal
 {
   char* geojsonGeometryLongName = NULL;
 
-  if (orionldState.out.contentType == GEOJSON)
+  if (orionldState.out.contentType == MT_GEOJSON)
   {
     if ((geometryProperty != NULL) && (strcmp(geometryProperty, "location") != 0))
       geojsonGeometryLongName = orionldContextItemExpand(orionldState.contextP, geometryProperty, true, NULL);
@@ -202,13 +202,13 @@ bool orionldGetEntitiesLocal
   }
   else
   {
-    KjNode*       apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
-    RenderFormat  rf              = RF_NORMALIZED;
+    KjNode*              apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
+    OrionldRenderFormat  rf              = RF_NORMALIZED;
 
     if      (orionldState.uriParamOptions.concise   == true) rf = RF_CONCISE;
-    else if (orionldState.uriParamOptions.keyValues == true) rf = RF_KEYVALUES;
+    else if (orionldState.uriParamOptions.keyValues == true) rf = RF_SIMPLIFIED;
 
-    if (orionldState.out.contentType == GEOJSON)
+    if (orionldState.out.contentType == MT_GEOJSON)
     {
       KjNode* geojsonToplevelP = kjObject(orionldState.kjsonP, NULL);
       KjNode* featuresP        = kjArray(orionldState.kjsonP, "features");  // this is where all entities go

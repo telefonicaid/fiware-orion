@@ -353,7 +353,7 @@ bool orionldGetEntity(void)
   {
     // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
 
-    if      (orionldState.out.format == RF_KEYVALUES)  ntosEntity(apiEntityP, lang);
+    if      (orionldState.out.format == RF_SIMPLIFIED) ntosEntity(apiEntityP, lang);
     else if (orionldState.out.format == RF_CONCISE)    ntocEntity(apiEntityP, lang, sysAttrs);
     else                                               ntonEntity(apiEntityP, lang, sysAttrs);
   }
@@ -361,7 +361,7 @@ bool orionldGetEntity(void)
   if ((apiEntityP != NULL) && (sysAttrs == false))
     kjSysAttrsRemove(apiEntityP, 2);
 
-  if (orionldState.out.contentType == GEOJSON)
+  if (orionldState.out.contentType == MT_GEOJSON)
   {
     apiEntityP = kjGeojsonEntityTransform(apiEntityP,
                                           orionldState.geoPropertyNode,

@@ -63,7 +63,7 @@ std::string getAttributesForEntityType
   EntityTypeResponse  response;
   std::string         entityTypeName = compV[2];
   char*               attrFormat     = orionldState.uriParams.attributeFormat;
-  bool                asJsonObject   = ((attrFormat != NULL) && (strcmp(attrFormat, "object") == 0)) && (orionldState.out.contentType == JSON);
+  bool                asJsonObject   = ((attrFormat != NULL) && (strcmp(attrFormat, "object") == 0)) && (orionldState.out.contentType == MT_JSON);
 
   response.statusCode.fill(SccOk);
 
@@ -78,7 +78,7 @@ std::string getAttributesForEntityType
   std::string rendered;
   TIMED_RENDER(rendered = response.render(orionldState.apiVersion,
                                           asJsonObject,
-                                          orionldState.out.contentType == JSON,
+                                          orionldState.out.contentType == MT_JSON,
                                           orionldState.uriParams.collapse));
 
   response.release();

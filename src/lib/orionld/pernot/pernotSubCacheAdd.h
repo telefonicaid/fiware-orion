@@ -30,13 +30,12 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "common/RenderFormat.h"                               // RenderFormat
-
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/types/QNode.h"                               // QNode
 #include "orionld/types/PernotSubscription.h"                  // PernotSubscription
 #include "orionld/types/PernotSubCache.h"                      // PernotSubCache
 #include "orionld/types/OrionldContext.h"                      // OrionldContext
+#include "orionld/types/OrionldRenderFormat.h"                 // OrionldRenderFormat
 
 
 
@@ -46,17 +45,17 @@ extern "C"
 //
 extern PernotSubscription* pernotSubCacheAdd
 (
-  char*            subscriptionId,
-  KjNode*          subP,
-  KjNode*          endpointP,
-  QNode*           qTree,
-  KjNode*          geoCoordinatesP,
-  OrionldContext*  contextP,
-  OrionldTenant*   tenantP,
-  KjNode*          showChangesP,
-  KjNode*          sysAttrsP,
-  RenderFormat     renderFormat,
-  double           timeInterval
+  char*                subscriptionId,
+  KjNode*              subP,
+  KjNode*              endpointP,
+  QNode*               qTree,
+  KjNode*              geoCoordinatesP,
+  OrionldContext*      contextP,
+  OrionldTenant*       tenantP,
+  KjNode*              showChangesP,
+  KjNode*              sysAttrsP,
+  OrionldRenderFormat  renderFormat,
+  double               timeInterval
 );
 
 #endif  // SRC_LIB_ORIONLD_PERNOT_PERNOTSUBCACHEADD_H_

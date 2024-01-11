@@ -34,7 +34,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "cache/subCache.h"                                    // subCacheItemLookup, CachedSubscription
 
 #include "orionld/types/QNode.h"                               // QNode
@@ -44,6 +43,7 @@ extern "C"
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/uuidGenerate.h"                       // uuidGenerate
 #include "orionld/common/subCacheApiSubscriptionInsert.h"      // subCacheApiSubscriptionInsert
+#include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
 #include "orionld/legacyDriver/legacyPostSubscriptions.h"      // legacyPostSubscriptions
 #include "orionld/kjTree/kjChildPrepend.h"                     // kjChildPrepend
 #include "orionld/dbModel/dbModelFromApiSubscription.h"        // dbModelFromApiSubscription
@@ -73,24 +73,24 @@ bool orionldPostSubscriptions(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))
     return legacyPostSubscriptions();  // this will be removed!! (after thorough testing)
 
-  KjNode*       subP            = orionldState.requestTree;
-  KjNode*       subIdP          = orionldState.payloadIdNode;
-  KjNode*       endpointP       = NULL;
-  KjNode*       ldqNodeP        = NULL;
-  KjNode*       uriP            = NULL;
-  KjNode*       notifierInfoP   = NULL;
-  KjNode*       geoCoordinatesP = NULL;
-  QNode*        qTree           = NULL;
-  char*         qRenderedForDb  = NULL;
-  bool          mqtt            = false;
-  char*         subId           = NULL;
-  bool          b               = false;
-  bool          qValidForV2     = false;
-  bool          qIsMq           = false;
-  KjNode*       showChangesP    = NULL;
-  KjNode*       sysAttrsP       = NULL;
-  double        timeInterval    = 0;
-  RenderFormat  renderFormat    = RF_NORMALIZED;
+  KjNode*              subP            = orionldState.requestTree;
+  KjNode*              subIdP          = orionldState.payloadIdNode;
+  KjNode*              endpointP       = NULL;
+  KjNode*              ldqNodeP        = NULL;
+  KjNode*              uriP            = NULL;
+  KjNode*              notifierInfoP   = NULL;
+  KjNode*              geoCoordinatesP = NULL;
+  QNode*               qTree           = NULL;
+  char*                qRenderedForDb  = NULL;
+  bool                 mqtt            = false;
+  char*                subId           = NULL;
+  bool                 b               = false;
+  bool                 qValidForV2     = false;
+  bool                 qIsMq           = false;
+  KjNode*              showChangesP    = NULL;
+  KjNode*              sysAttrsP       = NULL;
+  double               timeInterval    = 0;
+  OrionldRenderFormat  renderFormat    = RF_NORMALIZED;
 
   b = pCheckSubscription(subP,
                          true,

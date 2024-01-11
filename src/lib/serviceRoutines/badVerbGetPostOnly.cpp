@@ -26,9 +26,9 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
-#include "orionld/common/orionldState.h"             // orionldState
+#include "orionld/types/ApiVersion.h"                     // ApiVersion
+#include "orionld/common/orionldState.h"                  // orionldState
 
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
@@ -57,14 +57,14 @@ std::string badVerbGetPostOnly
   char*        allowed;
 
   // OPTIONS verb is only available for V2 API
-  if ((corsEnabled == true) && (orionldState.apiVersion == V2))    allowed = (char*) "POST, GET, OPTIONS";
-  else                                                             allowed = (char*) "POST, GET";
+  if ((corsEnabled == true) && (orionldState.apiVersion == API_VERSION_NGSI_V2))  allowed = (char*) "POST, GET, OPTIONS";
+  else                                                                            allowed = (char*) "POST, GET";
 
   orionldHeaderAdd(&orionldState.out.headers, HttpAllow, allowed, 0);
   orionldState.httpStatusCode = SccBadVerb;
-  alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInput(orionldState.clientIp, details);
 
-  if (orionldState.apiVersion == V1 || orionldState.apiVersion == NO_VERSION)
+  if (orionldState.apiVersion == API_VERSION_NGSI_V1 || orionldState.apiVersion == API_VERSION_NONE)
     return "";
 
   OrionError oe(SccBadVerb, ERROR_DESC_BAD_VERB);

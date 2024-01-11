@@ -56,7 +56,7 @@ static std::string duration(const std::string& path, const std::string& value, P
   if ((s = parseDataP->ucsr.res.duration.check()) != "OK")
   {
     std::string details = std::string("error parsing duration '") + parseDataP->ucsr.res.duration.get() + "': " + s;
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
   }
 
   return "OK";

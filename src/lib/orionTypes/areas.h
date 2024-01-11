@@ -29,7 +29,11 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/ApiVersion.h"
+
 #include "common/globals.h"
+
+
 
 namespace orion
 {

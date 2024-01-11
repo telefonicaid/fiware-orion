@@ -67,7 +67,7 @@ void QueueNotifier::sendNotifyContextRequest
   const std::string&               tenant,
   const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  attrsOrder,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist

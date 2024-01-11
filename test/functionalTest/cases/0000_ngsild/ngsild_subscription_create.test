@@ -771,12 +771,13 @@ bye
 13. Attempt to create a subscription with an expiresAt in the past
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 127
+Content-Length: 147
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "/expiresAt/ in the past",
+    "field": "expiresAt",
     "title": "Invalid Subscription",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

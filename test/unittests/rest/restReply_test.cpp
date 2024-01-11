@@ -50,7 +50,7 @@ TEST(restReply, MHD_create_response_from_data_error)
 
   utInit();
 
-  orionldState.verb = GET;
+  orionldState.verb = HTTP_GET;
 
   if (answer != NULL)
   {
@@ -76,7 +76,7 @@ TEST(restReply, json)
 
   utInit();
 
-  orionldState.verb = GET;
+  orionldState.verb = HTTP_GET;
 
   restReply(&ci, "123");
 

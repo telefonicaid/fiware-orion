@@ -25,7 +25,10 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+
+#include "orionld/types/ApiVersion.h"                   // ApiVersion
+#include "orionld/common/orionldState.h"                // orionldState
+#include "orionld/common/eqForDot.h"                    // eqForDot
 
 #include "common/tag.h"
 #include "common/RenderFormat.h"
@@ -37,9 +40,6 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/safeMongo.h"
 #include "mongoBackend/compoundResponses.h"
-
-#include "orionld/common/orionldState.h"                // orionldState
-#include "orionld/common/eqForDot.h"                    // eqForDot
 
 using namespace mongo;
 
@@ -267,7 +267,7 @@ ContextElementResponse::ContextElementResponse
       caP->metadataVector.push_back(md);
     }
 
-    if (apiVersion == V1)
+    if (apiVersion == API_VERSION_NGSI_V1)
     {
       /* Setting location metadata (if found) */
       if ((locAttr == ca.name) && (ca.type != GEO_POINT))
@@ -375,7 +375,7 @@ std::string ContextElementResponse::render
 */
 std::string ContextElementResponse::toJson
 (
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
@@ -467,7 +467,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
   //
   if (qcrP->contextElementResponseVector.size() > 1)
   {
-    alarmMgr.badInput(clientIp, "more than one context element found the this query - selecting the first one");
+    alarmMgr.badInput(orionldState.clientIp, "more than one context element found the this query - selecting the first one");
   }
 
   contextElement.fill(&qcrP->contextElementResponseVector[0]->contextElement);

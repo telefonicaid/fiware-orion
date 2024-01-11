@@ -27,9 +27,9 @@
 #include <sstream>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+
+#include "orionld/types/OrionldRenderFormat.h"
 #include "common/RenderFormat.h"
-#include "common/wsStrip.h"
 
 
 
@@ -37,25 +37,27 @@
 *
 * renderFormatToString - 
 */
-const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLegacyWord)
+const char* renderFormatToString(OrionldRenderFormat format, bool noDefault, bool useLegacyWord)
 {
   switch (format)
   {
   case RF_LEGACY:                         return useLegacyWord ? "legacy" : "JSON";
   case RF_NORMALIZED:                     return "normalized";
-  case RF_KEYVALUES:                      return "keyValues";
+  case RF_SIMPLIFIED:                     return "keyValues";
   case RF_VALUES:                         return "values";
   case RF_UNIQUE_VALUES:                  return "uniqueValues";
   case RF_CUSTOM:                         return "custom";
   case RF_CONCISE:                        return "concise";
   case RF_CROSS_APIS_NORMALIZED:          return "normalized";
-  case RF_CROSS_APIS_KEYVALUES:           return "keyValues";
+  case RF_CROSS_APIS_SIMPLIFIED:          return "keyValues";
   case RF_CROSS_APIS_NORMALIZED_COMPACT:  return "normalized";
-  case RF_CROSS_APIS_KEYVALUES_COMPACT:   return "keyValues";
+  case RF_CROSS_APIS_SIMPLIFIED_COMPACT:  return "keyValues";
   case RF_NONE:
     if      (noDefault == true)           return "no render format";
     else if (useLegacyWord == true)       return "legacy";
     else                                  return "JSON";
+  default:
+    return "Unknown render format";
   }
 
   return "Unknown render format";
@@ -67,13 +69,13 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
 *
 * stringToRenderFormat -
 */
-RenderFormat stringToRenderFormat(const char* s, bool noDefault)
+OrionldRenderFormat stringToRenderFormat(const char* s, bool noDefault)
 {
   if (strcmp(s, "JSON")         == 0) return RF_LEGACY;          // DB content for NGSIv1 rendering due to legacy reasons
   if (strcmp(s, "legacy")       == 0) return RF_LEGACY;
   if (strcmp(s, "normalized")   == 0) return RF_NORMALIZED;
-  if (strcmp(s, "keyValues")    == 0) return RF_KEYVALUES;
-  if (strcmp(s, "simplified")   == 0) return RF_KEYVALUES;
+  if (strcmp(s, "keyValues")    == 0) return RF_SIMPLIFIED;
+  if (strcmp(s, "simplified")   == 0) return RF_SIMPLIFIED;
   if (strcmp(s, "concise")      == 0) return RF_CONCISE;
   if (strcmp(s, "values")       == 0) return RF_VALUES;
   if (strcmp(s, "uniqueValues") == 0) return RF_UNIQUE_VALUES;
@@ -81,9 +83,9 @@ RenderFormat stringToRenderFormat(const char* s, bool noDefault)
 
   if (strcmp(s, "x-ngsiv2")                      == 0) return RF_CROSS_APIS_NORMALIZED_COMPACT;
   if (strcmp(s, "x-ngsiv2-normalized")           == 0) return RF_CROSS_APIS_NORMALIZED;
-  if (strcmp(s, "x-ngsiv2-keyValues")            == 0) return RF_CROSS_APIS_KEYVALUES;
+  if (strcmp(s, "x-ngsiv2-keyValues")            == 0) return RF_CROSS_APIS_SIMPLIFIED;
   if (strcmp(s, "x-ngsiv2-normalized-compacted") == 0) return RF_CROSS_APIS_NORMALIZED_COMPACT;
-  if (strcmp(s, "x-ngsiv2-keyValues-compacted")  == 0) return RF_CROSS_APIS_KEYVALUES_COMPACT;
+  if (strcmp(s, "x-ngsiv2-keyValues-compacted")  == 0) return RF_CROSS_APIS_SIMPLIFIED_COMPACT;
 
   return (noDefault == false)? DEFAULT_RENDER_FORMAT : RF_NONE;
 }

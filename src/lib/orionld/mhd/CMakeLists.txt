@@ -21,9 +21,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
-    orionldMhdConnectionInit.cpp
-    orionldMhdConnectionPayloadRead.cpp
-    orionldMhdConnectionTreat.cpp
+    mhdConnectionInit.cpp
+    mhdConnectionPayloadRead.cpp
+    mhdConnectionTreat.cpp
+    mhdReply.cpp
 )
 
 # Include directories

@@ -175,7 +175,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "type": "Point"
     },
     "origin": "cache",
-    "registrationName": "R1",    
+    "registrationName": "R1",
     "status": "active",
     "type": "ContextSourceRegistration"
 }
@@ -222,7 +222,7 @@ MongoDB server version: REGEX(.*)
 		"endAt" : 1861869600.456
 	},
 	"managementInterval" : {
-		"startAt" : 1514714400.7979999,
+		"startAt" : 1514714400.798,
 		"endAt" : 1830247200.12
 	},
 	"location" : {

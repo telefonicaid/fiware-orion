@@ -27,6 +27,8 @@ SET (SOURCES
     OrionldGeometry.cpp
     OrionldGeorel.cpp
     OrionldAlteration.cpp
+    OrionldRenderFormat.cpp
+    OrionldMimeType.cpp
     KeyValue.cpp
     OrionldResponseErrorType.cpp
     RegistrationMode.cpp
@@ -34,6 +36,7 @@ SET (SOURCES
     StringArray.cpp
     DistOpType.cpp
     TroeMode.cpp
+    Verb.cpp
 )
 
 # Include directories

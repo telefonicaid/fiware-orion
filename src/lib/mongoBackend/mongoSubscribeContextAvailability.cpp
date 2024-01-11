@@ -121,8 +121,8 @@ HttpStatusCode mongoSubscribeContextAvailability
   sub.append(CASUB_ATTRS, attrs.arr());
 
   //
-  // FIXME P5: RenderFormat right now hardcoded to "JSON" (RF_LEGACY),
-  //           in the future the RenderFormat will be taken from the payload
+  // FIXME P5: OrionldRenderFormat right now hardcoded to "JSON" (RF_LEGACY),
+  //           in the future the OrionldRenderFormat will be taken from the payload
   //
 
   /* Adding format to use in notifications */
@@ -138,8 +138,8 @@ HttpStatusCode mongoSubscribeContextAvailability
   }
 
   //
-  // FIXME P5: RenderFormat right now hardcoded to RF_LEGACY,
-  //           in the future the RenderFormat will be taken from the payload
+  // FIXME P5: OrionldRenderFormat right now hardcoded to RF_LEGACY,
+  //           in the future the OrionldRenderFormat will be taken from the payload
   //
   /* Send notifications for matching context registrations */
   processAvailabilitySubscription(requestP->entityIdVector,

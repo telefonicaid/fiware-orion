@@ -179,7 +179,7 @@ void orionldStateInit(MHD_Connection* connection)
   //
   // Outgoing HTTP headers
   //
-  orionldState.out.contentType    = JSON;              // Default response Content-Type is "application/json"
+  orionldState.out.contentType    = MT_JSON;           // Default response Content-Type is "application/json"
   orionldHeaderSetInit(&orionldState.out.headers, 5);  // 5 response headers, to start with
 
   //
@@ -252,7 +252,7 @@ void orionldStateRelease(void)
 
 #if 0
   //
-  // This was added to fix a leak in contextToPayload(), orionldMhdConnectionTreat.cpp, calling kjClone(). a number of times
+  // This was added to fix a leak in contextToPayload(), mhdConnectionTreat.cpp, calling kjClone(). a number of times
   // It happens for responses to GET that contain more than one item in the entity array.
   // Each item in the entity array needs a cloned context
   //
@@ -287,12 +287,6 @@ void orionldStateRelease(void)
 
   if (orionldState.qMongoFilterP != NULL)
     delete orionldState.qMongoFilterP;
-
-  if (orionldState.compoundValueRoot != NULL)
-  {
-    delete orionldState.compoundValueRoot;
-    orionldState.compoundValueRoot = NULL;
-  }
 }
 
 

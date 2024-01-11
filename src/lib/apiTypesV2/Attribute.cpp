@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/ApiVersion.h"
+
 #include "common/tag.h"
 #include "common/errorMessages.h"
 #include "common/RenderFormat.h"
@@ -50,7 +52,7 @@ std::string Attribute::render
   bool                comma                // in parameter
 )
 {
-  RenderFormat renderFormat = (keyValues == true)? RF_KEYVALUES : RF_NORMALIZED;
+  OrionldRenderFormat renderFormat = (keyValues == true)? RF_KEYVALUES : RF_NORMALIZED;
 
   if (pcontextAttribute)
   {
@@ -58,7 +60,7 @@ std::string Attribute::render
 
     if (requestType == EntityAttributeValueRequest)
     {
-      out = pcontextAttribute->toJsonAsValue(V2,
+      out = pcontextAttribute->toJsonAsValue(API_VERSION_NGSI_V2,
                                              outFormat,
                                              outContentTypeP,
                                              scP);

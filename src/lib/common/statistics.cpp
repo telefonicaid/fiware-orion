@@ -283,11 +283,11 @@ void timingStatisticsReset(void)
 */
 void statisticsUpdate(RequestType request, MimeType inContentType)
 {
-  if (inContentType == JSON)
+  if (inContentType == MT_JSON)
   {
     ++noOfJsonRequests;
   }
-  else if (inContentType == NOMIMETYPE)
+  else if (inContentType == MT_NONE)
   {
     // FIXME P4: Include this counter in the statistics (Issue #1400)
     ++noOfRequestsWithoutPayload;

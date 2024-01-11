@@ -88,7 +88,7 @@ std::string postAllEntitiesWithTypeAndId
   std::string                   answer;
   AppendContextElementResponse  response;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   // FIXME P1: AttributeDomainName skipped
   // FIXME P1: domainMetadataVector skipped
@@ -110,7 +110,7 @@ std::string postAllEntitiesWithTypeAndId
   {
     std::string  out;
 
-    alarmMgr.badInput(clientIp, "unknown field");
+    alarmMgr.badInput(orionldState.clientIp, "unknown field");
     response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
 
     TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
@@ -122,7 +122,7 @@ std::string postAllEntitiesWithTypeAndId
   // 03. Check validity of URI params
   if (typeInfo == EntityTypeEmpty)
   {
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(orionldState.clientIp, "entity::type cannot be empty for this request");
 
     response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
     response.entity.fill(entityId, entityType, "false");
@@ -134,7 +134,7 @@ std::string postAllEntitiesWithTypeAndId
   }
   else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
   {
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(orionldState.clientIp, "non-matching entity::types in URL");
 
     response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
     response.entity.fill(entityId, entityType, "false");

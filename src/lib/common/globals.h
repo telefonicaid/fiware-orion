@@ -163,21 +163,6 @@ typedef enum Ngsiv2Flavour
 
 /* ****************************************************************************
 *
-*  NGSI API version -
-*/
-typedef enum ApiVersion
-{
-  NO_VERSION  = -1,
-  ADMIN_API   = 0,
-  V1          = 1,
-  V2          = 2,
-  NGSI_LD_V1  = 3
-} ApiVersion;
-
-
-
-/* ****************************************************************************
-*
 * PERMANENT_EXPIRES_DATETIME - date for permanent subscriptions/registrations
 */
 #define PERMANENT_EXPIRES_DATETIME  LLONG_MAX
@@ -302,17 +287,6 @@ extern int64_t toSeconds(int value, char what, bool dayPart);
 *
 */
 extern int64_t parse8601(const std::string& s);
-
-
-
-/*****************************************************************************
-*
-* parse8601Time -
-*
-* This is common code for Duration and Throttling (at least)
-*
-*/
-extern double parse8601Time(char* ss);
 
 
 

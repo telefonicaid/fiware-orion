@@ -58,6 +58,7 @@
 #include "parse/CompoundValueNode.h"
 #include "parse/forbiddenChars.h"
 
+#include "jsonParse/jsonRequest.h"                               //  compoundInfo
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonParse.h"
 
@@ -168,7 +169,7 @@ static bool treat
       {
         std::string details = std::string("found a forbidden value in '") + value + "'";
           
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(orionldState.clientIp, details);
         orionldState.httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
         return false;
@@ -268,7 +269,7 @@ void eatCompound
   {
     LM_T(LmtLegacy, ("COMPOUND: '%s'", nodeName.c_str()));
     containerP = new CompoundValueNode(ValueTypeObject);
-    orionldState.compoundValueRoot = containerP;
+    compoundInfo.compoundValueRoot = containerP;
   }
   else
   {
@@ -277,7 +278,7 @@ void eatCompound
       if (forbiddenChars(nodeValue.c_str()) == true)
       {
         std::string details = std::string("found a forbidden value in compound '") + nodeValue + "'";
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(orionldState.clientIp, details);
 
         orionldState.httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Illegal value for JSON field");
@@ -358,7 +359,7 @@ static std::string jsonParse
     // This detects whether we are trying to use an object within an object instead of an one-item array.
     // We don't allow the first case, hence the exception thrown.
     // However, this restriction is not valid inside Compound Values.
-    if ((nodeName != arrayElementName) || (orionldState.inCompoundValue == true))
+    if ((nodeName != arrayElementName) || (compoundInfo.inCompoundValue == true))
     {
       path = path + "/" + nodeName;
     }
@@ -397,10 +398,10 @@ static std::string jsonParse
     if (ciP->answer == "")
     {
       ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();
-      alarmMgr.badInput(clientIp, ciP->answer);
+      alarmMgr.badInput(orionldState.clientIp, ciP->answer);
     }
 
-    alarmMgr.badInput(clientIp, ciP->answer);
+    alarmMgr.badInput(orionldState.clientIp, ciP->answer);
     return ciP->answer;
   }
 
@@ -416,7 +417,7 @@ static std::string jsonParse
     if (out != "OK")
     {
       std::string details = std::string("JSON parse error: '") + out + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
       return out;
     }
   }
@@ -531,7 +532,7 @@ std::string jsonParse
     if (res != "OK")
     {
       std::string details = std::string("JSON parse error: '") + res + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
       return res;
     }
   }

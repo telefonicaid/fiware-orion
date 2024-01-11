@@ -37,7 +37,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/globals.h"                                      // parse8601Time
 #include "orionTypes/OrionValueType.h"                           // orion::ValueType
 #include "orionTypes/UpdateActionType.h"                         // ActionType
 #include "parse/CompoundValueNode.h"                             // CompoundValueNode
@@ -67,7 +66,7 @@ extern "C"
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/payloadCheck/pCheckEntity.h"                   // pCheckEntity
 #include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
-#include "orionld/kjTree/kjTreeToUpdateContextRequest.h"         // kjTreeToUpdateContextRequest
+#include "orionld/legacyDriver/kjTreeToUpdateContextRequest.h"   // kjTreeToUpdateContextRequest
 #include "orionld/kjTree/kjEntityArrayErrorPurge.h"              // kjEntityArrayErrorPurge
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityListLookupWithIdTypeCreDate.h"   // mongoCppLegacyEntityListLookupWithIdTypeCreDate
 #include "orionld/legacyDriver/legacyPostBatchCreate.h"          // Own Interface
@@ -167,7 +166,7 @@ static KjNode* idArrayGet(KjNode* treeP, KjNode* errorsArrayP)
 bool legacyPostBatchCreate(void)
 {
   orionldState.noLinkHeader    = true;
-  orionldState.out.contentType = JSON;
+  orionldState.out.contentType = MT_JSON;
 
   ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
   EMPTY_ARRAY_CHECK(orionldState.requestTree, "incoming payload body");
@@ -333,7 +332,7 @@ bool legacyPostBatchCreate(void)
       {
         const char* entityId = mongoResponse.contextElementResponseVector.vec[ix]->contextElement.entityId.id.c_str();
 
-        if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == SccOk)
+        if (mongoResponse.contextElementResponseVector.vec[ix]->statusCode.code == 200)
           entitySuccessPush(successArrayP, entityId);
         else
           entityErrorPush(errorsArrayP,
@@ -376,13 +375,13 @@ bool legacyPostBatchCreate(void)
   {
     orionldState.httpStatusCode  = 201;
     orionldState.responseTree    = successArrayP;
-    orionldState.out.contentType = JSON;
+    orionldState.out.contentType = MT_JSON;
   }
   else
   {
     orionldState.httpStatusCode  = 207;
     orionldState.responseTree    = kjObject(orionldState.kjsonP, NULL);
-    orionldState.out.contentType = JSON;
+    orionldState.out.contentType = MT_JSON;
 
     kjChildAdd(orionldState.responseTree, successArrayP);
     kjChildAdd(orionldState.responseTree, errorsArrayP);

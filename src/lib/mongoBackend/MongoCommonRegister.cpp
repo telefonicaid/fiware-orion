@@ -289,7 +289,7 @@ static bool addTriggeredSubscriptions
       // FIXME P4: Once ctx availability notification formats get defined for NGSIv2,
       //           the first parameter for TriggeredSubscription will have "normalized" as default value
       //
-      RenderFormat           renderFormat = sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(&sub, CASUB_FORMAT)) : RF_LEGACY;
+      OrionldRenderFormat    renderFormat = sub.hasField(CASUB_FORMAT)? stringToRenderFormat(getStringFieldF(&sub, CASUB_FORMAT)) : RF_LEGACY;
       TriggeredSubscription* trigs        = new TriggeredSubscription(renderFormat, httpInfo, subToAttributeList(&sub));
 
       subs.insert(std::pair<std::string, TriggeredSubscription*>(subIdStr, trigs));

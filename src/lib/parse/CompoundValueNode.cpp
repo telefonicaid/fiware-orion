@@ -25,14 +25,14 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+
+#include "orionld/types/ApiVersion.h"
 
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
-
 #include "orionTypes/OrionValueType.h"
 #include "parse/CompoundValueNode.h"
 
@@ -589,7 +589,7 @@ std::string CompoundValueNode::check(void)
         rootP->error =
           std::string("bad tag-name of vector item: /") + childV[ix]->name + "/, should be /" + childV[0]->name + "/";
 
-        alarmMgr.badInput(clientIp, rootP->error);
+        alarmMgr.badInput(orionldState.clientIp, rootP->error);
         return rootP->error;
       }
     }
@@ -608,7 +608,7 @@ std::string CompoundValueNode::check(void)
         if (childV[ix]->name == childV[ix2]->name)
         {
           rootP->error = std::string("duplicated tag-name: /") + childV[ix]->name + "/ in path: " + path;
-          alarmMgr.badInput(clientIp, rootP->error);
+          alarmMgr.badInput(orionldState.clientIp, rootP->error);
 
           return rootP->error;
         }
@@ -619,7 +619,7 @@ std::string CompoundValueNode::check(void)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute");
+      alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the value of an attribute");
       return "Invalid characters in attribute value";
     }
   }
@@ -653,7 +653,7 @@ std::string CompoundValueNode::render(ApiVersion apiVersion, bool noComma, bool 
   if (noComma == true)
     jsonComma = false;
 
-  if (apiVersion == V2)
+  if (apiVersion == API_VERSION_NGSI_V2)
     return toJson(true, false); // FIXME P8: The info on comma-after-or-not is not available here ...
 
 

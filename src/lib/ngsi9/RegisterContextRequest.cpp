@@ -75,19 +75,19 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
 
   if (predetectedError != "")
   {
-    alarmMgr.badInput(clientIp, predetectedError);
+    alarmMgr.badInput(orionldState.clientIp, predetectedError);
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (contextRegistrationVector.size() == 0)
   {
-    alarmMgr.badInput(clientIp, "empty contextRegistration list");
+    alarmMgr.badInput(orionldState.clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   } 
   else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, predetectedError, counter)) != "OK") ||
            ((res = duration.check())                                                                        != "OK") ||
            ((res = registrationId.check())                                                                  != "OK"))
   {
-    alarmMgr.badInput(clientIp, res);
+    alarmMgr.badInput(orionldState.clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
   }
   else

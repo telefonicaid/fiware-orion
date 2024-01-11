@@ -50,14 +50,14 @@ std::string Restriction::check(int counter)
 
   if ((scopeVector.size() == 0) && (attributeExpression.isEmpty()))
   {
-    alarmMgr.badInput(clientIp, "empty restriction");
+    alarmMgr.badInput(orionldState.clientIp, "empty restriction");
     return "empty restriction";
   }
 
   if (((res = scopeVector.check())         != "OK") ||
       ((res = attributeExpression.check()) != "OK"))
   {
-    alarmMgr.badInput(clientIp, res);
+    alarmMgr.badInput(orionldState.clientIp, res);
 
     return res;
   }

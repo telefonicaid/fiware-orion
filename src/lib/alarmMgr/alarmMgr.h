@@ -25,21 +25,10 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/common/orionldState.h"                       // orionldState (easy include to reach orionldState.clientIp)
+
 #include "common/limits.h"
 #include "alarmMgr/AlarmManager.h"
-
-
-
-/* ****************************************************************************
-*
-* clientIp - the IP address of the current peer sending the request
-*
-* This information is needed for all "badInput" reports for the alarm manager
-* It is a thread-variable, only valid while the request is active.
-* A 'global' variable was chosen instead of passing the IP from function
-* to function.
-*/
-extern __thread char clientIp[IP_LENGTH_MAX + 1];
 
 
 

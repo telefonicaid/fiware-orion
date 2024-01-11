@@ -166,11 +166,11 @@ static void mongoSetEntities(ngsiv2::Registration* regP, const mongo::BSONObj* c
       typeGiven = true;
       entity.type = getStringFieldF(&ce, REG_ENTITY_TYPE);
 
-      if (orionldState.apiVersion == NGSI_LD_V1)
+      if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
         entity.type = orionldContextItemAliasLookup(orionldState.contextP, entity.type.c_str(), NULL, NULL);
     }
 
-    if ((typeGiven == true) && (entity.type != "") && (orionldState.apiVersion == NGSI_LD_V1))
+    if ((typeGiven == true) && (entity.type != "") && (orionldState.apiVersion == API_VERSION_NGSILD_V1))
       entity.type = orionldContextItemAliasLookup(orionldState.contextP, entity.type.c_str(), NULL, NULL);
 
     regP->dataProvided.entities.push_back(entity);

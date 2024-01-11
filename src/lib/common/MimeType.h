@@ -27,32 +27,7 @@
 */
 #include <string>
 
-
-
-/* ****************************************************************************
-*
-* DEFAULT_MIMETYPE - 
-*/
-#define DEFAULT_MIMETYPE              JSON
-#define DEFAULT_MIMETYPE_AS_STRING    "JSON"
-
-
-
-/* ****************************************************************************
-*
-* MimeType - 
-*/
-typedef enum MimeType
-{
-  NOMIMETYPEGIVEN  = 0,
-  NOMIMETYPE       = 1,
-  JSON             = 2,
-  TEXT             = 3,
-  HTML             = 4,
-  JSONLD           = 5,
-  GEOJSON          = 6,
-  MERGEPATCHJSON   = 7
-} MimeType;
+#include "orionld/types/OrionldMimeType.h"
 
 
 
@@ -77,6 +52,13 @@ extern const char* mimeTypeToString(MimeType mimeType);
 * stringToMimeType
 */
 extern MimeType stringToMimeType(const std::string& s);
+
+
+
+/* ****************************************************************************
+*
+* longStringToMimeType
+*/
 extern MimeType longStringToMimeType(const char* s);
 
 #endif  // SRC_LIB_COMMON_MIMETYPE_H_

@@ -27,6 +27,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "ngsi/ContextRegistrationResponseVector.h"
 
 
@@ -50,18 +52,18 @@ TEST(ContextRegistrationResponseVector, all)
   crrV.push_back(&crr);
 
   // check OK
-  rendered = crrV.check(V1, RegisterContext, "", 0);
+  rendered = crrV.check(API_VERSION_NGSI_V1, RegisterContext, "", 0);
   EXPECT_EQ("OK", rendered);
 
   // Now telling the crr that we've found an instance of '<entityIdList></entityIdList>
   // but without any entities inside the vector
   crr.contextRegistration.entityIdVectorPresent = true;
-  rendered = crrV.check(V1, RegisterContext, "", 0);
+  rendered = crrV.check(API_VERSION_NGSI_V1, RegisterContext, "", 0);
   EXPECT_EQ("Empty entityIdVector", rendered);
 
   EntityId             eId;   // Empty ID
 
   crr.contextRegistration.entityIdVector.push_back(&eId);
-  rendered = crrV.check(V1, RegisterContext, "", 0);
+  rendered = crrV.check(API_VERSION_NGSI_V1, RegisterContext, "", 0);
   EXPECT_EQ("empty entityId:id", rendered);
 }

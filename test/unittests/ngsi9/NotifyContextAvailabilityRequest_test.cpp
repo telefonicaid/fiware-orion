@@ -29,6 +29,9 @@
 #include "common/globals.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+#include "orionld/types/ApiVersion.h"
+
 #include "unittest.h"
 
 
@@ -46,8 +49,8 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 
   utInit();
 
-  orionldState.verb = POST;
-  orionldState.in.contentType  = JSON;
+  orionldState.verb = HTTP_POST;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -81,7 +84,7 @@ TEST(NotifyContextAvailabilityRequest, check)
 
   utInit();
 
-  out = ncr.check(V1, "");
+  out = ncr.check(API_VERSION_NGSI_V1, "");
   EXPECT_EQ("OK", out);
 
   utExit();

@@ -35,6 +35,8 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"
+
 #include "rest/uriParamNames.h"                // Default values for URI parameters
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
@@ -278,7 +280,7 @@ extern bool entitiesQuery
   bool*                            limitReached   = NULL,
   long long*                       countP         = NULL,
   char*                            sortOrderList  = NULL,
-  ApiVersion                       apiVersion     = V1
+  ApiVersion                       apiVersion     = API_VERSION_NGSI_V1
 );
 
 
@@ -355,7 +357,7 @@ extern mongo::BSONArray processConditionVector
   const std::string&                 subId,
   const ngsiv2::HttpInfo&            httpInfo,
   bool*                              notificationDone,
-  RenderFormat                       renderFormat,
+  OrionldRenderFormat                renderFormat,
   OrionldTenant*                     tenantP,
   const char*                        xauthToken,
   const std::vector<std::string>&    servicePathV,
@@ -377,7 +379,7 @@ extern bool processAvailabilitySubscription(
     const StringList&     attrL,
     const std::string&    subId,
     const std::string&    notifyUrl,
-    RenderFormat          renderFormat,
+    OrionldRenderFormat   renderFormat,
     OrionldTenant*        tenantP,
     const std::string&    fiwareCorrelator
 );

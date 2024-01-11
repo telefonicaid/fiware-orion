@@ -31,9 +31,9 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "common/RenderFormat.h"                                 // RenderFormat
 
 #include "orionld/types/QNode.h"                                 // QNode
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/q/qBuild.h"                                    // qBuild
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/fieldPaths.h"                     // Paths to fields in the payload, e.g. subscriptionNotification = Subscription::notification"
@@ -98,25 +98,25 @@ extern "C"
 //
 bool pCheckSubscription
 (
-  KjNode*        subP,
-  bool           isCreate,          // true if POST, false if PATCH
-  char*          subscriptionId,    // non-NULL if PATCH
-  KjNode*        idP,
-  KjNode*        typeP,
-  KjNode**       endpointP,
-  KjNode**       qNodeP,
-  QNode**        qTreeP,
-  char**         qRenderedForDbP,
-  bool*          qValidForV2P,
-  bool*          qIsMqP,
-  KjNode**       uriPP,
-  KjNode**       notifierInfoPP,
-  KjNode**       geoCoordinatesPP,
-  bool*          mqttChangeP,
-  KjNode**       showChangesP,
-  KjNode**       sysAttrsP,
-  double*        timeInterval,
-  RenderFormat*  renderFormatP
+  KjNode*               subP,
+  bool                  isCreate,          // true if POST, false if PATCH
+  char*                 subscriptionId,    // non-NULL if PATCH
+  KjNode*               idP,
+  KjNode*               typeP,
+  KjNode**              endpointP,
+  KjNode**              qNodeP,
+  QNode**               qTreeP,
+  char**                qRenderedForDbP,
+  bool*                 qValidForV2P,
+  bool*                 qIsMqP,
+  KjNode**              uriPP,
+  KjNode**              notifierInfoPP,
+  KjNode**              geoCoordinatesPP,
+  bool*                 mqttChangeP,
+  KjNode**              showChangesP,
+  KjNode**              sysAttrsP,
+  double*               timeInterval,
+  OrionldRenderFormat*  renderFormatP
 )
 {
   PCHECK_OBJECT(subP, 0, NULL, "A Subscription must be a JSON Object", 400);

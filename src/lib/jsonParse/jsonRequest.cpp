@@ -63,10 +63,20 @@
 
 #include "parse/compoundValue.h"
 #include "rest/restReply.h"
+#include "orionld/types/Verb.h"                   // Verb, verbToString
 
 
+
+// -----------------------------------------------------------------------------
+//
+// FUNCS -
+//
 #define FUNCS(prefix) json##prefix##ParseVector, json##prefix##Init,    \
                       json##prefix##Check,       json##prefix##Release
+
+
+
+__thread CompoundInfo compoundInfo;
 
 
 
@@ -143,7 +153,7 @@ static JsonRequest jsonRequest[] =
 */
 static JsonRequest* jsonRequestGet(RequestType request, Verb verb)
 {
-  std::string method = verbName(verb);
+  std::string method = verbToString(verb);
 
   for (unsigned int ix = 0; ix < sizeof(jsonRequest) / sizeof(jsonRequest[0]); ++ix)
   {
@@ -152,7 +162,7 @@ static JsonRequest* jsonRequestGet(RequestType request, Verb verb)
   }
 
   std::string details = std::string("no request found for RequestType '") + requestType(request) + "'', method '" + method + "'";
-  alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInput(orionldState.clientIp, details);
 
   return NULL;
 }
@@ -200,7 +210,7 @@ std::string jsonTreat
     snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
 
     std::string details = std::string("no request treating object found for RequestType ") + reqTypeV + " (" + requestType(request) + ")";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     return errorReply;
   }
@@ -224,7 +234,7 @@ std::string jsonTreat
     std::string errorReply;
 
     restErrorReplyGet(ciP, SccBadRequest, "JSON Parse Error", &errorReply);
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     return errorReply;
   }
   catch (...)
@@ -232,7 +242,7 @@ std::string jsonTreat
     std::string errorReply;
 
     restErrorReplyGet(ciP, SccBadRequest, "JSON Generic Error", &errorReply);
-    alarmMgr.badInput(clientIp, "JSON parse generic error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON parse generic error");
     return errorReply;
   }
 
@@ -241,26 +251,26 @@ std::string jsonTreat
     std::string details = std::string("JSON parse error: ") + res;
     std::string answer;
     
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     orionldState.httpStatusCode = SccBadRequest;
     restErrorReplyGet(ciP, orionldState.httpStatusCode, res, &answer);
     return answer;
   }
 
-  if (orionldState.inCompoundValue == true)
+  if (compoundInfo.inCompoundValue == true)
   {
     orion::compoundValueEnd(ciP, parseDataP);
   }
-  if ((lmTraceIsSet(LmtLegacy)) && (orionldState.compoundValueP != NULL))
+  if ((lmTraceIsSet(LmtLegacy)) && (compoundInfo.compoundValueP != NULL))
   {
-    orionldState.compoundValueP->shortShow("after parse: ");
+    compoundInfo.compoundValueP->shortShow("after parse: ");
   }
 
   res = reqP->check(parseDataP, ciP);
   if (res != "OK")
   {
     std::string details = reqP->keyword + ": " + res;
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
   }
 
   return res;

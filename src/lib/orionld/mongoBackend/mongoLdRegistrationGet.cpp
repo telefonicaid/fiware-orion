@@ -74,7 +74,7 @@ bool mongoLdRegistrationGet
     TIME_STAT_MONGO_READ_WAIT_STOP();
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
     *detailP     = (char*) "Internal Error during DB-query";
-    *statusCodeP = SccReceiverInternalError;
+    *statusCodeP = 500;
     return false;
   }
   TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -93,7 +93,7 @@ bool mongoLdRegistrationGet
       LM_E(("Runtime Error (exception in nextSafe(): %s - query: %s)", err.c_str(), query.toString().c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       *detailP     = (char*) "Runtime Error (exception in nextSafe)";
-      *statusCodeP = SccReceiverInternalError;
+      *statusCodeP = 500;
       return false;
     }
 
@@ -119,7 +119,7 @@ bool mongoLdRegistrationGet
       releaseMongoConnection(connection);
       LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *statusCodeP = SccReceiverInternalError;
+      *statusCodeP = 500;
       return false;
     }
 
@@ -136,7 +136,7 @@ bool mongoLdRegistrationGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, *detailP));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *statusCodeP = SccReceiverInternalError;
+      *statusCodeP = 500;
       return false;
     }
 
@@ -145,7 +145,7 @@ bool mongoLdRegistrationGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, *detailP));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *statusCodeP = SccReceiverInternalError;
+      *statusCodeP = 500;
       return false;
     }
 
@@ -154,7 +154,7 @@ bool mongoLdRegistrationGet
       LM_E(("Internal Error (mongoSetLdTimeInterval: %s: %s)", title, *detailP));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *statusCodeP = SccReceiverInternalError;
+      *statusCodeP = 500;
       return false;
     }
 
@@ -163,7 +163,7 @@ bool mongoLdRegistrationGet
       LM_E(("Internal Error (mongoSetLdProperties: %s: %s)", title, *detailP));
       releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
-      *statusCodeP = SccReceiverInternalError;
+      *statusCodeP = 500;
       return false;
     }
 
@@ -175,7 +175,7 @@ bool mongoLdRegistrationGet
       // Ooops, we expected only one
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       *detailP    = (char*) "more than one registration matched";
-      *statusCodeP = SccConflict;
+      *statusCodeP = 409;
       return false;
     }
   }
@@ -184,13 +184,13 @@ bool mongoLdRegistrationGet
     releaseMongoConnection(connection);
     reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
     *detailP     = (char*) "registration not found";
-    *statusCodeP = SccContextElementNotFound;
+    *statusCodeP = 404;
     return false;
   }
 
   releaseMongoConnection(connection);
   reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
 
-  *statusCodeP = SccOk;
+  *statusCodeP = 200;
   return true;
 }

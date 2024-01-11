@@ -100,7 +100,7 @@ std::string postIndividualContextEntity
   std::string                   answer;
   std::string                   out;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   //
   // 01. Check that total input in consistent and correct
@@ -111,7 +111,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::id differs in URL and payload";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(orionldState.clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
@@ -124,7 +124,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::type differs in URL and payload";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(orionldState.clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
@@ -138,7 +138,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::isPattern set to true in contextUpdate convenience operation";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(orionldState.clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));
@@ -150,7 +150,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "invalid request: mandatory entityId::id missing";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(orionldState.clientIp, error);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.render(orionldState.apiVersion, asJsonObject, IndividualContextEntity));

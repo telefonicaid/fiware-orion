@@ -26,7 +26,6 @@
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
-#include "common/globals.h"                                    // ApiVersion
 #include "orionld/types/QNode.h"                               // QNode
 #include "orionld/q/qRender.h"                                 // Own interface
 
@@ -93,7 +92,7 @@ static bool qRenderOp(QNode* qP, const char* opString, ApiVersion apiVersion, ch
 //
 static bool qRender(QNode* qP, ApiVersion apiVersion, char* buf, int bufLen, bool* mqP, int* bufIxP)
 {
-  if ((qP->type == QNodeOr) && (apiVersion == V2))
+  if ((qP->type == QNodeOr) && (apiVersion == API_VERSION_NGSI_V2))
     return false;
 
   switch (qP->type)

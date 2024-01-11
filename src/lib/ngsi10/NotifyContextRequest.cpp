@@ -66,7 +66,7 @@ std::string NotifyContextRequest::render(ApiVersion apiVersion, bool asJsonObjec
 */
 std::string NotifyContextRequest::toJson
 (
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist
@@ -75,7 +75,7 @@ std::string NotifyContextRequest::toJson
   if ((renderFormat != RF_NORMALIZED) && (renderFormat != RF_KEYVALUES) && (renderFormat != RF_VALUES))
   {
     OrionError oe(SccBadRequest, "Invalid notification format");
-    alarmMgr.badInput(clientIp, "Invalid notification format");
+    alarmMgr.badInput(orionldState.clientIp, "Invalid notification format");
 
     return oe.toJson();
   }

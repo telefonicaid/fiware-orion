@@ -26,6 +26,8 @@
 
 #include "common/string.h"
 
+#include "orionld/types/ApiVersion.h"                              // ApiVersion
+
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/restServiceLookup.h"
@@ -41,7 +43,7 @@
 */
 RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
 {
-  Verb          verb      = (*badVerbP == false)? orionldState.verb : NOVERB;
+  Verb          verb      = (*badVerbP == false)? orionldState.verb : HTTP_NOVERB;
   RestService*  serviceV  = restServiceVectorGet(verb);
   int           serviceIx = 0;
   bool          match     = false;
@@ -69,7 +71,7 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
         continue;
       }
 
-      if (orionldState.apiVersion == V1)
+      if (orionldState.apiVersion == API_VERSION_NGSI_V1)
       {
         if (strcasecmp(component, ciP->urlCompV[compNo].c_str()) != 0)
         {

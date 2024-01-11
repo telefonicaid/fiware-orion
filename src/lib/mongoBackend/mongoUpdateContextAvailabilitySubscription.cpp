@@ -87,7 +87,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
     if (responseP->errorCode.code == SccContextElementNotFound)
     {
       std::string details = std::string("invalid OID mimeType: '") + requestP->subscriptionId.get() + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
     else  // SccReceiverInternalError
     {
@@ -184,8 +184,8 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   //
-  // FIXME P5: RenderFormat right now hardcoded to "JSON" (RF_LEGACY),
-  //           in the future the RenderFormat will be taken from the payload
+  // FIXME P5: OrionldRenderFormat right now hardcoded to "JSON" (RF_LEGACY),
+  //           in the future the OrionldRenderFormat will be taken from the payload
   //
 
   /* Adding format to use in notifications */
@@ -204,8 +204,8 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
 
   //
-  // FIXME P5: RenderFormat right now hardcoded to RF_LEGACY,
-  //           in the future the RenderFormat will be taken from the payload
+  // FIXME P5: OrionldRenderFormat right now hardcoded to RF_LEGACY,
+  //           in the future the OrionldRenderFormat will be taken from the payload
   //
 
   /* Send notifications for matching context registrations */

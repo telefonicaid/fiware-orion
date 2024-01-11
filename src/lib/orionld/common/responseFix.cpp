@@ -29,8 +29,8 @@ extern "C"
 #include "kjson/kjBuilder.h"                                     // kjChildRemove
 }
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd, httpHeaderLinkAdd
-
+#include "orionld/http/httpHeaderLocationAdd.h"                  // httpHeaderLocationAdd
+#include "orionld/http/httpHeaderLinkAdd.h"                      // httpHeaderLinkAdd
 #include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/kjTree/kjChildCount.h"                         // kjChildCount

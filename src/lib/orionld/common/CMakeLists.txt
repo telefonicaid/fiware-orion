@@ -49,7 +49,6 @@ SET (SOURCES
     duplicatedInstances.cpp
     troeIgnored.cpp
     tenantList.cpp
-    mimeTypeFromString.cpp
     attributeTypeFromUriParam.cpp
     orionldError.cpp
     orionldPatchApply.cpp
@@ -64,10 +63,13 @@ SET (SOURCES
     batchCreateEntity.cpp
     batchUpdateEntity.cpp
     batchReplaceEntity.cpp
-    metadataAdd.cpp
     curlToBrokerStrerror.cpp
     fileName.cpp
     responseFix.cpp
+    lowercase.cpp
+    stringStrip.cpp
+    dateTime.cpp
+    forbidden.cpp
 )
 
 # Include directories

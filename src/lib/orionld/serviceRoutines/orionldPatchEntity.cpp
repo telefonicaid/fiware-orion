@@ -37,7 +37,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
@@ -272,7 +271,7 @@ bool orionldPatchEntity(void)
 
   //
   // If entity type is present in the payload body, it must be a String and identical to the entity type in the database.
-  // [ It is already extracted (by orionldMhdConnectionTreat) and checked for String ]
+  // [ It is already extracted (by mhdConnectionTreat) and checked for String ]
   //
   entityType = pCheckEntityType2(orionldState.payloadTypeNode, dbEntityP, entityType);
 

@@ -40,14 +40,14 @@ extern "C"
 #include "logMsg/logMsg.h"                                     // LM_*
 
 #include "cache/subCache.h"                                    // CachedSubscription, subCacheItemLookup
-#include "common/globals.h"                                    // parse8601Time
 
+#include "orionld/types/OrionldMimeType.h"                     // mimeTypeFromString
+#include "orionld/types/KeyValue.h"                            // KeyValue, keyValueLookup, keyValueAdd
+#include "orionld/types/MqttInfo.h"                            // MqttInfo
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/common/urlParse.h"                           // urlParse
-#include "orionld/common/mimeTypeFromString.h"                 // mimeTypeFromString
-#include "orionld/types/KeyValue.h"                            // KeyValue, keyValueLookup, keyValueAdd
-#include "orionld/types/MqttInfo.h"                            // MqttInfo
+#include "orionld/common/dateTime.h"                           // dateTimeFromString
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/payloadCheck/PCHECK.h"                       // PCHECK_URI
 #include "orionld/payloadCheck/pCheckSubscription.h"           // pCheckSubscription
@@ -680,8 +680,18 @@ static bool subCacheItemUpdate
     }
     else if ((strcmp(itemP->name, "expires") == 0) || (strcmp(itemP->name, "expiresAt") == 0))
     {
+      char errorString[256];
+
       // Give error for expires/expiresAt and version of NGSI-LD ?
-      cSubP->expirationTime = parse8601Time(itemP->value.s);
+      double expiresAt = dateTimeFromString(itemP->value.s, errorString, sizeof(errorString));
+
+      if (expiresAt > 0)
+        cSubP->expirationTime = expiresAt;
+      else
+      {
+        orionldError(OrionldBadRequestData, "Invalid ISO8601 for 'expiresAt'", errorString, 400);
+        r = false;
+      }
     }
     else if (strcmp(itemP->name, "throttling") == 0)
     {
@@ -807,25 +817,25 @@ bool orionldPatchSubscription(void)
 {
   PCHECK_URI(orionldState.wildcard[0], true, 0, "Subscription ID must be a valid URI", orionldState.wildcard[0], 400);
 
-  char*         subscriptionId         = orionldState.wildcard[0];
-  KjNode*       qP                     = NULL;
-  KjNode*       geoqP                  = kjLookup(orionldState.requestTree, "geoQ");
-  KjNode*       geoCoordinatesP        = NULL;
-  bool          mqttChange             = false;
-  KjNode*       subTree                = orionldState.requestTree;
-  KjNode*       idNode                 = orionldState.payloadIdNode;
-  KjNode*       typeNode               = orionldState.payloadTypeNode;
-  QNode*        qNodeP                 = NULL;
-  char*         qRenderedForDb         = NULL;
-  bool          qValidForV2            = false;
-  bool          qIsMq                  = false;
-  KjNode*       uriP                   = NULL;
-  KjNode*       notifierInfoP          = NULL;
-  KjNode*       showChangesP           = NULL;
-  KjNode*       sysAttrsP              = NULL;
-  double        timeInterval           = 0;
-  RenderFormat  renderFormat           = RF_NORMALIZED;
-  bool          r;
+  char*                subscriptionId         = orionldState.wildcard[0];
+  KjNode*              qP                     = NULL;
+  KjNode*              geoqP                  = kjLookup(orionldState.requestTree, "geoQ");
+  KjNode*              geoCoordinatesP        = NULL;
+  bool                 mqttChange             = false;
+  KjNode*              subTree                = orionldState.requestTree;
+  KjNode*              idNode                 = orionldState.payloadIdNode;
+  KjNode*              typeNode               = orionldState.payloadTypeNode;
+  QNode*               qNodeP                 = NULL;
+  char*                qRenderedForDb         = NULL;
+  bool                 qValidForV2            = false;
+  bool                 qIsMq                  = false;
+  KjNode*              uriP                   = NULL;
+  KjNode*              notifierInfoP          = NULL;
+  KjNode*              showChangesP           = NULL;
+  KjNode*              sysAttrsP              = NULL;
+  double               timeInterval           = 0;
+  OrionldRenderFormat  renderFormat           = RF_NORMALIZED;
+  bool                 r;
 
   r = pCheckSubscription(subTree,
                          false,

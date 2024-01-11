@@ -222,7 +222,7 @@ MongoDB server version: REGEX(.*)
 		"endAt" : 1861869600.456
 	},
 	"managementInterval" : {
-		"startAt" : 1514714400.7979999,
+		"startAt" : 1514714400.798,
 		"endAt" : 1830247200.12
 	},
 	"location" : {

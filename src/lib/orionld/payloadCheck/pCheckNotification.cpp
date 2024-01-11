@@ -29,8 +29,8 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                      // LM_*
-#include "common/RenderFormat.h"                                // RenderFormat, stringToRenderFormat
 
+#include "orionld/types/OrionldRenderFormat.h"                  // OrionldRenderFormat
 #include "orionld/common/orionldState.h"                        // orionldState
 #include "orionld/common/orionldError.h"                        // orionldError
 #include "orionld/context/orionldAttributeExpand.h"             // orionldAttributeExpand
@@ -47,14 +47,14 @@ extern "C"
 //
 bool pCheckNotification
 (
-  KjNode*        notificationP,
-  bool           patch,
-  KjNode**       uriPP,
-  KjNode**       notifierInfoPP,
-  bool*          mqttChangeP,
-  KjNode**       showChangesOutP,
-  KjNode**       sysAttrsOutP,
-  RenderFormat*  renderFormatP
+  KjNode*               notificationP,
+  bool                  patch,
+  KjNode**              uriPP,
+  KjNode**              notifierInfoPP,
+  bool*                 mqttChangeP,
+  KjNode**              showChangesOutP,
+  KjNode**              sysAttrsOutP,
+  OrionldRenderFormat*  renderFormatP
 )
 {
   KjNode* attributesP  = NULL;
@@ -90,7 +90,7 @@ bool pCheckNotification
       PCHECK_STRING(formatP, 0, NULL, SubscriptionNotificationFormatPath, 400);
       PCHECK_STRING_EMPTY(formatP, 0, NULL, SubscriptionNotificationFormatPath, 400);
 
-      RenderFormat rf = stringToRenderFormat(formatP->value.s, true);
+      OrionldRenderFormat rf = renderFormat(formatP->value.s);
       if ((rf == RF_NONE) || (rf == RF_LEGACY))
       {
         orionldError(OrionldBadRequestData, "Invalid value for 'Subscription::notification::format'", formatP->value.s, 400);

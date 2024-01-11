@@ -26,8 +26,8 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
+#include "orionld/types/ApiVersion.h"                            // ApiVersion
 #include "orionld/common/orionldState.h"                         // orionldState
 
 #include "common/string.h"
@@ -110,7 +110,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   int              port;
   std::string      prefix;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
@@ -119,7 +119,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   {
     std::string details = std::string("invalid providing application '") + upcrP->contextProvider + "'";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
@@ -137,7 +137,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string  payload;
   char*        cleanPayload;
 
-  orionldState.out.contentType  = JSON;
+  orionldState.out.contentType  = MT_JSON;
 
   //
   // FIXME: Forwards are done using NGSIv1 only, for now
@@ -145,7 +145,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   //        Once we implement forwards in NGSIv2, this render() should be like this:
   //        TIMED_RENDER(payload = upcrP->render(orionldState.apiVersion, asJsonObject, ""));
   //
-  TIMED_RENDER(payload = upcrP->render(V1, asJsonObject));
+  TIMED_RENDER(payload = upcrP->render(API_VERSION_NGSI_V1, asJsonObject));
 
   orionldState.out.contentType = savedContentType;
   cleanPayload                 = (char*) payload.c_str();
@@ -219,7 +219,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   ParseData parseData;
 
   // Overriding original verb to be a POST, now that this service routine has been invoked
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   parseData.upcrs.res.errorCode.fill(SccOk);
 
@@ -374,7 +374,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   //
   // If nothing at all in response vector, mark as not found (but not if DELETE request)
   //
-  if (orionldState.verb != DELETE)
+  if (orionldState.verb != HTTP_DELETE)
   {
     if (upcrsP->contextElementResponseVector.size() == 0)
     {
@@ -449,7 +449,7 @@ std::string postUpdateContext
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   //
   // 01. Check service-path consistency
@@ -462,7 +462,7 @@ std::string postUpdateContext
   if (ciP->servicePathV.size() > 1)
   {
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
-    alarmMgr.badInput(clientIp, "more than one service path for an update request");
+    alarmMgr.badInput(orionldState.clientIp, "more than one service path for an update request");
 
     TIMED_RENDER(answer = upcrsP->render(orionldState.apiVersion, asJsonObject));
     upcrP->release();
@@ -670,7 +670,7 @@ std::string postUpdateContext
   // Note this is a slight break in the separation of concerns among the different layers (i.e.
   // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
   // a smart way of dealing with partial update situations
-  if (orionldState.apiVersion == V2)
+  if (orionldState.apiVersion == API_VERSION_NGSI_V2)
   {
     // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
     // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in

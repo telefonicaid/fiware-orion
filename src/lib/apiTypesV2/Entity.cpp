@@ -27,8 +27,8 @@
 #include <map>
 
 #include "logMsg/traceLevels.h"
-#include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"
 #include "orionld/common/orionldState.h"
 
 #include "common/tag.h"
@@ -39,7 +39,6 @@
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
 #include "ngsi10/QueryContextResponse.h"
-
 #include "apiTypesV2/Entity.h"
 
 
@@ -82,7 +81,7 @@ std::string Entity::render(bool comma)
     return oe.toJson();
   }
 
-  RenderFormat  renderFormat = RF_NORMALIZED;
+  OrionldRenderFormat  renderFormat = RF_NORMALIZED;
 
   if      (orionldState.uriParamOptions.keyValues    == true)  { renderFormat = RF_KEYVALUES;     }
   else if (orionldState.uriParamOptions.values       == true)  { renderFormat = RF_VALUES;        }
@@ -202,7 +201,7 @@ std::string Entity::check(RequestType requestType)
   if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
@@ -214,7 +213,7 @@ std::string Entity::check(RequestType requestType)
   if ( (len = strlen(id.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
@@ -226,16 +225,16 @@ std::string Entity::check(RequestType requestType)
   // isPattern MUST be either "true" or "false" (or empty => "false")
   if ((isPattern != "true") && (isPattern != "false"))
   {
-    alarmMgr.badInput(clientIp, "invalid value for isPattern");
+    alarmMgr.badInput(orionldState.clientIp, "invalid value for isPattern");
     return "Invalid value for isPattern";
   }
 
   // Check for forbidden chars for "id", but not if "id" is a pattern
   if (isPattern == "false")
   {
-    if (forbiddenIdChars(V2, id.c_str()))
+    if (forbiddenIdChars(API_VERSION_NGSI_V2, id.c_str()))
     {
-      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
+      alarmMgr.badInput(orionldState.clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
       return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
     }
   }
@@ -243,7 +242,7 @@ std::string Entity::check(RequestType requestType)
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
@@ -253,7 +252,7 @@ std::string Entity::check(RequestType requestType)
     if ( (len = strlen(type.c_str())) < MIN_ID_LEN)
     {
       snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
+      alarmMgr.badInput(orionldState.clientIp, errorMsg);
       return std::string(errorMsg);
     }
   }
@@ -261,14 +260,14 @@ std::string Entity::check(RequestType requestType)
   // Check for forbidden chars for "type", but not if "type" is a pattern
   if (isTypePattern == false)
   {
-    if (forbiddenIdChars(V2, type.c_str()))
+    if (forbiddenIdChars(API_VERSION_NGSI_V2, type.c_str()))
     {
-      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
+      alarmMgr.badInput(orionldState.clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
       return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
     }
   }
 
-  return attributeVector.check(V2, requestType);
+  return attributeVector.check(API_VERSION_NGSI_V2, requestType);
 }
 
 

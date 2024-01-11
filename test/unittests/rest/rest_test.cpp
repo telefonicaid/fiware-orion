@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"
 #include "rest/ConnectionInfo.h"
 
+#include "orionld/types/ApiVersion.h"
 #include "unittests/unittest.h"
 
 
@@ -86,7 +87,7 @@ TEST(rest, servicePathSplit)
   ConnectionInfo  ci5;
   int             r;
 
-  orionldState.apiVersion = V1;
+  orionldState.apiVersion = API_VERSION_NGSI_V1;
 
   // 1. OK - as no Service Path has been received ...
   LM_M(("---- 1 -----"));

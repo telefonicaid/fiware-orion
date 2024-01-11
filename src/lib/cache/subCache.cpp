@@ -114,7 +114,7 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
     // in order to see how it works
     if (regcomp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED) != 0)
     {
-      alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
+      alarmMgr.badInput(orionldState.clientIp, "invalid regular expression for idPattern");
       isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
       entityIdPatternToBeFreed = false;
@@ -135,7 +135,7 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
     // in order to see how it works
     if (regcomp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED) != 0)
     {
-      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern");
+      alarmMgr.badInput(orionldState.clientIp, "invalid regular expression for typePattern");
       isTypePattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
       entityTypePatternToBeFreed = false;
@@ -851,7 +851,7 @@ bool subCacheItemInsert
   const char*                        subscriptionId,
   double                             expirationTime,
   double                             throttling,
-  RenderFormat                       renderFormat,
+  OrionldRenderFormat                renderFormat,
   bool                               notificationDone,
   double                             lastNotificationTime,
   double                             lastNotificationSuccessTime,
@@ -953,7 +953,7 @@ bool subCacheItemInsert
 
   if (q != "")
   {
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
     {
       // FIXME: Instead of calling qBuild here, I should pass the pointer from pCheckSubscription
       if (cSubP->qP != NULL)
@@ -1552,7 +1552,7 @@ void subCacheItemNotificationErrorStatus(const std::string& tenant, const std::s
     cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
     const char* errorString = "intent to update error status of non-existing subscription";
 
-    alarmMgr.badInput(clientIp, errorString);
+    alarmMgr.badInput(orionldState.clientIp, errorString);
     LM_W(("no sub found (subId: '%s') - counters/timestamps lost", subscriptionId.c_str()));
     return;
   }

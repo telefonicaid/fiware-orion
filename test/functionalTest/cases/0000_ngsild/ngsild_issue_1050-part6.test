@@ -62,7 +62,7 @@ echo "==========================================================================
 payload='{
   "batteryLevel": {
     "value": 7,
-    "observedAt": "1968-12-31T23:50:59.000Z",
+    "observedAt": "1971-12-31T23:50:59.000Z",
     "providedBy": { "object" : "8" }
   }
 }'
@@ -228,12 +228,12 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 06. PATCH the entity adding batteryLevel an invalid 'observedAt' - see error but no crash!
 ==========================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 133
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "1968-12-31T23:50:59.000Z",
+    "detail": "observedAt",
     "title": "Invalid ISO8601 timestamp",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

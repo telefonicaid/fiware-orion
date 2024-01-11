@@ -26,8 +26,20 @@
 
 #include <curl/curl.h>
 
+extern "C"
+{
+#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
+#include "kjson/kjRender.h"                                    // kjFastRender
+#include "kjson/kjson.h"                                       // Kjson
+#include "kjson/kjLookup.h"                                    // kjLookup
+#include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
+}
+
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+
+#include "orionld/types/ApiVersion.h"                          // ApiVersion
+#include "orionld/types/Verb.h"                                // Verb, verbToString
+#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 
 #include "common/string.h"
 #include "common/statistics.h"
@@ -39,24 +51,12 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
-#include "rest/httpHeaderAdd.h"
-
-#ifdef ORIONLD
-extern "C"
-{
-#include "kjson/kjRenderSize.h"                                // kjFastRenderSize
-#include "kjson/kjRender.h"                                    // kjFastRender
-#include "kjson/kjson.h"                                       // Kjson
-#include "kjson/kjLookup.h"                                    // kjLookup
-#include "kjson/kjBuilder.h"                                   // kjChildAdd, kjChildRemove
-}
-
 #include "cache/subCache.h"                                    // CachedSubscription
-#include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
-#include "orionld/kjTree/kjTreeFromNotification.h"             // kjTreeFromNotification
+
+#include "orionld/http/http.h"                                 // LINK_REL_AND_TYPE
+#include "orionld/legacyDriver/kjTreeFromNotification.h"       // kjTreeFromNotification
 #include "orionld/kjTree/kjGeojsonEntitiesTransform.h"         // kjGeojsonEntitiesTransform
 #include "orionld/notifications/notificationDataToGeoJson.h"   // notificationDataToGeoJson
-#endif
 
 #include "ngsiNotify/Notifier.h"
 
@@ -89,7 +89,7 @@ void Notifier::sendNotifyContextRequest
     const std::string&               tenant,
     const char*                      xauthToken,
     const std::string&               fiwareCorrelator,
-    RenderFormat                     renderFormat,
+    OrionldRenderFormat              renderFormat,
     const std::vector<std::string>&  attrsOrder,
     const std::vector<std::string>&  metadataFilter,
     bool                             blackList
@@ -141,7 +141,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
   const std::string&                 url,
   const std::string&                 tenant,
   const std::string&                 fiwareCorrelator,
-  RenderFormat                       renderFormat
+  OrionldRenderFormat                renderFormat
 )
 {
     /* Render NotifyContextAvailabilityRequest */
@@ -156,7 +156,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       std::string details = std::string("sending NotifyContextAvailabilityRequest: malformed URL: '") + url + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
 
       return;
     }
@@ -176,7 +176,7 @@ void Notifier::sendNotifyContextAvailabilityRequest
     params->resource         = uriPath;
     params->content_type     = content_type;
     params->content          = payload;
-    params->mimeType         = JSON;
+    params->mimeType         = MT_JSON;
     params->fiwareCorrelator = fiwareCorrelator;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->registration     = true;
@@ -210,7 +210,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     const std::string&                   tenant,
     const char*                          xauthToken,
     const std::string&                   fiwareCorrelator,
-    RenderFormat                         renderFormat,
+    OrionldRenderFormat                  renderFormat,
     const std::vector<std::string>&      attrsOrder,
     const std::vector<std::string>&      metadataFilter
 )
@@ -236,12 +236,12 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     //
     // 1. Verb/Method
     //
-    if (verb == NOVERB)
+    if (verb == HTTP_NOVERB)
     {
       // Default verb/method is POST
-      verb = POST;
+      verb = HTTP_POST;
     }
-    method = verbName(verb);
+    method = verbToString(verb);
 
 
     //
@@ -269,7 +269,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 
       if (renderFormat == RF_LEGACY)
       {
-        payload = ncr.render(V1, false);
+        payload = ncr.render(API_VERSION_NGSI_V1, false);
       }
       else
       {
@@ -393,7 +393,7 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
     params->resource         = uri;
     params->content_type     = mimeType;
     params->content          = payload;
-    params->mimeType         = JSON;
+    params->mimeType         = MT_JSON;
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
     params->extraHeaders     = headers;
@@ -419,7 +419,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
   const std::string&               tenant,
   const char*                      xauthToken,
   const std::string&               fiwareCorrelator,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  attrsOrder,
   const std::vector<std::string>&  metadataFilter,
   bool                             blackList
@@ -430,10 +430,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     CachedSubscription*               subP    = NULL;
     char*                             toFree  = NULL;
 
-    if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
+    if ((verb == HTTP_NOVERB) || (verb == HTTP_UNKNOWNVERB) || disableCusNotif)
     {
       // Default verb/method (or the one in case of disabled custom notifications) is POST
-      verb = POST;
+      verb = HTTP_POST;
     }
 
     //
@@ -500,8 +500,8 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string payloadString;
 
     if (renderFormat == RF_LEGACY)
-      payloadString = ncrP->render(V2, false);
-    else if (orionldState.apiVersion != NGSI_LD_V1)
+      payloadString = ncrP->render(API_VERSION_NGSI_V2, false);
+    else if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
       payloadString = ncrP->toJson(renderFormat, attrsOrder, metadataFilter, blackList);
     else
     {
@@ -522,7 +522,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
         return paramsV;
       }
 
-      if (httpInfo.mimeType == GEOJSON)
+      if (httpInfo.mimeType == MT_GEOJSON)
       {
         char*        attrs            = NULL;
         char*        preferHeader     = NULL;
@@ -573,16 +573,16 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     /* Set Content-Type */
     char* contentType;
 
-    if      (httpInfo.mimeType == JSONLD)   contentType = (char*) "application/ld+json";
-    else if (httpInfo.mimeType == GEOJSON)  contentType = (char*) "application/geo+json";
-    else                                    contentType = (char*) "application/json";
+    if      (httpInfo.mimeType == MT_JSONLD)   contentType = (char*) "application/ld+json";
+    else if (httpInfo.mimeType == MT_GEOJSON)  contentType = (char*) "application/geo+json";
+    else                                       contentType = (char*) "application/json";
 
     SenderThreadParams*  params = new SenderThreadParams();
 
     params->ip               = host;
     params->port             = port;
     params->protocol         = protocol;
-    params->verb             = verbName(verb);
+    params->verb             = verbToString(verb);
     params->tenant           = tenant;
     params->servicePath      = spathList;
     params->xauthToken       = (xauthToken == NULL)? "" : xauthToken;
@@ -605,7 +605,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     if (httpInfo.mqtt.password[0] != 0)
       strncpy(params->mqttPassword, httpInfo.mqtt.password, sizeof(params->mqttPassword) - 1);
 #else
-    params->mimeType         = JSON;
+    params->mimeType         = MT_JSON;
 #endif
     params->renderFormat     = renderFormatToString(renderFormat);
     params->fiwareCorrelator = fiwareCorrelator;
@@ -638,10 +638,10 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     if (subP != NULL)
     {
-      if ((httpInfo.mimeType       == JSON)                     &&
-          (renderFormat            != RF_CROSS_APIS_NORMALIZED) &&
-          (renderFormat            != RF_CROSS_APIS_KEYVALUES)  &&
-          (orionldState.apiVersion == NGSI_LD_V1))
+      if ((httpInfo.mimeType       == MT_JSON)                   &&
+          (renderFormat            != RF_CROSS_APIS_NORMALIZED)  &&
+          (renderFormat            != RF_CROSS_APIS_SIMPLIFIED)  &&
+          (orionldState.apiVersion == API_VERSION_NGSILD_V1))
       {
         if (subP->ldContext != "")
           params->extraHeaders["Link"] = std::string("<") + subP->ldContext + ">; " + LINK_REL_AND_TYPE;

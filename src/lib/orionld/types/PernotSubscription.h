@@ -33,14 +33,13 @@ extern "C"
 #include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "common/RenderFormat.h"                               // RenderFormat
-#include "common/MimeType.h"                                   // MimeType
-
+#include "orionld/types/OrionldRenderFormat.h"                 // OrionldRenderFormat
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
 #include "orionld/types/Protocol.h"                            // Protocol
 #include "orionld/types/StringArray.h"                         // StringArray
 #include "orionld/types/OrionldGeoInfo.h"                      // OrionldGeoInfo
 #include "orionld/types/QNode.h"                               // QNode
+#include "orionld/types/OrionldMimeType.h"                     // MimeType
 
 
 
@@ -110,7 +109,7 @@ typedef struct PernotSubscription
   // Notification Format/Details
   bool                        ngsiv2;
   bool                        sysAttrs;
-  RenderFormat                renderFormat;
+  OrionldRenderFormat         renderFormat;
   MimeType                    mimeType;
 
   // Errors

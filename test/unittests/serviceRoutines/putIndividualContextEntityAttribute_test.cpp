@@ -31,6 +31,8 @@
 #include "rest/RestService.h"
 #include "rest/rest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittests/unittest.h"
 
 
@@ -84,7 +86,7 @@ TEST(putIndividualContextEntityAttribute, json)
                                    sizeof(expectedBuf),
                                    outfile)) << "Error getting test data from '" << outfile << "'";
 
-  orionldState.in.contentType    = JSON;
+  orionldState.in.contentType    = MT_JSON;
   orionldState.in.payload        = testBuf;
   orionldState.in.payloadSize    = strlen(testBuf);
   ci.restServiceP   = &restService;

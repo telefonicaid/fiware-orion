@@ -32,11 +32,12 @@
 #include "logMsg/traceLevels.h"
 
 #include "orionld/types/OrionldTenant.h"                       // OrionldTenant
+#include "orionld/types/Verb.h"                                // Verb, verbToString
 
 #include "common/defaultValues.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/MongoCommonSubscription.h"
+#include "mongoBackend/MongoCommonSubscription.h"              // Own interface
 
 
 
@@ -90,9 +91,9 @@ void setExpiration(const Subscription& sub, BSONObjBuilder* b)
 */
 static void setCustomHttpInfo(const HttpInfo& httpInfo, BSONObjBuilder* b)
 {
-  if (httpInfo.verb != NOVERB)
+  if (httpInfo.verb != HTTP_NOVERB)
   {
-    std::string method = verbName(httpInfo.verb);
+    std::string method = verbToString(httpInfo.verb);
 
     b->append(CSUB_METHOD, method);
     LM_T(LmtLegacy, ("Subscription method: %s", method.c_str()));
@@ -327,7 +328,7 @@ void setCondsAndInitialNotify
   const std::vector<std::string>&  metadataV,
   const HttpInfo&                  httpInfo,
   bool                             blacklist,
-  RenderFormat                     attrsFormat,
+  OrionldRenderFormat              attrsFormat,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const char*                      xauthToken,

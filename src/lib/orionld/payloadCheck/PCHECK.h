@@ -32,9 +32,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                    // LM_*
 
+#include "orionld/types/OrionldAttributeType.h"               // NoAttributeType, Property
 #include "orionld/common/orionldState.h"                      // orionldState
 #include "orionld/common/orionldError.h"                      // orionldError
-#include "orionld/types/OrionldAttributeType.h"               // NoAttributeType, Property
+#include "orionld/common/dateTime.h"                          // dateTimeFromString
 #include "orionld/payloadCheck/pCheckUri.h"                   // pCheckUri
 
 
@@ -336,17 +337,19 @@ do                                                                              
 //
 // PCHECK_ISO8601 -
 //
-#define PCHECK_ISO8601(iso8601Var, iso8601String, _type, _title, detail, status)             \
-do                                                                                           \
-{                                                                                            \
-  int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                       \
-  const char* title = (_title == NULL)? "Invalid ISO8601"     : _title;                      \
-                                                                                             \
-  if ((iso8601Var = parse8601Time(iso8601String)) == -1)                                     \
-  {                                                                                          \
-    orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
-    return false;                                                                            \
-  }                                                                                          \
+#define PCHECK_ISO8601(iso8601Var, iso8601String, _type, _title, fieldName, status)            \
+do                                                                                             \
+{                                                                                              \
+  int         type  = (_type  ==    0)? OrionldBadRequestData : _type;                         \
+  const char* title = (_title == NULL)? "Invalid ISO8601"     : _title;                        \
+  char        errorString[512];                                                                \
+                                                                                               \
+  if ((iso8601Var = dateTimeFromString(iso8601String, errorString, sizeof(errorString))) < 0)  \
+  {                                                                                            \
+    orionldError((OrionldResponseErrorType) type, title, errorString, status);                 \
+    pdField(fieldName);                                                                        \
+    return false;                                                                              \
+  }                                                                                            \
 } while (0)
 
 
@@ -364,6 +367,7 @@ do                                                                              
   if (expiresAt < now)                                                                       \
   {                                                                                          \
     orionldError((OrionldResponseErrorType) type, title, detail, status);                    \
+    pdField("expiresAt");                                                                    \
     return false;                                                                            \
   }                                                                                          \
 } while (0)

@@ -25,7 +25,6 @@
 #include "logMsg/logMsg.h"                             // LM_*
 #include "logMsg/traceLevels.h"                        // Lmt*
 
-#include "common/globals.h"                            // noCache
 #include "cache/subCache.h"                            // CachedSubscription, subCacheItemLookup, ...
 
 #include "orionld/common/orionldState.h"               // orionldState
@@ -66,7 +65,7 @@ bool legacyDeleteSubscription(void)
       LM_W(("The subscription '%s' was successfully removed from DB but does not exist in sub-cache ... (sub-cache is enabled)"));
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
 
   return true;
 }

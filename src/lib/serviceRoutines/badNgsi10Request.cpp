@@ -53,7 +53,7 @@ std::string badNgsi10Request
   std::string answer;
   std::string details = std::string("service '") + orionldState.urlPath + "' not found";
 
-  alarmMgr.badInput(clientIp, details);
+  alarmMgr.badInput(orionldState.clientIp, details);
   restErrorReplyGet(ciP, SccBadRequest, "service not found", &answer);
 
   return answer;

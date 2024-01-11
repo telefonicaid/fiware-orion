@@ -102,7 +102,7 @@ std::string getEntityAttributeValue
     attribute.pcontextAttribute->type = "";
     attribute.pcontextAttribute->metadataVector.release();
 
-    if (orionldState.out.contentType == JSON)
+    if (orionldState.out.contentType == MT_JSON)
     {
       // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";

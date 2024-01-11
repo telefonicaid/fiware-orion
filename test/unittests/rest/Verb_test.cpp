@@ -33,15 +33,15 @@
 */
 TEST(Verb, all)
 {
-  EXPECT_STREQ("GET",          verbName(GET));
-  EXPECT_STREQ("PUT",          verbName(PUT));
-  EXPECT_STREQ("POST",         verbName(POST));
-  EXPECT_STREQ("DELETE",       verbName(DELETE));
-  EXPECT_STREQ("PATCH",        verbName(PATCH));
-  EXPECT_STREQ("HEAD",         verbName(HEAD));
-  EXPECT_STREQ("OPTIONS",      verbName(OPTIONS));
-  EXPECT_STREQ("TRACE",        verbName(TRACE));
-  EXPECT_STREQ("CONNECT",      verbName(CONNECT));
-  EXPECT_STREQ("",             verbName(NOVERB));
+  EXPECT_STREQ("GET",          verbName(HTTP_GET));
+  EXPECT_STREQ("PUT",          verbName(HTTP_PUT));
+  EXPECT_STREQ("POST",         verbName(HTTP_POST));
+  EXPECT_STREQ("DELETE",       verbName(HTTP_DELETE));
+  EXPECT_STREQ("PATCH",        verbName(HTTP_PATCH));
+  EXPECT_STREQ("HEAD",         verbName(HTTP_HEAD));
+  EXPECT_STREQ("OPTIONS",      verbName(HTTP_OPTIONS));
+  EXPECT_STREQ("TRACE",        verbName(HTTP_TRACE));
+  EXPECT_STREQ("CONNECT",      verbName(HTTP_CONNECT));
+  EXPECT_STREQ("",             verbName(HTTP_NOVERB));
   EXPECT_STREQ("Unknown verb", verbName((Verb) 1234));
 }

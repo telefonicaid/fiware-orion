@@ -33,13 +33,12 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/RenderFormat.h"                                 // RenderFormat
-
+#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/eqForDot.h"                             // eqForDot
 #include "orionld/common/numberToDate.h"                         // numberToDate
-#include "orionld/types/OrionldAttributeType.h"                  // OrionldAttributeType
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/dbModel/dbModelToObservedAt.h"                 // dbModelToObservedAt
 #include "orionld/dbModel/dbModelToUnitCode.h"                   // dbModelToUnitCode
@@ -94,7 +93,7 @@ void dbModelToApiSubAttribute(KjNode* dbSubAttrP)
 //
 // dbModelToApiSubAttribute2 - transform a sub-attribute from DB Model to API format
 //
-KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, RenderFormat renderFormat, const char* lang, OrionldProblemDetails* pdP)
+KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, OrionldRenderFormat renderFormat, const char* lang, OrionldProblemDetails* pdP)
 {
   if (strcmp(dbSubAttributeP->name, "observedAt") == 0)
     return dbModelToObservedAt(dbSubAttributeP);

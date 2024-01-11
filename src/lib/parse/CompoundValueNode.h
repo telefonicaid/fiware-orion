@@ -28,8 +28,9 @@
 #include <string>
 #include <vector>
 
-#include "common/globals.h"
+#include "orionld/types/ApiVersion.h"
 
+#include "common/globals.h"
 #include "orionTypes/OrionValueType.h"
 
 

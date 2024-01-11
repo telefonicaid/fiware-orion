@@ -149,7 +149,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
   {
     ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
 
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
     {
       if (eP->id != "")
       {
@@ -183,7 +183,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, mongo::BSON
     }
   }
 
-  if (orionldState.apiVersion == NGSI_LD_V1)
+  if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
   {
     for (unsigned int pIx = 0; pIx < regP->dataProvided.propertyV.size(); ++pIx)
       attrs.append(BSON(REG_ATTRS_NAME << regP->dataProvided.propertyV[pIx] << REG_ATTRS_TYPE << "Property" << REG_ATTRS_ISDOMAIN << "false"));
@@ -325,7 +325,7 @@ void mongoRegistrationCreate
   //
   mongo::BSONObjBuilder  bob;
 
-  if (orionldState.apiVersion == NGSI_LD_V1)
+  if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
     setNgsildRegistrationId(&bob, regP->id.c_str());
   else
     setRegistrationId(&bob, regIdP);

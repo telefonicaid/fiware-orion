@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextElementResponse.h"
+#include "orionld/types/OrionldMimeType.h"
 
 #include "unittest.h"
 
@@ -42,18 +43,18 @@ TEST(ContextElementResponse, check)
 
    utInit();
 
-   out = cer.check(V1, UpdateContext, "", 0);
+   out = cer.check(API_VERSION_NGSI_V1, UpdateContext, "", 0);
    EXPECT_STREQ("empty entityId:id", out.c_str());
 
    cer.contextElement.entityId.id         = "ID";
    cer.contextElement.entityId.type       = "Type";
    cer.contextElement.entityId.isPattern  = "false";
 
-   out = cer.check(V1, UpdateContext, "", 0);
+   out = cer.check(API_VERSION_NGSI_V1, UpdateContext, "", 0);
    EXPECT_STREQ("no code", out.c_str());
 
    cer.statusCode.fill(SccOk, "details");
-   out = cer.check(V1, UpdateContext, "", 0);
+   out = cer.check(API_VERSION_NGSI_V1, UpdateContext, "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
    utExit();
@@ -79,7 +80,7 @@ TEST(ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "details");
 
-   out = cer.render(V1, false, UpdateContextElement, false);
+   out = cer.render(API_VERSION_NGSI_V1, false, UpdateContextElement, false);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

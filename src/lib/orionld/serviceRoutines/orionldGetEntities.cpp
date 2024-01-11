@@ -237,12 +237,12 @@ bool orionldGetEntities(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntities();
 
-  char*   id        = orionldState.uriParams.id;         // Validity checked in orionldMhdConnectionTreat.cpp (pCheckEntityIdParam)
-  char*   type      = orionldState.uriParams.type;       // Validity checked in orionldMhdConnectionTreat.cpp (pCheckEntityTypeParam)
+  char*   id        = orionldState.uriParams.id;         // Validity assured in mhdConnectionTreat.cpp (pCheckEntityIdParam)
+  char*   type      = orionldState.uriParams.type;       // Validity assured in mhdConnectionTreat.cpp (pCheckEntityTypeParam)
   char*   idPattern = orionldState.uriParams.idPattern;  // No check
   char*   q         = orionldState.uriParams.q;
   char*   geometry  = orionldState.uriParams.geometry;
-  char*   attrs     = orionldState.uriParams.attrs;      // Validity checked in orionldMhdConnectionTreat.cpp (pCheckAttrsParam)
+  char*   attrs     = orionldState.uriParams.attrs;      // Validity assured in mhdConnectionTreat.cpp (pCheckAttrsParam)
   bool    local     = orionldState.uriParams.local;
   QNode*  qNode     = NULL;
 

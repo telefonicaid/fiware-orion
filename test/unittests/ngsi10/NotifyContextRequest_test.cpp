@@ -32,6 +32,9 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 
+#include "orionld/types/OrionldMimeType.h"
+#include "orionld/types/ApiVersion.h"
+
 #include "unittest.h"
 
 
@@ -51,11 +54,11 @@ TEST(NotifyContextRequest, json_ok)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_EQ("OK", result);
@@ -64,7 +67,7 @@ TEST(NotifyContextRequest, json_ok)
   // With the data obtained, render, present and release methods are exercised
   //
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = ncrP->render(V1, false);
+  rendered = ncrP->render(API_VERSION_NGSI_V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ncrP->release();
@@ -90,9 +93,9 @@ TEST(NotifyContextRequest, json_badIsPattern)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
   std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -147,7 +150,7 @@ TEST(NotifyContextRequest, json_render)
 
   // 1. Without ContextResponseList
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncrP->render(V1, false);
+  rendered = ncrP->render(API_VERSION_NGSI_V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -158,7 +161,7 @@ TEST(NotifyContextRequest, json_render)
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncrP->render(V1, false);
+  rendered = ncrP->render(API_VERSION_NGSI_V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -169,7 +172,7 @@ TEST(NotifyContextRequest, json_render)
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = ncrP->render(V1, false);
+  rendered = ncrP->render(API_VERSION_NGSI_V1, false);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

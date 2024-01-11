@@ -25,7 +25,7 @@
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/orionldError.h"                       // orionldError
 #include "orionld/mongoBackend/mongoLdRegistrationGet.h"       // mongoLdRegistrationGet
-#include "orionld/kjTree/kjTreeFromRegistration.h"             // kjTreeFromRegistration
+#include "orionld/legacyDriver/kjTreeFromRegistration.h"       // kjTreeFromRegistration
 #include "orionld/legacyDriver/legacyGetRegistration.h"        // Own Interface
 
 
@@ -46,7 +46,7 @@ bool legacyGetRegistration(void)
   }
 
   // Transform to KjNode tree
-  orionldState.httpStatusCode  = SccOk;
+  orionldState.httpStatusCode  = 200;
   orionldState.responseTree    = kjTreeFromRegistration(&registration);
 
   return true;

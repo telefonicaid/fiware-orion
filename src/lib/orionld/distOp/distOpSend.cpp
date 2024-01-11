@@ -38,9 +38,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "common/globals.h"                                      // NGSI_LD_V1
-
 #include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/ApiVersion.h"                            // API_VERSION_NGSILD_V1
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
@@ -396,7 +395,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Add URI Params
   //
   LM_T(LmtDistOpRequestParams, ("%s: ---- URL Parameters for %s ------------------------", distOpP->regP->regId, distOpP->id));
-  if (orionldState.verb == GET)
+  if (orionldState.verb == HTTP_GET)
   {
     if (distOpP->attrsParam != NULL)
       uriParamAdd(&urlParts, distOpP->attrsParam, NULL, distOpP->attrsParamLen);
@@ -426,7 +425,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     if (distOpP->qNode != NULL)
     {
       char buf[256];
-      qRender(distOpP->qNode, NGSI_LD_V1, buf, sizeof(buf), NULL);
+      qRender(distOpP->qNode, API_VERSION_NGSILD_V1, buf, sizeof(buf), NULL);
       LM_T(LmtDistOpRequestParams, ("DistOp %s has a Q: %s", distOpP->regP->regId, buf));
       if (orionldState.uriParams.q != NULL)
         LM_T(LmtDistOpRequestParams, ("The initial request also has a 'q'"));
@@ -539,7 +538,7 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
       if (strcasecmp(keyP->value.s, "jsonldContext") == 0)
       {
         jsonldContext = valueP->value.s;
-        contentType = JSON;
+        contentType = MT_JSON;
         continue;
       }
       if (strcasecmp(keyP->value.s, "Accept") == 0)
@@ -568,10 +567,10 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Link header must be added if "Content-Type" is "application/json" in original request
   // OR: if jsonldContext is present in "contextSourceInfo"
   //
-  if (orionldState.verb == GET)
-    contentType = JSON;
+  if (orionldState.verb == HTTP_GET)
+    contentType = MT_JSON;
 
-  if (contentType == JSON)
+  if (contentType == MT_JSON)
   {
     // Link header to be added if present in Registration::contextSourceInfo OR if not Core Context
     if (distOpP->regP->contextP != NULL)
@@ -641,10 +640,10 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     // Content-Type (for now we maintain the original Content-Type in the forwarded request
     // First we remove it from the "headers" curl_slist, so that we can formulate it ourselves
     //
-    const char* contentTypeString = (contentType == JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
+    const char* contentTypeString = (contentType == MT_JSON)? "Content-Type: application/json" : "Content-Type: application/ld+json";
     headers = curl_slist_append(headers, contentTypeString);
 
-    if (contentType == JSONLD)
+    if (contentType == MT_JSONLD)
     {
       //
       // Add the context to the body if not there already

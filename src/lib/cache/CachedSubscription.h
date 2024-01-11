@@ -105,7 +105,7 @@ struct CachedSubscription
   std::string                 ldContext;
   OrionldContext*             contextP;
   std::string                 lang;
-  RenderFormat                renderFormat;
+  OrionldRenderFormat         renderFormat;
   SubscriptionExpression      expression;
   bool                        blacklist;
   ngsiv2::HttpInfo            httpInfo;

@@ -31,6 +31,8 @@
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -86,9 +88,9 @@ TEST(RegisterContextRequest, json_ok)
   JsonRequest*             reqP;
   std::string              out;
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
-  orionldState.in.contentType      = JSON;
+  orionldState.in.contentType      = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -116,9 +118,9 @@ TEST(RegisterContextRequest, json_noContextRegistration)
 
   ConnectionInfo  ci;
 
-  orionldState.in.contentType  = JSON;
+  orionldState.in.contentType  = MT_JSON;
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -140,8 +142,8 @@ TEST(RegisterContextRequest, json_noProvidingApplication)
   const char*     outFile = "ngsi9.registerContextResponse.noProvidingApplication.valid.json";
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
-  orionldState.in.contentType  = JSON;
+  orionldState.verb = HTTP_POST;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -163,8 +165,8 @@ TEST(RegisterContextRequest, json_emptyProvidingApplication)
   const char*     outFile = "ngsi9.registerContextResponse.emptyProvidingApplication.valid.json";
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
-  orionldState.in.contentType  = JSON;
+  orionldState.verb = HTTP_POST;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -186,8 +188,8 @@ TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
   const char*     outFile = "ngsi9.registerContextResponse.entityIdWithIsPatternTrue.valid.json";
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
-  orionldState.in.contentType   = JSON;
+  orionldState.verb = HTTP_POST;
+  orionldState.in.contentType   = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -209,8 +211,8 @@ TEST(RegisterContextRequest, json_invalidIsPatternString)
   const char*     expect = "OK";
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
-  orionldState.in.contentType   = JSON;
+  orionldState.verb = HTTP_POST;
+  orionldState.in.contentType   = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -230,8 +232,8 @@ TEST(RegisterContextRequest, json_overwriteEntityIdType)
   const char*     inFile = "ngsi9.registerContextRequest.overwriteEntityIdType.invalid.json";
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
-  orionldState.in.contentType  = JSON;
+  orionldState.verb = HTTP_POST;
+  orionldState.in.contentType  = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -252,8 +254,8 @@ TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
   const char*     outFile = "ngsi9.registerContextResponse.badContextRegistrationAttributeIsDomain.valid.json";
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
-  orionldState.in.contentType   = JSON;
+  orionldState.verb = HTTP_POST;
+  orionldState.in.contentType   = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -275,8 +277,8 @@ TEST(RegisterContextRequest, json_reregistration)
   const char*     expect = "OK";
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
-  orionldState.in.contentType   = JSON;
+  orionldState.verb = HTTP_POST;
+  orionldState.in.contentType   = MT_JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 

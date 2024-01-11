@@ -80,7 +80,7 @@ std::string getNgsi10ContextEntityTypesAttribute
   EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
   std::string     typeNameFromUriParam  = orionldState.uriParams.type? orionldState.uriParams.type : "";
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
 
   // 01. Get values from URL (entityId::type, esist, !exist)
@@ -98,7 +98,7 @@ std::string getNgsi10ContextEntityTypesAttribute
   if (typeInfo == EntityTypeEmpty)
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
-    alarmMgr.badInput(clientIp, "entity::type cannot be empty for this request");
+    alarmMgr.badInput(orionldState.clientIp, "entity::type cannot be empty for this request");
 
     TIMED_RENDER(answer = parseDataP->qcrs.res.render(orionldState.apiVersion, asJsonObject));
     parseDataP->qcr.res.release();
@@ -107,7 +107,7 @@ std::string getNgsi10ContextEntityTypesAttribute
   else if ((typeNameFromUriParam != typeName) && (typeNameFromUriParam != ""))
   {
     parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
-    alarmMgr.badInput(clientIp, "non-matching entity::types in URL");
+    alarmMgr.badInput(orionldState.clientIp, "non-matching entity::types in URL");
 
     TIMED_RENDER(answer = parseDataP->qcrs.res.render(orionldState.apiVersion, asJsonObject));
     parseDataP->qcr.res.release();

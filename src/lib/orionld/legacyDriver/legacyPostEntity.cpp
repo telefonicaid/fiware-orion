@@ -22,52 +22,51 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>                                              // strlen
-#include <string>                                                // std::string
-#include <vector>                                                // std::vector
+#include <string.h>                                                       // strlen
+#include <string>                                                         // std::string
+#include <vector>                                                         // std::vector
 
 extern "C"
 {
-#include "kbase/kMacros.h"                                       // K_VEC_SIZE, K_FT
-#include "kbase/kTime.h"                                         // kTimeGet
-#include "kjson/kjBuilder.h"                                     // kjChildRemove, kjChildAdd
-#include "kjson/kjLookup.h"                                      // kjLookup
-#include "kjson/kjClone.h"                                       // kjClone
-#include "kjson/kjRender.h"                                      // kjRender
-#include "kalloc/kaAlloc.h"                                      // kaAlloc
-#include "kalloc/kaStrdup.h"                                     // kaStrdup
+#include "kbase/kMacros.h"                                                // K_VEC_SIZE, K_FT
+#include "kbase/kTime.h"                                                  // kTimeGet
+#include "kjson/kjBuilder.h"                                              // kjChildRemove, kjChildAdd
+#include "kjson/kjLookup.h"                                               // kjLookup
+#include "kjson/kjClone.h"                                                // kjClone
+#include "kjson/kjRender.h"                                               // kjRender
+#include "kalloc/kaAlloc.h"                                               // kaAlloc
+#include "kalloc/kaStrdup.h"                                              // kaStrdup
 }
 
-#include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
+#include "logMsg/logMsg.h"                                                // LM_*
 
-#include "common/MimeType.h"                                     // MimeType
-#include "ngsi/ContextAttribute.h"                               // ContextAttribute
-#include "ngsi10/UpdateContextRequest.h"                         // UpdateContextRequest
-#include "ngsi10/UpdateContextResponse.h"                        // UpdateContextResponse
-#include "mongoBackend/mongoUpdateContext.h"                     // mongoUpdateContext
+#include "ngsi/ContextAttribute.h"                                        // ContextAttribute
+#include "ngsi10/UpdateContextRequest.h"                                  // UpdateContextRequest
+#include "ngsi10/UpdateContextResponse.h"                                 // UpdateContextResponse
+#include "mongoBackend/mongoUpdateContext.h"                              // mongoUpdateContext
 
-#include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
-#include "orionld/common/orionldState.h"                         // orionldState
-#include "orionld/common/orionldError.h"                         // orionldError
-#include "orionld/common/performance.h"                          // PERFORMANCE
-#include "orionld/common/CHECK.h"                                // CHECK
-#include "orionld/common/SCOMPARE.h"                             // SCOMPAREx
-#include "orionld/common/dotForEq.h"                             // dotForEq
-#include "orionld/common/eqForDot.h"                             // eqForDot
-#include "orionld/common/attributeUpdated.h"                     // attributeUpdated
-#include "orionld/common/attributeNotUpdated.h"                  // attributeNotUpdated
-#include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
-#include "orionld/payloadCheck/pCheckUri.h"                      // pCheckUri
-#include "orionld/payloadCheck/pCheckAttribute.h"                // pCheckAttribute
-#include "orionld/context/orionldAttributeExpand.h"              // orionldAttributeExpand
-#include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
-#include "orionld/kjTree/kjTreeToContextAttribute.h"             // kjTreeToContextAttribute
-#include "orionld/kjTree/kjStringValueLookupInArray.h"           // kjStringValueLookupInArray
+#include "orionld/types/OrionldContextItem.h"                             // OrionldContextItem
+#include "orionld/types/OrionldMimeType.h"                                // MimeType
+#include "orionld/common/orionldState.h"                                  // orionldState
+#include "orionld/common/orionldError.h"                                  // orionldError
+#include "orionld/common/performance.h"                                   // PERFORMANCE
+#include "orionld/common/CHECK.h"                                         // CHECK
+#include "orionld/common/SCOMPARE.h"                                      // SCOMPAREx
+#include "orionld/common/dotForEq.h"                                      // dotForEq
+#include "orionld/common/eqForDot.h"                                      // eqForDot
+#include "orionld/common/attributeUpdated.h"                              // attributeUpdated
+#include "orionld/common/attributeNotUpdated.h"                           // attributeNotUpdated
+#include "orionld/payloadCheck/PCHECK.h"                                  // PCHECK_*
+#include "orionld/payloadCheck/pCheckUri.h"                               // pCheckUri
+#include "orionld/payloadCheck/pCheckAttribute.h"                         // pCheckAttribute
+#include "orionld/context/orionldAttributeExpand.h"                       // orionldAttributeExpand
+#include "orionld/context/orionldContextItemAliasLookup.h"                // orionldContextItemAliasLookup
+#include "orionld/legacyDriver/kjTreeToContextAttribute.h"                // kjTreeToContextAttribute
+#include "orionld/kjTree/kjStringValueLookupInArray.h"                    // kjStringValueLookupInArray
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityLookup.h"            // mongoCppLegacyEntityLookup
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityAttributesDelete.h"  // mongoCppLegacyEntityAttributesDelete
 #include "orionld/mongoCppLegacy/mongoCppLegacyEntityFieldReplace.h"      // mongoCppLegacyEntityFieldReplace
-#include "orionld/legacyDriver/legacyPostEntity.h"               // Own Interface
+#include "orionld/legacyDriver/legacyPostEntity.h"                        // Own Interface
 
 
 
@@ -298,12 +297,12 @@ bool legacyPostEntity(void)
     if (notUpdatedP->value.firstChildP == NULL)  // Empty array of "not updated attributes" - All OK
     {
       orionldState.responseTree   = NULL;
-      orionldState.httpStatusCode = SccNoContent;
+      orionldState.httpStatusCode = 204;
     }
     else
     {
       orionldState.responseTree   = responseP;
-      orionldState.httpStatusCode = SccMultiStatus;
+      orionldState.httpStatusCode = 207;
     }
 
     return true;
@@ -457,7 +456,6 @@ bool legacyPostEntity(void)
   // 10.2. Call mongoBackend to do the Update - if there are any attributes without datasetId
   if (notOnlyDatasets == true)
   {
-    HttpStatusCode            status;
     UpdateContextResponse     ucResponse;
     std::vector<std::string>  servicePathV;
 
@@ -468,19 +466,19 @@ bool legacyPostEntity(void)
     if (attrNameIx > 0)
       mongoCppLegacyEntityAttributesDelete(entityId, attrNameV, attrsInPayload);
 
-    status = mongoUpdateContext(&ucr,
-                                &ucResponse,
-                                orionldState.tenantP,
-                                servicePathV,
-                                orionldState.in.xAuthToken,
-                                orionldState.correlator,
-                                orionldState.attrsFormat,
-                                orionldState.apiVersion,
-                                NGSIV2_NO_FLAVOUR);
+    int status = (int) mongoUpdateContext(&ucr,
+                                          &ucResponse,
+                                          orionldState.tenantP,
+                                          servicePathV,
+                                          orionldState.in.xAuthToken,
+                                          orionldState.correlator,
+                                          orionldState.attrsFormat,
+                                          orionldState.apiVersion,
+                                          NGSIV2_NO_FLAVOUR);
 
     PERFORMANCE(dbEnd);
 
-    if (status != SccOk)
+    if (status != 200)
       LM_E(("mongoUpdateContext: %d", status));
   }
 
@@ -490,12 +488,12 @@ bool legacyPostEntity(void)
   if (notUpdatedP->value.firstChildP == NULL)  // Empty array of "not updated attributes" - All OK
   {
     orionldState.responseTree   = NULL;
-    orionldState.httpStatusCode = SccNoContent;
+    orionldState.httpStatusCode = 204;
   }
   else
   {
     orionldState.responseTree   = responseP;
-    orionldState.httpStatusCode = SccMultiStatus;
+    orionldState.httpStatusCode = 207;
   }
 
   ucr.release();

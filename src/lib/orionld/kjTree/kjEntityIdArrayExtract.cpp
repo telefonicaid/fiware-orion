@@ -92,7 +92,7 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* errorArray)
     //
     KjNode* contextNodeP  = kjLookup(entityP, "@context");
 
-    if ((orionldState.in.contentType == JSONLD) && (contextNodeP == NULL))
+    if ((orionldState.in.contentType == MT_JSONLD) && (contextNodeP == NULL))
     {
       LM_W(("Bad Input (Content-Type == application/ld+json, but no @context in payload data array item)"));
       entityErrorPush(errorArray,
@@ -107,7 +107,7 @@ KjNode* kjEntityIdArrayExtract(KjNode* entityArray, KjNode* errorArray)
     }
 
 
-    if ((orionldState.in.contentType != JSONLD) && (contextNodeP != NULL))
+    if ((orionldState.in.contentType != MT_JSONLD) && (contextNodeP != NULL))
     {
       LM_W(("Bad Input (Content-Type is 'application/json', and an @context is present in the payload data array item)"));
       entityErrorPush(errorArray,

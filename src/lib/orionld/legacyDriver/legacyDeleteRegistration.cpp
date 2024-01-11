@@ -54,7 +54,7 @@ bool legacyDeleteRegistration(void)
     return false;
   }
 
-  orionldState.httpStatusCode = SccNoContent;
+  orionldState.httpStatusCode = 204;
 
   return true;
 }

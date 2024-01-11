@@ -690,13 +690,13 @@ Date: REGEX(.*)
 36. Property with observedAt that is a string but not a valid ISO8601 - normalized
 ==================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 122
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "observedAt",
-    "title": "Not a valid ISO8601 DateTime",
+    "title": "Invalid ISO8601 timestamp",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
@@ -704,13 +704,13 @@ Date: REGEX(.*)
 37. Property with observedAt that is a string but not a valid ISO8601 - concise
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 122
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "detail": "observedAt",
-    "title": "Not a valid ISO8601 DateTime",
+    "title": "Invalid ISO8601 timestamp",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 

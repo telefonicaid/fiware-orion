@@ -140,9 +140,9 @@ int mongoSubCacheItemInsert(const char* tenant, const BSONObj& sub)
   //
   // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
-  const char*    ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(&sub, CSUB_LDCONTEXT) : NULL;
-  const char*    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(&sub, CSUB_FORMAT) : "legacy";
-  RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
+  const char*         ldContext          = sub.hasField(CSUB_LDCONTEXT)? getStringFieldF(&sub, CSUB_LDCONTEXT) : NULL;
+  const char*         renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(&sub, CSUB_FORMAT) : "legacy";
+  OrionldRenderFormat renderFormat       = stringToRenderFormat(renderFormatString);
 
   if ((ldContext != NULL) && (ldContext[0] != 0))  // NGSI-LD subscription
     cSubP->ldContext = ldContext;
@@ -372,7 +372,7 @@ int mongoSubCacheItemInsert
   const std::string&  georel,
   StringFilter*       stringFilterP,
   StringFilter*       mdStringFilterP,
-  RenderFormat        renderFormat
+  OrionldRenderFormat renderFormat
 )
 {
   //

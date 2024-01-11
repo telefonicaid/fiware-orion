@@ -27,6 +27,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"                            // ApiVersion
 #include "orionld/common/orionldState.h"                         // orionldState
 
 #include "common/statistics.h"
@@ -78,9 +79,9 @@ std::string postBatchUpdate
   if (parseDataP->upcr.res.contextElementVector.size() == 0)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
-    alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
+    alarmMgr.badInput(orionldState.clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
 
-    TIMED_RENDER(answer = oe.smartRender(V2));
+    TIMED_RENDER(answer = oe.smartRender(API_VERSION_NGSI_V2));
     orionldState.httpStatusCode = SccBadRequest;
 
     return answer;

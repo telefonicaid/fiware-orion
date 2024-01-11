@@ -23,6 +23,7 @@
 * Author: Fermin Galan
 */
 #include "orionTypes/EntityTypeVector.h"
+#include "orionld/types/OrionldMimeType.h"
 #include "unittests/unittest.h"
 
 
@@ -46,11 +47,11 @@ TEST(EntityTypeVector, check)
   EntityTypeVector etV2;
   etV2.push_back(&et2);
 
-  EXPECT_EQ("OK", etV1.check(V1, ""));
+  EXPECT_EQ("OK", etV1.check(API_VERSION_NGSI_V1, ""));
 
-  EXPECT_EQ("foo", etV1.check(V1, "foo"));
+  EXPECT_EQ("foo", etV1.check(API_VERSION_NGSI_V1, "foo"));
 
-  EXPECT_EQ("Empty Type", etV2.check(V1, ""));
+  EXPECT_EQ("Empty Type", etV2.check(API_VERSION_NGSI_V1, ""));
 
   utExit();
 }

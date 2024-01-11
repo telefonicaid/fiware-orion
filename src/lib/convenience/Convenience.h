@@ -29,9 +29,10 @@
 #include <vector>
 
 #include "rest/ConnectionInfo.h"
-#include "rest/Verb.h"
 #include "rest/HttpStatusCode.h"
 #include "ngsi/ParseData.h"
+
+#include "orionld/types/Verb.h"           // Verb
 
 
 

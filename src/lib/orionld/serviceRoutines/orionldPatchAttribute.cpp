@@ -35,8 +35,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLinkAdd
-
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
@@ -308,7 +306,7 @@ bool orionldPatchAttribute(void)
 
 
   //
-  // orionldMhdConnectionTreat() expands the attribute name for us.
+  // mhdConnectionTreat() expands the attribute name for us.
   // Here we save it in the orionldState.wildcard array, so that TRoE won't have to expand it
   //
   orionldState.wildcard[1] = orionldState.in.pathAttrExpanded;

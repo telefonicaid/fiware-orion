@@ -47,7 +47,6 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                     // LM_*
 
-#include "serviceRoutines/versionTreat.h"                      // versionGet (Orion version)
 #include "cache/subCache.h"                                    // subCacheItems
 
 #include "orionld/common/orionldState.h"                       // orionldState, orionldVersion, postgresServerVersion, mongocServerVersion
@@ -100,7 +99,7 @@ bool orionldGetVersion(void)
   kjChildAdd(orionldState.responseTree, nodeP);
 
   // Orion version
-  nodeP = kjString(orionldState.kjsonP, "based on orion", versionGet());
+  nodeP = kjString(orionldState.kjsonP, "based on orion", "1.15.0-next");
   kjChildAdd(orionldState.responseTree, nodeP);
 
   // K-Lib versions

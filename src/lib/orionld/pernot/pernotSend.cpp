@@ -164,7 +164,7 @@ bool pernotSend(PernotSubscription* subP, KjNode* entityArray)
   int  headerIx      = 7;
   bool addLinkHeader = true;
 
-  if (subP->mimeType == JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
+  if (subP->mimeType == MT_JSONLD)  // If Content-Type is application/ld+json, modify slot 2 of ioVec
   {
     ioVec[2].iov_base = (void*) contentTypeHeaderJsonLd;  // REPLACE "application/json" with "application/ld+json"
     ioVec[2].iov_len  = 35;

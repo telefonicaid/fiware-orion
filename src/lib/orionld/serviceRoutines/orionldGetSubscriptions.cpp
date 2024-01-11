@@ -30,10 +30,10 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "cache/subCache.h"                                      // CachedSubscription, subCacheHeadGet, subCacheItemLookup
-#include "common/RenderFormat.h"                                 // RenderFormat
 
 #include "orionld/types/OrionldHeader.h"                         // orionldHeaderAdd, HttpResultsCount
 #include "orionld/types/QNode.h"                                 // QNode
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/tenantList.h"                           // tenant0
@@ -108,23 +108,23 @@ static bool orionldGetSubscriptionsFromDb(void)
   //
   for (KjNode* dbSubP = dbSubV->value.firstChildP; dbSubP != NULL; dbSubP = dbSubP->next)
   {
-    QNode*       qTree         = NULL;
-    KjNode*      contextNodeP  = NULL;
-    KjNode*      coordinatesP  = NULL;
-    KjNode*      showChangesP  = NULL;
-    KjNode*      sysAttrsP     = NULL;
-    RenderFormat renderFormat  = RF_NORMALIZED;
-    double       timeInterval  = 0;
-    KjNode*      apiSubP       = dbModelToApiSubscription(dbSubP,
-                                                          orionldState.tenantP->tenant,
-                                                          false,
-                                                          &qTree,
-                                                          &coordinatesP,
-                                                          &contextNodeP,
-                                                          &showChangesP,
-                                                          &sysAttrsP,
-                                                          &renderFormat,
-                                                          &timeInterval);
+    QNode*              qTree         = NULL;
+    KjNode*             contextNodeP  = NULL;
+    KjNode*             coordinatesP  = NULL;
+    KjNode*             showChangesP  = NULL;
+    KjNode*             sysAttrsP     = NULL;
+    OrionldRenderFormat renderFormat  = RF_NORMALIZED;
+    double              timeInterval  = 0;
+    KjNode*             apiSubP       = dbModelToApiSubscription(dbSubP,
+                                                                 orionldState.tenantP->tenant,
+                                                                 false,
+                                                                 &qTree,
+                                                                 &coordinatesP,
+                                                                 &contextNodeP,
+                                                                 &showChangesP,
+                                                                 &sysAttrsP,
+                                                                 &renderFormat,
+                                                                 &timeInterval);
 
     if (apiSubP == NULL)
     {
@@ -132,7 +132,7 @@ static bool orionldGetSubscriptionsFromDb(void)
       continue;
     }
 
-    if (orionldState.out.contentType == JSONLD)
+    if (orionldState.out.contentType == MT_JSONLD)
     {
       KjNode* nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
       if (nodeP == NULL)
@@ -224,7 +224,7 @@ bool orionldGetSubscriptions(void)
       {
         if (pSubP->tenantP == orionldState.tenantP)
         {
-          KjNode* subP = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+          KjNode* subP = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == MT_JSONLD);
 
           if (subP == NULL)
           {
@@ -256,7 +256,7 @@ bool orionldGetSubscriptions(void)
           continue;
         }
 
-        KjNode* subP = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+        KjNode* subP = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == MT_JSONLD);
 
         if (subP == NULL)
         {

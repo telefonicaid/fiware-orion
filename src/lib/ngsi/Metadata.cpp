@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "orionld/types/ApiVersion.h"                              // ApiVersion
 #include "orionld/common/orionldState.h"                           // orionldState
 
 #include "common/globals.h"
@@ -273,7 +274,7 @@ std::string Metadata::render(bool comma)
   else if (valueType == orion::ValueTypeObject)
   {
     bool        isCompoundVector = false;
-    ApiVersion  apiVersion       = V1;
+    ApiVersion  apiVersion       = API_VERSION_NGSI_V1;
 
     if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
     {
@@ -317,7 +318,7 @@ std::string Metadata::render(bool comma)
   }
 
   // Adding sysAttrs, if NGSI-LD and if explicitly requested
-  if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
+  if ((orionldState.apiVersion == API_VERSION_NGSILD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
   {
     std::string dateTime = isodate2str(createdAt);
     out += JSON_STR("createdAt") + ":" + dateTime;
@@ -342,50 +343,50 @@ std::string Metadata::check(ApiVersion apiVersion)
   size_t len;
   char   errorMsg[128];
 
-  if (apiVersion == V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
+  if (apiVersion == API_VERSION_NGSI_V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if (name == "")
   {
-    alarmMgr.badInput(clientIp, "missing metadata name");
+    alarmMgr.badInput(orionldState.clientIp, "missing metadata name");
     return "missing metadata name";
   }
 
   if ( (len = strlen(name.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if (forbiddenIdChars(apiVersion , name.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata");
+    alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the name of a Metadata");
     return "Invalid characters in metadata name";
   }
 
   if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
 
-  if (apiVersion == V2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if (apiVersion == API_VERSION_NGSI_V2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
+    alarmMgr.badInput(orionldState.clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
   if (forbiddenIdChars(apiVersion, type.c_str()))
   {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata");
+    alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the type of a Metadata");
     return "Invalid characters in metadata type";
   }
 
@@ -393,13 +394,13 @@ std::string Metadata::check(ApiVersion apiVersion)
   {
     if (forbiddenChars(stringValue.c_str()))
     {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a Metadata");
+      alarmMgr.badInput(orionldState.clientIp, "found a forbidden character in the value of a Metadata");
       return "Invalid characters in metadata value";
     }
 
-    if (apiVersion == V1 && stringValue == "")
+    if (apiVersion == API_VERSION_NGSI_V1 && stringValue == "")
     {
-      alarmMgr.badInput(clientIp, "missing metadata value");
+      alarmMgr.badInput(orionldState.clientIp, "missing metadata value");
       return "missing metadata value";
     }
   }
@@ -558,7 +559,7 @@ std::string Metadata::toJson(bool isLastElement)
   }
 
   // Adding sysAttrs, if NGSI-LD and if explicitly requested
-  if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
+  if ((orionldState.apiVersion == API_VERSION_NGSILD_V1) && (orionldState.uriParamOptions.sysAttrs == true))
   {
     std::string dateTime = isodate2str(createdAt);
     out += JSON_STR("createdAt") + ":" + dateTime;

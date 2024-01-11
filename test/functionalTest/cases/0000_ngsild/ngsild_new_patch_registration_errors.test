@@ -1991,12 +1991,13 @@ Date: REGEX(.*)
 46. Attempt to PATCH the registration with an 'observationInterval' with a 'start' field that is not a valid DateTime - see failure
 ===================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 206
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "startAt",
+    "detail": "invalid DateTime: '2028-12-3010:00:00' (error in 'date' part '2028-12-3010:00:00')",
+    "field": "startAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2019,12 +2020,13 @@ Date: REGEX(.*)
 48. Attempt to PATCH the registration with an 'observationInterval' with an 'end' field that is not a valid DateTime - see failure
 ==================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 204
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "endAt",
+    "detail": "invalid DateTime: '2028-12-3110:00:00' (error in 'date' part '2028-12-3110:00:00')",
+    "field": "endAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2173,12 +2175,13 @@ Date: REGEX(.*)
 59. Attempt to PATCH the registration with an 'managementInterval' with a 'start' field that is not a valid DateTime - see failure
 ==================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 113
+Content-Length: 206
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "startAt",
+    "detail": "invalid DateTime: '2028-12-3010:00:00' (error in 'date' part '2028-12-3010:00:00')",
+    "field": "startAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2201,12 +2204,13 @@ Date: REGEX(.*)
 61. Attempt to PATCH the registration with an 'managementInterval' with an 'end' field that is not a valid DateTime - see failure
 =================================================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
+Content-Length: 204
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "endAt",
+    "detail": "invalid DateTime: '2028-12-3110:00:00' (error in 'date' part '2028-12-3110:00:00')",
+    "field": "endAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
@@ -2803,12 +2807,13 @@ Date: REGEX(.*)
 100. Attempt to PATCH the registration with an 'expiresAt' that is not a valid DateTime - see failure
 =====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 115
+Content-Length: 203
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "expiresAt",
+    "detail": "error in position 0 of DATE part 'no date' of DateTime 'no date': not a digit",
+    "field": "expiresAt",
     "title": "Invalid DateTime value",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }

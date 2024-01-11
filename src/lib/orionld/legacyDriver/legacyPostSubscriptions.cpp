@@ -38,15 +38,15 @@ extern "C"
 
 #include "apiTypesV2/Subscription.h"                           // Subscription
 #include "rest/OrionError.h"                                   // OrionError
-#include "rest/httpHeaderAdd.h"                                // httpHeaderLocationAdd
 #include "mongoBackend/mongoGetSubscriptions.h"                // mongoGetLdSubscription
 #include "mongoBackend/mongoCreateSubscription.h"              // mongoCreateSubscription
 
 #include "orionld/common/orionldState.h"                       // orionldState, coreContextUrl
 #include "orionld/common/orionldError.h"                       // orionldError
-#include "orionld/kjTree/kjTreeToSubscription.h"               // kjTreeToSubscription
+#include "orionld/http/httpHeaderLocationAdd.h"                // httpHeaderLocationAdd
 #include "orionld/mqtt/mqttParse.h"                            // mqttParse
 #include "orionld/mqtt/mqttConnectionEstablish.h"              // mqttConnectionEstablish
+#include "orionld/legacyDriver/kjTreeToSubscription.h"         // kjTreeToSubscription
 #include "orionld/legacyDriver/legacyPostSubscriptions.h"      // Own interface
 
 
@@ -70,7 +70,7 @@ bool legacyPostSubscriptions(void)
   // FIXME: attrsFormat etc. should be set to default by constructor
   //        only ... there is no constructor ...
   //
-  sub.attrsFormat = DEFAULT_RENDER_FORMAT;
+  sub.attrsFormat         = RF_DEFAULT;
   sub.expires             = -1;  // 0?
   sub.throttling          = -1;  // 0?
   sub.timeInterval        = -1;  // 0?
@@ -204,7 +204,7 @@ bool legacyPostSubscriptions(void)
     return false;
   }
 
-  orionldState.httpStatusCode = SccCreated;
+  orionldState.httpStatusCode = 201;
   httpHeaderLocationAdd("/ngsi-ld/v1/subscriptions/", subId.c_str(), orionldState.tenantP->tenant);
 
   return true;

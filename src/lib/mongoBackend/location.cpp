@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "orionld/types/ApiVersion.h"                    // ApiVersion
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "logMsg/logMsg.h"
@@ -118,7 +120,7 @@ static bool getGeoJson
   std::vector<double>  coordLong;
   BSONArrayBuilder     ba;
 
-  if ((apiVersion == V1) || (caP->type == GEO_POINT))
+  if ((apiVersion == API_VERSION_NGSI_V1) || (caP->type == GEO_POINT))
   {
     double  aLat;
     double  aLong;
@@ -420,7 +422,7 @@ bool processLocationAtUpdateAttribute
   //
   else if (*currentLocAttrName == targetAttr->name)
   {
-    if (apiVersion == V1)
+    if (apiVersion == API_VERSION_NGSI_V1)
     {
       /* In this case, no-location means that the target attribute doesn't have the "location" metadata. In order
        * to mantain backwards compabitibility, this is interpreted as a location update */

@@ -257,7 +257,7 @@ void UpdateContextRequest::fill
     }
     else if (mP->stringValue != metaID)
     {
-      alarmMgr.badInput(clientIp, "metaID differs in URI and payload");
+      alarmMgr.badInput(orionldState.clientIp, "metaID differs in URI and payload");
     }
   }
 

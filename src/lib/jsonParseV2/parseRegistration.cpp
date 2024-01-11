@@ -29,6 +29,7 @@
 #include "logMsg/logMsg.h"
 
 #include "orionld/common/orionldState.h"                         // orionldState
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 
 #include "common/string.h"
 #include "common/errorMessages.h"
@@ -341,9 +342,12 @@ std::string parseRegistration(ConnectionInfo* ciP, ngsiv2::Registration* regP)
 
     if (!expires.empty())
     {
-      expiresValue = parse8601Time((char*) expires.c_str());
+      char errorString[256];
+
+      expiresValue = dateTimeFromString(expires.c_str(), errorString, sizeof(errorString));
       if (expiresValue == -1)
       {
+        LM_E(("dateTimeFromString: %s", errorString));
         return badInput(ciP, "the field /expires/ has an invalid format");
       }
     }

@@ -28,6 +28,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionld/types/ApiVersion.h"                // ApiVersion
 #include "orionld/common/orionldState.h"             // orionldState
 
 #include "common/errorMessages.h"
@@ -38,6 +39,8 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/OrionError.h"
+
+#include "orionld/common/dateTime.h"
 
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseMetadataVector.h"
@@ -70,7 +73,7 @@ static std::string parseContextAttributeObject
     {
       if (type != "String")
       {
-        alarmMgr.badInput(clientIp, "ContextAttributeObject::type must be a String");
+        alarmMgr.badInput(orionldState.clientIp, "ContextAttributeObject::type must be a String");
         return "invalid JSON type for attribute type";
       }
 
@@ -122,7 +125,7 @@ static std::string parseContextAttributeObject
         std::string r   = parseContextAttributeCompoundValue(iter, caP, NULL);
         if (r != "OK")
         {
-          alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Vector");
+          alarmMgr.badInput(orionldState.clientIp, "json error in ContextAttributeObject::Vector");
           return "json error in ContextAttributeObject::Vector";
         }
       }
@@ -133,7 +136,7 @@ static std::string parseContextAttributeObject
         std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
         if (r != "OK")
         {
-          alarmMgr.badInput(clientIp, "json error in ContextAttributeObject::Object");
+          alarmMgr.badInput(orionldState.clientIp, "json error in ContextAttributeObject::Object");
           return "json error in ContextAttributeObject::Object";
         }
       }
@@ -145,7 +148,7 @@ static std::string parseContextAttributeObject
       if (r != "OK")
       {
         std::string details = std::string("error parsing Metadata: ") + r;
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(orionldState.clientIp, details);
         return r;
       }
     }
@@ -159,10 +162,12 @@ static std::string parseContextAttributeObject
   // Is it a date?
   if ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT))
   {
-    caP->numberValue =  parse8601Time((char*) caP->stringValue.c_str());
+    char errorString[256];
+    caP->numberValue =  dateTimeFromString(caP->stringValue.c_str(), errorString, sizeof(errorString));
 
-    if (caP->numberValue == -1)
+    if (caP->numberValue < 0)
     {
+      LM_E(("dateTimeFromString: %s", errorString));
       return "date has invalid format";
     }
 
@@ -232,7 +237,7 @@ std::string parseContextAttribute
 
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, "json error in ContextAttribute::Vector");
+        alarmMgr.badInput(orionldState.clientIp, "json error in ContextAttribute::Vector");
         orionldState.httpStatusCode = SccBadRequest;
         return "json error in ContextAttribute::Vector";
       }
@@ -244,7 +249,7 @@ std::string parseContextAttribute
     }
     else
     {
-      alarmMgr.badInput(clientIp, "bad type for ContextAttribute");
+      alarmMgr.badInput(orionldState.clientIp, "bad type for ContextAttribute");
       orionldState.httpStatusCode = SccBadRequest;
       return "invalid JSON type for ContextAttribute";
     }
@@ -256,25 +261,25 @@ std::string parseContextAttribute
     if (type != "Object")
     {
       std::string details = "attribute must be a JSON object, unless keyValues option is used";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
       orionldState.httpStatusCode = SccBadRequest;
       return details;
     }
 
     // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
-    if (iter->value.HasMember("value") || orionldState.apiVersion == V2)
+    if (iter->value.HasMember("value") || orionldState.apiVersion == API_VERSION_NGSI_V2)
     {
       std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector);
       if (r != "OK")
       {
-        alarmMgr.badInput(clientIp, "JSON parse error in ContextAttribute::Object");
+        alarmMgr.badInput(orionldState.clientIp, "JSON parse error in ContextAttribute::Object");
         orionldState.httpStatusCode = SccBadRequest;
         return r;
       }
     }
     else
     {
-      alarmMgr.badInput(clientIp, "no 'value' for ContextAttribute without keyValues");
+      alarmMgr.badInput(orionldState.clientIp, "no 'value' for ContextAttribute without keyValues");
       orionldState.httpStatusCode = SccBadRequest;
       return "no 'value' for ContextAttribute without keyValues";
     }
@@ -288,7 +293,7 @@ std::string parseContextAttribute
   std::string r = caP->check(orionldState.apiVersion, ciP->restServiceP->request);
   if (r != "OK")
   {
-    alarmMgr.badInput(clientIp, r);
+    alarmMgr.badInput(orionldState.clientIp, r);
     orionldState.httpStatusCode = SccBadRequest;
     return r;
   }
@@ -312,7 +317,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON parse error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON parse error");
     orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -323,7 +328,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(orionldState.clientIp, "JSON Parse Error");
     orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -336,7 +341,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
   {
     OrionError oe(SccBadRequest, r, "BadRequest");
 
-    alarmMgr.badInput(clientIp, r);
+    alarmMgr.badInput(orionldState.clientIp, r);
     orionldState.httpStatusCode = SccBadRequest;
 
     return oe.toJson();

@@ -38,13 +38,12 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd, httpHeaderLinkAdd
-
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/performance.h"                          // PERFORMANCE
 #include "orionld/common/responseFix.h"                          // responseFix
+#include "orionld/http/httpHeaderLocationAdd.h"                  // httpHeaderLocationAdd
 #include "orionld/legacyDriver/legacyPostEntities.h"             // legacyPostEntities
 #include "orionld/payloadCheck/PCHECK.h"                         // PCHECK_*
 #include "orionld/payloadCheck/pCheckEntityId.h"                 // pCheckEntityId
@@ -152,9 +151,9 @@ bool orionldPostEntities(void)
 
   //
   // NOTE
-  //   payloadParseAndExtractSpecialFields() from orionldMhdConnectionTreat() decouples the entity id and type
+  //   payloadParseAndExtractSpecialFields() from mhdConnectionTreat() decouples the entity id and type
   //   from the payload body, so, the entity type is not expanded by pCheckEntity()
-  //   The expansion is instead done by payloadTypeNodeFix, called by orionldMhdConnectionTreat
+  //   The expansion is instead done by payloadTypeNodeFix, called by mhdConnectionTreat
   //
 
   // dbModelFromApiEntity destroys the tree, need to make a copy for notifications and TRoE

@@ -80,7 +80,7 @@ std::string EntityIdVector::check(RequestType requestType)
   {
     if (vec.size() == 0)
     {
-      alarmMgr.badInput(clientIp, "mandatory entity list missing");
+      alarmMgr.badInput(orionldState.clientIp, "mandatory entity list missing");
       return "No entities";
     }
   }
@@ -91,7 +91,7 @@ std::string EntityIdVector::check(RequestType requestType)
 
     if ((res = vec[ix]->check(requestType)) != "OK")
     {
-      alarmMgr.badInput(clientIp, "invalid vector of EntityIds");
+      alarmMgr.badInput(orionldState.clientIp, "invalid vector of EntityIds");
       return res;
     }
   }

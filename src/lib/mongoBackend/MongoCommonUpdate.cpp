@@ -41,7 +41,8 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+
+#include "orionld/types/ApiVersion.h"                              // ApiVersion
 
 #include "common/limits.h"
 #include "common/globals.h"
@@ -69,7 +70,7 @@ extern "C"
 #include "orionld/mongoCppLegacy/mongoCppLegacyKjTreeToBsonObj.h"  // mongoCppLegacyKjTreeToBsonObj
 #include "orionld/mongoCppLegacy/mongoCppLegacyDataToKjTree.h"     // mongoCppLegacyDataToKjTree
 #include "orionld/kjTree/kjSort.h"                                 // kjSort
-#include "orionld/kjTree/kjTreeFromCompoundValue.h"                // kjTreeFromCompoundValue
+#include "orionld/legacyDriver/kjTreeFromCompoundValue.h"          // kjTreeFromCompoundValue
 
 #include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/safeMongo.h"
@@ -111,7 +112,7 @@ using orion::CompoundValueNode;
 */
 static bool isNotCustomMetadata(const char* mdName)
 {
-  if (orionldState.apiVersion == NGSI_LD_V1)
+  if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
   {
     if ((strcmp(mdName, NGSI_MD_ID)           != 0) &&    // "id"
         (strcmp(mdName, NGSI_MD_DATECREATED)  != 0) &&    // "creDate"
@@ -406,7 +407,7 @@ static void appendMetadata
     //
     // Setting sysAttrs
     //
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
     {
       if (mdP->createdAt == 0)
       {
@@ -473,7 +474,7 @@ static void appendMetadata
 static bool compoundValueDiffers(CompoundValueNode* newValueP, mongo::BSONObj* oldValueAsBsonP, mongo::BSONArray* oldArrayValueP, bool isArray)
 {
   // Non NGSI-LD requests assume there's a diff whenever a compound is updated => always notifies
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
     return true;
 
   char*    details;
@@ -559,7 +560,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->valueType != orion::ValueTypeNotGiven)
   {
-    caP->valueBson(ab, getStringFieldF(&attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
+    caP->valueBson(ab, getStringFieldF(&attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == API_VERSION_NGSI_V1));
   }
   else
   {
@@ -634,7 +635,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
       continue;
     }
 
-    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == V2);
+    appendMetadata(&mdBuilder, &mdNamesBuilder, mdP, apiVersion == API_VERSION_NGSI_V2);
   }
 
 
@@ -660,7 +661,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
 
       mdSize++;
 
-      if (apiVersion != V2 || caP->onlyValue)
+      if (apiVersion != API_VERSION_NGSI_V2 || caP->onlyValue)
       {
         char decodedMdName[256];
 
@@ -710,7 +711,7 @@ static bool mergeAttrInfo(const BSONObj& attr, ContextAttribute* caP, BSONObj* m
     // For NGSI-LD, we want ALL updates to give notifications, even if nothing changed.
     // At least for now ...
     //
-    if ((orionldState.apiVersion == NGSI_LD_V1) && (noNotifyFalseUpdate == false))
+    if ((orionldState.apiVersion == API_VERSION_NGSILD_V1) && (noNotifyFalseUpdate == false))
       actualUpdate = true;
     else
     {
@@ -882,7 +883,7 @@ static bool updateAttribute
     *actualUpdate = true;
 
     std::string attrType;
-    if (!caP->typeGiven && (apiVersion == V2))
+    if (!caP->typeGiven && (apiVersion == API_VERSION_NGSI_V2))
     {
       if ((caP->compoundValueP == NULL) || (caP->compoundValueP->valueType != orion::ValueTypeVector))
       {
@@ -902,13 +903,13 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_CREATION_DATE, orionldState.requestTime);
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, orionldState.requestTime);
 
-    caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
+    caP->valueBson(newAttr, attrType, ngsiv1Autocast && (apiVersion == API_VERSION_NGSI_V1));
 
     /* Custom metadata */
     BSONObj    md;
     BSONArray  mdNames;
 
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == API_VERSION_NGSI_V2))
     {
       newAttr.append(ENT_ATTRS_MD, md);
     }
@@ -999,10 +1000,10 @@ static bool appendAttribute
 
 
   /* 1. Value */
-  caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == V1));
+  caP->valueBson(ab, caP->type, ngsiv1Autocast && (apiVersion == API_VERSION_NGSI_V1));
 
   /* 2. Type */
-  if ((apiVersion == V2) && !caP->typeGiven)
+  if ((apiVersion == API_VERSION_NGSI_V2) && !caP->typeGiven)
   {
     std::string attrType;
 
@@ -1026,7 +1027,7 @@ static bool appendAttribute
   BSONObj   md;
   BSONArray mdNames;
 
-  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == V2))
+  if (contextAttributeCustomMetadataToBson(&md, &mdNames, caP, apiVersion == API_VERSION_NGSI_V2))
   {
     ab.append(ENT_ATTRS_MD, md);
   }
@@ -1684,12 +1685,12 @@ static bool addTriggeredSubscriptions_noCache
       //
       // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
       //
-      double            throttling         = getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING, true);
-      double            lastNotification   = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION, true);
-      const char*       renderFmt          = getStringFieldF(&sub, CSUB_FORMAT);
-      const char*       renderFormatString = (renderFmt[0] == 0)? "legacy" : renderFmt;
-      RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
-      ngsiv2::HttpInfo  httpInfo;
+      double               throttling         = getNumberFieldAsDoubleF(&sub, CSUB_THROTTLING, true);
+      double               lastNotification   = getNumberFieldAsDoubleF(&sub, CSUB_LASTNOTIFICATION, true);
+      const char*          renderFmt          = getStringFieldF(&sub, CSUB_FORMAT);
+      const char*          renderFormatString = (renderFmt[0] == 0)? "legacy" : renderFmt;
+      OrionldRenderFormat  renderFormat       = stringToRenderFormat(renderFormatString);
+      ngsiv2::HttpInfo     httpInfo;
 
 
       httpInfo.fill(&sub);
@@ -1840,7 +1841,7 @@ static bool processOnChangeConditionForUpdateContext
   const StringList&                attrL,
   const std::vector<std::string>&  metadataV,
   std::string                      subId,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   OrionldTenant*                   tenantP,
   const char*                      xauthToken,
   const char*                      fiwareCorrelator,
@@ -2205,7 +2206,7 @@ static bool processSubscriptions
       Scope  geoScope;
       char*  filterErr;
 
-      if (geoScope.fill(V2, tSubP->expression.geometry.c_str(), tSubP->expression.coords.c_str(), tSubP->expression.georel.c_str(), &filterErr) != 0)
+      if (geoScope.fill(API_VERSION_NGSI_V2, tSubP->expression.geometry.c_str(), tSubP->expression.coords.c_str(), tSubP->expression.georel.c_str(), &filterErr) != 0)
       {
         // This has been already checked at subscription creation/update parsing time. Thus, the code cannot reach
         // this part.
@@ -2711,11 +2712,11 @@ static bool updateContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     // oe->fill() not used, as this is done internally in processLocationAtUpdateAttribute()
 
-    alarmMgr.badInput(clientIp, err);
+    alarmMgr.badInput(orionldState.clientIp, err);
     return false;
   }
 
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == API_VERSION_NGSI_V2, NGSI_MD_ACTIONTYPE_UPDATE);
 
   return true;
 }
@@ -2759,7 +2760,7 @@ static bool appendContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     oe->fill(SccInvalidModification, details, "Unprocessable");
 
-    alarmMgr.badInput(clientIp, "attribute cannot be appended");
+    alarmMgr.badInput(orionldState.clientIp, "attribute cannot be appended");
     return false;
   }
 
@@ -2780,7 +2781,7 @@ static bool appendContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     // oe->fill() is not used here as it is managed by processLocationAtAppendAttribute()
 
-    alarmMgr.badInput(clientIp, err);
+    alarmMgr.badInput(orionldState.clientIp, err);
     return false;
   }
 
@@ -2789,7 +2790,7 @@ static bool appendContextAttributeItem
   // to be called after the location processing logic (as this logic may need the compoundValueP
 
   std::string actionType = (actualAppend == true)? NGSI_MD_ACTIONTYPE_APPEND : NGSI_MD_ACTIONTYPE_UPDATE;
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, actionType);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == API_VERSION_NGSI_V2, actionType);
 
   return true;
 }
@@ -2833,7 +2834,7 @@ static bool deleteContextAttributeItem
       cerP->statusCode.fill(SccInvalidParameter, details);
       oe->fill(SccInvalidModification, details, "Unprocessable");
 
-      alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time");
+      alarmMgr.badInput(orionldState.clientIp, "location attribute has to be defined at creation time");
       return false;
     }
 
@@ -2867,7 +2868,7 @@ static bool deleteContextAttributeItem
     cerP->statusCode.fill(SccInvalidParameter, details);
     oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
-    alarmMgr.badInput(clientIp, "attribute to be deleted is not found");
+    alarmMgr.badInput(orionldState.clientIp, "attribute to be deleted is not found");
     ca->found = false;
 
     return false;
@@ -3085,7 +3086,7 @@ static bool createEntity
    * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
    * exist (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) */
 
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
     ensureLocationIndex(tenantP);
 
   if (idIndex == true)
@@ -3107,7 +3108,7 @@ static bool createEntity
   std::string     locAttr;
   BSONObjBuilder  geoJson;
 
-  if (orionldState.apiVersion != NGSI_LD_V1)
+  if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
   {
     if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
     {
@@ -3134,7 +3135,7 @@ static bool createEntity
 
     std::string attrType;
 
-    if (!attrsV[ix]->typeGiven && (apiVersion == V2))
+    if (!attrsV[ix]->typeGiven && (apiVersion == API_VERSION_NGSI_V2))
     {
       if ((attrsV[ix]->compoundValueP == NULL) || (attrsV[ix]->compoundValueP->valueType != orion::ValueTypeVector))
       {
@@ -3154,7 +3155,7 @@ static bool createEntity
     bsonAttr.append(ENT_ATTRS_CREATION_DATE, now);
     bsonAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
-    attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
+    attrsV[ix]->valueBson(bsonAttr, attrType, ngsiv1Autocast && (apiVersion == API_VERSION_NGSI_V1));
 
     char         effectiveName[512];
     const char*  metadataId = attrsV[ix]->getMetadataId();
@@ -3174,7 +3175,7 @@ static bool createEntity
     /* Custom metadata */
     BSONObj   md;
     BSONArray mdNames;
-    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == V2))
+    if (contextAttributeCustomMetadataToBson(&md, &mdNames, attrsV[ix], apiVersion == API_VERSION_NGSI_V2))
     {
       bsonAttr.append(ENT_ATTRS_MD, md);
     }
@@ -3190,7 +3191,7 @@ static bool createEntity
 
   if (eP->type == "")
   {
-    if (apiVersion == V2)
+    if (apiVersion == API_VERSION_NGSI_V2)
     {
       // NGSIv2 uses default entity type
       bsonId.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
@@ -3521,7 +3522,7 @@ static void updateEntity
     {
       if (howManyAttrs(&attrs, ceP->contextAttributeVector[ix]->name.c_str()) != 0)
       {
-        alarmMgr.badInput(clientIp, "attribute already exists");
+        alarmMgr.badInput(orionldState.clientIp, "attribute already exists");
         *attributeAlreadyExistsError = true;
 
         //
@@ -3579,7 +3580,7 @@ static void updateEntity
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
 
-    if (orionldState.apiVersion == NGSI_LD_V1)
+    if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
     {
       releaseTriggeredSubscriptions(&subsToNotify);
       notifyCerP->release();
@@ -3774,7 +3775,7 @@ static void updateEntity
   /* To finish with this entity processing, search for CPrs in not found attributes and
    * add the corresponding ContextElementResponse to the global response
    */
-  if ((orionldState.apiVersion != NGSI_LD_V1) && ((action == ActionTypeUpdate) || (action == ActionTypeReplace)))
+  if ((orionldState.apiVersion != API_VERSION_NGSILD_V1) && ((action == ActionTypeUpdate) || (action == ActionTypeReplace)))
     searchContextProviders(tenantP, servicePathV, *enP, ceP->contextAttributeVector, cerP);
 
   // StatusCode may be set already (if so, we keep the existing value)
@@ -3826,7 +3827,7 @@ static bool contextElementPreconditionsCheck
         else
           snprintf(details, sizeof(details), "duplicated attribute name: '%s' (metadata id:'%s')", name, id);
 
-        alarmMgr.badInput(clientIp, details);
+        alarmMgr.badInput(orionldState.clientIp, details);
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification, "duplicated attribute /" + std::string(name) + "/");
         responseP->oe.fill(SccBadRequest, std::string("duplicated attribute /") + name + "/", "BadRequest");
         return false;  // Error already in responseP
@@ -3847,7 +3848,7 @@ static bool contextElementPreconditionsCheck
   if (((action == ActionTypeUpdate) ||
        (action == ActionTypeAppend) ||
        (action == ActionTypeAppendStrict) ||
-       (action == ActionTypeReplace)) && (apiVersion == V1))
+       (action == ActionTypeReplace)) && (apiVersion == API_VERSION_NGSI_V1))
   {
     // FIXME: Careful, in V2, this check is not wanted ...
 
@@ -3866,7 +3867,7 @@ static bool contextElementPreconditionsCheck
         buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification, details);
         responseP->oe.fill(SccBadRequest, details, "BadRequest");
 
-        alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE");
+        alarmMgr.badInput(orionldState.clientIp, "empty attribute not allowed in APPEND or UPDATE");
         return false;  // Error already in responseP
       }
     }
@@ -3914,7 +3915,7 @@ void processContextElement
 )
 {
   /* Check preconditions */
-  if ((orionldState.apiVersion != NGSI_LD_V1) && (contextElementPreconditionsCheck(ceP, responseP, action, apiVersion) == false))
+  if ((orionldState.apiVersion != API_VERSION_NGSILD_V1) && (contextElementPreconditionsCheck(ceP, responseP, action, apiVersion) == false))
   {
     return;  // Error already in responseP
   }
@@ -3953,7 +3954,7 @@ void processContextElement
   std::auto_ptr<DBClientCursor>  cursor;
 
   // Several checks related to NGSIv2
-  if (apiVersion == V2)
+  if (apiVersion == API_VERSION_NGSI_V2)
   {
     unsigned long long entitiesNumber;
     std::string        err;
@@ -4109,7 +4110,7 @@ void processContextElement
 
     if ((action == ActionTypeUpdate) || (action == ActionTypeReplace))
     {
-      if (orionldState.apiVersion != NGSI_LD_V1)
+      if (orionldState.apiVersion != API_VERSION_NGSILD_V1)
       {
         /* In the case of UPDATE or REPLACE we look for context providers */
         searchContextProviders(tenantP, servicePathV, *enP, ceP->contextAttributeVector, cerP);
@@ -4120,11 +4121,11 @@ void processContextElement
       //
       // If no context providers found, then the UPDATE was simply for a non-found entity and an error should be returned
       //
-      if ((orionldState.apiVersion == NGSI_LD_V1) || (forwardsPending(responseP) == false))
+      if ((orionldState.apiVersion == API_VERSION_NGSILD_V1) || (forwardsPending(responseP) == false))
       {
         cerP->statusCode.fill(SccContextElementNotFound);
 
-        if (apiVersion == V1)
+        if (apiVersion == API_VERSION_NGSI_V1)
         {
           responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_CONTEXT_ELEMENT, ERROR_NOT_FOUND);
         }
@@ -4185,7 +4186,7 @@ void processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == V2);
+        ContextElementResponse* notifyCerP = new ContextElementResponse(ceP, apiVersion == API_VERSION_NGSI_V2);
 
         // Set action type
         setActionType(notifyCerP, NGSI_MD_ACTIONTYPE_APPEND);

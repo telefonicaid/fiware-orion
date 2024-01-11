@@ -25,20 +25,18 @@
 #include <string>
 #include <vector>
 
-#include "orionld/common/orionldState.h"             // orionldState
+#include "logMsg/logMsg.h"
+
+#include "orionld/types/ApiVersion.h"                          // ApiVersion
+#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
+#include "orionld/common/orionldState.h"                       // orionldState
+
 
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "alarmMgr/alarmMgr.h"
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "orionld/common/orionldState.h"                       // orionldState
-#include "orionld/types/OrionldHeader.h"                       // orionldHeaderAdd
-
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -96,7 +94,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   {
     std::string details = std::string("invalid providing application '") + qcrP->contextProvider + "'";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
 
     //
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
@@ -182,7 +180,7 @@ static bool queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   ParseData parseData;
 
   // Overriding original verb to be a POST, now that this service routine has been invoked
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
 
   //
@@ -287,7 +285,7 @@ std::string postQueryContext
   long long                   count = 0;
   long long*                  countP = NULL;
 
-  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == JSON);
+  bool asJsonObject = (orionldState.in.attributeFormatAsObject == true) && (orionldState.out.contentType == MT_JSON);
 
   //
   // 00. Count or not count? That is the question ...
@@ -298,15 +296,15 @@ std::string postQueryContext
   // In API version 2, this has changed completely. Here, the total count of local entities is returned
   // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
   //
-  if ((orionldState.apiVersion == V2) && (orionldState.uriParams.count == true))
+  if ((orionldState.apiVersion == API_VERSION_NGSI_V2) && (orionldState.uriParams.count == true))
   {
     countP = &count;
   }
-  else if ((orionldState.apiVersion == V1) && (orionldState.uriParams.details == true))
+  else if ((orionldState.apiVersion == API_VERSION_NGSI_V1) && (orionldState.uriParams.details == true))
   {
     countP = &count;
   }
-  else if ((orionldState.apiVersion == NGSI_LD_V1) && (orionldState.uriParams.count == true))
+  else if ((orionldState.apiVersion == API_VERSION_NGSILD_V1) && (orionldState.uriParams.count == true))
     countP = &count;
 
 
@@ -336,9 +334,9 @@ std::string postQueryContext
   //
   // If API version 2, add count, if asked for, in HTTP header Fiware-Total-Count
   //
-  if (((orionldState.apiVersion == V2) || (orionldState.apiVersion == NGSI_LD_V1)) && (countP != NULL))
+  if (((orionldState.apiVersion == API_VERSION_NGSI_V2) || (orionldState.apiVersion == API_VERSION_NGSILD_V1)) && (countP != NULL))
   {
-    OrionldHeaderType headerType = (orionldState.apiVersion == NGSI_LD_V1)? HttpResultsCount : HttpNgsiv2Count;
+    OrionldHeaderType headerType = (orionldState.apiVersion == API_VERSION_NGSILD_V1)? HttpResultsCount : HttpNgsiv2Count;
 
     orionldHeaderAdd(&orionldState.out.headers, headerType, NULL, *countP);
   }

@@ -40,7 +40,6 @@
 #include "common/globals.h"
 #include "common/sem.h"
 #include "common/string.h"
-#include "common/wsStrip.h"
 #include "common/statistics.h"
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
@@ -635,7 +634,7 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     if (regcomp(&regex, en2->id.c_str(), REG_EXTENDED) != 0)
     {
       std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
     else
     {
@@ -829,7 +828,7 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
     std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
       "Please upgrade MongoDB server to 2.4 or newer)";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     return false;
   }
 
@@ -876,7 +875,7 @@ static bool processAreaScope(const Scope* scoP, BSONObj* areaQueryP)
   }
   else
   {
-    alarmMgr.badInput(clientIp, "unknown area type");
+    alarmMgr.badInput(orionldState.clientIp, "unknown area type");
     return false;
   }
 
@@ -919,13 +918,13 @@ static void addFilterScope(const Scope* scoP, std::vector<BSONObj>* filtersP)
       std::string details = std::string("unknown value for '") +
         SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
 
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
   }
   else
   {
     std::string details = std::string("unknown filter type '") + scoP->type + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
   }
 }
 
@@ -975,7 +974,7 @@ bool processAreaScopeV2(const Scope* scoP, BSONObj* areaQueryP)
     std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
       "Please upgrade MongoDB server to 2.4 or newer)";
 
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(orionldState.clientIp, details);
     return false;
   }
 
@@ -1223,7 +1222,7 @@ bool entitiesQuery
   /* The result of orEnt is appended to the final query */
   finalQuery.append("$or", orEnt.arr());
 
-  if (apiVersion != NGSI_LD_V1)
+  if (apiVersion != API_VERSION_NGSILD_V1)
   {
     /* Part 2: service path */
     const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
@@ -1275,7 +1274,7 @@ bool entitiesQuery
       geoScopes++;
       if (geoScopes > 1)
       {
-        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
+        alarmMgr.badInput(orionldState.clientIp, "current version supports only one area scope, extra geoScope is ignored");
       }
       else
       {
@@ -1289,7 +1288,7 @@ bool entitiesQuery
 
         if (result == true)
         {
-          if (orionldState.apiVersion == NGSI_LD_V1)
+          if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
           {
             char  dbAttrValuePath[512];
 
@@ -1337,7 +1336,7 @@ bool entitiesQuery
     else
     {
       std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
   }
 
@@ -1927,7 +1926,7 @@ bool registrationsQuery
     }
     docs++;
 
-    MimeType                  mimeType = JSON;
+    MimeType                  mimeType = MT_JSON;
     std::vector<BSONElement>  queryContextRegistrationV = getFieldF(&r, REG_CONTEXT_REGISTRATION).Array();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
@@ -2115,7 +2114,7 @@ static bool processOnChangeConditionForSubscription
   ConditionValueList*              condValues,
   const std::string&               subId,
   const HttpInfo&                  notifyHttpInfo,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   OrionldTenant*                   tenantP,
   const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -2159,7 +2158,7 @@ static bool processOnChangeConditionForSubscription
   // Special case: no entity/attribute found.
   //               If this happens, we'll notify with only entity info
   //
-  if (orionldState.apiVersion == NGSI_LD_V1)
+  if (orionldState.apiVersion == API_VERSION_NGSILD_V1)
   {
     if (rawCerV.size() == 0)
     {
@@ -2297,7 +2296,7 @@ static BSONArray processConditionVector
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   OrionldTenant*                   tenantP,
   const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -2371,7 +2370,7 @@ BSONArray processConditionVector
   const std::string&               subId,
   const HttpInfo&                  httpInfo,
   bool*                            notificationDone,
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   OrionldTenant*                   tenantP,
   const char*                      xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -2457,7 +2456,7 @@ bool processAvailabilitySubscription
   const StringList&     attrL,
   const std::string&    subId,
   const std::string&    notifyUrl,
-  RenderFormat          renderFormat,
+  OrionldRenderFormat   renderFormat,
   OrionldTenant*        tenantP,
   const std::string&    fiwareCorrelator
 )
@@ -2589,8 +2588,8 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
     /* Search for some CPr in crrV */
     std::string  perEntPa;
     std::string  perAttrPa;
-    MimeType     perEntPaMimeType  = NOMIMETYPE;
-    MimeType     perAttrPaMimeType = NOMIMETYPE;
+    MimeType     perEntPaMimeType  = MT_NONE;
+    MimeType     perAttrPaMimeType = MT_NONE;
 
     cprLookupByAttribute(cer->contextElement.entityId,
                          ca->name,

@@ -36,17 +36,17 @@ const char* verbName(Verb verb)
 {
   switch (verb)
   {
-  case GET:         return "GET";
-  case PUT:         return "PUT";
-  case POST:        return "POST";
-  case DELETE:      return "DELETE";
-  case PATCH:       return "PATCH";
-  case HEAD:        return "HEAD";
-  case OPTIONS:     return "OPTIONS";
-  case TRACE:       return "TRACE";
-  case CONNECT:     return "CONNECT";
-  case NOVERB:      return "";            // Should not be rendered at all
-  case UNKNOWNVERB: return "UNKNOWNVERB"; // Should not progress away parsing
+  case HTTP_GET:         return "GET";
+  case HTTP_PUT:         return "PUT";
+  case HTTP_POST:        return "POST";
+  case HTTP_DELETE:      return "DELETE";
+  case HTTP_PATCH:       return "PATCH";
+  case HTTP_HEAD:        return "HEAD";
+  case HTTP_OPTIONS:     return "OPTIONS";
+  case HTTP_TRACE:       return "TRACE";
+  case HTTP_CONNECT:     return "CONNECT";
+  case HTTP_NOVERB:      return "";            // Should not be rendered at all
+  case HTTP_UNKNOWNVERB: return "UNKNOWNVERB"; // Should not progress away parsing
   }
 
   return "Unknown verb";
@@ -60,16 +60,16 @@ const char* verbName(Verb verb)
 */
 Verb str2Verb(const std::string& str)
 {
-  if      (str == "GET")     return GET;
-  else if (str == "PUT")     return PUT;
-  else if (str == "POST")    return POST;
-  else if (str == "DELETE")  return DELETE;
-  else if (str == "PATCH")   return PATCH;
-  else if (str == "HEAD")    return HEAD;
-  else if (str == "OPTIONS") return OPTIONS;
-  else if (str == "TRACE")   return TRACE;
-  else if (str == "CONNECT") return CONNECT;
-  else if (str == "")        return NOVERB;
+  if      (str == "GET")     return HTTP_GET;
+  else if (str == "PUT")     return HTTP_PUT;
+  else if (str == "POST")    return HTTP_POST;
+  else if (str == "DELETE")  return HTTP_DELETE;
+  else if (str == "PATCH")   return HTTP_PATCH;
+  else if (str == "HEAD")    return HTTP_HEAD;
+  else if (str == "OPTIONS") return HTTP_OPTIONS;
+  else if (str == "TRACE")   return HTTP_TRACE;
+  else if (str == "CONNECT") return HTTP_CONNECT;
+  else if (str == "")        return HTTP_NOVERB;
 
-  return UNKNOWNVERB;
+  return HTTP_UNKNOWNVERB;
 }

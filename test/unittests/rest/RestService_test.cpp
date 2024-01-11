@@ -39,6 +39,8 @@
 #include "rest/RestService.h"
 #include "rest/rest.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittests/unittest.h"
 
 
@@ -96,7 +98,7 @@ TEST(RestService, payloadParse)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   //
   // 1. JSON
@@ -105,7 +107,7 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  orionldState.in.contentType     = JSON;
+  orionldState.in.contentType     = MT_JSON;
   orionldState.in.payload         = testBuf;
   orionldState.in.payloadSize     = strlen(testBuf);
 
@@ -120,7 +122,7 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  orionldState.in.contentType    = NOMIMETYPE;
+  orionldState.in.contentType    = MT_NONE;
   orionldState.in.payload        = (char*) "123";
   orionldState.in.payloadSize    = strlen(orionldState.in.payload);
 
@@ -149,7 +151,7 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   // No such service
   EXPECT_EQ("OK", testDataFromFile(testBuf,
@@ -159,7 +161,7 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  orionldState.in.contentType   = JSON;
+  orionldState.in.contentType   = MT_JSON;
   orionldState.in.payload       = testBuf;
   orionldState.in.payloadSize   = strlen(testBuf);
   ci.restServiceP               = &restService;
@@ -176,7 +178,7 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
                                    sizeof(expectedBuf),
                                    outfile2)) << "Error getting test data from '" << outfile2 << "'";
 
-  orionldState.in.contentType    = JSON;
+  orionldState.in.contentType    = MT_JSON;
   orionldState.in.payload        = testBuf;
   orionldState.in.payloadSize    = strlen(testBuf);
 

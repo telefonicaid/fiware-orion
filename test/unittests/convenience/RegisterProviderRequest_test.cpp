@@ -57,7 +57,7 @@ TEST(RegisterProviderRequest, json_ok)
   std::string     checked;
   ConnectionInfo  ci;
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
 
   // 1. Normal registerProviderRequest

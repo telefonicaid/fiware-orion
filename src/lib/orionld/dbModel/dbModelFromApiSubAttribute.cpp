@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/dotForEq.h"                             // dotForEq
+#include "orionld/common/dateTime.h"                             // dateTimeFromString
 #include "orionld/kjTree/kjTimestampAdd.h"                       // kjTimestampAdd
 #include "orionld/dbModel/dbModelFromApiSubAttribute.h"          // Own interface
 
@@ -87,11 +88,12 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
     //
     if (saP->type == KjString)
     {
-      double timestamp = parse8601Time(saP->value.s);
+      char   errorString[256];
+      double timestamp = dateTimeFromString(saP->value.s, errorString, sizeof(errorString));
 
       if (timestamp < 0)
       {
-        orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", saP->value.s, 400);
+        orionldError(OrionldBadRequestData, "Invalid ISO8601 timestamp", errorString, 400);
         LM_W(("Bad Request (Invalid ISO8601 timestamp: %s)", saP->value.s));
         return false;
       }

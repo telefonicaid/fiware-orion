@@ -52,7 +52,7 @@ public:
                                         const std::string&                         tenant,
                                         const char*                                xauthToken,
                                         const std::string&                         fiwareCorrelator,
-                                        RenderFormat                               renderFormat,
+                                        OrionldRenderFormat                        renderFormat,
                                         const std::vector<std::string>&            attrsOrder,
                                         const std::vector<std::string>&            metadataFilter,
                                         bool                                       blackList);
@@ -61,14 +61,14 @@ public:
                                                     const std::string&                url,
                                                     const std::string&                tenant,
                                                     const std::string&                fiwareCorrelator,
-                                                    RenderFormat                      renderFormat);
+                                                    OrionldRenderFormat               renderFormat);
 protected:
   static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest*            ncrP,
                                                              const ngsiv2::HttpInfo&          httpInfo,
                                                              const std::string&               tenant,
                                                              const char*                      xauthToken,
                                                              const std::string&               fiwareCorrelator,
-                                                             RenderFormat                     renderFormat,
+                                                             OrionldRenderFormat              renderFormat,
                                                              const std::vector<std::string>&  attrsOrder,
                                                              const std::vector<std::string>&  metadataFilter,
                                                              bool                             blackList

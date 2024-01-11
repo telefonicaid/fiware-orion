@@ -68,7 +68,7 @@ std::string postNotifyContextAvailability
   if (ciP->servicePathV.size() > 1)
   {
     ncar.responseCode.fill(SccBadRequest, "more than one service path for notification");
-    alarmMgr.badInput(clientIp, "more than one service path for a notification");
+    alarmMgr.badInput(orionldState.clientIp, "more than one service path for a notification");
 
     TIMED_RENDER(answer = ncar.render());
 

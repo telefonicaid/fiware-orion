@@ -76,7 +76,7 @@ std::string ContextElementResponseVector::render
 */
 std::string ContextElementResponseVector::toJson
 (
-  RenderFormat                     renderFormat,
+  OrionldRenderFormat              renderFormat,
   const std::vector<std::string>&  attrsFilter,
   const std::vector<std::string>&  metadataFilter,
   bool                             blacklist

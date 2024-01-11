@@ -62,7 +62,7 @@ extern std::string postSubscriptions
 
     snprintf(errMsg, MSG_SIZE, "max *one* service-path allowed for subscriptions (%lu given)",
              (unsigned long) ciP->servicePathV.size());
-    alarmMgr.badInput(clientIp, errMsg);
+    alarmMgr.badInput(orionldState.clientIp, errMsg);
     scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
     TIMED_RENDER(answer = scr.toJson());

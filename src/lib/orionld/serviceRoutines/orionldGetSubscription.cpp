@@ -185,13 +185,13 @@ static bool orionldGetSubscriptionFromDb(void)
   }
   kjTreeLog(dbSubP, "DB Sub", LmtSubCacheStats);
 
-  KjNode*      coordinatesNodeP = NULL;           // Not needed here, but dbModelToApiSubscription requires it
-  KjNode*      contextNodeP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
-  KjNode*      showChangesP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
-  KjNode*      sysAttrsP        = NULL;           // Not needed here, but dbModelToApiSubscription requires it
-  RenderFormat renderFormat     = RF_NORMALIZED;  // Not needed here, but dbModelToApiSubscription requires it
-  double       timeInterval     = 0;
-  KjNode*      apiSubP          = dbModelToApiSubscription(dbSubP,
+  KjNode*             coordinatesNodeP = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*             contextNodeP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*             showChangesP     = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  KjNode*             sysAttrsP        = NULL;           // Not needed here, but dbModelToApiSubscription requires it
+  OrionldRenderFormat renderFormat     = RF_NORMALIZED;  // Not needed here, but dbModelToApiSubscription requires it
+  double              timeInterval     = 0;
+  KjNode*             apiSubP          = dbModelToApiSubscription(dbSubP,
                                                            orionldState.tenantP->tenant,
                                                            false,
                                                            NULL,
@@ -258,7 +258,7 @@ bool orionldGetSubscription(void)
   {
     orionldState.httpStatusCode = 200;
 
-    orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+    orionldState.responseTree   = kjTreeFromCachedSubscription(cSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == MT_JSONLD);
     orionldSubCounters(orionldState.responseTree, cSubP, NULL);
 
     return true;
@@ -270,7 +270,7 @@ bool orionldGetSubscription(void)
   {
     orionldState.httpStatusCode = 200;
 
-    orionldState.responseTree   = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == JSONLD);
+    orionldState.responseTree   = kjTreeFromPernotSubscription(pSubP, orionldState.uriParamOptions.sysAttrs, orionldState.out.contentType == MT_JSONLD);
     orionldSubCounters(orionldState.responseTree, NULL, pSubP);
 
     return true;

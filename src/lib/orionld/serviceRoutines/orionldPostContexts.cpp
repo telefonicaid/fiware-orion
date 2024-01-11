@@ -31,13 +31,11 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "logMsg/traceLevels.h"                                  // Lmt*
-
-#include "rest/httpHeaderAdd.h"                                  // httpHeaderLocationAdd
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/types/OrionldProblemDetails.h"                 // OrionldProblemDetails
+#include "orionld/http/httpHeaderLocationAdd.h"                  // httpHeaderLocationAdd
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
 #include "orionld/context/orionldContextFromTree.h"              // orionldContextFromTree
 #include "orionld/contextCache/orionldContextCachePersist.h"     // orionldContextCachePersist
@@ -59,7 +57,7 @@ extern "C"
 // orionldContextFromTree() needs the value of the @context as the input tree, so, in case the "@context" member is
 // present, like in cases 3 and 4, then it will have to be extracted and its value used for orionldContextFromTree().
 //
-// orionldMhdConnectionTreat already finds and extracts the @context member if present, stores it in orionldState.payloadContextNode
+// mhdConnectionTreat already finds and extracts the @context member if present, stores it in orionldState.payloadContextNode
 //
 bool orionldPostContexts(void)
 {

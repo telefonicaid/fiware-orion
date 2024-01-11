@@ -285,7 +285,7 @@ static void setCondsAndInitialNotifyNgsiv1
   const std::string&               subId,
   const std::string&               status,
   const std::string&               url,
-  RenderFormat                     attrsFormat,
+  OrionldRenderFormat              attrsFormat,
   OrionldTenant*                   tenantP,
   const std::vector<std::string>&  servicePathV,
   const char*                      xauthToken,
@@ -387,7 +387,7 @@ static void setCondsAndInitialNotify
     bool                      blacklist;
     std::vector<std::string>  notifAttributesV;
     std::vector<std::string>  metadataV;
-    RenderFormat              attrsFormat = RF_NORMALIZED;
+    OrionldRenderFormat       attrsFormat = RF_NORMALIZED;
 
     if (subUp.statusProvided)
     {
@@ -778,7 +778,7 @@ void updateInCache
   std::string         geom;
   std::string         coords;
   std::string         georel;
-  RenderFormat        renderFormat = RF_NORMALIZED;  // Default value
+  OrionldRenderFormat renderFormat = RF_NORMALIZED;  // Default value
 
   if (doc.hasField(CSUB_FORMAT))
   {
@@ -870,7 +870,7 @@ std::string mongoUpdateSubscription
     if (sc.code == SccContextElementNotFound)
     {
       details = std::string("invalid OID mimeType: '") + subUp.id + "'";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
     }
     else  // SccReceiverInternalError
     {

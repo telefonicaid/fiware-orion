@@ -57,7 +57,7 @@ Subscription::~Subscription()
   }
 
   // Free notifierInfo, UNLESS this subscription is now part of the cache
-  if ((orionldState.serviceP != NULL) && (orionldState.verb == GET))
+  if ((orionldState.serviceP != NULL) && (orionldState.verb == HTTP_GET))
   {
     for (unsigned int ix = 0; ix < notification.httpInfo.notifierInfo.size(); ix++)
     {

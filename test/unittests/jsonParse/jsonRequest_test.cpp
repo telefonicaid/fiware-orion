@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "orionld/common/orionldState.h"
+#include "orionld/types/ApiVersion.h"
 
 #include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
@@ -53,12 +54,12 @@ TEST(jsonRequest, jsonTreat)
 
   utInit();
 
-  orionldState.verb        = POST;
-  orionldState.apiVersion  = V1;
+  orionldState.verb        = HTTP_POST;
+  orionldState.apiVersion  = API_VERSION_NGSI_V1;
 
   ci.restServiceP = &restService;
 
-  orionldState.apiVersion = V1;
+  orionldState.apiVersion = API_VERSION_NGSI_V1;
 
   out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, NULL);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,

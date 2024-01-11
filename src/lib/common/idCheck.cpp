@@ -59,7 +59,7 @@ std::string idCheck(const std::string& s)
     else
     {
       std::string details = std::string("invalid char '") + *cP + "' in ID string";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(orionldState.clientIp, details);
 
       return "invalid char in ID string";
     }

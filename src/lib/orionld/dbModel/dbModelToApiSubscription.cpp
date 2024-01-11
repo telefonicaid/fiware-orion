@@ -30,9 +30,9 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                       // LM_*
-#include "common/RenderFormat.h"                                 // RenderFormat
 
 #include "orionld/types/QNode.h"                                 // QNode
+#include "orionld/types/OrionldRenderFormat.h"                   // OrionldRenderFormat
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/common/numberToDate.h"                         // numberToDate
@@ -173,16 +173,16 @@ static bool notificationStatus(KjNode* dbLastSuccessP, KjNode* dbLastFailureP)
 //
 KjNode* dbModelToApiSubscription
 (
-  KjNode*        dbSubP,
-  const char*    tenant,
-  bool           forSubCache,
-  QNode**        qNodePP,
-  KjNode**       coordinatesPP,
-  KjNode**       contextNodePP,
-  KjNode**       showChangesP,
-  KjNode**       sysAttrsP,
-  RenderFormat*  renderFormatP,
-  double*        timeIntervalP
+  KjNode*               dbSubP,
+  const char*           tenant,
+  bool                  forSubCache,
+  QNode**               qNodePP,
+  KjNode**              coordinatesPP,
+  KjNode**              contextNodePP,
+  KjNode**              showChangesP,
+  KjNode**              sysAttrsP,
+  OrionldRenderFormat*  renderFormatP,
+  double*               timeIntervalP
 )
 {
   KjNode* dbSubIdP            = kjLookup(dbSubP, "_id");         DB_ITEM_NOT_FOUND(dbSubIdP, "id",          tenant);
@@ -384,7 +384,7 @@ KjNode* dbModelToApiSubscription
     if (v2mqP)
       kjChildRemove(dbExpressionP, v2mqP);
 
-    if (orionldState.apiVersion != NGSI_LD_V1)  // FIXME: When taking from DB at startup, this won't work ...
+    if (orionldState.apiVersion != API_VERSION_NGSILD_V1)  // FIXME: When taking from DB at startup, this won't work ...
     {
       if ((v2qP != NULL) && (v2qP->value.s[0] != 0))
         kjChildAdd(apiSubP, v2qP);
@@ -464,7 +464,7 @@ KjNode* dbModelToApiSubscription
   if (dbFormatP != NULL)
   {
     kjChildAdd(notificationP, dbFormatP);
-    *renderFormatP = stringToRenderFormat(dbFormatP->value.s);
+    *renderFormatP = renderFormat(dbFormatP->value.s);
   }
 
   KjNode* endpointP = kjObject(orionldState.kjsonP, "endpoint");

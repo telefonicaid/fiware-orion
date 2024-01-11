@@ -57,7 +57,7 @@ std::string changeLogLevel
   if (orionldState.uriParams.level == NULL)
   {
     orionldState.httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "no log level in URI param");
+    alarmMgr.badInput(orionldState.clientIp, "no log level in URI param");
     return "{\"error\":\"log level missing\"}";
   }
 
@@ -83,7 +83,7 @@ std::string changeLogLevel
   else
   {
     orionldState.httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "invalid log level in URI param");
+    alarmMgr.badInput(orionldState.clientIp, "invalid log level in URI param");
     return "{\"error\":\"invalid log level\"}";
   }
 
