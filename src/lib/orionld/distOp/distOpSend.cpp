@@ -518,8 +518,10 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
 
           if ((kvP != NULL) && (kvP->type == KjString))
           {
-            char header[512];
-            snprintf(header, sizeof(header), "%s: %s", kvP->name, kvP->value.s);
+            int    size   = strlen(kvP->name) + 2 + strlen(kvP->value.s) + 1;
+            char*  header = kaAlloc(&orionldState.kalloc, size + 1);
+
+            snprintf(header, size, "%s: %s", kvP->name, kvP->value.s);
             headers = curl_slist_append(headers, header);
           }
         }
