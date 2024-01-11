@@ -35,7 +35,11 @@ brokerStart CB 0 IPV4 -logDeprecate
 # 03. Create entity using NGSIv1 metadata location
 # 04. Create entity using NGSIv1 and geo:point
 # 05. Create entity using NGSIv2 and geo:point
-# 06. Get WARNING trace in logs
+# 06. Create registration using legacyForwarding mode
+# 07. Retrieve registrations (which uses legacyForwarding mode)
+# 08. Forwarded query using legacyForwarding mode
+# 09. Update query using legacyForwarding mode
+# 10. Get WARNING trace in logs
 #
 
 echo "01. Query E1-T1"
@@ -130,9 +134,62 @@ echo
 echo
 
 
-echo "06. Get WARNING trace in logs"
+echo "06. Create registration using legacyForwarding mode"
+echo "==================================================="
+payload='{
+   "dataProvided": {
+     "entities": [
+       {
+         "id": "E1",
+         "type": "T1"
+       }
+     ],
+     "attrs": [ "A1" ]
+   },
+   "provider": {
+     "http": {
+       "url": "http://localhost:'${CP1_PORT}'/v2"
+     },
+     "legacyForwarding": true
+   },
+   "status": "active"
+}'
+orionCurl --url /v2/registrations --payload "$payload" 
+echo
+echo
+
+
+REG_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "07. Retrieve registrations (which uses legacyForwarding mode)"
+echo "============================================================="
+orionCurl --url /v2/registrations
+echo
+echo
+
+
+echo "08. Forwarded query using legacyForwarding mode"
+echo "==============================================="
+orionCurl --url /v2/entities/E1/attrs/A1?type=T1
+echo
+echo
+
+
+echo "09. Update query using legacyForwarding mode"
+echo "============================================"
+payload='{
+  "value": 1,
+  "type": "Number"
+}'
+orionCurl --url /v2/entities/E1/attrs/A1?type=T1 -X PUT --payload "$payload"
+echo
+echo
+
+
+echo "10. Get WARNING trace in logs"
 echo "============================="
-cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}'
+cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}' | sed -e "s/$REG_ID/REG_ID/g"
 echo
 echo
 
@@ -252,7 +309,79 @@ Content-Length: 0
 
 
 
-06. Get WARNING trace in logs
+06. Create registration using legacyForwarding mode
+===================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+07. Retrieve registrations (which uses legacyForwarding mode)
+=============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 233
+
+[
+    {
+        "dataProvided": {
+            "attrs": [
+                "A1"
+            ],
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        },
+        "id": "REGEX([0-9a-f\-]{24})",
+        "provider": {
+            "http": {
+                "url": "http://localhost:9801/v2"
+            },
+            "legacyForwarding": true,
+            "supportedForwardingMode": "all"
+        },
+        "status": "active"
+    }
+]
+
+
+08. Forwarded query using legacyForwarding mode
+===============================================
+HTTP/1.1 404 Not Found
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+09. Update query using legacyForwarding mode
+============================================
+HTTP/1.1 404 Not Found
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+10. Get WARNING trace in logs
 =============================
 Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
 Deprecated NGSIv1 request received: GET /v1/contextEntities/E/attributes/A, response code: 200
@@ -261,6 +390,13 @@ Deprecated NGSIv1 request received: POST /v1/updateContext, request payload (279
 Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
 Deprecated NGSIv1 request received: POST /v1/updateContext, request payload (208 bytes): { "contextElements": [ { "type": "City", "isPattern": "false", "id": "Barcelona", "attributes": [ { "name": "location", "type": "geo:point", "value": "40.418889, -3.691944" } ] } ], "updateAction": "APPEND" }, response code: 200
 Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
+Deprecated usage of legacyForwarding mode in registration creation (regId: REG_ID)
+Deprecated usage of legacyForwarding mode detected in existing registration (regId: REG_ID)
+Deprecated usage of legacyForwarding mode in query forwarding operation (regId: REG_ID)
+Raising alarm ForwardingError localhost:9801/v2/queryContext: forwarding failure for sender-thread: Couldn't connect to server
+Deprecated usage of legacyForwarding mode in update forwarding operation (regId: REG_ID)
+Raising alarm ForwardingError localhost:9801/v2/updateContext: forwarding failure for sender-thread: Couldn't connect to server
+Raising alarm BadInput 127.0.0.1: The requested entity has not been found. Check type and id
 
 
 --TEARDOWN--
