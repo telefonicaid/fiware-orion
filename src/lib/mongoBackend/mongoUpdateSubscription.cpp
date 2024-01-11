@@ -369,6 +369,10 @@ std::string mongoUpdateSubscription
   if (subUp.notifyOnMetadataChangeProvided) setNotifyOnMetadataChange(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
 
+  if (logDeprecate && subUp.attrsFormat == NGSI_V1_LEGACY)
+  {
+    LM_W(("Deprecated usage of notification legacy format in subscription creation or modification (subId: %s)", subUp.id.c_str()));
+  }
 
   // Description is special, as "" value removes the field
   if (subUp.descriptionProvided)
