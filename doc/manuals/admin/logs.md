@@ -425,8 +425,9 @@ time=2024-01-11T13:57:13.624Z | lvl=WARN | corr=52808938-b089-11ee-9835-080027cd
 * Usages of [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification). For instance:
 
 ```
-time=2024-01-11T16:23:24.646Z | lvl=WARN | corr=be709034-b09d-11ee-b5d1-080027cd35f1 | trans=1704990203-652-00000000012 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonSubscription.cpp[598]:setFormat | msg=Deprecated usage of notification legacy format in subscription creation or modification (subId: 65a015fcda947708d30425eb)
+time=2024-01-11T16:23:24.646Z | lvl=WARN | corr=be709034-b09d-11ee-b5d1-080027cd35f1 | trans=1704990203-652-00000000012 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonSubscription.cpp[598]:setFormat | msg=Deprecated usage of notification legacy format in subscription creation (subId: 65a015fcda947708d30425eb)
 time=2024-01-11T16:23:24.675Z | lvl=WARN | corr=be74dc98-b09d-11ee-b2d6-080027cd35f1 | trans=1704990203-652-00000000013 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoGetSubscriptions.cpp[217]:setNotification | msg=Deprecated usage of notification legacy format detected in existing subscription (subId: 65a015fcda947708d30425eb)
+time=2024-01-11T16:23:24.701Z | lvl=WARN | corr=be709034-b09d-11ee-b5d1-080027cd35f1 | trans=1704990203-652-00000000012 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonSubscription.cpp[598]:setFormat | msg=Deprecated usage of notification legacy format in subscription modification (subId: 65a015fcda947708d30425eb)
 time=2024-01-11T16:23:24.716Z | lvl=WARN | corr=be7ae5ac-b09d-11ee-98c8-080027cd35f1 | trans=1704990203-652-00000000015 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=Notifier.cpp[680]:buildSenderParams | msg=Deprecated usage of notification legacy format in notification (subId: 65a015fcda947708d30425eb)
 ```
 

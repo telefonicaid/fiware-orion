@@ -199,7 +199,7 @@ std::string mongoCreateSubscription
 
   if (logDeprecate && sub.attrsFormat == NGSI_V1_LEGACY)
   {
-    LM_W(("Deprecated usage of notification legacy format in subscription creation or modification (subId: %s)", subId.c_str()));
+    LM_W(("Deprecated usage of notification legacy format in subscription creation (subId: %s)", subId.c_str()));
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);

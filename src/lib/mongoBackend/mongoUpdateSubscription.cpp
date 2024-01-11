@@ -371,7 +371,7 @@ std::string mongoUpdateSubscription
 
   if (logDeprecate && subUp.attrsFormat == NGSI_V1_LEGACY)
   {
-    LM_W(("Deprecated usage of notification legacy format in subscription creation or modification (subId: %s)", subUp.id.c_str()));
+    LM_W(("Deprecated usage of notification legacy format in subscription modification (subId: %s)", subUp.id.c_str()));
   }
 
   // Description is special, as "" value removes the field
