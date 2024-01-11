@@ -60,7 +60,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -105,7 +105,7 @@ TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -130,7 +130,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOkJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -156,7 +156,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -183,7 +183,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJso
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -212,7 +212,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -240,7 +240,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOkJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -266,7 +266,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -293,7 +293,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJs
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -322,7 +322,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -351,7 +351,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 
@@ -380,7 +380,7 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVerticesJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 

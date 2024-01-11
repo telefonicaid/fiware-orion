@@ -96,7 +96,7 @@ TEST(RestService, payloadParse)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   //
   // 1. JSON
@@ -149,7 +149,7 @@ TEST(RestService, DISABLED_noSuchServiceAndNotFound)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   // No such service
   EXPECT_EQ("OK", testDataFromFile(testBuf,

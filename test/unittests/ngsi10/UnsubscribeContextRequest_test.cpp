@@ -48,7 +48,7 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType  = JSON;
 

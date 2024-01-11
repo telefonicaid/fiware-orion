@@ -53,7 +53,7 @@ TEST(jsonRequest, jsonTreat)
 
   utInit();
 
-  orionldState.verb        = POST;
+  orionldState.verb        = HTTP_POST;
   orionldState.apiVersion  = V1;
 
   ci.restServiceP = &restService;

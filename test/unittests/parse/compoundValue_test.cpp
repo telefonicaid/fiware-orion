@@ -49,7 +49,7 @@ TEST(compoundValue, updateNoCompoundValue)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType = JSON;
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, NULL);
@@ -77,7 +77,7 @@ TEST(compoundValue, updateUnknownPath)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFileJson)) << "Error getting test data from '" << outFileJson << "'";
@@ -109,7 +109,7 @@ TEST(compoundValue, updateOneStringJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -177,7 +177,7 @@ TEST(compoundValue, updateTwoStringsJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -257,7 +257,7 @@ TEST(compoundValue, updateTwoItemsSameNameInStructJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
@@ -290,7 +290,7 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -357,7 +357,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -428,7 +428,7 @@ TEST(compoundValue, updateTwoStructsJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -581,7 +581,7 @@ TEST(compoundValue, sixLevelsJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
@@ -899,7 +899,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 

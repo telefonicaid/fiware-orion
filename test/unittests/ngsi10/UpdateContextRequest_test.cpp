@@ -56,7 +56,7 @@ TEST(UpdateContextRequest, ok_json)
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-   orionldState.verb = POST;
+   orionldState.verb = HTTP_POST;
 
    orionldState.in.contentType  = JSON;
 
@@ -89,7 +89,7 @@ TEST(UpdateContextRequest, badIsPattern_json)
 
    utInit();
 
-   orionldState.verb = POST;
+   orionldState.verb = HTTP_POST;
    orionldState.in.contentType  = JSON;
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";

@@ -50,7 +50,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType      = JSON;
 
@@ -92,7 +92,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 
   utInit();
 
-  orionldState.verb = POST;
+  orionldState.verb = HTTP_POST;
 
   orionldState.in.contentType      = JSON;
 
