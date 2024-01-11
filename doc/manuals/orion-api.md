@@ -458,6 +458,7 @@ The `error` reporting is as follows:
   + HTTP 411 Length Required corresponds to `ContentLengthRequired` (`411`)
   + HTTP 413 Request Entity Too Large corresponds to `RequestEntityTooLarge` (`413`)
   + HTTP 415 Unsupported Media Type corresponds to `UnsupportedMediaType` (`415`)
++ Internal errors use `InternalServerError` (`500`)
 
 ## Multi tenancy
 

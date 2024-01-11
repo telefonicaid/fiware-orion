@@ -83,7 +83,7 @@ HttpStatusCode mongoUpdateContextSubscription
     }
     else
     {
-      responseP->subscribeError.errorCode.fill(oe.code, oe.details);
+      responseP->subscribeError.errorCode.fill(oe.code, oe.description);
     }
   }
 

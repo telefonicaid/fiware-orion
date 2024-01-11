@@ -140,8 +140,8 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
-  EXPECT_EQ("OK", oe.reasonPhrase);
-  EXPECT_EQ("", oe.details);
+  EXPECT_EQ("OK", oe.error);
+  EXPECT_EQ("", oe.description);
 
   ASSERT_EQ(3, subs.size());
   Subscription             s;
@@ -244,8 +244,8 @@ TEST(mongoGetSubscription, getSubscription)
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
-  EXPECT_EQ("OK", oe.reasonPhrase);
-  EXPECT_EQ("", oe.details);
+  EXPECT_EQ("OK", oe.error);
+  EXPECT_EQ("", oe.description);
 
   std::vector<EntID>       ents;
   std::vector<std::string> attrs;

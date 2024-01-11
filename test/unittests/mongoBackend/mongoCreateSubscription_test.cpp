@@ -96,8 +96,8 @@ TEST(mongoCreateSubscriptions, createSubscriptionNotCustomOK)
 
   /* Check response is as expected */
   EXPECT_EQ(SccNone, oe.code);
-  EXPECT_EQ("", oe.reasonPhrase);
-  EXPECT_EQ("", oe.details);
+  EXPECT_EQ("", oe.error);
+  EXPECT_EQ("", oe.description);
 
   DBClientBase* connection = getMongoConnection();
 
@@ -193,8 +193,8 @@ TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
 
   /* Check response is as expected */
   EXPECT_EQ(SccNone, oe.code);
-  EXPECT_EQ("", oe.reasonPhrase);
-  EXPECT_EQ("", oe.details);
+  EXPECT_EQ("", oe.error);
+  EXPECT_EQ("", oe.description);
 
   DBClientBase* connection = getMongoConnection();
 

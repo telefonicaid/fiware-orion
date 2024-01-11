@@ -212,7 +212,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
 
       if (parseNotificationData(ciP, iter, ncrP, oeP) == false)
       {
-        alarmMgr.badInput(clientIp, oeP->details);
+        alarmMgr.badInput(clientIp, oeP->description);
         ciP->httpStatusCode = SccBadRequest;
 
         return false;
