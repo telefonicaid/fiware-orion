@@ -2822,6 +2822,9 @@ _**レスポンス・コード**_
 -   成功したオペレーションでは、200 OK を使用します
 -   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
     [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
 
 _**レスポンス・ヘッダ**_
 
@@ -2829,8 +2832,17 @@ _**レスポンス・ヘッダ**_
 
 _**レスポンス・ペイロード**_
 
-レスポンスは、id で識別されるエンティティを表すオブジェクトです。オブジェクトは、JSON エンティティ表現形式
-([JSON エンティティ表現](#json-entity-representation)のセクションと、
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+エンティティが見つかった場合、レスポンスは ID で識別されるエンティティを表すオブジェクトになります。
+オブジェクトは、JSON エンティティ表現形式 ([JSON エンティティ表現](#json-entity-representation)のセクションと、
 [簡略化されたエンティティ表現](#simplified-entity-representation)および、[部分的表現](#partial-representations)
 のセクションで説明されています) に従います。
 
@@ -2906,8 +2918,9 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、200 OK を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
 
 _**レスポンス・ヘッダ**_
 
@@ -2915,8 +2928,17 @@ _**レスポンス・ヘッダ**_
 
 _**レスポンス・ペイロード**_
 
-ペイロードは、URL パラメータの id で識別されるエンティティを表すオブジェクトです。オブジェクトは JSON
-エンティティ表現形式 ([JSON エンティティ表現](#json-entity-representation)のセクションと、
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+エンティティが見つかった場合、ペイロードは、URL パラメータの ID によって識別されるエンティティを表すオブジェクトです。
+オブジェクトは JSON エンティティ表現形式 ([JSON エンティティ表現](#json-entity-representation)のセクションと、
 [簡略化されたエンティティ表現](#simplified-entity-representation)および、[部分表現](#partial-representations)
 のセクションで説明されています) に従いますが、`id` フィールドと `type` フィールドは省略されます。
 
@@ -3014,8 +3036,45 @@ JSON エンティティ表現形式 ([JSON エンティティ表現](#json-entit
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   `append` オプションが使用されたときに、属性が存在していて、422 Unprocessable Content になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+`append` オプションが使用されたときに、*すべて* の属性が存在する場合:
+
+```
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+```
+
+`append` オプションが使用されたときに、*一部* (すべてではない) 属性が存在する場合 (部分更新):
+
+```
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ B ]",
+    "error": "PartialUpdate"
+}
+```
+
+`description` 内のエンティティ型は、リクエストにエンティティ型が含まれている場合にのみ表示されます。それ以外の場合は省略されます:
+
+```
+"description": "one or more of the attributes in the request already exist: E - [ B ]",
+```
 
 <a name="update-existing-entity-attributes-patch-v2entitiesentityidattrs"></a>
 
@@ -3081,6 +3140,46 @@ _**レスポンス**_
 -   成功したオペレーションでは、204 No Content を使用します
 -   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
     [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   属性が存在しないで、422 Unprocessable Content になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+リクエストに属性が *何も存在しない* 場合:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ]",
+    "error": "Unprocessable"
+}
+```
+
+*一部* (すべてではない) 属性が存在しない場合 (部分更新):
+
+```
+{
+    "description": "do not exist: E/T - [ C ]",
+    "error": "PartialUpdate"
+}
+```
+
+
+`description` 内のエンティティ型は、リクエストにエンティティ型が含まれている場合にのみ表示されます。それ以外の場合は省略されます:
+
+```
+"description": "do not exist: E - [ C ]",
+```
 
 <a name="replace-all-entity-attributes-put-v2entitiesentityidattrs"></a>
 
@@ -3143,8 +3242,20 @@ _**リクエスト・ペイロード**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
 
 <a name="remove-entity-delete-v2entitiesentityid"></a>
 
@@ -3176,8 +3287,20 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
 
 <a name="attributes"></a>
 
@@ -3308,8 +3431,29 @@ _**リクエスト・ペイロード**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティまたは属性が見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+属性が見つからない場合:
+
+```
+{
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
+}
+```
 
 <a name="remove-a-single-attribute-delete-v2entitiesentityidattrsattrname"></a>
 
@@ -3342,8 +3486,29 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   正常なオペレーションには、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティまたは属性が見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+属性が見つからない場合:
+
+```
+{
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
+}
+```
 
 <a name="attribute-value"></a>
 
@@ -3387,8 +3552,10 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、200 OK を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティまたは属性が見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   コンテンツが受け入れられないときに、406 Not Acceptable になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
 
 _**レスポンス・ヘッダ**_
 
@@ -3396,7 +3563,25 @@ _**レスポンス・ヘッダ**_
 
 _**レスポンス・ペイロード**_
 
-レスポンス・ペイロードは、オブジェクト、配列、文字列、数値、ブール値、または属性の値を持つ null にすることができます。
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+属性が見つからない場合:
+
+```
+{
+   "description": "The entity does not have such an attribute",
+   "error": "NotFound"
+}
+```
+
+エンティティと属性の両方が見つかった場合、レスポンス・ペイロードはオブジェクト、配列、文字列、数値、ブール値、または属性の値を持つ null になります。
 
 -   属性値が JSON 配列またはオブジェクトの場合:
     -   `Accept` ヘッダを `application/json` または `text/plain` に展開できる場合、レスポンス・タイプが
@@ -3486,8 +3671,29 @@ _**リクエスト・ペイロード**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、200 OK を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティまたは属性が見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+属性が見つからない場合:
+
+```
+{
+   "description": "The entity does not have such an attribute",
+   "error": "NotFound"
+}
+```
 
 <a name="types"></a>
 
@@ -4548,8 +4754,84 @@ _**リクエスト・ペイロード**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   `update`, `delete` または `replace` 時に `entities` フィールドにエンティティが存在しなければ、404 Not Found になります (次のサブセクションを参照)
+    -   そのほかの場合は、422 Unprocessable Content になります (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+アクション・タイプが `replace` の場合:
+
+-   `entities` 内にエンティティが *何も*存在しない場合:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+-   `entities` 内にエンティティの *いずれか (すべてではない)* が存在しない場合 (部分更新):
+
+```
+{
+    "description": "do not exist: G/T - [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+アクション・タイプが `update` または `delete` の場合:
+
+-   `entities` 内にエンティティが *何も*存在しない場合:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+-   `entities` に少なくとも1つのエンティティが存在し、既存のエンティティの *すべて* で属性の欠落により *完全な失敗* が発生した場合:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ], G/T [entity itself]",
+    "error": "Unprocessable"
+}
+```
+
+-   `entities` 内に少なくとも1つのエンティティが存在し、既存のエンティティの *少なくとも1つ*に、*少なくとも*1つの属性が存在するが、すべてのエンティティが存在するわけではない、
+    またはすべてのエンティティが存在するが、少なくとも1つのエンティティに少なくとも1つの属性が欠落している場合 (部分更新):
+
+```
+{
+    "description": "do not exist: E/T - [ D ], G/T [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+アクション・タイプが `appendStrict` の場合:
+
+-   `entities` 内の *すべて* エンティティで、既存の属性が原因で*完全な失敗*があった場合:
+
+{
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A, B ], E2/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+
+-   *少なくとも*1つの属性の `entities` 内の *少なくとも 1 つのエンティティ* で成功したが、 `entities` 内のすべてのエンティティが完全に成功したわけではない場合 (部分更新):
+
+{
+    "description": "one or more of the attributes in the request already exist: E2/T - [ A, B ]",
+    "error": "PartialUpdate"
+}
+
+`description` 内のエンティティ型は、リクエストにエンティティ型が含まれている場合にのみ表示されます。それ以外の場合は省略されます:
+
+```
+"description": "one or more of the attributes in the request already exist: E2 - [ A, B ]"
+```
 
 <a name="query-operation"></a>
 
