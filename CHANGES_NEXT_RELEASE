@@ -1,6 +1,8 @@
 - Add: servicePath field to builtin attributes (#2877)
 - Add: notification.mqtt.retain and notification.mqttCustom.retain flag for MQTT retain in notifications (#4388)
 - Add: notification payload in INFO log traces (#4449)
+- Add: log deprecation traces for usage of legacyForwarding mode in registrations
+- Add: log deprecation traces for usage of attrsFormat legacy in subscriptions
 - Fix: do not show dateExpires built-in attribute in GET /v2/types and GET /v2/types/{type} operations (#4451)
 - Fix: correctly detect JSON attribute and metadata value changes in subscription triggering logic (#4211, #4434, #643)
 - Fix: update forwarding was not working when entity type is not included in the request (#4460)

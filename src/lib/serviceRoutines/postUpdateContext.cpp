@@ -157,6 +157,11 @@ static bool updateForward
     TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
 
     op = "/updateContext";
+
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode in update forwarding operation (regId: %s)", regId.c_str()));
+    }
   }
   else
   {
