@@ -183,7 +183,7 @@ TEST(mongoCreateSubscriptions, createSubscriptionCustomOK)
   sub.notification.attributes.push_back("D");
   sub.notification.httpInfo.url      = "http://foo.bar";
   sub.notification.httpInfo.custom   = true;
-  sub.notification.httpInfo.verb     = PUT;
+  sub.notification.httpInfo.verb     = HTTP_PUT;
   sub.notification.httpInfo.headers.insert(std::pair<std::string, std::string>("X-My-Header", "foo"));
   sub.notification.httpInfo.headers.insert(std::pair<std::string, std::string>("Content-Type", "text/plain"));
   sub.notification.httpInfo.qs.insert(std::pair<std::string, std::string>("p1", "param1"));
