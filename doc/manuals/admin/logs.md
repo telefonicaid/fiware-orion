@@ -406,13 +406,28 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 If `-logDeprecate` CLI setting is used (or `deprecate` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels)) the
 following WARN traces are generated:
 
-* NGSIv1 requests (both with and without payload). Note this doesn't
-  include notifications using [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding
-  to registrations using [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
+* NGSIv1 requests (both with and without payload). For instance:
 
 ```
 time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
 time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
+```
+
+* Usages of [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
+
+```
+time=2024-01-11T13:57:13.537Z | lvl=WARN | corr=527378d8-b089-11ee-875d-080027cd35f1 | trans=1704981432-655-00000000006 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoRegistrationCreate.cpp[235]:mongoRegistrationCreate | msg=Deprecated usage of legacyForwarding mode in registration creation (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.565Z | lvl=WARN | corr=52778eaa-b089-11ee-861c-080027cd35f1 | trans=1704981432-655-00000000007 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoRegistrationGet.cpp[93]:setProvider | msg=Deprecated usage of legacyForwarding mode detected in existing registration (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.595Z | lvl=WARN | corr=527c0912-b089-11ee-bb8c-080027cd35f1 | trans=1704981432-655-00000000008 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=postQueryContext.cpp[191]:queryForward | msg=Deprecated usage of legacyForwarding mode in query forwarding operation (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.624Z | lvl=WARN | corr=52808938-b089-11ee-9835-080027cd35f1 | trans=1704981432-655-00000000010 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=postUpdateContext.cpp[163]:updateForward | msg=Deprecated usage of legacyForwarding mode in update forwarding operation (regId: 659ff3b9691855f16d00ec5a)
+```
+
+* Usages of [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification). For instance:
+
+```
+time=2024-01-11T16:23:24.646Z | lvl=WARN | corr=be709034-b09d-11ee-b5d1-080027cd35f1 | trans=1704990203-652-00000000012 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=MongoCommonSubscription.cpp[598]:setFormat | msg=Deprecated usage of notification legacy format in subscription creation or modification (subId: 65a015fcda947708d30425eb)
+time=2024-01-11T16:23:24.675Z | lvl=WARN | corr=be74dc98-b09d-11ee-b2d6-080027cd35f1 | trans=1704990203-652-00000000013 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoGetSubscriptions.cpp[217]:setNotification | msg=Deprecated usage of notification legacy format detected in existing subscription (subId: 65a015fcda947708d30425eb)
+time=2024-01-11T16:23:24.716Z | lvl=WARN | corr=be7ae5ac-b09d-11ee-98c8-080027cd35f1 | trans=1704990203-652-00000000015 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=Notifier.cpp[680]:buildSenderParams | msg=Deprecated usage of notification legacy format in notification (subId: 65a015fcda947708d30425eb)
 ```
 
 * Usages NGSIv1 usages of location metadata. Example:
