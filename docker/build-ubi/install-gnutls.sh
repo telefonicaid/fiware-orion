@@ -35,7 +35,6 @@ yum -y install https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packag
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/nettle-devel-3.4.1-7.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/libidn2-devel-2.2.0-1.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/libtasn1-devel-4.13-3.el8.x86_64.rpm
-yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-c++-3.6.16-7.el8.x86_64.rpm
 yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-c++-3.6.16-6.el8_7.x86_64.rpm
 yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-devel-3.6.16-6.el8_7.x86_64.rpm
 
