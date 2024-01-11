@@ -29,6 +29,7 @@
 #include "rest/RestService.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "orionld/types/ApiVersion.h"
 #include "orionld/types/OrionldMimeType.h"
 
 #include "unittest.h"
@@ -446,7 +447,7 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  rendered = caP->render(V1, false, UpdateContext, false);
+  rendered = caP->render(API_VERSION_NGSI_V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -598,7 +599,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  rendered = caP->render(V1, false, UpdateContext, false);
+  rendered = caP->render(API_VERSION_NGSI_V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 

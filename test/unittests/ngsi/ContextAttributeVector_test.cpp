@@ -27,6 +27,8 @@
 
 #include "ngsi/ContextAttributeVector.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -43,7 +45,7 @@ TEST(ContextAttributeVector, render)
 
   utInit();
 
-  out = cav.render(V1, false, UpdateContextAttribute, "");
+  out = cav.render(API_VERSION_NGSI_V1, false, UpdateContextAttribute, "");
   EXPECT_STREQ("", out.c_str());
 
   utExit();

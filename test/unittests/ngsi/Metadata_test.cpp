@@ -24,6 +24,8 @@
 */
 #include "ngsi/Metadata.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -91,13 +93,13 @@ TEST(Metadata, check)
 
   utInit();
 
-  checked = m1.check(V1);
+  checked = m1.check(API_VERSION_NGSI_V1);
   EXPECT_STREQ("missing metadata name", checked.c_str());
 
-  checked = m2.check(V1);
+  checked = m2.check(API_VERSION_NGSI_V1);
   EXPECT_STREQ("missing metadata value", checked.c_str());
 
-  checked = m3.check(V1);
+  checked = m3.check(API_VERSION_NGSI_V1);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

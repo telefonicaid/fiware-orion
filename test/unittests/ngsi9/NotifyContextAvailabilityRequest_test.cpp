@@ -30,6 +30,7 @@
 #include "jsonParse/jsonRequest.h"
 
 #include "orionld/types/OrionldMimeType.h"
+#include "orionld/types/ApiVersion.h"
 
 #include "unittest.h"
 
@@ -83,7 +84,7 @@ TEST(NotifyContextAvailabilityRequest, check)
 
   utInit();
 
-  out = ncr.check(V1, "");
+  out = ncr.check(API_VERSION_NGSI_V1, "");
   EXPECT_EQ("OK", out);
 
   utExit();

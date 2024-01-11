@@ -23,6 +23,7 @@
 * Author: Fermin Galan
 */
 #include "orionTypes/EntityType.h"
+#include "orionld/types/ApiVersion.h"
 #include "unittests/unittest.h"
 
 
@@ -38,9 +39,9 @@ TEST(EntityType, check)
   EntityType et1("myType");
   EntityType et2("");
 
-  EXPECT_EQ("OK", et1.check(V1, ""));
-  EXPECT_EQ("Empty Type", et2.check(V1, ""));
-  EXPECT_EQ("foo", et1.check(V1, "foo"));
+  EXPECT_EQ("OK", et1.check(API_VERSION_NGSI_V1, ""));
+  EXPECT_EQ("Empty Type", et2.check(API_VERSION_NGSI_V1, ""));
+  EXPECT_EQ("foo", et1.check(API_VERSION_NGSI_V1, "foo"));
 
   utExit();
 }

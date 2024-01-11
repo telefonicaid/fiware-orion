@@ -27,6 +27,8 @@
 
 #include "ngsi/ContextRegistrationResponse.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -71,7 +73,7 @@ TEST(ContextRegistrationResponse, check)
 
   utInit();
 
-  checked = crr.check(V1, RegisterContext, "", 0);
+  checked = crr.check(API_VERSION_NGSI_V1, RegisterContext, "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
 
   utExit();

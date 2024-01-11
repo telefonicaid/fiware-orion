@@ -27,6 +27,8 @@
 
 #include "ngsi/ContextAttributeVector.h"
 
+#include "orionld/types/OrionldMimeType.h"
+
 #include "unittest.h"
 
 
@@ -43,17 +45,17 @@ TEST(ContextAttribute, checkOne)
   utInit();
 
   caP->name = "";
-  res     = caP->check(V1, RegisterContext);
+  res     = caP->check(API_VERSION_NGSI_V1, RegisterContext);
   EXPECT_TRUE(res == "missing attribute name");
 
   caP->name  = "Algo, lo que sea!";
   caP->stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  res     = caP->check(V1, RegisterContext);
+  res     = caP->check(API_VERSION_NGSI_V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
 
   caP->stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-  res     = caP->check(V1, RegisterContext);
+  res     = caP->check(API_VERSION_NGSI_V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -82,7 +84,7 @@ TEST(ContextAttribute, checkVector)
   caVectorP->push_back(ca0P);
   caVectorP->push_back(ca1P);
 
-  res     = caVectorP->check(V1, RegisterContext);
+  res     = caVectorP->check(API_VERSION_NGSI_V1, RegisterContext);
   EXPECT_TRUE(res == "OK");
 
   utExit();
@@ -102,7 +104,7 @@ TEST(ContextAttribute, render)
 
   utInit();
 
-  out = caP->render(V1, false, UpdateContext, false);
+  out = caP->render(API_VERSION_NGSI_V1, false, UpdateContext, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

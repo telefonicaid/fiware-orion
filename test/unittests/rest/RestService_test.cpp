@@ -38,6 +38,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
+
 #include "orionld/types/OrionldMimeType.h"
 
 #include "unittests/unittest.h"
@@ -121,7 +122,7 @@ TEST(RestService, payloadParse)
                                    sizeof(testBuf),
                                    infile1)) << "Error getting test data from '" << infile1 << "'";
 
-  orionldState.in.contentType    = NOMIMETYPE;
+  orionldState.in.contentType    = MT_NONE;
   orionldState.in.payload        = (char*) "123";
   orionldState.in.payloadSize    = strlen(orionldState.in.payload);
 
