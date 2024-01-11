@@ -484,12 +484,12 @@ double dateTimeFromString(const char* iso8601String, char* errorString, int erro
     if (tzStart == NULL) tzStart = strchr(T, '-');
 
     if (tzStart == NULL)
-      strncpy(timeString, T, sizeof(timeString));
+      strncpy(timeString, T, sizeof(timeString) - 1);
     else
     {
-      strncpy(timezoneString, tzStart, sizeof(timezoneString));
+      strncpy(timezoneString, tzStart, sizeof(timezoneString) - 1);
       *tzStart = 0;
-      strncpy(timeString, T, sizeof(timeString));
+      strncpy(timeString, T, sizeof(timeString) - 1);
     }
   }
 
