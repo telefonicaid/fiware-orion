@@ -154,6 +154,11 @@ static bool setPayload
 
     if (*renderFormatP == NGSI_V1_LEGACY)
     {
+      if (logDeprecate)
+      {
+        LM_W(("Deprecated usage of notification legacy format in notification (subId: %s)", subscriptionId.c_str()));
+      }
+
       *payloadP = ncr.toJsonV1(false, attrsFilter, blacklist, metadataFilter);
     }
     else
@@ -670,6 +675,11 @@ SenderThreadParams* Notifier::buildSenderParams
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
+      if (logDeprecate)
+      {
+        LM_W(("Deprecated usage of notification legacy format in notification (subId: %s)", subId.c_str()));
+      }
+
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
       payloadString = ncr.toJsonV1(asJsonObject, attrsFilter, blacklist, metadataFilter);
     }

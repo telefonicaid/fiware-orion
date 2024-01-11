@@ -212,6 +212,11 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   // Attributes format
   subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
 
+  if (logDeprecate && subP->attrsFormat == NGSI_V1_LEGACY)
+  {
+    LM_W(("Deprecated usage of notification legacy format detected in existing subscription (subId: %s)", subP->id.c_str()));
+  }
+
 
   //
   // Check values from subscription cache, update object from cache-values if necessary

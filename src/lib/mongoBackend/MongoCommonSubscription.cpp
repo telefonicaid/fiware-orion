@@ -593,6 +593,11 @@ void setFormat(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   std::string format = renderFormatToString(sub.attrsFormat);
 
+  if (logDeprecate && sub.attrsFormat == NGSI_V1_LEGACY)
+  {
+    LM_W(("Deprecated usage of notification legacy format in subscription creation or modification (subId: %s)", sub.id.c_str()));
+  }
+
   b->append(CSUB_FORMAT, format);
   LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
 }
