@@ -42,9 +42,9 @@ char* stringStrip(char* s)
   while ((*s == ' ') || (*s == '\t') || (*s == '\n'))
     ++s;
 
-  // Amything left?
+  // Nothing left?
   if (*s == 0)
-    return NULL;
+    return (char*) "";
 
   // Remove all whitespace after
   char* sEnd = &s[strlen(s) - 1];
