@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string.h>                                            // strlen
+#include <unistd.h>                                            // NULL
 
 #include "orionld/common/stringStrip.h"                        // Own interface
 
@@ -34,9 +35,16 @@
 //
 char* stringStrip(char* s)
 {
+  if (s == NULL)
+    return NULL;
+
   // Remove all whitespace before
   while ((*s == ' ') || (*s == '\t') || (*s == '\n'))
     ++s;
+
+  // Nothing left?
+  if (*s == 0)
+    return (char*) "";
 
   // Remove all whitespace after
   char* sEnd = &s[strlen(s) - 1];

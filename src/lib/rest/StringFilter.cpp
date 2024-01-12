@@ -208,7 +208,7 @@ bool StringFilterItem::rangeParse(char* s, std::string* errorStringP)
   toString   = stringStrip(toString);
   fromString = stringStrip(fromString);
 
-  if ((*toString == 0) || (*fromString == 0))
+  if ((toString == NULL) || (*toString == 0) || (fromString == NULL) || (*fromString == 0))
   {
     *errorStringP = "empty item in range";
     return false;
@@ -278,7 +278,7 @@ bool StringFilterItem::listItemAdd(char* s, std::string* errorStringP)
   bool                   b;
 
   s = stringStrip(s);
-  if (*s == 0)
+  if ((s == NULL) || (*s == 0))
   {
     *errorStringP = "empty item in list";
     return false;
@@ -356,6 +356,8 @@ bool StringFilterItem::listParse(char* s, std::string* errorStringP)
   char* itemStart = stringStrip(s);
   char* cP        = itemStart;
   bool  inString  = false;
+
+  if (cP == NULL) cP = (char*) "";
 
   while (*cP != 0)
   {
@@ -589,7 +591,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   type = _type;
 
   s = stringStrip(s);
-  if (*s == 0)
+  if ((s == NULL) || (*s == 0))
   {
     free(toFree);
     *errorStringP = "empty q-item";
@@ -622,7 +624,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   // Check for invalid LHS
   // LHS can be empty ONLY if UNARY OP, i.e. SfopNotExists OR SfopExists
   //
-  if ((*lhs == 0) && (op != SfopNotExists) && (op != SfopExists))
+  if (((lhs == NULL) || (*lhs == 0)) && (op != SfopNotExists) && (op != SfopExists))
   {
     *errorStringP = "empty left-hand-side in q-item";
     free(toFree);
@@ -688,7 +690,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   // Check for empty RHS
   //
-  if (*rhs == 0)
+  if ((rhs == NULL) || (*rhs == 0))
   {
     *errorStringP = "empty right-hand-side in q-item";
     free(toFree);
