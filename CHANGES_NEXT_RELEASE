@@ -8,6 +8,7 @@
 - Fix: update forwarding was not working when entity type is not included in the request (#4460)
 - Fix: DateTime and geo:json types were not supported in custom notifications using ngsi patching (#4435)
 - Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
+- Fix: in custom notification NGSI payload patching macro subscription covering completely the string where is used, always cast to string for id/type (#4462)
 - Fix: improve error traces (#4387)
 - Fix: on delete attributes operation, the lack of attribute in entity doesn't preclude the deletion of attributes which do exist (this way behaving same way as update attributes operation)
 - Fix: POST /v2/entities/E/attrs?options=append was wrongly creating entities

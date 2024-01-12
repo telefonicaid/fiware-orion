@@ -1,0 +1,206 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+NGSI patching macro subscription covering completely the string always cast to string for id/type
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom sub1 with ngsi id and type with the value of idAtt and typeAtt attributes
+# 02. Create entity E with idAtt=1 and typeAtt=2 as numbers
+# 03. Update entity E with idAtt=110 and typeAtt=220 as numbers
+# 04. Dump accumulator and see notifications with id "1" and type "2" and id "110" and type "220"
+#
+
+
+echo "01. Create custom sub1 with ngsi id and type with the value of idAtt and typeAtt attributes"
+echo "==========================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "id": "${idAtt}",
+        "type": "${typeAtt}"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E with idAtt=1 and typeAtt=2 as numbers"
+echo "========================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "idAtt": {
+    "value": 1,
+    "type": "Number"
+  },
+  "typeAtt": {
+    "value": 2,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update entity E with idAtt=110 and typeAtt=220 as numbers"
+echo "============================================================="
+payload='{
+  "idAtt": {
+    "value": 110,
+    "type": "Number"
+  },
+  "typeAtt": {
+    "value": 220,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo '04. Dump accumulator and see notifications with id "1" and type "2" and id "110" and type "220"'
+echo "==============================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub1 with ngsi id and type with the value of idAtt and typeAtt attributes
+===========================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E with idAtt=1 and typeAtt=2 as numbers
+=========================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. Update entity E with idAtt=110 and typeAtt=220 as numbers
+=============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Dump accumulator and see notifications with id "1" and type "2" and id "110" and type "220"
+===============================================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 178
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "id": "1",
+            "idAtt": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "type": "2",
+            "typeAtt": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 186
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "id": "110",
+            "idAtt": {
+                "metadata": {},
+                "type": "Number",
+                "value": 110
+            },
+            "type": "220",
+            "typeAtt": {
+                "metadata": {},
+                "type": "Number",
+                "value": 220
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
