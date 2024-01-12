@@ -41,6 +41,9 @@ MimeType mimeTypeFromString(const char* mimeType, char** charsetP, bool wildcard
   char* s;
   char* cP = (char*) mimeType;
 
+  if ((cP == NULL) || (*cP == 0))
+    return MT_NONE;
+
   if ((s = strstr(cP, ";")) != NULL)
   {
     *s = 0;
