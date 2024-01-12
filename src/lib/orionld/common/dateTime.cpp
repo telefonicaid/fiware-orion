@@ -435,6 +435,12 @@ double dateTimeFromString(const char* iso8601String, char* errorString, int erro
 {
   char iso8601[64];
 
+  if (iso8601String == NULL)
+    LM_RE(-1, ("NULL ISO8601 String"));
+
+  if (*iso8601String == 0)
+    LM_RE(-1, ("Empty ISO8601 String"));
+
   strncpy(iso8601, iso8601String, sizeof(iso8601) - 1);
 
   char* date = stringStrip(iso8601);

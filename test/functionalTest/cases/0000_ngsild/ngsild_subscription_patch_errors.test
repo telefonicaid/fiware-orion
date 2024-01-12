@@ -2178,14 +2178,13 @@ Date: REGEX(.*)
 89. Attempt to PATCH the subscription with an 'expires' that is an empty string
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 179
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "invalid DateTime: '' (error in 'date' part '')",
-    "field": "Subscription::expiresAt",
-    "title": "Invalid ISO8601",
+    "detail": "Subscription::expiresAt",
+    "title": "Empty String",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
