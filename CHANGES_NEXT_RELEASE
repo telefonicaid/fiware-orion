@@ -1,2 +1,0 @@
-* Issue #1525:  Fixed a bug about cutting of HTTP headers for distributed requests
-* Issue #1495:  Fixed a CRASH about HTTP headers longer than 255 bytes for notifications over HTTPS 
