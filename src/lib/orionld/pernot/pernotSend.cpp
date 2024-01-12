@@ -148,8 +148,8 @@ bool pernotSend(PernotSubscription* subP, KjNode* entityArray)
   //
   headers += subP->headers.items;
 
-  char   hostHeader[128];
-  size_t hostHeaderLen = snprintf(hostHeader, sizeof(hostHeader) - 1, "Host: %s\r\n", subP->ip);
+  char   hostHeader[512];
+  size_t hostHeaderLen = snprintf(hostHeader, sizeof(hostHeader) - 1, "Host: %s:%d\r\n", subP->ip, subP->port);
 
   int           ioVecLen   = headers + 3;  // Request line + X headers + empty line + payload body
   struct iovec  ioVec[53]  = {
