@@ -688,7 +688,7 @@ bool StringFilterItem::parse(char* qItem, std::string* errorStringP, StringFilte
   //
   // Check for empty RHS
   //
-  if (*rhs == 0)
+  if ((rhs == NULL) || (*rhs == 0))
   {
     *errorStringP = "empty right-hand-side in q-item";
     free(toFree);
