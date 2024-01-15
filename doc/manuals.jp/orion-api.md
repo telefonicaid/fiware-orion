@@ -453,6 +453,7 @@ Oron の実装では、この節で説明する HTTP ステータス・コード
     -   HTTP 411 Length Required は `ContentLengthRequired` (`411`) に対応します
     -   HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します
     -   HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します
+-   内部エラー (Internal errors) には `InternalServerError` (`500`) を使用します
 
 <a name="multi-tenancy"></a>
 
