@@ -4472,7 +4472,7 @@ unsigned int processContextElement
   }
 
   // The following check makes sense only when there are at least one attribute in the request
-  // (e.g. entity deletion, which doesn't include attributes)
+  // (e.g. not for entity deletion, which doesn't include attributes)
   if ((updateCoverageP != NULL) && (eP->attributeVector.size() > 0))
   {
     if ((action == ActionTypeUpdate) || (action == ActionTypeDelete))
