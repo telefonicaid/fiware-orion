@@ -230,9 +230,13 @@ void mongoRegistrationCreate
 
   std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
 
-  if (logDeprecate && format == "JSON")
+  if (format == "JSON")
   {
-    LM_W(("Deprecated usage of legacyForwarding mode in registration creation (regId: %s)", regIdP->c_str()));
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode in registration creation (regId: %s)", regIdP->c_str()));
+    }
   }
 
   setFormat(format, &bob);

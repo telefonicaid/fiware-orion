@@ -29,6 +29,7 @@
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/errorMessages.h"
+#include "common/statistics.h"
 #include "logMsg/logMsg.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
@@ -324,6 +325,7 @@ static bool getGeoJson
     // This corresponds to the legacy way in NGSIv1 based in metadata
     // The block is the same that for GEO_POINT but it is clearer if we keep it separated
 
+    __sync_fetch_and_add(&noOfDprLocationMetadata, 1);
     if (logDeprecate)
     {
       LM_W(("Deprecated usage of metadata location %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
@@ -348,9 +350,13 @@ static bool getGeoJson
     return true;
   }
 
-  if ((logDeprecate) && ((caP->type == GEO_POINT) || (caP->type == GEO_LINE) || (caP->type == GEO_BOX) || (caP->type == GEO_POLYGON)))
+  if ((caP->type == GEO_POINT) || (caP->type == GEO_LINE) || (caP->type == GEO_BOX) || (caP->type == GEO_POLYGON))
   {
-    LM_W(("Deprecated usage of %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
+    __sync_fetch_and_add(&noOfDprGeoformat, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
+    }
   }
 
   if (caP->type == GEO_POINT)
