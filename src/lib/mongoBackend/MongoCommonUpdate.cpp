@@ -4471,7 +4471,9 @@ unsigned int processContextElement
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
   }
 
-  if (updateCoverageP != NULL)
+  // The following check makes sense only when there are at least one attribute in the request
+  // (e.g. not for entity deletion, which doesn't include attributes)
+  if ((updateCoverageP != NULL) && (eP->attributeVector.size() > 0))
   {
     if ((action == ActionTypeUpdate) || (action == ActionTypeDelete))
     {
