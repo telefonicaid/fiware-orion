@@ -3533,7 +3533,7 @@ static unsigned int updateEntity
       attrNames.push_back(eP->attributeVector[ix]->name);
     }
 
-    // Note we cannot usse eP->type for the type, as it may be blank in the request
+    // Note we cannot use eP->type for the type, as it may be blank in the request
     // (that would break the cases/1494_subscription_alteration_types/sub_alteration_type_entity_delete2.test case)
     if (!addTriggeredSubscriptions(notifyCerP->entity.id,
                                    notifyCerP->entity.type,
@@ -3557,7 +3557,7 @@ static unsigned int updateEntity
     addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityDelete));
     unsigned int notifSent = processSubscriptions(subsToNotify,
                                                   notifyCerP,
-                                                  tenant,
+                                                  tenant,   
                                                   xauthToken,
                                                   fiwareCorrelator,
                                                   notifStartCounter);
