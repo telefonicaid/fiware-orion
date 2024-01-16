@@ -367,6 +367,9 @@ time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c2958
 time=2023-06-08T15:14:21.176Z | lvl=WARN | corr=2518249e-060f-11ee-9e76-000c29583ca5 | trans=1686237259-703-00000000004 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[353]:getGeoJson | msg=Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
 ```
 
+非推奨機能の使用状況は、`-logDeprecate` CLI (またはログ管理 REST API の同等の `deprecate` パラメータ) が使用されていない場合でも、
+[統計 API の counters ブロック](statistics#counter-block) の `deprecatedFeature` オブジェクトで追跡されます。
+
 非推奨の機能とその解決方法の詳細については、[非推奨ドキュメント](../deprecated.md) を参照してください。
 
 [トップ](#top)
