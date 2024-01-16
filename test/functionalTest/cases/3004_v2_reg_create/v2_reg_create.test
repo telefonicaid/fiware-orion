@@ -138,10 +138,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 206
+Content-Length: 250
 
 {
     "counters": {
+        "deprecatedFeatures": {
+            "ngsiv1Forwarding": 2
+        },      
         "jsonRequests": 1,
         "noPayloadRequests": 2,
         "requests": {

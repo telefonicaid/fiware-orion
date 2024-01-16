@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "logMsg/logMsg.h"
+#include "common/statistics.h"
 
 
 
@@ -170,9 +171,13 @@ void logInfoRequestWithoutPayload
 {
   LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
 
-  if (logDeprecate && isNgsiV1Url(url))
+  if (isNgsiV1Url(url))
   {
-    LM_W(("Deprecated NGSIv1 request received: %s %s, response code: %d", verb, url, rc));
+    __sync_fetch_and_add(&noOfDprNgsiv1Request, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated NGSIv1 request received: %s %s, response code: %d", verb, url, rc));
+    }
   }
 }
 
@@ -205,9 +210,13 @@ void logInfoRequestWithPayload
 
   LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
 
-  if (logDeprecate && isNgsiV1Url(url))
+  if (isNgsiV1Url(url))
   {
-    LM_W(("Deprecated NGSIv1 request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
+    __sync_fetch_and_add(&noOfDprNgsiv1Request, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated NGSIv1 request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
+    }
   }
 
   if (cleanAfterUse)

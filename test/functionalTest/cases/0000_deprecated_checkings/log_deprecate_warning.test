@@ -25,7 +25,7 @@ Disable NGSIv1 CLI
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPV4 -logDeprecate
+brokerStart CB 0 IPV4 -logDeprecate -statCounters
 
 --SHELL--
 
@@ -47,6 +47,7 @@ brokerStart CB 0 IPV4 -logDeprecate
 # 12. Update subscription using attrsFormat legacy
 # 13. Trigger notification using attrsFormat legacy
 # 14. Get WARNING trace in logs
+# 15. Get statistics and see deprecatedFeatures counters
 #
 
 echo "01. Query E1-T1"
@@ -260,6 +261,13 @@ echo
 echo "14. Get WARNING trace in logs"
 echo "============================="
 cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}' | sed -e "s/$REG_ID/REG_ID/g" | sed -e "s/$SUB_ID/SUB_ID/g"
+echo
+echo
+
+
+echo "15. Get statistics and see deprecatedFeatures counters"
+echo "======================================================"
+orionCurl --url /statistics
 echo
 echo
 
@@ -538,6 +546,65 @@ Deprecated usage of notification legacy format detected in existing subscription
 Deprecated usage of notification legacy format in subscription modification (subId: SUB_ID)
 Deprecated usage of notification legacy format in notification (subId: SUB_ID)
 Raising alarm NotificationError localhost:1234/: notification failure for queue worker: Couldn't connect to server
+
+
+15. Get statistics and see deprecatedFeatures counters
+======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 587
+
+{
+    "counters": {
+        "deprecatedFeatures": {
+            "geoFormat": 2,
+            "metadataLocation": 1,
+            "ngsiv1Forwarding": 4,
+            "ngsiv1NotifFormat": 4,
+            "ngsiv1Requests": 4
+        },
+        "jsonRequests": 9,
+        "noPayloadRequests": 5,
+        "requests": {
+            "/statistics": {
+                "GET": 1
+            },
+            "/v2/entities": {
+                "POST": 2
+            },
+            "/v2/entities/{id}/attrs/{name}": {
+                "GET": 1,
+                "PUT": 1
+            },
+            "/v2/registrations": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v2/subscriptions": {
+                "GET": 1,
+                "POST": 1
+            },
+            "/v2/subscriptions/{id}": {
+                "PATCH": 1
+            }
+        },
+        "requestsLegacy": {
+            "/v1/contextEntities/{id}/attributes/{name}": {
+                "GET": 1
+            },
+            "/v1/queryContext": {
+                "POST": 1
+            },
+            "/v1/updateContext": {
+                "POST": 2
+            }
+        }
+    },
+    "measuring_interval_in_secs": REGEX(\d+),
+    "uptime_in_secs": REGEX(\d+)
+}
 
 
 --TEARDOWN--

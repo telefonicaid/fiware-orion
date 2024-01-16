@@ -249,7 +249,7 @@ orionCurl --url /v1/updateContext                -X POST --payload "$payload"  >
 
 # Get statistics
 
-orionCurl --url /statistics?options
+orionCurl --url /statistics
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -260,6 +260,9 @@ Content-Length: REGEX(\d+)
 
 {
     "counters": {
+        "deprecatedFeatures": {
+            "ngsiv1Requests": 7
+        },
         "jsonRequests": 16,
         "noPayloadRequests": 42,
         "requests": {

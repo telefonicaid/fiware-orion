@@ -154,6 +154,7 @@ static bool setPayload
 
     if (*renderFormatP == NGSI_V1_LEGACY)
     {
+      __sync_fetch_and_add(&noOfDprLegacyNotif, 1);
       if (logDeprecate)
       {
         LM_W(("Deprecated usage of notification legacy format in notification (subId: %s)", subscriptionId.c_str()));
@@ -689,6 +690,7 @@ SenderThreadParams* Notifier::buildSenderParams
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
+      __sync_fetch_and_add(&noOfDprLegacyNotif, 1);
       if (logDeprecate)
       {
         LM_W(("Deprecated usage of notification legacy format in notification (subId: %s)", subId.c_str()));
