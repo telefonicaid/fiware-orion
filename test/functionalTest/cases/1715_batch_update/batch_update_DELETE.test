@@ -136,10 +136,10 @@ HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 95
+Content-Length: 74
 
 {
-    "description": "The requested entity has not been found. Check type and id",
+    "description": "do not exist: E1/T1 - [entity itself]",
     "error": "NotFound"
 }
 

@@ -597,17 +597,26 @@ HttpStatusCode mongoEntityTypes
         continue;
       }
 
+      std::string attrName = attrsArray[jx].String();
+
+      // dateExpires shouldn't not be included in the response, as it is a built in attribute
+      // (see issue #4451)
+      if (attrName == DATE_EXPIRES)
+      {
+        continue;
+      }
+
       /* Note that we need and extra query() in the database (inside attributeType() function) to get each attribute type.
          * This could be inefficient, especially if the number of attributes is large */
       if (!noAttrDetail)
       {
         std::vector<std::string> attrTypes;
 
-        getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].String(), &attrTypes);
+        getAttributeTypes(tenant, servicePathV, entityType->type , attrName, &attrTypes);
 
         for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
         {
-          ContextAttribute* ca = new ContextAttribute(attrsArray[jx].String(), attrTypes[kx], "");
+          ContextAttribute* ca = new ContextAttribute(attrName, attrTypes[kx], "");
 
           entityType->contextAttributeVector.push_back(ca);
 
@@ -624,7 +633,7 @@ HttpStatusCode mongoEntityTypes
         // NOTE: here we add a ContextAttribute with empty type, as a marker for
         //       this special condition of 'No Attribute Detail'
         //
-        ContextAttribute* caP = new ContextAttribute(attrsArray[jx].String(), "", "");
+        ContextAttribute* caP = new ContextAttribute(attrName, "", "");
         entityType->contextAttributeVector.push_back(caP);
       }
     }
@@ -820,17 +829,26 @@ HttpStatusCode mongoAttributesForEntityType
 
     alarmMgr.dbErrorReset();
 
+    std::string attrName = idField.String();
+
+    // dateExpires shouldn't not be included in the response, as it is a built in attribute
+    // (see issue #4451)
+    if (attrName == DATE_EXPIRES)
+    {
+      continue;
+    }
+
     /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
      * This could be unefficient, specially if the number of attributes is large */
     if (!noAttrDetail)
     {
       std::vector<std::string> attrTypes;
 
-      getAttributeTypes(tenant, servicePathV, entityType , idField.String(), &attrTypes);
+      getAttributeTypes(tenant, servicePathV, entityType , attrName, &attrTypes);
 
       for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {
-        ContextAttribute*  ca = new ContextAttribute(idField.String(), attrTypes[kx], "");
+        ContextAttribute*  ca = new ContextAttribute(attrName, attrTypes[kx], "");
 
         responseP->entityType.contextAttributeVector.push_back(ca);
 
@@ -847,7 +865,7 @@ HttpStatusCode mongoAttributesForEntityType
       // NOTE: here we add a ContextAttribute with empty type, as a marker for
       //       this special condition of 'No Attribute Detail'
       //
-      ContextAttribute* caP = new ContextAttribute(idField.String(), "", "");
+      ContextAttribute* caP = new ContextAttribute(attrName, "", "");
       responseP->entityType.contextAttributeVector.push_back(caP);
     }
   }

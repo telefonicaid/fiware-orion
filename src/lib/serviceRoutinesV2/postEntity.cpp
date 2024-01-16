@@ -64,7 +64,6 @@ std::string postEntity
 {
   Entity*        eP  = &parseDataP->ent.res;
   ActionType     op;
-  Ngsiv2Flavour  flavor;
 
   eP->id   = compV[2];
   eP->type = ciP->uriParam["type"];
@@ -76,22 +75,20 @@ std::string postEntity
     return oe.toJson();
   }
 
-  if (ciP->uriParamOptions["append"] == true)  // pure-append
+  if (ciP->uriParamOptions[OPT_APPEND] == true)  // pure-append
   {
     op     = ActionTypeAppendStrict;
-    flavor = NGSIV2_FLAVOUR_ONUPDATE;
   }
   else
   {
     op     = ActionTypeAppend;  // append or update
-    flavor = NGSIV2_FLAVOUR_ONAPPEND;
   }
 
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);
 
   // Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP, flavor);
+  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPEND);
 
   // Any error in the response?
   std::string answer = "";

@@ -157,6 +157,12 @@ static bool updateForward
     TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
 
     op = "/updateContext";
+
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode in update forwarding operation (regId: %s)", regId.c_str()));
+    }
   }
   else
   {
@@ -840,7 +846,7 @@ std::string postUpdateContext
       failing = failing.substr(0, failing.size() - 2);
 
       // If some CER (but not all) fail, then it is a partial update
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Some of the following attributes were not updated: { " + failing + " }", "PartialUpdate");
+      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Some of the following attributes were not updated: { " + failing + " }", ERROR_PARTIAL_UPDATE);
     }
     else  // failures == 0
     {

@@ -185,6 +185,13 @@ static bool queryForward
   if (qcrP->providerFormat == PfJson)
   {
     op        = "/queryContext";
+
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode in query forwarding operation (regId: %s)", regId.c_str()));
+    }
+
     TIMED_RENDER(payload = qcrP->toJsonV1());
   }
   else
@@ -424,7 +431,7 @@ static bool queryForward
 
     if (b == false)
     {
-      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.details);
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
       parseData.qcr.res.release();
       parseData.qcrs.res.release();
       return false;

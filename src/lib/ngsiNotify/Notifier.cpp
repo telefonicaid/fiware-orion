@@ -154,6 +154,12 @@ static bool setPayload
 
     if (*renderFormatP == NGSI_V1_LEGACY)
     {
+      __sync_fetch_and_add(&noOfDprLegacyNotif, 1);
+      if (logDeprecate)
+      {
+        LM_W(("Deprecated usage of notification legacy format in notification (subId: %s)", subscriptionId.c_str()));
+      }
+
       *payloadP = ncr.toJsonV1(false, attrsFilter, blacklist, metadataFilter);
     }
     else
@@ -209,6 +215,26 @@ static bool setJsonPayload
 }
 
 
+/* ****************************************************************************
+*
+* removeQuotes -
+*
+* Entity id and type are special. Different from a attribute, they are always
+* strings and cannot take a number, boolean, etc. as value.
+*/
+inline std::string removeQuotes(std::string s)
+{
+  if (s[0] == '"')
+  {
+    return s.substr(1, s.size()-2);
+  }
+  else
+  {
+    return s;
+  }
+}
+
+
 
 /* ****************************************************************************
 *
@@ -247,10 +273,7 @@ static bool setNgsiPayload
   else
   {
     // If id is not found in the replacements macro, we use en.id.
-    // In addition, note we have to remove double quotes here given the
-    // values stored in replacements map are "raw strings"
-    std::string s = smartStringValue(ngsi.id, &replacements, '"' + en.id + '"');
-    effectiveId = s.substr(1, s.size()-2);
+    effectiveId = removeQuotes(smartStringValue(ngsi.id, &replacements, '"' + en.id + '"'));
   }
 
   std::string effectiveType;
@@ -261,10 +284,7 @@ static bool setNgsiPayload
   else
   {
     // If type is not found in the replacements macro, we use en.type.
-    // In addition, note we have to remove double quotes here given the
-    // values stored in replacements map are "raw strings"
-    std::string s = smartStringValue(ngsi.type, &replacements, '"' + en.type + '"');
-    effectiveType = s.substr(1, s.size()-2);
+    effectiveType = removeQuotes(smartStringValue(ngsi.type, &replacements, '"' + en.type + '"'));
   }
 
   cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
@@ -670,6 +690,12 @@ SenderThreadParams* Notifier::buildSenderParams
     std::string payloadString;
     if (renderFormat == NGSI_V1_LEGACY)
     {
+      __sync_fetch_and_add(&noOfDprLegacyNotif, 1);
+      if (logDeprecate)
+      {
+        LM_W(("Deprecated usage of notification legacy format in notification (subId: %s)", subId.c_str()));
+      }
+
       bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
       payloadString = ncr.toJsonV1(asJsonObject, attrsFilter, blacklist, metadataFilter);
     }

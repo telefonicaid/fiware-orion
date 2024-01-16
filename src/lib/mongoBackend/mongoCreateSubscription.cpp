@@ -31,6 +31,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/defaultValues.h"
+#include "common/statistics.h"
 #include "apiTypesV2/Subscription.h"
 #include "cache/subCache.h"
 #include "rest/OrionError.h"
@@ -195,6 +196,15 @@ std::string mongoCreateSubscription
     oe->fill(SccReceiverInternalError, err);
 
     return "";
+  }
+
+  if (sub.attrsFormat == NGSI_V1_LEGACY)
+  {
+    __sync_fetch_and_add(&noOfDprLegacyNotif, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of notification legacy format in subscription creation (subId: %s)", subId.c_str()));
+    }
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);

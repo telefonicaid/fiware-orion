@@ -91,6 +91,11 @@ static void resetStatistics(void)
   noOfNotificationsSent        = -1;
   noOfSimulatedNotifications   = -1;
 
+  noOfDprNgsiv1Request         = -1;
+  noOfDprLegacyForwarding      = -1;
+  noOfDprLegacyNotif           = -1;
+  noOfDprGeoformat             = -1;
+
   statisticsTime = getCurrentTime();
 
   QueueStatistics::reset();
@@ -212,6 +217,18 @@ std::string renderCounterStats(bool fullCounters)
   renderUsedCounter(&js, "registrationUpdateErrors", noOfRegistrationUpdateErrors, fullCounters);
   renderUsedCounter(&js, "discoveryErrors", noOfDiscoveryErrors, fullCounters);
   renderUsedCounter(&js, "notificationsSent", noOfNotificationsSent, fullCounters);
+
+  JsonObjectHelper jsDeprecated;
+  renderUsedCounter(&jsDeprecated, "ngsiv1Requests", noOfDprNgsiv1Request, fullCounters);
+  renderUsedCounter(&jsDeprecated, "ngsiv1Forwarding", noOfDprLegacyForwarding, fullCounters);
+  renderUsedCounter(&jsDeprecated, "ngsiv1NotifFormat", noOfDprLegacyNotif, fullCounters);
+  renderUsedCounter(&jsDeprecated, "geoFormat", noOfDprGeoformat, fullCounters);
+
+  std::string deprecation = jsDeprecated.str();
+  if (deprecation != "{}")
+  {
+    js.addRaw("deprecatedFeatures", deprecation);
+  }
 
   return js.str();
 }

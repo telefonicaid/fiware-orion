@@ -315,7 +315,7 @@ std::string getEntities
   {
     OrionError oe;
     entities.fill(parseDataP->qcrs.res, &oe);
-    TIMED_RENDER(answer = oe.toJson());
+    TIMED_RENDER(answer = oe.smartRender(V2));
     ciP->httpStatusCode = oe.code;
   }
   // 04. Render Entities response

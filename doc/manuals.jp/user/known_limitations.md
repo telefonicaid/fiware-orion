@@ -7,11 +7,8 @@ Orion Context Broker のデフォルトの最大リクエストサイズは1MB�
 
 ```
 {
-  "errorCode" : {
-    "code" : "413",
-    "reasonPhrase" : "Request Entity Too Large",
-    "details" : "payload size: 1500000, max size supported: 1048576"
-  }
+    "error": "RequestEntityTooLarge"
+    "description": "payload size: 1500000, max size supported: 1048576",
 }
 ```
 

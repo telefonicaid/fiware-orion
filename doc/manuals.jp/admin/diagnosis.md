@@ -206,44 +206,18 @@ Orion Context Broker は、次のフローを使用します :
 
 -   起動時に、broker が起動せず、ログ・ファイルに次のメッセージが表示されます :
 
-` X@08:04:45 main[313]: MongoDB error`
+```
+... msg=Database Startup Error (cannot connect to mongo - doing 100 retries with a 1000 millisecond interval)
+... msg=Fatal Error (MongoDB error)
+```
 
 -   broker 操作中、broker から送信されたレスポンスには、次のようなエラーメッセージが表示されます。
 
 ```
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: Null cursor"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: socket exception [CONNECT_ERROR] for localhost:27017"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: socket exception [FAILED_STATE] for localhost:27017"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: DBClientBase::findN: transport error: localhost:27017 ns: orion.$cmd query: { .. }"
-    }
-    ...
-
+{
+    "error": "InternalServerError",
+    "description": "Database Error ..."
+}
 ```
 
 どちらの場合も、MonogDB への接続が正しく構成されていることを確認してください。特に、[コマンドラインから実行する](cli.md)場合は "-dbhost" オプションです。また、シャーディングを使用しているかどうかによって異なりますが、mongod/mongos プロセスが起動していることです。

@@ -29,6 +29,7 @@
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/errorMessages.h"
+#include "common/statistics.h"
 #include "logMsg/logMsg.h"
 #include "ngsi/ContextAttribute.h"
 #include "parse/CompoundValueNode.h"
@@ -320,9 +321,13 @@ static bool getGeoJson
   std::vector<double>      coordLong;
   orion::BSONArrayBuilder  ba;
 
-  if ((logDeprecate) && ((caP->type == GEO_POINT) || (caP->type == GEO_LINE) || (caP->type == GEO_BOX) || (caP->type == GEO_POLYGON)))
+  if ((caP->type == GEO_POINT) || (caP->type == GEO_LINE) || (caP->type == GEO_BOX) || (caP->type == GEO_POLYGON))
   {
-    LM_W(("Deprecated usage of %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
+    __sync_fetch_and_add(&noOfDprGeoformat, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
+    }
   }
 
   if (caP->type == GEO_POINT)
