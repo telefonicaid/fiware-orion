@@ -453,6 +453,7 @@ Oron の実装では、この節で説明する HTTP ステータス・コード
     -   HTTP 411 Length Required は `ContentLengthRequired` (`411`) に対応します
     -   HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します
     -   HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します
+-   内部エラー (Internal errors) には `InternalServerError` (`500`) を使用します
 
 <a name="multi-tenancy"></a>
 
@@ -2245,6 +2246,9 @@ the value of the "temperature" attribute (of type Number) is 23.4
     -   マクロが *使用されている文字列を完全にカバーしている場合*、属性値の JSON の性質が考慮されます。たとえば、
         `"value": "${temperature}"` は、温度属性が数値の場合は `"value": 10` に解決され、`temperature`
         属性が文字列の場合は `"value": "10"` に解決されます
+        -   `id` と `type` は例外です。エンティティ ID と型が文字列でなければならないことを考えると
+            ([このセクション](#identifiers-syntax-restrictions)で説明されているように)、この場合、
+            属性値は常に文字列にキャストされます
     -   マクロが使用されている文字列の一部のみである場合、属性値は常に文字列にキャストされます。たとえば、
         `"value": "Temperature is: ${temperature}"` は、温度属性が数値であっても、`"value": "Temperature is 10"`
         に解決されます。属性値が JSON 配列またはオブジェクトの場合、この場合は文字列化されることに注意してください

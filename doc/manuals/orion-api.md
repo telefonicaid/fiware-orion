@@ -588,6 +588,8 @@ Some additional remarks:
 
 -   `Fiware-ServicePath` header is included in notification requests sent by Orion.
 
+-   You can use the [`servicePath` builtin attribute](#builtin-attributes) to get the entity service path.
+
 -   The scopes entities can be combined orthogonally with the
     [multi-tenancy functionality](#multi-tenancy). In that case,
     each `scope tree` lives in a different service/tenant and they can
