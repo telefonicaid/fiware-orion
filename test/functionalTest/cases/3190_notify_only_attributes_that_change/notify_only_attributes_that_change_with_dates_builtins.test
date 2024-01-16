@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Notify only attributes that change get with alterationType
+Notify only attributes that change get with dateCreated and dateModified
 
 --SHELL-INIT--
 dbInit CB
@@ -33,9 +33,9 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create entity E-A,B,C
-# 02. Create a subscription with onlyChangedAttrs: true and alterationType
+# 02. Create a subscription with onlyChangedAttrs: true and dateCreated/dateModified
 # 03. Update E-A
-# 04. Dump notification get E-A/alterationType
+# 04. Dump notification get E-A/dateCreated/dateModified
 #
 
 
@@ -62,8 +62,8 @@ echo
 echo
 
 
-echo '02. Create a subscription with onlyChangedAttrs: true and alterationType'
-echo '========================================================================'
+echo '02. Create a subscription with onlyChangedAttrs: true and dateCreated/dateModified'
+echo '=================================================================================='
 payload='{
   "subject": {
     "entities": [
@@ -78,7 +78,7 @@ payload='{
       "url": "http://localhost:'$LISTENER_PORT'/notify"
     },
     "attrs": [
-      "A","B","C", "alterationType"
+      "A","B","C", "dateModified", "dateCreated"
     ],
     "onlyChangedAttrs": true
   }
@@ -101,8 +101,8 @@ echo
 echo
 
 
-echo '04. Dump notification get E-A/alterationType'
-echo '============================================'
+echo '04. Dump notification get E-A/dateCreated/dateModified'
+echo '======================================================'
 accumulatorDump
 echo
 echo
@@ -119,8 +119,8 @@ Content-Length: 0
 
 
 
-02. Create a subscription with onlyChangedAttrs: true and alterationType
-========================================================================
+02. Create a subscription with onlyChangedAttrs: true and dateCreated/dateModified
+==================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -137,11 +137,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Dump notification get E-A/alterationType
-============================================
+04. Dump notification get E-A/dateCreated/dateModified
+======================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 192
+Content-Length: 289
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -157,10 +157,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "type": "Number",
                 "value": 2
             },
-            "alterationType": {
+            "dateCreated": {
                 "metadata": {},
-                "type": "Text",
-                "value": "entityChange"
+                "type": "DateTime",
+                "value": "REGEX(.*)"
+            },
+            "dateModified": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "REGEX(.*)"
             },
             "id": "E",
             "type": "T"
