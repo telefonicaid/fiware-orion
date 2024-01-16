@@ -2292,7 +2292,7 @@ static void getCommonAttributes
   std::vector<std::string>&         resultVector
 )
 {
-  for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)  
+  for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
   {
     // some builtin attributes are always include (even when onlyChangedAttrs is true)
     if ((sVector[avOc] == ALTERATION_TYPE) || (sVector[avOc] == DATE_CREATED) || (sVector[avOc] == DATE_MODIFIED))

@@ -3557,7 +3557,7 @@ static unsigned int updateEntity
     addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityDelete));
     unsigned int notifSent = processSubscriptions(subsToNotify,
                                                   notifyCerP,
-                                                  tenant,   
+                                                  tenant,
                                                   xauthToken,
                                                   fiwareCorrelator,
                                                   notifStartCounter);
