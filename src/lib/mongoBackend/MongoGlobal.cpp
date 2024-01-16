@@ -2296,9 +2296,10 @@ static void getCommonAttributes
   {
     for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
     {
-      if (fVector[cavOc] == sVector[avOc])
+      // some builtin attributes are always include (even when onlyChangedAttrs is true)
+      if ((sVector[avOc] == ALTERATION_TYPE) || (sVector[avOc] == DATE_CREATED) || (sVector[avOc] == DATE_MODIFIED) || (fVector[cavOc] == sVector[avOc]))
       {
-        resultVector.push_back(fVector[cavOc]);
+        resultVector.push_back(sVector[avOc]);
       }
     }
   }

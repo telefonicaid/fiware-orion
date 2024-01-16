@@ -657,7 +657,7 @@ rendered by Orion to provide extra information. From a representation point of v
 are just like regular attributes, with name, value and type.
 
 Builtin attributes are not rendered by default. In order to render a specific attribute, add its
-name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
+name to the `attrs` parameter in URLs (or payload field in `POST /v2/op/query` operation) or
 subscription (`attrs` sub-field within `notification`).
 
 The list of builtin attributes is as follows:
@@ -682,6 +682,13 @@ the subscriptions based in alteration type features (see [Subscription based in 
 
 Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
 However, they cannot be used in resource URLs.
+
+The following builtin attributes are included in notifications (if added to `attrs` sub-field within `notification`) even
+when `onlyChangedAttrs` is set to `true`:
+
+* `alterationType`
+* `dateCreated`
+* `dateModified`
 
 ## Special Metadata Types
 
