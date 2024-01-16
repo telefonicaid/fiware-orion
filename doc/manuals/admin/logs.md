@@ -443,6 +443,10 @@ time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c2958
 time=2023-06-08T15:14:21.176Z | lvl=WARN | corr=2518249e-060f-11ee-9e76-000c29583ca5 | trans=1686237259-703-00000000004 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[353]:getGeoJson | msg=Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
 ```
 
+Deprecated features usage is tracked in `deprecatedFeature` object in the [counters block of the statistics API
+(statistics#counter-block), even when `-logDeprecate` CLI (or equivalent `deprecate` parameter in the log admin REST API)
+is not used.
+
 Get more information about deprecated features and how to overcome them in the [deprecation documentation](../deprecated.md).
 
 [Top](#top)

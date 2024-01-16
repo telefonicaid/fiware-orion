@@ -46,10 +46,17 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 1525
+Content-Length: 1645
 
 {
     "counters": {
+        "deprecatedFeatures": {
+            "geoFormat": 0,
+            "metadataLocation": 0,
+            "ngsiv1Forwarding": 0,
+            "ngsiv1NotifFormat": 0,
+            "ngsiv1Requests": 0
+        },
         "discoveryErrors": 0,
         "invalidRequests": 0,
         "jsonRequests": 0,

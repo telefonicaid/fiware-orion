@@ -276,6 +276,12 @@ extern int noOfDiscoveryErrors;
 extern int noOfNotificationsSent;
 extern int noOfSimulatedNotifications;
 
+// Deprecated features
+extern int noOfDprNgsiv1Request;
+extern int noOfDprLegacyForwarding;
+extern int noOfDprLegacyNotif;
+extern int noOfDprLocationMetadata;
+extern int noOfDprGeoformat;
 
 /* ****************************************************************************
 *

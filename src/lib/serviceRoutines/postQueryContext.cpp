@@ -186,6 +186,7 @@ static bool queryForward
   {
     op        = "/queryContext";
 
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
     if (logDeprecate)
     {
       LM_W(("Deprecated usage of legacyForwarding mode in query forwarding operation (regId: %s)", regId.c_str()));
