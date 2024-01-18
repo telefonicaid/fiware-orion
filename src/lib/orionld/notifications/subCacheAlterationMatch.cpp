@@ -1175,7 +1175,10 @@ OrionldAlterationMatch* subCacheAlterationMatch(OrionldAlteration* alterationLis
       if ((subP->qP == NULL) && (subP->ldContext != "") && (subP->qText != NULL))
         subP->qP = qBuild(subP->qText, NULL, NULL, NULL, false, false);
 
-      if (subP->qP != NULL)
+      //
+      // Check the "q" filter, BUT not if the verb is DELETE
+      //
+      if ((subP->qP != NULL) && (orionldState.verb != HTTP_DELETE))
       {
         if (qMatch(subP->qP, altP) == false)
         {
