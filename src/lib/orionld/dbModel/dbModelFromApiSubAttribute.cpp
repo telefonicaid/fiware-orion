@@ -77,7 +77,7 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
 
   if (strcmp(saDotName, "value") == 0)
     return true;
-  else if ((strcmp(saDotName, "object") == 0) || (strcmp(saDotName, "languageMap") == 0))
+  else if ((strcmp(saDotName, "object") == 0) || (strcmp(saDotName, "languageMap") == 0) || (strcmp(saDotName, "vocab") == 0))
     saDotName = (char*) "value";  // Orion-LD's database model states that all attributes have a "value"
   else if (strcmp(saDotName, "observedAt") == 0)
   {
@@ -154,6 +154,9 @@ bool dbModelFromApiSubAttribute(KjNode* saP, KjNode* dbMdP, KjNode* mdAddedV, Kj
 
     if (valueP == NULL)
       valueP = kjLookup(saP, "languageMap");
+
+    if (valueP == NULL)
+      valueP = kjLookup(saP, "vocab");
 
     if (valueP != NULL)
       valueP->name = (char*) "value";

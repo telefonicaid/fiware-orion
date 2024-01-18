@@ -111,8 +111,23 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs, bool eqsForDots)
 
   if ((typeP != NULL) && (valueP != NULL) && (typeP->type == KjString))
   {
-    if      (strcmp(typeP->value.s, "Relationship")     == 0) valueP->name = (char*) "object";
-    else if (strcmp(typeP->value.s, "LanguageProperty") == 0) valueP->name = (char*) "languageMap";
+    if      (strcmp(typeP->value.s, "Relationship")       == 0) valueP->name = (char*) "object";
+    else if (strcmp(typeP->value.s, "LanguageProperty")   == 0) valueP->name = (char*) "languageMap";
+    else if (strcmp(typeP->value.s, "VocabularyProperty") == 0)
+    {
+      valueP->name = (char*) "vocab";
+
+      if (valueP->type == KjString)
+        valueP->value.s = orionldContextItemAliasLookup(orionldState.contextP, valueP->value.s, NULL, NULL);
+      else if (valueP->type == KjArray)
+      {
+        for (KjNode* wordP = valueP->value.firstChildP; wordP != NULL; wordP = wordP->next)
+        {
+          if (wordP->type == KjString)
+            wordP->value.s = orionldContextItemAliasLookup(orionldState.contextP, wordP->value.s, NULL, NULL);
+        }
+      }
+    }
   }
 
 
@@ -334,7 +349,7 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
   //   - and No metadata
   // => KeyValues
   //
-  // Else, just remove the attribute type, keep value/object/languageMap
+  // Else, just remove the attribute type, keep value/object/languageMap/vocab
   // And call dbModelToApiSubAttribute2 with Concise
   //
   bool    conciseAsKeyValues = false;
@@ -398,6 +413,21 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
       {
         if (attrType == Relationship)
           nodeP->name = (char*) "object";
+        else if (attrType == VocabularyProperty)
+        {
+          nodeP->name = (char*) "vocab";
+
+          if (nodeP->type == KjString)
+            nodeP->value.s = orionldContextItemAliasLookup(orionldState.contextP, nodeP->value.s, NULL, NULL);
+          else if (nodeP->type == KjArray)
+          {
+            for (KjNode* wordP = nodeP->value.firstChildP; wordP != NULL; wordP = wordP->next)
+            {
+              if (wordP->type == KjString)
+                wordP->value.s = orionldContextItemAliasLookup(orionldState.contextP, wordP->value.s, NULL, NULL);
+            }
+          }
+        }
         else if (attrType == LanguageProperty)
         {
           if (lang != NULL)

@@ -66,7 +66,7 @@ extern "C"
 //     * If Array, recursive call for each member (set the name to the sttribute name)
 //     * "datasetId" present - call orionldDbModelAttributeDatasetId
 //     * "type" can't be modified
-//     * "value"/"object"/"languageMap" changes name to "value" and RHS stays as is
+//     * "value"/"object"/"languageMap"/"vocab" changes name to "value" and RHS stays as is
 //     * "observedAt" is made an Object with single member "value"
 //     * "unitCode" is made an Object with single member "value"
 //     * "md" is created and added
