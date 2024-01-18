@@ -65,6 +65,7 @@ payload='{
       "type": "T"
     }
   ],
+  "q": "name==%221%22",
   "notification": {
     "endpoint": {
       "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify",

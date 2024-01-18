@@ -1,0 +1,165 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+No port in notification Host header
+
+--SHELL-INIT--
+dbInit CB
+dbInit CB openiot
+orionldStart CB -experimental -multiservice
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription, according to issue #1532
+# 02. Do an upsert/update creating an entity, provoking a notification
+# 03. Dump/Reset the accumulator, see Host header and the port
+#
+
+echo "01. Create a subscription, according to issue #1532"
+echo "==================================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "description": "Notify me of all feedstock changes",
+  "entities": [{"type": "FillingLevelSensor"}],
+  "watchedAttributes": ["filling"],
+  "notification": {
+    "attributes": ["filling", "location"],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://127.0.0.1:9997/notify",
+      "accept": "application/json",
+      "receiverInfo": [
+        {
+          "key": "fiware-service",
+          "value": "openiot"
+        }
+      ]
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --tenant openiot
+echo
+echo
+
+
+echo "02. Do an upsert/update creating an entity, provoking a notification"
+echo "===================================================================="
+payload='[
+  {
+    "id": "urn:ngsi-ld:Device:filling002",
+    "type": "FillingLevelSensor",
+    "filling": {
+      "type": "Property",
+      "value": 0.96,
+      "unitCode": "C62",
+      "accuracy": {
+        "type": "Property",
+        "value": 0.05
+      },
+      "observedAt": "2024-01-12T13:28:33.867Z"
+    }
+  }
+]'
+orionCurl --url /ngsi-ld/v1/entityOperations/upsert?options=update --payload "$payload" -H "Authorization: $Authorization" --tenant openiot
+echo
+echo
+
+
+echo "03. Dump/Reset the accumulator, see Host header and the port"
+echo "============================================================"
+accumulatorDump 
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription, according to issue #1532
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+NGSILD-Tenant: openiot
+
+
+
+02. Do an upsert/update creating an entity, provoking a notification
+====================================================================
+HTTP/1.1 201 Created
+Content-Length: 33
+Content-Type: application/json
+Date: REGEX(.*)
+NGSILD-Tenant: openiot
+
+[
+    "urn:ngsi-ld:Device:filling002"
+]
+
+
+03. Dump/Reset the accumulator, see Host header and the port
+============================================================
+POST http://127.0.0.1:9997/notify?subscriptionId=urn:S1
+Content-Length: 378
+User-Agent: orionld/REGEX(.*)
+Host: 127.0.0.1:9997
+Accept: application/json
+Fiware-Service: openiot
+Ngsild-Tenant: openiot
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "filling": {
+                "accuracy": {
+                    "type": "Property",
+                    "value": 0.05
+                },
+                "observedAt": "2024-01-12T13:28:33.867Z",
+                "type": "Property",
+                "unitCode": "C62",
+                "value": 0.96
+            },
+            "id": "urn:ngsi-ld:Device:filling002",
+            "type": "FillingLevelSensor"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB openiot
+accumulatorStop
