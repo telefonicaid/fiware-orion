@@ -1,0 +1,6 @@
+Fixed Issue:
+  * #1535  No matching with 'q' when matching subscriptions for deletion of an entity
+
+New Features:
+  * Support for VocabularyProperty (highlu untested and 'q' expansions for vocab-properties is not yet implemented)
+  

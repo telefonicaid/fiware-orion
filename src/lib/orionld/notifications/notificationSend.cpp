@@ -259,8 +259,26 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
   if (addedP   != NULL) kjChildRemove(attrP, addedP);
   if (removedP != NULL) kjChildRemove(attrP, removedP);
 
-  bool asSimplified = false;
 
+  //
+  // If vocab-property, its value needs to be compacted
+  //
+  KjNode* vocabP = kjLookup(attrP, "vocab");
+  if (vocabP != NULL)
+  {
+    if (vocabP->type == KjString)
+      vocabP->value.s = orionldContextItemAliasLookup(subP->contextP, vocabP->value.s, NULL, NULL);
+    else if (vocabP->type == KjArray)
+    {
+      for (KjNode* wordP = vocabP->value.firstChildP; wordP != NULL; wordP = wordP->next)
+      {
+        if (wordP->type == KjString)
+          wordP->value.s = orionldContextItemAliasLookup(subP->contextP, wordP->value.s, NULL, NULL);
+      }
+    }
+  }
+
+  bool asSimplified = false;
   if (attrP->type == KjObject)
   {
     if      (simplified)  attributeToSimplified(attrP, subP->lang.c_str());
@@ -284,6 +302,7 @@ static void attributeFix(KjNode* attrP, CachedSubscription* subP)
       if (strcmp(saP->name, "value")       == 0) continue;
       if (strcmp(saP->name, "object")      == 0) continue;
       if (strcmp(saP->name, "languageMap") == 0) continue;
+      if (strcmp(saP->name, "vocab")       == 0) continue;
       if (strcmp(saP->name, "unitCode")    == 0) continue;
 
       eqForDot(saP->name);

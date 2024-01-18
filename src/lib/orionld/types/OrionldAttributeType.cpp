@@ -38,11 +38,12 @@ const char* orionldAttributeTypeName(OrionldAttributeType attributeType)
 {
   switch (attributeType)
   {
-  case NoAttributeType:   return "NoAttributeType";
-  case Property:          return "Property";
-  case Relationship:      return "Relationship";
-  case GeoProperty:       return "GeoProperty";
-  case LanguageProperty:  return "LanguageProperty";
+  case NoAttributeType:     return "NoAttributeType";
+  case Property:            return "Property";
+  case Relationship:        return "Relationship";
+  case GeoProperty:         return "GeoProperty";
+  case LanguageProperty:    return "LanguageProperty";
+  case VocabularyProperty:  return "VocabularyProperty";
   }
 
   return "InvalidAttributeType";
@@ -56,10 +57,11 @@ const char* orionldAttributeTypeName(OrionldAttributeType attributeType)
 //
 OrionldAttributeType orionldAttributeType(const char* typeString)
 {
-  if      (strcmp(typeString, "Property")          == 0) return Property;
-  else if (strcmp(typeString, "Relationship")      == 0) return Relationship;
-  else if (strcmp(typeString, "GeoProperty")       == 0) return GeoProperty;
-  else if (strcmp(typeString, "LanguageProperty")  == 0) return LanguageProperty;
+  if      (strcmp(typeString, "Property")            == 0) return Property;
+  else if (strcmp(typeString, "Relationship")        == 0) return Relationship;
+  else if (strcmp(typeString, "GeoProperty")         == 0) return GeoProperty;
+  else if (strcmp(typeString, "LanguageProperty")    == 0) return LanguageProperty;
+  else if (strcmp(typeString, "VocabularyProperty")  == 0) return VocabularyProperty;
 
   return NoAttributeType;
 }

@@ -56,7 +56,7 @@ extern "C"
 //   * First an object "md" is created, and all fields of the attribute, except the special ones are moved inside "md".
 //     Special fields:
 //     - type
-//     - value/object/languageMap (must be renamed to "value" - that's part of the database model)
+//     - value/object/languageMap/vocab (must be called "value" - that's part of the database model)
 //     - observedAt
 //     - datasetId
 //     - unitCode
@@ -149,13 +149,13 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
   //
 
   // Move special fields back to "attrP"
-  const char* specialV[] = { "type", "value", "object", "languageMap", "datasetId" };  // observedAt+unitCode are mds (db-model)
+  const char* specialV[] = { "type", "value", "object", "languageMap", "vocab", "datasetId" };  // observedAt+unitCode are mds (db-model)
   for (unsigned int ix = 0; ix < K_VEC_SIZE(specialV); ix++)
   {
     KjNode* nodeP = kjLookup(mdP, specialV[ix]);
     if (nodeP != NULL)
     {
-      if ((ix == 2) || (ix == 3))         // "object", "languageMap", change name to "value" (Orion's DB model)
+      if ((ix == 2) || (ix == 3) || (ix == 4))         // "object", "languageMap", "vocab": change name to "value" (Orion's DB model)
         nodeP->name = (char*) "value";
 
       kjChildRemove(mdP, nodeP);

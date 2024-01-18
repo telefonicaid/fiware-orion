@@ -38,7 +38,8 @@ typedef enum OrionldAttributeType
   Property,
   Relationship,
   GeoProperty,
-  LanguageProperty
+  LanguageProperty,
+  VocabularyProperty
 } OrionldAttributeType;
 
 
