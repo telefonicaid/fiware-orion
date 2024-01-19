@@ -378,18 +378,25 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
     }
     else if (strcmp(attrTypeNodeP->value.s, "VocabularyProperty") == 0)
     {
-      attrP = kjLookup(dbAttrP, "value");
+      KjNode* valueP = kjLookup(dbAttrP, "value");
 
-      if (attrP->type == KjString)
-        attrP->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrP->value.s, NULL, NULL);
-      else if (attrP->type == KjArray)
+      if (valueP->type == KjString)
+        valueP->value.s = orionldContextItemAliasLookup(orionldState.contextP, valueP->value.s, NULL, NULL);
+      else if (valueP->type == KjArray)
       {
-        for (KjNode* wordP = attrP->value.firstChildP; wordP != NULL; wordP = wordP->next)
+        for (KjNode* wordP = valueP->value.firstChildP; wordP != NULL; wordP = wordP->next)
         {
           if (wordP->type == KjString)
             wordP->value.s = orionldContextItemAliasLookup(orionldState.contextP, wordP->value.s, NULL, NULL);
         }
       }
+
+      // Remove everything except the value, and change its name to "vocab"
+      dbAttrP->value.firstChildP = valueP;
+      dbAttrP->lastChild         = valueP;
+      valueP->next               = NULL;
+      valueP->name               = (char*) "vocab";
+      attrP = dbAttrP;
     }
     else
     {
