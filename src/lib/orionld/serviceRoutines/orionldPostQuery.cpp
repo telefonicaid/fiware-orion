@@ -95,10 +95,7 @@ bool orionldPostQuery(void)
     return false;
 
   KjNode*              apiEntityArray  = kjArray(orionldState.kjsonP, NULL);
-  OrionldRenderFormat  rf              = RF_NORMALIZED;
-
-  if      (orionldState.uriParamOptions.concise   == true) rf = RF_CONCISE;
-  else if (orionldState.uriParamOptions.keyValues == true) rf = RF_SIMPLIFIED;
+  OrionldRenderFormat  rf              = orionldState.out.format;
 
   if (orionldState.out.contentType == MT_GEOJSON)
   {

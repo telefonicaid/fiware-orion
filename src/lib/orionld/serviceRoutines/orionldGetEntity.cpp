@@ -370,7 +370,7 @@ bool orionldGetEntity(void)
                                           orionldState.uriParams.geometryProperty,
                                           orionldState.geoPropertyMissing,
                                           orionldState.linkHeaderAdded,
-                                          orionldState.uriParamOptions.concise,
+                                          orionldState.out.format == RF_CONCISE,
                                           orionldState.contextP->url);
 
     //

@@ -223,14 +223,14 @@ static KjNode* orionldForwardGetEntityPart(KjNode* registrationP, char* entityId
 
   if (*newUriParamAttrsString != 0)
   {
-    if (orionldState.uriParamOptions.keyValues)
+    if (orionldState.out.format == RF_SIMPLIFIED)
       snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?options=keyValues&attrs=%s", uriDirP, entityId, newUriParamAttrsString);
     else
       snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?attrs=%s", uriDirP, entityId, newUriParamAttrsString);
   }
   else
   {
-    if (orionldState.uriParamOptions.keyValues)
+    if (orionldState.out.format == RF_SIMPLIFIED)
       snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s?options=keyValues", uriDirP, entityId);
     else
       snprintf(urlPath, size, "%s/ngsi-ld/v1/entities/%s", uriDirP, entityId);
@@ -429,8 +429,8 @@ bool legacyGetEntity(void)
                                                    eqAttrV,
                                                    attrsMandatory,
                                                    orionldState.uriParamOptions.sysAttrs,
-                                                   orionldState.uriParamOptions.keyValues,
-                                                   orionldState.uriParamOptions.concise,
+                                                   orionldState.out.format == RF_SIMPLIFIED,
+                                                   orionldState.out.format == RF_CONCISE,
                                                    orionldState.uriParams.datasetId,
                                                    geometryProperty,
                                                    &orionldState.geoPropertyNode,
@@ -483,7 +483,7 @@ bool legacyGetEntity(void)
                                                          orionldState.uriParams.geometryProperty,
                                                          orionldState.geoPropertyMissing,
                                                          orionldState.linkHeaderAdded,
-                                                         orionldState.uriParamOptions.concise,
+                                                         orionldState.out.format == RF_CONCISE,
                                                          orionldState.contextP->url);
 
   return true;

@@ -221,7 +221,7 @@ inline bool pCheckAttributeString
   //
   // If all those are fulfilled, then the value (object) of the Relationship will be modified
   //
-  if ((orionldState.uriParamOptions.keyValues == true)                &&
+  if ((orionldState.out.format == RF_SIMPLIFIED)                      &&
       (orionldState.serviceP->serviceRoutine  == orionldPatchEntity2) &&
       (attrTypeFromDb                         == Relationship))
   {
@@ -985,7 +985,7 @@ static bool pCheckAttributeObject
     if ((attrTypeFromDb != NoAttributeType) && (attributeType != attrTypeFromDb))
     {
       // This might be OK, if keyValues is ON => attributeType is a guess
-      if (orionldState.uriParamOptions.keyValues == false)
+      if (orionldState.out.format != RF_SIMPLIFIED)
       {
         const char* title = attrTypeChangeTitle(attrTypeFromDb, attributeType);
         orionldError(OrionldBadRequestData, title, attrP->name, 400);
@@ -1046,7 +1046,7 @@ static bool pCheckAttributeObject
     if ((attrTypeFromDb != NoAttributeType) && (attributeType != NoAttributeType) && (attributeType != attrTypeFromDb))
     {
       // This might be OK, if keyValues is ON => attributeType is a guess
-      if (orionldState.uriParamOptions.keyValues == false)
+      if (orionldState.out.format != RF_SIMPLIFIED)
       {
         const char* title = attrTypeChangeTitle(attrTypeFromDb, attributeType);
         orionldError(OrionldBadRequestData, title, attrP->name, 400);

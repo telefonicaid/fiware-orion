@@ -163,7 +163,7 @@ static void ipAddressAndPort(void)
 //
 // optionsParse -
 //
-static void optionsParse(const char* options)
+void optionsParse(const char* options)
 {
   char* optionStart = (char*) options;
   char* cP          = (char*) options;
@@ -182,10 +182,10 @@ static void optionsParse(const char* options)
       if      (strcmp(optionStart, "update")        == 0)  orionldState.uriParamOptions.update        = true;
       else if (strcmp(optionStart, "replace")       == 0)  orionldState.uriParamOptions.replace       = true;
       else if (strcmp(optionStart, "noOverwrite")   == 0)  orionldState.uriParamOptions.noOverwrite   = true;
-      else if (strcmp(optionStart, "keyValues")     == 0)  orionldState.uriParamOptions.keyValues     = true;
-      else if (strcmp(optionStart, "simplified")    == 0)  orionldState.uriParamOptions.keyValues     = true;
-      else if (strcmp(optionStart, "concise")       == 0)  orionldState.uriParamOptions.concise       = true;
-      else if (strcmp(optionStart, "normalized")    == 0)  orionldState.uriParamOptions.normalized    = true;
+      else if (strcmp(optionStart, "keyValues")     == 0)  { if (orionldState.uriParams.format == NULL) orionldState.uriParamOptions.keyValues     = true; }
+      else if (strcmp(optionStart, "simplified")    == 0)  { if (orionldState.uriParams.format == NULL) orionldState.uriParamOptions.keyValues     = true; }
+      else if (strcmp(optionStart, "concise")       == 0)  { if (orionldState.uriParams.format == NULL) orionldState.uriParamOptions.concise       = true; }
+      else if (strcmp(optionStart, "normalized")    == 0)  { if (orionldState.uriParams.format == NULL) orionldState.uriParamOptions.normalized    = true; }
       else if (strcmp(optionStart, "sysAttrs")      == 0)  orionldState.uriParamOptions.sysAttrs      = true;
       else if (strcmp(optionStart, "fromDb")        == 0)  orionldState.uriParamOptions.fromDb        = true;
       else if (strcmp(optionStart, "append")        == 0)  orionldState.uriParamOptions.append        = true;  // NGSIv2 compatibility
@@ -676,8 +676,23 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   else if (strcmp(key, "options") == 0)
   {
     orionldState.uriParams.options = (char*) value;
-    optionsParse(value);
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_OPTIONS;
+  }
+  else if (strcmp(key, "format") == 0)
+  {
+    orionldState.uriParams.format = (char*) value;
+
+    if      (strcmp(value, "normalized") == 0)  orionldState.out.format = RF_NORMALIZED;
+    else if (strcmp(value, "concise")    == 0)  orionldState.out.format = RF_CONCISE;
+    else if (strcmp(value, "simplified") == 0)  orionldState.out.format = RF_SIMPLIFIED;
+    else if (strcmp(value, "keyValues")  == 0)  orionldState.out.format = RF_SIMPLIFIED;
+    else
+    {
+      orionldError(OrionldBadRequestData, "Bad value for URI parameter /format/", value, 400);
+      return MHD_YES;
+    }
+
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_FORMAT;
   }
   else if (strcmp(key, "geometry") == 0)
   {
@@ -1152,7 +1167,14 @@ MHD_Result mhdConnectionInit
   // 5. GET URI params
   //
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, NULL);
-  LM_T(LmtCount, ("orionldState.uriParams.count: %s", K_FT(orionldState.uriParams.count)));
+
+  //
+  // As "format" has precedence over options=concise/simplified/etc, the call to optionsParse must wait until after
+  // all calls to orionldUriArgumentGet are done.
+  // Because, optionsParse n eeds to know whether "format" has been used.
+  //
+  if (orionldState.uriParams.options != NULL)
+    optionsParse(orionldState.uriParams.options);
 
   //
   // Format of response payload
