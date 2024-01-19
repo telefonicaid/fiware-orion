@@ -376,6 +376,21 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
       dbModelToApiLangPropertySimplified(dbAttrP, lang);
       attrP = dbAttrP;
     }
+    else if (strcmp(attrTypeNodeP->value.s, "VocabularyProperty") == 0)
+    {
+      attrP = kjLookup(dbAttrP, "value");
+
+      if (attrP->type == KjString)
+        attrP->value.s = orionldContextItemAliasLookup(orionldState.contextP, attrP->value.s, NULL, NULL);
+      else if (attrP->type == KjArray)
+      {
+        for (KjNode* wordP = attrP->value.firstChildP; wordP != NULL; wordP = wordP->next)
+        {
+          if (wordP->type == KjString)
+            wordP->value.s = orionldContextItemAliasLookup(orionldState.contextP, wordP->value.s, NULL, NULL);
+        }
+      }
+    }
     else
     {
       // "Steal" the value node and rename it to have the attribute's name instead - that's all that's needed for SIMPLIFIED FORMAT

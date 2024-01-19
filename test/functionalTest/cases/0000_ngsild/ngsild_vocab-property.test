@@ -41,6 +41,8 @@ accumulatorStart --pretty-print
 # 05b. See urn:E2 in the DB - see [ "vocab", "id" ] expanded
 # 06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
 #
+# 07. GET urn:E1 in simplified format
+#
 
 echo '01. Create a subscription on entity type T'
 echo '=========================================='
@@ -121,6 +123,13 @@ echo "======================================================="
 sleep .2
 accumulatorDump
 accumulatorReset
+echo
+echo
+
+
+echo "07. GET urn:E1 in simplified format"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E2?options=simplified
 echo
 echo
 
@@ -312,6 +321,24 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+
+
+07. GET urn:E1 in simplified format
+===================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "V2": [
+        "vocab",
+        "id"
+    ],
+    "id": "urn:E2",
+    "type": "T"
+}
 
 
 --TEARDOWN--
