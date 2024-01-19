@@ -109,7 +109,7 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
 
   if (langValueNodeP == NULL)
   {
-    if (orionldState.uriParamOptions.keyValues == false)
+    if (orionldState.out.format != RF_SIMPLIFIED)
     {
       valueP->type      = KjString;
       valueP->value.s   = (char*) "empty languageMap ...";
@@ -122,7 +122,7 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
   }
   else if (langValueNodeP->type == KjString)
   {
-    if (orionldState.uriParamOptions.keyValues == false)
+    if (orionldState.out.format != RF_SIMPLIFIED)
     {
       valueP->type      = KjString;
       valueP->value.s   = langValueNodeP->value.s;
@@ -135,7 +135,7 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
   }
   else  // It's an array
   {
-    if (orionldState.uriParamOptions.keyValues == false)
+    if (orionldState.out.format != RF_SIMPLIFIED)
     {
       valueP->type                       = KjArray;
       valueP->value.firstChildP          = langValueNodeP->value.firstChildP;
@@ -152,7 +152,7 @@ void langValueFix(KjNode* attrP, KjNode* valueP, KjNode* typeP, const char* lang
     langValueNodeP->lastChild         = NULL;
   }
 
-  if (orionldState.uriParamOptions.keyValues == false)
+  if (orionldState.out.format != RF_SIMPLIFIED)
   {
     if (langValueNodeP != NULL)
     {

@@ -77,14 +77,14 @@ echo
 
 echo "02. GET using Concise output format"
 echo "==================================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&format=concise'
 echo
 echo
 
 
 echo "03. GET using Normalized output format"
 echo "======================================"
-orionCurl --url '/ngsi-ld/v1/entities?type=T&options=normalized'
+orionCurl --url '/ngsi-ld/v1/entities?type=T&format=normalized'
 echo
 echo
 
@@ -127,6 +127,13 @@ echo
 echo "09. GET using Concise output format w/ sysAttrs"
 echo "==============================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=T&options=concise,sysAttrs'
+echo
+echo
+
+
+echo "10. GET single entity using Concise output format w/ sysAttrs"
+echo "============================================================="
+orionCurl --url '/ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1?type=T&options=sysAttrs&format=concise'
 echo
 echo
 
@@ -469,6 +476,115 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "type": "T"
     }
 ]
+
+
+10. GET single entity using Concise output format w/ sysAttrs
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 1751
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "Array": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": [
+            5,
+            6
+        ]
+    },
+    "Bool": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "true"
+    },
+    "Float": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": 3.14
+    },
+    "Geo": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": {
+            "coordinates": [
+                1,
+                2
+            ],
+            "type": "Point"
+        }
+    },
+    "Int": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": 1
+    },
+    "Rel": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "object": "urn:ngsi-ld:entities:E2"
+    },
+    "String": {
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": "String"
+    },
+    "Sub": {
+        "Array": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "value": [
+                5,
+                6
+            ]
+        },
+        "Bool": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "value": "true"
+        },
+        "Float": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "value": 3.14
+        },
+        "Geo": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "value": {
+                "coordinates": [
+                    1,
+                    2
+                ],
+                "type": "Point"
+            }
+        },
+        "Int": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "value": 1
+        },
+        "Rel": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "object": "urn:ngsi-ld:entities:E2"
+        },
+        "String": {
+            "createdAt": "202REGEX(.*)",
+            "modifiedAt": "202REGEX(.*)",
+            "value": "String"
+        },
+        "createdAt": "202REGEX(.*)",
+        "modifiedAt": "202REGEX(.*)",
+        "value": 6
+    },
+    "createdAt": "202REGEX(.*)",
+    "id": "urn:ngsi-ld:entities:E1",
+    "modifiedAt": "202REGEX(.*)",
+    "type": "T"
+}
 
 
 --TEARDOWN--

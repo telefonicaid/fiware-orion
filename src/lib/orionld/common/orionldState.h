@@ -166,6 +166,7 @@ typedef struct OrionldUriParams
   bool      local;
   bool      onlyIds;
   bool      entityMap;
+  char*     format;
 
   double    observedAtAsDouble;
   uint64_t  mask;

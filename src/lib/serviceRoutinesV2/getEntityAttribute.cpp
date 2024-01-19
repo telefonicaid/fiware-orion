@@ -94,7 +94,7 @@ std::string getEntityAttribute
   TIMED_RENDER(answer = attribute.render(orionldState.out.contentType,
                                          &orionldState.out.contentType,
                                          &orionldState.httpStatusCode,
-                                         orionldState.uriParamOptions.keyValues,
+                                         orionldState.out.format == RF_SIMPLIFIED,
                                          orionldState.uriParams.metadata? orionldState.uriParams.metadata : "",
                                          EntityAttributeResponse));
 

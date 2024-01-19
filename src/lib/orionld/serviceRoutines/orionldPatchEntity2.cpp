@@ -575,7 +575,7 @@ bool orionldPatchEntity2(void)
   // If options=simplified/keyValues is present, the behaviour is very different
   // BUT, if I add the "value" to each attribute in the payload body, I have "Normalized" it
   //
-  if (orionldState.uriParamOptions.keyValues == true)
+  if (orionldState.out.format == RF_SIMPLIFIED)
   {
     if (apiEntitySimplifiedToNormalized(orionldState.requestTree, dbAttrsP) == false)
       return false;

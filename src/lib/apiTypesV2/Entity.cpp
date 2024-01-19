@@ -83,7 +83,7 @@ std::string Entity::render(bool comma)
 
   OrionldRenderFormat  renderFormat = RF_NORMALIZED;
 
-  if      (orionldState.uriParamOptions.keyValues    == true)  { renderFormat = RF_KEYVALUES;     }
+  if      (orionldState.out.format                   == RF_KEYVALUES)  { renderFormat = RF_KEYVALUES;     }
   else if (orionldState.uriParamOptions.values       == true)  { renderFormat = RF_VALUES;        }
   else if (orionldState.uriParamOptions.uniqueValues == true)  { renderFormat = RF_UNIQUE_VALUES; }
 

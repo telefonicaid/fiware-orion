@@ -248,7 +248,7 @@ bool dbModelFromApiAttribute(KjNode* attrP, KjNode* dbAttrsP, KjNode* attrAddedV
     // Very Special case: If key-values is set, and an uri param 'observedAt' is present, and we're doing a patchEntity2, then:
     // modify the observedAt sub-attr accordingly
     //
-    if ((orionldState.uriParamOptions.keyValues == true) && (orionldState.uriParams.observedAt != NULL) && (dbMdP != NULL))
+    if ((orionldState.out.format == RF_SIMPLIFIED) && (orionldState.uriParams.observedAt != NULL) && (dbMdP != NULL))
     {
       KjNode* observedAtP = kjLookup(dbMdP, "observedAt");
       if (observedAtP != NULL)

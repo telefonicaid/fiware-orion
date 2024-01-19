@@ -1098,6 +1098,11 @@ ConnectionInfo* connectionTreatInit
   // URI parameters
   //
   MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, orionldUriArgumentGet, ciP);
+
+  extern void optionsParse(const char* options);
+  if (orionldState.uriParams.options != NULL)
+    optionsParse(orionldState.uriParams.options);
+
   if (orionldState.httpStatusCode >= 400)
   {
     LM_W(("Bad Request (error in URI parameters - %s: %s)", orionldState.pd.title, orionldState.pd.detail));
@@ -1380,9 +1385,10 @@ static MHD_Result connectionTreat
     //
     bool keyValuesEtAl = true;
 
-    if      ((orionldState.uriParamOptions.keyValues) && (orionldState.uriParamOptions.values))        keyValuesEtAl = false;
-    else if ((orionldState.uriParamOptions.keyValues) && (orionldState.uriParamOptions.uniqueValues))  keyValuesEtAl = false;
-    else if ((orionldState.uriParamOptions.values)    && (orionldState.uriParamOptions.uniqueValues))  keyValuesEtAl = false;
+    if      ((orionldState.out.format == RF_SIMPLIFIED) && (orionldState.uriParamOptions.values))        keyValuesEtAl = false;
+    else if ((orionldState.out.format == RF_SIMPLIFIED) && (orionldState.uriParamOptions.uniqueValues))  keyValuesEtAl = false;
+    else if ((orionldState.uriParamOptions.values)      && (orionldState.uriParamOptions.uniqueValues))  keyValuesEtAl = false;
+
     if (keyValuesEtAl == false)
     {
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");

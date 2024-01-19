@@ -145,8 +145,8 @@ bool legacyGetEntities(void)
   char*                 coordinates    = orionldState.uriParams.coordinates;
   bool                  local          = orionldState.uriParams.local;
   char*                 lang           = orionldState.uriParams.lang;
-  bool                  keyValues      = orionldState.uriParamOptions.keyValues;
-  bool                  concise        = orionldState.uriParamOptions.concise;
+  bool                  keyValues      = orionldState.out.format == RF_SIMPLIFIED;
+  bool                  concise        = orionldState.out.format == RF_CONCISE;
   char*                 idString       = (id   != NULL)? id      : idPattern;
   const char*           isIdPattern    = (id   != NULL)? "false" : "true";
   bool                  isTypePattern  = (type != NULL)? false   : true;
@@ -483,7 +483,7 @@ bool legacyGetEntities(void)
   if (countP != NULL)
     orionldHeaderAdd(&orionldState.out.headers, HttpResultsCount, NULL, *countP);
 
-  if (orionldState.uriParamOptions.concise == true)
+  if (orionldState.out.format == RF_CONCISE)
     kjEntityNormalizedToConcise(orionldState.responseTree, NULL);  // lang already taken care of by apiEntityLanguageProps
 
   mongoRequest.release();

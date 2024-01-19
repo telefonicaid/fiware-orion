@@ -198,7 +198,7 @@ std::string parseContextAttribute
 
   caP->name = name;
 
-  if (orionldState.uriParamOptions.keyValues)
+  if (orionldState.out.format == RF_SIMPLIFIED)
   {
     if (type == "String")
     {
