@@ -829,6 +829,42 @@ static bool pCheckUrlPathAttributeName(void)
 
 // -----------------------------------------------------------------------------
 //
+// pCheckExpandValuesParam -
+//
+static bool pCheckExpandValuesParam(void)
+{
+  if (orionldState.uriParams.expandValues == NULL)
+    return true;
+
+  int   items     = commaCount(orionldState.uriParams.expandValues) + 1;
+  char* arraysDup = kaStrdup(&orionldState.kalloc, orionldState.uriParams.expandValues);  // To not destroy the original value
+
+  orionldState.in.expandValuesList.items = items;
+  orionldState.in.expandValuesList.array = (char**) kaAlloc(&orionldState.kalloc, sizeof(char*) * items);
+
+  if (orionldState.in.expandValuesList.array == NULL)
+  {
+    LM_E(("Out of memory (allocating an /expandValues/ array of %d char pointers)", items));
+    orionldError(OrionldInternalError, "Out of memory", "allocating the array for /expandValues/ URI param", 500);
+    return false;
+  }
+
+  int splitItems = kStringSplit(arraysDup, ',', orionldState.in.expandValuesList.array, items);
+
+  if (splitItems != items)
+  {
+    LM_E(("kStringSplit didn't find exactly %d items (it found %d)", items, splitItems));
+    orionldError(OrionldInternalError, "Internal Error", "kStringSplit does not agree with commaCount", 500);
+    return false;
+  }
+
+  return true;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // uriParamExpansion -
 //
 // Expand attribute names and entity types.
@@ -845,6 +881,7 @@ static bool uriParamExpansion(void)
   if (pCheckUriParamGeometryProperty() == false) return false;
   if (pCheckPayloadEntityType()        == false) return false;
   if (pCheckUrlPathAttributeName()     == false) return false;
+  if (pCheckExpandValuesParam()        == false) return false;  // This one isn't expanded, it's just a StringArray of attribute names for VocabularyProperty
 
   // Can't do anything about 'q' - needs to be parsed first - expansion done in 'orionld/q/qParse.cpp'
 

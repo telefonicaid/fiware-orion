@@ -225,6 +225,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_IDPATTERN;
     serviceP->uriParams |= ORIONLD_URIPARAM_ATTRS;
     serviceP->uriParams |= ORIONLD_URIPARAM_Q;
+    serviceP->uriParams |= ORIONLD_URIPARAM_EXPAND_VALUES;
     serviceP->uriParams |= ORIONLD_URIPARAM_CSF;
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOREL;
     serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRY;

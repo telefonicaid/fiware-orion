@@ -27,6 +27,7 @@
 #include "orionld/types/QNode.h"                               // QNode
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/common/dateTime.h"                           // dateTimeFromString
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/q/qNode.h"                                   // qNode
 #include "orionld/q/qNodeType.h"                               // qNodeType
 #include "orionld/q/qLexCheck.h"                               // qLexCheck
@@ -44,7 +45,24 @@ static QNode* qStringPush(QNode* prev, char* stringValue)
 {
   QNode* qNodeP = qNode(QNodeStringValue);
 
-  LM_T(LmtQ, ("Pushing a String: '%s'", stringValue));
+  LM_T(LmtQ, ("Pushing a String:     '%s'", stringValue));
+  if (orionldState.qVariable != NULL)
+  {
+    LM_T(LmtQ, ("For Variable:         '%s'", orionldState.qVariable->value.s));
+    if (orionldState.uriParams.expandValues != NULL)
+    {
+      LM_T(LmtQ, ("And, expandValues is: '%s'", orionldState.uriParams.expandValues));
+      for (int ix = 0; ix <  orionldState.in.expandValuesList.items; ix++)
+      {
+        LM_T(LmtQ, ("expandValuesList[%d]:  '%s'", ix, orionldState.in.expandValuesList.array[ix]));
+        if (strcmp(orionldState.qVariable->value.s, orionldState.in.expandValuesList.array[ix]) == 0)
+        {
+          LM_T(LmtQ, ("The string '%s' needs to be expanded", stringValue));
+          stringValue = orionldContextItemExpand(orionldState.contextP, stringValue, true, NULL);
+        }
+      }
+    }
+  }
 
   if (orionldState.useMalloc == false)
     qNodeP->value.s = stringValue;
@@ -178,6 +196,12 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
       type = QNodeRegexpValue;
 
     QNode* qNodeP = qNode(type);
+
+    if (type == QNodeVariable)
+    {
+      orionldState.qVariable = qNodeP;
+      LM_T(LmtQ, ("'%s' IS a VARIABLE", term));
+    }
 
     if (dateTime == true)
     {

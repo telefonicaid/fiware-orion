@@ -34,6 +34,7 @@ extern "C"
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/context/orionldAttributeExpand.h"            // orionldAttributeExpand
 #include "orionld/context/orionldSubAttributeExpand.h"         // orionldSubAttributeExpand
+#include "orionld/context/orionldContextItemExpand.h"          // orionldContextItemExpand
 #include "orionld/q/qVariableFix.h"                            // qVariableFix
 #include "orionld/q/qClone.h"                                  // qClone
 #include "orionld/q/qNodeType.h"                               // qNodeType
@@ -188,7 +189,7 @@ QNode* qParse(QNode* qLexList, QNode* endNodeP, bool forDb, bool qToDbModel, cha
     case QNodeTrueValue:
     case QNodeFalseValue:
     case QNodeRegexpValue:
-      if (compOpP == NULL)  // Still no operatore - this is on the Left-Hand side - saved for later
+      if (compOpP == NULL)  // Still no operator - this is on the Left-Hand side - saved for later
       {
         leftP = qLexP;
       }

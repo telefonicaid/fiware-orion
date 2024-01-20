@@ -678,6 +678,11 @@ MHD_Result orionldUriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     orionldState.uriParams.options = (char*) value;
     orionldState.uriParams.mask |= ORIONLD_URIPARAM_OPTIONS;
   }
+  else if (strcmp(key, "expandValues") == 0)
+  {
+    orionldState.uriParams.expandValues = (char*) value;
+    orionldState.uriParams.mask |= ORIONLD_URIPARAM_EXPAND_VALUES;
+  }
   else if (strcmp(key, "format") == 0)
   {
     orionldState.uriParams.format = (char*) value;
