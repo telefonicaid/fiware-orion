@@ -42,6 +42,9 @@ accumulatorStart --pretty-print
 # 06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
 #
 # 07. GET urn:E2 in simplified format
+# 08. Query entities with q=V1==abc => see nothing
+# 09. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1
+# 10. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2
 #
 
 echo '01. Create a subscription on entity type T'
@@ -130,6 +133,27 @@ echo
 echo "07. GET urn:E2 in simplified format"
 echo "==================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:E2?options=simplified
+echo
+echo
+
+
+echo "08. Query entities with q=V1==abc => see nothing"
+echo "================================================"
+orionCurl --url /ngsi-ld/v1/entities?q=V1==%22abc%22
+echo
+echo
+
+
+echo "09. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1"
+echo "=================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=V1==%22abc%22&expandValues=V1,V2'
+echo
+echo
+
+
+echo "10. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2"
+echo "================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?q=V2==%22id%22&expandValues=V1,V2'
 echo
 echo
 
@@ -341,6 +365,59 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "id": "urn:E2",
     "type": "T"
 }
+
+
+08. Query entities with q=V1==abc => see nothing
+================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+09. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 77
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "V1": {
+            "type": "VocabularyProperty",
+            "vocab": "abc"
+        },
+        "id": "urn:E1",
+        "type": "T"
+    }
+]
+
+
+10. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 86
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "V2": {
+            "type": "VocabularyProperty",
+            "vocab": [
+                "vocab",
+                "id"
+            ]
+        },
+        "id": "urn:E2",
+        "type": "T"
+    }
+]
 
 
 --TEARDOWN--
