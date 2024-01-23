@@ -542,8 +542,8 @@ In order to search for `Tree1` in that scope, the same
 Fiware-ServicePath will be used.
 
 Scopes are hierarchical and hierarchical search can be done. In order to
-do that the `\#` special keyword is used. Thus, a query with
-pattern entity id `.\*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
+do that the `#` special keyword is used. Thus, a query with
+pattern entity id `.*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
 will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
 
 Finally, you can query for disjoint scopes, using a comma-separated list
@@ -571,7 +571,7 @@ Some additional remarks:
     entities created without `Fiware-ServicePath` (or that don't include
     service path information in the database) belongs to a root scope
     `/` implicitly. All the queries without using `Fiware-ServicePath`
-    (including subscriptions) are on `\#` implicitly. This behavior
+    (including subscriptions) are on `/#` implicitly. This behavior
     ensures backward compatibility to pre-0.14.0 versions.
 
 -   It is possible to have an entity with the same ID and type in
