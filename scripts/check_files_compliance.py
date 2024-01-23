@@ -137,7 +137,8 @@ def ignore(root, file):
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'Changelog', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
-                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.readthedocs.yml', 'uncrustify.cfg' ]
+                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.readthedocs.yml', 'uncrustify.cfg',
+                   'requirements.txt']
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
@@ -145,7 +146,7 @@ def ignore(root, file):
         return True
     
     # For several requirements.txt files we have in this repo
-    if ('acceptance' in root or 'doc' in root or 'scripts' in 'root') and (file.endswith('.txt') or file.endswith('.json')):
+    if ('acceptance' in root or 'doc' in root) and (file.endswith('.txt') or file.endswith('.json')):
         return True
 
     return False
