@@ -145,7 +145,7 @@ def ignore(root, file):
         return True
     
     # For several requirements.txt files we have in this repo
-    if ('acceptance' in root or 'doc' in root) and (file.endswith('.txt') or file.endswith('.json')):
+    if ('acceptance' in root or 'doc' in root or 'scripts' in 'root') and (file.endswith('.txt') or file.endswith('.json')):
         return True
 
     return False

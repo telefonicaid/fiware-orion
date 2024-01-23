@@ -26,7 +26,7 @@ Each entity in DB has an `_id` field with three subfields:
 * `type`
 * `servicePath`
 
-## Rule 11: mandatory fields in entity
+### Rule 11: mandatory fields in entity
 
 The following fields are mandatory:
 
@@ -36,7 +36,7 @@ The following fields are mandatory:
 
 It is not an exhaustive check of every field in the database model, but some entities created/updated with old Orion versions may be missing them.
 
-## Rule 12: mandatory fields in attribute
+### Rule 12: mandatory fields in attribute
 
 The following subfields are mandatory for every attribute:
 
