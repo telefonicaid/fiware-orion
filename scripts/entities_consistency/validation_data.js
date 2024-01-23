@@ -1589,7 +1589,7 @@ db.getSiblingDB("orion-validation").entities.insertMany([
                 1
               ],
               [
-                20,
+                200,
                 10
               ],
               [
@@ -2782,7 +2782,7 @@ db.getSiblingDB("orion-validation").entities.insertMany([
         },
         "A1#": {
           "value": 10,
-          "type": "Number#",
+          "type": "Number",
           "creDate": 1705931202.187858,
           "modDate": 1705931202.187858,
           "md": {
@@ -2841,7 +2841,7 @@ db.getSiblingDB("orion-validation").entities.insertMany([
         },
         "A1": {
           "value": 10,
-          "type": "Number",
+          "type": "",
           "creDate": 1705931202.187858,
           "modDate": 1705931202.187858,
           "md": {
@@ -3257,7 +3257,7 @@ db.getSiblingDB("orion-validation").entities.insertMany([
           "creDate": 1705931202.187858,
           "modDate": 1705931202.187858,
           "md": {
-            "MD1": {
+            "MD1(": {
               "type": "Number",
               "value": 100
             },
@@ -3267,7 +3267,7 @@ db.getSiblingDB("orion-validation").entities.insertMany([
             }
           },
           "mdNames": [
-            "MD1",
+            "MD1(",
             "MD.2"
           ]
         },
@@ -3376,7 +3376,7 @@ db.getSiblingDB("orion-validation").entities.insertMany([
           "modDate": 1705931202.187858,
           "md": {
             "MD1": {
-              "type": "Number",
+              "type": "",
               "value": 100
             },
             "MD=2": {

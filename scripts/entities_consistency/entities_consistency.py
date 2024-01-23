@@ -175,7 +175,7 @@ def check_id(id):
 # Rules functions
 def rule10(entity):
     """
-    Rule 10: `_id` field inconsistency
+    Rule 10: `_id` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -234,7 +234,7 @@ def rule12(entity):
 
 def rule13(entity):
     """
-    Rule 13: `attrNames` field inconsistency
+    Rule 13: `attrNames` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -269,7 +269,7 @@ def rule13(entity):
 
 def rule14(entity):
     """
-    Rule 14: `mdNames` field inconsistency
+    Rule 14: `mdNames` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -308,7 +308,7 @@ def rule14(entity):
 
 def rule15(entities_collection):
     """
-    Rule 15: swapped subkeys in `_id`
+    Rule 15: not swapped subkeys in `_id`
 
     See README.md for an explanation of the rule
 
@@ -343,7 +343,7 @@ def rule15(entities_collection):
 
 def rule16(entity):
     """
-    Rule 16: `location` field inconsistency
+    Rule 16: `location` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -368,7 +368,7 @@ def rule16(entity):
         else:
             # not null value in geo location attribute case
             if 'location' not in entity:
-                return f"geo location detected in '{geo_attr}' ({geo_type}) but location field not found in entity"
+                return f"geo location '{geo_attr}' ({geo_type}) not null but location field not found in entity"
             if entity['location']['attrName'] != geo_attr:
                 return f"location.attrName ({entity['location']['attrName']}) differs from '{geo_attr}'"
 
@@ -394,7 +394,7 @@ def rule16(entity):
 
 def rule17(entity):
     """
-    Rule 17: missing `lastCorrelator`
+    Rule 17: `lastCorrelator` existence
 
     See README.md for an explanation of the rule
     """
@@ -579,27 +579,31 @@ def rule26(entity):
 
 def rule90(entity):
     """
-    Rule 90: usage of `geo:x` attribute type where `x` different from `json`
+    Rule 90: detect usage of `geo:x` attribute type where `x` different from `json`
 
     See README.md for an explanation of the rule
     """
+
+    # note we could have more than one case, as ignoreType can be in use
+    s = []
     for attr in entity['attrs']:
         # type existence in attribute is checked by another rule
         if 'type' in entity['attrs'][attr]:
             type = entity['attrs'][attr]['type']
             if is_geo_type(type) and type != 'geo:json':
-                return f"in attribute '{attr}' usage of deprecated {type} found"
+                s.append(f"{attr} ({type})")
 
-    return None
+    #
+    if len(s) > 0:
+        return f"usage of deprecated geo type in attributes: {', '.join(s)}"
 
 
 def rule91(entity):
     """
-    Rule 91: usage of more than one legacy `location` metadata
+    Rule 91: detect usage of more than one legacy `location` metadata
 
     See README.md for an explanation of the rule
     """
-    n = 0
     attrs = []
     for attr in entity['attrs']:
         if 'md' in entity['attrs'][attr]:
@@ -607,14 +611,14 @@ def rule91(entity):
                 attrs.append(attr)
 
     if len(attrs) > 1:
-        return f"location metadata found {n} times in attributes: {', '.join(attrs)} (maximum should be just 1)"
+        return f"location metadata found {len(attrs)} times in attributes: {', '.join(attrs)} (maximum should be just 1)"
     else:
         return None
 
 
 def rule92(entity):
     """
-    Rule 92: legacy `location` metadata should be `WGS84` or `WSG84`
+    Rule 92: detect legacy `location` metadata should be `WGS84` or `WSG84`
 
     See README.md for an explanation of the rule
     """
@@ -634,7 +638,7 @@ def rule92(entity):
 
 def rule93(entity):
     """
-    Rule 93: usage of redundant legacy `location`
+    Rule 93: detect usage of redundant legacy `location`
 
     See README.md for an explanation of the rule
     """
@@ -649,7 +653,7 @@ def rule93(entity):
 
 def rule94(entity):
     """
-    Rule 94: usage of not redundant legacy `location`
+    Rule 94: detect usage of not redundant legacy `location`
 
     See README.md for an explanation of the rule
     """
