@@ -216,7 +216,7 @@ def rule12(entity):
     See README.md for an explanation of the rule
     """
     s = []
-    for attr in entity['attrs'].keys():
+    for attr in entity['attrs']:
         missing_fields = []
 
         for field in ['mdNames', 'creDate', 'modDate']:
@@ -251,7 +251,7 @@ def rule13(entity):
     # attrs in attrNames
     attrs_not_in_attrnames = []
     if 'attrs' in entity:
-        for attr in entity['attrs'].keys():
+        for attr in entity['attrs']:
             if 'attrNames' not in entity or attr.replace('=', '.') not in entity['attrNames']:
                 attrs_not_in_attrnames.append(attr)
 
@@ -277,7 +277,7 @@ def rule14(entity):
     # some guards for not breaking in that case
 
     s = []
-    for item in entity['attrs'].keys():
+    for item in entity['attrs']:
         attr = entity['attrs'][item]
         # mdNames in md
         if 'mdNames' in attr:
@@ -289,7 +289,7 @@ def rule14(entity):
         # md in mdNames
         md_not_in_mdnames = []
         if 'md' in attr:
-            for md in attr['md'].keys():
+            for md in attr['md']:
                 if 'mdNames' not in attr or md.replace('=', '.') not in attr['mdNames']:
                     md_not_in_mdnames.append(md)
 
@@ -350,7 +350,8 @@ def rule16(entity):
     # check that as much as one attribute is using geo type
     geo_attrs = []
     for attr in entity['attrs']:
-        if is_geo_type(entity['attrs'][attr]['type']) and not ignore_type(entity['attrs'][attr]):
+        # type existence in attribute is checked by another rule
+        if 'type' in entity['attrs'][attr] and is_geo_type(entity['attrs'][attr]['type']) and not ignore_type(entity['attrs'][attr]):
             geo_attrs.append(attr)
 
     if len(geo_attrs) > 1:
@@ -361,7 +362,7 @@ def rule16(entity):
         geo_attr = geo_attrs[0]
         geo_type = entity['attrs'][geo_attr]['type']
         if entity['attrs'][geo_attr]['value'] is None:
-            # if null value in geo location attribute, then location field must not be present
+            # if null value in geolocation attribute, then location field must not be present
             if 'location' in entity:
                 return f"geo location '{geo_attr}' ({geo_type}) with null value and location field found"
         else:
@@ -388,7 +389,7 @@ def rule16(entity):
     else:  # len(geo_attrs) == 0
         # If no geo attr found, check there isn't a location field
         if 'location' in entity:
-            return f"location field detected but no geo attribute is present (or metadata location is used)"
+            return f"location field detected but no geo attribute is present (maybe metadata location is used?)"
 
 
 def rule17(entity):
@@ -453,19 +454,24 @@ def rule22(entity):
     if not sp.startswith('/'):
         return f"servicePath '{sp}' does not starts with '/'"
 
+    # This special case can be problematic (as split will detect always a level and the minimum length rule
+    # will break. So early return
+    if sp == '/':
+        return None
+
     # 10 maximum scope levels in a path
-    sp_levels = sp.split('/')
+    sp_levels = sp[1:].split('/')
     if len(sp_levels) > 10:
         return f"servicePath has {len(sp_levels)} tokens but the limit is 10"
 
     # 50 maximum characters in each level (1 char is minimum), only alphanumeric and underscore allowed
-    for level in sp_levels:
-        if len(level) == 0:
-            return f'servicePath length is 0 but minimum is 1'
-        if len(level) > 50:
-            return f'servicePath length is {len(level)} but maximum is 50'
-        if re.search('[^a-zA-Z0-9_]', level):
-            return f"unallowed characters in '{level}' in servicePath level"
+    for i in range(len(sp_levels)):
+        if len(sp_levels[i]) == 0:
+            return f'servicePath level #{i} length is 0 but minimum is 1'
+        if len(sp_levels[i]) > 50:
+            return f'servicePath level #{i} length is {len(sp_levels[i])} but maximum is 50'
+        if re.search('[^a-zA-Z0-9_]', sp_levels[i]):
+            return f"unallowed characters in '{sp_levels[i]}' in servicePath level #{i}"
 
 
 def rule23(entity):
@@ -475,7 +481,17 @@ def rule23(entity):
     See README.md for an explanation of the rule
     """
     s = []
+
+    # attrNames-attrs consistency is checked by another rule. In the present rule we cannot assume
+    # they are consistent, so we do a union of both sets
+    attrs_to_check = set()
+    if 'attrNames' in entity:
+        attrs_to_check.update(entity['attrNames'])
     for attr in entity['attrs']:
+        attrs_to_check.add(attr.replace('=', '.'))
+
+    # check in the resulting union set
+    for attr in attrs_to_check:
         r = check_id(attr)
         if r is not None:
             s.append(f"attribute name ({attr}) syntax violation: {r}")
@@ -516,11 +532,20 @@ def rule25(entity):
     """
     s = []
     for attr in entity['attrs']:
+        # mdNames-md consistency is checked by another rule. In the present rule we cannot assume
+        # they are consistent, so we do a union of both sets
+        md_to_check = set()
+        if 'mdNames' in entity['attrs'][attr]:
+            md_to_check.update(entity['attrs'][attr]['mdNames'])
         if 'md' in entity['attrs'][attr]:
             for md in entity['attrs'][attr]['md']:
-                r = check_id(md)
-                if r is not None:
-                    s.append(f"in attribute '{attr}' metadata name ({md}) syntax violation: {r}")
+                md_to_check.add(md.replace('=', '.'))
+
+        # check in the resulting union set
+        for md in md_to_check:
+            r = check_id(md)
+            if r is not None:
+                s.append(f"in attribute '{attr}' metadata name ({md}) syntax violation: {r}")
 
     if len(s) > 0:
         return ', '.join(s)
@@ -558,10 +583,12 @@ def rule90(entity):
 
     See README.md for an explanation of the rule
     """
-    for attr in entity['attrs'].keys():
-        type = entity['attrs'][attr]['type']
-        if is_geo_type(type) and type != 'geo:json':
-            return f"in attribute '{attr}' usage of deprecated {type} found"
+    for attr in entity['attrs']:
+        # type existence in attribute is checked by another rule
+        if 'type' in entity['attrs'][attr]:
+            type = entity['attrs'][attr]['type']
+            if is_geo_type(type) and type != 'geo:json':
+                return f"in attribute '{attr}' usage of deprecated {type} found"
 
     return None
 
@@ -573,13 +600,14 @@ def rule91(entity):
     See README.md for an explanation of the rule
     """
     n = 0
-    for attr in entity['attrs'].keys():
+    attrs = []
+    for attr in entity['attrs']:
         if 'md' in entity['attrs'][attr]:
-            if 'location' in entity['attrs'][attr]['md'].keys():
-                n += 1
+            if 'location' in entity['attrs'][attr]['md']:
+                attrs.append(attr)
 
-    if n > 1:
-        return f'location metadata found {n} times among entity attributes (maximum should be just 1)'
+    if len(attrs) > 1:
+        return f"location metadata found {n} times in attributes: {', '.join(attrs)} (maximum should be just 1)"
     else:
         return None
 
@@ -591,14 +619,14 @@ def rule92(entity):
     See README.md for an explanation of the rule
     """
     s = []
-    for attr in entity['attrs'].keys():
+    for attr in entity['attrs']:
         if 'md' in entity['attrs'][attr]:
-            if 'location' in entity['attrs'][attr]['md'].keys():
+            if 'location' in entity['attrs'][attr]['md']:
                 location_value = entity['attrs'][attr]['md']['location']['value']
                 if location_value != 'WGS84' and location_value != 'WSG84':
                     s.append(f"in attribute '{attr}' location metadata value is {location_value} (should be WGS84 or WSG84)")
 
-    if len(s) > 1:
+    if len(s) > 0:
         return ', '.join(s)
     else:
         return None
@@ -610,13 +638,11 @@ def rule93(entity):
 
     See README.md for an explanation of the rule
     """
-    for attr in entity['attrs'].keys():
+    for attr in entity['attrs']:
         if 'md' in entity['attrs'][attr]:
             for md in entity['attrs'][attr]['md']:
-                if md == 'location':
-                    if is_geo_type(entity['attrs'][attr]['type']):
-                        return f"in attribute '{attr}' redundant location metadata found (attribute is " \
-                               f"already using {entity['attrs'][attr]['type']} type)"
+                if md == 'location' and is_geo_type(entity['attrs'][attr]['type']):
+                    return f"in attribute '{attr}' redundant location metadata found (attribute is already using {entity['attrs'][attr]['type']} type)"
 
     return None
 
@@ -627,13 +653,11 @@ def rule94(entity):
 
     See README.md for an explanation of the rule
     """
-    for attr in entity['attrs'].keys():
+    for attr in entity['attrs']:
         if 'md' in entity['attrs'][attr]:
             for md in entity['attrs'][attr]['md']:
-                if md == 'location':
-                    if not is_geo_type(entity['attrs'][attr]['type']):
-                        return f"in attribute '{attr}' location metadata found (attribute type " \
-                               f"is {entity['attrs'][attr]['type']})"
+                if md == 'location' and not is_geo_type(entity['attrs'][attr]['type']):
+                    return f"in attribute '{attr}' location metadata found (attribute type is {entity['attrs'][attr]['type']})"
 
     return None
 
@@ -835,7 +859,7 @@ if __name__ == '__main__':
     fails = 0
     if args.db is not None:
         if args.db in db_names:
-            fails += process_db(logger, args.db, mongo_client[args.db], query, args.rules_exp)
+            fails += process_db(logger, args.db, mongo_client, query, args.rules_exp)
         else:
             logger.fatal(f'database {args.db} does not exist')
             sys.exit(1)
@@ -843,6 +867,6 @@ if __name__ == '__main__':
         # Process all Orion databases
         for db_name in db_names:
             if db_name.startswith('orion-'):
-                fails += process_db(logger, db_name, mongo_client[db_name], query, args.rules_exp)
+                fails += process_db(logger, db_name, mongo_client, query, args.rules_exp)
 
     logger.info(f'total rule violations: {fails}')

@@ -3057,6 +3057,64 @@ db.getSiblingDB("orion-validation").entities.insertMany([
     },
     {
       "_id": {
+        "id": "Rule24.5",
+        "type": "T",
+        "servicePath": "/SS"
+      },
+      "attrNames": [
+        "desc",
+        "A1",
+        "A2",
+        "A.3"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule24.5: attr type is missing",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "A1": {
+          "value": 10,
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "md": {
+            "MD1": {
+              "type": "Number",
+              "value": 100
+            },
+            "MD=2": {
+              "type": "Number",
+              "value": 200
+            }
+          },
+          "mdNames": [
+            "MD1",
+            "MD.2"
+          ]
+        },
+        "A2": {
+          "value": 20,
+          "type": "Number",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "A=3": {
+          "value": 30,
+          "type": "Number",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        }
+      },
+      "creDate": 1705931202.187858,
+      "modDate": 1705931202.187858,
+      "lastCorrelator": "acae5f4c-b92c-11ee-8f0c-080027cd35f1"
+    },    
+    {
+      "_id": {
         "id": "Rule25.1",
         "type": "T",
         "servicePath": "/SS"
@@ -3526,5 +3584,603 @@ db.getSiblingDB("orion-validation").entities.insertMany([
       "creDate": 1705931202.187858,
       "modDate": 1705931202.187858,
       "lastCorrelator": "acae5f4c-b92c-11ee-8f0c-080027cd35f1"
-    }
+    },
+    {
+      "_id": {
+        "id": "Rule26.5",
+        "type": "T",
+        "servicePath": "/SS"
+      },
+      "attrNames": [
+        "desc",
+        "A1",
+        "A2",
+        "A.3"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule26.5: md type is missing",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "A1": {
+          "value": 10,
+          "type": "Number",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "md": {
+            "MD1": {
+              "value": 100
+            },
+            "MD=2": {
+              "type": "Number",
+              "value": 200
+            }
+          },
+          "mdNames": [
+            "MD1",
+            "MD.2"
+          ]
+        },
+        "A2": {
+          "value": 20,
+          "type": "Number",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "A=3": {
+          "value": 30,
+          "type": "Number",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        }
+      },
+      "creDate": 1705931202.187858,
+      "modDate": 1705931202.187858,
+      "lastCorrelator": "acae5f4c-b92c-11ee-8f0c-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule90.1",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule90.1: usage of legacy geo:point",
+          "type": "Text",
+          "creDate": 1706006146.1601377,
+          "modDate": 1706006146.1601377,
+          "mdNames": []
+        },
+        "location": {
+          "value": "1, 2",
+          "type": "geo:point",
+          "creDate": 1706006146.1601377,
+          "modDate": 1706006146.1601377,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706006146.1601377,
+      "modDate": 1706006146.1601377,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Point",
+          "coordinates": [
+            2,
+            1
+          ]
+        }
+      },
+      "lastCorrelator": "2ac4f6a8-b9db-11ee-8c49-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule90.2",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule90.2: usage of legacy geo:line",
+          "type": "Text",
+          "creDate": 1706006146.17774,
+          "modDate": 1706006146.17774,
+          "mdNames": []
+        },
+        "location": {
+          "value": [
+            "1, 2",
+            "3, 4"
+          ],
+          "type": "geo:line",
+          "creDate": 1706006146.17774,
+          "modDate": 1706006146.17774,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706006146.17774,
+      "modDate": 1706006146.17774,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              2,
+              1
+            ],
+            [
+              4,
+              3
+            ]
+          ]
+        }
+      },
+      "lastCorrelator": "2ac4f6a8-b9db-11ee-8c49-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule90.3",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule90.3: usage of legacy geo:box",
+          "type": "Text",
+          "creDate": 1706006146.179189,
+          "modDate": 1706006146.179189,
+          "mdNames": []
+        },
+        "location": {
+          "value": [
+            "1, 2",
+            "3, 4"
+          ],
+          "type": "geo:box",
+          "creDate": 1706006146.179189,
+          "modDate": 1706006146.179189,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706006146.179189,
+      "modDate": 1706006146.179189,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                2,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                4,
+                3
+              ],
+              [
+                4,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          ]
+        }
+      },
+      "lastCorrelator": "2ac4f6a8-b9db-11ee-8c49-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule90.4",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule90.4: usage of legacy geo:polygon",
+          "type": "Text",
+          "creDate": 1706006146.1812057,
+          "modDate": 1706006146.1812057,
+          "mdNames": []
+        },
+        "location": {
+          "value": [
+            "1, 2",
+            "10, 20",
+            "10, -20",
+            "1, 2"
+          ],
+          "type": "geo:polygon",
+          "creDate": 1706006146.1812057,
+          "modDate": 1706006146.1812057,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706006146.1812057,
+      "modDate": 1706006146.1812057,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                2,
+                1
+              ],
+              [
+                20,
+                10
+              ],
+              [
+                -20,
+                10
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          ]
+        }
+      },
+      "lastCorrelator": "2ac4f6a8-b9db-11ee-8c49-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule91.1",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location",
+        "ignoredLocation"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule91.1: no more than one location metadata",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },  
+        "location": {
+          "value": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  1,
+                  2
+                ],
+                [
+                  10,
+                  20
+                ],
+                [
+                  10,
+                  -20
+                ],
+                [
+                  1,
+                  2
+                ]
+              ]
+            ]
+          },
+          "type": "polygon",
+          "creDate": 1705933908.9142942,
+          "modDate": 1705933908.9142942,
+          "md": {
+            "location": {
+              "type": "string",
+              "value": "WSG84"
+            }
+          },
+          "mdNames": [
+            "location"
+          ]
+        },
+        "ignoredLocation": {
+          "value": null,
+          "type": "point",
+          "creDate": 1705933908.9073899,
+          "modDate": 1705933908.9073899,
+          "md": {
+            "ignoreType": {
+              "type": "Bool",
+              "value": true
+            },
+            "location": {
+              "type": "string",
+              "value": "WSG84"
+            }
+          },
+          "mdNames": [
+            "ignoreType",
+            "location"
+          ]
+        } 
+      },
+      "creDate": 1705933908.9142942,
+      "modDate": 1705933908.9142942,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                1,
+                2
+              ],
+              [
+                10,
+                20
+              ],
+              [
+                10,
+                -20
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          ]
+        }
+      },
+      "lastCorrelator": "fa02fa68-b932-11ee-a0fb-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule92.1",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule92.1: location must be WSG84 or WGS84",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },  
+        "location": {
+          "value": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  1,
+                  2
+                ],
+                [
+                  10,
+                  20
+                ],
+                [
+                  10,
+                  -20
+                ],
+                [
+                  1,
+                  2
+                ]
+              ]
+            ]
+          },
+          "type": "polygon",
+          "creDate": 1705933908.9142942,
+          "modDate": 1705933908.9142942,
+          "md": {
+            "location": {
+              "type": "string",
+              "value": "WSG99"
+            }
+          },
+          "mdNames": [
+            "location"
+          ]
+        }
+      },
+      "creDate": 1705933908.9142942,
+      "modDate": 1705933908.9142942,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                1,
+                2
+              ],
+              [
+                10,
+                20
+              ],
+              [
+                10,
+                -20
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          ]
+        }
+      },
+      "lastCorrelator": "fa02fa68-b932-11ee-a0fb-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule93.1",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule93.1: redundant metadata location",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },  
+        "location": {
+          "value": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  1,
+                  2
+                ],
+                [
+                  10,
+                  20
+                ],
+                [
+                  10,
+                  -20
+                ],
+                [
+                  1,
+                  2
+                ]
+              ]
+            ]
+          },
+          "type": "geo:json",
+          "creDate": 1705933908.9142942,
+          "modDate": 1705933908.9142942,
+          "md": {
+            "location": {
+              "type": "string",
+              "value": "WSG84"
+            }
+          },
+          "mdNames": [
+            "location"
+          ]
+        }
+      },
+      "creDate": 1705933908.9142942,
+      "modDate": 1705933908.9142942,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                1,
+                2
+              ],
+              [
+                10,
+                20
+              ],
+              [
+                10,
+                -20
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          ]
+        }
+      },
+      "lastCorrelator": "fa02fa68-b932-11ee-a0fb-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule94.1",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule94.1: non redundant location metadata",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "location": {
+          "value": "40.418889, -3.691944",
+          "type": "coords",
+          "creDate": 1706007163.0475833,
+          "modDate": 1706007163.0475833,
+          "md": {
+            "location": {
+              "type": "string",
+              "value": "WSG84"
+            }
+          },
+          "mdNames": [
+            "location"
+          ]
+        }
+      },
+      "creDate": 1706007163.0475833,
+      "modDate": 1706007163.0475833,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Point",
+          "coordinates": [
+            -3.691944,
+            40.418889
+          ]
+        }
+      },
+      "lastCorrelator": "88e1bc10-b9dd-11ee-8755-080027cd35f1"
+    }    
 ])
