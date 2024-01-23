@@ -51,5 +51,5 @@ class TestEntitiesConsistency(unittest.TestCase):
         logger = logging.getLogger()
 
         # connect to MongoDB and process validation DB
-        mongo_client = MongoClient('mongodb://localhost:47017')
+        mongo_client = MongoClient('mongodb://localhost:27017')
         process_db(logger, 'orion-validation', mongo_client, {}, None)
