@@ -110,9 +110,9 @@ The following table provides information about the last Orion version supporting
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
-| `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
 | `GET /v2` operation                                                        | Not yet defined                           | Not yet defined                 |
 | `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types       | Not yet defined                           | Not yet defined                 |
+| `location` metadata to specify entity location                             | 3.10.1                                    | June 12th, 2023                 |
 | NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | 3.9.0 (*)                                 | June 2nd, 2023                  |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | 3.7.0 (*)                                 | May 26th, 2022                  |
 | Initial notification upon subscription creation or update                  | 3.1.0                                     | June 9th, 2021                  |
