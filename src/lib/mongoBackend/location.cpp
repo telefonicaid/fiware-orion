@@ -314,7 +314,7 @@ static bool getGeoJson
   const ContextAttribute*  caP,
   orion::BSONObjBuilder*   geoJson,
   std::string*             errDetail,
-  //ApiVersion               apiVersion
+  ApiVersion               apiVersion
 )
 {
   std::vector<double>      coordLat;
