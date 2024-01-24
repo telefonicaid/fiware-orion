@@ -542,8 +542,8 @@ In order to search for `Tree1` in that scope, the same
 Fiware-ServicePath will be used.
 
 Scopes are hierarchical and hierarchical search can be done. In order to
-do that the `\#` special keyword is used. Thus, a query with
-pattern entity id `.\*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
+do that the `#` special keyword is used. Thus, a query with
+pattern entity id `.*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
 will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
 
 Finally, you can query for disjoint scopes, using a comma-separated list
@@ -571,7 +571,7 @@ Some additional remarks:
     entities created without `Fiware-ServicePath` (or that don't include
     service path information in the database) belongs to a root scope
     `/` implicitly. All the queries without using `Fiware-ServicePath`
-    (including subscriptions) are on `\#` implicitly. This behavior
+    (including subscriptions) are on `/#` implicitly. This behavior
     ensures backward compatibility to pre-0.14.0 versions.
 
 -   It is possible to have an entity with the same ID and type in
@@ -657,7 +657,7 @@ rendered by Orion to provide extra information. From a representation point of v
 are just like regular attributes, with name, value and type.
 
 Builtin attributes are not rendered by default. In order to render a specific attribute, add its
-name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
+name to the `attrs` parameter in URLs (or payload field in `POST /v2/op/query` operation) or
 subscription (`attrs` sub-field within `notification`).
 
 The list of builtin attributes is as follows:
@@ -682,6 +682,13 @@ the subscriptions based in alteration type features (see [Subscription based in 
 
 Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
 However, they cannot be used in resource URLs.
+
+The following builtin attributes are included in notifications (if added to `attrs` sub-field within `notification`) even
+when `onlyChangedAttrs` is set to `true`:
+
+* `alterationType`
+* `dateCreated`
+* `dateModified`
 
 ## Special Metadata Types
 

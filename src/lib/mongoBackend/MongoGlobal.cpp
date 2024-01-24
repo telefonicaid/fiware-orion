@@ -2292,13 +2292,22 @@ static void getCommonAttributes
   std::vector<std::string>&         resultVector
 )
 {
-  for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+  for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
   {
-    for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+    // some builtin attributes are always include (even when onlyChangedAttrs is true)
+    if ((sVector[avOc] == ALTERATION_TYPE) || (sVector[avOc] == DATE_CREATED) || (sVector[avOc] == DATE_MODIFIED))
     {
-      if (fVector[cavOc] == sVector[avOc])
-      {
-        resultVector.push_back(fVector[cavOc]);
+      resultVector.push_back(sVector[avOc]);
+    }
+    else 
+    {
+      for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+      {      
+        if (fVector[cavOc] == sVector[avOc])
+        {
+          resultVector.push_back(sVector[avOc]);
+          break;          
+        }
       }
     }
   }
