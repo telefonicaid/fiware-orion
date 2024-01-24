@@ -737,8 +737,6 @@ The list of builtin metadata is as follows:
   was included in the request that triggered the notification. Its value depends on the request operation
   type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
 
-* `location`, which is currently [deprecated](deprecated.md), but still supported.
-
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
 ## Attribute names restrictions

@@ -58,7 +58,7 @@ A list of deprecated features and the version in which they were deprecated foll
 * `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,
   use `/v1` and `/v1/registry` instead.
         * `/ngsi9` URL paths removed in Orion 3.8.0
-* `location` metadata to specify entity location is deprecated in Orion 1.1.0. The new way
+* `location` metadata to specify entity location is deprecated in Orion 1.1.0 (removed in Orion 3.11.0). The new way
   of specifying entity location is to use `geo:json` type for the attribute (see details in
   [the corresponding section of the Orion API specification](orion-api.md#geospatial-properties-of-entities).
 * Deprecated command line argument in Orion 0.26.1 (removed in Orion 1.0.0).
@@ -110,9 +110,9 @@ The following table provides information about the last Orion version supporting
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
-| `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
 | `GET /v2` operation                                                        | Not yet defined                           | Not yet defined                 |
 | `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types       | Not yet defined                           | Not yet defined                 |
+| `location` metadata to specify entity location                             | 3.10.1                                    | June 12th, 2023                 |
 | NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | 3.9.0 (*)                                 | June 2nd, 2023                  |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | 3.7.0 (*)                                 | May 26th, 2022                  |
 | Initial notification upon subscription creation or update                  | 3.1.0                                     | June 9th, 2021                  |

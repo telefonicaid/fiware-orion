@@ -706,81 +706,59 @@ ContextAttribute::ContextAttribute
 * - If overrideMetadata option is used (as in this case existing medatada are goint to be deleted and
 *   doesn't count for looking ignoreTYpe)
 */
-std::string ContextAttribute::getLocation(orion::BSONObj* attrsP, ApiVersion apiVersion) const
+bool ContextAttribute::getLocation(orion::BSONObj* attrsP) const
 {
-  if (apiVersion == V1)
+  // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
+  if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
   {
-    // Deprecated way, but still supported
-    for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+    // First lookup in the metadata included in the request
+    if (metadataVector.lookupByName(NGSI_MD_IGNORE_TYPE))
     {
-      if (metadataVector[ix]->name == NGSI_MD_LOCATION)
-      {
-        return metadataVector[ix]->stringValue;
-      }
+      return !hasIgnoreType();
     }
 
-    // Current way of declaring location in NGSIv1, aligned with NGSIv2 (originally only only geo:point was supported
-    // but doing so have problems so we need to support all them at the end, 
-    // see https://github.com/telefonicaid/fiware-orion/issues/3442 for details)
-    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
+    // If ignoreType has not yet found, second lookup in the existing metadata attributes
+    // (if attrP is not NULL and metadata array exists)
+    if (attrsP != NULL)
     {
-      return LOCATION_WGS84;
-    }
-  }
-  else // v2
-  {
-    // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
-    if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
-    {
-      // First lookup in the metadata included in the request
-      if (metadataVector.lookupByName(NGSI_MD_IGNORE_TYPE))
+      std::string effectiveName = dbEncode(name);
+      if (attrsP->hasField(effectiveName))
       {
-        return hasIgnoreType() ? "" : LOCATION_WGS84;
-      }
-
-      // If ignoreType has not yet found, second lookup in the existing metadata attributes
-      // (if attrP is not NULL and metadata array exists)
-      if (attrsP != NULL)
-      {
-        std::string effectiveName = dbEncode(name);
-        if (attrsP->hasField(effectiveName))
+        orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
+        if (attr.hasField(ENT_ATTRS_MD))
         {
-          orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
-          if (attr.hasField(ENT_ATTRS_MD))
+          // FIXME P5: not sure if this way of lookup the metadata collection is the best one
+          // or can be simplified
+          orion::BSONObj         md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+          std::set<std::string>  mdsSet;
+
+          md.getFieldNames(&mdsSet);
+
+          for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
           {
-            // FIXME P5: not sure if this way of lookup the metadata collection is the best one
-            // or can be simplified
-            orion::BSONObj         md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
-            std::set<std::string>  mdsSet;
-
-            md.getFieldNames(&mdsSet);
-
-            for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
+            std::string  mdName = *i;
+            if (mdName == NGSI_MD_IGNORE_TYPE)
             {
-              std::string  mdName = *i;
-              if (mdName == NGSI_MD_IGNORE_TYPE)
+              orion::BSONObj mdItem = getObjectFieldF(md, mdName);
+              orion::BSONElement mdValue = getFieldF(mdItem, ENT_ATTRS_MD_VALUE);
+              if ((mdValue.type() == orion::Bool) && (mdValue.Bool() == true))
               {
-                orion::BSONObj mdItem = getObjectFieldF(md, mdName);
-                orion::BSONElement mdValue = getFieldF(mdItem, ENT_ATTRS_MD_VALUE);
-                if ((mdValue.type() == orion::Bool) && (mdValue.Bool() == true))
-                {
-                  return "";
-                }
-                else  // false or not a boolean
-                {
-                  return LOCATION_WGS84;
-                }
+                return false;
+              }
+              else  // false or not a boolean
+              {
+                return true;
               }
             }
           }
         }
       }
-
-      return LOCATION_WGS84;
     }
+
+    return true;
   }
 
-  return "";
+  return false;
 }
 
 

@@ -92,7 +92,7 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Check if attribute means a location  */
-  std::string  getLocation(orion::BSONObj* attrsP, ApiVersion apiVersion) const;
+  bool  getLocation(orion::BSONObj* attrsP) const;
 
   std::string  toJsonV1(bool                             asJsonObject,
                         RequestType                      request,

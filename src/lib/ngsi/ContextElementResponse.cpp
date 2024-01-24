@@ -125,7 +125,119 @@ ContextElementResponse::ContextElementResponse
   //
   // Attribute vector
   //
-  entity.attributeVector.fill(getObjectFieldF(entityDoc, ENT_ATTRS), attrL, includeEmpty, locAttr, apiVersion);
+  orion::BSONObj         attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
+  std::set<std::string>  attrNames;
+
+  attrs.getFieldNames(&attrNames);
+  for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
+  {
+    std::string        attrName                = *i;
+    orion::BSONObj     attr                    = getObjectFieldF(attrs, attrName);
+    ContextAttribute*  caP                     = NULL;
+    ContextAttribute   ca;
+
+    // Name and type
+    ca.name           = dbDecode(attrName);
+    ca.type           = getStringFieldF(attr, ENT_ATTRS_TYPE);
+
+    // Skip attribute if the attribute is in the list (or attrL is empty or includes "*")
+    if (!includedAttribute(ca.name, attrL))
+    {
+      continue;
+    }
+
+    /* It could happen (although very rarely) that the value field is missing in the
+     * DB for the attribute. The following is a safety check measure to protect against that */
+    if (!attr.hasField(ENT_ATTRS_VALUE))
+    {
+      caP = new ContextAttribute(ca.name, ca.type, "");
+    }
+    else
+    {
+      switch(getFieldF(attr, ENT_ATTRS_VALUE).type())
+      {
+      case orion::String:
+        ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
+        if (!includeEmpty && ca.stringValue.empty())
+        {
+          continue;
+        }
+        caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
+        break;
+
+      case orion::NumberDouble:
+        ca.numberValue = getNumberFieldF(attr, ENT_ATTRS_VALUE);
+        caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
+        break;
+
+      case orion::NumberInt:
+        ca.numberValue = (double) getIntFieldF(attr, ENT_ATTRS_VALUE);
+        caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
+        break;
+
+      case orion::Bool:
+        ca.boolValue = getBoolFieldF(attr, ENT_ATTRS_VALUE);
+        caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
+        break;
+
+      case orion::jstNULL:
+        caP = new ContextAttribute(ca.name, ca.type, "");
+        caP->valueType = orion::ValueTypeNull;
+        break;
+
+      case orion::Object:
+        caP = new ContextAttribute(ca.name, ca.type, "");
+        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
+        caP->valueType = orion::ValueTypeObject;
+        compoundObjectResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
+        break;
+
+      case orion::Array:
+        caP = new ContextAttribute(ca.name, ca.type, "");
+        caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
+        caP->valueType = orion::ValueTypeVector;
+        compoundVectorResponse(caP->compoundValueP, getFieldF(attr, ENT_ATTRS_VALUE));
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", getFieldF(attr, ENT_ATTRS_VALUE).type()));
+      }
+    }
+
+    /* dateExpires is managed like a regular attribute in DB, but it is a builtin and it is shadowed */
+    if (caP->name == DATE_EXPIRES)
+    {
+      caP->shadowed = true;
+    }
+
+    /* Setting custom metadata (if any) */
+    if (attr.hasField(ENT_ATTRS_MD))
+    {
+      orion::BSONObj         mds = getObjectFieldF(attr, ENT_ATTRS_MD);
+      std::set<std::string>  mdsSet;
+
+      mds.getFieldNames(&mdsSet);
+      for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
+      {
+        std::string currentMd = *i;
+        Metadata*   md = new Metadata(dbDecode(currentMd), getObjectFieldF(mds, currentMd));
+        caP->metadataVector.push_back(md);
+      }
+    }
+
+    /* Set creDate and modDate at attribute level */
+    if (attr.hasField(ENT_ATTRS_CREATION_DATE))
+    {
+      caP->creDate = getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE);
+    }
+
+    if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
+    {
+      caP->modDate = getNumberFieldF(attr, ENT_ATTRS_MODIFICATION_DATE);
+    }
+
+    entity.attributeVector.push_back(caP);
+  }
 
   /* Set creDate and modDate at entity level */
   if (entityDoc.hasField(ENT_CREATION_DATE))

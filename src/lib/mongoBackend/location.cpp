@@ -304,6 +304,8 @@ static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuil
 *
 * It returns true, except in the case of error (in which in addition errDetail gets filled)
 *
+* FIXME P6: try to avoid apiVersion
+*
 * FIXME P6: review the cases in which this function returns false. Maybe many cases (or all them)
 * can be moved to checkGeoJson() in the parsing layer, as preconditions.
 */
@@ -318,37 +320,6 @@ static bool getGeoJson
   std::vector<double>      coordLat;
   std::vector<double>      coordLong;
   orion::BSONArrayBuilder  ba;
-
-  if ((apiVersion == V1) && (caP->type != GEO_POINT) && (caP->type != GEO_LINE) && (caP->type != GEO_BOX) &&
-      (caP->type != GEO_POLYGON) && (caP->type != GEO_JSON))
-  {
-    // This corresponds to the legacy way in NGSIv1 based in metadata
-    // The block is the same that for GEO_POINT but it is clearer if we keep it separated
-
-    __sync_fetch_and_add(&noOfDprLocationMetadata, 1);
-    if (logDeprecate)
-    {
-      LM_W(("Deprecated usage of metadata location %s detected in attribute %s at entity update, please use geo:json instead", caP->type.c_str(), caP->name.c_str()));
-    }
-
-    double  aLat;
-    double  aLong;
-
-    if (!string2coords(caP->stringValue, aLat, aLong))
-    {
-      *errDetail = "geo coordinates format error [see Orion user manual]: " + caP->stringValue;
-      return false;
-    }
-
-    geoJson->append("type", "Point");
-
-    orion::BSONArrayBuilder ba;
-    ba.append(aLong);
-    ba.append(aLat);
-    geoJson->append("coordinates", ba.arr());
-
-    return true;
-  }
 
   if ((caP->type == GEO_POINT) || (caP->type == GEO_LINE) || (caP->type == GEO_BOX) || (caP->type == GEO_POLYGON))
   {
@@ -563,9 +534,7 @@ bool processLocationAtEntityCreation
   {
     const ContextAttribute* caP = caV[ix];
 
-    std::string location = caP->getLocation(NULL, apiVersion);
-
-    if (location.empty())
+    if (!caP->getLocation(NULL))
     {
       continue;
     }
@@ -574,13 +543,6 @@ bool processLocationAtEntityCreation
     {
       *errDetail = ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC;
       oe->fill(SccRequestEntityTooLarge, *errDetail, ERROR_NO_RESOURCES_AVAILABLE);
-      return false;
-    }
-
-    if ((location != LOCATION_WGS84) && (location != LOCATION_WGS84_LEGACY))
-    {
-      *errDetail = "only WGS84 are supported, found: " + location;
-      oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
       return false;
     }
 
@@ -614,22 +576,12 @@ bool processLocationAtUpdateAttribute
 )
 {
   std::string subErr;
-  std::string locationString = targetAttr->getLocation(attrsP, apiVersion);
-
-  /* Check that location (if any) is using the correct coordinates string (it only
-   * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
-  {
-    *errDetail = "only WGS84 is supported for location, found: [" + locationString + "]";
-    oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
-    return false;
-  }
 
   //
   // Case 1:
   //   update *to* location. There are 3 sub-cases
   //
-  if (!locationString.empty())
+  if (targetAttr->getLocation(attrsP))
   {
     //
     // Case 1a:
@@ -740,19 +692,10 @@ bool processLocationAtAppendAttribute
 )
 {
   std::string subErr;
-  std::string locationString = targetAttr->getLocation(attrsP, apiVersion);
-
-  /* Check that location (if any) is using the correct coordinates string (it only
-     * makes sense for NGSIv1, this is legacy code that will be eventually removed) */
-  if ((!locationString.empty()) && (locationString != LOCATION_WGS84) && (locationString != LOCATION_WGS84_LEGACY))
-  {
-    *errDetail = "only WGS84 is supported for location, found: [" + locationString + "]";
-    oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
-    return false;
-  }
+  bool        isALocation = targetAttr->getLocation(attrsP);
 
   /* Case 1: append of new location attribute */
-  if (actualAppend && (!locationString.empty()))
+  if (actualAppend && isALocation)
   {
     /* Case 1a: there is a previous location attribute -> error */
     if (!currentLocAttrName->empty())
@@ -777,7 +720,7 @@ bool processLocationAtAppendAttribute
     }
   }
   /* Case 2: append-as-update changing attribute type from no-location -> location */
-  else if (!actualAppend && (!locationString.empty()))
+  else if (!actualAppend && isALocation)
   {
     /* Case 2a: there is a previous (not empty and with different name) location attribute -> error */
     if ((!currentLocAttrName->empty()) && (*currentLocAttrName != targetAttr->name))
@@ -813,7 +756,7 @@ bool processLocationAtAppendAttribute
   }
   /* Check 3: in the case of append-as-update, type changes from location -> no-location for the current location
    * attribute, then remove location attribute */
-  else if (!actualAppend && (locationString.empty()) && (*currentLocAttrName == targetAttr->name))
+  else if (!actualAppend && !isALocation && (*currentLocAttrName == targetAttr->name))
   {
     *currentLocAttrName = "";
   }

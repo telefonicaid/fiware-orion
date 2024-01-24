@@ -153,7 +153,6 @@ int noOfSimulatedNotifications   = -1;
 int noOfDprNgsiv1Request         = -1;
 int noOfDprLegacyForwarding      = -1;
 int noOfDprLegacyNotif           = -1;
-int noOfDprLocationMetadata      = -1;
 int noOfDprGeoformat             = -1;
 
 

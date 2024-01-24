@@ -21,6 +21,7 @@
 - Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
 - Fix: improve logs in MongoDB query logic
 - Fix: false positive in log deprecation logic when entity name (or other literal) includes the token "v1" (#4454)
+- Remove: deprecated NGSIv1 location metadata to specify entity geo-location
 - Upgrade Debian version from 11.6 to 12.4 in Dockerfile
 - Hardening: upgrade libmongoc dependency from 1.23.1 to 1.24.3
 - Reference MongoDB version changed from 4.4 to 6.0

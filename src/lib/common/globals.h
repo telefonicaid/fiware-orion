@@ -44,9 +44,6 @@
 
 #define EARTH_RADIUS_METERS         6371000
 
-#define LOCATION_WGS84              "WGS84"
-#define LOCATION_WGS84_LEGACY       "WSG84"    // We fixed the right string at 0.17.0, but the old one needs to be mantained
-
 
 
 /* ****************************************************************************

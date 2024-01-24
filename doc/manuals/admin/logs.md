@@ -431,12 +431,6 @@ time=2024-01-11T16:23:24.701Z | lvl=WARN | corr=be709034-b09d-11ee-b5d1-080027cd
 time=2024-01-11T16:23:24.716Z | lvl=WARN | corr=be7ae5ac-b09d-11ee-98c8-080027cd35f1 | trans=1704990203-652-00000000015 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=Notifier.cpp[680]:buildSenderParams | msg=Deprecated usage of notification legacy format in notification (subId: 65a015fcda947708d30425eb)
 ```
 
-* Usages NGSIv1 usages of location metadata. Example:
-
-```
-time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c29583ca5 | trans=1686237259-703-00000000003 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[329]:getGeoJson | msg=Deprecated usage of metadata location coords detected in attribute location at entity update, please use geo:json instead
-```
-
 * Usages of `geo:point`, `geo:line`, `geo:box` or `geo:line`.
 
 ```

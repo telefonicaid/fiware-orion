@@ -35,19 +35,18 @@ brokerStart CB 0 IPV4 -logDeprecate -statCounters
 #
 # 01. Query E1-T1
 # 02. GET /v1/contextEntities/E/attributes/A
-# 03. Create entity using NGSIv1 metadata location
-# 04. Create entity using NGSIv1 and geo:point
-# 05. Create entity using NGSIv2 and geo:point
-# 06. Create registration using legacyForwarding mode
-# 07. Retrieve registrations (which uses legacyForwarding mode)
-# 08. Forwarded query using legacyForwarding mode
-# 09. Update query using legacyForwarding mode
-# 10. Create subscription using attrsFormat legacy
-# 11. Retrieve subscriptions (which uses attrsFormat legacy)
-# 12. Update subscription using attrsFormat legacy
-# 13. Trigger notification using attrsFormat legacy
-# 14. Get WARNING trace in logs
-# 15. Get statistics and see deprecatedFeatures counters
+# 03. Create entity using NGSIv1 and geo:point
+# 04. Create entity using NGSIv2 and geo:point
+# 05. Create registration using legacyForwarding mode
+# 06. Retrieve registrations (which uses legacyForwarding mode)
+# 07. Forwarded query using legacyForwarding mode
+# 08. Update query using legacyForwarding mode
+# 09. Create subscription using attrsFormat legacy
+# 10. Retrieve subscriptions (which uses attrsFormat legacy)
+# 11. Update subscription using attrsFormat legacy
+# 12. Trigger notification using attrsFormat legacy
+# 13. Get WARNING trace in logs
+# 14. Get statistics and see deprecatedFeatures counters
 #
 
 echo "01. Query E1-T1"
@@ -72,38 +71,7 @@ echo
 echo
 
 
-echo "03. Create entity using NGSIv1 metadata location"
-echo "================================================"
-payload='{
-  "contextElements": [
-  {
-    "type": "City",
-    "isPattern": "false",
-    "id": "Madrid",
-    "attributes": [
-    {
-      "name": "location",
-      "type": "coords",
-      "value": "40.418889, -3.691944",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WSG84"
-        }
-      ]
-    }
-    ]
-  }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload"
-echo
-echo
-
-
-echo "04. Create entity using NGSIv1 and geo:point"
+echo "03. Create entity using NGSIv1 and geo:point"
 echo "============================================"
 payload='{
   "contextElements": [
@@ -127,7 +95,7 @@ echo
 echo
 
 
-echo "05. Create entity using NGSIv2 and geo:point"
+echo "04. Create entity using NGSIv2 and geo:point"
 echo "============================================"
 payload='{
   "id": "Sevilla",
@@ -142,7 +110,7 @@ echo
 echo
 
 
-echo "06. Create registration using legacyForwarding mode"
+echo "05. Create registration using legacyForwarding mode"
 echo "==================================================="
 payload='{
    "dataProvided": {
@@ -170,21 +138,21 @@ echo
 REG_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "07. Retrieve registrations (which uses legacyForwarding mode)"
+echo "06. Retrieve registrations (which uses legacyForwarding mode)"
 echo "============================================================="
 orionCurl --url /v2/registrations
 echo
 echo
 
 
-echo "08. Forwarded query using legacyForwarding mode"
+echo "07. Forwarded query using legacyForwarding mode"
 echo "==============================================="
 orionCurl --url /v2/entities/E1/attrs/A1?type=T1
 echo
 echo
 
 
-echo "09. Update query using legacyForwarding mode"
+echo "08. Update query using legacyForwarding mode"
 echo "============================================"
 payload='{
   "value": 1,
@@ -195,7 +163,7 @@ echo
 echo
 
 
-echo "10. Create subscription using attrsFormat legacy"
+echo "09. Create subscription using attrsFormat legacy"
 echo "================================================"
 payload='{
   "subject": {
@@ -221,14 +189,14 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "11. Retrieve subscriptions (which uses attrsFormat legacy)"
+echo "10. Retrieve subscriptions (which uses attrsFormat legacy)"
 echo "=========================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "12. Update subscription using attrsFormat legacy"
+echo "11. Update subscription using attrsFormat legacy"
 echo "================================================"
 payload='{
   "notification": {
@@ -243,7 +211,7 @@ echo
 echo
 
 
-echo "13. Trigger notification using attrsFormat legacy"
+echo "12. Trigger notification using attrsFormat legacy"
 echo "================================================="
 payload='{
   "id": "E2",
@@ -258,14 +226,14 @@ echo
 echo
 
 
-echo "14. Get WARNING trace in logs"
+echo "13. Get WARNING trace in logs"
 echo "============================="
 cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}' | sed -e "s/$REG_ID/REG_ID/g" | sed -e "s/$SUB_ID/SUB_ID/g"
 echo
 echo
 
 
-echo "15. Get statistics and see deprecatedFeatures counters"
+echo "14. Get statistics and see deprecatedFeatures counters"
 echo "======================================================"
 orionCurl --url /statistics
 echo
@@ -306,46 +274,7 @@ Content-Length: 98
 }
 
 
-03. Create entity using NGSIv1 metadata location
-================================================
-HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 267
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": ""
-                    }
-                ],
-                "id": "Madrid",
-                "isPattern": "false",
-                "type": "City"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-04. Create entity using NGSIv1 and geo:point
+03. Create entity using NGSIv1 and geo:point
 ============================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -377,7 +306,7 @@ Content-Length: 207
 }
 
 
-05. Create entity using NGSIv2 and geo:point
+04. Create entity using NGSIv2 and geo:point
 ============================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -387,7 +316,7 @@ Content-Length: 0
 
 
 
-06. Create registration using legacyForwarding mode
+05. Create registration using legacyForwarding mode
 ===================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -397,7 +326,7 @@ Content-Length: 0
 
 
 
-07. Retrieve registrations (which uses legacyForwarding mode)
+06. Retrieve registrations (which uses legacyForwarding mode)
 =============================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -431,7 +360,7 @@ Content-Length: 233
 ]
 
 
-08. Forwarded query using legacyForwarding mode
+07. Forwarded query using legacyForwarding mode
 ===============================================
 HTTP/1.1 404 Not Found
 Date: REGEX(.*)
@@ -445,7 +374,7 @@ Content-Length: 95
 }
 
 
-09. Update query using legacyForwarding mode
+08. Update query using legacyForwarding mode
 ============================================
 HTTP/1.1 404 Not Found
 Date: REGEX(.*)
@@ -459,7 +388,7 @@ Content-Length: 95
 }
 
 
-10. Create subscription using attrsFormat legacy
+09. Create subscription using attrsFormat legacy
 ================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -469,7 +398,7 @@ Content-Length: 0
 
 
 
-11. Retrieve subscriptions (which uses attrsFormat legacy)
+10. Retrieve subscriptions (which uses attrsFormat legacy)
 ==========================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -506,7 +435,7 @@ Content-Length: 288
 ]
 
 
-12. Update subscription using attrsFormat legacy
+11. Update subscription using attrsFormat legacy
 ================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -514,7 +443,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-13. Trigger notification using attrsFormat legacy
+12. Trigger notification using attrsFormat legacy
 =================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -524,12 +453,10 @@ Content-Length: 0
 
 
 
-14. Get WARNING trace in logs
+13. Get WARNING trace in logs
 =============================
 Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
 Deprecated NGSIv1 request received: GET /v1/contextEntities/E/attributes/A, response code: 200
-Deprecated usage of metadata location coords detected in attribute location at entity update, please use geo:json instead
-Deprecated NGSIv1 request received: POST /v1/updateContext, request payload (279 bytes): { "contextElements": [ { "type": "City", "isPattern": "false", "id": "Madrid", "attributes": [ { "name": "location", "type": "coords", "value": "40.418889, -3.691944", "metadatas": [ { "name": "location", "type": "string", "value": "WSG84" } ] } ] } ], "updateAction": "APPEND" }, response code: 200
 Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
 Deprecated NGSIv1 request received: POST /v1/updateContext, request payload (208 bytes): { "contextElements": [ { "type": "City", "isPattern": "false", "id": "Barcelona", "attributes": [ { "name": "location", "type": "geo:point", "value": "40.418889, -3.691944" } ] } ], "updateAction": "APPEND" }, response code: 200
 Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
@@ -548,24 +475,23 @@ Deprecated usage of notification legacy format in notification (subId: SUB_ID)
 Raising alarm NotificationError localhost:1234/: notification failure for queue worker: Couldn't connect to server
 
 
-15. Get statistics and see deprecatedFeatures counters
+14. Get statistics and see deprecatedFeatures counters
 ======================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 587
+Content-Length: 566
 
 {
     "counters": {
         "deprecatedFeatures": {
             "geoFormat": 2,
-            "metadataLocation": 1,
             "ngsiv1Forwarding": 4,
             "ngsiv1NotifFormat": 4,
-            "ngsiv1Requests": 4
+            "ngsiv1Requests": 3
         },
-        "jsonRequests": 9,
+        "jsonRequests": 8,
         "noPayloadRequests": 5,
         "requests": {
             "/statistics": {
@@ -598,7 +524,7 @@ Content-Length: 587
                 "POST": 1
             },
             "/v1/updateContext": {
-                "POST": 2
+                "POST": 1
             }
         }
     },

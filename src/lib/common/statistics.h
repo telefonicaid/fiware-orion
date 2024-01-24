@@ -280,7 +280,6 @@ extern int noOfSimulatedNotifications;
 extern int noOfDprNgsiv1Request;
 extern int noOfDprLegacyForwarding;
 extern int noOfDprLegacyNotif;
-extern int noOfDprLocationMetadata;
 extern int noOfDprGeoformat;
 
 /* ****************************************************************************

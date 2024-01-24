@@ -44,7 +44,6 @@ Orion Context broker は、`GET /statistics` と `GET /cache/statistics` を介�
   "counters": {
     "deprecatedFeatures": {
       "geoFormat": 2,
-      "metadataLocation": 1,
       "ngsiv1Forwarding": 4,
       "ngsiv1NotifFormat": 4,
       "ngsiv1Requests": 4
