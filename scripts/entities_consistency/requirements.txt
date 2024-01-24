@@ -1,0 +1,2 @@
+pymongo==4.6.1
+deepdiff==6.7.1
