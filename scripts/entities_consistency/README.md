@@ -89,7 +89,7 @@ Check [identifiers syntax restrictions](../../doc/manuals/orion-api.md#identifie
 
 ### Rule 22: entity servicePath syntax
 
-https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/orion-api.md#entity-service-path
+Check [servicePath documentation](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/orion-api.md#entity-service-path)
 
 ### Rule 23: attribute name syntax
 
