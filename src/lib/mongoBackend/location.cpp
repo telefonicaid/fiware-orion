@@ -304,7 +304,7 @@ static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuil
 *
 * It returns true, except in the case of error (in which in addition errDetail gets filled)
 *
-* FIXME PR: try to avoid apiVersion
+* FIXME P6: try to avoid apiVersion
 *
 * FIXME P6: review the cases in which this function returns false. Maybe many cases (or all them)
 * can be moved to checkGeoJson() in the parsing layer, as preconditions.
@@ -314,7 +314,7 @@ static bool getGeoJson
   const ContextAttribute*  caP,
   orion::BSONObjBuilder*   geoJson,
   std::string*             errDetail,
-  ApiVersion               apiVersion
+  //ApiVersion               apiVersion
 )
 {
   std::vector<double>      coordLat;
