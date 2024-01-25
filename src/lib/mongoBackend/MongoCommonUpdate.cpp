@@ -3504,7 +3504,7 @@ static unsigned int updateEntity
 
   /* Build CER used for notifying (if needed) */
   StringList               emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
@@ -3921,7 +3921,7 @@ static unsigned int updateEntity
       notifyCerP->release();
       delete notifyCerP;
 
-      notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL, true, apiVersion);
+      notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL);
     }
   }
   else

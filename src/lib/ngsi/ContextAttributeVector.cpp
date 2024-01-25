@@ -308,10 +308,7 @@ void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDef
 void ContextAttributeVector::fill
 (
   const orion::BSONObj&  attrs,
-  const StringList&      attrL,
-  bool                   includeEmpty,
-  const std::string&     locAttr,
-  ApiVersion             apiVersion
+  const StringList&      attrL
 )
 {
   std::set<std::string>  attrNames;
@@ -346,10 +343,6 @@ void ContextAttributeVector::fill
       {
       case orion::String:
         ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
-        if (!includeEmpty && ca.stringValue.empty())
-        {
-          continue;
-        }
         caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
         break;
 
@@ -440,7 +433,7 @@ void ContextAttributeVector::fill
 void ContextAttributeVector::fill(const orion::BSONObj&  attrs)
 {
   StringList emptyList;
-  return fill(attrs, emptyList, true, "", V2);
+  return fill(attrs, emptyList);
 }
 
 
