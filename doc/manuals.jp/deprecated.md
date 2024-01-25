@@ -40,7 +40,7 @@
 * Orion 1.5.0 では、NGSIv2 で `dateCreated` および/または `dateModified` 属性を含めるために `optionsURL` パラメータ使用することは推奨されていません。代わりに `attrs`URI パラメータを使用してください
 * パス・プレフィックスとして /ngsi10 そして /ngsi9URL は、orion 1.2.0 で廃止されました。代わりに `/v1` と `/v1/registry` を使用してください
     * `/ngsi9` URL パスは Orion 3.8.0 で削除されました
-* エンティティの場所を指定する `location` メタデータは、Orion 1.1.0 では非推奨です。エンティティの場所を指定する新しい方法は、属性の `geo:json` 型を使用することです。[Orion API の対応するセクション](orion-api.md#geospatial-properties-of-entities)を参照してください)
+* エンティティの場所を指定する `location` メタデータは、Orion 1.1.0 では非推奨です (Orion 3.11.0 で削除されました)。エンティティの場所を指定する新しい方法は、属性の `geo:json` 型を使用することです。[Orion API の対応するセクション](orion-api.md#geospatial-properties-of-entities)を参照してください)
 * Orion 0.26.1 のコマンドライン引数は廃止されました。Orion 1.0.0 で削除されました
     * **--silent** : エラー以外のすべてのログ出力を抑止します。代わりに `-logLevel ERROR` を使用してください
 * ONTIMEINTERVAL サブスクリプションは Orion 0.26.0 以降で廃止されました。Orion 1.0.0 では削除されました。ONTIMEINTERVAL サブスクリプションにはいくつかの問題があります。CB に状態 (state) を導入するため、水平スケーリングの設定をより困難にし、ページネーション/フィルタリングの導入を困難にします。実際には、ONTIMEINTERVAL 通知に基づくユース・ケースは、レセプタが queryContext を同じ頻度で実行する等価なユース・ケースに変換できるため、実際には必要ありません。ページ区切りやフィルタリングなどの queryContext の機能を利用してください
@@ -83,6 +83,7 @@
 | エンティティのロケーションを指定する `location` メタデータ                           | まだ定義されていません                          | まだ定義されていません     |
 | `GET /v2` 操作                                                                       | まだ定義されていません                          | まだ定義されていません     |
 | `geo:point`, `geo:line`, `geo:box` および `geo:polygon` 属性タイプ                   | まだ定義されていません                          | まだ定義されていません     |
+| エンティティの場所を指定するための `location` メタデータ                             | 3.10.1                                          | 2023年6月12日              |
 | NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)             | 3.9.0 (*)                                       | 2023年6月2日               |
 | `/ngsi10` および `/ngsi9` URL プレフィックス                                         | 3.7.0 (*)                                       | 2022年5月26日              |
 |サブスクリプションの作成または更新時の初期通知                                        | 3.1.0                                           | 2021年6月9日               |
