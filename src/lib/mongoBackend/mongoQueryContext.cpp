@@ -362,7 +362,6 @@ HttpStatusCode mongoQueryContext
                      requestP->restriction,
                      &rawCerV,
                      &err,
-                     //true,
                      tenant,
                      servicePathV,
                      offset,

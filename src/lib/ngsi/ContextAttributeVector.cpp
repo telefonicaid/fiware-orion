@@ -433,7 +433,7 @@ void ContextAttributeVector::fill
 void ContextAttributeVector::fill(const orion::BSONObj&  attrs)
 {
   StringList emptyList;
-  return fill(attrs, emptyList/*, true*/);
+  return fill(attrs, emptyList);
 }
 
 
