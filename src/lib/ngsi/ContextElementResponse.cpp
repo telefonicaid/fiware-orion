@@ -98,8 +98,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP, boo
 ContextElementResponse::ContextElementResponse
 (
   const orion::BSONObj&  entityDoc,
-  const StringList&      attrL/*,
-  bool                   includeEmpty*/
+  const StringList&      attrL
 )
 {
   prune = false;
@@ -124,7 +123,7 @@ ContextElementResponse::ContextElementResponse
   //
   // Attribute vector
   //
-  entity.attributeVector.fill(getObjectFieldF(entityDoc, ENT_ATTRS), attrL/*, includeEmpty*/);
+  entity.attributeVector.fill(getObjectFieldF(entityDoc, ENT_ATTRS), attrL);
   /*orion::BSONObj         attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 

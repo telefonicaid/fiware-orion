@@ -1385,11 +1385,6 @@ static bool isCustomAttr(std::string attrName)
 * This method is used by queryContext. It takes a vector with entities and a vector
 * with attributes as input and returns the corresponding ContextElementResponseVector or error.
 *
-* Note the includeEmpty argument. This is used if we don't want the result to include empty
-* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
-* subscribeContext case, as empty values can cause problems in the case of federating Context
-* Brokers (the notifyContext is processed as an updateContext and in the latter case, an
-* empty value causes an error)
 */
 bool entitiesQuery
 (
@@ -1398,7 +1393,6 @@ bool entitiesQuery
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
-  //bool                             includeEmpty,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset,
@@ -1636,7 +1630,7 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL/*, includeEmpty*/);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL);
 
     // Add builtin attributes and metadata (only in NGSIv2)
     if (apiVersion == V2)

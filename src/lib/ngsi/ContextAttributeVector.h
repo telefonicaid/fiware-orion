@@ -52,7 +52,7 @@ typedef struct ContextAttributeVector
   unsigned int             size(void) const;
   void                     release(void);
   void                     fill(const ContextAttributeVector& caV, bool useDefaultType = false, bool cloneCompounds = false);
-  void                     fill(const orion::BSONObj& attrs, const StringList& attrL/*, bool includeEmpty*/);
+  void                     fill(const orion::BSONObj& attrs, const StringList& attrL);
   void                     fill(const orion::BSONObj& attrs);
   int                      get(const std::string& attributeName) const;
 
