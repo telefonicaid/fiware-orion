@@ -309,9 +309,7 @@ void ContextAttributeVector::fill
 (
   const orion::BSONObj&  attrs,
   const StringList&      attrL,
-  bool                   includeEmpty,
-  const std::string&     locAttr,
-  ApiVersion             apiVersion
+  bool                   includeEmpty
 )
 {
   std::set<std::string>  attrNames;
@@ -440,7 +438,7 @@ void ContextAttributeVector::fill
 void ContextAttributeVector::fill(const orion::BSONObj&  attrs)
 {
   StringList emptyList;
-  return fill(attrs, emptyList, true, "", V2);
+  return fill(attrs, emptyList, true);
 }
 
 
