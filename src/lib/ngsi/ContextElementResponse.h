@@ -61,9 +61,8 @@ typedef struct ContextElementResponse
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
   ContextElementResponse(const orion::BSONObj&  entityDoc,
-                         const StringList&      attrL,
-                         bool                   includeEmpty = true,
-                         ApiVersion             apiVersion   = V1);
+                         const StringList&      attrL/*,
+                         bool                   includeEmpty = true*/);
   ContextElementResponse(Entity* eP, bool useDefaultType = false);
 
   std::string  toJsonV1(bool                             asJsonObject,

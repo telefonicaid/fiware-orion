@@ -98,9 +98,8 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP, boo
 ContextElementResponse::ContextElementResponse
 (
   const orion::BSONObj&  entityDoc,
-  const StringList&      attrL,
-  bool                   includeEmpty,
-  ApiVersion             apiVersion
+  const StringList&      attrL/*,
+  bool                   includeEmpty*/
 )
 {
   prune = false;
@@ -125,7 +124,8 @@ ContextElementResponse::ContextElementResponse
   //
   // Attribute vector
   //
-  orion::BSONObj         attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
+  entity.attributeVector.fill(getObjectFieldF(entityDoc, ENT_ATTRS), attrL/*, includeEmpty*/);
+  /*orion::BSONObj         attrs = getObjectFieldF(entityDoc, ENT_ATTRS);
   std::set<std::string>  attrNames;
 
   attrs.getFieldNames(&attrNames);
@@ -146,8 +146,8 @@ ContextElementResponse::ContextElementResponse
       continue;
     }
 
-    /* It could happen (although very rarely) that the value field is missing in the
-     * DB for the attribute. The following is a safety check measure to protect against that */
+    // It could happen (although very rarely) that the value field is missing in the
+    // DB for the attribute. The following is a safety check measure to protect against that
     if (!attr.hasField(ENT_ATTRS_VALUE))
     {
       caP = new ContextAttribute(ca.name, ca.type, "");
@@ -204,13 +204,13 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
-    /* dateExpires is managed like a regular attribute in DB, but it is a builtin and it is shadowed */
+    // dateExpires is managed like a regular attribute in DB, but it is a builtin and it is shadowed
     if (caP->name == DATE_EXPIRES)
     {
       caP->shadowed = true;
     }
 
-    /* Setting custom metadata (if any) */
+    // Setting custom metadata (if any)
     if (attr.hasField(ENT_ATTRS_MD))
     {
       orion::BSONObj         mds = getObjectFieldF(attr, ENT_ATTRS_MD);
@@ -225,7 +225,7 @@ ContextElementResponse::ContextElementResponse
       }
     }
 
-    /* Set creDate and modDate at attribute level */
+    // Set creDate and modDate at attribute level
     if (attr.hasField(ENT_ATTRS_CREATION_DATE))
     {
       caP->creDate = getNumberFieldF(attr, ENT_ATTRS_CREATION_DATE);
@@ -237,7 +237,7 @@ ContextElementResponse::ContextElementResponse
     }
 
     entity.attributeVector.push_back(caP);
-  }
+  }*/
 
   /* Set creDate and modDate at entity level */
   if (entityDoc.hasField(ENT_CREATION_DATE))

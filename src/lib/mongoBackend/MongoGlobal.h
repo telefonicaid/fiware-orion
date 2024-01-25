@@ -230,7 +230,7 @@ extern bool entitiesQuery
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
-  bool                             includeEmpty,
+  //bool                             includeEmpty,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset         = DEFAULT_PAGINATION_OFFSET_INT,
