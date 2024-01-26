@@ -1,0 +1,237 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+alarm for notification queue overpassing a given threshold
+
+--SHELL-INIT--
+dbInit ${CB_DB_NAME} serv1
+dbInit ${CB_DB_NAME} serv2
+dbInit ${CB_DB_NAME} serv3
+brokerStart CB 0 IPv4 -multiservice -notifAlarmThreshold 50 -notificationMode threadpool:6:1,serv1:4:1,serv2:2:1
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. Subscribe serv1 to the accumulator endpoint that never responses
+# 02. Subscribe serv2 to the accumulator endpoint that never responses
+# 03. Subscribe serv3 to the accumulator endpoint that never responses
+# 04. Create/update entity in serv1 5 times (update #3 raises alarm)
+# 05. Create/update entity in serv2 3 times (update #2 raises alarm)
+# 06. Create/update entity in serv3 (default) 7 times (update #4 raises alarm)
+# 07. Grep log for notificationQueue alarm
+#
+
+
+echo '01. Subscribe serv1 to the accumulator endpoint that never responses'
+echo '===================================================================='
+payload='{
+  "description": "serv1 subscriptions",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/waitForever"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant serv1
+echo
+echo
+
+
+echo '02. Subscribe serv2 to the accumulator endpoint that never responses'
+echo '===================================================================='
+payload='{
+  "description": "serv2 subscriptions",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/waitForever"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant serv2
+echo
+echo
+
+
+
+echo '03. Subscribe serv3 to the accumulator endpoint that never responses'
+echo '===================================================================='
+payload='{
+  "description": "serv3 subscriptions",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/waitForever"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant serv3
+echo
+echo
+
+
+
+echo "04. Create/update entity in serv1 5 times (update #3 raises alarm)"
+echo "=================================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+     "value": 1,
+   "type": "Number"
+  }
+}'
+for i in {1..5}
+do
+   echo $i
+   orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload" --tenant serv1 > /dev/null
+done
+echo
+echo
+
+
+echo "05. Create/update entity in serv2 3 times (update #2 raises alarm)"
+echo "=================================================================="
+for i in {1..3}
+do
+   echo $i
+   orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload" --tenant serv2 > /dev/null
+done
+echo
+echo
+
+
+echo "06. Create/update entity in serv3 (default) 7 times (update #4 raises alarm)"
+echo "============================================================================"
+for i in {1..7}
+do
+   echo $i
+   orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload" --tenant serv3 > /dev/null
+done
+echo
+echo
+
+
+echo "07. Grep log for notificationQueue alarm"
+echo "========================================"
+egrep 'Raising alarm|Releasing alarm|Repeated' /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
+echo
+echo
+
+
+accumulatorStop $LISTENER_PORT
+
+
+--REGEXPECT--
+01. Subscribe serv1 to the accumulator endpoint that never responses
+====================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Subscribe serv2 to the accumulator endpoint that never responses
+====================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Subscribe serv3 to the accumulator endpoint that never responses
+====================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+04. Create/update entity in serv1 5 times (update #3 raises alarm)
+==================================================================
+1
+2
+3
+4
+5
+
+
+05. Create/update entity in serv2 3 times (update #2 raises alarm)
+==================================================================
+1
+2
+3
+
+
+06. Create/update entity in serv3 (default) 7 times (update #4 raises alarm)
+============================================================================
+1
+2
+3
+4
+5
+6
+7
+
+
+07. Grep log for notificationQueue alarm
+========================================
+Raising alarm NotificationQueue serv1: notification queue reached maximum threshold
+Raising alarm NotificationQueue serv2: notification queue reached maximum threshold
+Raising alarm NotificationQueue default: notification queue reached maximum threshold
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop ${CB_DB_NAME} serv1
+dbDrop ${CB_DB_NAME} serv2
+dbDrop ${CB_DB_NAME} serv3

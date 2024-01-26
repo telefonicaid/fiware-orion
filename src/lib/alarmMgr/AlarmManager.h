@@ -44,6 +44,8 @@ class AlarmManager
   int64_t                     badInputResets;
   int64_t                     notificationErrors;
   int64_t                     notificationErrorResets;
+  int64_t                     notificationQueues;
+  int64_t                     notificationQueueResets;
   int64_t                     forwardingErrors;
   int64_t                     forwardingErrorResets;
   int64_t                     mqttConnectionErrors;
@@ -53,11 +55,13 @@ class AlarmManager
   bool                        dbOk;
 
   std::map<std::string, int>  notificationV;
+  std::map<std::string, int>  notificationQ;
   std::map<std::string, int>  forwardingErrorV;
   std::map<std::string, int>  badInputV;
   std::map<std::string, int>  mqttConnectionErrorV;
 
   bool                        notificationErrorLogAlways;
+  bool                        notificationQueueLogAlways;
   bool                        forwardingErrorLogAlways;
   bool                        mqttConnectionErrorLogAlways;
   bool                        badInputLogAlways;
@@ -80,6 +84,9 @@ class AlarmManager
   bool notificationError(const std::string& url, const std::string& details);
   bool notificationErrorReset(const std::string& url);
 
+  bool notificationQueueReset(const std::string& service);
+  bool notificationQueue(const std::string& service, const std::string& details);
+
   bool forwardingError(const std::string& url, const std::string& details);
   bool forwardingErrorReset(const std::string& url);
 
@@ -93,6 +100,7 @@ class AlarmManager
   void dbErrorsGet(bool* active, int64_t* raised, int64_t* released);
   void badInputGet(int64_t* active, int64_t* raised, int64_t* released);
   void notificationErrorGet(int64_t* active, int64_t* raised, int64_t* released);
+  void notificationQueueGet(int64_t* active, int64_t* raised, int64_t* released);
   void forwardingErrorGet(int64_t* active, int64_t* raised, int64_t* released);
   void mqttConnectionErrorGet(int64_t* active, int64_t* raised, int64_t* released);
 

@@ -207,6 +207,7 @@ unsigned long   fcMaxInterval;
 int             mqttMaxAge;
 
 bool            logDeprecate;
+int             notifAlarmThreshold;
 
 
 
@@ -277,6 +278,7 @@ bool            logDeprecate;
 #define NGSIV1_AUTOCAST_DESC   "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
 #define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
+#define NOTIF_ALARM_THRESHOLD_DESC "maximum threshold for notification queue alarms, as a percentage of the maximum queue size, default 0 (meaning no queue alarms are used)"
 #define DBURI_DESC             "complete URI for database connection"
 
 
@@ -336,10 +338,8 @@ PaArgument paArgs[] =
   { "-connectionMemory",            &connectionMemory,      "CONN_MEMORY",              PaUInt,   PaOpt, 64,                              0,     1024,                  CONN_MEMORY_DESC             },
   { "-maxConnections",              &maxConnections,        "MAX_CONN",                 PaUInt,   PaOpt, 1020,                            1,     PaNL,                  MAX_CONN_DESC                },
   { "-reqPoolSize",                 &reqPoolSize,           "TRQ_POOL_SIZE",            PaUInt,   PaOpt, 0,                               0,     1024,                  REQ_POOL_SIZE                },
-
   { "-inReqPayloadMaxSize",         &inReqPayloadMaxSize,   "IN_REQ_PAYLOAD_MAX_SIZE",  PaULong,  PaOpt, DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE, 0,     PaNL,                  IN_REQ_PAYLOAD_MAX_SIZE_DESC },
   { "-outReqMsgMaxSize",            &outReqMsgMaxSize,      "OUT_REQ_MSG_MAX_SIZE",     PaULong,  PaOpt, DEFAULT_OUT_REQ_MSG_MAX_SIZE,    0,     PaNL,                  OUT_REQ_MSG_MAX_SIZE_DESC    },
-
   { "-notificationMode",            &notificationMode,      "NOTIF_MODE",               PaString, PaOpt, _i "transient",                  PaNL,  PaNL,                  NOTIFICATION_MODE_DESC       },
   { "-notifFlowControl",            &notifFlowControl,      "NOTIF_FLOW_CONTROL",       PaString, PaOpt, _i "",                           PaNL,  PaNL,                  FLOW_CONTROL_DESC            },
   { "-simulatedNotification",       &simulatedNotification, "DROP_NOTIF",               PaBool,   PaOpt, false,                           false, true,                  SIMULATED_NOTIF_DESC         },
@@ -370,6 +370,8 @@ PaArgument paArgs[] =
   { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 60,                              PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
 
   { "-logDeprecate",                &logDeprecate,          "LOG_DEPRECATE",            PaBool,   PaOpt, false,                           false, true,                  LOG_DEPRECATE_DESC           },
+
+  { "-notifAlarmThreshold",         &notifAlarmThreshold,   "NOTIF_ALARM_THRESHOLD",    PaInt,    PaOpt, 0,                               PaNL,  PaNL,                  NOTIF_ALARM_THRESHOLD_DESC   },
 
   PA_END_OF_ARGS
 };
@@ -671,6 +673,15 @@ static void contextBrokerInit(void)
   else
   {
     pNotifier = new Notifier();
+  }
+
+  if (notifAlarmThreshold < 0)
+  {
+    LM_X(1, ("Fatal Error (notifAlarmThreshold negative value not allowed)"));
+  }
+  if (notifAlarmThreshold > 100)
+  {
+    LM_X(1, ("Fatal Error (notifAlarmThreshold value is greater than 100)"));
   }
 
   /* Set notifier object (singleton) */

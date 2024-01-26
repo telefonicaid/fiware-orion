@@ -58,6 +58,8 @@ AlarmManager::AlarmManager()
   badInputResets(0),
   notificationErrors(0),
   notificationErrorResets(0),
+  notificationQueues(0),
+  notificationQueueResets(0),
   forwardingErrors(0),
   forwardingErrorResets(0),
   mqttConnectionErrors(0),
@@ -66,6 +68,7 @@ AlarmManager::AlarmManager()
   dbErrorResets(0),
   dbOk(true),
   notificationErrorLogAlways(false),
+  notificationQueueLogAlways(false),
   forwardingErrorLogAlways(false),
   mqttConnectionErrorLogAlways(false),
   badInputLogAlways(false),
@@ -82,6 +85,7 @@ AlarmManager::AlarmManager()
 int AlarmManager::init(bool logAlreadyRaisedAlarms)
 {
   notificationErrorLogAlways   = logAlreadyRaisedAlarms;
+  notificationQueueLogAlways   = logAlreadyRaisedAlarms;
   badInputLogAlways            = logAlreadyRaisedAlarms;
   dbErrorLogAlways             = logAlreadyRaisedAlarms;
   mqttConnectionErrorLogAlways = logAlreadyRaisedAlarms;
@@ -243,6 +247,21 @@ void AlarmManager::notificationErrorGet(int64_t* active, int64_t* raised, int64_
   *active    = notificationV.size();
   *raised    = notificationErrors;
   *released  = notificationErrorResets;
+}
+
+
+/* ****************************************************************************
+*
+* AlarmManager::notificationQueueGet -
+*
+* NOTE
+*   To read values, no semaphore is used.
+*/
+void AlarmManager::notificationQueueGet(int64_t* active, int64_t* raised, int64_t* released)
+{
+  *active    = notificationQ.size();
+  *raised    = notificationQueues;
+  *released  = notificationQueueResets;
 }
 
 
@@ -587,6 +606,74 @@ bool AlarmManager::forwardingErrorReset(const std::string& url)
   return true;
 }
 
+
+
+/* ****************************************************************************
+*
+* AlarmManager::notificationQueue -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*/
+bool AlarmManager::notificationQueue(const std::string& service, const std::string& details)
+{
+  semTake();
+
+  std::map<std::string, int>::iterator iter = notificationQ.find(service);
+
+  if (iter != notificationQ.end())
+  {
+    iter->second += 1;
+
+    if (notificationQueueLogAlways)
+    {
+      LM_W(("Repeated NotificationQueue %s: %s", service.c_str(), details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtNotifierQueue, ("Repeated NotificationQueue %s: %s", service.c_str(), details.c_str()));
+    }
+
+    semGive();
+    return false;
+  }
+
+  ++notificationQueues;
+
+  notificationQ[service] = 1;
+  semGive();
+
+  LM_W(("Raising alarm NotificationQueue %s: %s", service.c_str(), details.c_str()));
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::notificationQueuesResets -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*/
+bool AlarmManager::notificationQueueReset(const std::string& service)
+{
+  semTake();
+
+  if (notificationQ.find(service) == notificationQ.end())  // Doesn't exist
+  {
+    semGive();
+    return false;
+  }
+
+  notificationQ.erase(service);
+  ++notificationQueueResets;
+  semGive();
+
+  LM_W(("Releasing alarm NotificationQueue %s", service.c_str()));
+
+  return true;
+}
 
 
 /* ****************************************************************************
