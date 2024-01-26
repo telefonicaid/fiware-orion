@@ -24,4 +24,3 @@
 Flask==2.0.3
 pyOpenSSL==22.0.0
 paho-mqtt==1.5.1
-Werkzeug==2.3.6
