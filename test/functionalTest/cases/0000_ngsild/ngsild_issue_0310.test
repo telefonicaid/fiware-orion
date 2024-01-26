@@ -123,7 +123,7 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:Entity02
 04. Get the Entity from step 3 and make sure the array is intact
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 97
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -133,9 +133,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "type": "T1",
     "urn:ngsi-ld:attrs:P1": {
         "type": "Property",
-        "value": [
-            12
-        ]
+        "value": 12
     }
 }
 
