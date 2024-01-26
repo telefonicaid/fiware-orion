@@ -149,8 +149,9 @@ struct Subject
 *
 * Subscription -
 */
-struct Subscription
+class Subscription
 {
+public:
   std::string   id;
   std::string   description;
   bool          descriptionProvided;
@@ -163,6 +164,10 @@ struct Subscription
   Restriction   restriction;
   std::string   toJson();
   void          release();
+
+  Subscription():
+    attrsFormat(NGSI_V2_NORMALIZED)
+  {}
 
   ~Subscription();
 };
