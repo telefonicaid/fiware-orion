@@ -1782,6 +1782,251 @@ db.getSiblingDB("orion-validation").entities.insertMany([
     },
     {
       "_id": {
+        "id": "Rule16.12",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule16.12: Feature without geometry",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "location": {
+          "value": {
+            "type": "Feature",
+            "properties": {
+              "label": "-3.6127119138731127, 40.53901978067972"
+            }
+          },
+          "type": "geo:json",
+          "creDate": 1706274323.1297336,
+          "modDate": 1706274323.1297336,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706274323.1297336,
+      "modDate": 1706274323.1297336,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Point",
+          "coordinates": [
+            -3.6127119138731127,
+            40.53901978067972
+          ]
+        }
+      },
+      "lastCorrelator": "90b31496-bc4b-11ee-ab64-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule16.13",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule16.13: FeatureCollection without features element",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "location": {
+          "value": {
+            "type": "FeatureCollection"
+          },
+          "type": "geo:json",
+          "creDate": 1706274323.130671,
+          "modDate": 1706274323.130671,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706274323.130671,
+      "modDate": 1706274323.130671,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Point",
+          "coordinates": [
+            -3.6127119138731127,
+            40.53901978067972
+          ]
+        }
+      },
+      "lastCorrelator": "90b31496-bc4b-11ee-ab64-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule16.14",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule16.14: FeatureCollection with 0 Feature",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "location": {
+          "value": {
+            "type": "FeatureCollection",
+            "features": [
+            ]
+          },
+          "type": "geo:json",
+          "creDate": 1706274323.130671,
+          "modDate": 1706274323.130671,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706274323.130671,
+      "modDate": 1706274323.130671,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Point",
+          "coordinates": [
+            -3.6127119138731127,
+            40.53901978067972
+          ]
+        }
+      },
+      "lastCorrelator": "90b31496-bc4b-11ee-ab64-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule16.15",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule16.15: FeatureCollection with more than one Feature",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "location": {
+          "value": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [
+                    -3.6127119138731127,
+                    40.53901978067972
+                  ]
+                }
+              },
+              {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [
+                    -3.6127119138731127,
+                    40.53901978067972
+                  ]
+                }
+              }
+            ]
+          },
+          "type": "geo:json",
+          "creDate": 1706274323.130671,
+          "modDate": 1706274323.130671,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706274323.130671,
+      "modDate": 1706274323.130671,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Point",
+          "coordinates": [
+            -3.6127119138731127,
+            40.53901978067972
+          ]
+        }
+      },
+      "lastCorrelator": "90b31496-bc4b-11ee-ab64-080027cd35f1"
+    },
+    {
+      "_id": {
+        "id": "Rule16.16",
+        "type": "T",
+        "servicePath": "/"
+      },
+      "attrNames": [
+        "desc",
+        "location"
+      ],
+      "attrs": {
+        "desc": {
+          "value": "Rule16.16: FeatureCollection with Feature without geometry",
+          "type": "Text",
+          "creDate": 1705931202.187858,
+          "modDate": 1705931202.187858,
+          "mdNames": []
+        },
+        "location": {
+          "value": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "properties": {}
+              }
+            ]
+          },
+          "type": "geo:json",
+          "creDate": 1706274323.130671,
+          "modDate": 1706274323.130671,
+          "mdNames": []
+        }
+      },
+      "creDate": 1706274323.130671,
+      "modDate": 1706274323.130671,
+      "location": {
+        "attrName": "location",
+        "coords": {
+          "type": "Point",
+          "coordinates": [
+            -3.6127119138731127,
+            40.53901978067972
+          ]
+        }
+      },
+      "lastCorrelator": "90b31496-bc4b-11ee-ab64-080027cd35f1"
+    },
+    {
+      "_id": {
         "id": "Rule17.1",
         "type": "T",
         "servicePath": "/SS"

@@ -52,4 +52,4 @@ class TestEntitiesConsistency(unittest.TestCase):
 
         # connect to MongoDB and process validation DB
         mongo_client = MongoClient('mongodb://localhost:27017')
-        process_db(logger, 'orion-validation', mongo_client, {}, None)
+        process_db(logger, 'orion-validation', mongo_client, False, {}, None)

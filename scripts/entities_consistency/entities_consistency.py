@@ -25,6 +25,7 @@ __author__ = 'fermin'
 
 from pymongo import MongoClient
 from deepdiff import DeepDiff
+from datetime import datetime
 import argparse
 import logging
 import json
@@ -33,6 +34,7 @@ import re
 
 
 # Helper functions
+
 
 def is_geo_type(attr_type):
     """
@@ -52,11 +54,23 @@ def ignore_type(attr):
     return 'md' in attr and 'ignoreType' in attr['md']
 
 
+def is_geo_attr(attr):
+    """
+    Check if a given attr is of geo type, i.e. following conditions are true:
+    * It has a geo type (geo:json, et.c9
+    * It doesn't use the ignoreType metadata
+    * Its value is not null
+    """
+    return is_geo_type(attr['type']) and not ignore_type(attr) and attr['value'] is not None
+
+
 def to_geo_json(attr):
     """
     Return the GeoJSON corresponding to an attribute location, taking into account the type
 
     Useful ref: https://github.com/telefonicaid/fiware-orion/blob/3.9.0/doc/manuals/orion-api.md
+
+    :return: either a dict (containing a GeoJSON) or a string (in the case of error)
     """
 
     if attr['type'] == 'geo:point':
@@ -116,10 +130,29 @@ def to_geo_json(attr):
             'coordinates': [coordinates]
         }
     elif attr['type'] == 'geo:json':
-        return attr['value']
+        # Feature is a special type, see https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/orion-api.md#geojson
+        if attr['value']['type'] == 'Feature':
+            if 'geometry' in attr['value']:
+                return attr['value']['geometry']
+            else:
+                return "geo:json Feature does not have geometry element"
+        # FeatureCollection is a special type, see https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/orion-api.md#geojson
+        if attr['value']['type'] == 'FeatureCollection':
+            if 'features' not in attr['value']:
+                return "geo:json FeatureCollection does not have features element"
+            if len(attr['value']['features']) == 0:
+                return "geo:json FeatureCollection features has no elements"
+            if len(attr['value']['features']) > 1:
+                return "geo:json FeatureCollection features has more than one element"
+            if 'geometry' in attr['value']['features'][0]:
+                return attr['value']['features'][0]['geometry']
+            else:
+                return "geo:json FeatureCollection feature does not have geometry element"
+        else:
+            return attr['value']
+
     else:
-        logger.error(f"unknown geo location type: {attr['type']}")
-        return None
+        return f"unknown geo location type: {attr['type']}"
 
 
 def convert_strings_to_numbers(data):
@@ -351,7 +384,7 @@ def rule16(entity):
     geo_attrs = []
     for attr in entity['attrs']:
         # type existence in attribute is checked by another rule
-        if 'type' in entity['attrs'][attr] and is_geo_type(entity['attrs'][attr]['type']) and not ignore_type(entity['attrs'][attr]):
+        if 'type' in entity['attrs'][attr] and is_geo_attr(entity['attrs'][attr]):
             geo_attrs.append(attr)
 
     if len(geo_attrs) > 1:
@@ -361,31 +394,28 @@ def rule16(entity):
         # If geo attr found, then check that there is consistent location field
         geo_attr = geo_attrs[0]
         geo_type = entity['attrs'][geo_attr]['type']
-        if entity['attrs'][geo_attr]['value'] is None:
-            # if null value in geolocation attribute, then location field must not be present
-            if 'location' in entity:
-                return f"geo location '{geo_attr}' ({geo_type}) with null value and location field found"
-        else:
-            # not null value in geo location attribute case
-            if 'location' not in entity:
-                return f"geo location '{geo_attr}' ({geo_type}) not null but location field not found in entity"
-            if entity['location']['attrName'] != geo_attr:
-                return f"location.attrName ({entity['location']['attrName']}) differs from '{geo_attr}'"
 
-            geo_json = to_geo_json(entity['attrs'][geo_attr])
+        if 'location' not in entity:
+            return f"geo location '{geo_attr}' ({geo_type}) not null but location field not found in entity"
+        if entity['location']['attrName'] != geo_attr:
+            return f"location.attrName ({entity['location']['attrName']}) differs from '{geo_attr}'"
 
-            # https://www.testcult.com/deep-comparison-of-json-in-python/
-            diff = DeepDiff(geo_json, entity['location']['coords'], ignore_order=True)
-            if diff:
-                # A typical difference is that attribute value uses strings and location uses numbers
-                # (this happens when the location was created/updated using NGSIv1). We try to identify that case
-                geo_json = convert_strings_to_numbers(geo_json)
-                if not DeepDiff(geo_json, entity['location']['coords'], ignore_order=True):
-                    return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) is consistent, but value " \
-                           f"should use numbers for coordinates instead of strings"
-                else:
-                    # Other causes
-                    return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) value: {diff}"
+        geo_json = to_geo_json(entity['attrs'][geo_attr])
+        if type(geo_json) == str:
+            return geo_json
+
+        # https://www.testcult.com/deep-comparison-of-json-in-python/
+        diff = DeepDiff(geo_json, entity['location']['coords'], ignore_order=True)
+        if diff:
+            # A typical difference is that attribute value uses strings and location uses numbers
+            # (this happens when the location was created/updated using NGSIv1). We try to identify that case
+            geo_json = convert_strings_to_numbers(geo_json)
+            if not DeepDiff(geo_json, entity['location']['coords'], ignore_order=True):
+                return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) is consistent, but value " \
+                        f"should use numbers for coordinates instead of strings"
+            else:
+                # Other causes
+                return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) value: {diff}"
     else:  # len(geo_attrs) == 0
         # If no geo attr found, check there isn't a location field
         if 'location' in entity:
@@ -628,7 +658,8 @@ def rule92(entity):
             if 'location' in entity['attrs'][attr]['md']:
                 location_value = entity['attrs'][attr]['md']['location']['value']
                 if location_value != 'WGS84' and location_value != 'WSG84':
-                    s.append(f"in attribute '{attr}' location metadata value is {location_value} (should be WGS84 or WSG84)")
+                    s.append(
+                        f"in attribute '{attr}' location metadata value is {location_value} (should be WGS84 or WSG84)")
 
     if len(s) > 0:
         return ', '.join(s)
@@ -773,20 +804,22 @@ rules = [
 ]
 
 
-def process_db(logger, db_name, db_conn, query, rules_exp):
+def process_db(logger, db_name, db_conn, include_entity_date, query, rules_exp):
     """
     Process an individual DB
 
     :param logger: logger object
     :param db_name: the name of the DB to process
     :param db_conn: connection to MongoDB
+    :param include_entity_date: if True, include entity modification date in log traces
     :param query: query to filter entities to be processed
     :param rules_exp: regular expression to filter rules to apply
     :return: fails
     """
 
-    logger.info(f'Processing {db_name}')
+    logger.info(f'processing {db_name}')
     n = 0
+    failed_entities = 0
     fails = 0
 
     # check collection existence
@@ -808,7 +841,15 @@ def process_db(logger, db_name, db_conn, query, rules_exp):
     # apply per-entity rules
     for entity in db_conn[db_name]['entities'].find(query):
         n += 1
+        entity_fail = False
+
         id_string = json.dumps(entity['_id'])
+        if include_entity_date:
+            if 'modDate' in entity:
+                id_string = f"({datetime.fromtimestamp(entity['modDate']).strftime('%Y-%m-%dT%H:%M:%SZ')}) {id_string}"
+            else:
+                id_string = f"(<no date>)) {id_string}"
+
         logger.debug(f'* processing entity {id_string}')
         for rule in rules:
             if rules_exp is not None and not re.search(rules_exp, rule['label']):
@@ -818,9 +859,17 @@ def process_db(logger, db_name, db_conn, query, rules_exp):
                 s = rule['func'](entity)
                 if s is not None:
                     logger.warning(f'DB {db_name} {rule["label"]} violation for entity {id_string}: {s}')
+                    entity_fail = True
                     fails += 1
 
-    logger.info(f'processed {n} entities ({fails} rule violations)')
+        if entity_fail:
+            failed_entities += 1
+
+    if n > 0:
+        logger.info(
+            f'processed {db_name}: {failed_entities}/{n} ({round(failed_entities / n * 100, 2)}%) failed entities with {fails} rule violations')
+    else:
+        logger.warning(f'{db_name} has 0 entities (maybe it should be cleaned up?)')
 
     return fails
 
@@ -834,10 +883,12 @@ if __name__ == '__main__':
                         help='MongoDB URI. Default is mongodb://localhost:27017')
     parser.add_argument('--db', dest='db',
                         help='DB name to check. If omitted all DBs starting with "orion" will be checked.')
+    parser.add_argument('--include-entities-date', dest='include_entities_date', default=False, action='store_true',
+                        help='include entity modification time in log traces')
     parser.add_argument('--query', dest='query', default='{}',
                         help='query to filter entities to check, in JSON MongoDB query language. By default, '
                              'all entities in the collection will be checked.')
-    parser.add_argument('--rulesExp', dest='rules_exp',
+    parser.add_argument('--rules-exp', dest='rules_exp',
                         help='Specifies the rules to apply, as a regular expression. By default all rules are applied.')
     parser.add_argument('--logLevel', dest='log_level', choices=['DEBUG', 'INFO', 'WARN', 'ERROR'], default='INFO',
                         help='log level. Default is INFO')
@@ -863,7 +914,7 @@ if __name__ == '__main__':
     fails = 0
     if args.db is not None:
         if args.db in db_names:
-            fails += process_db(logger, args.db, mongo_client, query, args.rules_exp)
+            fails += process_db(logger, args.db, mongo_client, args.include_entities_date, query, args.rules_exp)
         else:
             logger.fatal(f'database {args.db} does not exist')
             sys.exit(1)
@@ -871,6 +922,6 @@ if __name__ == '__main__':
         # Process all Orion databases
         for db_name in db_names:
             if db_name.startswith('orion-'):
-                fails += process_db(logger, db_name, mongo_client, query, args.rules_exp)
+                fails += process_db(logger, db_name, mongo_client, args.include_entities_date, query, args.rules_exp)
 
     logger.info(f'total rule violations: {fails}')
