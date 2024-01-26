@@ -27,6 +27,7 @@
 
 extern "C"
 {
+#include "kbase/kMacros.h"                                       // K_FT
 #include "kalloc/kaStrdup.h"                                     // kaStrdup
 #include "kjson/KjNode.h"                                        // KjNode
 #include "kjson/kjLookup.h"                                      // kjLookup
@@ -107,6 +108,33 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
 
 // -----------------------------------------------------------------------------
 //
+// arrayReduce -
+//
+static void arrayReduce(KjNode* valueP)
+{
+  if (valueP->type != KjArray)
+    return;
+
+  if (valueP->value.firstChildP == NULL)
+    return;
+
+  if (valueP->value.firstChildP->next != NULL)
+    return;
+
+  // It's an array with one single item
+  KjNode* itemP = valueP->value.firstChildP;
+
+  valueP->type      = itemP->type;
+  valueP->value     = itemP->value;
+  valueP->lastChild = itemP->lastChild;
+
+  LM_T(LmtArrayReduction, ("Reduced an array of one single item to a JSON %s", kjValueType(valueP->type)));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // pCheckTypeFromContext -
 //
 static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContextInfoP)
@@ -166,24 +194,37 @@ static bool pCheckTypeFromContext(KjNode* attrP, OrionldContextItem* attrContext
       }
     }
     else if (strcmp(attrContextInfoP->type, "@set") == 0)
+    {
+      LM_T(LmtArrayReduction, ("the type for '%s' in the @context is '@set' - arrayReduction is set to FALSE", attrP->name));
       arrayReduction = false;
+    }
     else if (strcmp(attrContextInfoP->type, "@list") == 0)
+    {
+      LM_T(LmtArrayReduction, ("the type for '%s' in the @context is '@list' - arrayReduction is set to FALSE", attrP->name));
       arrayReduction = false;
+    }
   }
 
   //
   // Array Reduction
   //
+  LM_T(LmtArrayReduction, ("Attribute: '%s' - arrayReduction: %s, type '%s'", attrP->name, K_FT(arrayReduction), kjValueType(attrP->type)));
+
   if ((attrP->type == KjArray) && (arrayReduction == true))
   {
+    LM_T(LmtArrayReduction, ("The value of '%s' is an array and arrayReduction is ON", attrP->name));
     if ((attrP->value.firstChildP != NULL) && (attrP->value.firstChildP->next == NULL))
     {
+      LM_T(LmtArrayReduction, ("'%s' is an array of one single element => arrayReduction is PERFORMED", attrP->name));
+
       KjNode* arrayItemP = attrP->value.firstChildP;
 
       attrP->type      = arrayItemP->type;
       attrP->value     = arrayItemP->value;
       attrP->lastChild = arrayItemP->lastChild;  // Might be an array or object inside the array ...
     }
+    else
+      LM_T(LmtArrayReduction, ("'%s' is an array of zero od +1 elements => arrayReduction is NOT performed", attrP->name));
   }
 
   return true;
@@ -336,7 +377,7 @@ inline bool pCheckAttributeArray
   valueP->lastChild         = attrP->lastChild;
 
   pCheckAttributeTransform(attrP, "Property", valueP);
-
+  arrayReduce(valueP);
   return true;
 }
 
@@ -1022,14 +1063,23 @@ static bool pCheckAttributeObject
       if (isGeoJsonValue(valueP) == true)
         attributeType = GeoProperty;
       else
+      {
         attributeType = Property;
+        arrayReduce(valueP);
+      }
     }
     else if (objectP != NULL)
+    {
       attributeType = Relationship;
+      arrayReduce(objectP);
+    }
     else if (languageMapP != NULL)
       attributeType = LanguageProperty;
     else if (vocabP != NULL)
+    {
       attributeType = VocabularyProperty;
+      arrayReduce(vocabP);
+    }
     else
     {
       // If new attribute and no value field at all - error

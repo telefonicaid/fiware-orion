@@ -1,6 +1,7 @@
-Fixed Issue:
-  * #1535  No matching with 'q' when matching subscriptions for deletion of an entity
+## Fixed Issues:
+  * #1535:  No matching with 'q' when matching subscriptions for deletion of an entity
+  * #1542:  Array Reduction (arrays of one single element are "flattened" to that very element) 
 
-New Features:
+## New Features:
   * Support for VocabularyProperty
   * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)

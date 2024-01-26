@@ -35,16 +35,20 @@ accumulatorStart --pretty-print
 # 01. Create a subscription on entity type T
 # 02. Create an entity urn:E1, type T, with a VocabularyProperty V1: "abc"
 # 03. Create an entity urn:E2, type T, with a VocabularyProperty V2: [ "vocab", "id" ]
-# 04. GET urn:E1 to see V1
-# 04b. See urn:E1 in the DB - see "abc" expanded
-# 05. GET urn:E2 to see V2
-# 05b. See urn:E2 in the DB - see [ "vocab", "id" ] expanded
-# 06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
+# 04. Create an entity urn:E3, type T, with a VocabularyProperty V3: [ "test" ] - array of one item - flattened to String
+# 05. GET urn:E1 to see V1
+# 05b. See urn:E1 in the DB - see "abc" expanded
+# 06. GET urn:E2 to see V2
+# 06b. See urn:E2 in the DB - see [ "vocab", "id" ] expanded
+# 07. GET urn:E3 to see V3 - see V3 as a string
+# 07b. See urn:E3 in the DB - see "test" expanded and V3 as a string, not an array
 #
-# 07. GET urn:E2 in simplified format
-# 08. Query entities with q=V1==abc => see nothing
-# 09. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1
-# 10. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2
+# 08. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
+#
+# 09. GET urn:E2 in simplified format
+# 10. Query entities with q=V1==abc => see nothing
+# 11. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1
+# 12. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2
 #
 
 echo '01. Create a subscription on entity type T'
@@ -93,35 +97,61 @@ echo
 echo
 
 
-echo '04. GET urn:E1 to see V1'
+echo '04. Create an entity urn:E3, type T, with a VocabularyProperty V3: [ "test" ] - array of one item - flattened to String'
+echo '======================================================================================================================='
+payload='{
+  "id": "urn:E3",
+  "type": "T",
+  "V2": { "vocab": [ "test" ] }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '05. GET urn:E1 to see V1'
 echo '========================'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1
 echo
 echo
 
 
-echo '04b. See urn:E1 in the DB - see "abc" expanded'
+echo '05b. See urn:E1 in the DB - see "abc" expanded'
 echo '=============================================='
 mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:E1"})'
 echo
 echo
 
 
-echo '05. GET urn:E2 to see V2'
+echo '06. GET urn:E2 to see V2'
 echo '========================'
 orionCurl --url /ngsi-ld/v1/entities/urn:E2
 echo
 echo
 
 
-echo '05b. See urn:E2 in the DB - see [ "vocab", "id" ] expanded'
+echo '06b. See urn:E2 in the DB - see [ "vocab", "id" ] expanded'
 echo '=========================================================='
 mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:E2"})'
 echo
 echo
 
 
-echo "06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2"
+echo '07. GET urn:E3 to see V3 - see V3 as a string'
+echo '============================================='
+orionCurl --url /ngsi-ld/v1/entities/urn:E3
+echo
+echo
+
+
+echo '07b. See urn:E3 in the DB - see "test" expanded and V3 as a string, not an array'
+echo '================================================================================'
+mongoCmd2 ftest 'db.entities.findOne({"_id.id": "urn:E3"})'
+echo
+echo
+
+
+echo "08. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2"
 echo "======================================================="
 sleep .2
 accumulatorDump
@@ -130,28 +160,28 @@ echo
 echo
 
 
-echo "07. GET urn:E2 in simplified format"
+echo "09. GET urn:E2 in simplified format"
 echo "==================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:E2?options=simplified
 echo
 echo
 
 
-echo "08. Query entities with q=V1==abc => see nothing"
+echo "10. Query entities with q=V1==abc => see nothing"
 echo "================================================"
 orionCurl --url /ngsi-ld/v1/entities?q=V1==%22abc%22
 echo
 echo
 
 
-echo "09. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1"
+echo "11. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1"
 echo "=================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?q=V1==%22abc%22&expandValues=V1,V2'
 echo
 echo
 
 
-echo "10. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2"
+echo "12. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2"
 echo "================================================================="
 orionCurl --url '/ngsi-ld/v1/entities?q=V2==%22id%22&expandValues=V1,V2'
 echo
@@ -186,7 +216,16 @@ Location: /ngsi-ld/v1/entities/urn:E2
 
 
 
-04. GET urn:E1 to see V1
+04. Create an entity urn:E3, type T, with a VocabularyProperty V3: [ "test" ] - array of one item - flattened to String
+=======================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+05. GET urn:E1 to see V1
 ========================
 HTTP/1.1 200 OK
 Content-Length: 75
@@ -204,7 +243,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 }
 
 
-04b. See urn:E1 in the DB - see "abc" expanded
+05b. See urn:E1 in the DB - see "abc" expanded
 ==============================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
@@ -234,7 +273,7 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-05. GET urn:E2 to see V2
+06. GET urn:E2 to see V2
 ========================
 HTTP/1.1 200 OK
 Content-Length: 84
@@ -255,7 +294,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 }
 
 
-05b. See urn:E2 in the DB - see [ "vocab", "id" ] expanded
+06b. See urn:E2 in the DB - see [ "vocab", "id" ] expanded
 ==========================================================
 MongoDB shell version REGEX(.*)
 connecting to: REGEX(.*)
@@ -288,7 +327,55 @@ MongoDB server version: REGEX(.*)
 bye
 
 
-06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
+07. GET urn:E3 to see V3 - see V3 as a string
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 76
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "V2": {
+        "type": "VocabularyProperty",
+        "vocab": "test"
+    },
+    "id": "urn:E3",
+    "type": "T"
+}
+
+
+07b. See urn:E3 in the DB - see "test" expanded and V3 as a string, not an array
+================================================================================
+MongoDB shell version v4.4.28
+connecting to: mongodb://localhost:27017/ftest?compressors=disabled&gssapiServiceName=mongodb
+MongoDB server version: 4.4.22
+{
+	"_id" : {
+		"id" : "urn:E3",
+		"type" : "https://uri.etsi.org/ngsi-ld/default-context/T",
+		"servicePath" : "/"
+	},
+	"attrNames" : [
+		"https://uri.etsi.org/ngsi-ld/default-context/V2"
+	],
+	"attrs" : {
+		"https://uri=etsi=org/ngsi-ld/default-context/V2" : {
+			"type" : "VocabularyProperty",
+			"creDate" : REGEX(.*),
+			"modDate" : REGEX(.*),
+			"value" : "https://uri.etsi.org/ngsi-ld/default-context/test",
+			"mdNames" : [ ]
+		}
+	},
+	"creDate" : REGEX(.*),
+	"modDate" : REGEX(.*),
+	"lastCorrelator" : ""
+}
+bye
+
+
+08. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
 =======================================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
 Content-Length: 256
@@ -345,9 +432,35 @@ Ngsild-Attribute-Format: Normalized
     "type": "Notification"
 }
 =======================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 257
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "V2": {
+                "type": "VocabularyProperty",
+                "vocab": "test"
+            },
+            "id": "urn:E3",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
 
 
-07. GET urn:E2 in simplified format
+09. GET urn:E2 in simplified format
 ===================================
 HTTP/1.1 200 OK
 Content-Length: 56
@@ -367,7 +480,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 }
 
 
-08. Query entities with q=V1==abc => see nothing
+10. Query entities with q=V1==abc => see nothing
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 2
@@ -377,7 +490,7 @@ Date: REGEX(.*)
 []
 
 
-09. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1
+11. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1
 ==================================================================
 HTTP/1.1 200 OK
 Content-Length: 77
@@ -397,7 +510,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 ]
 
 
-10. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2
+12. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2
 =================================================================
 HTTP/1.1 200 OK
 Content-Length: 86

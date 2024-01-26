@@ -95,7 +95,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 02. GET 'urn:E1'
 ================
 HTTP/1.1 200 OK
-Content-Length: 97
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -103,9 +103,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 {
     "id": "urn:E1",
     "occupier": {
-        "object": [
-            "urn:ngsi-ld:Person:You"
-        ],
+        "object": "urn:ngsi-ld:Person:You",
         "type": "Relationship"
     },
     "type": "T"
