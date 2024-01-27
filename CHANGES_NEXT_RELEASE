@@ -5,3 +5,4 @@
 ## New Features:
   * Support for VocabularyProperty
   * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)
+  * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language

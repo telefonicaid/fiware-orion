@@ -90,8 +90,7 @@ void pgAttributeAppend
   bool             subProperties,
   char*            unitCode,      // Can be NULL
   char*            datasetId,     // Can be NULL
-  KjNode*          valueNodeP,
-  char*            object
+  KjNode*          valueNodeP
 )
 {
   char        localBuf[2 * 1024];
@@ -116,8 +115,28 @@ void pgAttributeAppend
   }
   else if (strcmp(type, "Relationship") == 0)
   {
-    snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Relationship', '%s', null, null, null, null, null, null, null, null, null, null, '%s')",
-             comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, object, orionldState.requestTimeString);
+    if (valueNodeP->type == KjString)
+    {
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'Relationship', '%s', null, null, null, null, null, null, null, null, null, null, '%s')",
+               comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, valueNodeP->value.s, orionldState.requestTimeString);
+    }
+#if 0
+    else
+    {
+      //
+      // FIXME: Right now, we can't enter here. See 'skip' variable in pgAttributeBuild()
+      //
+
+      // WARNING: If an attribute is HUGE, it may not have room enough in a buffer allocated by kaAlloc (there's a max-size)
+      int          renderedValueSize   = kjFastRenderSize(valueNodeP);
+      char*        renderedValue       = kaAlloc(&orionldState.kalloc, renderedValueSize);
+
+      kjFastRender(valueNodeP, renderedValue);
+
+      snprintf(buf, bufSize, "%s('%s', '%s', '%s', '%s', %s, %s, %s, '%s', 'RelationshipArray', null, null, null, null, '%s', null, null, null, null, null, null, '%s')",
+               comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, renderedValue, orionldState.requestTimeString);
+    }
+#endif
   }
   else if (strcmp(type, "GeoProperty") == 0)
   {
