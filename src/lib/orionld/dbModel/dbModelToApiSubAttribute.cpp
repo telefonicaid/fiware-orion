@@ -85,6 +85,7 @@ void dbModelToApiSubAttribute(KjNode* dbSubAttrP)
     if      (strcmp(typeP->value.s, "Relationship")       == 0) valueP->name = (char*) "object";
     else if (strcmp(typeP->value.s, "LanguageProperty")   == 0) valueP->name = (char*) "languageMap";
     else if (strcmp(typeP->value.s, "VocabularyProperty") == 0) valueP->name = (char*) "vocab";
+    else if (strcmp(typeP->value.s, "JsonProperty")       == 0) valueP->name = (char*) "json";
   }
 }
 
@@ -144,6 +145,7 @@ KjNode* dbModelToApiSubAttribute2(KjNode* dbSubAttributeP, bool sysAttrs, Orionl
       if      (subAttrType == Relationship)        nodeP->name = (char*) "object";
       else if (subAttrType == LanguageProperty)    nodeP->name = (char*) "languageMap";
       else if (subAttrType == VocabularyProperty)  nodeP->name = (char*) "vocab";
+      else if (subAttrType == JsonProperty)        nodeP->name = (char*) "json";
 
       kjChildAdd(subAttrP, nodeP);
     }
