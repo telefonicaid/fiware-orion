@@ -1167,7 +1167,10 @@ static bool pCheckAttributeObject
       arrayReduce(vocabP);
     }
     else if (jsonP != NULL)
+    {
       attributeType = JsonProperty;
+      arrayReduce(jsonP);
+    }
     else
     {
       // If new attribute and no value field at all - error

@@ -36,15 +36,10 @@ accumulatorStart --pretty-print
 # 02. Create an entity urn:E1, type T, with a JsonProperty V1: "abc"
 # 03. Create an entity urn:E2, type T, with a JsonProperty V2: [ "vocab", "id" ]
 # 04. GET urn:E1 to see V1
-# 04b. See urn:E1 in the DB - see "abc" expanded
 # 05. GET urn:E2 to see V2
-# 05b. See urn:E2 in the DB - see [ "vocab", "id" ] expanded
 # 06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
 #
 # 07. GET urn:E2 in simplified format
-# 08. Query entities with q=V1==abc => see nothing
-# 09. Query entities with q=V1==abc&expandValues=V1,V2 => see urn:E1
-# 10. Query entities with q=V2==id&expandValues=V1,V2 => see urn:E2
 #
 
 echo '01. Create a subscription on entity type T'
@@ -92,6 +87,9 @@ payload='{
   "V2": {
     "json": [ "json", "id" ],
     "type": "JsonProperty"    
+  },
+  "V3": {
+    "json": [ "json" ]
   }
 }'
 orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
@@ -178,7 +176,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 05. GET urn:E2 to see V2
 ========================
 HTTP/1.1 200 OK
-Content-Length: 76
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -191,6 +189,10 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "type": "JsonProperty"
     },
+    "V3": {
+        "json": "json",
+        "type": "JsonProperty"
+    },    
     "id": "urn:E2",
     "type": "T"
 }
@@ -225,7 +227,7 @@ Ngsild-Attribute-Format: Normalized
 }
 =======================================
 POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
-Content-Length: 257
+Content-Length: 300
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
 Accept: application/json
@@ -243,6 +245,10 @@ Ngsild-Attribute-Format: Normalized
                 ],
                 "type": "JsonProperty"
             },
+            "V3": {
+                "json": "json",
+                "type": "JsonProperty"
+            },
             "id": "urn:E2",
             "type": "T"
         }
@@ -258,7 +264,7 @@ Ngsild-Attribute-Format: Normalized
 07. GET urn:E2 in simplified format
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 54
+Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -269,6 +275,9 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
             "json",
             "id"
         ]
+    },
+    "V3": {
+        "json": "json"
     },
     "id": "urn:E2",
     "type": "T"
