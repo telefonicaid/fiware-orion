@@ -81,7 +81,7 @@ bool troePatchEntity(void)
         {
           char instanceId[80];
           uuidGenerate(instanceId, sizeof(instanceId), "urn:ngsi-ld:attribute:instance:");
-          pgAttributeAppend(&attributesBuffer, instanceId, attrName, "Delete", entityId, NULL, NULL, true, NULL, NULL, NULL, NULL);
+          pgAttributeAppend(&attributesBuffer, instanceId, attrName, "Delete", entityId, NULL, NULL, true, NULL, NULL, NULL);
         }
         else
         {

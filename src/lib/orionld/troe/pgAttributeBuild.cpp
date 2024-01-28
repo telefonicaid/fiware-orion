@@ -63,7 +63,6 @@ bool pgAttributeBuild
   bool    subProperties = false;
   char*   unitCode      = NULL;
   char*   datasetId     = NULL;
-  char*   object        = NULL;  // Only for relationships
   KjNode* valueNodeP    = NULL;
   KjNode* subAttrV      = kjArray(orionldState.kjsonP, NULL);
 
@@ -73,18 +72,28 @@ bool pgAttributeBuild
   KjNode* nodeP = attributeNodeP->value.firstChildP;
   KjNode* next;
 
+  char* skip = NULL;
+
   while (nodeP != NULL)
   {
     next = nodeP->next;
 
-    if      (strcmp(nodeP->name, "observedAt") == 0)  observedAt = pgObservedAtExtract(nodeP);
-    else if (strcmp(nodeP->name, "unitCode")   == 0)  unitCode   = nodeP->value.s;
-    else if (strcmp(nodeP->name, "type")       == 0)  type       = nodeP->value.s;
-    else if (strcmp(nodeP->name, "datasetId")  == 0)  datasetId  = nodeP->value.s;
-    else if (strcmp(nodeP->name, "value")      == 0)  valueNodeP = nodeP;
-    else if (strcmp(nodeP->name, "object")     == 0)  object     = nodeP->value.s;
-    else if (strcmp(nodeP->name, "createdAt")  == 0)  {}  // Skipping
-    else if (strcmp(nodeP->name, "modifiedAt") == 0)  {}  // Skipping
+    if      (strcmp(nodeP->name, "observedAt")  == 0)  observedAt = pgObservedAtExtract(nodeP);
+    else if (strcmp(nodeP->name, "unitCode")    == 0)  unitCode   = nodeP->value.s;
+    else if (strcmp(nodeP->name, "type")        == 0)  type       = nodeP->value.s;
+    else if (strcmp(nodeP->name, "datasetId")   == 0)  datasetId  = nodeP->value.s;
+    else if (strcmp(nodeP->name, "value")       == 0)  valueNodeP = nodeP;
+    else if (strcmp(nodeP->name, "object")      == 0)
+    {
+      if (nodeP->type == KjString)
+        valueNodeP = nodeP;
+      else
+        skip = (char*) "RelationshipArray";
+    }
+    else if (strcmp(nodeP->name, "languageMap") == 0)  skip = (char*) "LanguageProperty";
+    else if (strcmp(nodeP->name, "vocab")       == 0)  skip = (char*) "VocabularyProperty";
+    else if (strcmp(nodeP->name, "createdAt")   == 0)  {}  // skip = (char*) "BuiltinTimestamp";
+    else if (strcmp(nodeP->name, "modifiedAt")  == 0)  {}  // skip = (char*) "BuiltinTimestamp";
     else if (strcmp(nodeP->name, "https://uri.etsi.org/ngsi-ld/createdAt")  == 0)  {}  // Skipping
     else if (strcmp(nodeP->name, "https://uri.etsi.org/ngsi-ld/modifiedAt") == 0)  {}  // Skipping
     else
@@ -97,7 +106,13 @@ bool pgAttributeBuild
     nodeP = next;
   }
 
-  pgAttributeAppend(attributesBuffer, instanceId, attributeNodeP->name, opMode, entityId, type, observedAt, subProperties, unitCode, datasetId, valueNodeP, object);
+  if (skip != NULL)
+  {
+    LM_W(("Sorry, attributes of type '%s' are not stored in the Temporal database right now (to be implemented)", skip));
+    return true;
+  }
+
+  pgAttributeAppend(attributesBuffer, instanceId, attributeNodeP->name, opMode, entityId, type, observedAt, subProperties, unitCode, datasetId, valueNodeP);
 
   // Now that all the attribute data is gathered, we can serve the sub-attrs
   for (nodeP = subAttrV->value.firstChildP; nodeP != NULL; nodeP = nodeP->next)
