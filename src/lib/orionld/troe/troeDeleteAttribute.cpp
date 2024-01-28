@@ -68,7 +68,7 @@ bool troeDeleteAttribute(void)
   pgAppend(&attributesBuffer, PG_ATTRIBUTE_INSERT_START, 0);
 
   if (orionldState.uriParams.datasetId != NULL)
-    pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL, NULL);
+    pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL);
   else if (orionldState.uriParams.deleteAll == true)
   {
     if (orionldState.dbAttrWithDatasetsP == NULL)
@@ -81,7 +81,7 @@ bool troeDeleteAttribute(void)
       {
         KjNode* defaultInstanceP = kjLookup(attrsP, attributeNameEq);
         if (defaultInstanceP != NULL)
-          pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL, NULL);
+          pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, orionldState.uriParams.datasetId, NULL);
       }
 
       KjNode* datasetsP = kjLookup(orionldState.dbAttrWithDatasetsP, "@datasets");
@@ -97,14 +97,14 @@ bool troeDeleteAttribute(void)
             KjNode* datasetIdNodeP = kjLookup(aP, "datasetId");
 
             if (datasetIdNodeP != NULL)
-              pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, datasetIdNodeP->value.s, NULL, NULL);
+              pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, datasetIdNodeP->value.s, NULL);
           }
         }
       }
     }
   }
   else
-    pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, NULL, NULL, NULL);
+    pgAttributeAppend(&attributesBuffer, instanceId, attributeName, "Delete", entityId, (char*) "NULL", NULL, false, NULL, NULL, NULL);
 
   if (attributesBuffer.values > 0)
   {

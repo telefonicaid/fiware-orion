@@ -1,7 +1,12 @@
-Fixed Issue:
-  * #1535  No matching with 'q' when matching subscriptions for deletion of an entity
+## Fixed Issues:
+  * #1535:  No matching with 'q' when matching subscriptions for deletion of an entity
+  * #1542:  Array Reduction (arrays of one single element are "flattened" to that very element) 
 
-New Features:
+## New Features:
   * Support for VocabularyProperty
   * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)
   * Support for JsonProperty attribute type
+  * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language
+
+## Notes
+  * TRoE is still not prepared for attributes of type Vocab/Json/Language, so, attributes of those types are not stored in the historical database

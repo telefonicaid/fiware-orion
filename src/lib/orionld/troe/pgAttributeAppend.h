@@ -50,8 +50,7 @@ extern void pgAttributeAppend
   bool             subProperties,
   char*            unitCode,      // Can be NULL
   char*            datasetId,     // Can be NULL
-  KjNode*          valueNodeP,
-  char*            object
+  KjNode*          valueNodeP
 );
 
 #endif  // SRC_LIB_ORIONLD_TROE_PGATTRIBUTEAPPEND_H_
