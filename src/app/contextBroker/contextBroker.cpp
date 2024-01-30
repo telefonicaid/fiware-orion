@@ -309,8 +309,8 @@ PaArgument paArgs[] =
   { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,                  DBDISABLERETRYWRITES_DESC    },
 
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,                  DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,              DB_TMO_DESC                  },
-  { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,                 DBPS_DESC                    },
+  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, -1,                              -1,    UINT_MAX,              DB_TMO_DESC                  },
+  { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                               1,    10000,                 DBPS_DESC                    },
 
   { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV4_DESC                 },
   { "-ipv6",                        &useOnlyIPv6,           "USEIPV6",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV6_DESC                 },
