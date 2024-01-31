@@ -204,6 +204,7 @@ SET (ORION_LIBS
     common
     alarmMgr
     metricsMgr
+    jexl
     logSummary
     lm
     pa
@@ -245,6 +246,7 @@ SET (DYNAMIC_LIBS
     uuid
     crypto
     sasl2
+    python3.11
 )
 
 #
@@ -263,6 +265,7 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
+include_directories("/usr/include/python3.11/")
 
 
 # Needed for the new C driver
@@ -319,6 +322,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)
+  ADD_SUBDIRECTORY(src/lib/jexl)
   ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/lib/mqtt)
   ADD_SUBDIRECTORY(src/app/contextBroker)
