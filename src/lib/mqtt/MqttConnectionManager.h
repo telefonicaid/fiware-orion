@@ -64,7 +64,7 @@ class MqttConnectionManager
  public:
   MqttConnectionManager();
 
-  int  init(long _timeout);
+  void init(long _timeout);
   void teardown(void);
 
   const char*  semGet(void);
@@ -74,7 +74,7 @@ class MqttConnectionManager
 
  private:
   void disconnect(struct mosquitto*  mosq, const std::string& endpoint);
-  int  semInit(void);
+  void semInit(void);
   void semTake(void);
   void semGive(void);
 
