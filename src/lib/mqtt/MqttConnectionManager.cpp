@@ -105,7 +105,7 @@ MqttConnectionManager::MqttConnectionManager(void)
 *
 * MqttConnectionManager::init -
 */
-int MqttConnectionManager::init(long _timeout)
+void MqttConnectionManager::init(long _timeout)
 {
   LM_T(LmtMqttNotif, ("Initializing MQTT library"));
   mosquitto_lib_init();
@@ -119,7 +119,7 @@ int MqttConnectionManager::init(long _timeout)
     timeout = DEFAULT_TIMEOUT;
   }
 
-  return semInit();
+  semInit();
 }
 
 
@@ -152,15 +152,12 @@ void MqttConnectionManager::teardown(void)
 *
 * MqttConnectionManager::semInit -
 */
-int MqttConnectionManager::semInit(void)
+void MqttConnectionManager::semInit(void)
 {
   if (sem_init(&sem, 0, 1) == -1)
   {
-    LM_E(("Runtime Error (error initializing 'mqtt connection mgr' semaphore: %s)", strerror(errno)));
-    return -1;
+    LM_X(1, ("Fatal Error (error initializing 'mqtt connection mgr' semaphore: %s)", strerror(errno)));
   }
-
-  return 0;
 }
 
 

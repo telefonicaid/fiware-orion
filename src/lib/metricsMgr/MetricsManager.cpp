@@ -103,18 +103,15 @@ bool MetricsManager::subServiceValid(const std::string& subsrv)
 *   It's only one sys-call, and this way, the broker is prepared to receive 'on/off'
 *   via REST.
 */
-bool MetricsManager::init(bool _on, bool _semWaitStatistics)
+void MetricsManager::init(bool _on, bool _semWaitStatistics)
 {
   on                 = _on;
   semWaitStatistics  = _semWaitStatistics;
 
   if (sem_init(&sem, 0, 1) == -1)
   {
-    LM_E(("Runtime Error (error initializing 'metrics mgr' semaphore: %s)", strerror(errno)));
-    return false;
+    LM_X(1, ("Fatal Error (error initializing 'metrics mgr' semaphore: %s)", strerror(errno)));
   }
-
-  return true;
 }
 
 
