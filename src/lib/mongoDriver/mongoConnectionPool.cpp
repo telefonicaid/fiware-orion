@@ -402,18 +402,20 @@ static std::string composeMongoUri
     // Check if timeout is not zero (which means it's either unset or explicitly set to a positive value)
     if (timeout != 0)
     {
-        // If timeout is negative (e.g., -1 indicating it's unset), set it to the default value of 10000
-        if (timeout < 0)
-        {
-            timeout = 10000;
-        }
-
-        char buf[STRING_SIZE_FOR_LONG];
+      char buf[STRING_SIZE_FOR_LONG];
+      // If timeout is negative (e.g., -1 indicating it's unset), set it to the default value of 10000
+      if (timeout < 0)
+      {
+        i2s(10000, buf, sizeof(buf));
+      }
+      else
+      {
         i2s(timeout, buf, sizeof(buf));
-        uri += optionPrefix + "connectTimeoutMS=" + buf;
-        optionPrefix = "&";
+      }
+      uri += optionPrefix + "connectTimeoutMS=" + buf;
+      optionPrefix = "&";
     }
-
+  }
   LM_T(LmtMongo, ("MongoDB connection URI: '%s'", offuscatePassword(uri, passwd).c_str()));
 
   return uri;
