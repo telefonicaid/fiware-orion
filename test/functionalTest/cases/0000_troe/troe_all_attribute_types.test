@@ -92,6 +92,7 @@ opmode,id,valuetype,entityid,subproperties,unitcode,datasetid,text,number,boolea
 Create,https://uri.etsi.org/ngsi-ld/default-context/property,Number,urn:ngsi-ld:entities:E1,f,,None,,12,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/geop,GeoPoint,urn:ngsi-ld:entities:E1,f,,None,,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/relationship,Relationship,urn:ngsi-ld:entities:E1,f,,None,urn:E1,,,,202REGEX(.*)
+Create,https://uri.etsi.org/ngsi-ld/default-context/json1,String,urn:ngsi-ld:entities:E1,f,,None,abc,,,,202REGEX(.*)
 Create,https://uri.etsi.org/ngsi-ld/default-context/json2,Number,urn:ngsi-ld:entities:E1,f,,None,,134,,,202REGEX(.*)
 
 
