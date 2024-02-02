@@ -471,7 +471,16 @@ static MHD_Result orionldHttpHeaderReceive(void* cbDataP, MHD_ValueKind kind, co
   else if (strcasecmp(key, "X-Auth-Token")       == 0) orionldState.in.xAuthToken       = (char*) value;
   else if (strcasecmp(key, "Authorization")      == 0) orionldState.in.authorization    = (char*) value;
   else if (strcasecmp(key, "Fiware-Correlator")  == 0) orionldState.correlator          = (char*) value;
-  else if (strcasecmp(key, "Content-Length")     == 0) orionldState.in.contentLength    = atoi(value);
+  else if (strcasecmp(key, "Content-Length")     == 0)
+  {
+    orionldState.in.contentLength = atoi(value);
+    if ((unsigned long long) orionldState.in.contentLength > inReqPayloadMaxSize)
+    {
+      char detail[256];
+      snprintf(detail, sizeof(detail), "payload size: %u, max size supported: %llu", orionldState.in.contentLength, inReqPayloadMaxSize);
+      orionldError(OrionldBadRequestData, "Request Entity too large", detail, 413);
+    }
+  }
   else if (strcasecmp(key, "Prefer")             == 0) orionldState.preferHeader        = (char*) value;
   else if (strcasecmp(key, "Origin")             == 0) orionldState.in.origin           = (char*) value;
   else if (strcasecmp(key, "Host")               == 0) orionldState.in.host             = (char*) value;

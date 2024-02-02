@@ -246,7 +246,7 @@ static bool payloadParseAndExtractSpecialFields(bool* contextToBeCashedP)
   //
   if (orionldState.requestTree == NULL)
   {
-    orionldError(OrionldInvalidRequest, "JSON Parse Error", orionldState.kjsonP->errorString, 400);
+    orionldError(OrionldInvalidRequest, "JSON Parse Error", "Invalid JSON payload", 400);
     return false;
   }
 
