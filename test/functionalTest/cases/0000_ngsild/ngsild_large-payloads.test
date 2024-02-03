@@ -1,0 +1,145 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Large requests - starting the broker to accept requetsts of up to 4Mb (more or less)
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -inReqPayloadMaxSize 4000000 -experimental
+
+--SHELL--
+#
+# Creating a file of ~5 MB.
+# The default max size of a request is 1 MB but the broker is started with -inReqPayloadMaxSize 4000000 (~4 MB), and a ~3 MB request must be permitted
+#
+#
+# Note that we are not using a valid JSON payload - in this test case, what matters is the size, not the format of the data.
+#
+# 01. As the HUGE payload is accepted, size-wise, it will be parsed and a Parse Error will be the result.
+# 02. In test case 02, the HUGE payload is too big and is not accepted - a "413 Content Too Large" is returned
+# 03. Creating an entity with 1000 Attributes of 3k each - the total payload body is well over 3M, but as the broker accepts close to 4M, all OK
+# 04. GET the entity from step 03 to make sure all is good
+#
+
+echo "01. Sending a request of ~3 MB, to a broker that excepts request upto ~4 MB - see parse error as a result"
+echo "========================================================================================================="
+tr -dc A-Za-z0-9 < /dev/urandom  2>/dev/null | head -c 3000000 > /tmp/threeMegas
+orionCurl --url /ngsi-ld/v1/entities --payload /tmp/threeMegas
+echo
+echo
+
+
+echo "02. Sending a request of ~5 MB, to a broker that excepts request upto ~4 MB - see 413 error"
+echo "==========================================================================================="
+tr -dc A-Za-z0-9 < /dev/urandom  2>/dev/null | head -c 5000000 > /tmp/fiveMegas
+orionCurl --url /ngsi-ld/v1/entities --payload /tmp/fiveMegas
+echo
+echo
+
+
+echo "03. Creating an entity with 1000 Attributes of 3k each - the total payload body is well over 3M, but as the broker accepts close to 4M, all OK"
+echo "=============================================================================================================================================="
+echo '{'                  > /tmp/entity
+echo '  "id": "urn:E1",' >> /tmp/entity
+echo '  "type": "T",'    >> /tmp/entity
+
+ATTRS=1000
+ATTRSIZE=3072
+attrValue=$(tr -dc A-Za-z < /dev/urandom  2>/dev/null | head -c $ATTRSIZE)
+
+typeset -i aIx
+aIx=1
+while [ $aIx -le $ATTRS ]
+do
+  attr='"A'$aIx'": { "type": "Property", "value": "'$attrValue'"}'
+  if [ $aIx -lt $ATTRS ]
+  then
+    attr=$attr','
+  fi
+  echo '  '$attr >> /tmp/entity
+  aIx=$aIx+1
+done
+echo '}' >> /tmp/entity
+
+orionCurl --url /ngsi-ld/v1/entities --payload /tmp/entity
+echo
+echo
+
+
+echo "04. GET the entity from step 03 to make sure all is good"
+echo "========================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 | head -5
+echo
+echo
+
+
+--REGEXPECT--
+01. Sending a request of ~3 MB, to a broker that excepts request upto ~4 MB - see parse error as a result
+=========================================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Invalid JSON payload",
+    "title": "JSON Parse Error",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
+}
+
+
+02. Sending a request of ~5 MB, to a broker that excepts request upto ~4 MB - see 413 error
+===========================================================================================
+HTTP/1.1 413 Content Too Large
+Content-Length: 158
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "payload size: 5000000, max size supported: 4000000",
+    "title": "Request Entity too large",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. Creating an entity with 1000 Attributes of 3k each - the total payload body is well over 3M, but as the broker accepts close to 4M, all OK
+==============================================================================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+04. GET the entity from step 03 to make sure all is good
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 3109919
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
