@@ -1,0 +1,1 @@
+- Fix: return 400 Bad Request when subject.entities exists but it is an empty array (#4499)
