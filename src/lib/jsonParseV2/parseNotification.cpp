@@ -116,6 +116,8 @@ static bool parseNotificationData
 
     if (parseContextElementResponse(ciP, iter2, cerP, oeP) == false)
     {
+      //delete the allocated memory and return false
+      delete cerP;
       return false;
     }
   }

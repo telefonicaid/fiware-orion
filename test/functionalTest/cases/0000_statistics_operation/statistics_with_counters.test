@@ -145,7 +145,7 @@ payload='{
 }'
 # FIXME #4261. Once the issue gets solved, this line should be uncommented
 # The REGEXPECT part would need a little adapation after that
-#orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
+orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
 
 
 payload='{
