@@ -1,0 +1,1 @@
+- Fix: Service path levels with 0 length should not be allowed (#4495)

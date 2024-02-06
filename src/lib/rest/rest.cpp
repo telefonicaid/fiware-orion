@@ -704,6 +704,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     return 1;
   }
 
+  if (servicePath[1] == '/')
+  {
+    OrionError oe(SccBadRequest, "Zero length service path levels are not allowed, minimum 1 charater is required");
+    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+    return 1;
+  }
+
   if (ciP->servicePathV.size() > 1)
   {
     if (ciP->verb == PATCH)
