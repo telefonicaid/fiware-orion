@@ -979,13 +979,17 @@ static void logEnvVars(void)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
       }
+      else if (aP->type == PaULong)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((unsigned long*) aP->varP)));
+      }
       else if (aP->type == PaDouble)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
       }
       else
       {
-        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option));
+        LM_E(("cannot show env var ORION_%s (%s) due to unrecognized type: %d", aP->envName, aP->option, aP->type));
       }
     }
   }
