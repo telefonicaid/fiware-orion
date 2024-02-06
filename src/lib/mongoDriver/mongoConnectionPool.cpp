@@ -334,7 +334,7 @@ static std::string composeMongoUri
 
   if (strlen(dbURI) != 0)
   {
-    if (strlen(username) != 0 || strlen(authDb) != 0 || strlen(rplSet) != 0 || strlen(mechanism) != 0 || dbSSL || dbDisableRetryWrites || timeout > -1)
+    if (strlen(username) != 0 || strlen(authDb) != 0 || strlen(rplSet) != 0 || strlen(mechanism) != 0 || dbSSL || dbDisableRetryWrites || timeout > 0)
     {
         LM_X(1, ("Invalid Command Line Options: -dbURI cannot be combined with -dbhost, -rplSet, -dbTimeout, -dbuser, -dbAuthMech, -dbAuthDb, -dbSSL and -dbDisableRetryWrites"));
     }
@@ -399,19 +399,10 @@ static std::string composeMongoUri
       optionPrefix = "&";
     }
 
-    // Check if timeout is not zero (which means it's either unset or explicitly set to a positive value)
-    if (timeout != 0)
+    if (timeout > 0)
     {
       char buf[STRING_SIZE_FOR_LONG];
-      // If timeout is negative (e.g., -1 indicating it's unset), set it to the default value of 10000
-      if (timeout < 0)
-      {
-        i2s(10000, buf, sizeof(buf));
-      }
-      else
-      {
-        i2s(timeout, buf, sizeof(buf));
-      }
+      i2s(timeout, buf, sizeof(buf));
       uri += optionPrefix + "connectTimeoutMS=" + buf;
       optionPrefix = "&";
     }
