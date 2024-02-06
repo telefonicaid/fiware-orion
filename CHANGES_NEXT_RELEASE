@@ -1,1 +1,1 @@
-- Fix: Changed the default value of `-dbTimeout` to 0 to resolve conflict with `-dbURI` (#4496)
+- Fix: changed the default value of `-dbTimeout` to 0 to resolve conflict with `-dbURI` (#4496) 
