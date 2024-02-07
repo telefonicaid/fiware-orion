@@ -706,7 +706,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   if (servicePath[1] == '/')
   {
-    OrionError oe(SccBadRequest, "Zero length service path levels are not allowed, minimum 1 charater is required");
+    OrionError oe(SccBadRequest, "empty component in ServicePath");
     ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
     return 1;
   }
