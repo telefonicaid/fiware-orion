@@ -1,1 +1,2 @@
 - Fix: changed the default value of `-dbTimeout` to 0 to resolve conflict with `-dbURI` (#4496) 
+- Fix: wrong INFO startup log showing ORION_MONGO_TIMEOUT, ORION_IN_REQ_PAYLOAD_MAX_SIZE and ORION_OUT_REQ_MSG_MAX_SIZE env var values (#4496)
