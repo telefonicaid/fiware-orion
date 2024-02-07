@@ -407,7 +407,7 @@ static std::string composeMongoUri
       optionPrefix = "&";
     }
   }
-
+  
   LM_T(LmtMongo, ("MongoDB connection URI: '%s'", offuscatePassword(uri, passwd).c_str()));
 
   return uri;
