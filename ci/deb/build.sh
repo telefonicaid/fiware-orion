@@ -93,8 +93,8 @@ function _execute()
 
     sleep 3
 
-    contextBroker -port 30001 -dbhost localhost:20001 -pidpath cb1.pid &
-    contextBroker -port 30002 -dbhost localhost:20002 -pidpath cb2.pid &
+    contextBroker -port 30001 -dbURI mongodb://localhost:20001 -pidpath cb1.pid &
+    contextBroker -port 30002 -dbURI mongodb://localhost:20002 -pidpath cb2.pid &
 }
 
 [ $# = 0 ] && _usage

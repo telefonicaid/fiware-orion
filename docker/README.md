@@ -35,7 +35,7 @@ Follow these steps:
 		      - "1026:1026"
 		    depends_on:
 		      - mongo
-		    command: -dbhost mongo
+		    command: -dbURI mongodb://mongo
 		
 		  mongo:
 		    image: mongo:6.0
@@ -81,7 +81,7 @@ In case you want to run MongoDB on another container you can launch it like this
 
 And then run Orion with this command
 
-	sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbhost mongodb
+	sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbURI mongodb://mongodb
 
 Check that everything works with
 
@@ -93,7 +93,7 @@ This method is functionally equivalent as the one described in section 1, but do
 
 If you want to connect to a different MongoDB instance do the following command **instead of** the previous one
 
-	sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbhost <MongoDB Host>
+	sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbURI mongodb://<MongoDB Host>
 
 Check that everything works with
 
@@ -113,10 +113,10 @@ Steps:
 	* Manually, running MongoDB on another container: 
 		1. `sudo docker run --name mongodb -d mongo:6.0`
 		2. `sudo docker build -t orion .`
-		3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
+		3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbURI mongodb://mongodb`.
 	* Manually, specifying where to find your MongoDB host:
 		1. `sudo docker build -t orion .`
-		2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbhost <MongoDB Host>`.
+		2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbURI mongodb://<MongoDB Host>`.
 
 Check that everything works with
 
