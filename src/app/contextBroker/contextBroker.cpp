@@ -598,6 +598,8 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
+  jexlMgr.release();
+
 #ifdef DEBUG
   // valgrind pass is done using DEBUG compilation, so we have to take care with
   // the cache releasing to avoid false positives. In production this is not really

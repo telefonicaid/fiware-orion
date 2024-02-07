@@ -26,6 +26,7 @@
 * Author: Fermin Galan
 */
 
+#include <Python.h>
 #include <semaphore.h>
 
 /* ****************************************************************************
@@ -35,10 +36,13 @@
 class JexlManager
 {
 private:
-  sem_t           sem;
+  PyObject*  jexl_module;
+  PyObject*  jexl_engine;
+  sem_t      sem;
 
 public:
    void  init(void);
+   void  release(void);
 };
 
 #endif  // SRC_LIB_JEXL_JEXLMANAGER_H_
