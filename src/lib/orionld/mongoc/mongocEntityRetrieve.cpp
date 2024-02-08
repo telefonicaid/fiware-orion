@@ -412,10 +412,7 @@ KjNode* mongocEntityRetrieve
   bson_init(&mongoFilter);
   bson_append_utf8(&mongoFilter, "_id.id", 6, entityId, -1);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   //
   // Run the query

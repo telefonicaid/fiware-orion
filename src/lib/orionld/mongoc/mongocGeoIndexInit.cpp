@@ -55,7 +55,7 @@ bool mongocGeoIndexInit(void)
   //
   // DB Connection
   //
-  mongocConnectionGet();
+  mongocConnectionGet(NULL, DbNone);
 
   //
   // Loop over all tenants

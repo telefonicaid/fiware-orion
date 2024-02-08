@@ -54,7 +54,7 @@ bool mongocTenantsGet(void)
   bson_init(&command);
   bson_init(&reply);
 
-  mongocConnectionGet();
+  mongocConnectionGet(NULL, DbNone);
 
   bson_append_int32(&command, "listDatabases", 13, 1);
 

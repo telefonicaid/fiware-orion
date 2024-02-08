@@ -52,7 +52,7 @@ bool mongocIdIndexCreate(OrionldTenant* tenantP)
   bson_init(&key);
   BSON_APPEND_INT32(&key, "_id.id", 1);
 
-  mongocConnectionGet();
+  mongocConnectionGet(NULL, DbNone);
 
   mongoc_database_t*  dbP                = mongoc_client_get_database(orionldState.mongoc.client, tenantP->mongoDbName);
   char*               indexName          = mongoc_collection_keys_to_index_string(&key);

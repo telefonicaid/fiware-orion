@@ -25,6 +25,22 @@
 *
 * Author: Ken Zangelin
 */
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
+
+
+
+// -----------------------------------------------------------------------------
+//
+// DbCollection - move to orionld/types/DbCollection.h
+//
+typedef enum DbCollection
+{
+  DbNone           = 1,
+  DbEntities       = 2,
+  DbSubscriptions  = 4,
+  DbRegistrations  = 8,
+  DbContexts       = 16
+} DbCollection;
 
 
 
@@ -32,6 +48,6 @@
 //
 // mongocConnectionGet -
 //
-extern void mongocConnectionGet(void);
+extern void mongocConnectionGet(OrionldTenant* tenantP, DbCollection dbCollection);
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCCONNECTIONGET_H_

@@ -639,6 +639,7 @@ extern mongoc_collection_t*  mongoRegistrationsCollectionP;  // Deprecated
 extern mongoc_uri_t*          mongocUri;
 extern mongoc_client_pool_t*  mongocPool;
 extern sem_t                  mongocContextsSem;
+extern sem_t                  mongocConnectionSem;
 extern char                   mongocServerVersion[128];
 extern char                   postgresServerVersion[128];
 

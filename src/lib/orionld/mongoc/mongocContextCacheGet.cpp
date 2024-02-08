@@ -55,10 +55,7 @@ KjNode* mongocContextCacheGet(void)
   bson_t*           query        = bson_new();       // Empty - to find all the contexts in the DB
   KjNode*           contextArray = kjArray(orionldState.kjsonP, NULL);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.contextsP == NULL)
-    orionldState.mongoc.contextsP = mongoc_client_get_collection(orionldState.mongoc.client, "orionld", "contexts");
+  mongocConnectionGet(NULL, DbContexts);
 
   sem_wait(&mongocContextsSem);
 

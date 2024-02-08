@@ -79,10 +79,7 @@ KjNode* mongocEntityTypeGet(OrionldProblemDetails* pdP, const char* typeLongName
 
   mongoc_read_prefs_t* readPrefs = mongoc_read_prefs_new(MONGOC_READ_NEAREST);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   mongoc_cursor_t*      mongoCursorP;
   mongoCursorP = mongoc_collection_find_with_opts(orionldState.mongoc.entitiesP, &mongoFilter, &options, readPrefs);

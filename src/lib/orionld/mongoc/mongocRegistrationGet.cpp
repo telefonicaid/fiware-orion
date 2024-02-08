@@ -58,10 +58,7 @@ KjNode* mongocRegistrationGet(const char* registrationId)
   bson_init(&mongoFilter);
   bson_append_utf8(&mongoFilter, "_id", 3, registrationId, -1);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.registrationsP == NULL)
-    orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "registrations");
+  mongocConnectionGet(orionldState.tenantP, DbRegistrations);
 
   //
   // Run the query

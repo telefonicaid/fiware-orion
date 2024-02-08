@@ -49,10 +49,7 @@ bool mongocRegistrationReplace(const char* registrationId, KjNode* dbRegistratio
   bson_t replacement;
   bson_t reply;
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.registrationsP == NULL)
-    orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "registrations");
+  mongocConnectionGet(orionldState.tenantP, DbRegistrations);
 
   bson_init(&selector);
   bson_init(&replacement);
