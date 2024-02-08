@@ -310,7 +310,7 @@ PaArgument paArgs[] =
   { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,                  DBDISABLERETRYWRITES_DESC    },
 
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,                  DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,              DB_TMO_DESC                  },
+  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 0,                               0,     UINT_MAX,              DB_TMO_DESC                  },
   { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,                 DBPS_DESC                    },
 
   { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV4_DESC                 },
@@ -982,13 +982,17 @@ static void logEnvVars(void)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
       }
+      else if (aP->type == PaULong)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((unsigned long*) aP->varP)));
+      }
       else if (aP->type == PaDouble)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
       }
       else
       {
-        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option));
+        LM_E(("cannot show env var ORION_%s (%s) due to unrecognized type: %d", aP->envName, aP->option, aP->type));
       }
     }
   }

@@ -278,6 +278,11 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     return badInput(ciP, errorString);
   }
 
+  if (subsP->subject.entities.size() == 0)
+  {
+    return badInput(ciP, "subject entities is empty");
+  }
+
   // Condition
   if (subject.HasMember("condition"))
   {

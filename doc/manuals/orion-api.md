@@ -812,7 +812,7 @@ i.e. `GET /v2/entities?q=T>2021-04-21`.
 {
   "timestamp": {
     "value": "2017-06-17T07:21:24.238Z",
-    "type: "DateTime"
+    "type": "DateTime"
   }
 }
 ```
