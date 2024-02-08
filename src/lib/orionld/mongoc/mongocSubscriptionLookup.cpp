@@ -59,10 +59,7 @@ KjNode* mongocSubscriptionLookup(const char* subscriptionId)
   bson_init(&mongoFilter);
   bson_append_utf8(&mongoFilter, "_id", 3, subscriptionId, -1);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.subscriptionsP == NULL)
-    orionldState.mongoc.subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "csubs");
+  mongocConnectionGet(orionldState.tenantP, DbSubscriptions);
 
   //
   // Run the query

@@ -39,13 +39,10 @@
 //
 bool mongocRegistrationDelete(const char* registrationId)
 {
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.registrationsP == NULL)
-    orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "registrations");
-
   bson_t            selector;
   bson_error_t      error;
+
+  mongocConnectionGet(orionldState.tenantP, DbRegistrations);
 
   //
   // Create the filter for the query

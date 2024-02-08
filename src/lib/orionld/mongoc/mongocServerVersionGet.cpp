@@ -52,7 +52,7 @@ bool mongocServerVersionGet(char* serverVersionBuf)
   bson_init(&command);
   bson_init(&reply);
 
-  mongocConnectionGet();
+  mongocConnectionGet(NULL, DbNone);
 
   bson_append_int32(&command, "buildinfo", 9, 1);
 

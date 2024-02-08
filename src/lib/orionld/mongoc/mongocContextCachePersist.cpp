@@ -49,10 +49,7 @@ void mongocContextCachePersist(KjNode* contextObject)
 
   mongocKjTreeToBson(contextObject, &bson);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.contextsP == NULL)
-    orionldState.mongoc.contextsP = mongoc_client_get_collection(orionldState.mongoc.client, "orionld", "contexts");
+  mongocConnectionGet(NULL, DbContexts);
 
   sem_wait(&mongocContextsSem);
 

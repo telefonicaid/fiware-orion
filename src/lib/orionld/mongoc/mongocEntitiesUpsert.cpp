@@ -48,13 +48,9 @@ extern "C"
 //
 bool mongocEntitiesUpsert(KjNode* createArrayP, KjNode* updateArrayP)
 {
-  mongocConnectionGet();  // mongocConnectionGet(MONGO_ENTITIES) - do the mongoc_client_get_collection also
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   mongoc_bulk_operation_t* bulkP;
-
   bulkP = mongoc_collection_create_bulk_operation_with_opts(orionldState.mongoc.entitiesP, NULL);
 
   if (createArrayP != NULL)

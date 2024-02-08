@@ -96,10 +96,7 @@ KjNode* mongocEntitiesGet(char** fieldV, int fields, bool entityIdPresent)
   bson_t mongoFilter;
   bson_init(&mongoFilter);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   //
   // Run the query

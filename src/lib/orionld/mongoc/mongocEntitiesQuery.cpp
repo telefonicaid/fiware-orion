@@ -775,10 +775,7 @@ KjNode* mongocEntitiesQuery
   bson_append_document(&options, "projection", 10, &projection);
   bson_destroy(&projection);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   // semTake(&mongoEntitiesSem);
 

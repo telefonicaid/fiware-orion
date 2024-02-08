@@ -61,10 +61,7 @@ KjNode* mongocRegistrationLookup(const char* entityId, const char* attribute, in
     // { $or: [ { "contextRegistration.attrs": { $size: 0 }}, { "contextRegistration.attrs.name": 'attribute' } ]  }  ???
   }
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.registrationsP == NULL)
-    orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "registrations");
+  mongocConnectionGet(orionldState.tenantP, DbRegistrations);
 
   //
   // Run the query

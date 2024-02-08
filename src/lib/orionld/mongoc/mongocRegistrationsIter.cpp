@@ -62,7 +62,7 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   //
   bson_init(&mongoFilter);
 
-  mongocConnectionGet();
+  mongocConnectionGet(NULL, DbNone);
 
   //
   // Can't use the "orionldState.mongoc.registrationsP" here, as we'll deal with not one single tenant but all of them

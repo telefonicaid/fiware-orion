@@ -52,10 +52,7 @@ bool mongocSubscriptionInsert(KjNode* dbSubscriptionP, const char* subscriptionI
   bson_t document;
   bson_t reply;
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.subscriptionsP == NULL)
-    orionldState.mongoc.subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "csubs");
+  mongocConnectionGet(orionldState.tenantP, DbSubscriptions);
 
   bson_init(&document);
   bson_init(&reply);

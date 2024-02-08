@@ -118,6 +118,7 @@ bool              entityMapsEnabled = false;
 mongoc_uri_t*          mongocUri;
 mongoc_client_pool_t*  mongocPool;
 sem_t                  mongocContextsSem;
+sem_t                  mongocConnectionSem;
 char                   mongocServerVersion[128];
 char                   postgresServerVersion[128];
 

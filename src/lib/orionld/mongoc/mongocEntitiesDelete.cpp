@@ -48,10 +48,7 @@ extern "C"
 //
 bool mongocEntitiesDelete(KjNode* entityIdArray)
 {
-  mongocConnectionGet();  // mongocConnectionGet(MONGO_ENTITIES) - do the mongoc_client_get_collection also
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   mongoc_bulk_operation_t* bulkP;
 

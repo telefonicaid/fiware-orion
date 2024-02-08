@@ -44,10 +44,7 @@ extern "C"
 //
 bool mongocEntityDelete(const char* entityId, char** detailP)
 {
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "csubs");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   bson_t            selector;
   bson_error_t      error;

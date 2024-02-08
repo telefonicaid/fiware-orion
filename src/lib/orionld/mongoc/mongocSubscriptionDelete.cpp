@@ -39,10 +39,7 @@
 //
 bool mongocSubscriptionDelete(const char* subscriptionId)
 {
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.subscriptionsP == NULL)
-    orionldState.mongoc.subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "csubs");
+  mongocConnectionGet(orionldState.tenantP, DbSubscriptions);
 
   bson_t            selector;
   bson_error_t      error;

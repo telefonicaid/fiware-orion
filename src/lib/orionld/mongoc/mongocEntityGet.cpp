@@ -91,10 +91,7 @@ KjNode* mongocEntityGet(const char* entityId, const char** projectionV, bool inc
   //
   // Get the connection
   //
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   //
   // Perform the query
