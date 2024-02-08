@@ -314,7 +314,7 @@ static SenderThreadParams* buildSenderParamsCustom
     const SubscriptionId&            subscriptionId,
     ContextElementResponse*          notifyCerP,
     const ngsiv2::Notification&      notification,
-    const std::string&               tenant, // FIXME PR: duplicated in service thread variable?
+    const std::string&               tenant,
     long long                        maxFailsLimit,
     long long                        failsCounter,
     const std::string&               xauthToken,
@@ -337,7 +337,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, service, xauthToken, &replacements);
+  buildReplacementsMap(en, tenant, xauthToken, &replacements);
 
   //
   // 1. Verb/Method
