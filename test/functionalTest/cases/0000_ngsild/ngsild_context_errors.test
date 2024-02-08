@@ -44,7 +44,7 @@ orionldStart CB
 # 10. GET Contexts - see only Core Context
 # 11. URL in context is a valid URL but it doesn't exist
 # 12. GET Contexts - see only Core Context
-# 13. Ugly Parse Error: @context: { 'https://...' ]
+# 13. Ugly Parse Error: @context: { 'http://...' ]
 # 14. GET Contexts - see only Core Context
 # 15. Parse Error in an external context (https://fiware.github.io/NGSI-LD_TestSuite/ldContext/contextWithParseError.jsonld)
 # 16. GET Contexts - see only Core Context
@@ -200,8 +200,8 @@ echo
 echo
 
 
-echo "13. Ugly Parse Error: @context: { 'https://...' ]"
-echo "================================================="
+echo "13. Ugly Parse Error: @context: { 'http://...' ]"
+echo "================================================"
 payload='{
   "id": "urn:E1",
   "type": "A",
@@ -531,15 +531,15 @@ Date: REGEX(.*)
 ]
 
 
-13. Ugly Parse Error: @context: { 'https://...' ]
-=================================================
+13. Ugly Parse Error: @context: { 'http://...' ]
+================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 153
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "JSON Parse Error: no colon found after name of member",
+    "detail": "Invalid JSON payload",
     "title": "JSON Parse Error",
     "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }
@@ -651,12 +651,12 @@ Date: REGEX(.*)
 19. Inline context that is an array of three and the middle member is a context that gives parse error
 ======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 149
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "JSON Parse Error: expecting comma or end of array",
+    "detail": "Invalid JSON payload",
     "title": "JSON Parse Error",
     "type": "https://uri.etsi.org/ngsi-ld/errors/InvalidRequest"
 }

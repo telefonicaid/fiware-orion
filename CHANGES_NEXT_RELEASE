@@ -1,9 +1,11 @@
 ## Fixed Issues:
-  * #1535:  No matching with 'q' when matching subscriptions for deletion of an entity
-  * #1542:  Array Reduction (arrays of one single element are "flattened" to that very element) 
+  * #1535:  Ignore Subscription::q when matching subscriptions for deletion of an entity
+  * #1542:  Array Reduction (arrays of one single element are "flattened" to that very element)
+  * SOF:    https://stackoverflow.com/questions/77911109/fiware-to-payload-too-large
 
 ## New Features:
-  * Support for VocabularyProperty
+  * Support for attributes of type VocabularyProperty
+  * Support for attributes of type JsonProperty
   * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)
   * Support for JsonProperty attribute type
   * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language

@@ -25,7 +25,7 @@ Large request - starting the broker to accept very large requests
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -inReqPayloadMaxSize 50000000
+brokerStart CB 0-255 IPV4 -inReqPayloadMaxSize 50000000 -experimental
 
 --SHELL--
 #
