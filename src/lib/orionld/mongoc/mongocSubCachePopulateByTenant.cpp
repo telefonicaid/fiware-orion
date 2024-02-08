@@ -78,6 +78,9 @@ bool mongocSubCachePopulateByTenant(OrionldTenant* tenantP, bool refresh)
   mongoc_client_t*     connectionP    = mongoc_client_pool_pop(mongocPool);
   mongoc_collection_t* subscriptionsP = mongoc_client_get_collection(connectionP, tenantP->mongoDbName, "csubs");
 
+  if (subscriptionsP == NULL)
+    LM_X(1, ("mongoc_client_get_collection failed for 'csubs' collection on tenant '%s'", tenantP->mongoDbName));
+
   //
   // Run the query
   //

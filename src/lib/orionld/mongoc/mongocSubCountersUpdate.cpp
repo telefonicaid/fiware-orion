@@ -83,6 +83,9 @@ void mongocSubCountersUpdate
   bson_t                selector;
   bson_t                inc;
 
+  if (subscriptionsP == NULL)
+    LM_X(1, ("mongoc_client_get_collection failed for 'csubs' collection on tenant '%s'", tenantP->mongoDbName));
+
   bson_init(&reply);
   bson_init(&selector);
   bson_init(&inc);

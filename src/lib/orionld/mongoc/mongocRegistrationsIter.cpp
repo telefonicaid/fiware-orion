@@ -69,6 +69,9 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   //
   mongoc_collection_t* regsCollectionP = mongoc_client_get_collection(orionldState.mongoc.client, rcP->tenantP->mongoDbName, "registrations");
 
+  if (regsCollectionP == NULL)
+    LM_X(1, ("mongoc_client_get_collection failed for 'registrations' collection on tenant '%s'", rcP->tenantP->mongoDbName));
+
   //
   // Run the query
   //
