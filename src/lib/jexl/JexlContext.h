@@ -30,6 +30,7 @@
 
 #include <string>
 
+
 /* ****************************************************************************
 *
 * JexlContext -
@@ -42,7 +43,16 @@ private:
 public:
   ~JexlContext();
 
-  JexlContext(const std::string& id, const std::string& type, const std::string& service, const std::string& servicePath, const std::string& token);
+  JexlContext
+  (
+    const std::string& id,
+    const std::string& type,
+    const std::string& service,
+    const std::string& servicePath,
+    const std::string& token
+  );
+
+  void add(const std::string& key, const std::string& value);
 };
 
 

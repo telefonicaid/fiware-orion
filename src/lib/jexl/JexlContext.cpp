@@ -31,7 +31,14 @@
 *
 * JexlContext::JexlContext -
 */
-JexlContext::JexlContext(const std::string& id, const std::string& type, const std::string& service, const std::string& servicePath, const std::string& token)
+JexlContext::JexlContext
+(
+  const std::string& id,
+  const std::string& type,
+  const std::string& service,
+  const std::string& servicePath,
+  const std::string& token
+)
 {
   jexl_context = PyDict_New();
 
@@ -61,14 +68,19 @@ JexlContext::JexlContext(const std::string& id, const std::string& type, const s
   value = Py_BuildValue("s", token.c_str());
   PyDict_SetItemString(jexl_context, "authToken", value);
   Py_DECREF(value);
+}
 
-  /*for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
-  {
-    // FIXME PR: the first argument in Py_BuildValue would depend on the attribute type, "s" is only for string type
-    value = Py_BuildValue("s", en.attributeVector[ix]->toJsonValue().c_str());
-    PyDict_SetItemString(jexl_context, en.attributeVector[ix]->name.c_str(), value);
-    Py_DECREF(value);
-  }*/
+
+
+/* ****************************************************************************
+*
+* JexlContext::add -
+*/
+void JexlContext::add(const std::string& key, const std::string& _value)
+{
+  PyObject* value = Py_BuildValue("s", _value.c_str());
+  PyDict_SetItemString(jexl_context, key.c_str(), value);
+  Py_DECREF(value);
 }
 
 

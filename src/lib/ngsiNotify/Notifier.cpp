@@ -339,6 +339,10 @@ static SenderThreadParams* buildSenderParamsCustom
   //std::map<std::string, std::string> replacements;
   //buildReplacementsMap(en, tenant, xauthToken, &replacements);
   JexlContext jexlContext(en.id, en.type, tenant, en.servicePath, xauthToken);
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    jexlContext.add(en.attributeVector[ix]->name, en.attributeVector[ix]->toJsonValue());
+  }
 
   //
   // 1. Verb/Method
