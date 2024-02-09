@@ -32,6 +32,7 @@
 #include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
 
+#include "jexl/jexlMgr.h"
 
 
 /* ****************************************************************************
@@ -39,6 +40,9 @@
 * smartStringValue -
 *
 * Returns the effective string value, taking into account replacements
+*
+* FIXME PR: notFoundDefault is not longer used?
+*
 */
 std::string smartStringValue(const std::string stringValue, JexlContext* jexlContextP, const std::string notFoundDefault)
 {
@@ -47,21 +51,11 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
   // is different, which makes difficult to unify both them
   if ((jexlContextP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
   {
-    /* FIXME PR: needs adaptation replacementsP -> jexlContextP
     // "Full replacement" case. In this case, the result is not always a string
     // len("${") + len("}") = 3
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
-    std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
-    if (iter == replacementsP->end())
-    {
-      // macro doesn't exist in the replacement map, so we use null as failsafe
-      return notFoundDefault;
-    }
-    else
-    {
-      return iter->second;
-    }*/
-    return "";
+
+    return jexlMgr.evaluate(jexlContextP, macroName);
   }
   else if (jexlContextP != NULL)
   {
@@ -115,10 +109,12 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
 /* ****************************************************************************
 *
 * stringValueOrNothing -
+*
+* FIXME PR: notFoundDefault no longer used?
 */
 static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::string key, const std::string& notFoundDefault)
 {
-  // FIXME PR: to from replacementsP to jexlContextP
+  return jexlMgr.evaluate(jexlContextP, key);
   /*std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
   if (iter == replacementsP->end())
   {
@@ -139,7 +135,6 @@ static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::st
       return value;
     }
   }*/
-  return "";
 }
 
 
