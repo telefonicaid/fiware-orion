@@ -121,8 +121,7 @@ static bool setPayload
   const std::string&               notifPayload,
   const SubscriptionId&            subscriptionId,
   Entity&                          en,
-  const std::string&               service,
-  const std::string&               token,
+  std::map<std::string, std::string>* replacementsP,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
@@ -171,9 +170,7 @@ static bool setPayload
   }
   else
   {
-    std::map<std::string, std::string> replacements;
-    buildReplacementsMap(en, service, token, &replacements);
-    if (!macroSubstitute(payloadP, notifPayload, &replacements, ""))
+    if (!macroSubstitute(payloadP, notifPayload, replacementsP, ""))
     {
       return false;
     }
@@ -197,19 +194,12 @@ static bool setPayload
 static bool setJsonPayload
 (
   orion::CompoundValueNode*  json,
-  const Entity&              en,
-  const std::string&         service,
-  const std::string&         token,
+  std::map<std::string, std::string>* replacementsP,
   std::string*               payloadP,
   std::string*               mimeTypeP
 )
 {
-  // Prepare a map for macro replacements. We firstly tried to pass Entity object to
-  // orion::CompoundValueNode()::toJson(), but the include Entity.h in CompoundValueNode.h
-  // makes compiler to cry (maybe some kind of circular dependency problem?)
-  std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, service, token, &replacements);
-  *payloadP = json->toJson(&replacements);
+  *payloadP = json->toJson(replacementsP);
   *mimeTypeP = "application/json";  // this can be overriden by headers field
   return true;
 }
@@ -247,8 +237,7 @@ static bool setNgsiPayload
   const Entity&                    ngsi,
   const SubscriptionId&            subscriptionId,
   Entity&                          en,
-  const std::string&               service,
-  const std::string&               token,
+  std::map<std::string, std::string>* replacementsP,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
@@ -256,12 +245,6 @@ static bool setNgsiPayload
   RenderFormat                     renderFormat
 )
 {
-  // Prepare a map for macro replacements. We firstly tried to pass Entity object to
-  // orion::CompoundValueNode()::toJson(), but the include Entity.h in CompoundValueNode.h
-  // makes compiler to cry (maybe some kind of circular dependency problem?)
-  std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, service, token, &replacements);
-
   NotifyContextRequest   ncr;
   ContextElementResponse cer;
 
@@ -273,7 +256,7 @@ static bool setNgsiPayload
   else
   {
     // If id is not found in the replacements macro, we use en.id.
-    effectiveId = removeQuotes(smartStringValue(ngsi.id, &replacements, '"' + en.id + '"'));
+    effectiveId = removeQuotes(smartStringValue(ngsi.id, replacementsP, '"' + en.id + '"'));
   }
 
   std::string effectiveType;
@@ -284,7 +267,7 @@ static bool setNgsiPayload
   else
   {
     // If type is not found in the replacements macro, we use en.type.
-    effectiveType = removeQuotes(smartStringValue(ngsi.type, &replacements, '"' + en.type + '"'));
+    effectiveType = removeQuotes(smartStringValue(ngsi.type, replacementsP, '"' + en.type + '"'));
   }
 
   cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
@@ -310,11 +293,11 @@ static bool setNgsiPayload
 
   if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES))
   {
-    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, &replacements);
+    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
   }
   else
   {
-    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, &replacements);
+    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, replacementsP);
   }
 
   return true;
@@ -354,7 +337,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, service, xauthToken, &replacements);
+  buildReplacementsMap(en, tenant, xauthToken, &replacements);
 
   //
   // 1. Verb/Method
@@ -396,7 +379,7 @@ static SenderThreadParams* buildSenderParamsCustom
   {
     bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
     std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
-    if (!setPayload(includePayload, notifPayload, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
+    if (!setPayload(includePayload, notifPayload, subscriptionId, en, &replacements, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
       // Warning already logged in macroSubstitute()
       return NULL;
@@ -405,14 +388,14 @@ static SenderThreadParams* buildSenderParamsCustom
   else if (customPayloadType == ngsiv2::CustomPayloadType::Json)
   {
     orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
-    setJsonPayload(json, en, tenant, xauthToken, &payload, &mimeType);
+    setJsonPayload(json, &replacements, &payload, &mimeType);
     renderFormat = NGSI_V2_CUSTOM;
   }
   else  // customPayloadType == ngsiv2::CustomPayloadType::Ngsi
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
     const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
-    if (!setNgsiPayload(ngsi, subscriptionId, en, tenant, xauthToken, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
+    if (!setNgsiPayload(ngsi, subscriptionId, en, &replacements, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
     {
       // Warning already logged in macroSubstitute()
       return NULL;
