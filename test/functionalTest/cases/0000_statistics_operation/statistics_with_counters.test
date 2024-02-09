@@ -261,7 +261,7 @@ Content-Length: REGEX(\d+)
         "deprecatedFeatures": {
             "ngsiv1Requests": 7
         },
-        "jsonRequests": 16,
+        "jsonRequests": 17,
         "noPayloadRequests": 42,
         "requests": {
             "/admin/log": {
