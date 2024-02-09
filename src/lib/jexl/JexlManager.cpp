@@ -100,6 +100,41 @@ void JexlManager::init(void)
   LM_T(LmtJexl, ("jexl engine has been created"));
 }
 
+
+
+/* ****************************************************************************
+*
+* JexlManager::evaluate -
+*/
+std::string JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _expression)
+{
+  PyObject* expression = Py_BuildValue("s", _expression);
+  if (expression == NULL)
+  {
+    // FIXME PR: manage error
+    return "null";
+  }
+
+  PyObject* result = PyObject_CallMethod(jexl_engine, "evaluate", "OO", expression, jexlContextP->get());
+  if (result == NULL)
+  {
+    // FIXME PR: manage error
+    return "null";
+  }
+
+  PyObject* repr = PyObject_Repr(result);
+  if (repr == NULL)
+  {
+    // FIXME PR: manage error
+    return "null";
+  }
+
+  const char* result_str = PyUnicode_AsUTF8(repr);
+  return std::string(result_str);
+}
+
+
+
 /* ****************************************************************************
 *
 * JexlManager::release -

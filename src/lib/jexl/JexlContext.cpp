@@ -71,6 +71,16 @@ JexlContext::JexlContext
 }
 
 
+/* ****************************************************************************
+*
+* JexlContext::get -
+*/
+PyObject* JexlContext::get(void)
+{
+  return jexl_context;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -81,6 +91,22 @@ void JexlContext::add(const std::string& key, const std::string& _value)
   PyObject* value = Py_BuildValue("s", _value.c_str());
   PyDict_SetItemString(jexl_context, key.c_str(), value);
   Py_DECREF(value);
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContext::hasKey -
+*/
+bool JexlContext::hasKey(const std::string& key)
+{
+  // Check if the key exists in the jexl_context dictionary
+  PyObject* keyObject = PyUnicode_FromString(key.c_str());
+  int result = PyDict_Contains(jexl_context, keyObject);
+  Py_DECREF(keyObject);
+
+  return result == 1; // Return true if key exists, false otherwise
 }
 
 

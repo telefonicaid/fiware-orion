@@ -52,7 +52,9 @@ public:
     const std::string& token
   );
 
-  void add(const std::string& key, const std::string& value);
+  PyObject* get(void);
+  void      add(const std::string& key, const std::string& value);
+  bool      hasKey(const std::string& key);
 };
 
 

@@ -29,6 +29,8 @@
 #include <Python.h>
 #include <semaphore.h>
 
+#include "jexl/JexlContext.h"
+
 /* ****************************************************************************
 *
 * JexlManager -
@@ -41,8 +43,9 @@ private:
   sem_t      sem;
 
 public:
-   void  init(void);
-   void  release(void);
+   void         init(void);
+   std::string  evaluate(JexlContext* jexlContextP, const std::string& expression);
+   void         release(void);
 };
 
 #endif  // SRC_LIB_JEXL_JEXLMANAGER_H_
