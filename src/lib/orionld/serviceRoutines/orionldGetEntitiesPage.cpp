@@ -37,6 +37,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
+#include "orionld/apiModel/ntocEntity.h"                            // ntocEntity
+#include "orionld/apiModel/ntosEntity.h"                            // ntosEntity
 #include "orionld/distOp/distOpLookupByRegId.h"                     // distOpLookupByRegId
 #include "orionld/distOp/distOpListDebug.h"                         // distOpListDebug
 #include "orionld/distOp/distOpsSend.h"                             // distOpsSend2
@@ -66,7 +68,6 @@ static void cleanupSysAttrs(void)
     {
       nextAttrP = attrP->next;
 
-      LM_T(LmtSR, ("attrP->name: '%s'", attrP->name));
       if      (strcmp(attrP->name, "createdAt")  == 0)  kjChildRemove(entityP, attrP);
       else if (strcmp(attrP->name, "modifiedAt") == 0)  kjChildRemove(entityP, attrP);
       else if (attrP->type == KjObject)
@@ -125,6 +126,24 @@ static int queryResponse(DistOp* distOpP, void* callbackParam)
 
   distOpResponseMergeIntoEntityArray(distOpP, entityArray);
   return 0;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// formatFix -
+//
+static void formatFix(KjNode* entityArray)
+{
+  for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    if (orionldState.out.format == RF_CONCISE)
+      ntocEntity(entityP, orionldState.uriParams.lang, orionldState.uriParamOptions.sysAttrs);
+    else if (orionldState.out.format == RF_SIMPLIFIED)
+      ntosEntity(entityP, orionldState.uriParams.lang);
+  }
 }
 
 
@@ -331,6 +350,8 @@ bool orionldGetEntitiesPage(void)
   {
     distOpItemListDebug(distOpListItem, "To Forward for GET /entities");
     distOpsSendAndReceive(distOpListItem, queryResponse, entityArray);
+
+    formatFix(entityArray);
   }
 
   orionldState.responseTree = entityArray;

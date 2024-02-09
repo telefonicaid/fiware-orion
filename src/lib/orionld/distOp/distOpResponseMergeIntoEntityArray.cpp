@@ -34,6 +34,8 @@ extern "C"
 #include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/kjTree/kjEntityIdLookupInEntityArray.h"           // kjEntityIdLookupInEntityArray
+#include "orionld/kjTree/kjEntityNormalizedToConcise.h"             // kjEntityNormalizedToConcise
+#include "orionld/kjTree/kjEntityNormalizedToSimplified.h"          // kjEntityNormalizedToSimplified
 #include "orionld/distOp/distOpEntityMerge.h"                       // distOpEntityMerge
 #include "orionld/distOp/distOpResponseMergeIntoEntityArray.h"      // Own interface
 
@@ -57,6 +59,7 @@ void distOpResponseMergeIntoEntityArray(DistOp* distOpP, KjNode* entityArray)
 
     KjNode* entityP = distOpP->responseBody->value.firstChildP;
     KjNode* next;
+
     while (entityP != NULL)
     {
       next = entityP->next;
@@ -91,4 +94,3 @@ void distOpResponseMergeIntoEntityArray(DistOp* distOpP, KjNode* entityArray)
     }
   }
 }
-

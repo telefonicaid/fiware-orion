@@ -2,7 +2,8 @@
   * #1535:  Ignore Subscription::q when matching subscriptions for deletion of an entity
   * #1542:  Array Reduction (arrays of one single element are "flattened" to that very element)
   * SOF:    https://stackoverflow.com/questions/77911109/fiware-to-payload-too-large
-
+  * #1551:  format=simplified for distribute GET /entities gave Normalized for entities from other brokers
+ 
 ## New Features:
   * Support for attributes of type VocabularyProperty
   * Support for attributes of type JsonProperty
