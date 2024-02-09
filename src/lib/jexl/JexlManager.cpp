@@ -108,29 +108,39 @@ void JexlManager::init(void)
 */
 std::string JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _expression)
 {
-  PyObject* expression = Py_BuildValue("s", _expression);
+  LM_T(LmtJexl, ("evaluating JEXL expresion: %s", _expression.c_str()));
+
+  PyObject* expression = Py_BuildValue("s", _expression.c_str());
   if (expression == NULL)
   {
-    // FIXME PR: manage error
+    // FIXME PR: grab error message from Python stack
+    LM_T(LmtJexl, ("error evaluating expression, result is null"));
     return "null";
   }
 
   PyObject* result = PyObject_CallMethod(jexl_engine, "evaluate", "OO", expression, jexlContextP->get());
+  Py_XDECREF(expression);
   if (result == NULL)
   {
-    // FIXME PR: manage error
+    // FIXME PR: grab error message from Python stack
+    LM_T(LmtJexl, ("error evaluating expression, result is null"));
     return "null";
   }
 
   PyObject* repr = PyObject_Repr(result);
+  Py_XDECREF(result);
   if (repr == NULL)
   {
-    // FIXME PR: manage error
+    // FIXME PR: grab error message from Python stack
+    LM_T(LmtJexl, ("error evaluating expression, result is null"));
     return "null";
   }
 
-  const char* result_str = PyUnicode_AsUTF8(repr);
-  return std::string(result_str);
+  std::string result_str = std::string(PyUnicode_AsUTF8(repr));
+  Py_XDECREF(repr);
+
+  LM_T(LmtJexl, ("JEXL expression evaluation result: %s", result_str.c_str()));
+  return result_str;
 }
 
 
