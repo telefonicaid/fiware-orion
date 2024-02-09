@@ -612,7 +612,7 @@ bool CompoundValueNode::equal(const orion::BSONElement& be)
 * CompoundValueNode:toJson
 *
 */
-std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replacementsP)
+std::string CompoundValueNode::toJson(JexlContext* jexlContextP)
 {
   std::string      out;
   JsonVectorHelper jvh;
@@ -621,7 +621,7 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
   switch (valueType)
   {
   case orion::ValueTypeString:
-    return smartStringValue(stringValue, replacementsP, "null");
+    return smartStringValue(stringValue, jexlContextP, "null");
 
   case orion::ValueTypeNumber:
     return double2string(numberValue);
@@ -635,14 +635,14 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
   case orion::ValueTypeVector:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      jvh.addRaw(childV[ix]->toJson(replacementsP));
+      jvh.addRaw(childV[ix]->toJson(jexlContextP));
     }
     return jvh.str();
 
   case orion::ValueTypeObject:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      joh.addRaw(childV[ix]->name, childV[ix]->toJson(replacementsP));
+      joh.addRaw(childV[ix]->name, childV[ix]->toJson(jexlContextP));
     }
     return joh.str();
 

@@ -33,6 +33,7 @@
 #include "ngsi/StringList.h"
 #include "ngsi/ContextAttribute.h"
 #include "apiTypesV2/Entity.h"
+#include "jexl/JexlContext.h"
 
 #include "mongoDriver/BSONObj.h"
 
@@ -82,7 +83,7 @@ typedef struct ContextElementResponse
                       const std::vector<std::string>&      attrsFilter,
                       bool                                 blacklist,
                       const std::vector<std::string>&      metadataFilter,
-                      std::map<std::string, std::string>*  replacementsP);
+                      JexlContext*                         jexlContext);
 
   void         applyUpdateOperators(void);
 

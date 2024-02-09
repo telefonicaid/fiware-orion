@@ -35,6 +35,8 @@
 
 #include "mongoDriver/BSONElement.h"
 
+#include "jexl/JexlContext.h"
+
 
 namespace orion
 {
@@ -117,7 +119,7 @@ class CompoundValueNode
   bool                equal(const orion::BSONElement& be);
   std::string         finish(void);
 
-  std::string         toJson(std::map<std::string, std::string>* replacementsP = NULL);
+  std::string         toJson(JexlContext* jexlContextP = NULL);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

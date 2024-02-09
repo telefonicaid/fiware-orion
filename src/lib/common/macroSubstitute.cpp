@@ -40,13 +40,14 @@
 *
 * Returns the effective string value, taking into account replacements
 */
-std::string smartStringValue(const std::string stringValue, std::map<std::string, std::string>* replacementsP, const std::string notFoundDefault)
+std::string smartStringValue(const std::string stringValue, JexlContext* jexlContextP, const std::string notFoundDefault)
 {
   // This code is pretty similar to the one in CompoundValueNode::toJson()
   // The program logic branching is the same, but the result at the end of each if-else
   // is different, which makes difficult to unify both them
-  if ((replacementsP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
+  if ((jexlContextP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
   {
+    /* FIXME PR: needs adaptation replacementsP -> jexlContextP
     // "Full replacement" case. In this case, the result is not always a string
     // len("${") + len("}") = 3
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
@@ -59,13 +60,14 @@ std::string smartStringValue(const std::string stringValue, std::map<std::string
     else
     {
       return iter->second;
-    }
+    }*/
+    return "";
   }
-  else if (replacementsP != NULL)
+  else if (jexlContextP != NULL)
   {
     // "Partial replacement" case. In this case, the result is always a string
     std::string effectiveValue;
-    if (!macroSubstitute(&effectiveValue, stringValue, replacementsP, "null"))
+    if (!macroSubstitute(&effectiveValue, stringValue, jexlContextP, "null"))
     {
       // error already logged in macroSubstitute, using stringValue itself as failsafe
       effectiveValue = stringValue;
@@ -87,7 +89,7 @@ std::string smartStringValue(const std::string stringValue, std::map<std::string
 * buildReplacementMap -
 *
 */
-void buildReplacementsMap
+/*void buildReplacementsMap
 (
   const Entity&                        en,
   const std::string&                   service,
@@ -106,7 +108,7 @@ void buildReplacementsMap
     // an anti-pattern), the attribute takes precedence
     (*replacementsP)[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
   }
-}
+}*/
 
 
 
@@ -114,16 +116,17 @@ void buildReplacementsMap
 *
 * stringValueOrNothing -
 */
-static std::string stringValueOrNothing(std::map<std::string, std::string>* replacementsP, const std::string key, const std::string& notFoundDefault)
+static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::string key, const std::string& notFoundDefault)
 {
-  std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
+  // FIXME PR: to from replacementsP to jexlContextP
+  /*std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
   if (iter == replacementsP->end())
   {
     return notFoundDefault;
   }
   else
   {
-    // replacementP contents are prepared for "full replacement" case, so string values use
+    // replacementsP contents are prepared for "full replacement" case, so string values use
     // double quotes. But in this case we are in a "partial replacement" case, so we have
     // to remove them if we find them
     std::string value = iter->second;
@@ -135,7 +138,8 @@ static std::string stringValueOrNothing(std::map<std::string, std::string>* repl
     {
       return value;
     }
-  }
+  }*/
+  return "";
 }
 
 
@@ -165,7 +169,7 @@ static std::string stringValueOrNothing(std::map<std::string, std::string>* repl
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, std::map<std::string, std::string>* replacementsP, const std::string& notFoundDefault)
+bool macroSubstitute(std::string* to, const std::string& from, JexlContext* jexlContextP, const std::string& notFoundDefault)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -228,7 +232,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNothing(replacementsP, macroName, notFoundDefault).length() * times;
+    toAdd += stringValueOrNothing(jexlContextP, macroName, notFoundDefault).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -246,7 +250,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNothing(replacementsP, macroName, notFoundDefault);
+    std::string value = stringValueOrNothing(jexlContextP, macroName, notFoundDefault);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)

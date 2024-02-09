@@ -34,7 +34,7 @@
 * smartStringValue -
 *
 */
-extern std::string smartStringValue(const std::string stringValue, std::map<std::string, std::string>* replacementsP, const std::string notFoundDefault);
+extern std::string smartStringValue(const std::string stringValue, JexlContext* jexlContextP, const std::string notFoundDefault);
 
 
 
@@ -43,13 +43,13 @@ extern std::string smartStringValue(const std::string stringValue, std::map<std:
 * buildReplacementMap -
 *
 */
-extern void buildReplacementsMap
+/*extern void buildReplacementsMap
 (
   const Entity&                        en,
   const std::string&                   service,
   const std::string&                   token,
   std::map<std::string, std::string>*  replacementsP
-);
+);*/
 
 
 
@@ -58,6 +58,6 @@ extern void buildReplacementsMap
 * macroSubstitute -
 *
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, std::map<std::string, std::string>* replacementsP, const std::string& notFoundDefault);
+extern bool macroSubstitute(std::string* sP, const std::string& in, JexlContext* jexlContextP, const std::string& notFoundDefault);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

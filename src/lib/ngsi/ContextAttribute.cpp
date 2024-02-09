@@ -1052,7 +1052,7 @@ void ContextAttribute::filterAndOrderMetadata
 * renderNgsiField true is used in custom notification payloads, which have some small differences
 * with regards to conventional rendering
 */
-std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, std::map<std::string, std::string>* replacementsP)
+std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, JexlContext* jexlContextP)
 {
   JsonObjectHelper jh;
 
@@ -1085,7 +1085,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     // of DB entities) may lead to NULL, so the check is needed
     if (childToRenderP != NULL)
     {
-      jh.addRaw("value", childToRenderP->toJson(replacementsP));
+      jh.addRaw("value", childToRenderP->toJson(jexlContextP));
     }
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -1101,7 +1101,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else if (valueType == orion::ValueTypeString)
   {
-    jh.addRaw("value", smartStringValue(stringValue, replacementsP, "null"));
+    jh.addRaw("value", smartStringValue(stringValue, jexlContextP, "null"));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {

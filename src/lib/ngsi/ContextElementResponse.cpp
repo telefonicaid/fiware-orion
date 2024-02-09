@@ -215,12 +215,12 @@ std::string ContextElementResponse::toJson
   const std::vector<std::string>&      attrsFilter,
   bool                                 blacklist,
   const std::vector<std::string>&      metadataFilter,
-  std::map<std::string, std::string>*  replacementsP
+  JexlContext*                         jexlContextP
 )
 {
   std::string out;
 
-  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false, replacementsP);
+  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false, jexlContextP);
 
   return out;
 }
