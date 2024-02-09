@@ -37,6 +37,7 @@ brokerStart CB
 # 05. Create entity E3/T3/A3=3, with servicepath '//Level_1' (SP level with 0 length), see error
 # 06. Create entity E3/T3/A3=3, with servicepath '///Level_1///Level_2//' (SP level with 0 length), see error
 # 07. Create entity E3/T3/A3=3, with servicepath '/Level_1///Level_2' (SP level with 0 length), see error
+# 08. Create entity E3/T3/A3=3, with servicepath '/Level_1/Level_2//' (SP level with 0 length), see error
 #
 
 
@@ -129,6 +130,21 @@ echo
 echo
 
 
+echo "08. Create entity E3/T3/A3=3, with servicepath '/Level_1/Level_2//' (SP level with 0 length), see error"
+echo "======================================================================================================="
+payload='{
+    "id": "E3",
+    "type": "T3",
+    "A3": {
+      "value": 3,
+      "type": "Integer"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload" --servicePath /Level_1/Level_2//
+echo
+echo
+
+
 --REGEXPECT--
 01. Create entity E1/T1/A1=1, with servicepath '/Level_1' (success case)
 ========================================================================
@@ -217,6 +233,20 @@ Content-Length: 69
 
 
 07. Create entity E3/T3/A3=3, with servicepath '/Level_1///Level_2' (SP level with 0 length), see error
+=======================================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
+
+{
+    "description": "empty component in ServicePath",
+    "error": "BadRequest"
+}
+
+
+08. Create entity E3/T3/A3=3, with servicepath '/Level_1/Level_2//' (SP level with 0 length), see error
 =======================================================================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)

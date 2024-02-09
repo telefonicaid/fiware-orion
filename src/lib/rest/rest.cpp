@@ -802,7 +802,7 @@ static char* removeTrailingSlash(std::string path)
   char* cpath = (char*) path.c_str();
 
   /* strlen(cpath) > 1 ensures that root service path "/" is not touched */
-  while ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
+  if ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
   {
     cpath[strlen(cpath) - 1] = 0;
   }
