@@ -243,6 +243,7 @@ bool            debugCurl    = false;
 uint32_t        cSubCounters;
 char            coreContextVersion[64];
 bool            triggerOperation = false;
+bool            noprom           = false;
 
 
 
@@ -335,6 +336,7 @@ bool            triggerOperation = false;
 #define DEBUG_CURL_DESC        "turn on debugging of libcurl - to the broker's logfile"
 #define CSUBCOUNTERS_DESC      "number of subscription counter updates before flush from sub-cache to DB (0: never, 1: always)"
 #define CORE_CONTEXT_DESC      "core context version (v1.0|v1.3|v1.4|v1.5|v1.6|v1.7) - v1.6 is default"
+#define NO_PROM_DESC           "run without Prometheus metrics"
 
 
 
@@ -438,6 +440,7 @@ PaArgument paArgs[] =
   { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC           },
   { "-debugCurl",             &debugCurl,               "DEBUG_CURL",                PaBool,    PaHid,  false,           false,  true,             DEBUG_CURL_DESC          },
   { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC           },
+  { "-noprom",                &noprom,                  "NO_PROM",                   PaBool,    PaHid,  false,           false,  true,             NO_PROM_DESC             },
 
   PA_END_OF_ARGS
 };
@@ -1130,7 +1133,9 @@ int main(int argC, char* argV[])
   if (fg == false)
     daemonize();
 
-  if (promInit(8000) != 0)
+  if (noprom == true)
+    LM_W(("Running without Prometheus metrics"));
+  else if (promInit(8000) != 0)
     LM_W(("Error initializing Prometheus Metrics library"));
 
   IpVersion ipVersion = IPDUAL;
