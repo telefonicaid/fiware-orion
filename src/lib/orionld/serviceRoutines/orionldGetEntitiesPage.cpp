@@ -135,10 +135,20 @@ static int queryResponse(DistOp* distOpP, void* callbackParam)
 //
 // formatFix -
 //
-static void formatFix(KjNode* entityArray)
+static void formatFix(KjNode* entityArray, int skip)
 {
+  int ix = -1;
   for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
   {
+    ++ix;
+    if (ix < skip)  // Entities from the local DB have already been transformed to the desired format
+    {
+      LM_T(LmtFormat, ("Skipping child %d as it comes from local DB", ix));
+      continue;
+    }
+
+    LM_T(LmtFormat, ("Fixing format for child %d as it comes from remote", ix));
+
     if (orionldState.out.format == RF_CONCISE)
       ntocEntity(entityP, orionldState.uriParams.lang, orionldState.uriParamOptions.sysAttrs);
     else if (orionldState.out.format == RF_SIMPLIFIED)
@@ -348,13 +358,18 @@ bool orionldGetEntitiesPage(void)
 
   if (distOpListItem != NULL)
   {
+    int localKids = kjChildCount(entityArray);
+
+    LM_T(LmtFormat, ("Number of children from local: %d (no format fix for those)", localKids));
+
     distOpItemListDebug(distOpListItem, "To Forward for GET /entities");
     distOpsSendAndReceive(distOpListItem, queryResponse, entityArray);
 
-    formatFix(entityArray);
+    formatFix(entityArray, localKids);
   }
 
-  orionldState.responseTree = entityArray;
+  orionldState.responseTree   = entityArray;
+  orionldState.httpStatusCode = 200;
 
   //
   // Time to cleanup ...
