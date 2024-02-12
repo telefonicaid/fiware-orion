@@ -170,7 +170,7 @@ static bool setPayload
   }
   else
   {
-    if (!macroSubstitute(payloadP, notifPayload, jexlContextP, ""))
+    if (!macroSubstitute(payloadP, notifPayload, jexlContextP, "", true))
     {
       return false;
     }
@@ -211,6 +211,8 @@ static bool setJsonPayload
 *
 * Entity id and type are special. Different from a attribute, they are always
 * strings and cannot take a number, boolean, etc. as value.
+*
+* FIXME PR: duplicated logic! (both " and ' in different points of the code)
 */
 inline std::string removeQuotes(std::string s)
 {
@@ -341,6 +343,7 @@ static SenderThreadParams* buildSenderParamsCustom
   JexlContext jexlContext(en.id, en.type, tenant, en.servicePath, xauthToken);
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
+    // FIXME PR: this works with every attribute type? (number, bool, etc.)
     jexlContext.add(en.attributeVector[ix]->name, en.attributeVector[ix]->toJsonValue());
   }
 
@@ -368,7 +371,7 @@ static SenderThreadParams* buildSenderParamsCustom
   // 2. URL
   //
   std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-  if (macroSubstitute(&url, notifUrl, &jexlContext, "") == false)
+  if (macroSubstitute(&url, notifUrl, &jexlContext, "", true) == false)
   {
     // Warning already logged in macroSubstitute()
     return NULL;
@@ -419,7 +422,7 @@ static SenderThreadParams* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, &jexlContext, "") == false) || (macroSubstitute(&value, it->second, &jexlContext, "") == false))
+      if ((macroSubstitute(&key, it->first, &jexlContext, "", true) == false) || (macroSubstitute(&value, it->second, &jexlContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
         return NULL;
@@ -445,7 +448,7 @@ static SenderThreadParams* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, &jexlContext,  "") == false) || (macroSubstitute(&value, it->second, &jexlContext, "") == false))
+      if ((macroSubstitute(&key, it->first, &jexlContext,  "", true) == false) || (macroSubstitute(&value, it->second, &jexlContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
         return NULL;
@@ -510,7 +513,7 @@ static SenderThreadParams* buildSenderParamsCustom
   // 8. Topic (only in the case of MQTT notifications)
   if (notification.type == ngsiv2::MqttNotification)
   {
-    if (macroSubstitute(&topic, notification.mqttInfo.topic, &jexlContext, "") == false)
+    if (macroSubstitute(&topic, notification.mqttInfo.topic, &jexlContext, "", true) == false)
     {
       // Warning already logged in macroSubstitute()
       return NULL;

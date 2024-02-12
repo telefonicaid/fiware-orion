@@ -41,8 +41,6 @@
 *
 * Returns the effective string value, taking into account replacements
 *
-* FIXME PR: notFoundDefault is not longer used?
-*
 */
 std::string smartStringValue(const std::string stringValue, JexlContext* jexlContextP, const std::string notFoundDefault)
 {
@@ -55,13 +53,18 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
     // len("${") + len("}") = 3
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
 
+    if (!jexlContextP->hasKey(macroName))
+    {
+      return notFoundDefault;
+    }
+
     return jexlMgr.evaluate(jexlContextP, macroName);
   }
   else if (jexlContextP != NULL)
   {
     // "Partial replacement" case. In this case, the result is always a string
     std::string effectiveValue;
-    if (!macroSubstitute(&effectiveValue, stringValue, jexlContextP, "null"))
+    if (!macroSubstitute(&effectiveValue, stringValue, jexlContextP, "null", true))
     {
       // error already logged in macroSubstitute, using stringValue itself as failsafe
       effectiveValue = stringValue;
@@ -110,11 +113,28 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
 *
 * stringValueOrNothing -
 *
-* FIXME PR: notFoundDefault no longer used?
 */
-static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::string key, const std::string& notFoundDefault)
+// FIXME PR: inTheMiddle -> raw ?
+static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::string key, const std::string& notFoundDefault, bool inTheMiddle)
 {
-  return jexlMgr.evaluate(jexlContextP, key);
+  if (!jexlContextP->hasKey(key))
+  {
+    return notFoundDefault;
+  }
+
+  std::string s = jexlMgr.evaluate(jexlContextP, key);
+
+  if (inTheMiddle)
+  {
+    // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
+    // so double quotes have to be be removed
+    if (s[0] == '"')
+    {
+      s = s.substr(1, s.size()-2);
+    }
+  }
+
+  return s;
   /*std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
   if (iter == replacementsP->end())
   {
@@ -164,7 +184,8 @@ static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::st
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, JexlContext* jexlContextP, const std::string& notFoundDefault)
+// FIXME PR: inTheMiddle -> raw ?
+bool macroSubstitute(std::string* to, const std::string& from, JexlContext* jexlContextP, const std::string& notFoundDefault, bool inTheMiddle)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -227,7 +248,7 @@ bool macroSubstitute(std::string* to, const std::string& from, JexlContext* jexl
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNothing(jexlContextP, macroName, notFoundDefault).length() * times;
+    toAdd += stringValueOrNothing(jexlContextP, macroName, notFoundDefault, inTheMiddle).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -245,7 +266,7 @@ bool macroSubstitute(std::string* to, const std::string& from, JexlContext* jexl
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNothing(jexlContextP, macroName, notFoundDefault);
+    std::string value = stringValueOrNothing(jexlContextP, macroName, notFoundDefault, inTheMiddle);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)

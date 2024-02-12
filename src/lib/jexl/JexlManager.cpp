@@ -108,12 +108,12 @@ void JexlManager::init(void)
 */
 std::string JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _expression)
 {
-  LM_T(LmtJexl, ("evaluating JEXL expresion: %s", _expression.c_str()));
+  LM_T(LmtJexl, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
 
   PyObject* expression = Py_BuildValue("s", _expression.c_str());
   if (expression == NULL)
   {
-    // FIXME PR: grab error message from Python stack
+    // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
     LM_T(LmtJexl, ("error evaluating expression, result is null"));
     return "null";
   }
@@ -122,7 +122,7 @@ std::string JexlManager::evaluate(JexlContext* jexlContextP, const std::string& 
   Py_XDECREF(expression);
   if (result == NULL)
   {
-    // FIXME PR: grab error message from Python stack
+    // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
     LM_T(LmtJexl, ("error evaluating expression, result is null"));
     return "null";
   }
@@ -131,7 +131,7 @@ std::string JexlManager::evaluate(JexlContext* jexlContextP, const std::string& 
   Py_XDECREF(result);
   if (repr == NULL)
   {
-    // FIXME PR: grab error message from Python stack
+    // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
     LM_T(LmtJexl, ("error evaluating expression, result is null"));
     return "null";
   }
@@ -139,7 +139,19 @@ std::string JexlManager::evaluate(JexlContext* jexlContextP, const std::string& 
   std::string result_str = std::string(PyUnicode_AsUTF8(repr));
   Py_XDECREF(repr);
 
-  LM_T(LmtJexl, ("JEXL expression evaluation result: %s", result_str.c_str()));
+  // Check if the string has quotes
+  /*if ((result_str.front() == '\'') && (result_str.back() == '\''))
+  {
+    // Erase the first and last characters (quotes)
+    result_str.erase(0, 1);  // Erase the first character
+    result_str.erase(result_str.size() - 1);  // Erase the last character
+  }*/
+  if (result_str[0] == '\'')
+  {
+    result_str = result_str.substr(1, result_str.size()-2);
+  }
+
+  LM_T(LmtJexl, ("JEXL expression evaluation result: <%s>", result_str.c_str()));
   return result_str;
 }
 

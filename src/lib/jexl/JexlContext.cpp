@@ -53,27 +53,27 @@ JexlContext::JexlContext
   PyObject* value;
 
   LM_T(LmtJexl, ("adding to JEXL context: id=%s", id.c_str()));
-  value = Py_BuildValue("s", id.c_str());
+  value = Py_BuildValue("s", ("\"" + id + "\"").c_str());
   PyDict_SetItemString(jexl_context, "id", value);
   Py_DECREF(value);
 
-  LM_T(LmtJexl, ("adding to JEXL context: type=%s", type.c_str()));
-  value = Py_BuildValue("s", type.c_str());
+  LM_T(LmtJexl, ("adding to JEXL context: type=\"%s\"", type.c_str()));
+  value = Py_BuildValue("s", ("\"" + type + "\"").c_str());
   PyDict_SetItemString(jexl_context, "type", value);
   Py_DECREF(value);
 
-  LM_T(LmtJexl, ("adding to JEXL context: service=%s", service.c_str()));
-  value = Py_BuildValue("s", service.c_str());
+  LM_T(LmtJexl, ("adding to JEXL context: service=\"%s\"", service.c_str()));
+  value = Py_BuildValue("s", ("\"" + service + "\"").c_str());
   PyDict_SetItemString(jexl_context, "service", value);
   Py_DECREF(value);
 
-  LM_T(LmtJexl, ("adding to JEXL context: servicePath=%s", servicePath.c_str()));
-  value = Py_BuildValue("s", servicePath.c_str());
+  LM_T(LmtJexl, ("adding to JEXL context: servicePath=\"%s\"", servicePath.c_str()));
+  value = Py_BuildValue("s", ("\"" + servicePath + "\"").c_str());
   PyDict_SetItemString(jexl_context, "servicePath", value);
   Py_DECREF(value);
 
-  LM_T(LmtJexl, ("adding to JEXL context: token=%s", token.c_str()));
-  value = Py_BuildValue("s", token.c_str());
+  LM_T(LmtJexl, ("adding to JEXL context: token=\"%s\"", token.c_str()));
+  value = Py_BuildValue("s", ("\"" + token + "\"").c_str());
   PyDict_SetItemString(jexl_context, "authToken", value);
   Py_DECREF(value);
 }
