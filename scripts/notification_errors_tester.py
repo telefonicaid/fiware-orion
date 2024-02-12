@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: latin-1 -*-
 # Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -301,8 +301,8 @@ def usage_and_exit(msg):
     """
 
     if msg != '':
-        print msg
-        print
+        print(msg)
+        print()
 
     usage()
     sys.exit(1)
@@ -313,17 +313,17 @@ def usage():
     Print usage message
     """
 
-    print 'Usage: %s --host <host> --port <port> --url <server url> -v -u' % os.path.basename(__file__)
-    print ''
-    print 'Parameters:'
-    print "  --host <host>: host to use database to use (default is '0.0.0.0')"
-    print "  --port <port>: port to use (default is 1028)"
-    print "  --url <server url>: server URL to use (default is /)"
-    print "  --https: start in https"
-    print "  --key: key file (only used if https is enabled)"
-    print "  --cert: cert file (only used if https is enabled)"
-    print "  -v: verbose mode"
-    print "  -u: print this usage message"
+    print('Usage: %s --host <host> --port <port> --url <server url> -v -u' % os.path.basename(__file__))
+    print('')
+    print('Parameters:')
+    print("  --host <host>: host to use database to use (default is '0.0.0.0')")
+    print("  --port <port>: port to use (default is 1028)")
+    print("  --url <server url>: server URL to use (default is /)")
+    print("  --https: start in https")
+    print("  --key: key file (only used if https is enabled)")
+    print("  --cert: cert file (only used if https is enabled)")
+    print("  -v: verbose mode")
+    print("  -u: print this usage message")
 
 
 # This function is registered to be called upon termination
@@ -370,18 +370,18 @@ for opt, arg in opts:
 
 if https:
     if key_file is None or cert_file is None:
-        print "if --https is used then you have to provide --key and --cert"
+        print("if --https is used then you have to provide --key and --cert")
         sys.exit(1)
 
 if verbose:
-    print "verbose mode is on"
-    print "port: " + str(port)
-    print "host: " + str(host)
-    print "url_root: " + str(url_root)
-    print "https: " + str(https)
+    print("verbose mode is on")
+    print("port: " + str(port))
+    print("host: " + str(host))
+    print("url_root: " + str(url_root))
+    print("https: " + str(https))
     if https:
-        print "key file: " + key_file
-        print "cert file: " + cert_file
+        print("key file: " + key_file)
+        print("cert file: " + cert_file)
 
 
 app = Flask(__name__)

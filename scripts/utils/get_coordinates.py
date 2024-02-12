@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -88,7 +88,7 @@ def process_page(entities):
         if loc_attr is None:
             loc_attr = get_ngsiv1_location(entity)
         if loc_attr is not None:
-            print '%s: %s' % (entity['id'], entity[loc_attr]['value'])
+            print('%s: %s' % (entity['id'], entity[loc_attr]['value']))
 
 
 ### Main program starts here ###
@@ -97,8 +97,8 @@ def process_page(entities):
 res = requests.get('%s/v2/entities?offset=0&limit=%s&options=count' % (cb_endpoint, str(page_size)),
                    headers=headers, verify=False)
 if res.status_code != 200:
-        print 'Error getting entities (%d): %s' % (res.status_code, res.json())
-        sys.exit(1)
+    print('Error getting entities (%d): %s' % (res.status_code, res.json()))
+    sys.exit(1)
 
 # Get count
 count = int(res.headers['fiware-total-count'])
@@ -107,16 +107,16 @@ count = int(res.headers['fiware-total-count'])
 process_page(res.json())
 
 # Number of batches
-pages = count / page_size
-for i in range(0, pages):
+pages = count // page_size
+for i in range(pages):
     offset = (i + 1) * page_size
     res = requests.get('%s/v2/entities?offset=%s&limit=%s' % (cb_endpoint, str(offset), str(page_size)),
                        headers=headers, verify=False)
     if res.status_code != 200:
-        print 'Error getting entities (%d): %s' % (res.status_code, res.json())
+        print('Error getting entities (%d): %s' % (res.status_code, res.json()))
         sys.exit(1)
     process_page(res.json())
 
-print 'Hints:'
-print '* use "awk -F \': \' \'{print $2}\'" filter if you want to grab just the coordinates'
-print '* copy-paste output to https://www.darrinward.com/lat-long so see where you entities are on a map'
+print('Hints:')
+print('* use "awk -F \': \' \'{print $2}\'" filter if you want to grab just the coordinates')
+print('* copy-paste output to https://www.darrinward.com/lat-long so see where you entities are on a map')
