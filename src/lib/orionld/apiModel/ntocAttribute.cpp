@@ -57,6 +57,8 @@ void ntocAttribute(KjNode* attrP, const char* lang, bool sysAttrs)
     return;
   }
 
+  kjTreeLog(attrP, "attribute to convert from Normalized to Concise", LmtFormat);
+
   // 1. Remove the sysAttrs, if so requested
   if (sysAttrs == false)
     kjSysAttrsRemove(attrP, 0);
