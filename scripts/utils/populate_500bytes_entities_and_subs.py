@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -90,12 +90,12 @@ payload_sub = {
 }
 
 for i in range(0, 1500):
-    print '* Creating entity ' + str(i)
+    print('* Creating entity ' + str(i))
     payload_entities['id'] = str(i).zfill(10)
     r = post(url_entities, data=json.dumps(payload_entities), headers=headers)
-    #print r.text
-	
+    #print(r.text)
+
 for i in range(0, 1500):
-    print '* Creating subscription ' + str(i)
+    print('* Creating subscription ' + str(i))
     r = post(url_subscription, data=json.dumps(payload_sub), headers=headers)
-    #print r.text
+    #print(r.text)
