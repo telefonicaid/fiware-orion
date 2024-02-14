@@ -23,12 +23,14 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     JexlManager.cpp
     JexlContext.cpp
+    JexlResult.cpp
     jexlMgr.cpp    
 )
 
 SET (HEADERS
     JexlManager.h
     JexlContext.h
+    JexlResult.h
     jexlMgr.h
 )
 

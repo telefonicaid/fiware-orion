@@ -1292,6 +1292,54 @@ std::string ContextAttribute::toJsonAsValue
 
 /* ****************************************************************************
 *
+* addToContext -
+*
+* Pretty similar in structure to toJsonValue
+*/
+void ContextAttribute::addToContext(JexlContext* jexlContextP)
+{
+  if (compoundValueP != NULL)
+  {
+    // FIXME PR: not sure if this has the proper effect...
+    jexlContextP->add(name, compoundValueP->toJson());
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      jexlContextP->add(name, toJsonString(isodate2str(numberValue)));
+    }
+    else // regular number
+    {
+      jexlContextP->add(name, numberValue);
+    }
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    jexlContextP->add(name, toJsonString(stringValue));
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    jexlContextP->add(name, boolValue);
+  }
+  else if (valueType == orion::ValueTypeNull)
+  {
+    jexlContextP->add(name);
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_E(("Runtime Error (value not given for attribute %s)", name.c_str()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::check - 
 */
 std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType)

@@ -30,6 +30,7 @@
 #include <semaphore.h>
 
 #include "jexl/JexlContext.h"
+#include "jexl/JexlResult.h"
 
 /* ****************************************************************************
 *
@@ -43,9 +44,9 @@ private:
   sem_t      sem;
 
 public:
-   void         init(void);
-   std::string  evaluate(JexlContext* jexlContextP, const std::string& expression);
-   void         release(void);
+   void        init(void);
+   JexlResult  evaluate(JexlContext* jexlContextP, const std::string& expression);
+   void        release(void);
 };
 
 #endif  // SRC_LIB_JEXL_JEXLMANAGER_H_

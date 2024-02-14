@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JEXL_JEXLCONTEXT_H_
-#define SRC_LIB_JEXL_JEXLCONTEXT_H_
+#ifndef SRC_LIB_JEXL_JEXLRESULT_H_
+#define SRC_LIB_JEXL_JEXLRESULT_H_
 
 /*
 *
@@ -26,40 +26,27 @@
 * Author: Fermin Galan
 */
 
-#include <Python.h>
+#include "orionTypes/OrionValueType.h"
 
 #include <string>
 
-
 /* ****************************************************************************
 *
-* JexlContext -
+* JexlResult -
 */
-class JexlContext
+class JexlResult
 {
-private:
-  PyObject*  jexl_context;
-
 public:
-  ~JexlContext();
+  // Similar to the fields used in ContextAttribute.h
+  
+  orion::ValueType  valueType;    // Type of value
+  std::string       stringValue;  // "value" as a String
+  double            numberValue;  // "value" as a Number
+  bool              boolValue;    // "value" as a Boolean
 
-  JexlContext
-  (
-    const std::string& id,
-    const std::string& type,
-    const std::string& service,
-    const std::string& servicePath,
-    const std::string& token
-  );
-
-  PyObject* get(void);
-  void      add(const std::string& key, const std::string& value);
-  void      add(const std::string& key, double value);
-  void      add(const std::string& key, bool value);
-  void      add(const std::string& key);
-  bool      hasKey(const std::string& key);
+  std::string       toString(void);
 };
 
 
 
-#endif  // #define SRC_LIB_JEXL_JEXLCONTEXT_H_
+#endif  // #define SRC_LIB_JEXL_JEXLRESULT_H_

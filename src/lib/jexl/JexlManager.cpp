@@ -26,7 +26,10 @@
 #include <Python.h>
 
 #include "jexl/JexlManager.h"
+#include "jexl/JexlResult.h"
 #include "logMsg/logMsg.h"
+
+#include "orionTypes/OrionValueType.h"
 
 
 
@@ -62,6 +65,36 @@ static const char* capturePythonError()
 
   PyErr_Clear();
   return "<no captured error>";
+}
+
+
+/* ****************************************************************************
+*
+* getPyObjectType -
+*
+* FIXME PR: ValueTypeVector and ValueTypeObject should be taken into account
+*/
+static orion::ValueType getPyObjectType(PyObject* obj)
+{
+  // PyBool_Check() has to be donde before than PyLong_Check(). Alternatively, PyLong_CheckExact() could be
+  // used (not tested). See: https://stackoverflow.com/q/77990353/1485926
+  if (PyBool_Check(obj))
+  {
+    return orion::ValueTypeBoolean;
+  }
+  else if (PyLong_Check(obj))
+  {
+    return orion::ValueTypeNumber;
+  }
+  else if (PyFloat_Check(obj))
+  {
+    return orion::ValueTypeNumber;
+  }
+  else
+  {
+    // For other types (including dict and list) we use string as failsafe
+    return orion::ValueTypeString;
+  }
 }
 
 
@@ -106,16 +139,21 @@ void JexlManager::init(void)
 *
 * JexlManager::evaluate -
 */
-std::string JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _expression)
+JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _expression)
 {
   LM_T(LmtJexl, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
+
+  JexlResult r;
+
+  // If nothing changes, the returned value is null
+  r.valueType = orion::ValueTypeNull;
 
   PyObject* expression = Py_BuildValue("s", _expression.c_str());
   if (expression == NULL)
   {
     // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
     LM_T(LmtJexl, ("error evaluating expression, result is null"));
-    return "null";
+    return r;
   }
 
   PyObject* result = PyObject_CallMethod(jexl_engine, "evaluate", "OO", expression, jexlContextP->get());
@@ -124,35 +162,54 @@ std::string JexlManager::evaluate(JexlContext* jexlContextP, const std::string& 
   {
     // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
     LM_T(LmtJexl, ("error evaluating expression, result is null"));
-    return "null";
+    return r;
   }
 
-  PyObject* repr = PyObject_Repr(result);
-  Py_XDECREF(result);
-  if (repr == NULL)
+  // Special case: expresion evalutes to None
+  if (result == Py_None)
   {
-    // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
-    LM_T(LmtJexl, ("error evaluating expression, result is null"));
-    return "null";
+    Py_XDECREF(result);
+    r.valueType = orion::ValueTypeNull;
+    LM_T(LmtJexl, ("JEXL evaluation result is null"));
+    return r;
   }
 
-  std::string result_str = std::string(PyUnicode_AsUTF8(repr));
-  Py_XDECREF(repr);
-
-  // Check if the string has quotes
-  /*if ((result_str.front() == '\'') && (result_str.back() == '\''))
+  // Other not null types
+  r.valueType = getPyObjectType(result);
+  if (r.valueType == orion::ValueTypeNumber)
   {
-    // Erase the first and last characters (quotes)
-    result_str.erase(0, 1);  // Erase the first character
-    result_str.erase(result_str.size() - 1);  // Erase the last character
-  }*/
-  if (result_str[0] == '\'')
+    r.numberValue = PyFloat_AsDouble(result);
+    LM_T(LmtJexl, ("JEXL evaluation result (double): %f", r.numberValue));
+    Py_XDECREF(result);    
+  }
+  else if (r.valueType == orion::ValueTypeBoolean)
   {
-    result_str = result_str.substr(1, result_str.size()-2);
+    r.boolValue = PyObject_IsTrue(result);
+    LM_T(LmtJexl, ("JEXL evaluation result (bool): %s", r.boolValue ? "true": "false"));
+    Py_XDECREF(result);
+  }
+  else if (r.valueType == orion::ValueTypeString)
+  {
+    const char* repr = PyUnicode_AsUTF8(result);
+    Py_XDECREF(result);
+    if (repr == NULL)
+    {
+      // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
+      LM_T(LmtJexl, ("error evaluating expression, result is null"));
+    }
+    else
+    {
+      r.stringValue = std::string(repr);
+      LM_T(LmtJexl, ("JEXL evaluation result (string): %s", r.stringValue.c_str()));
+    }
   }
 
-  LM_T(LmtJexl, ("JEXL expression evaluation result: <%s>", result_str.c_str()));
-  return result_str;
+  //if (result_str[0] == '\'')
+  //{
+  //  result_str = result_str.substr(1, result_str.size()-2);
+  //}
+
+  return r;
 }
 
 

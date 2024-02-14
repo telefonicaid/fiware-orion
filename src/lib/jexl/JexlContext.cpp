@@ -50,33 +50,13 @@ JexlContext::JexlContext
     // FIXME PR: error control
   }
 
-  PyObject* value;
-
-  LM_T(LmtJexl, ("adding to JEXL context: id=%s", id.c_str()));
-  value = Py_BuildValue("s", ("\"" + id + "\"").c_str());
-  PyDict_SetItemString(jexl_context, "id", value);
-  Py_DECREF(value);
-
-  LM_T(LmtJexl, ("adding to JEXL context: type=\"%s\"", type.c_str()));
-  value = Py_BuildValue("s", ("\"" + type + "\"").c_str());
-  PyDict_SetItemString(jexl_context, "type", value);
-  Py_DECREF(value);
-
-  LM_T(LmtJexl, ("adding to JEXL context: service=\"%s\"", service.c_str()));
-  value = Py_BuildValue("s", ("\"" + service + "\"").c_str());
-  PyDict_SetItemString(jexl_context, "service", value);
-  Py_DECREF(value);
-
-  LM_T(LmtJexl, ("adding to JEXL context: servicePath=\"%s\"", servicePath.c_str()));
-  value = Py_BuildValue("s", ("\"" + servicePath + "\"").c_str());
-  PyDict_SetItemString(jexl_context, "servicePath", value);
-  Py_DECREF(value);
-
-  LM_T(LmtJexl, ("adding to JEXL context: token=\"%s\"", token.c_str()));
-  value = Py_BuildValue("s", ("\"" + token + "\"").c_str());
-  PyDict_SetItemString(jexl_context, "authToken", value);
-  Py_DECREF(value);
+  add("id", id);
+  add("type", type);
+  add("service", service);
+  add("servicePath", servicePath);
+  add("authToken", token);
 }
+
 
 
 /* ****************************************************************************
@@ -96,10 +76,56 @@ PyObject* JexlContext::get(void)
 */
 void JexlContext::add(const std::string& key, const std::string& _value)
 {
-  LM_T(LmtJexl, ("adding to JEXL context: %s=%s", key.c_str(), _value.c_str()));
+  LM_T(LmtJexl, ("adding to JEXL context (string): %s=%s", key.c_str(), _value.c_str()));
   PyObject* value = Py_BuildValue("s", _value.c_str());
   PyDict_SetItemString(jexl_context, key.c_str(), value);
   Py_DECREF(value);
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContext::add -
+*/
+void JexlContext::add(const std::string& key, double _value)
+{
+  LM_T(LmtJexl, ("adding to JEXL context (double): %s=%f", key.c_str(), _value));
+  PyObject* value = Py_BuildValue("d", _value);
+  PyDict_SetItemString(jexl_context, key.c_str(), value);
+  Py_DECREF(value);
+}
+
+
+
+
+/* ****************************************************************************
+*
+* JexlContext::add -
+*/
+void JexlContext::add(const std::string& key, bool _value)
+{
+  LM_T(LmtJexl, ("adding to JEXL context (bool): %s=%s", key.c_str(), _value? "true" : "false"));
+  if (_value)
+  {
+    PyDict_SetItemString(jexl_context, key.c_str(), Py_True);
+  }
+  else
+  {
+    PyDict_SetItemString(jexl_context, key.c_str(), Py_False);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContext::add -
+*/
+void JexlContext::add(const std::string& key)
+{
+  LM_T(LmtJexl, ("adding to JEXL context (none): %s", key.c_str()));
+  PyDict_SetItemString(jexl_context, key.c_str(), Py_None);
 }
 
 
@@ -126,5 +152,6 @@ bool JexlContext::hasKey(const std::string& key)
 */
 JexlContext::~JexlContext()
 {
+  // FIXME PR: this is not correct. Recursively release of the dict object
   Py_XDECREF(jexl_context);
 }

@@ -119,6 +119,8 @@ public:
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
 
+  void         addToContext(JexlContext* jexlContextP);
+
   void         release(void);
   std::string  getName(void);
 

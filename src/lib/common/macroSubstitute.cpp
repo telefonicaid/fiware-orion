@@ -53,12 +53,12 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
     // len("${") + len("}") = 3
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
 
-    if (!jexlContextP->hasKey(macroName))
-    {
-      return notFoundDefault;
-    }
+    //if (!jexlContextP->hasKey(macroName))
+    //{
+    //  return notFoundDefault;
+    //}
 
-    return jexlMgr.evaluate(jexlContextP, macroName);
+    return jexlMgr.evaluate(jexlContextP, macroName).toString();
   }
   else if (jexlContextP != NULL)
   {
@@ -117,12 +117,12 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
 // FIXME PR: inTheMiddle -> raw ?
 static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::string key, const std::string& notFoundDefault, bool inTheMiddle)
 {
-  if (!jexlContextP->hasKey(key))
-  {
-    return notFoundDefault;
-  }
+  //if (!jexlContextP->hasKey(key))
+  //{
+  //  return notFoundDefault;
+  //}
 
-  std::string s = jexlMgr.evaluate(jexlContextP, key);
+  std::string s = jexlMgr.evaluate(jexlContextP, key).toString();
 
   if (inTheMiddle)
   {

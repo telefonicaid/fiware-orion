@@ -344,7 +344,8 @@ static SenderThreadParams* buildSenderParamsCustom
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
     // FIXME PR: this works with every attribute type? (number, bool, etc.)
-    jexlContext.add(en.attributeVector[ix]->name, en.attributeVector[ix]->toJsonValue());
+    //jexlContext.add(en.attributeVector[ix]->name, en.attributeVector[ix]->toJsonValue());
+    en.attributeVector[ix]->addToContext(&jexlContext);
   }
 
   //

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_JEXL_JEXLCONTEXT_H_
-#define SRC_LIB_JEXL_JEXLCONTEXT_H_
-
 /*
 *
 * Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
@@ -26,40 +23,41 @@
 * Author: Fermin Galan
 */
 
-#include <Python.h>
+#include "jexl/JexlResult.h"
 
-#include <string>
-
+#include "common/string.h"
+#include "common/JsonHelper.h"
+#include "logMsg/logMsg.h"
 
 /* ****************************************************************************
 *
-* JexlContext -
+* toString -
+*
+* Pretty similar to ContextAttribute::toJsonValue()
+*
+* FIXME PR: ValueTypeVector and ValueTypeObject should be taken into account
 */
-class JexlContext
+std::string JexlResult::toString(void)
 {
-private:
-  PyObject*  jexl_context;
-
-public:
-  ~JexlContext();
-
-  JexlContext
-  (
-    const std::string& id,
-    const std::string& type,
-    const std::string& service,
-    const std::string& servicePath,
-    const std::string& token
-  );
-
-  PyObject* get(void);
-  void      add(const std::string& key, const std::string& value);
-  void      add(const std::string& key, double value);
-  void      add(const std::string& key, bool value);
-  void      add(const std::string& key);
-  bool      hasKey(const std::string& key);
-};
-
-
-
-#endif  // #define SRC_LIB_JEXL_JEXLCONTEXT_H_
+  if (valueType == orion::ValueTypeNumber)
+  {
+    return double2string(numberValue);
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    return boolValue ? "true" : "false";
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    return "\"" + toJsonString(stringValue) + "\"";
+  }
+  else if (valueType == orion::ValueTypeNull)
+  {
+    return "null";
+  }
+  else
+  {
+    LM_E(("Runtime Error (not allowed type in JexlResult: %s)", valueTypeName(valueType)));
+    return "";
+  }
+}
