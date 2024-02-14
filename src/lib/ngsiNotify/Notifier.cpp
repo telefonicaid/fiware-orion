@@ -338,8 +338,6 @@ static SenderThreadParams* buildSenderParamsCustom
   Entity&                             en      = notifyCerP->entity;
 
   // Used by several macroSubstitute() calls along this function
-  //std::map<std::string, std::string> replacements;
-  //buildReplacementsMap(en, tenant, xauthToken, &replacements);
   JexlContext jexlContext;
   jexlContext.add("id", en.id);
   jexlContext.add("type", en.type);
@@ -348,8 +346,6 @@ static SenderThreadParams* buildSenderParamsCustom
   jexlContext.add("authToken", xauthToken);
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
-    // FIXME PR: this works with every attribute type? (number, bool, etc.)
-    //jexlContext.add(en.attributeVector[ix]->name, en.attributeVector[ix]->toJsonValue());
     en.attributeVector[ix]->addToContext(&jexlContext);
   }
 
@@ -380,6 +376,7 @@ static SenderThreadParams* buildSenderParamsCustom
   if (macroSubstitute(&url, notifUrl, &jexlContext, "", true) == false)
   {
     // Warning already logged in macroSubstitute()
+    jexlContext.release();
     return NULL;
   }
 
@@ -396,6 +393,7 @@ static SenderThreadParams* buildSenderParamsCustom
     if (!setPayload(includePayload, notifPayload, subscriptionId, en, &jexlContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
       // Warning already logged in macroSubstitute()
+      jexlContext.release();
       return NULL;
     }
   }
@@ -412,6 +410,7 @@ static SenderThreadParams* buildSenderParamsCustom
     if (!setNgsiPayload(ngsi, subscriptionId, en, &jexlContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
     {
       // Warning already logged in macroSubstitute()
+      jexlContext.release();
       return NULL;
     }
     mimeType = "application/json";
@@ -431,6 +430,7 @@ static SenderThreadParams* buildSenderParamsCustom
       if ((macroSubstitute(&key, it->first, &jexlContext, "", true) == false) || (macroSubstitute(&value, it->second, &jexlContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
+        jexlContext.release();
         return NULL;
       }
 
@@ -457,6 +457,7 @@ static SenderThreadParams* buildSenderParamsCustom
       if ((macroSubstitute(&key, it->first, &jexlContext,  "", true) == false) || (macroSubstitute(&value, it->second, &jexlContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
+        jexlContext.release();
         return NULL;
       }
 
@@ -488,6 +489,7 @@ static SenderThreadParams* buildSenderParamsCustom
   if (!parseUrl(url, host, port, uriPath, protocol))
   {
     LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
+    jexlContext.release();
     return NULL;
   }
 
@@ -522,6 +524,7 @@ static SenderThreadParams* buildSenderParamsCustom
     if (macroSubstitute(&topic, notification.mqttInfo.topic, &jexlContext, "", true) == false)
     {
       // Warning already logged in macroSubstitute()
+      jexlContext.release();
       return NULL;
     }
   }
@@ -557,6 +560,7 @@ static SenderThreadParams* buildSenderParamsCustom
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   paramsP->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
+  jexlContext.release();
   return paramsP;
 }
 

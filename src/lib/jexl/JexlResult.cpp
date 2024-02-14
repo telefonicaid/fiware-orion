@@ -53,7 +53,7 @@ std::string JexlResult::toString(void)
   }
   else if ((valueType == orion::ValueTypeObject)||(valueType == orion::ValueTypeVector))
   {
-    return toJsonString(stringValue);
+    return stringValue;
   }
   else if (valueType == orion::ValueTypeNull)
   {

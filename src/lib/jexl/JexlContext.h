@@ -46,8 +46,6 @@ private:
   PyObject*  jexl_context;
 
 public:
-  ~JexlContext();
-
   JexlContext();
 
   PyObject* get(void);
@@ -58,6 +56,7 @@ public:
   void      add(const std::string& key, JexlContext jexlContext);
   void      add(const std::string& key, JexlContextList jexlContextList);
   bool      hasKey(const std::string& key);
+  void      release(void);
 };
 
 class JexlContextList
@@ -66,8 +65,6 @@ private:
   PyObject*  jexl_context;
 
 public:
-  ~JexlContextList();
-
   JexlContextList();
 
   PyObject* get(void);
@@ -77,6 +74,7 @@ public:
   void      add(void);
   void      add(JexlContext jexlContext);
   void      add(JexlContextList jexlContextList);
+  void      release(void);
 };
 
 

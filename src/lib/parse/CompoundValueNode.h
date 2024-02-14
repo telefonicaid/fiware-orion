@@ -121,6 +121,9 @@ class CompoundValueNode
 
   std::string         toJson(JexlContext* jexlContextP = NULL);
 
+  JexlContext         toJexlContext(void);
+  JexlContextList     toJexlContextList(void);
+
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);
 

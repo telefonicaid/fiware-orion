@@ -39,8 +39,10 @@
 class JexlManager
 {
 private:
-  PyObject*  jexl_module;
-  PyObject*  jexl_engine;
+  PyObject*  pyjexlModule;
+  PyObject*  jexlEngine;
+  PyObject*  jsonModule;
+  //PyObject*  customJsonSerializer;
   sem_t      sem;
 
 public:

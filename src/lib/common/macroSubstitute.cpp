@@ -53,12 +53,15 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
     // len("${") + len("}") = 3
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
 
-    //if (!jexlContextP->hasKey(macroName))
-    //{
-    //  return notFoundDefault;
-    //}
-
-    return jexlMgr.evaluate(jexlContextP, macroName).toString();
+    JexlResult r = jexlMgr.evaluate(jexlContextP, macroName);
+    if (r.valueType == orion::ValueTypeNull)
+    {
+      return notFoundDefault;
+    }
+    else
+    {
+      return r.toString();
+    }
   }
   else if (jexlContextP != NULL)
   {
@@ -117,44 +120,27 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
 // FIXME PR: inTheMiddle -> raw ?
 static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::string key, const std::string& notFoundDefault, bool inTheMiddle)
 {
-  //if (!jexlContextP->hasKey(key))
-  //{
-  //  return notFoundDefault;
-  //}
+  JexlResult r = jexlMgr.evaluate(jexlContextP, key);
 
-  std::string s = jexlMgr.evaluate(jexlContextP, key).toString();
-
-  if (inTheMiddle)
-  {
-    // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
-    // so double quotes have to be be removed
-    if (s[0] == '"')
-    {
-      s = s.substr(1, s.size()-2);
-    }
-  }
-
-  return s;
-  /*std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
-  if (iter == replacementsP->end())
+  if (r.valueType == orion::ValueTypeNull)
   {
     return notFoundDefault;
   }
   else
   {
-    // replacementsP contents are prepared for "full replacement" case, so string values use
-    // double quotes. But in this case we are in a "partial replacement" case, so we have
-    // to remove them if we find them
-    std::string value = iter->second;
-    if (value[0] == '"')
+    std::string s = r.toString();
+    if (inTheMiddle)
     {
-      return value.substr(1, value.size()-2);
+      // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
+      // so double quotes have to be be removed
+      if (s[0] == '"')
+      {
+        s = s.substr(1, s.size()-2);
+      }
     }
-    else
-    {
-      return value;
-    }
-  }*/
+
+    return s;
+  }
 }
 
 

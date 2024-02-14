@@ -1300,8 +1300,14 @@ void ContextAttribute::addToContext(JexlContext* jexlContextP)
 {
   if (compoundValueP != NULL)
   {
-    // FIXME PR: not sure if this has the proper effect...
-    jexlContextP->add(name, compoundValueP->toJson());
+    if (valueType == orion::ValueTypeObject)
+    {
+      jexlContextP->add(name, compoundValueP->toJexlContext());
+    }
+    else  // valueType == orion::ValueTypeVector
+    {
+      jexlContextP->add(name, compoundValueP->toJexlContextList());
+    }
   }
   else if (valueType == orion::ValueTypeNumber)
   {

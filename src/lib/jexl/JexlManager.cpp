@@ -71,8 +71,6 @@ static const char* capturePythonError()
 /* ****************************************************************************
 *
 * getPyObjectType -
-*
-* FIXME PR: ValueTypeVector and ValueTypeObject should be taken into account
 */
 static orion::ValueType getPyObjectType(PyObject* obj)
 {
@@ -107,14 +105,46 @@ static orion::ValueType getPyObjectType(PyObject* obj)
 
 
 
+#if 0
+/* ****************************************************************************
+*
+* customJsonSerializerFunction -
+*
+* To be used in the json.dumps() step in JexlManager::evaluate() in order to get
+* integer numbers when possible (i.e. "2" instead of "2.0"), this way behaving as
+* the pre-JEXL macro replacement logic
+*/
+static PyObject* customJsonSerializerFunction(PyObject* obj)
+{
+  // Check if the object is a float
+  if (PyFloat_Check(obj))
+  {
+    // Convert float to integer if it represents a whole number
+    double value = PyFloat_AsDouble(obj);
+    if (value == (int)value)
+    {
+      return PyLong_FromDouble(value);
+    }
+  }
+
+  // Return the original object
+  Py_INCREF(obj);
+  return obj;
+}
+#endif
+
+
+
 /* ****************************************************************************
 *
 * JexlManager::init -
 */
 void JexlManager::init(void)
 {
-  jexl_module = NULL;
-  jexl_engine = NULL;
+  pyjexlModule         = NULL;
+  jsonModule           = NULL;
+  jexlEngine           = NULL;
+  //customJsonSerializer = NULL;
 
   if (sem_init(&sem, 0, 1) == -1)
   {
@@ -124,19 +154,37 @@ void JexlManager::init(void)
   Py_Initialize();
   LM_T(LmtJexl, ("Python interpreter has been initialized"));
 
-  jexl_module = PyImport_ImportModule("pyjexl");
-  if (jexl_module == NULL)
+  pyjexlModule = PyImport_ImportModule("pyjexl");
+  if (pyjexlModule == NULL)
   {
     const char* error = capturePythonError();
-    LM_X(1, ("Fatal Error (error importing jexl_module: %s)", error));
+    LM_X(1, ("Fatal Error (error importing pyjexl module: %s)", error));
   }
-  LM_T(LmtJexl, ("jexl module has been loaded"));
+  LM_T(LmtJexl, ("pyjexl module has been loaded"));
 
-  jexl_engine = PyObject_CallMethod(jexl_module, "JEXL", NULL);
-  if (jexl_engine == NULL)
+  jsonModule = PyImport_ImportModule("json");
+  if (jsonModule == NULL)
   {
     const char* error = capturePythonError();
-    LM_X(1, ("Fatal Error (error creating jexl_engine: %s)", error));
+    LM_X(1, ("Fatal Error (error importing json module: %s)", error));
+  }
+  LM_T(LmtJexl, ("json module has been loaded"));
+
+#if 0
+  customJsonSerializer = PyCapsule_New((void*)customJsonSerializerFunction, NULL, NULL);
+  if (customJsonSerializer == NULL)
+  {
+    const char* error = capturePythonError();
+    LM_X(1, ("Fatal Error (error creating json custom serializer function: %s)", error));
+  }
+  LM_T(LmtJexl, ("json custom serializer has been createdmodule has been loaded"));
+#endif
+
+  jexlEngine = PyObject_CallMethod(pyjexlModule, "JEXL", NULL);
+  if (jexlEngine == NULL)
+  {
+    const char* error = capturePythonError();
+    LM_X(1, ("Fatal Error (error creating jexlEngine: %s)", error));
   }
   LM_T(LmtJexl, ("jexl engine has been created"));
 }
@@ -153,32 +201,32 @@ JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _
 
   JexlResult r;
 
-  // If nothing changes, the returned value is null
+  // If nothing changes, the returned value would be null (failsafe)
   r.valueType = orion::ValueTypeNull;
 
   PyObject* expression = Py_BuildValue("s", _expression.c_str());
   if (expression == NULL)
   {
-    // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
-    LM_T(LmtJexl, ("error evaluating expression, result is null"));
+    // FIXME PR: use LM_E/LM_W?
+    LM_T(LmtJexl, ("error building expression: %s", capturePythonError()));
     return r;
   }
 
-  PyObject* result = PyObject_CallMethod(jexl_engine, "evaluate", "OO", expression, jexlContextP->get());
+  PyObject* result = PyObject_CallMethod(jexlEngine, "evaluate", "OO", expression, jexlContextP->get());
   Py_XDECREF(expression);
   if (result == NULL)
   {
-    // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
-    LM_T(LmtJexl, ("error evaluating expression, result is null"));
+    // FIXME PR: use LM_E/LM_W?
+    LM_T(LmtJexl, ("error evaluating expression: %s", capturePythonError()));
     return r;
   }
 
   // Special case: expresion evalutes to None
   if (result == Py_None)
   {
-    Py_XDECREF(result);
-    r.valueType = orion::ValueTypeNull;
     LM_T(LmtJexl, ("JEXL evaluation result is null"));
+    r.valueType = orion::ValueTypeNull;
+    Py_XDECREF(result);
     return r;
   }
 
@@ -196,58 +244,52 @@ JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _
     LM_T(LmtJexl, ("JEXL evaluation result (bool): %s", r.boolValue ? "true": "false"));
     Py_XDECREF(result);
   }
-  else if (r.valueType == orion::ValueTypeObject)
+  else if ((r.valueType == orion::ValueTypeObject) || (r.valueType == orion::ValueTypeVector))
   {
-    // FIXME PR: same processing than string? Unify?
-    const char* repr = PyUnicode_AsUTF8(result);
+    // Using Python json.dumps() for this may seem overkill, but noe that PyObject_Repr(result) cannot
+    // be used, as it produce string with ' instead of " in the resulting JSON string.
+    // FIXME PR: is the customJsonSerializer going to be used at the end?
+    PyObject* repr = PyObject_CallMethod(jsonModule, "dumps", "O", result);
     Py_XDECREF(result);
     if (repr == NULL)
     {
-      // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
-      LM_T(LmtJexl, ("error evaluating expression, result is null"));
+        // FIXME PR: use LM_E/LM_W?
+        LM_T(LmtJexl, ("error obtaining dict/list representation: %s", capturePythonError()));
+        r.valueType = orion::ValueTypeNull;
     }
     else
     {
-      r.stringValue = std::string(repr);
-      LM_T(LmtJexl, ("JEXL evaluation result (object): %s", r.stringValue.c_str()));
-    }
-  }
-  else if (r.valueType == orion::ValueTypeVector)
-  {
-    // FIXME PR: same processing than string? Unify?
-    const char* repr = PyUnicode_AsUTF8(result);
-    Py_XDECREF(result);
-    if (repr == NULL)
-    {
-      // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
-      LM_T(LmtJexl, ("error evaluating expression, result is null"));
-    }
-    else
-    {
-      r.stringValue = std::string(repr);
-      LM_T(LmtJexl, ("JEXL evaluation result (list): %s", r.stringValue.c_str()));
+      const char* str = PyUnicode_AsUTF8(repr);
+      Py_XDECREF(repr);
+      if (str == NULL)
+      {
+        // FIXME PR: use LM_E/LM_W?
+        LM_T(LmtJexl, ("error obtaining str representation (object or vector): %s", capturePythonError()));
+        r.valueType = orion::ValueTypeNull;
+      }
+      else
+      {
+        LM_T(LmtJexl, ("JEXL evaluation result (object or vector): %s", str));
+        r.stringValue = std::string(str);
+      }
     }
   }
   else if (r.valueType == orion::ValueTypeString)
   {
-    const char* repr = PyUnicode_AsUTF8(result);
+    const char* str = PyUnicode_AsUTF8(result);
     Py_XDECREF(result);
-    if (repr == NULL)
+    if (str == NULL)
     {
-      // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
-      LM_T(LmtJexl, ("error evaluating expression, result is null"));
+      // FIXME PR: use LM_E/LM_W?
+      LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+      r.valueType = orion::ValueTypeNull;
     }
     else
     {
-      r.stringValue = std::string(repr);
-      LM_T(LmtJexl, ("JEXL evaluation result (string): %s", r.stringValue.c_str()));
+      LM_T(LmtJexl, ("JEXL evaluation result (string): %s", str));
+      r.stringValue = std::string(str);
     }
   }
-
-  //if (result_str[0] == '\'')
-  //{
-  //  result_str = result_str.substr(1, result_str.size()-2);
-  //}
 
   return r;
 }
@@ -260,16 +302,30 @@ JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _
 */
 void JexlManager::release(void)
 {
-  if (jexl_engine != NULL)
+  if (jexlEngine != NULL)
   {
-    Py_XDECREF(jexl_engine);
+    Py_XDECREF(jexlEngine);
     LM_T(LmtJexl, ("jexl engine has been freed"));
   }
 
-  if (jexl_module != NULL)
+  if (pyjexlModule != NULL)
   {
-    Py_XDECREF(jexl_module);
-    LM_T(LmtJexl, ("jexl module has been freed"));
+    Py_XDECREF(pyjexlModule);
+    LM_T(LmtJexl, ("pyjexl module has been freed"));
+  }
+
+#if 0
+  if (customJsonSerializer != NULL)
+  {
+    Py_XDECREF(customJsonSerializer);
+    LM_T(LmtJexl, ("json custom serializer module has been freed"));
+  }
+#endif
+
+  if (jsonModule != NULL)
+  {
+    Py_XDECREF(jsonModule);
+    LM_T(LmtJexl, ("json module has been freed"));
   }
 
   Py_Finalize();

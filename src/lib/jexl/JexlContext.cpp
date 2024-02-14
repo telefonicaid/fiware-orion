@@ -166,12 +166,12 @@ bool JexlContext::hasKey(const std::string& key)
 
 /* ****************************************************************************
 *
-* JexlContext::~JexlContext -
+* JexlContext::release -
 */
-JexlContext::~JexlContext()
+void JexlContext::release(void)
 {
   // FIXME PR: this is not correct. Recursively release of the dict object
-  Py_XDECREF(jexl_context);
+  //Py_XDECREF(jexl_context);
 }
 
 
@@ -291,9 +291,9 @@ void JexlContextList::add(JexlContextList _jexlContextList)
 
 /* ****************************************************************************
 *
-* JexlContextList::~JexlContextList -
+* JexlContextList::relesase -
 */
-JexlContextList::~JexlContextList()
+void JexlContextList::release(void)
 {
   // FIXME PR: this is not correct. Recursively release of the list object
   Py_XDECREF(jexl_context);
