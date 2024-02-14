@@ -38,6 +38,8 @@ brokerStart CB
 # 06. Create entity E3/T3/A3=3, with servicepath '///Level_1///Level_2//' (SP level with 0 length), see error
 # 07. Create entity E3/T3/A3=3, with servicepath '/Level_1///Level_2' (SP level with 0 length), see error
 # 08. Create entity E3/T3/A3=3, with servicepath '/Level_1/Level_2//' (SP level with 0 length), see error
+# 09. Create entity E4/T4/A4=4, with servicepath '/Level_1/Level_2/' (success case)
+# 10. GET /v2/entities/E4, with servicepath '/Level_1/Level_2' (without slash) to see E4/T4/A4=4
 #
 
 
@@ -141,6 +143,28 @@ payload='{
     }
 }'
 orionCurl --url /v2/entities --payload "$payload" --servicePath /Level_1/Level_2//
+echo
+echo
+
+
+echo "09. Create entity E4/T4/A4=4, with servicepath '/Level_1/Level_2/' (success case)"
+echo "================================================================================="
+payload='{
+    "id": "E4",
+    "type": "T4",
+    "A4": {
+      "value": 4,
+      "type": "Integer"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload" --servicePath /Level_1/Level_2/
+echo
+echo
+
+
+echo "10. GET /v2/entities/E4, with servicepath '/Level_1/Level_2' (without slash) to see E4/T4/A4=4"
+echo "=============================================================================================="
+orionCurl --url /v2/entities/E4 --servicePath /Level_1/Level_2
 echo
 echo
 
@@ -257,6 +281,35 @@ Content-Length: 69
 {
     "description": "empty component in ServicePath",
     "error": "BadRequest"
+}
+
+
+09. Create entity E4/T4/A4=4, with servicepath '/Level_1/Level_2/' (success case)
+=================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T4
+Content-Length: 0
+
+
+
+10. GET /v2/entities/E4, with servicepath '/Level_1/Level_2' (without slash) to see E4/T4/A4=4
+==============================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
+
+{
+    "A4": {
+        "metadata": {},
+        "type": "Integer",
+        "value": 4
+    },
+    "id": "E4",
+    "type": "T4"
 }
 
 
