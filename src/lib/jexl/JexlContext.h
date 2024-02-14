@@ -26,10 +26,15 @@
 * Author: Fermin Galan
 */
 
+// FIXME PR: rename this to a better name (ExprContextDict?)
+
 #include <Python.h>
 
 #include <string>
 
+//#include "jexl/JexlContextList.h"
+
+class JexlContextList;   // forward declaration
 
 /* ****************************************************************************
 *
@@ -43,23 +48,36 @@ private:
 public:
   ~JexlContext();
 
-  JexlContext
-  (
-    const std::string& id,
-    const std::string& type,
-    const std::string& service,
-    const std::string& servicePath,
-    const std::string& token
-  );
+  JexlContext();
 
   PyObject* get(void);
   void      add(const std::string& key, const std::string& value);
   void      add(const std::string& key, double value);
   void      add(const std::string& key, bool value);
   void      add(const std::string& key);
+  void      add(const std::string& key, JexlContext jexlContext);
+  void      add(const std::string& key, JexlContextList jexlContextList);
   bool      hasKey(const std::string& key);
 };
 
+class JexlContextList
+{
+private:
+  PyObject*  jexl_context;
+
+public:
+  ~JexlContextList();
+
+  JexlContextList();
+
+  PyObject* get(void);
+  void      add(const std::string& value);
+  void      add(double value);
+  void      add(bool value);
+  void      add(void);
+  void      add(JexlContext jexlContext);
+  void      add(JexlContextList jexlContextList);
+};
 
 
 #endif  // #define SRC_LIB_JEXL_JEXLCONTEXT_H_

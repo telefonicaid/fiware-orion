@@ -23,6 +23,9 @@
 * Author: Fermin Galan
 */
 
+// FIXME PR: use better names than JexlContext and JexlContextList. Also in LM_T
+// FIXME PR: add methods should check error in Py_BuildValue() for NULL
+
 #include <string>
 
 #include "logMsg/logMsg.h"
@@ -35,26 +38,15 @@
 * JexlContext::JexlContext -
 */
 JexlContext::JexlContext
-(
-  const std::string& id,
-  const std::string& type,
-  const std::string& service,
-  const std::string& servicePath,
-  const std::string& token
-)
+()
 {
   jexl_context = PyDict_New();
 
   if (jexl_context == NULL)
   {
     // FIXME PR: error control
+    // Note that this ruins the object... eg. add methods are not calleable (maybe should inclue a NULL check in all them)
   }
-
-  add("id", id);
-  add("type", type);
-  add("service", service);
-  add("servicePath", servicePath);
-  add("authToken", token);
 }
 
 
@@ -132,6 +124,32 @@ void JexlContext::add(const std::string& key)
 
 /* ****************************************************************************
 *
+* JexlContext::add -
+*/
+void JexlContext::add(const std::string& key, JexlContext _jexlContext)
+{
+  // FIXME PR: implement a toString() method in JexlContext to be used here
+  //LM_T(LmtJexl, ("adding to JEXL context (none): %s", key.c_str()));
+  PyDict_SetItemString(jexl_context, key.c_str(), _jexlContext.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContext::add -
+*/
+void JexlContext::add(const std::string& key, JexlContextList jexlContextList)
+{
+  // FIXME PR: implement a toString() method in JexlContextList to be used here
+  //LM_T(LmtJexl, ("adding to JEXL context (none): %s", key.c_str()));
+  PyDict_SetItemString(jexl_context, key.c_str(), jexlContextList.get());
+}
+
+
+
+/* ****************************************************************************
+*
 * JexlContext::hasKey -
 */
 bool JexlContext::hasKey(const std::string& key)
@@ -153,5 +171,130 @@ bool JexlContext::hasKey(const std::string& key)
 JexlContext::~JexlContext()
 {
   // FIXME PR: this is not correct. Recursively release of the dict object
+  Py_XDECREF(jexl_context);
+}
+
+
+/* ****************************************************************************
+*
+* JexlContextList::JexlContextList -
+*/
+JexlContextList::JexlContextList()
+{
+  jexl_context = PyList_New(0);
+
+  if (jexl_context == NULL)
+  {
+    // FIXME PR: error control
+    // Note that this ruins the object... eg. add methods are not calleable (maybe should inclue a NULL check in all them)
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContextList::get -
+*/
+PyObject* JexlContextList::get(void)
+{
+  return jexl_context;
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContextList::add -
+*/
+void JexlContextList::add(const std::string& _value)
+{
+  LM_T(LmtJexl, ("adding to JEXL context list (string): %s=", _value.c_str()));
+  PyObject* value = Py_BuildValue("s", _value.c_str());
+  PyList_Append(jexl_context, value);
+  Py_DECREF(value);
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContextList::add -
+*/
+void JexlContextList::add(double _value)
+{
+  LM_T(LmtJexl, ("adding to JEXL context list (double): %f", _value));
+  PyObject* value = Py_BuildValue("d", _value);
+  PyList_Append(jexl_context, value);
+  Py_DECREF(value);
+}
+
+
+
+
+/* ****************************************************************************
+*
+* JexlContextList::add -
+*/
+void JexlContextList::add(bool _value)
+{
+  LM_T(LmtJexl, ("adding to JEXL context list (bool): %s", _value? "true" : "false"));
+  if (_value)
+  {
+    PyList_Append(jexl_context, Py_True);
+  }
+  else
+  {
+    PyList_Append(jexl_context, Py_False);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContextList::add -
+*/
+void JexlContextList::add(void)
+{
+  LM_T(LmtJexl, ("adding to JEXL context list (none)"));
+  PyList_Append(jexl_context, Py_None);
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContextList::add -
+*/
+void JexlContextList::add(JexlContext _jexlContextP)
+{
+  // FIXME PR: implement a toString() method in JexlContext to be used here
+  //LM_T(LmtJexl, ("adding to JEXL context (none): %s", key.c_str()));
+  PyList_Append(jexl_context, _jexlContextP.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContextList::add -
+*/
+void JexlContextList::add(JexlContextList _jexlContextList)
+{
+  // FIXME PR: implement a toString() method in JexlContextList to be used here
+  //LM_T(LmtJexl, ("adding to JEXL context (none): %s", key.c_str()));
+  PyList_Append(jexl_context, _jexlContextList.get());
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlContextList::~JexlContextList -
+*/
+JexlContextList::~JexlContextList()
+{
+  // FIXME PR: this is not correct. Recursively release of the list object
   Py_XDECREF(jexl_context);
 }

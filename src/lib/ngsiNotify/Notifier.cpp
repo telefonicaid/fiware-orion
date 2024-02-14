@@ -340,7 +340,12 @@ static SenderThreadParams* buildSenderParamsCustom
   // Used by several macroSubstitute() calls along this function
   //std::map<std::string, std::string> replacements;
   //buildReplacementsMap(en, tenant, xauthToken, &replacements);
-  JexlContext jexlContext(en.id, en.type, tenant, en.servicePath, xauthToken);
+  JexlContext jexlContext;
+  jexlContext.add("id", en.id);
+  jexlContext.add("type", en.type);
+  jexlContext.add("service", tenant);
+  jexlContext.add("servicePath", en.servicePath);
+  jexlContext.add("authToken", xauthToken);
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
     // FIXME PR: this works with every attribute type? (number, bool, etc.)

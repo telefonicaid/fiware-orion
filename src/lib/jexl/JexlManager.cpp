@@ -90,9 +90,17 @@ static orion::ValueType getPyObjectType(PyObject* obj)
   {
     return orion::ValueTypeNumber;
   }
+  else if (PyDict_Check(obj))
+  {
+    return orion::ValueTypeObject;
+  }
+  else if (PyList_Check(obj))
+  {
+    return orion::ValueTypeVector;
+  }
   else
   {
-    // For other types (including dict and list) we use string as failsafe
+    // For other types we use string (this is also a failsafe for types not being strings)
     return orion::ValueTypeString;
   }
 }
@@ -187,6 +195,38 @@ JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _
     r.boolValue = PyObject_IsTrue(result);
     LM_T(LmtJexl, ("JEXL evaluation result (bool): %s", r.boolValue ? "true": "false"));
     Py_XDECREF(result);
+  }
+  else if (r.valueType == orion::ValueTypeObject)
+  {
+    // FIXME PR: same processing than string? Unify?
+    const char* repr = PyUnicode_AsUTF8(result);
+    Py_XDECREF(result);
+    if (repr == NULL)
+    {
+      // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
+      LM_T(LmtJexl, ("error evaluating expression, result is null"));
+    }
+    else
+    {
+      r.stringValue = std::string(repr);
+      LM_T(LmtJexl, ("JEXL evaluation result (object): %s", r.stringValue.c_str()));
+    }
+  }
+  else if (r.valueType == orion::ValueTypeVector)
+  {
+    // FIXME PR: same processing than string? Unify?
+    const char* repr = PyUnicode_AsUTF8(result);
+    Py_XDECREF(result);
+    if (repr == NULL)
+    {
+      // FIXME PR: grab error message from Python stack, use LM_E/LM_W?
+      LM_T(LmtJexl, ("error evaluating expression, result is null"));
+    }
+    else
+    {
+      r.stringValue = std::string(repr);
+      LM_T(LmtJexl, ("JEXL evaluation result (list): %s", r.stringValue.c_str()));
+    }
   }
   else if (r.valueType == orion::ValueTypeString)
   {
