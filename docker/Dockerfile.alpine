@@ -93,6 +93,7 @@ RUN \
     cd cmake-build && \
     # Different from ci/deb/build-dep.sh and build from source documentation, we add here also
     # the MONGOC_TEST_USE_CRYPT_SHARED=FALSE. It needs Python and in this tiny image we don't have it
+    # FIXME PR: now that Python is going to be include for JEXL functionalty, maybe this should be changed...
     cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE ..   && \
     make && \
     make install && \
