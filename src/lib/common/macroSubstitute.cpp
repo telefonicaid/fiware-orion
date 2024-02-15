@@ -54,7 +54,7 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
 
     JexlResult r = jexlMgr.evaluate(jexlContextP, macroName);
-    if (r.valueType == orion::ValueTypeNotGiven)
+    if (r.valueType == orion::ValueTypeNull)
     {
       return notFoundDefault;
     }
@@ -122,7 +122,7 @@ static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::st
 {
   JexlResult r = jexlMgr.evaluate(jexlContextP, key);
 
-  if (r.valueType == orion::ValueTypeNotGiven)
+  if (r.valueType == orion::ValueTypeNull)
   {
     return notFoundDefault;
   }

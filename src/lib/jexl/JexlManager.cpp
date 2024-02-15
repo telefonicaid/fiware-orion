@@ -201,8 +201,8 @@ JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _
 
   JexlResult r;
 
-  // If nothing changes, the returned value would be ValueTypeNotGiven
-  r.valueType = orion::ValueTypeNotGiven;
+  // If nothing changes, the returned value would be null (failsafe)
+  r.valueType = orion::ValueTypeNull;
 
   PyObject* expression = Py_BuildValue("s", _expression.c_str());
   if (expression == NULL)
