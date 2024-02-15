@@ -297,7 +297,7 @@ Content-Length: 0
 
 07. Dump accumulator
 ====================
-PATCH http://localhost:REGEX(\d+)/notify?Q2=null
+PATCH http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 36
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -306,7 +306,6 @@ Host: localhost:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-H2: null
 
 {
     "What": "PAYLOAD2",
