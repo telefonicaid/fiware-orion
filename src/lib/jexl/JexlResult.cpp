@@ -29,6 +29,208 @@
 #include "common/JsonHelper.h"
 #include "logMsg/logMsg.h"
 
+
+
+/* ****************************************************************************
+*
+* capturePythonError -
+*
+* FIXME PR: duplicate code. Unify
+*/
+static const char* capturePythonError()
+{
+  if (PyErr_Occurred())
+  {
+    PyObject* ptype;
+    PyObject* pvalue;
+    PyObject* ptraceback;
+
+    // Fetch the exception type, value, and traceback
+    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+
+    if (pvalue != NULL)
+    {
+      PyObject* str_obj = PyObject_Str(pvalue);
+      const char* error_message = PyUnicode_AsUTF8(str_obj);
+
+      // Release the Python objects
+      Py_XDECREF(str_obj);
+      Py_XDECREF(ptype);
+      Py_XDECREF(pvalue);
+      Py_XDECREF(ptraceback);
+
+      return error_message;
+    }
+  }
+
+  PyErr_Clear();
+  return "<no captured error>";
+}
+
+
+
+/* ****************************************************************************
+*
+* getPyObjectType -
+*/
+static orion::ValueType getPyObjectType(PyObject* obj)
+{
+  // PyBool_Check() has to be done before than PyLong_Check(). Alternatively, PyLong_CheckExact() could be
+  // used (not tested). See: https://stackoverflow.com/q/77990353/1485926
+  if (PyBool_Check(obj))
+  {
+    return orion::ValueTypeBoolean;
+  }
+  else if (PyLong_Check(obj))
+  {
+    return orion::ValueTypeNumber;
+  }
+  else if (PyFloat_Check(obj))
+  {
+    return orion::ValueTypeNumber;
+  }
+  else if (PyDict_Check(obj))
+  {
+    return orion::ValueTypeObject;
+  }
+  else if (PyList_Check(obj))
+  {
+    return orion::ValueTypeVector;
+  }
+  else
+  {
+    // For other types we use string (this is also a failsafe for types not being strings)
+    return orion::ValueTypeString;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* fill -
+*
+*/
+void JexlResult::fill(PyObject* result)
+{
+  // If nothing changes, the returned value would be null (failsafe)
+  valueType = orion::ValueTypeNull;
+
+  // Special case: expresion evalutes to None
+  if (result == Py_None)
+  {
+    LM_T(LmtJexl, ("JexlResult is null"));
+    valueType = orion::ValueTypeNull;
+    return;
+  }
+
+  // Other not null types
+  // FIXME PR: integrate getPyObjetType function into this one
+  valueType = getPyObjectType(result);
+  if (valueType == orion::ValueTypeNumber)
+  {
+    numberValue = PyFloat_AsDouble(result);
+    LM_T(LmtJexl, ("JexlResult (double): %f", numberValue));
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    boolValue = PyObject_IsTrue(result);
+    LM_T(LmtJexl, ("JexlResult (bool): %s", boolValue ? "true": "false"));
+  }
+  else if (valueType == orion::ValueTypeObject)
+  {
+    processDict(compoundValueP, result);
+    // Using Python json.dumps() for this may seem overkill, but noe that PyObject_Repr(result) cannot
+    // be used, as it produce string with ' instead of " in the resulting JSON string.
+    // FIXME PR: is the customJsonSerializer going to be used at the end?
+    /*PyObject* repr = PyObject_CallMethod(jsonModule, "dumps", "O", result);
+    if (repr == NULL)
+    {
+        // FIXME PR: use LM_E/LM_W?
+        LM_T(LmtJexl, ("error obtaining dict/list representation: %s", capturePythonError()));
+        valueType = orion::ValueTypeNull;
+    }
+    else
+    {
+      const char* str = PyUnicode_AsUTF8(repr);
+      Py_XDECREF(repr);
+      if (str == NULL)
+      {
+        // FIXME PR: use LM_E/LM_W?
+        LM_T(LmtJexl, ("error obtaining str representation (object or vector): %s", capturePythonError()));
+        valueType = orion::ValueTypeNull;
+      }
+      else
+      {
+        LM_T(LmtJexl, ("JexlResult (object or vector): %s", str));
+        stringValue = std::string(str);
+      }
+    }*/
+  }
+  else if (valueType == orion::ValueTypeVector)
+  {
+    processList(compoundValueP, result);
+    // Using Python json.dumps() for this may seem overkill, but noe that PyObject_Repr(result) cannot
+    // be used, as it produce string with ' instead of " in the resulting JSON string.
+    // FIXME PR: is the customJsonSerializer going to be used at the end?
+    /*PyObject* repr = PyObject_CallMethod(jsonModule, "dumps", "O", result);
+    if (repr == NULL)
+    {
+        // FIXME PR: use LM_E/LM_W?
+        LM_T(LmtJexl, ("error obtaining dict/list representation: %s", capturePythonError()));
+        valueType = orion::ValueTypeNull;
+    }
+    else
+    {
+      const char* str = PyUnicode_AsUTF8(repr);
+      Py_XDECREF(repr);
+      if (str == NULL)
+      {
+        // FIXME PR: use LM_E/LM_W?
+        LM_T(LmtJexl, ("error obtaining str representation (object or vector): %s", capturePythonError()));
+        valueType = orion::ValueTypeNull;
+      }
+      else
+      {
+        LM_T(LmtJexl, ("JexlResult (object or vector): %s", str));
+        stringValue = std::string(str);
+      }
+    }*/
+  }  
+  else if (valueType == orion::ValueTypeString)
+  {
+    const char* str = PyUnicode_AsUTF8(result);
+    if (str == NULL)
+    {
+      // FIXME PR: use LM_E/LM_W?
+      LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+      valueType = orion::ValueTypeNull;
+    }
+    else
+    {
+      LM_T(LmtJexl, ("JexlResult (string): %s", str));
+      stringValue = std::string(str);
+    }
+  }
+}
+
+
+
+  void JexlResult::processList(orion::CompoundValueNode* node, PyObject* result)
+  {
+
+  }
+
+
+
+
+  void JexlResult::processDict(orion::CompoundValueNode* node, PyObject* result)
+  {
+
+  }
+
+
+
 /* ****************************************************************************
 *
 * toString -

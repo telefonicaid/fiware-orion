@@ -30,6 +30,7 @@
 
 #include "parse/CompoundValueNode.h"
 
+#include <Python.h>
 #include <string>
 
 /* ****************************************************************************
@@ -48,6 +49,11 @@ public:
 
   // Use only when valueType is object or vector
   orion::CompoundValueNode*  compoundValueP;
+
+  void fill(PyObject* result);
+
+  void processList(orion::CompoundValueNode* node, PyObject* result);
+  void processDict(orion::CompoundValueNode* node, PyObject* result);
 
   std::string  toString(void);
   void         release(void);

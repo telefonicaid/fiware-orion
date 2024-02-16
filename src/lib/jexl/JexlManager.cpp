@@ -68,42 +68,6 @@ static const char* capturePythonError()
 }
 
 
-/* ****************************************************************************
-*
-* getPyObjectType -
-*/
-static orion::ValueType getPyObjectType(PyObject* obj)
-{
-  // PyBool_Check() has to be donde before than PyLong_Check(). Alternatively, PyLong_CheckExact() could be
-  // used (not tested). See: https://stackoverflow.com/q/77990353/1485926
-  if (PyBool_Check(obj))
-  {
-    return orion::ValueTypeBoolean;
-  }
-  else if (PyLong_Check(obj))
-  {
-    return orion::ValueTypeNumber;
-  }
-  else if (PyFloat_Check(obj))
-  {
-    return orion::ValueTypeNumber;
-  }
-  else if (PyDict_Check(obj))
-  {
-    return orion::ValueTypeObject;
-  }
-  else if (PyList_Check(obj))
-  {
-    return orion::ValueTypeVector;
-  }
-  else
-  {
-    // For other types we use string (this is also a failsafe for types not being strings)
-    return orion::ValueTypeString;
-  }
-}
-
-
 
 #if 0
 /* ****************************************************************************
@@ -197,12 +161,9 @@ void JexlManager::init(void)
 */
 JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _expression)
 {
-  LM_T(LmtJexl, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
-
   JexlResult r;
 
-  // If nothing changes, the returned value would be null (failsafe)
-  r.valueType = orion::ValueTypeNull;
+  LM_T(LmtJexl, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
 
   PyObject* expression = Py_BuildValue("s", _expression.c_str());
   if (expression == NULL)
@@ -221,8 +182,11 @@ JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _
     return r;
   }
 
+  r.fill(result);
+  Py_XDECREF(result);
+
   // Special case: expresion evalutes to None
-  if (result == Py_None)
+  /*if (result == Py_None)
   {
     LM_T(LmtJexl, ("JEXL evaluation result is null"));
     r.valueType = orion::ValueTypeNull;
@@ -289,7 +253,7 @@ JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _
       LM_T(LmtJexl, ("JEXL evaluation result (string): %s", str));
       r.stringValue = std::string(str);
     }
-  }
+  }*/
 
   return r;
 }
