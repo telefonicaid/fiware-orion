@@ -704,6 +704,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     return 1;
   }
 
+  if (servicePath[1] == '/')
+  {
+    OrionError oe(SccBadRequest, "empty component in ServicePath");
+    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+    return 1;
+  }
+
   if (ciP->servicePathV.size() > 1)
   {
     if (ciP->verb == PATCH)
@@ -795,7 +802,7 @@ static char* removeTrailingSlash(std::string path)
   char* cpath = (char*) path.c_str();
 
   /* strlen(cpath) > 1 ensures that root service path "/" is not touched */
-  while ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
+  if ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
   {
     cpath[strlen(cpath) - 1] = 0;
   }

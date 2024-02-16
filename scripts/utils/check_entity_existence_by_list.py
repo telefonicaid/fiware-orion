@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -64,12 +64,12 @@ def check_entity(id):
 
     if res.status_code != 200:
         # res.json() is not used but it can be if we want
-        print '%s|-|FAIL|%d' % (id, res.status_code)
+        print('%s|-|FAIL|%d' % (id, res.status_code))
         n_fail += 1
         return
 
     type = res.json()['type']
-    print '%s|%s|OK|200' % (id, type)
+    print('%s|%s|OK|200' % (id, type))
     n_ok += 1
     return
 
@@ -89,7 +89,7 @@ def check_entities(filename):
 ### Main program starts here ###
 
 if len(sys.argv) != 2:
-    print "invalid number of arguments, please provide the file name of entities"
+    print("invalid number of arguments, please provide the file name of entities")
     sys.exit()
 
 filename = sys.argv[1]
@@ -98,7 +98,7 @@ n_ok = 0
 n_fail = 0
 check_entities(filename)
 
-print '----------------'
-print 'OK:    %d' % n_ok
-print 'FAIL:  %d' % n_fail
-print 'TOTAL: %d' % (n_ok + n_fail)
+print('----------------')
+print('OK:    %d' % n_ok)
+print('FAIL:  %d' % n_fail)
+print('TOTAL: %d' % (n_ok + n_fail))

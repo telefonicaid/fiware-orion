@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -27,7 +27,7 @@ __author__ = 'fermin'
 ##############################################################
 # BEGIN of the configuration part (don't touch above this line ;)
 
-cb_endpoint = 'https://localhost:1026'
+cb_endpoint = 'http://localhost:1026'
 
 headers = {
     'fiware-service': 'service',
@@ -51,7 +51,7 @@ def testing_populate(n, entity_type):
     :param n: number of entitis to populate (with ids from e1 to e<n>)
     :param entity_type: entity type used for the populated entities (all with the same type)
     """
-    print 'Populating %d entities of type %s' % (n, entity_type)
+    print('Populating %d entities of type %s' % (n, entity_type))
 
     entities = []
     for i in range(1, 110):
@@ -76,7 +76,7 @@ def testing_populate(n, entity_type):
 
     res = requests.post(cb_endpoint + '/v2/op/update', json=body, headers=headers, verify=False)
     if res.status_code != 204:
-        print 'Error populating entities (%d): %s' % (res.status_code, res.json())
+        print('Error populating entities (%d): %s' % (res.status_code, res.json()))
 
 
 def get_entities_count():
@@ -90,7 +90,7 @@ def get_entities_count():
     res = requests.get(cb_endpoint + '/v2/entities?limit=1&options=count&attrs=noexist' + filter, headers=headers,
                        verify=False)
     if res.status_code != 200:
-        print 'Error getting entities count (%d): %s' % (res.status_code, res.json())
+        print('Error getting entities count (%d): %s' % (res.status_code, res.json()))
         return -1
     else:
         return int(res.headers['fiware-total-count'])
@@ -101,10 +101,10 @@ def initial_statistics():
     Print some initial data statistics
     """
     total = get_entities_count()
-    print 'There are %d entities' % total
-    pages = total / page_size
+    print('There are %d entities' % total)
+    pages = total // page_size
     rest = total - (pages * page_size)
-    print 'There are %d pages of %d entities (and a final page of %d entities)' % (pages, page_size, rest)
+    print('There are %d pages of %d entities (and a final page of %d entities)' % (pages, page_size, rest))
 
 
 def remove_page():
@@ -130,7 +130,7 @@ def remove_page():
 
     res = requests.post(cb_endpoint + '/v2/op/update', json=body, headers=headers, verify=False)
     if res.status_code != 204:
-        print 'Error deleting entities (%d): %s' % (res.status_code, res.json())
+        print('Error deleting entities (%d): %s' % (res.status_code, res.json()))
         return False
 
     return True
@@ -142,7 +142,7 @@ def remove_all():
     """
     i = 1
     while get_entities_count() > 0:
-        print '- Remove page %d' % i
+        print('- Remove page %d' % i)
         remove_page()
         i += 1
 
@@ -150,10 +150,10 @@ def remove_all():
 ### Main program starts here ###
 
 # Warn user
-print "WARNING!!!! This script will delete all the entities matching the filter '%s'" % filter
-print "This action cannot be undone. If you are sure you want to continue type 'yes' and press Enter"
+print("WARNING!!!! This script will delete all the entities matching the filter '%s'" % filter)
+print("This action cannot be undone. If you are sure you want to continue type 'yes' and press Enter")
 
-confirm = raw_input()
+confirm = input()
 
 if (confirm != 'yes'):
     sys.exit()
@@ -162,4 +162,5 @@ if (confirm != 'yes'):
 #testing_populate(109, 'testing')
 initial_statistics()
 remove_all()
-print 'We are done!'
+print('We are done!')
+
