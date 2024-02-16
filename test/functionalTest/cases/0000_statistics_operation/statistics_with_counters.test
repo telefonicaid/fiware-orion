@@ -143,7 +143,6 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v2/op/notify -X OPTIONS                      > /dev/null
 orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
 
 
@@ -316,15 +315,14 @@ Content-Length: REGEX(\d+)
                 "POST": 1,
                 "PUT": 1
             },
+            "/v2/op/notify": {
+                "POST": 1
+            },
             "/v2/op/query": {
                 "OPTIONS": 1,
                 "POST": 1
             },
             "/v2/op/update": {
-                "OPTIONS": 1,
-                "POST": 1
-            },
-            "/v2/op/notify": {
                 "OPTIONS": 1,
                 "POST": 1
             },       
