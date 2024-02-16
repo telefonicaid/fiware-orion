@@ -35,7 +35,6 @@
 *
 * Pretty similar to ContextAttribute::toJsonValue()
 *
-* FIXME PR: ValueTypeVector and ValueTypeObject should be taken into account
 */
 std::string JexlResult::toString(void)
 {
@@ -53,7 +52,15 @@ std::string JexlResult::toString(void)
   }
   else if ((valueType == orion::ValueTypeObject)||(valueType == orion::ValueTypeVector))
   {
-    return stringValue;
+    if (compoundValueP != NULL)
+    {
+      return compoundValueP->toJson();
+    }
+    else
+    {
+      LM_E(("Runtime Error (result is vector/object but compountValue is NULL)"));
+      return "";
+    }
   }
   else if (valueType == orion::ValueTypeNull)
   {
@@ -63,5 +70,20 @@ std::string JexlResult::toString(void)
   {
     LM_E(("Runtime Error (not allowed type in JexlResult: %s)", valueTypeName(valueType)));
     return "";
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* JexlResult::release -
+*/
+void JexlResult::release(void)
+{
+  if (compoundValueP != NULL)
+  {
+    delete compoundValueP;
+    compoundValueP = NULL;
   }
 }

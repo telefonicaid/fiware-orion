@@ -28,6 +28,8 @@
 
 #include "orionTypes/OrionValueType.h"
 
+#include "parse/CompoundValueNode.h"
+
 #include <string>
 
 /* ****************************************************************************
@@ -44,7 +46,11 @@ public:
   double            numberValue;  // "value" as a Number
   bool              boolValue;    // "value" as a Boolean
 
-  std::string       toString(void);
+  // Use only when valueType is object or vector
+  orion::CompoundValueNode*  compoundValueP;
+
+  std::string  toString(void);
+  void         release(void);
 };
 
 
