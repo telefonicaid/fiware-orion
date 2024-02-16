@@ -143,9 +143,7 @@ payload='{
     }
   ]
 }'
-# FIXME #4261. Once the issue gets solved, this line should be uncommented
-# The REGEXPECT part would need a little adapation after that
-#orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
+orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
 
 
 payload='{
@@ -263,7 +261,7 @@ Content-Length: REGEX(\d+)
         "deprecatedFeatures": {
             "ngsiv1Requests": 7
         },
-        "jsonRequests": 16,
+        "jsonRequests": 17,
         "noPayloadRequests": 42,
         "requests": {
             "/admin/log": {
@@ -317,6 +315,9 @@ Content-Length: REGEX(\d+)
                 "POST": 1,
                 "PUT": 1
             },
+            "/v2/op/notify": {
+                "POST": 1
+            },
             "/v2/op/query": {
                 "OPTIONS": 1,
                 "POST": 1
@@ -324,7 +325,7 @@ Content-Length: REGEX(\d+)
             "/v2/op/update": {
                 "OPTIONS": 1,
                 "POST": 1
-            },
+            },       
             "/v2/registrations": {
                 "GET": 1,
                 "OPTIONS": 1,
