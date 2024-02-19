@@ -58,6 +58,29 @@ OrionldContextOrigin orionldOriginFromString(const char* s)
 
 // -----------------------------------------------------------------------------
 //
+// orionldOriginToString - FIXME: move to its own module
+//
+const char* orionldOriginToString(OrionldContextOrigin origin)
+{
+  switch (origin)
+  {
+  case OrionldContextUnknownOrigin:       return "UnknownOrigin";
+  case OrionldContextFromInline:          return "FromInline";
+  case OrionldContextDownloaded:          return "Downloaded";
+  case OrionldContextFileCached:          return "FileCached";
+  case OrionldContextForNotifications:    return "ForNotifications";
+  case OrionldContextForForwarding:       return "ForForwarding";
+  case OrionldContextUserCreated:         return "UserCreated";
+  case OrionldContextBuiltinCoreContext:  return "BuiltinCoreContext";
+  }
+
+  return "InvalidOrigin";
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldContextCreate -
 //
 // FIXME: If the context is to be saved in the cache, then 'kalloc' can't be used.

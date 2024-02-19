@@ -92,6 +92,13 @@ extern OrionldContextOrigin orionldOriginFromString(const char* s);
 
 
 
+// -----------------------------------------------------------------------------
+//
+// orionldOriginToString -
+//
+extern const char* orionldOriginToString(OrionldContextOrigin origin);
+
+
 
 // ----------------------------------------------------------------------------
 //

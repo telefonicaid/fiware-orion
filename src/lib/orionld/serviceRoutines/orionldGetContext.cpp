@@ -61,9 +61,21 @@ bool orionldGetContext(void)
     return false;
   }
 
-  contextP->tree->name = (char*) "@context";
+  if (orionldState.uriParams.details == true)
+  {
+    KjNode* urlNodeP   = kjString(orionldState.kjsonP, "URL",     contextP->url);
+    KjNode* idNodeP    = kjString(orionldState.kjsonP, "localId", contextP->id);
+    KjNode* kindNodeP  = kjString(orionldState.kjsonP, "kind",    orionldOriginToString(contextP->origin));
 
-  kjChildAdd(orionldState.responseTree, contextP->tree);
+    kjChildAdd(orionldState.responseTree, urlNodeP);
+    kjChildAdd(orionldState.responseTree, idNodeP);
+    kjChildAdd(orionldState.responseTree, kindNodeP);
+  }
+  else
+  {
+    contextP->tree->name = (char*) "@context";
+    kjChildAdd(orionldState.responseTree, contextP->tree);
+  }
 
   return true;
 }

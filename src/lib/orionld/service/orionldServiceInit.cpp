@@ -472,8 +472,9 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   else if (serviceP->serviceRoutine == orionldGetContext)
   {
     serviceP->options  = 0;  // Tenant is Ignored
-
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
   }
   else if (serviceP->serviceRoutine == orionldPostContexts)
   {

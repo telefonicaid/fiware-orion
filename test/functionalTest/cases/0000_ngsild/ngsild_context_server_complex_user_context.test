@@ -41,14 +41,16 @@ orionldStart CB
 
 echo "01. Create a new context to be served by the broker, one that is an array of a URL and a key-value list: 3 contexts in total"
 echo "============================================================================================================================"
-payload='[
-  "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
-  {
-    "A1": "urn:ngsi-ld:attributes:A1",
-    "A2": "urn:ngsi-ld:attributes:A2",
-    "A3": "urn:ngsi-ld:attributes:A3"    
-  }
-]'
+payload='{
+  "@context": [
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    {
+      "A1": "urn:ngsi-ld:attributes:A1",
+      "A2": "urn:ngsi-ld:attributes:A2",
+      "A3": "urn:ngsi-ld:attributes:A3"
+    }
+  ]
+}'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo
