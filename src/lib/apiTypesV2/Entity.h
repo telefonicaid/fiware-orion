@@ -91,8 +91,8 @@ class Entity
                       const std::vector<std::string>&      attrsFilter,
                       bool                                 blacklist,
                       const std::vector<std::string>&      metadataFilter,
-                      bool                                 renderNgsiField = false,
-                      ExprContextObject*                         exprContext     = NULL);
+                      bool                                 renderNgsiField    = false,
+                      ExprContextObject*                   exprContextObjectP = NULL);
 
   std::string  toJson(RenderFormat                     renderFormat,
                       bool                             renderNgsiField = false);
@@ -145,8 +145,8 @@ class Entity
   std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonNormalized(const std::vector<ContextAttribute*>&  orderedAttrs,
                                const std::vector<std::string>&        metadataFilter,
-                               bool                                   renderNgsiField = false,
-                               ExprContextObject*                           exprContext     = NULL);
+                               bool                                   renderNgsiField   = false,
+                               ExprContextObject*                     exprContextObject = NULL);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

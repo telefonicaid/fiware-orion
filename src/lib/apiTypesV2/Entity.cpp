@@ -308,7 +308,7 @@ std::string Entity::toJson
   bool                                 blacklist,
   const std::vector<std::string>&      metadataFilter,
   bool                                 renderNgsiField,
-  ExprContextObject*                         exprContextObjectP
+  ExprContextObject*                   exprContextObjectP
 )
 {
   std::vector<ContextAttribute* > orderedAttrs;
@@ -444,7 +444,7 @@ std::string Entity::toJsonNormalized
   const std::vector<ContextAttribute*>&  orderedAttrs,
   const std::vector<std::string>&        metadataFilter,
   bool                                   renderNgsiField,
-  ExprContextObject*                           exprContextObjectP
+  ExprContextObject*                     exprContextObjectP
 )
 {
   JsonObjectHelper jh;
