@@ -40,21 +40,6 @@ extern std::string smartStringValue(const std::string stringValue, JexlContext* 
 
 /* ****************************************************************************
 *
-* buildReplacementMap -
-*
-*/
-/*extern void buildReplacementsMap
-(
-  const Entity&                        en,
-  const std::string&                   service,
-  const std::string&                   token,
-  std::map<std::string, std::string>*  replacementsP
-);*/
-
-
-
-/* ****************************************************************************
-*
 * macroSubstitute -
 *
 */

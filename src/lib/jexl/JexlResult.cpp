@@ -147,34 +147,9 @@ void JexlResult::fill(PyObject* result)
     Py_ssize_t pos = 0;
     while (PyDict_Next(result, &pos, &key, &value))
     {
+      // FIXME PR: memory should be freed?
       processDictItem(compoundValueP, key, value);
     }
-    // Using Python json.dumps() for this may seem overkill, but noe that PyObject_Repr(result) cannot
-    // be used, as it produce string with ' instead of " in the resulting JSON string.
-    // FIXME PR: is the customJsonSerializer going to be used at the end?
-    /*PyObject* repr = PyObject_CallMethod(jsonModule, "dumps", "O", result);
-    if (repr == NULL)
-    {
-        // FIXME PR: use LM_E/LM_W?
-        LM_T(LmtJexl, ("error obtaining dict/list representation: %s", capturePythonError()));
-        valueType = orion::ValueTypeNull;
-    }
-    else
-    {
-      const char* str = PyUnicode_AsUTF8(repr);
-      Py_XDECREF(repr);
-      if (str == NULL)
-      {
-        // FIXME PR: use LM_E/LM_W?
-        LM_T(LmtJexl, ("error obtaining str representation (object or vector): %s", capturePythonError()));
-        valueType = orion::ValueTypeNull;
-      }
-      else
-      {
-        LM_T(LmtJexl, ("JexlResult (object or vector): %s", str));
-        stringValue = std::string(str);
-      }
-    }*/
   }
   else if (valueType == orion::ValueTypeVector)
   {
@@ -182,34 +157,9 @@ void JexlResult::fill(PyObject* result)
     Py_ssize_t size = PyList_Size(result);
     for (Py_ssize_t ix = 0; ix < size; ++ix)
     {
-       processListItem(compoundValueP, PyList_GetItem(result, ix));
+      // FIXME PR: memory should be freed?
+      processListItem(compoundValueP, PyList_GetItem(result, ix));
     }
-    // Using Python json.dumps() for this may seem overkill, but noe that PyObject_Repr(result) cannot
-    // be used, as it produce string with ' instead of " in the resulting JSON string.
-    // FIXME PR: is the customJsonSerializer going to be used at the end?
-    /*PyObject* repr = PyObject_CallMethod(jsonModule, "dumps", "O", result);
-    if (repr == NULL)
-    {
-        // FIXME PR: use LM_E/LM_W?
-        LM_T(LmtJexl, ("error obtaining dict/list representation: %s", capturePythonError()));
-        valueType = orion::ValueTypeNull;
-    }
-    else
-    {
-      const char* str = PyUnicode_AsUTF8(repr);
-      Py_XDECREF(repr);
-      if (str == NULL)
-      {
-        // FIXME PR: use LM_E/LM_W?
-        LM_T(LmtJexl, ("error obtaining str representation (object or vector): %s", capturePythonError()));
-        valueType = orion::ValueTypeNull;
-      }
-      else
-      {
-        LM_T(LmtJexl, ("JexlResult (object or vector): %s", str));
-        stringValue = std::string(str);
-      }
-    }*/
   }  
   else if (valueType == orion::ValueTypeString)
   {
@@ -288,6 +238,7 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
     for (Py_ssize_t ix = 0; ix < size; ++ix)
     {
        processListItem(nodeP, PyList_GetItem(value, ix));
+       // FIXME PR: memory should be freed?
     }
     parentP->add(nodeP);
     break;
@@ -298,6 +249,7 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
     while (PyDict_Next(value, &pos, &keyAux, &valueAux))
     {
       processDictItem(nodeP, keyAux, valueAux);
+      // FIXME PR: memory should be freed?
     }
     parentP->add(nodeP);
     break;
@@ -378,6 +330,7 @@ void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
     for (Py_ssize_t ix = 0; ix < size; ++ix)
     {
        processListItem(nodeP, PyList_GetItem(value, ix));
+       // FIXME PR: memory should be freed?
     }
     parentP->add(nodeP);
     break;
@@ -388,6 +341,7 @@ void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
     while (PyDict_Next(value, &pos, &keyAux, &valueAux))
     {
       processDictItem(nodeP, keyAux, valueAux);
+      // FIXME PR: memory should be freed?
     }
     parentP->add(nodeP);
     break;
