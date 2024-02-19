@@ -72,85 +72,15 @@ static orion::ValueType getPyObjectType(PyObject* obj)
 }
 
 
-
-/* ****************************************************************************
-*
-* fill -
-*
-*/
-void ExprResult::fill(PyObject* result)
-{
-  // If nothing changes, the returned value would be null (failsafe)
-  valueType = orion::ValueTypeNull;
-
-  // Special case: expresion evalutes to None
-  if (result == Py_None)
-  {
-    LM_T(LmtExpr, ("ExprResult is null"));
-    valueType = orion::ValueTypeNull;
-    return;
-  }
-
-  // Other not null types
-  valueType = getPyObjectType(result);
-  if (valueType == orion::ValueTypeNumber)
-  {
-    numberValue = PyFloat_AsDouble(result);
-    LM_T(LmtExpr, ("ExprResult (double): %f", numberValue));
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    boolValue = PyObject_IsTrue(result);
-    LM_T(LmtExpr, ("ExprResult (bool): %s", boolValue ? "true": "false"));
-  }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-    while (PyDict_Next(result, &pos, &key, &value))
-    {
-      // No need to free memory of each dict item here, the whole result object is freed
-      // in ExprManager::evaluate()
-      processDictItem(compoundValueP, key, value);
-    }
-  }
-  else if (valueType == orion::ValueTypeVector)
-  {
-    compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
-    Py_ssize_t size = PyList_Size(result);
-    for (Py_ssize_t ix = 0; ix < size; ++ix)
-    {
-      // No need to free memory of each list item here, the whole result object is freed
-      // in ExprManager::evaluate()
-      processListItem(compoundValueP, PyList_GetItem(result, ix));
-    }
-  }  
-  else if (valueType == orion::ValueTypeString)
-  {
-    const char* str = PyUnicode_AsUTF8(result);
-    if (str == NULL)
-    {
-      LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
-      valueType = orion::ValueTypeNull;
-    }
-    else
-    {
-      LM_T(LmtExpr, ("ExprResult (string): %s", str));
-      stringValue = std::string(str);
-    }
-  }
-}
-
+static void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value);  // forward declaration
 
 
 /* ****************************************************************************
 *
 * processListItem -
 *
-* FIXME PR: maybe this should be static function out of the class?
 */
-void ExprResult::processListItem(orion::CompoundValueNode* parentP, PyObject* value)
+void processListItem(orion::CompoundValueNode* parentP, PyObject* value)
 {
   orion::CompoundValueNode* nodeP;
 
@@ -234,9 +164,8 @@ void ExprResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
 *
 * processDictItem -
 *
-* FIXME PR: maybe this should be static function out of the class?
 */
-void ExprResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value)
+void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value)
 {
   const char * keyStr = PyUnicode_AsUTF8(key);
   if (keyStr == NULL)
@@ -317,6 +246,77 @@ void ExprResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
 
   default:
     LM_E(("Runtime Error (value type unknown))"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* fill -
+*
+*/
+void ExprResult::fill(PyObject* result)
+{
+  // If nothing changes, the returned value would be null (failsafe)
+  valueType = orion::ValueTypeNull;
+
+  // Special case: expresion evalutes to None
+  if (result == Py_None)
+  {
+    LM_T(LmtExpr, ("ExprResult is null"));
+    valueType = orion::ValueTypeNull;
+    return;
+  }
+
+  // Other not null types
+  valueType = getPyObjectType(result);
+  if (valueType == orion::ValueTypeNumber)
+  {
+    numberValue = PyFloat_AsDouble(result);
+    LM_T(LmtExpr, ("ExprResult (double): %f", numberValue));
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    boolValue = PyObject_IsTrue(result);
+    LM_T(LmtExpr, ("ExprResult (bool): %s", boolValue ? "true": "false"));
+  }
+  else if (valueType == orion::ValueTypeObject)
+  {
+    compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(result, &pos, &key, &value))
+    {
+      // No need to free memory of each dict item here, the whole result object is freed
+      // in ExprManager::evaluate()
+      processDictItem(compoundValueP, key, value);
+    }
+  }
+  else if (valueType == orion::ValueTypeVector)
+  {
+    compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
+    Py_ssize_t size = PyList_Size(result);
+    for (Py_ssize_t ix = 0; ix < size; ++ix)
+    {
+      // No need to free memory of each list item here, the whole result object is freed
+      // in ExprManager::evaluate()
+      processListItem(compoundValueP, PyList_GetItem(result, ix));
+    }
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    const char* str = PyUnicode_AsUTF8(result);
+    if (str == NULL)
+    {
+      LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
+      valueType = orion::ValueTypeNull;
+    }
+    else
+    {
+      LM_T(LmtExpr, ("ExprResult (string): %s", str));
+      stringValue = std::string(str);
+    }
   }
 }
 
