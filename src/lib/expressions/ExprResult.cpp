@@ -131,8 +131,7 @@ void ExprResult::fill(PyObject* result)
     const char* str = PyUnicode_AsUTF8(result);
     if (str == NULL)
     {
-      // FIXME PR: use LM_E/LM_W?
-      LM_T(LmtExpr, ("error obtaning str representation (string): %s", capturePythonError()));
+      LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
       valueType = orion::ValueTypeNull;
     }
     else
@@ -167,8 +166,7 @@ void ExprResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
     str = PyUnicode_AsUTF8(value);
     if (str == NULL)
     {
-      // FIXME PR: use LM_E/LM_W?
-      LM_T(LmtExpr, ("error obtaning str representation (string): %s", capturePythonError()));
+      LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
     }
     else
     {
@@ -243,8 +241,7 @@ void ExprResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
   const char * keyStr = PyUnicode_AsUTF8(key);
   if (keyStr == NULL)
   {
-    // FIXME PR: use LM_E/LM_W?
-    LM_T(LmtExpr, ("error obtaning str representation (string): %s", capturePythonError()));
+    LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
     return;
   }
 
@@ -261,8 +258,7 @@ void ExprResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
     str = PyUnicode_AsUTF8(value);
     if (str == NULL)
     {
-      // FIXME PR: use LM_E/LM_W?
-      LM_T(LmtExpr, ("error obtaning str representation (string): %s", capturePythonError()));
+      LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
     }
     else
     {

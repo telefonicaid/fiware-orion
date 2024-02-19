@@ -50,7 +50,9 @@ public:
   void      add(const std::string& key);
   void      add(const std::string& key, ExprContextObject exprContextObject);
   void      add(const std::string& key, ExprContextList exprContextList);
-  bool      hasKey(const std::string& key);
+
+  std::string toString(void);
+
   void      release(void);
 };
 
@@ -69,6 +71,9 @@ public:
   void      add(void);
   void      add(ExprContextObject exprContextObject);
   void      add(ExprContextList exprContextList);
+
+  std::string toString(void);
+
   void      release(void);
 };
 

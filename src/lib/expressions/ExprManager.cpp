@@ -84,8 +84,7 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
   PyObject* expression = Py_BuildValue("s", _expression.c_str());
   if (expression == NULL)
   {
-    // FIXME PR: use LM_E/LM_W?
-    LM_T(LmtExpr, ("error building expression: %s", capturePythonError()));
+    LM_W(("error building JEXL expression: %s", capturePythonError()));
     return r;
   }
 
@@ -93,8 +92,7 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
   Py_XDECREF(expression);
   if (result == NULL)
   {
-    // FIXME PR: use LM_E/LM_W?
-    LM_T(LmtExpr, ("error evaluating expression: %s", capturePythonError()));
+    LM_W(("error evaluating JEXL expression: %s", capturePythonError()));
     return r;
   }
 
