@@ -97,6 +97,10 @@ static orion::ValueType getPyObjectType(PyObject* obj)
   {
     return orion::ValueTypeVector;
   }
+  else if (obj == Py_None)
+  {
+    return orion::ValueTypeNull;
+  }
   else
   {
     // For other types we use string (this is also a failsafe for types not being strings)
@@ -232,16 +236,20 @@ void JexlResult::fill(PyObject* result)
 *
 * FIXME PR: maybe this should be static function out of the class?
 */
-void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* item)
+void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* value)
 {
   orion::CompoundValueNode* nodeP;
+
   const char* str;
   double d;
   bool b;
-  switch (getPyObjectType(item))
+  PyObject *keyAux, *valueAux;
+  Py_ssize_t pos, size;
+
+  switch (getPyObjectType(value))
   {
   case orion::ValueTypeString:
-    str = PyUnicode_AsUTF8(item);
+    str = PyUnicode_AsUTF8(value);
     if (str == NULL)
     {
       // FIXME PR: use LM_E/LM_W?
@@ -256,14 +264,14 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* it
     break;
 
   case orion::ValueTypeNumber:
-    d = PyFloat_AsDouble(item);
+    d = PyFloat_AsDouble(value);
     LM_T(LmtJexl, ("processList (double): %f", d));
     nodeP = new orion::CompoundValueNode("", d, orion::ValueTypeNumber);
     parentP->add(nodeP);
     break;
 
   case orion::ValueTypeBoolean:
-    b = PyObject_IsTrue(item);
+    b = PyObject_IsTrue(value);
     LM_T(LmtJexl, ("JexlResult (bool): %s", b ? "true": "false"));
     nodeP = new orion::CompoundValueNode("", b, orion::ValueTypeBoolean);
     parentP->add(nodeP);
@@ -275,11 +283,23 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* it
     break;
 
   case orion::ValueTypeVector:
-    // TBD
+    nodeP = new orion::CompoundValueNode(orion::ValueTypeVector);
+    size = PyList_Size(value);
+    for (Py_ssize_t ix = 0; ix < size; ++ix)
+    {
+       processListItem(nodeP, PyList_GetItem(value, ix));
+    }
+    parentP->add(nodeP);
     break;
 
   case orion::ValueTypeObject:
-    // TBD
+    nodeP = new orion::CompoundValueNode(orion::ValueTypeObject);
+    pos = 0;
+    while (PyDict_Next(value, &pos, &keyAux, &valueAux))
+    {
+      processDictItem(nodeP, keyAux, valueAux);
+    }
+    parentP->add(nodeP);
     break;
 
   case orion::ValueTypeNotGiven:
@@ -301,11 +321,21 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* it
 */
 void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value)
 {
-  std::string keyStr = "";
+  const char * keyStr = PyUnicode_AsUTF8(key);
+  if (keyStr == NULL)
+  {
+    // FIXME PR: use LM_E/LM_W?
+    LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+    return;
+  }
+
   orion::CompoundValueNode* nodeP;
   const char* str;
   double d;
   bool b;
+  PyObject *keyAux, *valueAux;
+  Py_ssize_t pos, size;
+
   switch (getPyObjectType(value))
   {
   case orion::ValueTypeString:
@@ -343,11 +373,23 @@ void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
     break;
 
   case orion::ValueTypeVector:
-    // TBD
+    nodeP = new orion::CompoundValueNode(keyStr, "", orion::ValueTypeVector);
+    size = PyList_Size(value);
+    for (Py_ssize_t ix = 0; ix < size; ++ix)
+    {
+       processListItem(nodeP, PyList_GetItem(value, ix));
+    }
+    parentP->add(nodeP);
     break;
 
   case orion::ValueTypeObject:
-    // TBD
+    nodeP = new orion::CompoundValueNode(keyStr, "", orion::ValueTypeObject);
+    pos = 0;
+    while (PyDict_Next(value, &pos, &keyAux, &valueAux))
+    {
+      processDictItem(nodeP, keyAux, valueAux);
+    }
+    parentP->add(nodeP);
     break;
 
   case orion::ValueTypeNotGiven:
