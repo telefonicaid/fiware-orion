@@ -162,6 +162,7 @@ void JexlManager::init(void)
 JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _expression)
 {
   JexlResult r;
+  r.valueType = orion::ValueTypeNull;
 
   LM_T(LmtJexl, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
 
