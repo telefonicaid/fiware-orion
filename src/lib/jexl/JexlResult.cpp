@@ -125,7 +125,6 @@ void JexlResult::fill(PyObject* result)
   }
 
   // Other not null types
-  // FIXME PR: integrate getPyObjetType function into this one
   valueType = getPyObjectType(result);
   if (valueType == orion::ValueTypeNumber)
   {
@@ -139,7 +138,13 @@ void JexlResult::fill(PyObject* result)
   }
   else if (valueType == orion::ValueTypeObject)
   {
-    processDict(compoundValueP, result);
+    compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(result, &pos, &key, &value))
+    {
+      processDictItem(compoundValueP, key, value);
+    }
     // Using Python json.dumps() for this may seem overkill, but noe that PyObject_Repr(result) cannot
     // be used, as it produce string with ' instead of " in the resulting JSON string.
     // FIXME PR: is the customJsonSerializer going to be used at the end?
@@ -169,7 +174,12 @@ void JexlResult::fill(PyObject* result)
   }
   else if (valueType == orion::ValueTypeVector)
   {
-    processList(compoundValueP, result);
+    compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
+    Py_ssize_t size = PyList_Size(result);
+    for (Py_ssize_t ix = 0; ix < size; ++ix)
+    {
+       processListItem(compoundValueP, PyList_GetItem(result, ix));
+    }
     // Using Python json.dumps() for this may seem overkill, but noe that PyObject_Repr(result) cannot
     // be used, as it produce string with ' instead of " in the resulting JSON string.
     // FIXME PR: is the customJsonSerializer going to be used at the end?
@@ -216,18 +226,138 @@ void JexlResult::fill(PyObject* result)
 
 
 
-  void JexlResult::processList(orion::CompoundValueNode* node, PyObject* result)
+/* ****************************************************************************
+*
+* processListItem -
+*
+* FIXME PR: maybe this should be static function out of the class?
+*/
+void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* item)
+{
+  orion::CompoundValueNode* nodeP;
+  const char* str;
+  double d;
+  bool b;
+  switch (getPyObjectType(item))
   {
+  case orion::ValueTypeString:
+    str = PyUnicode_AsUTF8(item);
+    if (str == NULL)
+    {
+      // FIXME PR: use LM_E/LM_W?
+      LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+    }
+    else
+    {
+      LM_T(LmtJexl, ("processListITem (string): %s", str));
+      nodeP = new orion::CompoundValueNode("", str, orion::ValueTypeString);
+      parentP->add(nodeP);
+    }
+    break;
 
+  case orion::ValueTypeNumber:
+    d = PyFloat_AsDouble(item);
+    LM_T(LmtJexl, ("processList (double): %f", d));
+    nodeP = new orion::CompoundValueNode("", d, orion::ValueTypeNumber);
+    parentP->add(nodeP);
+    break;
+
+  case orion::ValueTypeBoolean:
+    b = PyObject_IsTrue(item);
+    LM_T(LmtJexl, ("JexlResult (bool): %s", b ? "true": "false"));
+    nodeP = new orion::CompoundValueNode("", b, orion::ValueTypeBoolean);
+    parentP->add(nodeP);
+    break;
+
+  case orion::ValueTypeNull:
+    nodeP = new orion::CompoundValueNode("", "", orion::ValueTypeNull);
+    parentP->add(nodeP);
+    break;
+
+  case orion::ValueTypeVector:
+    // TBD
+    break;
+
+  case orion::ValueTypeObject:
+    // TBD
+    break;
+
+  case orion::ValueTypeNotGiven:
+    LM_E(("Runtime Error (value type not given))"));
+    break;
+
+  default:
+    LM_E(("Runtime Error (value type unknown))"));
   }
+}
 
 
 
-
-  void JexlResult::processDict(orion::CompoundValueNode* node, PyObject* result)
+/* ****************************************************************************
+*
+* processDictItem -
+*
+* FIXME PR: maybe this should be static function out of the class?
+*/
+void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value)
+{
+  std::string keyStr = "";
+  orion::CompoundValueNode* nodeP;
+  const char* str;
+  double d;
+  bool b;
+  switch (getPyObjectType(value))
   {
+  case orion::ValueTypeString:
+    str = PyUnicode_AsUTF8(value);
+    if (str == NULL)
+    {
+      // FIXME PR: use LM_E/LM_W?
+      LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+    }
+    else
+    {
+      LM_T(LmtJexl, ("processListITem (string): %s", str));
+      nodeP = new orion::CompoundValueNode(keyStr, str, orion::ValueTypeString);
+      parentP->add(nodeP);
+    }
+    break;
 
+  case orion::ValueTypeNumber:
+    d = PyFloat_AsDouble(value);
+    LM_T(LmtJexl, ("processList (double): %f", d));
+    nodeP = new orion::CompoundValueNode(keyStr, d, orion::ValueTypeNumber);
+    parentP->add(nodeP);
+    break;
+
+  case orion::ValueTypeBoolean:
+    b = PyObject_IsTrue(value);
+    LM_T(LmtJexl, ("JexlResult (bool): %s", b ? "true": "false"));
+    nodeP = new orion::CompoundValueNode(keyStr, b, orion::ValueTypeBoolean);
+    parentP->add(nodeP);
+    break;
+
+  case orion::ValueTypeNull:
+    nodeP = new orion::CompoundValueNode(keyStr, "", orion::ValueTypeNull);
+    parentP->add(nodeP);
+    break;
+
+  case orion::ValueTypeVector:
+    // TBD
+    break;
+
+  case orion::ValueTypeObject:
+    // TBD
+    break;
+
+  case orion::ValueTypeNotGiven:
+    LM_E(("Runtime Error (value type not given))"));
+    break;
+
+  default:
+    LM_E(("Runtime Error (value type unknown))"));
   }
+}
 
 
 

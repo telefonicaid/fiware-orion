@@ -52,8 +52,8 @@ public:
 
   void fill(PyObject* result);
 
-  void processList(orion::CompoundValueNode* node, PyObject* result);
-  void processDict(orion::CompoundValueNode* node, PyObject* result);
+  void processListItem(orion::CompoundValueNode* parentP, PyObject* item);
+  void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value);
 
   std::string  toString(void);
   void         release(void);
