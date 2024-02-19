@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_EXPRESSIONS_EXPRMGR_H_
-#define SRC_LIB_EXPRESSIONS_EXPRMGR_H_
-
 /*
 *
 * Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,14 +22,39 @@
 *
 * Author: Fermin Galan
 */
-#include "expressions/ExprManager.h"
 
-
+#include "expressions/exprCommon.h"
 
 /* ****************************************************************************
 *
-* metricsMgr -
+* capturePythonError -
 */
-extern ExprManager exprMgr;
+const char* capturePythonError()
+{
+  if (PyErr_Occurred())
+  {
+    PyObject* ptype;
+    PyObject* pvalue;
+    PyObject* ptraceback;
 
-#endif  // SRC_LIB_EXPRESSIONS_EXPRMGR_H_
+    // Fetch the exception type, value, and traceback
+    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+
+    if (pvalue != NULL)
+    {
+      PyObject* strObj = PyObject_Str(pvalue);
+      const char* errorMessage = PyUnicode_AsUTF8(strObj);
+
+      // Release the Python objects
+      Py_XDECREF(strObj);
+      Py_XDECREF(ptype);
+      Py_XDECREF(pvalue);
+      Py_XDECREF(ptraceback);
+
+      return errorMessage;
+    }
+  }
+
+  PyErr_Clear();
+  return "<no captured error>";
+}

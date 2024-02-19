@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JEXL_EXPRMANAGER_H_
-#define SRC_LIB_JEXL_EXPRMANAGER_H_
+#ifndef SRC_LIB_EXPRESSIONS_EXPRMANAGER_H_
+#define SRC_LIB_EXPRESSIONS_EXPRMANAGER_H_
 
 /*
 *
@@ -42,7 +42,6 @@ private:
   PyObject*  pyjexlModule;
   PyObject*  jexlEngine;
   PyObject*  jsonModule;
-  //PyObject*  customJsonSerializer;
   sem_t      sem;
 
 public:
@@ -51,4 +50,4 @@ public:
    void        release(void);
 };
 
-#endif  // SRC_LIB_JEXL_EXPRMANAGER_H_
+#endif  // SRC_LIB_EXPRESSIONS_EXPRMANAGER_H_

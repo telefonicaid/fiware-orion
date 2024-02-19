@@ -24,48 +24,11 @@
 */
 
 #include "expressions/ExprResult.h"
+#include "expressions/exprCommon.h"
 
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "logMsg/logMsg.h"
-
-
-
-/* ****************************************************************************
-*
-* capturePythonError -
-*
-* FIXME PR: duplicate code. Unify
-*/
-static const char* capturePythonError()
-{
-  if (PyErr_Occurred())
-  {
-    PyObject* ptype;
-    PyObject* pvalue;
-    PyObject* ptraceback;
-
-    // Fetch the exception type, value, and traceback
-    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
-
-    if (pvalue != NULL)
-    {
-      PyObject* str_obj = PyObject_Str(pvalue);
-      const char* error_message = PyUnicode_AsUTF8(str_obj);
-
-      // Release the Python objects
-      Py_XDECREF(str_obj);
-      Py_XDECREF(ptype);
-      Py_XDECREF(pvalue);
-      Py_XDECREF(ptraceback);
-
-      return error_message;
-    }
-  }
-
-  PyErr_Clear();
-  return "<no captured error>";
-}
 
 
 

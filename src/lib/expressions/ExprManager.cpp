@@ -27,45 +27,10 @@
 
 #include "expressions/ExprManager.h"
 #include "expressions/ExprResult.h"
+#include "expressions/exprCommon.h"
 #include "logMsg/logMsg.h"
 
 #include "orionTypes/OrionValueType.h"
-
-
-
-/* ****************************************************************************
-*
-* capturePythonError -
-*/
-static const char* capturePythonError()
-{
-  if (PyErr_Occurred())
-  {
-    PyObject* ptype;
-    PyObject* pvalue;
-    PyObject* ptraceback;
-
-    // Fetch the exception type, value, and traceback
-    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
-
-    if (pvalue != NULL)
-    {
-      PyObject* str_obj = PyObject_Str(pvalue);
-      const char* error_message = PyUnicode_AsUTF8(str_obj);
-
-      // Release the Python objects
-      Py_XDECREF(str_obj);
-      Py_XDECREF(ptype);
-      Py_XDECREF(pvalue);
-      Py_XDECREF(ptraceback);
-
-      return error_message;
-    }
-  }
-
-  PyErr_Clear();
-  return "<no captured error>";
-}
 
 
 
@@ -76,7 +41,6 @@ static const char* capturePythonError()
 void ExprManager::init(void)
 {
   pyjexlModule         = NULL;
-  jsonModule           = NULL;
   jexlEngine           = NULL;
 
   if (sem_init(&sem, 0, 1) == -1)
@@ -94,14 +58,6 @@ void ExprManager::init(void)
     LM_X(1, ("Fatal Error (error importing pyjexl module: %s)", error));
   }
   LM_T(LmtExpr, ("pyjexl module has been loaded"));
-
-  jsonModule = PyImport_ImportModule("json");
-  if (jsonModule == NULL)
-  {
-    const char* error = capturePythonError();
-    LM_X(1, ("Fatal Error (error importing json module: %s)", error));
-  }
-  LM_T(LmtExpr, ("json module has been loaded"));
 
   jexlEngine = PyObject_CallMethod(pyjexlModule, "JEXL", NULL);
   if (jexlEngine == NULL)
@@ -168,12 +124,6 @@ void ExprManager::release(void)
   {
     Py_XDECREF(pyjexlModule);
     LM_T(LmtExpr, ("pyjexl module has been freed"));
-  }
-
-  if (jsonModule != NULL)
-  {
-    Py_XDECREF(jsonModule);
-    LM_T(LmtExpr, ("json module has been freed"));
   }
 
   Py_Finalize();

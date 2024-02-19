@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_EXPRESSIONS_EXPRMGR_H_
-#define SRC_LIB_EXPRESSIONS_EXPRMGR_H_
+#ifndef SRC_LIB_EXPRESSIONS_EXPRCOMMON_H_
+#define SRC_LIB_EXPRESSIONS_EXPRCOMMON_H_
 
 /*
 *
@@ -25,14 +25,17 @@
 *
 * Author: Fermin Galan
 */
-#include "expressions/ExprManager.h"
+
+#include <Python.h>
 
 
 
 /* ****************************************************************************
 *
-* metricsMgr -
+* capturePythonError -
 */
-extern ExprManager exprMgr;
+extern const char* capturePythonError();
 
-#endif  // SRC_LIB_EXPRESSIONS_EXPRMGR_H_
+
+
+#endif  // SRC_LIB_EXPRESSIONS_EXPRCOMMON_H_
