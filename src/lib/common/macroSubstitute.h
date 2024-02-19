@@ -34,7 +34,7 @@
 * smartStringValue -
 *
 */
-extern std::string smartStringValue(const std::string stringValue, JexlContext* jexlContextP, const std::string notFoundDefault);
+extern std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault);
 
 
 
@@ -43,6 +43,6 @@ extern std::string smartStringValue(const std::string stringValue, JexlContext* 
 * macroSubstitute -
 *
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, JexlContext* jexlContextP, const std::string& notFoundDefault, bool inTheMiddle = false);
+extern bool macroSubstitute(std::string* sP, const std::string& in, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw = false);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

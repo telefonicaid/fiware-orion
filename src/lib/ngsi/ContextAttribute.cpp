@@ -1052,7 +1052,7 @@ void ContextAttribute::filterAndOrderMetadata
 * renderNgsiField true is used in custom notification payloads, which have some small differences
 * with regards to conventional rendering
 */
-std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, JexlContext* jexlContextP)
+std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, ExprContextObject* exprContextObjectP)
 {
   JsonObjectHelper jh;
 
@@ -1085,7 +1085,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     // of DB entities) may lead to NULL, so the check is needed
     if (childToRenderP != NULL)
     {
-      jh.addRaw("value", childToRenderP->toJson(jexlContextP));
+      jh.addRaw("value", childToRenderP->toJson(exprContextObjectP));
     }
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -1101,7 +1101,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else if (valueType == orion::ValueTypeString)
   {
-    jh.addRaw("value", smartStringValue(stringValue, jexlContextP, "null"));
+    jh.addRaw("value", smartStringValue(stringValue, exprContextObjectP, "null"));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -1296,41 +1296,41 @@ std::string ContextAttribute::toJsonAsValue
 *
 * Pretty similar in structure to toJsonValue
 */
-void ContextAttribute::addToContext(JexlContext* jexlContextP)
+void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP)
 {
   if (compoundValueP != NULL)
   {
     if (valueType == orion::ValueTypeObject)
     {
-      jexlContextP->add(name, compoundValueP->toJexlContext());
+      exprContextObjectP->add(name, compoundValueP->toExprContextObject());
     }
     else  // valueType == orion::ValueTypeVector
     {
-      jexlContextP->add(name, compoundValueP->toJexlContextList());
+      exprContextObjectP->add(name, compoundValueP->toExprContextList());
     }
   }
   else if (valueType == orion::ValueTypeNumber)
   {
     if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
     {
-      jexlContextP->add(name, toJsonString(isodate2str(numberValue)));
+      exprContextObjectP->add(name, toJsonString(isodate2str(numberValue)));
     }
     else // regular number
     {
-      jexlContextP->add(name, numberValue);
+      exprContextObjectP->add(name, numberValue);
     }
   }
   else if (valueType == orion::ValueTypeString)
   {
-    jexlContextP->add(name, toJsonString(stringValue));
+    exprContextObjectP->add(name, toJsonString(stringValue));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    jexlContextP->add(name, boolValue);
+    exprContextObjectP->add(name, boolValue);
   }
   else if (valueType == orion::ValueTypeNull)
   {
-    jexlContextP->add(name);
+    exprContextObjectP->add(name);
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {

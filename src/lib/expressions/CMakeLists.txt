@@ -21,17 +21,17 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    JexlManager.cpp
-    JexlContext.cpp
-    JexlResult.cpp
-    jexlMgr.cpp    
+    ExprManager.cpp
+    ExprContext.cpp
+    ExprResult.cpp
+    exprMgr.cpp    
 )
 
 SET (HEADERS
-    JexlManager.h
-    JexlContext.h
-    JexlResult.h
-    jexlMgr.h
+    ExprManager.h
+    ExprContext.h
+    ExprResult.h
+    exprMgr.h
 )
 
 
@@ -43,4 +43,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(jexl STATIC ${SOURCES} ${HEADERS})
+ADD_LIBRARY(expressions STATIC ${SOURCES} ${HEADERS})

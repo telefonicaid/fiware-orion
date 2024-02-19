@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JEXL_JEXLMANAGER_H_
-#define SRC_LIB_JEXL_JEXLMANAGER_H_
+#ifndef SRC_LIB_JEXL_EXPRRESULT_H_
+#define SRC_LIB_JEXL_EXPRRESULT_H_
 
 /*
 *
@@ -26,29 +26,39 @@
 * Author: Fermin Galan
 */
 
-#include <Python.h>
-#include <semaphore.h>
+#include "orionTypes/OrionValueType.h"
 
-#include "jexl/JexlContext.h"
-#include "jexl/JexlResult.h"
+#include "parse/CompoundValueNode.h"
+
+#include <Python.h>
+#include <string>
 
 /* ****************************************************************************
 *
-* JexlManager -
+* ExprResult -
 */
-class JexlManager
+class ExprResult
 {
-private:
-  PyObject*  pyjexlModule;
-  PyObject*  jexlEngine;
-  PyObject*  jsonModule;
-  //PyObject*  customJsonSerializer;
-  sem_t      sem;
-
 public:
-   void        init(void);
-   JexlResult  evaluate(JexlContext* jexlContextP, const std::string& expression);
-   void        release(void);
+  // Similar to the fields used in ContextAttribute.h
+  
+  orion::ValueType  valueType;    // Type of value
+  std::string       stringValue;  // "value" as a String
+  double            numberValue;  // "value" as a Number
+  bool              boolValue;    // "value" as a Boolean
+
+  // Use only when valueType is object or vector
+  orion::CompoundValueNode*  compoundValueP;
+
+  void fill(PyObject* result);
+
+  void processListItem(orion::CompoundValueNode* parentP, PyObject* item);
+  void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value);
+
+  std::string  toString(void);
+  void         release(void);
 };
 
-#endif  // SRC_LIB_JEXL_JEXLMANAGER_H_
+
+
+#endif  // #define SRC_LIB_JEXL_EXPRRESULT_H_

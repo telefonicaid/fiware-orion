@@ -32,7 +32,7 @@
 #include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
 
-#include "jexl/jexlMgr.h"
+#include "expressions/exprMgr.h"
 
 
 /* ****************************************************************************
@@ -42,18 +42,18 @@
 * Returns the effective string value, taking into account replacements
 *
 */
-std::string smartStringValue(const std::string stringValue, JexlContext* jexlContextP, const std::string notFoundDefault)
+std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault)
 {
   // This code is pretty similar to the one in CompoundValueNode::toJson()
   // The program logic branching is the same, but the result at the end of each if-else
   // is different, which makes difficult to unify both them
-  if ((jexlContextP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
+  if ((exprContextObjectP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
   {
     // "Full replacement" case. In this case, the result is not always a string
     // len("${") + len("}") = 3
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
 
-    JexlResult r = jexlMgr.evaluate(jexlContextP, macroName);
+    ExprResult r = exprMgr.evaluate(exprContextObjectP, macroName);
     if (r.valueType == orion::ValueTypeNull)
     {
       return notFoundDefault;
@@ -63,11 +63,11 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
       return r.toString();
     }
   }
-  else if (jexlContextP != NULL)
+  else if (exprContextObjectP != NULL)
   {
     // "Partial replacement" case. In this case, the result is always a string
     std::string effectiveValue;
-    if (!macroSubstitute(&effectiveValue, stringValue, jexlContextP, "null", true))
+    if (!macroSubstitute(&effectiveValue, stringValue, exprContextObjectP, "null", true))
     {
       // error already logged in macroSubstitute, using stringValue itself as failsafe
       effectiveValue = stringValue;
@@ -89,10 +89,9 @@ std::string smartStringValue(const std::string stringValue, JexlContext* jexlCon
 * stringValueOrNothing -
 *
 */
-// FIXME PR: inTheMiddle -> raw ?
-static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::string key, const std::string& notFoundDefault, bool inTheMiddle)
+static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, const std::string key, const std::string& notFoundDefault, bool raw)
 {
-  JexlResult r = jexlMgr.evaluate(jexlContextP, key);
+  ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
 
   if (r.valueType == orion::ValueTypeNull)
   {
@@ -101,17 +100,16 @@ static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::st
   else
   {
     std::string s = r.toString();
-    if (inTheMiddle)
+    if (raw)
     {
       // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
       // so double quotes have to be be removed
-      if (s[0] == '"')
-      {
-        s = s.substr(1, s.size()-2);
-      }
+      return removeQuotes(s);
     }
-
-    return s;
+    else
+    {
+      return s;
+    }
   }
 }
 
@@ -142,8 +140,7 @@ static std::string stringValueOrNothing(JexlContext* jexlContextP, const std::st
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-// FIXME PR: inTheMiddle -> raw ?
-bool macroSubstitute(std::string* to, const std::string& from, JexlContext* jexlContextP, const std::string& notFoundDefault, bool inTheMiddle)
+bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -206,7 +203,7 @@ bool macroSubstitute(std::string* to, const std::string& from, JexlContext* jexl
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNothing(jexlContextP, macroName, notFoundDefault, inTheMiddle).length() * times;
+    toAdd += stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -224,7 +221,7 @@ bool macroSubstitute(std::string* to, const std::string& from, JexlContext* jexl
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNothing(jexlContextP, macroName, notFoundDefault, inTheMiddle);
+    std::string value = stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)

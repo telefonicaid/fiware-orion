@@ -25,8 +25,8 @@
 
 #include <Python.h>
 
-#include "jexl/JexlManager.h"
-#include "jexl/JexlResult.h"
+#include "expressions/ExprManager.h"
+#include "expressions/ExprResult.h"
 #include "logMsg/logMsg.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -71,9 +71,9 @@ static const char* capturePythonError()
 
 /* ****************************************************************************
 *
-* JexlManager::init -
+* ExprManager::init -
 */
-void JexlManager::init(void)
+void ExprManager::init(void)
 {
   pyjexlModule         = NULL;
   jsonModule           = NULL;
@@ -85,7 +85,7 @@ void JexlManager::init(void)
   }
 
   Py_Initialize();
-  LM_T(LmtJexl, ("Python interpreter has been initialized"));
+  LM_T(LmtExpr, ("Python interpreter has been initialized"));
 
   pyjexlModule = PyImport_ImportModule("pyjexl");
   if (pyjexlModule == NULL)
@@ -93,7 +93,7 @@ void JexlManager::init(void)
     const char* error = capturePythonError();
     LM_X(1, ("Fatal Error (error importing pyjexl module: %s)", error));
   }
-  LM_T(LmtJexl, ("pyjexl module has been loaded"));
+  LM_T(LmtExpr, ("pyjexl module has been loaded"));
 
   jsonModule = PyImport_ImportModule("json");
   if (jsonModule == NULL)
@@ -101,7 +101,7 @@ void JexlManager::init(void)
     const char* error = capturePythonError();
     LM_X(1, ("Fatal Error (error importing json module: %s)", error));
   }
-  LM_T(LmtJexl, ("json module has been loaded"));
+  LM_T(LmtExpr, ("json module has been loaded"));
 
   jexlEngine = PyObject_CallMethod(pyjexlModule, "JEXL", NULL);
   if (jexlEngine == NULL)
@@ -109,40 +109,42 @@ void JexlManager::init(void)
     const char* error = capturePythonError();
     LM_X(1, ("Fatal Error (error creating jexlEngine: %s)", error));
   }
-  LM_T(LmtJexl, ("jexl engine has been created"));
+  LM_T(LmtExpr, ("jexl engine has been created"));
 }
 
 
 
 /* ****************************************************************************
 *
-* JexlManager::evaluate -
+* ExprManager::evaluate -
 */
-JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _expression)
+ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const std::string& _expression)
 {
-  JexlResult r;
+  ExprResult r;
   r.valueType = orion::ValueTypeNull;
 
-  LM_T(LmtJexl, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
+  LM_T(LmtExpr, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
 
   PyObject* expression = Py_BuildValue("s", _expression.c_str());
   if (expression == NULL)
   {
     // FIXME PR: use LM_E/LM_W?
-    LM_T(LmtJexl, ("error building expression: %s", capturePythonError()));
+    LM_T(LmtExpr, ("error building expression: %s", capturePythonError()));
     return r;
   }
 
-  PyObject* result = PyObject_CallMethod(jexlEngine, "evaluate", "OO", expression, jexlContextP->get());
+  PyObject* result = PyObject_CallMethod(jexlEngine, "evaluate", "OO", expression, exprContextObjectP->get());
   Py_XDECREF(expression);
   if (result == NULL)
   {
     // FIXME PR: use LM_E/LM_W?
-    LM_T(LmtJexl, ("error evaluating expression: %s", capturePythonError()));
+    LM_T(LmtExpr, ("error evaluating expression: %s", capturePythonError()));
     return r;
   }
 
   r.fill(result);
+
+  // FIXME PR: does this Py_XDECREF() recursively in the case of dicts or lists?
   Py_XDECREF(result);
 
   return r;
@@ -152,28 +154,28 @@ JexlResult JexlManager::evaluate(JexlContext* jexlContextP, const std::string& _
 
 /* ****************************************************************************
 *
-* JexlManager::release -
+* ExprManager::release -
 */
-void JexlManager::release(void)
+void ExprManager::release(void)
 {
   if (jexlEngine != NULL)
   {
     Py_XDECREF(jexlEngine);
-    LM_T(LmtJexl, ("jexl engine has been freed"));
+    LM_T(LmtExpr, ("jexl engine has been freed"));
   }
 
   if (pyjexlModule != NULL)
   {
     Py_XDECREF(pyjexlModule);
-    LM_T(LmtJexl, ("pyjexl module has been freed"));
+    LM_T(LmtExpr, ("pyjexl module has been freed"));
   }
 
   if (jsonModule != NULL)
   {
     Py_XDECREF(jsonModule);
-    LM_T(LmtJexl, ("json module has been freed"));
+    LM_T(LmtExpr, ("json module has been freed"));
   }
 
   Py_Finalize();
-  LM_T(LmtJexl, ("Python interpreter has been finalized"));
+  LM_T(LmtExpr, ("Python interpreter has been finalized"));
 }

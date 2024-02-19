@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_JEXL_JEXLRESULT_H_
-#define SRC_LIB_JEXL_JEXLRESULT_H_
-
 /*
 *
 * Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,40 +22,12 @@
 *
 * Author: Fermin Galan
 */
+#include "expressions/ExprManager.h"
 
-#include "orionTypes/OrionValueType.h"
 
-#include "parse/CompoundValueNode.h"
-
-#include <Python.h>
-#include <string>
 
 /* ****************************************************************************
 *
-* JexlResult -
+* exprMgr -
 */
-class JexlResult
-{
-public:
-  // Similar to the fields used in ContextAttribute.h
-  
-  orion::ValueType  valueType;    // Type of value
-  std::string       stringValue;  // "value" as a String
-  double            numberValue;  // "value" as a Number
-  bool              boolValue;    // "value" as a Boolean
-
-  // Use only when valueType is object or vector
-  orion::CompoundValueNode*  compoundValueP;
-
-  void fill(PyObject* result);
-
-  void processListItem(orion::CompoundValueNode* parentP, PyObject* item);
-  void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value);
-
-  std::string  toString(void);
-  void         release(void);
-};
-
-
-
-#endif  // #define SRC_LIB_JEXL_JEXLRESULT_H_
+ExprManager exprMgr;

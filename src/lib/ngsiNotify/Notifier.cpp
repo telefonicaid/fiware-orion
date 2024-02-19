@@ -121,7 +121,7 @@ static bool setPayload
   const std::string&               notifPayload,
   const SubscriptionId&            subscriptionId,
   Entity&                          en,
-  JexlContext*                     jexlContextP,
+  ExprContextObject*               exprContextObjectP,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
@@ -170,7 +170,7 @@ static bool setPayload
   }
   else
   {
-    if (!macroSubstitute(payloadP, notifPayload, jexlContextP, "", true))
+    if (!macroSubstitute(payloadP, notifPayload, exprContextObjectP, "", true))
     {
       return false;
     }
@@ -194,36 +194,14 @@ static bool setPayload
 static bool setJsonPayload
 (
   orion::CompoundValueNode*  json,
-  JexlContext*               jexlContextP,
+  ExprContextObject*         exprContextObjectP,
   std::string*               payloadP,
   std::string*               mimeTypeP
 )
 {
-  *payloadP = json->toJson(jexlContextP);
+  *payloadP = json->toJson(exprContextObjectP);
   *mimeTypeP = "application/json";  // this can be overriden by headers field
   return true;
-}
-
-
-/* ****************************************************************************
-*
-* removeQuotes -
-*
-* Entity id and type are special. Different from a attribute, they are always
-* strings and cannot take a number, boolean, etc. as value.
-*
-* FIXME PR: duplicated logic! (both " and ' in different points of the code)
-*/
-inline std::string removeQuotes(std::string s)
-{
-  if (s[0] == '"')
-  {
-    return s.substr(1, s.size()-2);
-  }
-  else
-  {
-    return s;
-  }
 }
 
 
@@ -239,7 +217,7 @@ static bool setNgsiPayload
   const Entity&                    ngsi,
   const SubscriptionId&            subscriptionId,
   Entity&                          en,
-  JexlContext*                     jexlContextP,
+  ExprContextObject*               exprContextObjectP,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
@@ -258,7 +236,7 @@ static bool setNgsiPayload
   else
   {
     // If id is not found in the replacements macro, we use en.id.
-    effectiveId = removeQuotes(smartStringValue(ngsi.id, jexlContextP, '"' + en.id + '"'));
+    effectiveId = removeQuotes(smartStringValue(ngsi.id, exprContextObjectP, '"' + en.id + '"'));
   }
 
   std::string effectiveType;
@@ -269,7 +247,7 @@ static bool setNgsiPayload
   else
   {
     // If type is not found in the replacements macro, we use en.type.
-    effectiveType = removeQuotes(smartStringValue(ngsi.type, jexlContextP, '"' + en.type + '"'));
+    effectiveType = removeQuotes(smartStringValue(ngsi.type, exprContextObjectP, '"' + en.type + '"'));
   }
 
   cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
@@ -295,11 +273,11 @@ static bool setNgsiPayload
 
   if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES))
   {
-    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, jexlContextP);
+    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
   }
   else
   {
-    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, jexlContextP);
+    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
   }
 
   return true;
@@ -338,15 +316,15 @@ static SenderThreadParams* buildSenderParamsCustom
   Entity&                             en      = notifyCerP->entity;
 
   // Used by several macroSubstitute() calls along this function
-  JexlContext jexlContext;
-  jexlContext.add("id", en.id);
-  jexlContext.add("type", en.type);
-  jexlContext.add("service", tenant);
-  jexlContext.add("servicePath", en.servicePath);
-  jexlContext.add("authToken", xauthToken);
+  ExprContextObject exprContext;
+  exprContext.add("id", en.id);
+  exprContext.add("type", en.type);
+  exprContext.add("service", tenant);
+  exprContext.add("servicePath", en.servicePath);
+  exprContext.add("authToken", xauthToken);
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
-    en.attributeVector[ix]->addToContext(&jexlContext);
+    en.attributeVector[ix]->addToContext(&exprContext);
   }
 
   //
@@ -373,10 +351,10 @@ static SenderThreadParams* buildSenderParamsCustom
   // 2. URL
   //
   std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-  if (macroSubstitute(&url, notifUrl, &jexlContext, "", true) == false)
+  if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
   {
     // Warning already logged in macroSubstitute()
-    jexlContext.release();
+    exprContext.release();
     return NULL;
   }
 
@@ -390,27 +368,27 @@ static SenderThreadParams* buildSenderParamsCustom
   {
     bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
     std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
-    if (!setPayload(includePayload, notifPayload, subscriptionId, en, &jexlContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
+    if (!setPayload(includePayload, notifPayload, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
       // Warning already logged in macroSubstitute()
-      jexlContext.release();
+      exprContext.release();
       return NULL;
     }
   }
   else if (customPayloadType == ngsiv2::CustomPayloadType::Json)
   {
     orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
-    setJsonPayload(json, &jexlContext, &payload, &mimeType);
+    setJsonPayload(json, &exprContext, &payload, &mimeType);
     renderFormat = NGSI_V2_CUSTOM;
   }
   else  // customPayloadType == ngsiv2::CustomPayloadType::Ngsi
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
     const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
-    if (!setNgsiPayload(ngsi, subscriptionId, en, &jexlContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
+    if (!setNgsiPayload(ngsi, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
     {
       // Warning already logged in macroSubstitute()
-      jexlContext.release();
+      exprContext.release();
       return NULL;
     }
     mimeType = "application/json";
@@ -427,10 +405,10 @@ static SenderThreadParams* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, &jexlContext, "", true) == false) || (macroSubstitute(&value, it->second, &jexlContext, "", true) == false))
+      if ((macroSubstitute(&key, it->first, &exprContext, "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
-        jexlContext.release();
+        exprContext.release();
         return NULL;
       }
 
@@ -454,10 +432,10 @@ static SenderThreadParams* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, &jexlContext,  "", true) == false) || (macroSubstitute(&value, it->second, &jexlContext, "", true) == false))
+      if ((macroSubstitute(&key, it->first, &exprContext,  "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
-        jexlContext.release();
+        exprContext.release();
         return NULL;
       }
 
@@ -489,7 +467,7 @@ static SenderThreadParams* buildSenderParamsCustom
   if (!parseUrl(url, host, port, uriPath, protocol))
   {
     LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
-    jexlContext.release();
+    exprContext.release();
     return NULL;
   }
 
@@ -521,10 +499,10 @@ static SenderThreadParams* buildSenderParamsCustom
   // 8. Topic (only in the case of MQTT notifications)
   if (notification.type == ngsiv2::MqttNotification)
   {
-    if (macroSubstitute(&topic, notification.mqttInfo.topic, &jexlContext, "", true) == false)
+    if (macroSubstitute(&topic, notification.mqttInfo.topic, &exprContext, "", true) == false)
     {
       // Warning already logged in macroSubstitute()
-      jexlContext.release();
+      exprContext.release();
       return NULL;
     }
   }
@@ -560,7 +538,7 @@ static SenderThreadParams* buildSenderParamsCustom
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   paramsP->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
-  jexlContext.release();
+  exprContext.release();
   return paramsP;
 }
 

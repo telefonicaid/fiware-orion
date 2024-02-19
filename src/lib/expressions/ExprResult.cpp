@@ -23,7 +23,7 @@
 * Author: Fermin Galan
 */
 
-#include "jexl/JexlResult.h"
+#include "expressions/ExprResult.h"
 
 #include "common/string.h"
 #include "common/JsonHelper.h"
@@ -115,7 +115,7 @@ static orion::ValueType getPyObjectType(PyObject* obj)
 * fill -
 *
 */
-void JexlResult::fill(PyObject* result)
+void ExprResult::fill(PyObject* result)
 {
   // If nothing changes, the returned value would be null (failsafe)
   valueType = orion::ValueTypeNull;
@@ -123,7 +123,7 @@ void JexlResult::fill(PyObject* result)
   // Special case: expresion evalutes to None
   if (result == Py_None)
   {
-    LM_T(LmtJexl, ("JexlResult is null"));
+    LM_T(LmtExpr, ("ExprResult is null"));
     valueType = orion::ValueTypeNull;
     return;
   }
@@ -133,12 +133,12 @@ void JexlResult::fill(PyObject* result)
   if (valueType == orion::ValueTypeNumber)
   {
     numberValue = PyFloat_AsDouble(result);
-    LM_T(LmtJexl, ("JexlResult (double): %f", numberValue));
+    LM_T(LmtExpr, ("ExprResult (double): %f", numberValue));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
     boolValue = PyObject_IsTrue(result);
-    LM_T(LmtJexl, ("JexlResult (bool): %s", boolValue ? "true": "false"));
+    LM_T(LmtExpr, ("ExprResult (bool): %s", boolValue ? "true": "false"));
   }
   else if (valueType == orion::ValueTypeObject)
   {
@@ -147,7 +147,8 @@ void JexlResult::fill(PyObject* result)
     Py_ssize_t pos = 0;
     while (PyDict_Next(result, &pos, &key, &value))
     {
-      // FIXME PR: memory should be freed?
+      // No need to free memory of each dict item here, the whole result object is freed
+      // in ExprManager::evaluate()
       processDictItem(compoundValueP, key, value);
     }
   }
@@ -157,7 +158,8 @@ void JexlResult::fill(PyObject* result)
     Py_ssize_t size = PyList_Size(result);
     for (Py_ssize_t ix = 0; ix < size; ++ix)
     {
-      // FIXME PR: memory should be freed?
+      // No need to free memory of each list item here, the whole result object is freed
+      // in ExprManager::evaluate()
       processListItem(compoundValueP, PyList_GetItem(result, ix));
     }
   }  
@@ -167,12 +169,12 @@ void JexlResult::fill(PyObject* result)
     if (str == NULL)
     {
       // FIXME PR: use LM_E/LM_W?
-      LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+      LM_T(LmtExpr, ("error obtaning str representation (string): %s", capturePythonError()));
       valueType = orion::ValueTypeNull;
     }
     else
     {
-      LM_T(LmtJexl, ("JexlResult (string): %s", str));
+      LM_T(LmtExpr, ("ExprResult (string): %s", str));
       stringValue = std::string(str);
     }
   }
@@ -186,7 +188,7 @@ void JexlResult::fill(PyObject* result)
 *
 * FIXME PR: maybe this should be static function out of the class?
 */
-void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* value)
+void ExprResult::processListItem(orion::CompoundValueNode* parentP, PyObject* value)
 {
   orion::CompoundValueNode* nodeP;
 
@@ -203,11 +205,11 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
     if (str == NULL)
     {
       // FIXME PR: use LM_E/LM_W?
-      LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+      LM_T(LmtExpr, ("error obtaning str representation (string): %s", capturePythonError()));
     }
     else
     {
-      LM_T(LmtJexl, ("processListITem (string): %s", str));
+      LM_T(LmtExpr, ("processListITem (string): %s", str));
       nodeP = new orion::CompoundValueNode("", str, orion::ValueTypeString);
       parentP->add(nodeP);
     }
@@ -215,14 +217,14 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
 
   case orion::ValueTypeNumber:
     d = PyFloat_AsDouble(value);
-    LM_T(LmtJexl, ("processList (double): %f", d));
+    LM_T(LmtExpr, ("processList (double): %f", d));
     nodeP = new orion::CompoundValueNode("", d, orion::ValueTypeNumber);
     parentP->add(nodeP);
     break;
 
   case orion::ValueTypeBoolean:
     b = PyObject_IsTrue(value);
-    LM_T(LmtJexl, ("JexlResult (bool): %s", b ? "true": "false"));
+    LM_T(LmtExpr, ("ExprResult (bool): %s", b ? "true": "false"));
     nodeP = new orion::CompoundValueNode("", b, orion::ValueTypeBoolean);
     parentP->add(nodeP);
     break;
@@ -237,8 +239,9 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
     size = PyList_Size(value);
     for (Py_ssize_t ix = 0; ix < size; ++ix)
     {
-       processListItem(nodeP, PyList_GetItem(value, ix));
-       // FIXME PR: memory should be freed?
+      // No need to free memory of each list item here, the whole result object is freed
+      // in ExprManager::evaluate()
+      processListItem(nodeP, PyList_GetItem(value, ix));
     }
     parentP->add(nodeP);
     break;
@@ -248,8 +251,9 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
     pos = 0;
     while (PyDict_Next(value, &pos, &keyAux, &valueAux))
     {
+      // No need to free memory of each dict item here, the whole result object is freed
+      // in ExprManager::evaluate()
       processDictItem(nodeP, keyAux, valueAux);
-      // FIXME PR: memory should be freed?
     }
     parentP->add(nodeP);
     break;
@@ -271,13 +275,13 @@ void JexlResult::processListItem(orion::CompoundValueNode* parentP, PyObject* va
 *
 * FIXME PR: maybe this should be static function out of the class?
 */
-void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value)
+void ExprResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value)
 {
   const char * keyStr = PyUnicode_AsUTF8(key);
   if (keyStr == NULL)
   {
     // FIXME PR: use LM_E/LM_W?
-    LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+    LM_T(LmtExpr, ("error obtaning str representation (string): %s", capturePythonError()));
     return;
   }
 
@@ -295,11 +299,11 @@ void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
     if (str == NULL)
     {
       // FIXME PR: use LM_E/LM_W?
-      LM_T(LmtJexl, ("error obtaning str representation (string): %s", capturePythonError()));
+      LM_T(LmtExpr, ("error obtaning str representation (string): %s", capturePythonError()));
     }
     else
     {
-      LM_T(LmtJexl, ("processListITem (string): %s", str));
+      LM_T(LmtExpr, ("processListITem (string): %s", str));
       nodeP = new orion::CompoundValueNode(keyStr, str, orion::ValueTypeString);
       parentP->add(nodeP);
     }
@@ -307,14 +311,14 @@ void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
 
   case orion::ValueTypeNumber:
     d = PyFloat_AsDouble(value);
-    LM_T(LmtJexl, ("processList (double): %f", d));
+    LM_T(LmtExpr, ("processList (double): %f", d));
     nodeP = new orion::CompoundValueNode(keyStr, d, orion::ValueTypeNumber);
     parentP->add(nodeP);
     break;
 
   case orion::ValueTypeBoolean:
     b = PyObject_IsTrue(value);
-    LM_T(LmtJexl, ("JexlResult (bool): %s", b ? "true": "false"));
+    LM_T(LmtExpr, ("ExprResult (bool): %s", b ? "true": "false"));
     nodeP = new orion::CompoundValueNode(keyStr, b, orion::ValueTypeBoolean);
     parentP->add(nodeP);
     break;
@@ -329,8 +333,9 @@ void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
     size = PyList_Size(value);
     for (Py_ssize_t ix = 0; ix < size; ++ix)
     {
-       processListItem(nodeP, PyList_GetItem(value, ix));
-       // FIXME PR: memory should be freed?
+      // No need to free memory of each list item here, the whole result object is freed
+      // in ExprManager::evaluate()
+      processListItem(nodeP, PyList_GetItem(value, ix));
     }
     parentP->add(nodeP);
     break;
@@ -340,8 +345,9 @@ void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
     pos = 0;
     while (PyDict_Next(value, &pos, &keyAux, &valueAux))
     {
+      // No need to free memory of each dict item here, the whole result object is freed
+      // in ExprManager::evaluate()
       processDictItem(nodeP, keyAux, valueAux);
-      // FIXME PR: memory should be freed?
     }
     parentP->add(nodeP);
     break;
@@ -364,7 +370,7 @@ void JexlResult::processDictItem(orion::CompoundValueNode* parentP, PyObject* ke
 * Pretty similar to ContextAttribute::toJsonValue()
 *
 */
-std::string JexlResult::toString(void)
+std::string ExprResult::toString(void)
 {
   if (valueType == orion::ValueTypeNumber)
   {
@@ -396,7 +402,7 @@ std::string JexlResult::toString(void)
   }
   else
   {
-    LM_E(("Runtime Error (not allowed type in JexlResult: %s)", valueTypeName(valueType)));
+    LM_E(("Runtime Error (not allowed type in ExprResult: %s)", valueTypeName(valueType)));
     return "";
   }
 }
@@ -405,9 +411,9 @@ std::string JexlResult::toString(void)
 
 /* ****************************************************************************
 *
-* JexlResult::release -
+* ExprResult::release -
 */
-void JexlResult::release(void)
+void ExprResult::release(void)
 {
   if (compoundValueP != NULL)
   {

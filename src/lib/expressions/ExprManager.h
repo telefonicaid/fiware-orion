@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_JEXL_JEXLMGR_H_
-#define SRC_LIB_JEXL_JEXLMGR_H_
+#ifndef SRC_LIB_JEXL_EXPRMANAGER_H_
+#define SRC_LIB_JEXL_EXPRMANAGER_H_
 
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,14 +25,30 @@
 *
 * Author: Fermin Galan
 */
-#include "jexl/JexlManager.h"
 
+#include <Python.h>
+#include <semaphore.h>
 
+#include "expressions/ExprContext.h"
+#include "expressions/ExprResult.h"
 
 /* ****************************************************************************
 *
-* metricsMgr -
+* ExprManager -
 */
-extern JexlManager jexlMgr;
+class ExprManager
+{
+private:
+  PyObject*  pyjexlModule;
+  PyObject*  jexlEngine;
+  PyObject*  jsonModule;
+  //PyObject*  customJsonSerializer;
+  sem_t      sem;
 
-#endif  // SRC_LIB_JEXL_JEXLMGR_H_
+public:
+   void        init(void);
+   ExprResult  evaluate(ExprContextObject* exprContextObjectP, const std::string& expression);
+   void        release(void);
+};
+
+#endif  // SRC_LIB_JEXL_EXPRMANAGER_H_

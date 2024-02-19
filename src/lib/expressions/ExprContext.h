@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JEXL_JEXLCONTEXT_H_
-#define SRC_LIB_JEXL_JEXLCONTEXT_H_
+#ifndef SRC_LIB_JEXL_EXPRCONTEXT_H_
+#define SRC_LIB_JEXL_EXPRCONTEXT_H_
 
 /*
 *
@@ -26,56 +26,51 @@
 * Author: Fermin Galan
 */
 
-// FIXME PR: rename this to a better name (ExprContextDict?)
-
 #include <Python.h>
-
 #include <string>
 
-//#include "jexl/JexlContextList.h"
-
-class JexlContextList;   // forward declaration
+class ExprContextList;   // forward declaration
 
 /* ****************************************************************************
 *
-* JexlContext -
+* ExprContext -
 */
-class JexlContext
+class ExprContextObject
 {
 private:
-  PyObject*  jexl_context;
+  PyObject*  jexlContext;
 
 public:
-  JexlContext();
+  ExprContextObject();
 
   PyObject* get(void);
   void      add(const std::string& key, const std::string& value);
   void      add(const std::string& key, double value);
   void      add(const std::string& key, bool value);
   void      add(const std::string& key);
-  void      add(const std::string& key, JexlContext jexlContext);
-  void      add(const std::string& key, JexlContextList jexlContextList);
+  void      add(const std::string& key, ExprContextObject exprContextObject);
+  void      add(const std::string& key, ExprContextList exprContextList);
   bool      hasKey(const std::string& key);
   void      release(void);
 };
 
-class JexlContextList
+class ExprContextList
 {
 private:
-  PyObject*  jexl_context;
+  PyObject*  jexlContext;
 
 public:
-  JexlContextList();
+  ExprContextList();
 
   PyObject* get(void);
   void      add(const std::string& value);
   void      add(double value);
   void      add(bool value);
   void      add(void);
-  void      add(JexlContext jexlContext);
-  void      add(JexlContextList jexlContextList);
+  void      add(ExprContextObject exprContextObject);
+  void      add(ExprContextList exprContextList);
   void      release(void);
 };
 
 
-#endif  // #define SRC_LIB_JEXL_JEXLCONTEXT_H_
+#endif  // #define SRC_LIB_JEXL_EXPRCONTEXT_H_

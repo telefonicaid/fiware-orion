@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_JEXL_EXPRMGR_H_
+#define SRC_LIB_JEXL_EXPRMGR_H_
+
 /*
 *
-* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,14 +23,16 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Fermin Galan
 */
-#include "jexl/JexlManager.h"
+#include "expressions/ExprManager.h"
 
 
 
 /* ****************************************************************************
 *
-* jexlMgr -
+* metricsMgr -
 */
-JexlManager jexlMgr;
+extern ExprManager exprMgr;
+
+#endif  // SRC_LIB_JEXL_EXPRMGR_H_

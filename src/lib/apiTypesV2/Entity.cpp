@@ -41,7 +41,7 @@
 #include "rest/OrionError.h"
 
 #include "apiTypesV2/Entity.h"
-#include "jexl/JexlContext.h"
+#include "expressions/ExprContext.h"
 
 
 
@@ -308,7 +308,7 @@ std::string Entity::toJson
   bool                                 blacklist,
   const std::vector<std::string>&      metadataFilter,
   bool                                 renderNgsiField,
-  JexlContext*                         jexlContextP
+  ExprContextObject*                         exprContextObjectP
 )
 {
   std::vector<ContextAttribute* > orderedAttrs;
@@ -327,7 +327,7 @@ std::string Entity::toJson
     out = toJsonKeyvalues(orderedAttrs);
     break;
   default:  // NGSI_V2_NORMALIZED
-    out = toJsonNormalized(orderedAttrs, metadataFilter, renderNgsiField, jexlContextP);
+    out = toJsonNormalized(orderedAttrs, metadataFilter, renderNgsiField, exprContextObjectP);
     break;
   }
 
@@ -444,7 +444,7 @@ std::string Entity::toJsonNormalized
   const std::vector<ContextAttribute*>&  orderedAttrs,
   const std::vector<std::string>&        metadataFilter,
   bool                                   renderNgsiField,
-  JexlContext*                           jexlContextP
+  ExprContextObject*                           exprContextObjectP
 )
 {
   JsonObjectHelper jh;
@@ -476,7 +476,7 @@ std::string Entity::toJsonNormalized
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
     ContextAttribute* caP = orderedAttrs[ix];
-    jh.addRaw(caP->name, caP->toJson(metadataFilter, renderNgsiField, jexlContextP));
+    jh.addRaw(caP->name, caP->toJson(metadataFilter, renderNgsiField, exprContextObjectP));
   }
 
   return jh.str();

@@ -612,7 +612,7 @@ bool CompoundValueNode::equal(const orion::BSONElement& be)
 * CompoundValueNode:toJson
 *
 */
-std::string CompoundValueNode::toJson(JexlContext* jexlContextP)
+std::string CompoundValueNode::toJson(ExprContextObject* exprContextObjectP)
 {
   std::string      out;
   JsonVectorHelper jvh;
@@ -621,7 +621,7 @@ std::string CompoundValueNode::toJson(JexlContext* jexlContextP)
   switch (valueType)
   {
   case orion::ValueTypeString:
-    return smartStringValue(stringValue, jexlContextP, "null");
+    return smartStringValue(stringValue, exprContextObjectP, "null");
 
   case orion::ValueTypeNumber:
     return double2string(numberValue);
@@ -635,14 +635,14 @@ std::string CompoundValueNode::toJson(JexlContext* jexlContextP)
   case orion::ValueTypeVector:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      jvh.addRaw(childV[ix]->toJson(jexlContextP));
+      jvh.addRaw(childV[ix]->toJson(exprContextObjectP));
     }
     return jvh.str();
 
   case orion::ValueTypeObject:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      joh.addRaw(childV[ix]->name, childV[ix]->toJson(jexlContextP));
+      joh.addRaw(childV[ix]->name, childV[ix]->toJson(exprContextObjectP));
     }
     return joh.str();
 
@@ -660,39 +660,39 @@ std::string CompoundValueNode::toJson(JexlContext* jexlContextP)
 
 /* ****************************************************************************
 *
-* CompoundValueNode:toJexlContext
+* CompoundValueNode:toExprContextObject
 *
 */
-JexlContext CompoundValueNode::toJexlContext(void)
+ExprContextObject CompoundValueNode::toExprContextObject(void)
 {
-  JexlContext jc;
+  ExprContextObject co;
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
     CompoundValueNode* child = childV[ix];
     switch (child->valueType)
     {
     case orion::ValueTypeString:
-      jc.add(child->name, child->stringValue);
+      co.add(child->name, child->stringValue);
       break;
 
     case orion::ValueTypeNumber:
-      jc.add(child->name, child->numberValue);
+      co.add(child->name, child->numberValue);
       break;
 
     case orion::ValueTypeBoolean:
-      jc.add(child->name, child->boolValue);
+      co.add(child->name, child->boolValue);
       break;
 
     case orion::ValueTypeNull:
-      jc.add(child->name);
+      co.add(child->name);
       break;
 
     case orion::ValueTypeVector:
-      jc.add(child->name, child->toJexlContextList());
+      co.add(child->name, child->toExprContextList());
       break;
 
     case orion::ValueTypeObject:
-      jc.add(child->name, child->toJexlContext());
+      co.add(child->name, child->toExprContextObject());
       break;
 
     case orion::ValueTypeNotGiven:
@@ -703,46 +703,46 @@ JexlContext CompoundValueNode::toJexlContext(void)
       LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
     }
   }
-  return jc;
+  return co;
 }
 
 
 
 /* ****************************************************************************
 *
-* CompoundValueNode:toJexlContextList
+* CompoundValueNode:toExprContextList
 *
 */
-JexlContextList CompoundValueNode::toJexlContextList(void)
+ExprContextList CompoundValueNode::toExprContextList(void)
 {
-  JexlContextList jcl;
+  ExprContextList cl;
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
     CompoundValueNode* child = childV[ix];
     switch (child->valueType)
     {
     case orion::ValueTypeString:
-      jcl.add(child->stringValue);
+      cl.add(child->stringValue);
       break;
 
     case orion::ValueTypeNumber:
-      jcl.add(child->numberValue);
+      cl.add(child->numberValue);
       break;
 
     case orion::ValueTypeBoolean:
-      jcl.add(child->boolValue);
+      cl.add(child->boolValue);
       break;
 
     case orion::ValueTypeNull:
-      jcl.add();
+      cl.add();
       break;
 
     case orion::ValueTypeVector:
-      jcl.add(child->toJexlContextList());
+      cl.add(child->toExprContextList());
       break;
 
     case orion::ValueTypeObject:
-      jcl.add(child->toJexlContext());
+      cl.add(child->toExprContextObject());
       break;
 
     case orion::ValueTypeNotGiven:
@@ -753,7 +753,7 @@ JexlContextList CompoundValueNode::toJexlContextList(void)
       LM_E(("Runtime Error (value type unknown)"));
     }
   }
-  return jcl;
+  return cl;
 }
 
 

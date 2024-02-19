@@ -37,7 +37,7 @@
 #include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoDriver/BSONObjBuilder.h"
-#include "jexl/JexlContext.h"
+#include "expressions/ExprContext.h"
 
 
 
@@ -108,7 +108,7 @@ public:
 
   std::string  toJsonV1AsNameString(bool comma);
 
-  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, JexlContext* jexlContextP = NULL);
+  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
   std::string  toJsonValue(void);
 
@@ -119,7 +119,7 @@ public:
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
 
-  void         addToContext(JexlContext* jexlContextP);
+  void         addToContext(ExprContextObject* exprContextObjectP);
 
   void         release(void);
   std::string  getName(void);

@@ -204,7 +204,7 @@ SET (ORION_LIBS
     common
     alarmMgr
     metricsMgr
-    jexl
+    expressions
     logSummary
     lm
     pa
@@ -322,7 +322,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)
-  ADD_SUBDIRECTORY(src/lib/jexl)
+  ADD_SUBDIRECTORY(src/lib/expressions)
   ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/lib/mqtt)
   ADD_SUBDIRECTORY(src/app/contextBroker)

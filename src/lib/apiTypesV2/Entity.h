@@ -32,7 +32,7 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/EntityId.h"
 #include "rest/OrionError.h"
-#include "jexl/JexlContext.h"
+#include "expressions/ExprContext.h"
 
 
 
@@ -92,7 +92,7 @@ class Entity
                       bool                                 blacklist,
                       const std::vector<std::string>&      metadataFilter,
                       bool                                 renderNgsiField = false,
-                      JexlContext*                         jexlContext    = NULL);
+                      ExprContextObject*                         exprContext     = NULL);
 
   std::string  toJson(RenderFormat                     renderFormat,
                       bool                             renderNgsiField = false);
@@ -146,7 +146,7 @@ class Entity
   std::string toJsonNormalized(const std::vector<ContextAttribute*>&  orderedAttrs,
                                const std::vector<std::string>&        metadataFilter,
                                bool                                   renderNgsiField = false,
-                               JexlContext*                           jexlContext     = NULL);
+                               ExprContextObject*                           exprContext     = NULL);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_
