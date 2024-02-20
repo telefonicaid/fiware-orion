@@ -69,7 +69,13 @@ bool orionldPostContexts(void)
 
   url = orionldContextUrlGenerate(&id);
 
-  OrionldContext* contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, orionldState.requestTree);
+  if (orionldState.payloadContextNode == NULL)
+  {
+    orionldError(OrionldAlreadyExists, "Invalid @context", "@context field missing", 400);
+    return false;
+  }
+
+  OrionldContext* contextP = orionldContextFromTree(url, OrionldContextUserCreated, id, orionldState.payloadContextNode);
   if (contextP == NULL)
   {
     LM_W(("Unable to create context (%s: %s)", orionldState.pd.title, orionldState.pd.detail));
