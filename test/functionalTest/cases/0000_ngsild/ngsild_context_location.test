@@ -108,14 +108,24 @@ contextId: REGEX(.*)
 02. Retrieve the context, with details
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 154
+Content-Length: 379
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "URL": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
-    "kind": "Downloaded",
-    "localId": "REGEX(.*)"
+    "createdAt": "202REGEX(.*)",
+    "extraInfo": {
+        "URLs": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+        ],
+        "origin": "Downloaded",
+        "type": "array"
+    },
+    "kind": "Cached",
+    "lastUsage": "202REGEX(.*)",
+    "localId": "REGEX(.*)",
+    "numberOfHits": 2
 }
 
 

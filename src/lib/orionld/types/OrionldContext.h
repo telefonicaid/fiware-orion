@@ -86,6 +86,20 @@ typedef enum OrionldContextOrigin
 
 // -----------------------------------------------------------------------------
 //
+// OrionldContextKind -
+//
+typedef enum OrionldContextKind
+{
+  OrionldContextUnknownKind,
+  OrionldContextHosted,
+  OrionldContextCached,
+  OrionldContextImplicit
+} OrionldContextKind;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldOriginFromString -
 //
 extern OrionldContextOrigin orionldOriginFromString(const char* s);
@@ -97,6 +111,22 @@ extern OrionldContextOrigin orionldOriginFromString(const char* s);
 // orionldOriginToString -
 //
 extern const char* orionldOriginToString(OrionldContextOrigin origin);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldKindFromString -
+//
+extern OrionldContextKind orionldKindFromString(const char* s);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldKindToString -
+//
+extern const char* orionldKindToString(OrionldContextKind kind);
 
 
 
@@ -120,6 +150,7 @@ typedef struct OrionldContext
   bool                  keyValues;
   OrionldContextInfo    context;
   OrionldContextOrigin  origin;
+  OrionldContextKind    kind;
 } OrionldContext;
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDCONTEXT_H_

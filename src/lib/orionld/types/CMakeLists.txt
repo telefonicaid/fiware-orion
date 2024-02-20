@@ -37,6 +37,7 @@ SET (SOURCES
     DistOpType.cpp
     TroeMode.cpp
     Verb.cpp
+    OrionldContext.cpp
 )
 
 # Include directories

@@ -84,6 +84,7 @@ bool orionldPostContexts(void)
 
   contextP->createdAt = orionldState.requestTime;
   contextP->usedAt    = orionldState.requestTime;
+  contextP->kind      = OrionldContextHosted;
 
   httpHeaderLocationAdd(contextP->url, NULL, NULL);
 
