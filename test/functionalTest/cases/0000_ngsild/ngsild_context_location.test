@@ -120,7 +120,7 @@ Date: REGEX(.*)
             "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
         ],
         "compactions": 0,
-        "expansions": 3,
+        "expansions": 2,
         "origin": "Downloaded",
         "type": "array"
     },

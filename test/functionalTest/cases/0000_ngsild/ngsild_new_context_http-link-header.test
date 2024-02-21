@@ -105,7 +105,7 @@ Date: REGEX(.*)
       "type": "hash-table",
       "origin": "Downloaded",
       "compactions": 0,
-      "expansions": 1,
+      "expansions": 0,
       "hash-table": {
         "T": "http://example.org/T",
         "P1": "http://example.org/P1",

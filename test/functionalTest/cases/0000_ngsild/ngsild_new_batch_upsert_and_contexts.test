@@ -1190,7 +1190,7 @@ bye
 07. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 2000
+Content-Length: 2001
 Content-Type: application/json
 Date: REGEX(.*)
 
