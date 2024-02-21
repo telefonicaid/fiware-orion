@@ -77,7 +77,7 @@ OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origi
   }
 
   contextP->keyValues = keyValues;
-  contextP->lookups   = 0;
+  contextP->lookups   = 1;
 
   return contextP;
 }

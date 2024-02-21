@@ -101,6 +101,7 @@ typedef enum TraceLevels
   LmtContexts = 100,                   // Contexts
   LmtContextTree,                      // Context Tree
   LmtContextCache,                     // Context Cache
+  LmtContextCacheStats,                // Context Cache Statistics
   LmtContextDownload,                  // Context Download
   LmtCoreContext,                      // Core Context
 

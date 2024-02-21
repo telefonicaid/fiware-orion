@@ -170,6 +170,8 @@ Date: REGEX(.*)
         "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 281,
             "hash-table": {
                 "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
                 "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -187,6 +189,8 @@ Date: REGEX(.*)
         "URL": "REGEX(.*)",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
             "hash-table": {
                 "A1": "urn:ngsi-ld:attributes:A1",
                 "A2": "urn:ngsi-ld:attributes:A2",
@@ -198,12 +202,14 @@ Date: REGEX(.*)
         "kind": "Hosted",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)",
-        "numberOfHits": 0
+        "numberOfHits": 1
     },
     {
         "URL": "REGEX(.*)",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
             "hash-table": {
                 "B1": "urn:ngsi-ld:attributes:B1",
                 "B2": "urn:ngsi-ld:attributes:B2",
@@ -215,12 +221,14 @@ Date: REGEX(.*)
         "kind": "Hosted",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)",
-        "numberOfHits": 0
+        "numberOfHits": 1
     },
     {
         "URL": "REGEX(.*)",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
             "hash-table": {
                 "C1": "urn:ngsi-ld:attributes:C1",
                 "C2": "urn:ngsi-ld:attributes:C2",
@@ -232,7 +240,7 @@ Date: REGEX(.*)
         "kind": "Hosted",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)",
-        "numberOfHits": 0
+        "numberOfHits": 1
     }
 ]
 
@@ -296,6 +304,8 @@ Date: REGEX(.*)
         "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 281,
             "hash-table": {
                 "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
                 "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -313,6 +323,8 @@ Date: REGEX(.*)
         "URL": "REGEX(.*)",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
             "hash-table": {
                 "A1": "urn:ngsi-ld:attributes:A1",
                 "A2": "urn:ngsi-ld:attributes:A2",
@@ -324,12 +336,14 @@ Date: REGEX(.*)
         "kind": "Hosted",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)",
-        "numberOfHits": 0
+        "numberOfHits": 1
     },
     {
         "URL": "REGEX(.*)",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
             "hash-table": {
                 "C1": "urn:ngsi-ld:attributes:C1",
                 "C2": "urn:ngsi-ld:attributes:C2",
@@ -341,7 +355,7 @@ Date: REGEX(.*)
         "kind": "Hosted",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)",
-        "numberOfHits": 0
+        "numberOfHits": 1
     }
 ]
 

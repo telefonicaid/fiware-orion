@@ -114,6 +114,8 @@ Date: REGEX(.*)
         "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 281,
             "hash-table": {
                 "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
                 "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -131,6 +133,8 @@ Date: REGEX(.*)
         "URL": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 86,
             "hash-table": {
                 "StockOrder": "https://fiware.github.io/tutorials.Step-by-Step/schema/StockOrder",
                 "commercial": "https://uri.fiware.org/ns/data-models#commercial",
@@ -144,12 +148,14 @@ Date: REGEX(.*)
         "kind": "Cached",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)",
-        "numberOfHits": 0
+        "numberOfHits": 1
     },
     {
         "URL": "REGEX(.*)",
         "createdAt": "1970-01-01T00:00:00.000Z",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
             "hash-table": {
                 "A1": "urn:ngsi-ld:attributes:A1",
                 "A2": "urn:ngsi-ld:attributes:A2",
@@ -162,7 +168,7 @@ Date: REGEX(.*)
         "kind": "Cached",
         "lastUsage": "1970-01-01T00:00:00.000Z",
         "localId": "REGEX(.*)",
-        "numberOfHits": 0
+        "numberOfHits": 1
     },
     {
         "URL": "REGEX(.*)",
@@ -172,13 +178,15 @@ Date: REGEX(.*)
                 "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
                 "http://REGEX(.*)"
             ],
+            "compactions": 0,
+            "expansions": 0,
             "origin": "UserCreated",
             "type": "array"
         },
         "kind": "Hosted",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)",
-        "numberOfHits": 0
+        "numberOfHits": 1
     }
 ]
 

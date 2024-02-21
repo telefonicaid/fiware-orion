@@ -830,7 +830,7 @@ Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jso
 04. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1854
+Content-Length: 2000
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -843,6 +843,8 @@ Date: REGEX(.*)
     "extraInfo": {
       "type": "hash-table",
       "origin": "Downloaded",
+      "compactions": 5,
+      "expansions": 286,
       "hash-table": {
         "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
         "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -860,6 +862,8 @@ Date: REGEX(.*)
     "extraInfo": {
       "type": "hash-table",
       "origin": "Downloaded",
+      "compactions": 0,
+      "expansions": 26,
       "hash-table": {
         "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
         "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
@@ -869,7 +873,7 @@ Date: REGEX(.*)
       }
     },
     "lastUsage": "202REGEX(.*)",
-    "numberOfHits": 0
+    "numberOfHits": 1
   },
   {
     "URL": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
@@ -879,12 +883,14 @@ Date: REGEX(.*)
     "extraInfo": {
       "type": "array",
       "origin": "Downloaded",
+      "compactions": 25,
+      "expansions": 27,
       "URLs": [
         "https://fiware.github.io/data-models/context.jsonld"
       ]
     },
     "lastUsage": "202REGEX(.*)",
-    "numberOfHits": 5
+    "numberOfHits": 2
   }
 ]
 
@@ -1184,7 +1190,7 @@ bye
 07. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1855
+Content-Length: 2000
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -1197,6 +1203,8 @@ Date: REGEX(.*)
     "extraInfo": {
       "type": "hash-table",
       "origin": "Downloaded",
+      "compactions": 10,
+      "expansions": 291,
       "hash-table": {
         "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
         "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
@@ -1214,6 +1222,8 @@ Date: REGEX(.*)
     "extraInfo": {
       "type": "hash-table",
       "origin": "Downloaded",
+      "compactions": 0,
+      "expansions": 52,
       "hash-table": {
         "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
         "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
@@ -1223,7 +1233,7 @@ Date: REGEX(.*)
       }
     },
     "lastUsage": "202REGEX(.*)",
-    "numberOfHits": 0
+    "numberOfHits": 1
   },
   {
     "URL": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
@@ -1233,12 +1243,14 @@ Date: REGEX(.*)
     "extraInfo": {
       "type": "array",
       "origin": "Downloaded",
+      "compactions": 50,
+      "expansions": 54,
       "URLs": [
         "https://fiware.github.io/data-models/context.jsonld"
       ]
     },
     "lastUsage": "202REGEX(.*)",
-    "numberOfHits": 11
+    "numberOfHits": 3
   }
 ]
 

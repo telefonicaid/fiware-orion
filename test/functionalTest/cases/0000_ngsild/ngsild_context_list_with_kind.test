@@ -1,0 +1,467 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Create and DELETE contexts
+
+--SHELL-INIT--
+dbInit CB
+dbDrop orionld
+orionldStart CB
+
+--SHELL--
+
+#
+# 01. Create context A in the broker (array of two URLs - Hosted + 2 Cached)
+# 02. Create context B in the broker (key-values - Hosted)
+# 03. Create context C in the broker (key-values - Hosted)
+# 04. GET all contexts, with details, see A-B-C + the two Cached ones, and the core context
+# 05. GET all contexts, with kind=Hosted - see A-B-C
+# 06. GET all contexts, with kind=Hosted AND details - see A-B-C
+# 07. GET all contexts, with kind=Cached - see the 2 URLs from step 1 + the Core Context
+# 08. GET all contexts, with kind=Cached AND details - see the 2 URLs from step 1 +	the Core Context
+# 09. GET all contexts, with kind=Nada - see 400 Bad Request
+#
+
+echo "01. Create context A in the broker (array of two URLs - Hosted + 2 Cached)"
+echo "=========================================================================="
+payload='{
+  "@context": [
+    "http://smartdatamodels.org/context.jsonld",
+    "https://fiware.github.io/data-models/context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
+echo
+echo
+
+
+echo "02. Create context B in the broker"
+echo "=================================="
+payload='{
+  "@context": {
+    "B1": "urn:ngsi-ld:attributes:B1",
+    "B2": "urn:ngsi-ld:attributes:B2",
+    "B3": "urn:ngsi-ld:attributes:B3"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
+echo
+echo
+
+
+echo "03. Create context C in the broker"
+echo "=================================="
+payload='{
+  "@context": {
+    "C1": "urn:ngsi-ld:attributes:C1",
+    "C2": "urn:ngsi-ld:attributes:C2",
+    "C3": "urn:ngsi-ld:attributes:C3"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
+echo
+echo
+
+
+echo "04. GET all contexts, with details, see A-B-C + the two Cached ones, and the core context"
+echo "========================================================================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
+echo
+echo
+
+
+echo "05. GET all contexts, with kind=Hosted - see A-B-C"
+echo "=================================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts?kind=Hosted
+echo
+echo
+
+
+echo "06. GET all contexts, with kind=Hosted AND details - see A-B-C"
+echo "=============================================================="
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?details=true&kind=Hosted'
+echo
+echo
+
+
+echo "07. GET all contexts, with kind=Cached - see the 2 URLs from step 1 + the Core Context"
+echo "======================================================================================"
+orionCurl --url /ngsi-ld/v1/jsonldContexts?kind=Cached
+echo
+echo
+
+
+echo "08. GET all contexts, with kind=Cached AND details - see the 2 URLs from step 1 + the Core Context"
+echo "=================================================================================================="
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?details=true&kind=Cached'
+echo
+echo
+
+
+echo "09. GET all contexts, with kind=Nada - see 400 Bad Request"
+echo "=========================================================="
+orionCurl --url '/ngsi-ld/v1/jsonldContexts?details=true&kind=Nada'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create context A in the broker (array of two URLs - Hosted + 2 Cached)
+==========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: http://REGEX(.*)
+
+
+
+02. Create context B in the broker
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: http://REGEX(.*)
+
+
+
+03. Create context C in the broker
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: http://REGEX(.*)
+
+
+
+04. GET all contexts, with details, see A-B-C + the two Cached ones, and the core context
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 283,
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
+    },
+    {
+        "URL": "http://smartdatamodels.org/context.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 2,
+            "hash-table": {
+                "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+                "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+                "efficCurve": "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/efficCurve",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "https://fiware.github.io/data-models/context.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle",
+                "areaServed": "https://schema.org/areaServed",
+                "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+                "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+                "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "http://REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "URLs": [
+                "http://smartdatamodels.org/context.jsonld",
+                "https://fiware.github.io/data-models/context.jsonld"
+            ],
+            "compactions": 0,
+            "expansions": 0,
+            "origin": "UserCreated",
+            "type": "array"
+        },
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "http://REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "B1": "urn:ngsi-ld:attributes:B1",
+                "B2": "urn:ngsi-ld:attributes:B2",
+                "B3": "urn:ngsi-ld:attributes:B3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
+        },
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "http://REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "C1": "urn:ngsi-ld:attributes:C1",
+                "C2": "urn:ngsi-ld:attributes:C2",
+                "C3": "urn:ngsi-ld:attributes:C3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
+        },
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    }
+]
+
+
+05. GET all contexts, with kind=Hosted - see A-B-C
+==================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "http://REGEX(.*)",
+    "http://REGEX(.*)",
+    "http://REGEX(.*)"
+]
+
+
+06. GET all contexts, with kind=Hosted AND details - see A-B-C
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "URL": "http://REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "URLs": [
+                "http://smartdatamodels.org/context.jsonld",
+                "https://fiware.github.io/data-models/context.jsonld"
+            ],
+            "compactions": 0,
+            "expansions": 0,
+            "origin": "UserCreated",
+            "type": "array"
+        },
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "http://REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "B1": "urn:ngsi-ld:attributes:B1",
+                "B2": "urn:ngsi-ld:attributes:B2",
+                "B3": "urn:ngsi-ld:attributes:B3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
+        },
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "http://REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "C1": "urn:ngsi-ld:attributes:C1",
+                "C2": "urn:ngsi-ld:attributes:C2",
+                "C3": "urn:ngsi-ld:attributes:C3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
+        },
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    }
+]
+
+
+07. GET all contexts, with kind=Cached - see the 2 URLs from step 1 + the Core Context
+======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "http://smartdatamodels.org/context.jsonld",
+    "https://fiware.github.io/data-models/context.jsonld"
+]
+
+
+08. GET all contexts, with kind=Cached AND details - see the 2 URLs from step 1 + the Core Context
+==================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1887
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 283,
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
+    },
+    {
+        "URL": "http://smartdatamodels.org/context.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 2,
+            "hash-table": {
+                "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+                "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+                "efficCurve": "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/efficCurve",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "https://fiware.github.io/data-models/context.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle",
+                "areaServed": "https://schema.org/areaServed",
+                "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+                "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+                "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    }
+]
+
+
+09. GET all contexts, with kind=Nada - see 400 Bad Request
+==========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 126
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "Nada",
+    "title": "Invalid value for uri parameter /kind/",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

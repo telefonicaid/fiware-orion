@@ -170,6 +170,8 @@ typedef struct OrionldUriParams
   bool      entityMap;
   char*     format;
 
+  OrionldContextKind kind;
+
   double    observedAtAsDouble;
   uint64_t  mask;
 } OrionldUriParams;

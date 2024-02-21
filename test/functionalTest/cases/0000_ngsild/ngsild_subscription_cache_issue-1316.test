@@ -26,7 +26,7 @@ Subscription Creation Error - issue #1317
 --SHELL-INIT--
 dbInit CB
 dbInit CB t_02
-orionldStart CB -experimental -multiservice
+orionldStart CB -experimental -multiservice -t 0-255
 
 --SHELL--
 
@@ -77,7 +77,8 @@ echo
 echo "03. Restart the broker"
 echo "======================"
 brokerStop CB
-orionldStart CB -experimental -multiservice
+sleep 1
+orionldStart CB -experimental -multiservice -t 0-255
 echo
 echo
 

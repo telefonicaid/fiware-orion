@@ -75,7 +75,7 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 652
+Content-Length: 701
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -88,6 +88,8 @@ Date: REGEX(.*)
     "extraInfo": {
       "type": "hash-table",
       "origin": "Downloaded",
+      "compactions": 0,
+      "expansions": 282,
       "hash-table": {
         "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
         "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
