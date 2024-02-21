@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-JEXL expression in custom notification
+Legacy expression using attributes with weird syntax
 
 --SHELL-INIT--
 dbInit CB
@@ -31,16 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub with custom expression sum: A+B
-# 02. Create entity E1 with A=1 and B=2
-# 03. Update entity E1 with A=foo and B=bar
-# 04. Update entity E1 with A=2.1 and B=-3.8
-# 05. Dump accumulator and see two notifications (sum: 3 and sum: foobar)
+# 01. Create custom sub with custom expression: A-B and A:B
+# 02. Create entity E1 with A-B 1 and A:B 2
+# 03. Update entity E1 with A-B 3 and A:B 4
+# 04. Dump accumulator and see notifications (R1 null, R2 null and R1 null, R2 null)
 #
 
 
-echo "01. Create custom sub with custom expression sum: A+B"
-echo "====================================================="
+echo "01. Create custom sub with custom expression: A-B and A:B"
+echo "========================================================="
 payload='{
   "subject": {
     "entities": [
@@ -54,12 +53,17 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
-        "sum": {
-          "value": "${A+B}",
+        "R1": {
+          "value": "${A-B}",
+          "type": "Calculated"
+        },
+        "R2": {
+          "value": "${A:B}",
           "type": "Calculated"
         }
       }
-    }
+    },
+    "attrs": [ "R1", "R2" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -67,16 +71,16 @@ echo
 echo
 
 
-echo "02. Create entity E1 with A=1 and B=2"
-echo "====================================="
+echo "02. Create entity E1 with A-B 1 and A:B 2"
+echo "========================================="
 payload='{
   "id": "E1",
   "type": "T",
-  "A": {
+  "A-B": {
     "value": 1,
     "type": "Number"
   },
-  "B": {
+  "A:B": {
     "value": 2,
     "type": "Number"
   }
@@ -86,32 +90,15 @@ echo
 echo
 
 
-echo "03. Update entity E1 with A=foo and B=bar"
+echo "03. Update entity E1 with A-B 3 and A:B 4"
 echo "========================================="
 payload='{
-  "A": {
-    "value": "foo",
-    "type": "Text"
-  },
-  "B": {
-    "value": "bar",
-    "type": "Text"
-  }
-}'
-orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "04. Update entity E1 with A=2.1 and B=-3.8"
-echo "=========================================="
-payload='{
-  "A": {
-    "value": 2.1,
+  "A-B": {
+    "value": 3,
     "type": "Number"
   },
-  "B": {
-    "value": -3.8,
+  "A:B": {
+    "value": 4,
     "type": "Number"
   }
 }'
@@ -120,16 +107,16 @@ echo
 echo
 
 
-echo "05. Dump accumulator and see three notifications (sum: 3, sum: foobar, sum: -1,7)"
-echo "================================================================================="
+echo "04. Dump accumulator and see notifications (R1 null, R2 null and R1 null, R2 null)"
+echo "=================================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom sub with custom expression sum: A+B
-=====================================================
+01. Create custom sub with custom expression: A-B and A:B
+=========================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -138,8 +125,8 @@ Content-Length: 0
 
 
 
-02. Create entity E1 with A=1 and B=2
-=====================================
+02. Create entity E1 with A-B 1 and A:B 2
+=========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -148,7 +135,7 @@ Content-Length: 0
 
 
 
-03. Update entity E1 with A=foo and B=bar
+03. Update entity E1 with A-B 3 and A:B 4
 =========================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -156,19 +143,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Update entity E1 with A=2.1 and B=-3.8
-==========================================
-HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-
-
-05. Dump accumulator and see three notifications (sum: 3, sum: foobar, sum: -1,7)
-=================================================================================
+04. Dump accumulator and see notifications (R1 null, R2 null and R1 null, R2 null)
+==================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 221
+Content-Length: 185
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -179,22 +158,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "A": {
-                "metadata": {},
-                "type": "Number",
-                "value": 1
-            },
-            "B": {
-                "metadata": {},
-                "type": "Number",
-                "value": 2
-            },
-            "id": "E1",
-            "sum": {
+            "R1": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": 3
+                "value": null
             },
+            "R2": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "id": "E1",
             "type": "T"
         }
     ],
@@ -203,7 +177,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 232
+Content-Length: 185
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -214,57 +188,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "A": {
-                "metadata": {},
-                "type": "Text",
-                "value": "foo"
-            },
-            "B": {
-                "metadata": {},
-                "type": "Text",
-                "value": "bar"
-            },
-            "id": "E1",
-            "sum": {
+            "R1": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": "foobar"
+                "value": null
             },
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 229
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "data": [
-        {
-            "A": {
-                "metadata": {},
-                "type": "Number",
-                "value": 2.1
-            },
-            "B": {
-                "metadata": {},
-                "type": "Number",
-                "value": -3.8
-            },
-            "id": "E1",
-            "sum": {
+            "R2": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": -1.7
+                "value": null
             },
+            "id": "E1",
             "type": "T"
         }
     ],
