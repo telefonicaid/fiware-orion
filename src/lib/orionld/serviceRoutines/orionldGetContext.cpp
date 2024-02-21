@@ -38,6 +38,7 @@ extern "C"
 
 
 
+extern KjNode* orionldContextWithDetails(OrionldContext* contextP);
 // ----------------------------------------------------------------------------
 //
 // orionldGetContext -
@@ -54,25 +55,18 @@ bool orionldGetContext(void)
     return false;
   }
 
-  orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
-  if (orionldState.responseTree == NULL)
-  {
-    orionldError(OrionldBadRequestData, "kjObject failed", "out of memory?", 500);
-    return false;
-  }
 
   if (orionldState.uriParams.details == true)
-  {
-    KjNode* urlNodeP   = kjString(orionldState.kjsonP, "URL",     contextP->url);
-    KjNode* idNodeP    = kjString(orionldState.kjsonP, "localId", contextP->id);
-    KjNode* kindNodeP  = kjString(orionldState.kjsonP, "kind",    orionldOriginToString(contextP->origin));
-
-    kjChildAdd(orionldState.responseTree, urlNodeP);
-    kjChildAdd(orionldState.responseTree, idNodeP);
-    kjChildAdd(orionldState.responseTree, kindNodeP);
-  }
+    orionldState.responseTree = orionldContextWithDetails(contextP);
   else
   {
+    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+    if (orionldState.responseTree == NULL)
+    {
+      orionldError(OrionldBadRequestData, "kjObject failed", "out of memory?", 500);
+      return false;
+    }
+
     contextP->tree->name = (char*) "@context";
     kjChildAdd(orionldState.responseTree, contextP->tree);
   }

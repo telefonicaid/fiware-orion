@@ -31,11 +31,10 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/types/OrionldContext.h"                        // OrionldContext
+#include "orionld/types/OrionldContext.h"                        // OrionldContext, orionldOriginToString, orionldKindToString
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/uuidGenerate.h"                         // uuidGenerate
 #include "orionld/context/orionldContextUrlGenerate.h"           // orionldContextUrlGenerate
-#include "orionld/context/orionldContextOriginName.h"            // orionldContextOriginName
 #include "orionld/mongoc/mongocContextCachePersist.h"            // mongocContextCachePersist - FIXME: Use dbContextCachePersist
 #include "orionld/contextCache/orionldContextCachePersist.h"     // Own interface
 
@@ -61,7 +60,8 @@ void orionldContextCachePersist(OrionldContext* contextP)
   KjNode*  idP;
   KjNode*  urlP         = kjString(orionldState.kjsonP, "url",       contextP->url);
   KjNode*  parentP;
-  KjNode*  originP      = kjString(orionldState.kjsonP, "origin",    orionldContextOriginName(contextP->origin));
+  KjNode*  originP      = kjString(orionldState.kjsonP, "origin",    orionldOriginToString(contextP->origin));
+  KjNode*  kindP        = kjString(orionldState.kjsonP, "kind",      orionldKindToString(contextP->kind));
   KjNode*  createdAtP   = kjFloat(orionldState.kjsonP,  "createdAt", orionldState.requestTime);  // FIXME: make sure it's not overwritten if already exists
   KjNode*  valueP       = contextP->tree;
 
@@ -87,6 +87,9 @@ void orionldContextCachePersist(OrionldContext* contextP)
 
   // Field: "origin"
   kjChildAdd(contextObjP, originP);
+
+  // Field: "kind"
+  kjChildAdd(contextObjP, kindP);
 
   // Field: "createdAt"
   kjChildAdd(contextObjP, createdAtP);

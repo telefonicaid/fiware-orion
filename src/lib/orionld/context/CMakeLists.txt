@@ -42,7 +42,6 @@ SET (SOURCES
     orionldContextItemAlreadyExpanded.cpp
     orionldAttributeExpand.cpp
     orionldSubAttributeExpand.cpp
-    orionldContextOriginName.cpp
     orionldEntityExpand.cpp
     orionldEntityCompact.cpp
 )

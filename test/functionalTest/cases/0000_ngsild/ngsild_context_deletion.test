@@ -167,60 +167,72 @@ Date: REGEX(.*)
 
 [
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
-            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "A1": "urn:ngsi-ld:attributes:A1",
-            "A2": "urn:ngsi-ld:attributes:A2",
-            "A3": "urn:ngsi-ld:attributes:A3"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "hash-table": {
+                "A1": "urn:ngsi-ld:attributes:A1",
+                "A2": "urn:ngsi-ld:attributes:A2",
+                "A3": "urn:ngsi-ld:attributes:A3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "UserCreated",
-        "type": "hash-table",
-        "url": "http://REGEX(.*)
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 0
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "B1": "urn:ngsi-ld:attributes:B1",
-            "B2": "urn:ngsi-ld:attributes:B2",
-            "B3": "urn:ngsi-ld:attributes:B3"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "hash-table": {
+                "B1": "urn:ngsi-ld:attributes:B1",
+                "B2": "urn:ngsi-ld:attributes:B2",
+                "B3": "urn:ngsi-ld:attributes:B3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "UserCreated",
-        "type": "hash-table",
-        "url": "http://REGEX(.*)
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 0
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "C1": "urn:ngsi-ld:attributes:C1",
-            "C2": "urn:ngsi-ld:attributes:C2",
-            "C3": "urn:ngsi-ld:attributes:C3"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "hash-table": {
+                "C1": "urn:ngsi-ld:attributes:C1",
+                "C2": "urn:ngsi-ld:attributes:C2",
+                "C3": "urn:ngsi-ld:attributes:C3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "UserCreated",
-        "type": "hash-table",
-        "url": "http://REGEX(.*)
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 0
     }
 ]
 
@@ -235,6 +247,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"parent" : null,
 	"origin" : "Downloaded",
+	"kind" : "Cached",
 	"createdAt" : REGEX(.*)
 }
 {
@@ -242,6 +255,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
+	"kind" : "Hosted",
 	"createdAt" : REGEX(.*)
 }
 {
@@ -249,6 +263,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
+	"kind" : "Hosted",
 	"createdAt" : REGEX(.*)
 }
 {
@@ -256,6 +271,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
+	"kind" : "Hosted",
 	"createdAt" : REGEX(.*)
 }
 bye
@@ -277,46 +293,55 @@ Date: REGEX(.*)
 
 [
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
-            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "A1": "urn:ngsi-ld:attributes:A1",
-            "A2": "urn:ngsi-ld:attributes:A2",
-            "A3": "urn:ngsi-ld:attributes:A3"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "hash-table": {
+                "A1": "urn:ngsi-ld:attributes:A1",
+                "A2": "urn:ngsi-ld:attributes:A2",
+                "A3": "urn:ngsi-ld:attributes:A3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "UserCreated",
-        "type": "hash-table",
-        "url": "http://REGEX(.*)
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 0
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "C1": "urn:ngsi-ld:attributes:C1",
-            "C2": "urn:ngsi-ld:attributes:C2",
-            "C3": "urn:ngsi-ld:attributes:C3"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "hash-table": {
+                "C1": "urn:ngsi-ld:attributes:C1",
+                "C2": "urn:ngsi-ld:attributes:C2",
+                "C3": "urn:ngsi-ld:attributes:C3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "UserCreated",
-        "type": "hash-table",
-        "url": "http://REGEX(.*)
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 0
     }
 ]
 
@@ -331,6 +356,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"parent" : null,
 	"origin" : "Downloaded",
+	"kind" : "Cached",
 	"createdAt" : REGEX(.*)
 }
 {
@@ -338,6 +364,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
+	"kind" : "Hosted",
 	"createdAt" : REGEX(.*)
 }
 {
@@ -345,6 +372,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "httpREGEX(.*)",
 	"parent" : null,
 	"origin" : "UserCreated",
+	"kind" : "Hosted",
 	"createdAt" : REGEX(.*)
 }
 bye
