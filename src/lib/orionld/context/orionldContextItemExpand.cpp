@@ -96,6 +96,8 @@ char* orionldContextItemExpand
       if (contextItemPP != NULL)
         *contextItemPP = NULL;
 
+      orionldCoreContextP->expansions += 1;  // Really, @vocab expansions of the core context
+
       return longName;
     }
 
@@ -105,6 +107,8 @@ char* orionldContextItemExpand
   // 4. Save the pointer to the context item
   if (contextItemPP != NULL)
     *contextItemPP = contextItemP;
+
+  contextP->expansions += 1;  // Really, @vocab expansions of the core context
 
   return contextItemP->id;
 }

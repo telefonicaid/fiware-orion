@@ -83,7 +83,7 @@ bool orionldGetContexts(void)
 
   orionldState.noLinkHeader = true;  // We don't want the Link header for context requests
 
-  orionldState.responseTree = orionldContextCacheGet(contextTree, orionldState.uriParams.details);
+  orionldState.responseTree = orionldContextCacheGet(contextTree, orionldState.uriParams.details, orionldState.uriParams.kind);
 
   return true;
 }

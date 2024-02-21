@@ -49,16 +49,11 @@ OrionldContext* orionldContextCacheLookup(const char* url)
 
     if (strcmp(url, orionldContextCache[ix]->url) == 0)
       contextP = orionldContextCache[ix];
-
-    if ((orionldContextCache[ix]->id != NULL) && (strcmp(url, orionldContextCache[ix]->id) == 0))
+    else if ((orionldContextCache[ix]->id != NULL) && (strcmp(url, orionldContextCache[ix]->id) == 0))
       contextP = orionldContextCache[ix];
 
     if (contextP != NULL)
-    {
-      contextP->usedAt   = orionldState.requestTime;
-      contextP->lookups += 1;
       return contextP;
-    }
   }
 
   return NULL;

@@ -10,3 +10,6 @@
   * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)
   * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language
   * Modified the @context hosting feature to be according to API spec
+  * Support for URI param 'kind' for GET Contexts
+  * Improved counters for GET Context/Contexts
+  * API spec compliance for GET Context/Contexts

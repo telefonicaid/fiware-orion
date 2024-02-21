@@ -146,7 +146,9 @@ typedef struct OrionldContext
   bool                  coreContext;
   double                createdAt;
   double                usedAt;
-  int                   lookups;
+  int                   compactions;     // Number of compactions done with this @context
+  int                   expansions;      // Number of expansions done with this @context
+  int                   lookups;         // Number of NGSI-LD requests done using this @context
   bool                  keyValues;
   OrionldContextInfo    context;
   OrionldContextOrigin  origin;

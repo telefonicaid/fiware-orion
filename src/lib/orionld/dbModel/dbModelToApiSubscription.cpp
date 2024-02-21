@@ -548,7 +548,6 @@ KjNode* dbModelToApiSubscription
   }
 
 
-
   //
   // origin
   //

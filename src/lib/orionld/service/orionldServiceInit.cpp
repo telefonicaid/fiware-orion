@@ -466,6 +466,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_DETAILS;
     serviceP->uriParams |= ORIONLD_URIPARAM_LOCATION;
     serviceP->uriParams |= ORIONLD_URIPARAM_URL;
+    serviceP->uriParams |= ORIONLD_URIPARAM_KIND;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_DONT_ADD_CONTEXT_TO_RESPONSE_PAYLOAD;
   }

@@ -32,7 +32,7 @@ extern "C"
 #include "logMsg/logMsg.h"                                       // LM_*
 #include "logMsg/traceLevels.h"                                  // Lmt*
 
-#include "orionld/types/OrionldContext.h"                        // OrionldContext, orionldOriginToString
+#include "orionld/types/OrionldContext.h"                        // OrionldContext, orionldOriginToString, OrionldContextKind
 #include "orionld/types/OrionldContextItem.h"                    // OrionldContextItem
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/numberToDate.h"                         // numberToDate
@@ -67,35 +67,39 @@ KjNode* orionldContextWithDetails(OrionldContext* contextP)
 
   KjNode*          contextObjP      = kjObject(orionldState.kjsonP, NULL);
 
-  KjNode*          urlStringP       = kjString(orionldState.kjsonP, "URL",       contextP->url);
-  KjNode*          idStringP        = kjString(orionldState.kjsonP, "localId",   (contextP->id == NULL)? "None" : contextP->id);
-  KjNode*          kindP            = kjString(orionldState.kjsonP, "kind",      orionldKindToString(contextP->kind));
-  KjNode*          createdAtP       = kjString(orionldState.kjsonP, "createdAt", createdAtString);
-  KjNode*          extraInfoP       = kjObject(orionldState.kjsonP, "extraInfo");
-  KjNode*          typeStringP      = kjString(orionldState.kjsonP, "type",      contextP->keyValues? "hash-table" : "array");
-  KjNode*          originP          = kjString(orionldState.kjsonP, "origin",    orionldOriginToString(contextP->origin));
+  KjNode*          urlStringP       = kjString(orionldState.kjsonP,  "URL",          contextP->url);
+  KjNode*          idStringP        = kjString(orionldState.kjsonP,  "localId",      (contextP->id == NULL)? "None" : contextP->id);
+  KjNode*          kindP            = kjString(orionldState.kjsonP,  "kind",         orionldKindToString(contextP->kind));
+  KjNode*          createdAtP       = kjString(orionldState.kjsonP,  "createdAt",    createdAtString);
+  KjNode*          extraInfoP       = kjObject(orionldState.kjsonP,  "extraInfo");
+  KjNode*          typeStringP      = kjString(orionldState.kjsonP,  "type",         (contextP->keyValues == true)? "hash-table" : "array");
+  KjNode*          originP          = kjString(orionldState.kjsonP,  "origin",       orionldOriginToString(contextP->origin));
+  KjNode*          compactionsP     = kjInteger(orionldState.kjsonP, "compactions",  contextP->compactions);
+  KjNode*          expansionsP      = kjInteger(orionldState.kjsonP, "expansions",   contextP->expansions);
 
   kjChildAdd(contextObjP, urlStringP);
   kjChildAdd(contextObjP, idStringP);
   kjChildAdd(contextObjP, kindP);
   kjChildAdd(contextObjP, createdAtP);
   kjChildAdd(contextObjP, extraInfoP);
-  kjChildAdd(extraInfoP, typeStringP);
-  kjChildAdd(extraInfoP, originP);
+
 
   if (contextP != orionldCoreContextP)
   {
-    KjNode*          usedAtP          = kjString(orionldState.kjsonP,  "lastUsage",     lastUseString);
-    KjNode*          lookupsP         = kjInteger(orionldState.kjsonP, "numberOfHits",  contextP->lookups);
-
+    KjNode*          usedAtP          = kjString(orionldState.kjsonP,  "lastUsage",    lastUseString);
+    KjNode*          lookupsP         = kjInteger(orionldState.kjsonP, "numberOfHits", contextP->lookups);
     kjChildAdd(contextObjP, usedAtP);
     kjChildAdd(contextObjP, lookupsP);
   }
 
+  kjChildAdd(extraInfoP,  typeStringP);
+  kjChildAdd(extraInfoP,  originP);
+  kjChildAdd(extraInfoP,  compactionsP);
+  kjChildAdd(extraInfoP,  expansionsP);
+
   if (contextP->parent != NULL)
   {
     KjNode* parentP = kjString(orionldState.kjsonP, "parent", contextP->parent);
-
     kjChildAdd(extraInfoP, parentP);
   }
 
@@ -155,13 +159,16 @@ KjNode* orionldContextWithDetails(OrionldContext* contextP)
 //
 // orionldContextCacheGet -
 //
-KjNode* orionldContextCacheGet(KjNode* arrayP, bool details)
+KjNode* orionldContextCacheGet(KjNode* arrayP, bool details, OrionldContextKind kind)
 {
   for (int ix = 0; ix < orionldContextCacheSlotIx; ix++)
   {
-    OrionldContext*  contextP         = orionldContextCacheArray[ix];
+    OrionldContext*  contextP = orionldContextCacheArray[ix];
 
     if (contextP == NULL)
+      continue;
+
+    if ((kind != OrionldContextUnknownKind) && (contextP->kind != kind))
       continue;
 
     if (details == true)

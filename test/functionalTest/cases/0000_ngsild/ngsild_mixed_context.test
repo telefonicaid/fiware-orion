@@ -144,7 +144,7 @@ Date: REGEX(.*)
 03. Get all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 1364
+Content-Length: 1459
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -153,6 +153,8 @@ Date: REGEX(.*)
         "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 281,
             "hash-table": {
                 "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
                 "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
@@ -170,6 +172,8 @@ Date: REGEX(.*)
         "URL": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
         "createdAt": "202REGEX(.*)",
         "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
             "hash-table": {
                 "P1": "http://example.org/P1",
                 "P2": "http://example.org/P2",
@@ -183,7 +187,7 @@ Date: REGEX(.*)
         "kind": "Cached",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)"
-        "numberOfHits": 0
+        "numberOfHits": 1
     },
     {
         "URL": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
@@ -192,13 +196,15 @@ Date: REGEX(.*)
             "URLs": [
                 "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
             ],
+            "compactions": 0,
+            "expansions": 0,
             "origin": "Downloaded",
             "type": "array"
         },
         "kind": "Cached",
         "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)"
-        "numberOfHits": 0
+        "numberOfHits": 1
     }
 ]
 

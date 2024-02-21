@@ -62,12 +62,17 @@ OrionldContextItem* orionldContextItemLookup(OrionldContext* contextP, const cha
     }
   }
 
-  if (valueMayBeCompactedP != NULL)
+  if (itemP != NULL)
   {
-    if ((itemP->type != NULL) && (strcmp(itemP->type, "@vocab") == 0))
-      *valueMayBeCompactedP = true;
-    else
-      *valueMayBeCompactedP = false;
+    contextP->expansions += 1;
+
+    if (valueMayBeCompactedP != NULL)
+    {
+      if ((itemP->type != NULL) && (strcmp(itemP->type, "@vocab") == 0))
+        *valueMayBeCompactedP = true;
+      else
+        *valueMayBeCompactedP = false;
+    }
   }
 
   return itemP;
