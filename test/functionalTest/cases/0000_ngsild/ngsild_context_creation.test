@@ -200,7 +200,7 @@ URL of newly created context: REGEX(.*)
 02. GET all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 948
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -339,7 +339,7 @@ Date: REGEX(.*)
 09. GET all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 3111
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 

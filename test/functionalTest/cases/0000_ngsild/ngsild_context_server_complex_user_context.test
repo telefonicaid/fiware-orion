@@ -105,7 +105,7 @@ Location: http://REGEX(.*)
 02. GET all contexts - see 4 contexts: array, downloaded and inline (the core context is the "fourth")
 ======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2147
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 

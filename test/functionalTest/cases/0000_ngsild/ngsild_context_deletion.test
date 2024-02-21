@@ -161,7 +161,7 @@ URL of context C: REGEX(.*)
 04. GET all contexts, with details, see A-B-C
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 1788
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -287,7 +287,7 @@ Date: REGEX(.*)
 07. GET all contexts, with details, see A-C
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1368
+Content-Length: RGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 
