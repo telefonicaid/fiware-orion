@@ -71,6 +71,7 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
     if (oldType == GeoProperty)         return "Attempt to transform a GeoProperty into a Property";
     if (oldType == LanguageProperty)    return "Attempt to transform a LanguageProperty into a Property";
     if (oldType == VocabularyProperty)  return "Attempt to transform a VocabularyProperty into a Property";
+    if (oldType == JsonProperty)        return "Attempt to transform a JsonProperty into a Property";
   }
   else if (newType == Relationship)
   {
@@ -78,6 +79,7 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
     if (oldType == GeoProperty)         return "Attempt to transform a GeoProperty into a Relationship";
     if (oldType == LanguageProperty)    return "Attempt to transform a LanguageProperty into a Relationship";
     if (oldType == VocabularyProperty)  return "Attempt to transform a VocabularyProperty into a Relationship";
+    if (oldType == JsonProperty)        return "Attempt to transform a JsonProperty into a Relationship";
   }
   else if (newType == GeoProperty)
   {
@@ -85,6 +87,7 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
     if (oldType == Relationship)        return "Attempt to transform a Relationship into a GeoProperty";
     if (oldType == LanguageProperty)    return "Attempt to transform a LanguageProperty into a GeoProperty";
     if (oldType == VocabularyProperty)  return "Attempt to transform a VocabularyProperty into a GeoProperty";
+    if (oldType == JsonProperty)        return "Attempt to transform a JsonProperty into a GeoProperty";
   }
   else if (newType == LanguageProperty)
   {
@@ -92,13 +95,23 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
     if (oldType == Relationship)        return "Attempt to transform a Relationship into a LanguageProperty";
     if (oldType == GeoProperty)         return "Attempt to transform a GeoProperty into a LanguageProperty";
     if (oldType == VocabularyProperty)  return "Attempt to transform a VocabularyProperty into a LanguageProperty";
+    if (oldType == JsonProperty)        return "Attempt to transform a JsonProperty into a LanguageProperty";
   }
   else if (newType == VocabularyProperty)
   {
     if (oldType == Property)            return "Attempt to transform a Property into a VocabularyProperty";
     if (oldType == Relationship)        return "Attempt to transform a Relationship into a VocabularyProperty";
     if (oldType == GeoProperty)         return "Attempt to transform a GeoProperty into a VocabularyProperty";
-    if (oldType == LanguageProperty)    return "Attempt to transform a LanguageProperty into a GeoProperty";
+    if (oldType == LanguageProperty)    return "Attempt to transform a LanguageProperty into a VocabularyProperty";
+    if (oldType == JsonProperty)        return "Attempt to transform a JsonProperty into a VocabularyProperty";
+  }
+  else if (newType == JsonProperty)
+  {
+    if (oldType == Property)            return "Attempt to transform a Property into a JsonProperty";
+    if (oldType == Relationship)        return "Attempt to transform a Relationship into a JsonProperty";
+    if (oldType == GeoProperty)         return "Attempt to transform a GeoProperty into a JsonProperty";
+    if (oldType == LanguageProperty)    return "Attempt to transform a LanguageProperty into a JsonProperty";
+    if (oldType == VocabularyProperty)  return "Attempt to transform a VocabularyProperty into a JsonProperty";
   }
 
   return "Attribute type inconsistency";
@@ -413,6 +426,7 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
   KjNode* objectP      = kjLookup(attrP, "object");
   KjNode* languageMapP = kjLookup(attrP, "languageMap");
   KjNode* vocabP       = kjLookup(attrP, "vocab");
+  KjNode* jsonP        = kjLookup(attrP, "json");
 
   if (attributeType == Property)
   {
@@ -429,6 +443,11 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
     else if (vocabP != NULL)
     {
       orionldError(OrionldBadRequestData, "Forbidden field for a Property: vocab", attrP->name, 400);
+      return false;
+    }
+    else if (jsonP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a Property: json", attrP->name, 400);
       return false;
     }
     else if ((valueP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
@@ -454,6 +473,11 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
       orionldError(OrionldBadRequestData, "Forbidden field for a GeoProperty: vocab", attrP->name, 400);
       return false;
     }
+    else if (jsonP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a GeoProperty: json", attrP->name, 400);
+      return false;
+    }
     else if ((valueP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
     {
       orionldError(OrionldBadRequestData, "Missing /value/ field for GeoProperty at creation time", attrP->name, 400);
@@ -475,6 +499,11 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
     else if (vocabP != NULL)
     {
       orionldError(OrionldBadRequestData, "Forbidden field for a Relationship: vocab", attrP->name, 400);
+      return false;
+    }
+    else if (jsonP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a Relationship: json", attrP->name, 400);
       return false;
     }
     else if ((objectP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
@@ -500,6 +529,11 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
       orionldError(OrionldBadRequestData, "Forbidden field for a LanguageProperty: vocab", attrP->name, 400);
       return false;
     }
+    else if (jsonP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a LanguageProperty: json", attrP->name, 400);
+      return false;
+    }
     else if ((languageMapP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
     {
       orionldError(OrionldBadRequestData, "Missing /languageMap/ field for LanguageProperty at creation time", attrP->name, 400);
@@ -523,9 +557,42 @@ bool valueAndTypeCheck(KjNode* attrP, OrionldAttributeType attributeType, bool a
       orionldError(OrionldBadRequestData, "Forbidden field for a VocabularyProperty: languageMap", attrP->name, 400);
       return false;
     }
+    else if (jsonP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a VocabularyProperty: json", attrP->name, 400);
+      return false;
+    }
     else if ((vocabP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
     {
       orionldError(OrionldBadRequestData, "Missing /vocab/ field for VocabularyProperty at creation time", attrP->name, 400);
+      return false;
+    }
+  }
+  else if (attributeType == JsonProperty)
+  {
+    if (valueP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a JsonProperty: value", attrP->name, 400);
+      return false;
+    }
+    else if (objectP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a JsonProperty: object", attrP->name, 400);
+      return false;
+    }
+    else if (languageMapP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a JsonProperty: languageMap", attrP->name, 400);
+      return false;
+    }
+    else if (vocabP != NULL)
+    {
+      orionldError(OrionldBadRequestData, "Forbidden field for a JsonProperty: vocab", attrP->name, 400);
+      return false;
+    }
+    else if ((jsonP == NULL) && (attributeExisted == false))  // Attribute is new but the value is missing
+    {
+      orionldError(OrionldBadRequestData, "Missing /json/ field for JsonProperty at creation time", attrP->name, 400);
       return false;
     }
   }
@@ -837,6 +904,15 @@ bool deletionWithTypePresent(KjNode* attrP, KjNode* typeP)
       }
     }
   }
+  else if (strcmp(typeP->value.s, "JsonProperty") == 0)
+  {
+    valueP = kjLookup(attrP, "json");
+    if ((valueP != NULL) && (valueP->type == KjString) && (strcmp(valueP->value.s, "urn:ngsi-ld:null") == 0))
+    {
+      attrP->type = KjNull;
+      return true;
+    }
+  }
 
   return false;
 }
@@ -854,7 +930,8 @@ static bool deletionWithoutTypePresent
   KjNode*               valueP,
   KjNode*               objectP,
   KjNode*               languageMapP,
-  KjNode*               vocabP
+  KjNode*               vocabP,
+  KjNode*               jsonP
 )
 {
   if ((attributeType == Property) || (attributeType == GeoProperty))
@@ -891,6 +968,14 @@ static bool deletionWithoutTypePresent
         attrP->type = KjNull;
         return true;
       }
+    }
+  }
+  else if (attributeType == JsonProperty)
+  {
+    if ((jsonP != NULL) && (jsonP->type == KjString) && (strcmp(jsonP->value.s, "urn:ngsi-ld:null") == 0))
+    {
+      attrP->type = KjNull;
+      return true;
     }
   }
 
@@ -1057,6 +1142,7 @@ static bool pCheckAttributeObject
     KjNode* objectP      = kjLookup(attrP, "object");
     KjNode* languageMapP = kjLookup(attrP, "languageMap");
     KjNode* vocabP       = kjLookup(attrP, "vocab");
+    KjNode* jsonP        = kjLookup(attrP, "json");
 
     if (valueP != NULL)
     {
@@ -1079,6 +1165,11 @@ static bool pCheckAttributeObject
     {
       attributeType = VocabularyProperty;
       arrayReduce(vocabP);
+    }
+    else if (jsonP != NULL)
+    {
+      attributeType = JsonProperty;
+      arrayReduce(jsonP);
     }
     else
     {
@@ -1110,7 +1201,7 @@ static bool pCheckAttributeObject
     //
     if ((orionldState.serviceP->options & ORIONLD_SERVICE_OPTION_ACCEPT_JSONLD_NULL) != 0)
     {
-      if (deletionWithoutTypePresent(attrP, attributeType, valueP, objectP, languageMapP, vocabP) == true)
+      if (deletionWithoutTypePresent(attrP, attributeType, valueP, objectP, languageMapP, vocabP, jsonP) == true)
         return true;
     }
   }
@@ -1157,7 +1248,7 @@ static bool pCheckAttributeObject
           fieldP->value     = fieldP->value.firstChildP->value;
         }
       }
-      if ((attributeType == Relationship) || (attributeType == LanguageProperty) || (attributeType == VocabularyProperty))
+      if ((attributeType == Relationship) || (attributeType == LanguageProperty) || (attributeType == VocabularyProperty) || (attributeType == JsonProperty))
       {
         orionldError(OrionldBadRequestData, "Invalid member /value/", "valid for Property/GeoProperty attributes only", 400);
         return false;
@@ -1192,6 +1283,9 @@ static bool pCheckAttributeObject
     {
       if (pCheckVocabulary(fieldP, attrP->name) == false)
         return false;
+    }
+    else if ((attributeType == JsonProperty) && (strcmp(fieldP->name, "json") == 0))
+    {
     }
     else if (strcmp(fieldP->name, "observedAt") == 0)
     {
@@ -1392,6 +1486,12 @@ static bool validAttrName(const char* attrName, bool isAttribute)
 //  - Attributes of type VocabularyProperty can have the following special attributes:
 //      - type
 //      - vocab
+//      - observedAt
+//      - datasetId (sub-attributes don't have datasetId)
+//
+//  - Attributes of type JsonProperty can have the following special attributes:
+//      - type
+//      - json
 //      - observedAt
 //      - datasetId (sub-attributes don't have datasetId)
 //

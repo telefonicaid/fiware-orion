@@ -113,6 +113,7 @@ void dbModelToApiAttribute(KjNode* dbAttrP, bool sysAttrs, bool eqsForDots)
   {
     if      (strcmp(typeP->value.s, "Relationship")       == 0) valueP->name = (char*) "object";
     else if (strcmp(typeP->value.s, "LanguageProperty")   == 0) valueP->name = (char*) "languageMap";
+    else if (strcmp(typeP->value.s, "JsonProperty")       == 0) valueP->name = (char*) "json";
     else if (strcmp(typeP->value.s, "VocabularyProperty") == 0)
     {
       valueP->name = (char*) "vocab";
@@ -398,6 +399,17 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
       valueP->name               = (char*) "vocab";
       attrP = dbAttrP;
     }
+    else if (strcmp(attrTypeNodeP->value.s, "JsonProperty") == 0)
+    {
+      KjNode* valueP = kjLookup(dbAttrP, "value");
+
+      // Remove everything except the value, and change its name to "vocab"
+      dbAttrP->value.firstChildP = valueP;
+      dbAttrP->lastChild         = valueP;
+      valueP->next               = NULL;
+      valueP->name               = (char*) "json";
+      attrP = dbAttrP;
+    }
     else
     {
       // "Steal" the value node and rename it to have the attribute's name instead - that's all that's needed for SIMPLIFIED FORMAT
@@ -435,6 +447,8 @@ KjNode* dbModelToApiAttribute2(KjNode* dbAttrP, KjNode* datasetP, bool sysAttrs,
       {
         if (attrType == Relationship)
           nodeP->name = (char*) "object";
+        else if (attrType == JsonProperty)
+          nodeP->name = (char*) "json";
         else if (attrType == VocabularyProperty)
         {
           nodeP->name = (char*) "vocab";

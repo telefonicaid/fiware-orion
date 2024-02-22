@@ -83,6 +83,7 @@ bool pgAttributeBuild
     else if (strcmp(nodeP->name, "type")        == 0)  type       = nodeP->value.s;
     else if (strcmp(nodeP->name, "datasetId")   == 0)  datasetId  = nodeP->value.s;
     else if (strcmp(nodeP->name, "value")       == 0)  valueNodeP = nodeP;
+    else if (strcmp(nodeP->name, "json")        == 0)  valueNodeP = nodeP;
     else if (strcmp(nodeP->name, "object")      == 0)
     {
       if (nodeP->type == KjString)

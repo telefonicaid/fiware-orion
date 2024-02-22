@@ -44,6 +44,7 @@ const char* orionldAttributeTypeName(OrionldAttributeType attributeType)
   case GeoProperty:         return "GeoProperty";
   case LanguageProperty:    return "LanguageProperty";
   case VocabularyProperty:  return "VocabularyProperty";
+  case JsonProperty:        return "JsonProperty";
   }
 
   return "InvalidAttributeType";
@@ -62,6 +63,7 @@ OrionldAttributeType orionldAttributeType(const char* typeString)
   else if (strcmp(typeString, "GeoProperty")         == 0) return GeoProperty;
   else if (strcmp(typeString, "LanguageProperty")    == 0) return LanguageProperty;
   else if (strcmp(typeString, "VocabularyProperty")  == 0) return VocabularyProperty;
+  else if (strcmp(typeString, "JsonProperty")        == 0) return JsonProperty;
 
   return NoAttributeType;
 }

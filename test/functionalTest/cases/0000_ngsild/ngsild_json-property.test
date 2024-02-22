@@ -1,0 +1,290 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+VocabularyProperty
+
+--SHELL-INIT--
+dbInit CB
+
+orionldStart CB -experimental
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription on entity type T
+# 02. Create an entity urn:E1, type T, with a JsonProperty V1: "abc"
+# 03. Create an entity urn:E2, type T, with a JsonProperty V2: [ "vocab", "id" ]
+# 04. GET urn:E1 to see V1
+# 05. GET urn:E2 to see V2
+# 06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
+#
+# 07. GET urn:E2 in simplified format
+#
+
+echo '01. Create a subscription on entity type T'
+echo '=========================================='
+payload='{
+  "id": "urn:ngsi-ld:subs:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "showChanges": true
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. Create an entity urn:E1, type T, with a JsonProperty V1: "abc"'
+echo '========================================================================'
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "V1": {
+    "json": "abc",
+    "type": "JsonProperty"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '03. Create an entity urn:E2, type T, with a JsonProperty V2: [ "json", "id" ]'
+echo '===================================================================================='
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "V2": {
+    "json": [ "json", "id" ],
+    "type": "JsonProperty"    
+  },
+  "V3": {
+    "json": [ "json" ]
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo '04. GET urn:E1 to see V1'
+echo '========================'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo '05. GET urn:E2 to see V2'
+echo '========================'
+orionCurl --url /ngsi-ld/v1/entities/urn:E2
+echo
+echo
+
+
+echo "06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2"
+echo "======================================================="
+sleep .2
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. GET urn:E2 in simplified format"
+echo "==================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E2?options=simplified
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription on entity type T
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
+
+
+
+02. Create an entity urn:E1, type T, with a JsonProperty V1: "abc"
+========================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+03. Create an entity urn:E2, type T, with a JsonProperty V2: [ "json", "id" ]
+====================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+04. GET urn:E1 to see V1
+========================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "V1": {
+        "json": "abc",
+        "type": "JsonProperty"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+05. GET urn:E2 to see V2
+========================
+HTTP/1.1 200 OK
+Content-Length: 119
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "V2": {
+        "json": [
+            "json",
+            "id"
+        ],
+        "type": "JsonProperty"
+    },
+    "V3": {
+        "json": "json",
+        "type": "JsonProperty"
+    },    
+    "id": "urn:E2",
+    "type": "T"
+}
+
+
+06. Dump/Reset accumulator, see urn:E1+V1 and urn:E2+V2
+=======================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 249
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "V1": {
+                "json": "abc",
+                "type": "JsonProperty"
+            },
+            "id": "urn:E1",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:ngsi-ld:subs:S1
+Content-Length: 300
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "V2": {
+                "json": [
+                    "json",
+                    "id"
+                ],
+                "type": "JsonProperty"
+            },
+            "V3": {
+                "json": "json",
+                "type": "JsonProperty"
+            },
+            "id": "urn:E2",
+            "type": "T"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:ngsi-ld:subs:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+07. GET urn:E2 in simplified format
+===================================
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "V2": {
+        "json": [
+            "json",
+            "id"
+        ]
+    },
+    "V3": {
+        "json": "json"
+    },
+    "id": "urn:E2",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

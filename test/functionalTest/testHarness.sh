@@ -33,6 +33,7 @@ export PGPASSWORD=${PGPASSWORD:-password}
 
 testStartTime=$(date +%s.%2N)
 MAX_TRIES=${CB_MAX_TRIES:-3}
+export CB_CONTEXT_SERVER_DELAY=${CB_CONTEXT_SERVER_DELAY:-3}
 
 
 
@@ -201,14 +202,15 @@ function usage()
   echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
   echo ""
   echo "Env Vars:"
-  echo "CB_TRACELEVELS:      the trace-level string, as used with -t for the broker"
-  echo "CB_MAX_TRIES:        the number of tries before giving up on a failing test case"
-  echo "CB_SKIP_LIST:        default value for option --skipList"
-  echo "CB_SKIP_FUNC_TESTS:  comma-separated list of names of func tests to skip"
-  echo "CB_NO_CACHE:         Start the broker without subscription cache (if set to 'ON')"
-  echo "CB_THREADPOOL:       Start the broker without thread pool (if set to 'OFF')"
-  echo "CB_DIFF_TOOL:        To view diff of failing tests with diff/tkdiff/meld/..."
-  echo "CB_EXTERNAL_BROKER:  The broker is started externally - not 'automatically' by the test harness (if set to 'ON')"
+  echo "CB_TRACELEVELS:          the trace-level string, as used with -t for the broker"
+  echo "CB_MAX_TRIES:            the number of tries before giving up on a failing test case"
+  echo "CB_SKIP_LIST:            default value for option --skipList"
+  echo "CB_SKIP_FUNC_TESTS:      comma-separated list of names of func tests to skip"
+  echo "CB_NO_CACHE:             Start the broker without subscription cache (if set to 'ON')"
+  echo "CB_THREADPOOL:           Start the broker without thread pool (if set to 'OFF')"
+  echo "CB_DIFF_TOOL:            To view diff of failing tests with diff/tkdiff/meld/..."
+  echo "CB_EXTERNAL_BROKER:      The broker is started externally - not 'automatically' by the test harness (if set to 'ON')"
+  echo "CB_CONTEXT_SERVER_DELAY: Delay to wait context server to be ready"
   echo
   exit $1
 }
@@ -699,7 +701,7 @@ then
         echo "The Context Server isn't running. Starting it ..."
         docker run --rm -d --name context-server -p 7080:8080 -e MEMORY_ENABLED=true wistefan/context-server
         echo "... Context Server Started"
-        sleep 3  # Very slow - it doesn't work without this delay
+        sleep $CB_CONTEXT_SERVER_DELAY  # Very slow - it doesn't work without this delay
     else
         pushContexts=0                                 # Assuming the @contexts have been pushed already
     fi

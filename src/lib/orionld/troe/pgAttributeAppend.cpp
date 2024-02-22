@@ -216,7 +216,7 @@ void pgAttributeAppend
                comma, instanceId, attributeName, opMode, entityId, observedAt, hasSubProperties, unitCode, datasetId, coordsString, orionldState.requestTimeString);
     }
   }
-  else  // Property
+  else  // Property OR JsonProperty
   {
     if (valueNodeP->type == KjString)
     {
@@ -242,6 +242,12 @@ void pgAttributeAppend
     }
     else if ((valueNodeP->type == KjArray) || (valueNodeP->type == KjObject))
     {
+      if (strcmp(type, "JsonProperty") == 0)
+      {
+        LM_W(("TRoE for Compound JsonProperty still to be implemented"));
+        return;
+      }
+
       // WARNING: If an attribute is HUGE, it may not have room enough in a buffer allocated by kaAlloc (there's a max-size)
       int          renderedValueSize   = kjFastRenderSize(valueNodeP);
       char*        renderedValue       = kaAlloc(&orionldState.kalloc, renderedValueSize);
