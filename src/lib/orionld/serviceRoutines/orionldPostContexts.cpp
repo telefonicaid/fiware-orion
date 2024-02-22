@@ -71,7 +71,7 @@ bool orionldPostContexts(void)
 
   if (orionldState.payloadContextNode == NULL)
   {
-    orionldError(OrionldAlreadyExists, "Invalid @context", "@context field missing", 400);
+    orionldError(OrionldInvalidRequest, "Invalid @context", "@context field missing", 400);
     return false;
   }
 
