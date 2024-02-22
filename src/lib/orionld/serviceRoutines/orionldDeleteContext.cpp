@@ -59,7 +59,10 @@ bool orionldDeleteContext(void)
 
   if (orionldState.uriParams.reload == true)
   {
-    if (oldContextP->origin != OrionldContextDownloaded)
+    //
+    // Only contexts of type Cached (indirect download) can be reloaded
+    //
+    if (oldContextP->kind != OrionldContextCached)
     {
       orionldError(OrionldBadRequestData, "Wrong type of context", "only cached contexts are subject for reload", 400);
       return false;
@@ -93,6 +96,7 @@ bool orionldDeleteContext(void)
     if (contextP == NULL)
     {
       orionldContextCacheInsert(oldContextP);
+      // orionldError(OrionldLdContextNotAvailable, "Unable to reload the @context", oldContextP->url, 504);
       return false;
     }
 

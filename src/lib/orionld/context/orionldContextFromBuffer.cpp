@@ -67,7 +67,7 @@ OrionldContext* orionldContextFromBuffer(char* url, OrionldContextOrigin origin,
   KjNode* contextNodeP = kjLookup(tree, "@context");
   if (contextNodeP == NULL)
   {
-    orionldError(OrionldBadRequestData, "Invalid context - @context field missing", url, 400);
+    orionldError(OrionldInvalidRequest, "Invalid context - @context field missing", url, 400);
     return NULL;
   }
 
