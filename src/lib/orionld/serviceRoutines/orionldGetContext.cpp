@@ -55,6 +55,16 @@ bool orionldGetContext(void)
     return false;
   }
 
+  //
+  // Contexts of type Cached (indirect download) are not served.
+  // The broker is not a context server.
+  // See 5.13.4.4 of the NGSI-LD API Specification
+  //
+  if ((contextP->kind == OrionldContextCached) && (orionldState.uriParams.details == false))
+  {
+    orionldError(OrionldOperationNotSupported, "Not serving cached JSON-LD @context", orionldState.wildcard[0], 422);
+    return false;
+  }
 
   if (orionldState.uriParams.details == true)
     orionldState.responseTree = orionldContextWithDetails(contextP);
