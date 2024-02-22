@@ -38,6 +38,7 @@ extern "C"
 
 
 
+extern KjNode* orionldContextWithDetails(OrionldContext* contextP);
 // ----------------------------------------------------------------------------
 //
 // orionldGetContext -
@@ -54,16 +55,31 @@ bool orionldGetContext(void)
     return false;
   }
 
-  orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
-  if (orionldState.responseTree == NULL)
+  //
+  // Contexts of type Cached (indirect download) are not served.
+  // The broker is not a context server.
+  // See 5.13.4.4 of the NGSI-LD API Specification
+  //
+  if ((contextP->kind == OrionldContextCached) && (orionldState.uriParams.details == false))
   {
-    orionldError(OrionldBadRequestData, "kjObject failed", "out of memory?", 500);
+    orionldError(OrionldOperationNotSupported, "Not serving cached JSON-LD @context", orionldState.wildcard[0], 422);
     return false;
   }
 
-  contextP->tree->name = (char*) "@context";
+  if (orionldState.uriParams.details == true)
+    orionldState.responseTree = orionldContextWithDetails(contextP);
+  else
+  {
+    orionldState.responseTree = kjObject(orionldState.kjsonP, NULL);
+    if (orionldState.responseTree == NULL)
+    {
+      orionldError(OrionldBadRequestData, "kjObject failed", "out of memory?", 500);
+      return false;
+    }
 
-  kjChildAdd(orionldState.responseTree, contextP->tree);
+    contextP->tree->name = (char*) "@context";
+    kjChildAdd(orionldState.responseTree, contextP->tree);
+  }
 
   return true;
 }

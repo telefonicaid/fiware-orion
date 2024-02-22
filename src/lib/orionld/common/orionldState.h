@@ -170,6 +170,8 @@ typedef struct OrionldUriParams
   bool      entityMap;
   char*     format;
 
+  OrionldContextKind kind;
+
   double    observedAtAsDouble;
   uint64_t  mask;
 } OrionldUriParams;
@@ -639,6 +641,7 @@ extern mongoc_collection_t*  mongoRegistrationsCollectionP;  // Deprecated
 extern mongoc_uri_t*          mongocUri;
 extern mongoc_client_pool_t*  mongocPool;
 extern sem_t                  mongocContextsSem;
+extern sem_t                  mongocConnectionSem;
 extern char                   mongocServerVersion[128];
 extern char                   postgresServerVersion[128];
 

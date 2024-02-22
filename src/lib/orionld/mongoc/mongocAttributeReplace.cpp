@@ -47,10 +47,7 @@ extern "C"
 //
 bool mongocAttributeReplace(const char* entityId, KjNode* dbAttrP, char** detailP)
 {
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   bson_t selector;
   bson_init(&selector);

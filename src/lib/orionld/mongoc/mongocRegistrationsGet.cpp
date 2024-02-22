@@ -79,11 +79,7 @@ KjNode* mongocRegistrationsGet(int64_t* countP)
   //
   bson_init(&mongoFilter);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.registrationsP == NULL)
-    orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "registrations");
-
+  mongocConnectionGet(orionldState.tenantP, DbRegistrations);
 
   // count?
   if (orionldState.uriParams.count == true)

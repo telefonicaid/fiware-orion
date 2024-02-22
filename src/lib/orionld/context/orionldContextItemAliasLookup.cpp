@@ -59,10 +59,15 @@ char* orionldContextItemAliasLookup
   if (contextItemPP != NULL)
     *contextItemPP = NULL;
 
+  if (contextP == NULL)
+    contextP = orionldCoreContextP;
 
   // 1. Is it the default URL?
   if (strncmp(longName, orionldDefaultUrl, orionldDefaultUrlLen) == 0)
+  {
+    orionldCoreContextP->compactions += 1;
     return (char*) &longName[orionldDefaultUrlLen];
+  }
 
   // 2. Found in Core Context?
   contextItemP = orionldContextItemValueLookup(orionldCoreContextP, longName);
@@ -91,5 +96,6 @@ char* orionldContextItemAliasLookup
     *contextItemPP = contextItemP;
 
   // Return the short name
+  contextP->compactions += 1;
   return contextItemP->name;
 }

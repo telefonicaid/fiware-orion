@@ -78,10 +78,7 @@ KjNode* mongocEntityLookup(const char* entityId, const char* entityType, StringA
   if (entityType != NULL)
     bson_append_utf8(&mongoFilter, "_id.type", 8, entityType, -1);
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   //
   // Projection (will be added to if attrList != NULL)

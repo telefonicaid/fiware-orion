@@ -66,13 +66,13 @@ bool mongocTenantExists(const char* tenantName)
   bson_init(&command);
   bson_init(&reply);
 
-  mongocConnectionGet();
+  mongocConnectionGet(NULL, DbNone);
 
   bson_append_int32(&command, "listDatabases", 13, 1);
 
   bool b = mongoc_client_read_command_with_opts(orionldState.mongoc.client, "admin", &command, NULL, NULL, &reply, &mcError);
   if (b == false)
-    LM_RE(false, ("Database Error ()", mcError.message));
+    LM_RE(false, ("Database Error (%s)", mcError.message));
 
   char*   title;
   char*   detail;

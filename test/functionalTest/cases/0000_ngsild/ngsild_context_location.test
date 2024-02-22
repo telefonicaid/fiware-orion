@@ -56,7 +56,16 @@ echo "02. GET the local location of the context from step 1 and save its URL"
 echo "======================================================================"
 orionCurl --url '/ngsi-ld/v1/jsonldContexts?location=true&url=https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld'
 contextUrl=$(cat /tmp/httpHeaders.out | grep 'Location' | awk '{ print $2}')
+contextId=$(echo $contextUrl | awk -F/ '{ print $5 }')
 echo contextUrl: $contextUrl
+echo contextId: $contextId
+echo
+echo
+
+
+echo "02. Retrieve the context, with details"
+echo "======================================"
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/$contextId?details=true'
 echo
 echo
 
@@ -93,6 +102,33 @@ Date: REGEX(.*)
 Location: /ngsi-ld/v1/jsonldContexts/REGEX(.*)
 
 contextUrl: /ngsi-ld/v1/jsonldContexts/REGEX(.*)
+contextId: REGEX(.*)
+
+
+02. Retrieve the context, with details
+======================================
+HTTP/1.1 200 OK
+Content-Length: 410
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "URL": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+    "createdAt": "202REGEX(.*)",
+    "extraInfo": {
+        "URLs": [
+            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+        ],
+        "compactions": 0,
+        "expansions": 2,
+        "origin": "Downloaded",
+        "type": "array"
+    },
+    "kind": "Cached",
+    "lastUsage": "202REGEX(.*)",
+    "localId": "REGEX(.*)",
+    "numberOfHits": 1
+}
 
 
 03. DELETE the context from the cache

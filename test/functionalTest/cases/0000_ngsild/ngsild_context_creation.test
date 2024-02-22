@@ -51,9 +51,11 @@ orionldStart CB
 echo "01. Create a new context to be served by the broker"
 echo "==================================================="
 payload='{
-  "A1": "urn:ngsi-ld:attributes:A1",
-  "A2": "urn:ngsi-ld:attributes:A2",
-  "A3": "urn:ngsi-ld:attributes:A3"
+  "@context": {
+    "A1": "urn:ngsi-ld:attributes:A1",
+    "A2": "urn:ngsi-ld:attributes:A2",
+    "A3": "urn:ngsi-ld:attributes:A3"
+  }
 }'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
@@ -112,10 +114,12 @@ echo
 
 echo "07. Create another context, this one an array of two already existing contexts"
 echo "=============================================================================="
-payload='[
-  "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
-  "https://fiware.github.io/data-models/context.jsonld"
-]'
+payload='{
+  "@context": [
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+    "https://fiware.github.io/data-models/context.jsonld"
+  ]
+}'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
@@ -162,10 +166,12 @@ echo
 
 echo "12. Create a context, as an object with a @context member with an array"
 echo "======================================================================="
-payload='[
-  "https://fiware.github.io/data-models/context.jsonld",
-  "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
-]'
+payload='{
+  "@context": [
+    "https://fiware.github.io/data-models/context.jsonld",
+    "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+  ]
+}'
 orionCurl --url /ngsi-ld/v1/jsonldContexts --payload "$payload"
 contextURL="/"$(echo "$_responseHeaders" | grep Location: | awk -F:9999/ '{ print $2 }' | tr -d "\r\n")
 echo URL of newly created context: $contextURL
@@ -200,32 +206,42 @@ Date: REGEX(.*)
 
 [
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
-            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 281,
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "A1": "urn:ngsi-ld:attributes:A1",
-            "A2": "urn:ngsi-ld:attributes:A2",
-            "A3": "urn:ngsi-ld:attributes:A3"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "A1": "urn:ngsi-ld:attributes:A1",
+                "A2": "urn:ngsi-ld:attributes:A2",
+                "A3": "urn:ngsi-ld:attributes:A3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "UserCreated",
-        "type": "hash-table",
-        "url": "http://REGEX(.*)
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
     }
 ]
 
@@ -333,91 +349,121 @@ Date: REGEX(.*)
 
 [
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
-            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 281,
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "A1": "urn:ngsi-ld:attributes:A1",
-            "A2": "urn:ngsi-ld:attributes:A2",
-            "A3": "urn:ngsi-ld:attributes:A3"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "A1": "urn:ngsi-ld:attributes:A1",
+                "A2": "urn:ngsi-ld:attributes:A2",
+                "A3": "urn:ngsi-ld:attributes:A3"
+            },
+            "origin": "UserCreated",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 2,
-        "origin": "UserCreated",
-        "type": "hash-table",
-        "url": "REGEX(.*)"
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "A1": "urn:ngsi-ld:attributes:A1",
-            "A2": "urn:ngsi-ld:attributes:A2",
-            "A3": "urn:ngsi-ld:attributes:A3"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 3,
+            "expansions": 6,
+            "hash-table": {
+                "A1": "urn:ngsi-ld:attributes:A1",
+                "A2": "urn:ngsi-ld:attributes:A2",
+                "A3": "urn:ngsi-ld:attributes:A3"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 1,
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "REGEX(.*)"
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 2
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "StockOrder": "https://fiware.github.io/tutorials.Step-by-Step/schema/StockOrder",
-            "commercial": "https://uri.fiware.org/ns/data-models#commercial",
-            "inProgress": "https://fiware.github.io/tutorials.Step-by-Step/schema/inProgress",
-            "industrial": "https://uri.fiware.org/ns/data-models#industrial",
-            "stockCount": "https://fiware.github.io/tutorials.Step-by-Step/schema/stockCount"
+        "URL": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 86,
+            "hash-table": {
+                "StockOrder": "https://fiware.github.io/tutorials.Step-by-Step/schema/StockOrder",
+                "commercial": "https://uri.fiware.org/ns/data-models#commercial",
+                "inProgress": "https://fiware.github.io/tutorials.Step-by-Step/schema/inProgress",
+                "industrial": "https://uri.fiware.org/ns/data-models#industrial",
+                "stockCount": "https://fiware.github.io/tutorials.Step-by-Step/schema/stockCount"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle",
-            "areaServed": "https://schema.org/areaServed",
-            "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
-            "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
-            "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
+        "URL": "https://fiware.github.io/data-models/context.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle",
+                "areaServed": "https://schema.org/areaServed",
+                "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+                "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+                "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://fiware.github.io/data-models/context.jsonld"
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
     },
     {
-        "URLs": [
-            "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
-            "https://fiware.github.io/data-models/context.jsonld"
-        ],
-        "createdAt": "REGEX(.*)",
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 1,
-        "origin": "UserCreated",
-        "type": "array",
-        "url": "REGEX(.*)"
+        "URL": "REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "URLs": [
+                "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+                "https://fiware.github.io/data-models/context.jsonld"
+            ],
+            "compactions": 0,
+            "expansions": 0,
+            "origin": "UserCreated",
+            "type": "array"
+        },
+        "kind": "Hosted",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
     }
 ]
 

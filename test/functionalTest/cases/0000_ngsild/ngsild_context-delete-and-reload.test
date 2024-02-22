@@ -34,7 +34,8 @@ orionldStart CB
 #
 # 01. Create a context in the context server
 # 02. Create an entity using the context from step 01, just to get the context inside the context cache of the broker
-# 03. GET the context (from step 01) from the broker
+# 03. GET the context (from step 01) from the broker - without details - see 422
+# 03. GET the context (from step 01) from the broker - with details - see metadata of the context
 # 04. Update the context in the context server
 # 05. DELETE and RELOAD the context in the broker's context cache
 # 06. GET the context (from step 05) from the broker and make sure it's been updated
@@ -72,9 +73,16 @@ echo
 echo
 
 
-echo "03. GET the context (from step 01) from the broker"
-echo "=================================================="
+echo "03. GET the context (from step 01) from the broker - without details - see 422"
+echo "=============================================================================="
 orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
+echo
+echo
+
+
+echo "03. GET the context (from step 01) from the broker - with details - see metadata of the context"
+echo "==============================================================================================="
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2?details=true'
 echo
 echo
 
@@ -103,7 +111,7 @@ echo
 
 echo "06. GET the context (from step 05) from the broker and make sure it's been updated"
 echo "=================================================================================="
-orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2?details=true'
 echo
 echo
 
@@ -131,7 +139,7 @@ echo
 
 echo "10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06"
 echo "======================================================================================================================="
-orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2'
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/http://localhost:7080/jsonldContexts/testContext2?details=true'
 echo
 echo
 
@@ -156,18 +164,44 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entities:E1
 
 
 
-03. GET the context (from step 01) from the broker
-==================================================
-HTTP/1.1 200 OK
-Content-Length: 42
+03. GET the context (from step 01) from the broker - without details - see 422
+==============================================================================
+HTTP/1.1 422 Unprocessable Content
+Content-Length: 175
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "@context": {
-        "p1": "urn:p1",
-        "p2": "urn:p2"
-    }
+    "detail": "http://localhost:7080/jsonldContexts/testContext2",
+    "title": "Not serving cached JSON-LD @context",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/OperationNotSupported"
+}
+
+
+03. GET the context (from step 01) from the broker - with details - see metadata of the context
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 349
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "URL": "http://localhost:7080/jsonldContexts/testContext2",
+    "createdAt": "202REGEX(.*)",
+    "extraInfo": {
+        "compactions": 0,
+        "expansions": 0,
+        "hash-table": {
+            "p1": "urn:p1",
+            "p2": "urn:p2"
+        },
+        "origin": "Downloaded",
+        "type": "hash-table"
+    },
+    "kind": "Cached",
+    "lastUsage": "202REGEX(.*)",
+    "localId": "REGEX(.*)",
+    "numberOfHits": 1
 }
 
 
@@ -196,15 +230,27 @@ Date: REGEX(.*)
 06. GET the context (from step 05) from the broker and make sure it's been updated
 ==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 56
+Content-Length: 363
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "@context": {
-        "p1": "urn:step04:p1",
-        "p2": "urn:step04:p2"
-    }
+    "URL": "http://localhost:7080/jsonldContexts/testContext2",
+    "createdAt": "202REGEX(.*)",
+    "extraInfo": {
+        "compactions": 0,
+        "expansions": 0,
+        "hash-table": {
+            "p1": "urn:step04:p1",
+            "p2": "urn:step04:p2"
+        },
+        "origin": "Downloaded",
+        "type": "hash-table"
+    },
+    "kind": "Cached",
+    "lastUsage": "202REGEX(.*)",
+    "localId": "REGEX(.*)",
+    "numberOfHits": 1
 }
 
 
@@ -242,15 +288,27 @@ Date: REGEX(.*)
 10. GET the context from the broker and make sure it exists in the broker's context cache and is the same as in step 06
 =======================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 56
+Content-Length: 363
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "@context": {
-        "p1": "urn:step04:p1",
-        "p2": "urn:step04:p2"
-    }
+    "URL": "http://localhost:7080/jsonldContexts/testContext2",
+    "createdAt": "202REGEX(.*)",
+    "extraInfo": {
+        "compactions": 0,
+        "expansions": 0,
+        "hash-table": {
+            "p1": "urn:step04:p1",
+            "p2": "urn:step04:p2"
+        },
+        "origin": "Downloaded",
+        "type": "hash-table"
+    },
+    "kind": "Cached",
+    "lastUsage": "202REGEX(.*)",
+    "localId": "REGEX(.*)",
+    "numberOfHits": 1
 }
 
 

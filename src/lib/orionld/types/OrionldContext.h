@@ -86,10 +86,47 @@ typedef enum OrionldContextOrigin
 
 // -----------------------------------------------------------------------------
 //
+// OrionldContextKind -
+//
+typedef enum OrionldContextKind
+{
+  OrionldContextUnknownKind,
+  OrionldContextHosted,
+  OrionldContextCached,
+  OrionldContextImplicit
+} OrionldContextKind;
+
+
+
+// -----------------------------------------------------------------------------
+//
 // orionldOriginFromString -
 //
 extern OrionldContextOrigin orionldOriginFromString(const char* s);
 
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldOriginToString -
+//
+extern const char* orionldOriginToString(OrionldContextOrigin origin);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldKindFromString -
+//
+extern OrionldContextKind orionldKindFromString(const char* s);
+
+
+
+// -----------------------------------------------------------------------------
+//
+// orionldKindToString -
+//
+extern const char* orionldKindToString(OrionldContextKind kind);
 
 
 
@@ -109,10 +146,13 @@ typedef struct OrionldContext
   bool                  coreContext;
   double                createdAt;
   double                usedAt;
-  int                   lookups;
+  int                   compactions;     // Number of compactions done with this @context
+  int                   expansions;      // Number of expansions done with this @context
+  int                   lookups;         // Number of NGSI-LD requests done using this @context
   bool                  keyValues;
   OrionldContextInfo    context;
   OrionldContextOrigin  origin;
+  OrionldContextKind    kind;
 } OrionldContext;
 
 #endif  // SRC_LIB_ORIONLD_TYPES_ORIONLDCONTEXT_H_

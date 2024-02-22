@@ -726,52 +726,67 @@ Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jso
 04. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1639
+Content-Length: 2000
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
   {
-    "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-    "id": "REGEX(.*)",
-    "type": "hash-table",
-    "origin": "Downloaded",
+    "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "localId": "REGEX(.*)",
+    "kind": "Cached",
     "createdAt": "202REGEX(.*)",
-    "hash-table": {
-      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-      "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-      "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-      "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-      "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated"
+    "extraInfo": {
+      "type": "hash-table",
+      "origin": "Downloaded",
+      "compactions": 5,
+      "expansions": 286,
+      "hash-table": {
+        "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+        "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+        "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+        "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+        "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated"
+      }
     }
   },
   {
-    "url": "https://fiware.github.io/data-models/context.jsonld",
-    "id": "REGEX(.*)",
-    "type": "hash-table",
-    "origin": "Downloaded",
+    "URL": "https://fiware.github.io/data-models/context.jsonld",
+    "localId": "REGEX(.*)",
+    "kind": "Cached",
     "createdAt": "202REGEX(.*)",
-    "lastUse": "202REGEX(.*)",
-    "lookups": 0,
-    "hash-table": {
-      "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
-      "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
-      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
-      "areaServed": "https://schema.org/areaServed",
-      "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle"
-    }
+    "extraInfo": {
+      "type": "hash-table",
+      "origin": "Downloaded",
+      "compactions": 0,
+      "expansions": 26,
+      "hash-table": {
+        "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
+        "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+        "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+        "areaServed": "https://schema.org/areaServed",
+        "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle"
+      }
+    },
+    "lastUsage": "202REGEX(.*)",
+    "numberOfHits": 1
   },
   {
-    "url": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
-    "id": "REGEX(.*)",
-    "type": "array",
-    "origin": "Downloaded",
+    "URL": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
+    "localId": "REGEX(.*)",
+    "kind": "Cached",
     "createdAt": "202REGEX(.*)",
-    "lastUse": "202REGEX(.*)",
-    "lookups": 10,
-    "URLs": [
-      "https://fiware.github.io/data-models/context.jsonld"
-    ]
+    "extraInfo": {
+      "type": "array",
+      "origin": "Downloaded",
+      "compactions": 25,
+      "expansions": 27,
+      "URLs": [
+        "https://fiware.github.io/data-models/context.jsonld"
+      ]
+    },
+    "lastUsage": "202REGEX(.*)",
+    "numberOfHits": 2
   }
 ]
 
@@ -981,52 +996,67 @@ Link: <http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jso
 07. Get all contexts from the context cache
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 1639
+Content-Length: 2001
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
   {
-    "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-    "id": "REGEX(.*)",
-    "type": "hash-table",
-    "origin": "Downloaded",
+    "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "localId": "REGEX(.*)",
+    "kind": "Cached",
     "createdAt": "202REGEX(.*)",
-    "hash-table": {
-      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-      "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-      "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-      "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-      "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated"
+    "extraInfo": {
+      "type": "hash-table",
+      "origin": "Downloaded",
+      "compactions": 10,
+      "expansions": 291,
+      "hash-table": {
+        "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+        "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+        "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+        "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+        "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated"
+      }
     }
   },
   {
-    "url": "https://fiware.github.io/data-models/context.jsonld",
-    "id": "REGEX(.*)",
-    "type": "hash-table",
-    "origin": "Downloaded",
+    "URL": "https://fiware.github.io/data-models/context.jsonld",
+    "localId": "REGEX(.*)",
+    "kind": "Cached",
     "createdAt": "202REGEX(.*)",
-    "lastUse": "202REGEX(.*)",
-    "lookups": 0,
-    "hash-table": {
-      "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
-      "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
-      "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
-      "areaServed": "https://schema.org/areaServed",
-      "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle"
-    }
+    "extraInfo": {
+      "type": "hash-table",
+      "origin": "Downloaded",
+      "compactions": 0,
+      "expansions": 52,
+      "hash-table": {
+        "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed",
+        "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+        "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+        "areaServed": "https://schema.org/areaServed",
+        "anyVehicle": "https://uri.fiware.org/ns/data-models#anyVehicle"
+      }
+    },
+    "lastUsage": "202REGEX(.*)",
+    "numberOfHits": 1
   },
   {
-    "url": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
-    "id": "REGEX(.*)",
-    "type": "array",
-    "origin": "Downloaded",
+    "URL": "http://localhost:7080/jsonldContexts/schema_lab_fiware_org_ld_context.jsonld",
+    "localId": "REGEX(.*)",
+    "kind": "Cached",
     "createdAt": "202REGEX(.*)",
-    "lastUse": "202REGEX(.*)",
-    "lookups": 21,
-    "URLs": [
-      "https://fiware.github.io/data-models/context.jsonld"
-    ]
+    "extraInfo": {
+      "type": "array",
+      "origin": "Downloaded",
+      "compactions": 50,
+      "expansions": 54,
+      "URLs": [
+        "https://fiware.github.io/data-models/context.jsonld"
+      ]
+    },
+    "lastUsage": "202REGEX(.*)",
+    "numberOfHits": 3
   }
 ]
 

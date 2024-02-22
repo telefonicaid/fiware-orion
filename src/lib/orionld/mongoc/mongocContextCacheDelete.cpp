@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <semaphore.h>                                           // sem_wait, sem_post
 #include <bson/bson.h>                                           // bson_t, ...
 #include <mongoc/mongoc.h>                                       // mongoc driver
 
@@ -46,10 +47,7 @@ void mongocContextCacheDelete(const char* id)
 {
   bson_t selector;
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.contextsP == NULL)
-    orionldState.mongoc.contextsP = mongoc_client_get_collection(orionldState.mongoc.client, "orionld", "contexts");
+  mongocConnectionGet(NULL, DbContexts);
 
   bson_init(&selector);
   bson_append_utf8(&selector, "_id", 3, id, -1);

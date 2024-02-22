@@ -2,6 +2,7 @@
   * #1535:  Ignore Subscription::q when matching subscriptions for deletion of an entity
   * #1542:  Array Reduction (arrays of one single element are "flattened" to that very element)
   * SOF:    https://stackoverflow.com/questions/77911109/fiware-to-payload-too-large
+  * #1551:  format=simplified for distribute GET /entities gave Normalized for entities from other brokers
 
 ## New Features:
   * Support for attributes of type VocabularyProperty
@@ -12,3 +13,7 @@
 
 ## Notes
   * TRoE is still not prepared for attributes of type Vocab/Json/Language, so, attributes of those types are not stored in the historical database
+  * Modified the @context hosting feature to be according to API spec
+  * Support for URI param 'kind' for GET Contexts
+  * Improved counters for GET Context/Contexts
+  * API spec compliance for GET Context/Contexts

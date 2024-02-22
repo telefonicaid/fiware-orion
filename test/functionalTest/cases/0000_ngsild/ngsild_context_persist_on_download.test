@@ -99,6 +99,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
 	"parent" : null,
 	"origin" : "Downloaded",
+	"kind" : "Cached",
 	"createdAt" : REGEX(.*)
 }
 {
@@ -106,6 +107,7 @@ MongoDB server version: REGEX(.*)
 	"url" : "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
 	"parent" : null,
 	"origin" : "Downloaded",
+	"kind" : "Cached",
 	"createdAt" : REGEX(.*)
 }
 bye

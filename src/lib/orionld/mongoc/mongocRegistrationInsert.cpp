@@ -51,10 +51,7 @@ bool mongocRegistrationInsert(KjNode* dbRegistrationP, const char* registrationI
   bson_t document;
   bson_t reply;
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.registrationsP == NULL)
-    orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "registrations");
+  mongocConnectionGet(orionldState.tenantP, DbRegistrations);
 
   bson_init(&document);
   bson_init(&reply);

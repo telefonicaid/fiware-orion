@@ -30,12 +30,14 @@ extern "C"
 #include "kjson/KjNode.h"                                        // KjNode
 }
 
+#include "orionld/types/OrionldContext.h"                        // OrionldContextKind
+
 
 
 // -----------------------------------------------------------------------------
 //
 // orionldContextCacheGet -
 //
-extern KjNode* orionldContextCacheGet(KjNode* arrayP, bool details);
+extern KjNode* orionldContextCacheGet(KjNode* arrayP, bool details, OrionldContextKind kind);
 
 #endif  // SRC_LIB_ORIONLD_CONTEXTCACHE_ORIONLDCONTEXTCACHEGET_H_

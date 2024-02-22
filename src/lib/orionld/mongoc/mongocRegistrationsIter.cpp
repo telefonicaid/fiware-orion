@@ -62,12 +62,15 @@ int mongocRegistrationsIter(RegCache* rcP, RegCacheIterFunc callback)
   //
   bson_init(&mongoFilter);
 
-  mongocConnectionGet();
+  mongocConnectionGet(NULL, DbNone);
 
   //
   // Can't use the "orionldState.mongoc.registrationsP" here, as we'll deal with not one single tenant but all of them
   //
   mongoc_collection_t* regsCollectionP = mongoc_client_get_collection(orionldState.mongoc.client, rcP->tenantP->mongoDbName, "registrations");
+
+  if (regsCollectionP == NULL)
+    LM_X(1, ("mongoc_client_get_collection failed for 'registrations' collection on tenant '%s'", rcP->tenantP->mongoDbName));
 
   //
   // Run the query

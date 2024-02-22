@@ -37,6 +37,8 @@ extern "C"
 #include "orionld/common/orionldState.h"                            // orionldState, entityMaps
 #include "orionld/common/orionldError.h"                            // orionldError
 #include "orionld/kjTree/kjChildCount.h"                            // kjChildCount
+#include "orionld/apiModel/ntocEntity.h"                            // ntocEntity
+#include "orionld/apiModel/ntosEntity.h"                            // ntosEntity
 #include "orionld/distOp/distOpLookupByRegId.h"                     // distOpLookupByRegId
 #include "orionld/distOp/distOpListDebug.h"                         // distOpListDebug
 #include "orionld/distOp/distOpsSend.h"                             // distOpsSend2
@@ -66,7 +68,6 @@ static void cleanupSysAttrs(void)
     {
       nextAttrP = attrP->next;
 
-      LM_T(LmtSR, ("attrP->name: '%s'", attrP->name));
       if      (strcmp(attrP->name, "createdAt")  == 0)  kjChildRemove(entityP, attrP);
       else if (strcmp(attrP->name, "modifiedAt") == 0)  kjChildRemove(entityP, attrP);
       else if (attrP->type == KjObject)
@@ -125,6 +126,34 @@ static int queryResponse(DistOp* distOpP, void* callbackParam)
 
   distOpResponseMergeIntoEntityArray(distOpP, entityArray);
   return 0;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+//
+// formatFix -
+//
+static void formatFix(KjNode* entityArray, int skip)
+{
+  int ix = -1;
+  for (KjNode* entityP = entityArray->value.firstChildP; entityP != NULL; entityP = entityP->next)
+  {
+    ++ix;
+    if (ix < skip)  // Entities from the local DB have already been transformed to the desired format
+    {
+      LM_T(LmtFormat, ("Skipping child %d as it comes from local DB", ix));
+      continue;
+    }
+
+    LM_T(LmtFormat, ("Fixing format for child %d as it comes from remote", ix));
+
+    if (orionldState.out.format == RF_CONCISE)
+      ntocEntity(entityP, orionldState.uriParams.lang, orionldState.uriParamOptions.sysAttrs);
+    else if (orionldState.out.format == RF_SIMPLIFIED)
+      ntosEntity(entityP, orionldState.uriParams.lang);
+  }
 }
 
 
@@ -329,11 +358,18 @@ bool orionldGetEntitiesPage(void)
 
   if (distOpListItem != NULL)
   {
+    int localKids = kjChildCount(entityArray);
+
+    LM_T(LmtFormat, ("Number of children from local: %d (no format fix for those)", localKids));
+
     distOpItemListDebug(distOpListItem, "To Forward for GET /entities");
     distOpsSendAndReceive(distOpListItem, queryResponse, entityArray);
+
+    formatFix(entityArray, localKids);
   }
 
-  orionldState.responseTree = entityArray;
+  orionldState.responseTree   = entityArray;
+  orionldState.httpStatusCode = 200;
 
   //
   // Time to cleanup ...

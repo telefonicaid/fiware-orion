@@ -318,6 +318,11 @@ void mongocInit
   //
   sem_init(&mongocContextsSem, 0, 1);  // 0: shared between threads of the same process. 1: free to be taken
 
+  //
+  // Semaphore for getting a connection/collection for mongo
+  //
+  sem_init(&mongocConnectionSem, 0, 1);  // 0: shared between threads of the same process. 1: free to be taken
+
   if (mongocTenantsGet() == false)
     LM_X(1, ("Unable to extract tenants from the database - fatal error"));
 

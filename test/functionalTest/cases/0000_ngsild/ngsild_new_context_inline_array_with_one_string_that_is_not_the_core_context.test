@@ -75,40 +75,50 @@ Location: /ngsi-ld/v1/entities/http://a.b.c/entity/E1
 02. Ask for the entire list of contexts in the context cache
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 1095
+Content-Length: 1338
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
   {
-    "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
-    "id": "REGEX(.*)",
-    "type": "hash-table",
-    "origin": "Downloaded",
-    "createdAt": "REGEX(.*)",
-    "hash-table": {
-      "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-      "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-      "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-      "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-      "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated"
+    "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+    "localId": "REGEX(.*)",
+    "kind": "Cached",
+    "createdAt": "202REGEX(.*)",
+    "extraInfo": {
+      "type": "hash-table",
+      "origin": "Downloaded",
+      "compactions": 0,
+      "expansions": 282,
+      "hash-table": {
+        "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+        "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+        "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+        "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+        "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated"
+      }
     }
   },
   {
-    "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
-    "id": "REGEX(.*)",
-    "type": "hash-table",
-    "origin": "Downloaded",
-    "createdAt": "REGEX(.*)",
-    "lastUse": "REGEX(.*)",
-    "lookups": 0,
-    "hash-table": {
-      "T": "http://example.org/T",
-      "P1": "http://example.org/P1",
-      "P2": "http://example.org/P2",
-      "R1": "http://example.org/R1",
-      "P3": "http://example.org/P3"
-    }
+    "URL": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "localId": "REGEX(.*)",
+    "kind": "Cached",
+    "createdAt": "202REGEX(.*)",
+    "extraInfo": {
+      "type": "hash-table",
+      "origin": "Downloaded",
+      "compactions": 0,
+      "expansions": 0,
+      "hash-table": {
+        "T": "http://example.org/T",
+        "P1": "http://example.org/P1",
+        "P2": "http://example.org/P2",
+        "R1": "http://example.org/R1",
+        "P3": "http://example.org/P3"
+      }
+    },
+    "lastUsage": "202REGEX(.*)",
+    "numberOfHits": 1
   }
 ]
 

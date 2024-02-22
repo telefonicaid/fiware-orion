@@ -23,9 +23,11 @@
 * Author: Ken Zangelin
 */
 #include <unistd.h>                                              // NULL
+#include <semaphore.h>                                           // sem_wait, sem_post
 #include <mongoc/mongoc.h>                                       // mongoc driver
 
 #include "orionld/common/orionldState.h"                         // orionldState, mongocPool
+#include "orionld/types/OrionldTenant.h"                         // OrionldTenant
 #include "orionld/mongoc/mongocConnectionGet.h"                  // Own interface
 
 
@@ -34,8 +36,36 @@
 //
 // mongocConnectionGet -
 //
-void mongocConnectionGet(void)
+void mongocConnectionGet(OrionldTenant* tenantP, DbCollection dbCollection)
 {
+  sem_wait(&mongocConnectionSem);
+
   if (orionldState.mongoc.client == NULL)
     orionldState.mongoc.client = mongoc_client_pool_pop(mongocPool);
+
+  if ((dbCollection & DbEntities) == DbEntities)
+  {
+    if (orionldState.mongoc.entitiesP == NULL)
+      orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, tenantP->mongoDbName, "entities");
+  }
+
+  if ((dbCollection & DbSubscriptions) == DbSubscriptions)
+  {
+    if (orionldState.mongoc.subscriptionsP == NULL)
+      orionldState.mongoc.subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, tenantP->mongoDbName, "csubs");
+  }
+
+  if ((dbCollection & DbRegistrations) == DbRegistrations)
+  {
+    if (orionldState.mongoc.registrationsP == NULL)
+      orionldState.mongoc.registrationsP = mongoc_client_get_collection(orionldState.mongoc.client, tenantP->mongoDbName, "registrations");
+  }
+
+  if ((dbCollection & DbContexts) == DbContexts)
+  {
+    if (orionldState.mongoc.contextsP == NULL)
+      orionldState.mongoc.contextsP = mongoc_client_get_collection(orionldState.mongoc.client, "orionld", "contexts");
+  }
+
+  sem_post(&mongocConnectionSem);
 }

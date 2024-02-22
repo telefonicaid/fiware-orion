@@ -135,40 +135,50 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:ambient_temperature:335547901
 03. GET all contexts from the brokers context cache - see only 2
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 1028
+Content-Length: 1167
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
-            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 281,
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
-            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
-            "properties": "https://uri.etsi.org/ngsi-ld/properties"
+        "URL": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "attributes": "https://uri.etsi.org/ngsi-ld/attributes",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt",
+                "properties": "https://uri.etsi.org/ngsi-ld/properties"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 200,
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "http://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
     }
 ]
 

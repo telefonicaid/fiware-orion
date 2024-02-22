@@ -46,7 +46,15 @@ orionldStart CP2 -experimental -forwarding -wip entityMaps
 # 10. Create an inclusive registration R2 in CP1 on entities of type T pointing to CP2
 # 11. Create an inclusive registration R1 in CP2 on entities of type T pointing to CB
 # 12. Create an inclusive registration R2 in CP2 on entities of type T pointing to CP1
+#
+# Due to timing, distributed entities come in aleatory order, and the SORT_START/SORT_END mechanism seems to not work here ...
+# Cases 13 and 14 will check only the HTTP headers (incl Content-Length) and the entity ids.
+# Any error here would change the Content-Length ... good enough
+#
 # 13. GET /entities?type=T in CB
+# 14. GET /entities?type=T&format=simplified in CB
+# 15. GET /entities?type=T&options=sysAttrs in CB
+# 16. GET /entities?type=T&format=concise in CB
 #
 
 #
@@ -294,8 +302,42 @@ echo
 
 echo "13. GET /entities?type=T in CB"
 echo "=============================="
-orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' -H "aerOS: true"
+orionCurl --url '/ngsi-ld/v1/entities?type=T&count=true' -H "aerOS: true" > /tmp/entities
 entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+head -7 /tmp/entities
+echo
+grep '"id": "' /tmp/entities | sort
+echo
+echo
+
+
+echo "14. GET /entities?type=T&format=simplified in CB"
+echo "================================================"
+orionCurl --url '/ngsi-ld/v1/entities?type=T&format=simplified' -H "aerOS: true" > /tmp/entities
+head -6 /tmp/entities
+echo
+grep '"id": "' /tmp/entities | sort
+echo
+echo
+
+
+echo '15. GET /entities?type=T&options=sysAttrs in CB'
+echo "==============================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&options=sysAttrs' -H "aerOS: true" > /tmp/entities
+head -6 /tmp/entities
+echo
+grep '"id": "' /tmp/entities | sort
+\rm -f /tmp/entities
+echo
+echo
+
+echo "16. GET /entities?type=T&format=concise in CB"
+echo "============================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&format=concise' -H "aerOS: true" > /tmp/entities
+head -6 /tmp/entities
+echo
+grep '"id": "' /tmp/entities | sort
+\rm -f /tmp/entities
 echo
 echo
 
@@ -412,87 +454,70 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
 13. GET /entities?type=T in CB
 ==============================
 HTTP/1.1 200 OK
-Content-Length: REGEX(.*)
+Content-Length: 781
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
 NGSILD-Results-Count: 6
 
-[
-    {
-        "P1": {
-            "type": "Property",
-            "value": "Entity E1 in Orion A"
-        },
-        "R1": {
-            "object": "urn:E2",
-            "type": "Relationship"
-        },
         "id": "urn:E1",
-        "type": "T"
-    },
-    {
-        "P1": {
-            "type": "Property",
-            "value": "Entity E2 in Orion A"
-        },
-        "R1": {
-            "object": "urn:E2",
-            "type": "Relationship"
-        },
         "id": "urn:E2",
-        "type": "T"
-    },
-    {
-        "P1": {
-            "type": "Property",
-            "value": "Entity E3 in Orion B"
-        },
-        "R1": {
-            "object": "urn:E4",
-            "type": "Relationship"
-        },
         "id": "urn:E3",
-        "type": "T"
-    },
-    {
-        "P1": {
-            "type": "Property",
-            "value": "Entity E4 in Orion B"
-        },
-        "R1": {
-            "object": "urn:E3",
-            "type": "Relationship"
-        },
         "id": "urn:E4",
-        "type": "T"
-    },
-    {
-        "P1": {
-            "type": "Property",
-            "value": "Entity E5 in Orion C"
-        },
-        "R1": {
-            "object": "urn:E6",
-            "type": "Relationship"
-        },
         "id": "urn:E5",
-        "type": "T"
-    },
-    {
-        "P1": {
-            "type": "Property",
-            "value": "Entity E6 in Orion C"
-        },
-        "R1": {
-            "object": "urn:E5",
-            "type": "Relationship"
-        },
         "id": "urn:E6",
-        "type": "T"
-    }
-]
+
+
+14. GET /entities?type=T&format=simplified in CB
+================================================
+HTTP/1.1 200 OK
+Content-Length: 415
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+        "id": "urn:E1",
+        "id": "urn:E2",
+        "id": "urn:E3",
+        "id": "urn:E4",
+        "id": "urn:E5",
+        "id": "urn:E6",
+
+
+15. GET /entities?type=T&options=sysAttrs in CB
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 2203
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+        "id": "urn:E1",
+        "id": "urn:E2",
+        "id": "urn:E3",
+        "id": "urn:E4",
+        "id": "urn:E5",
+        "id": "urn:E6",
+
+
+16. GET /entities?type=T&format=concise in CB
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 481
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+        "id": "urn:E1",
+        "id": "urn:E2",
+        "id": "urn:E3",
+        "id": "urn:E4",
+        "id": "urn:E5",
+        "id": "urn:E6",
 
 
 --TEARDOWN---

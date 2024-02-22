@@ -51,10 +51,7 @@ bool mongocEntityReplace(KjNode* dbEntityP, const char* entityId)
   bson_t replacement;
   bson_t reply;
 
-  mongocConnectionGet();  // mongocConnectionGet(MONGO_ENTITIES) - do the mongoc_client_get_collection also
-
-  if (orionldState.mongoc.entitiesP == NULL)
-    orionldState.mongoc.entitiesP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "entities");
+  mongocConnectionGet(orionldState.tenantP, DbEntities);
 
   bson_init(&selector);
   bson_init(&replacement);

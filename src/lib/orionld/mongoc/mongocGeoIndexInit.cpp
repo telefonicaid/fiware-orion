@@ -55,7 +55,7 @@ bool mongocGeoIndexInit(void)
   //
   // DB Connection
   //
-  mongocConnectionGet();
+  mongocConnectionGet(NULL, DbNone);
 
   //
   // Loop over all tenants
@@ -72,6 +72,8 @@ bool mongocGeoIndexInit(void)
     // Get handle to collection
     //
     mCollectionP = mongoc_client_get_collection(orionldState.mongoc.client, tenantP->mongoDbName, "entities");
+    if (mCollectionP == NULL)
+      LM_X(1, ("mongoc_client_get_collection failed for 'entities' collection on tenant '%s'", tenantP->mongoDbName));
 
     // Aggregation pipeline
 

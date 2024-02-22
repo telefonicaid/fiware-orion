@@ -101,6 +101,7 @@ typedef enum TraceLevels
   LmtContexts = 100,                   // Contexts
   LmtContextTree,                      // Context Tree
   LmtContextCache,                     // Context Cache
+  LmtContextCacheStats,                // Context Cache Statistics
   LmtContextDownload,                  // Context Download
   LmtCoreContext,                      // Core Context
 
@@ -142,6 +143,7 @@ typedef enum TraceLevels
   LmtDateTime,                         // DateTime (ISO8601) conversion
   LmtMimeType,                         // MimeType
   LmtArrayReduction,                   // Arrays of only one item are reduced to the item
+  LmtFormat,                           // Normalized, Concise, Simplified
 
   //
   // Legacy

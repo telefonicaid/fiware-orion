@@ -52,10 +52,7 @@ bool mongocSubscriptionReplace(const char* subscriptionId, KjNode* dbSubscriptio
   bson_t replacement;
   bson_t reply;
 
-  mongocConnectionGet();
-
-  if (orionldState.mongoc.subscriptionsP == NULL)
-    orionldState.mongoc.subscriptionsP = mongoc_client_get_collection(orionldState.mongoc.client, orionldState.tenantP->mongoDbName, "csubs");
+  mongocConnectionGet(orionldState.tenantP, DbSubscriptions);
 
   bson_init(&selector);
   bson_init(&replacement);

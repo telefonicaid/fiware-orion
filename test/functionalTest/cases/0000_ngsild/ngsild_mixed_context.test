@@ -144,52 +144,67 @@ Date: REGEX(.*)
 03. Get all contexts, with details
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 1245
+Content-Length: 1459
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
-            "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
-            "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
-            "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
-            "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 281,
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld"
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
     },
     {
-        "createdAt": "REGEX(.*)",
-        "hash-table": {
-            "P1": "http://example.org/P1",
-            "P2": "http://example.org/P2",
-            "P3": "http://example.org/P3",
-            "R1": "http://example.org/R1",
-            "T": "http://example.org/T"
+        "URL": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "P1": "http://example.org/P1",
+                "P2": "http://example.org/P2",
+                "P3": "http://example.org/P3",
+                "R1": "http://example.org/R1",
+                "T": "http://example.org/T"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
         },
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "Downloaded",
-        "type": "hash-table",
-        "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)"
+        "numberOfHits": 1
     },
     {
-        "URLs": [
-            "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
-        ],
-        "createdAt": "REGEX(.*)",
-        "id": "REGEX(.*)",
-        "lastUse": "REGEX(.*)",
-        "lookups": 0,
-        "origin": "Downloaded",
-        "type": "array",
-        "url": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld"
+        "URL": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "URLs": [
+                "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld"
+            ],
+            "compactions": 0,
+            "expansions": 0,
+            "origin": "Downloaded",
+            "type": "array"
+        },
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)"
+        "numberOfHits": 1
     }
 ]
 
