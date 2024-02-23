@@ -335,7 +335,6 @@ OrionldContext* orionldContextFromUrl(char* url, char* id)
   if (contextP != NULL)
   {
     contextP->origin    = OrionldContextDownloaded;
-    contextP->createdAt = orionldState.requestTime;
     contextP->usedAt    = orionldState.requestTime;
 
     orionldContextCachePersist(contextP);

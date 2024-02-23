@@ -53,8 +53,10 @@ OrionldContext* orionldContextCreate(const char* url, OrionldContextOrigin origi
     LM_X(1, ("out of memory - trying to allocate a OrionldContext of %d bytes", sizeof(OrionldContext)));
 
   contextP->origin    = origin;
-  contextP->kind      = OrionldContextCached;  // By defaukt. Changed later to Hosted/Implicit if needed
+  contextP->kind      = OrionldContextCached;  // Default. Changed later to Hosted/Implicit if needed
   contextP->parent    = NULL;
+  contextP->createdAt = orionldState.requestTime;
+  contextP->usedAt    = orionldState.requestTime;
 
   // NULL URL means NOT to be saved - will live just inside the request-thread
   if (url != NULL)

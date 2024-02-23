@@ -1,0 +1,262 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription Context
+
+--SHELL-INIT--
+dbInit CB
+dbInit orionld
+orionldStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create a subscription with Content.Type app/ld+json and a compound @context
+# 01b. See the subscription in mongo
+# 02. GET the subscription - see the ImplicitlyCreated ldContext
+# 03. Query for all hosted contexts, see 4 contexts (core, implicit-for-sub, and the two of the array)
+#
+
+echo "01. Create a subscription with Content.Type app/ld+json and a compound @context"
+echo "==============================================================================="
+payload='{
+  "id": "urn:ngsi-ld:subscriptions:01",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://a.b.c/123"
+    }
+  },
+  "@context": [
+    "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+    "http://smartdatamodels.org/context.jsonld"
+  ]
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" --in jsonld
+echo
+echo
+
+
+echo "01b. See the subscription in mongo"
+echo "=================================="
+mongoCmd2 ftest "db.csubs.findOne()"
+echo
+echo
+
+
+echo "02. GET the subscription - see the ImplicitlyCreated ldContext"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01
+echo
+echo
+
+
+echo "03. Query for all hosted contexts, see 4 contexts (core, implicit-for-sub, and the two of the array)"
+echo "===================================================================================================="
+orionCurl --url /ngsi-ld/v1/jsonldContexts?details=true
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with Content.Type app/ld+json and a compound @context
+===============================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:01
+
+
+
+01b. See the subscription in mongo
+==================================
+MongoDB shell version REGEX(.*)
+connecting to: REGEX(.*)
+MongoDB server version: REGEX(.*)
+{
+	"_id" : "urn:ngsi-ld:subscriptions:01",
+	"expiration" : 0,
+	"reference" : "http://a.b.c/123",
+	"custom" : false,
+	"mimeType" : "application/json",
+	"throttling" : 0,
+	"servicePath" : "/#",
+	"status" : "active",
+	"entities" : [
+		{
+			"id" : "",
+			"isPattern" : "",
+			"type" : "https://uri.etsi.org/ngsi-ld/default-context/T1",
+			"isTypePattern" : false
+		}
+	],
+	"attrs" : [ ],
+	"metadata" : [ ],
+	"blacklist" : false,
+	"ldContext" : "http:REGEX(.*)",
+	"createdAt" : REGEX(.*),
+	"modifiedAt" : REGEX(.*),
+	"conditions" : [ ],
+	"expression" : {
+		"q" : "",
+		"mq" : "",
+		"geometry" : "",
+		"coords" : "",
+		"georel" : "",
+		"geoproperty" : ""
+	},
+	"format" : "normalized"
+}
+bye
+
+
+02. GET the subscription - see the ImplicitlyCreated ldContext
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "entities": [
+        {
+            "type": "T1"
+        }
+    ],
+    "id": "urn:ngsi-ld:subscriptions:01",
+    "isActive": true,
+    "jsonldContext": "REGEX(.*)"
+    "notification": {
+        "endpoint": {
+            "accept": "application/json",
+            "uri": "http://a.b.c/123"
+        },
+        "format": "normalized",
+        "status": "ok"
+    },
+    "status": "active",
+    "type": "Subscription"
+}
+
+
+03. Query for all hosted contexts, see 4 contexts (core, implicit-for-sub, and the two of the array)
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "URL": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 1,
+            "expansions": 284,
+            "hash-table": {
+                "MultiPoint": "https://purl.org/geojson/vocab#MultiPoint",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "notUpdated": "https://uri.etsi.org/ngsi-ld/notUpdated",
+                "notifiedAt": "https://uri.etsi.org/ngsi-ld/notifiedAt",
+                "observedAt": "https://uri.etsi.org/ngsi-ld/observedAt"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "localId": "REGEX(.*)"
+    },
+    {
+        "URL": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 0,
+            "hash-table": {
+                "P1": "http://example.org/P1",
+                "P2": "http://example.org/P2",
+                "P3": "http://example.org/P3",
+                "R1": "http://example.org/R1",
+                "T": "http://example.org/T"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "http://smartdatamodels.org/context.jsonld",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "compactions": 0,
+            "expansions": 2,
+            "hash-table": {
+                "carSharing": "https://uri.fiware.org/ns/data-models#carSharing",
+                "copyMachineOrService": "https://uri.fiware.org/ns/data-models#copyMachineOrService",
+                "efficCurve": "https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/efficCurve",
+                "instanceId": "https://uri.etsi.org/ngsi-ld/instanceId",
+                "roadClosed": "https://uri.fiware.org/ns/data-models#roadClosed"
+            },
+            "origin": "Downloaded",
+            "type": "hash-table"
+        },
+        "kind": "Cached",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 1
+    },
+    {
+        "URL": "http://REGEX(.*)",
+        "createdAt": "202REGEX(.*)",
+        "extraInfo": {
+            "URLs": [
+                "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testContext.jsonld",
+                "http://smartdatamodels.org/context.jsonld"
+            ],
+            "compactions": 0,
+            "expansions": 0,
+            "origin": "FromInline",
+            "type": "array"
+        },
+        "kind": "ImplicitlyCreated",
+        "lastUsage": "202REGEX(.*)",
+        "localId": "REGEX(.*)",
+        "numberOfHits": 2
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

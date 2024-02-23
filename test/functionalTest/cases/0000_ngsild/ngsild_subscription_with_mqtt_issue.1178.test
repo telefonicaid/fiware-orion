@@ -199,7 +199,7 @@ bye
 03. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 522
+Content-Length: 600
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -214,6 +214,7 @@ Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.
     ],
     "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
     "notification": {
         "attributes": [
             "Engine_Oxigen",

@@ -152,7 +152,7 @@ Location: /ngsi-ld/v1/subscriptions/urn:S1
 02. GET S1 and see the receiverInfo
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 338
+Content-Length: 421
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -166,6 +166,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -250,7 +251,7 @@ Date: REGEX(.*)
 05. GET S1 and see the new values of MQTT-Version and MQTT-QoS
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 340
+Content-Length: 423
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -264,6 +265,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -345,7 +347,7 @@ bye
 08. GET S1 and see the receiverInfo
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 340
+Content-Length: 423
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -359,6 +361,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
     "notification": {
         "endpoint": {
             "accept": "application/json",

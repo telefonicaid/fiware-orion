@@ -86,7 +86,7 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:mySubscription123
 02. GET the subscription to see the geo-data intact
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 423
+Content-Length: 506
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -107,6 +107,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     },
     "id": "urn:ngsi-ld:Subscription:mySubscription123",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
     "notification": {
         "attributes": [
             "speed"
