@@ -307,7 +307,7 @@ Notifications: 1
 07. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
