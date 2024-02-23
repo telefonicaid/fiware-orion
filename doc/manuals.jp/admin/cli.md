@@ -34,23 +34,7 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-db <db>** : 使用する MogoDB データベース、または (`-multiservice` を使用している場合) サービス単位/テナント単位のデータベースのプレフィックス ([マルチ・テナンシー](../orion-api.md#multi-tenancy)のセクションを参照してください) です。このフィールドは最大10文字までです
 -   **-dbURI <uri>** : 使用する MongoDB を URI で指定します。 
     URI に文字列 `${PWD}` がある場合は `-dbpwd` または環境変数 `ORION_MONGO_PASSWORD` で指定したパスワードで置き換えられます。
-    このオプションは `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL`, `-dbDisableRetryWrites` と組み合わせできません。（組み合わせた場合、Orion は起動時にエラーで終了します）
--   **-dbhost <host>** : 使用する MongoDB のホストとポートです。たとえば、`-dbhost localhost:12345` です
--   **-rplSet <replicat_set>** : 指定すれば、Orion CB が MongoDB レプリカセット (スタンドアロン MongoDB インスタンスではなく) に接続されます。使用するレプリカセットの名前は、パラメータの値です。この場合、-dbhost パラメーターは、レプリカ・セットのシードとして使用されるホスト ("," で区切られた) のリストにすることができます
--   **-dbTimeout <interval>** : レプリカセット (-rplSet) を使用する場合にのみ使用され、それ以外の場合は無視されます。レプリカセットへの接続のタイムアウトをミリ秒単位で指定します
--   **-dbuser <user>** : 使用する MongoDB ユーザ。MongoDB が認証を使用しない場合、このオプションは避けなければなりません。[データベース認証セクション](database_admin.md#database-authorization)を参照してください
 -   **-dbpwd <pass>** : 使用する MongoDB パスワード。MongoDB が認証を使用しない場合、このオプションは避けなければなりません。[データベース認証セクション](database_admin.md#database-authorization)を参照してください
--   **-dbAuthMech <mechanism>**. `-dbuser` と `-dbpwd` を提供する場合に使用する MongoDB
-    認証メカニズム。代替手段はSCRAM-SHA-1 または SCRAM-SHA-256 です。
--   **-dbAuthDb <database>** : `-dbuser` と `-dbpwd` を提供する場合に認証に使用するデータベース
-    を指定します。
--   **-dbSSL** : MongoDB への接続で SSL を有効にします。MongoDB サーバまたはレプリカ・セットが
-    SSL を使用している場合は、このオプションを使用する必要があります (または、逆に、MongoDB
-    サーバまたはレプリカ・セットが SSL を使用していない場合は、このオプションを使用する必要は
-    ありません)。現在、制限があることに注意してください。この場合、Orion は `tlsAllowInvalidCertificates=true`
-    を使用するため、MongoDB サーバで使用される証明書は検証されません。
--   **-dbDisableRetryWrites** : DB 接続で retryWrite パラメータを false に設定します
-    (古い MongoDB インスタンスとの互換性を維持するためにのみで、通常は推奨されません)
 -   **-dbPoolSize <size>** : データベース・コネクション・プール プールのデフォルトサイズは10接続です
 -   **-writeConcern <0|1>** : MongoDB の書き込み操作に対する確認を指定 : 確認 (1) または未確認 (0)。デフォルトは 1です
 -   **-https** : セキュアな HTTP モードで作業します (`-cert` および `-key` を参照)
@@ -143,15 +127,8 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_PORT  |   port    |
 |   ORION_PID_PATH  |   pidpath |
 |	ORION_MONGO_URI	|	dbURI	|
-|   ORION_MONGO_HOST    |   dbhost  |
-|   ORION_MONGO_REPLICA_SET |   rplSet  |
-|   ORION_MONGO_USER    |   dbuser  |
 |   ORION_MONGO_PASSWORD    |   dbpwd   |
-|   ORION_MONGO_AUTH_MECH   |   dbAuthMech  |
-|   ORION_MONGO_AUTH_SOURCE |   dbAuthDb    |
-|   ORION_MONGO_SSL |   dbSSL   |
 |   ORION_MONGO_DB  |   db  |
-|   ORION_MONGO_TIMEOUT |   dbTimeout   |
 |   ORION_MONGO_POOL_SIZE   |   dbPoolSize  |
 |   ORION_USEIPV4   |   ipv4    |
 |   ORION_USEIPV6   |   ipv6    |
