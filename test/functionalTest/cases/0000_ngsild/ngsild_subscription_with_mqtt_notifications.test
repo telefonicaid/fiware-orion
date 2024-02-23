@@ -220,7 +220,7 @@ bye
 03. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -236,6 +236,7 @@ Link: <https://fiware.github.io/data-models/context.jsonld>; rel="http://www.w3.
     ],
     "id": "urn:ngsi-ld:Subscription:mqttNotification",
     "isActive": true,
+    "jsonldContext": "REGEX(.*)",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -306,7 +307,7 @@ Notifications: 1
 07. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 422
+Content-Length: REGEX(.*)
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -322,6 +323,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:Subscription:mqttNotification",
     "isActive": true,
+    "jsonldContext": "REGEX(.*)",
     "notification": {
         "endpoint": {
             "accept": "application/json",

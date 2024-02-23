@@ -157,7 +157,7 @@ bye
 03. GET S1 - see q with %22
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 356
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -170,6 +170,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:subscriptions:S1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
     "notification": {
         "endpoint": {
             "accept": "application/json",
@@ -187,7 +188,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 04. GET all subscriptions - see S1:q with %22
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 275
+Content-Length: 358
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -201,6 +202,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscriptions:S1",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
         "notification": {
             "endpoint": {
                 "accept": "application/json",

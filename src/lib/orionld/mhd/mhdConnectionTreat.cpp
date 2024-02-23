@@ -77,6 +77,8 @@ extern "C"
 #include "orionld/serviceRoutines/orionldGetEntity.h"              // orionldGetEntity
 #include "orionld/serviceRoutines/orionldGetEntities.h"            // orionldGetEntities
 #include "orionld/serviceRoutines/orionldPostEntities.h"           // orionldPostEntities
+#include "orionld/serviceRoutines/orionldPostSubscriptions.h"      // orionldPostSubscriptions
+#include "orionld/serviceRoutines/orionldPatchSubscription.h"      // orionldPatchSubscription
 #include "orionld/mhd/mhdReply.h"                                  // mhdReply
 #include "orionld/mhd/mhdConnectionTreat.h"                        // Own Interface
 
@@ -1110,6 +1112,15 @@ MHD_Result mhdConnectionTreat(void)
     //
     if (orionldState.payloadContextNode != NULL)
     {
+      bool implicitlyCreated = false;
+
+      LM_T(LmtContextCacheStats, ("Got an @context in the payload body (type %s)", kjValueType(orionldState.payloadContextNode->type)));
+      if ((orionldState.serviceP->serviceRoutine == orionldPostSubscriptions) || (orionldState.serviceP->serviceRoutine == orionldPatchSubscription))
+      {
+        implicitlyCreated = true;
+        LM_T(LmtContextCacheStats, ("And the service is Subscription Creation"));
+      }
+
       OrionldProblemDetails pd = { OrionldBadRequestData, (char*) "naught", (char*) "naught", 0 };
 
       char* id  = NULL;
@@ -1132,6 +1143,9 @@ MHD_Result mhdConnectionTreat(void)
 
       if (pd.status >= 400)
         goto respond;
+
+      if ((orionldState.contextP != orionldCoreContextP) && (implicitlyCreated == true))
+        orionldState.contextP->kind = OrionldContextImplicit;  // Too late - the context is already in mongo
     }
   }
 

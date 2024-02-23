@@ -142,7 +142,7 @@ bye
 03. GET /ngsi-ld/v1/subscription/urn:ngsi-ld:subscription:S1, make sure the Q-filter is OK
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 638
+Content-Length: 733
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
@@ -156,6 +156,7 @@ Link: <https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld>
     ],
     "id": "urn:ngsi-ld:subscription:S1",
     "isActive": true,
+    "jsonldContext": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
     "notification": {
         "attributes": [
             "numberOfItems",

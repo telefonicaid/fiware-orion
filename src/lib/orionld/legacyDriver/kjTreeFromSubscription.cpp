@@ -536,14 +536,17 @@ KjNode* kjTreeFromSubscription(ngsiv2::Subscription* subscriptionP, CachedSubscr
     kjChildAdd(topP, nodeP);
   }
 
-  // FIXME: This is not how it is meant ...
+  // jsonldContext
+  if (subscriptionP->ldContext != "")
+  {
+    nodeP = kjString(orionldState.kjsonP, "jsonldContext", subscriptionP->ldContext.c_str());
+    kjChildAdd(topP, nodeP);
+  }
+
+  // @context
   if (orionldState.out.contentType == MT_JSONLD)
   {
-    if (subscriptionP->ldContext != "")
-      nodeP = kjString(orionldState.kjsonP, "@context", subscriptionP->ldContext.c_str());
-    else
-      nodeP = kjString(orionldState.kjsonP, "@context", orionldCoreContextP->url);
-
+    nodeP = kjString(orionldState.kjsonP, "@context", orionldState.contextP->url);
     kjChildAdd(topP, nodeP);
   }
 

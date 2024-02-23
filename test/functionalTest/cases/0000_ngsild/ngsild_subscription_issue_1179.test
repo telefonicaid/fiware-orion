@@ -349,7 +349,7 @@ NGSILD-Tenant: captn
 07. GET subscriptions
 =====================
 HTTP/1.1 200 OK
-Content-Length: 2072
+Content-Length: 2321
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -366,6 +366,7 @@ NGSILD-Results-Count: 3
         ],
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld",
         "notification": {
             "attributes": [
                 "location",
@@ -408,6 +409,7 @@ NGSILD-Results-Count: 3
         ],
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld",
         "notification": {
             "attributes": [
                 "location",
@@ -447,6 +449,7 @@ NGSILD-Results-Count: 3
         ],
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld",
         "notification": {
             "attributes": [
                 "location",
@@ -482,7 +485,7 @@ NGSILD-Results-Count: 3
 08. Count subscriptions
 =======================
 HTTP/1.1 200 OK
-Content-Length: 2072
+Content-Length: 2321
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -499,6 +502,7 @@ NGSILD-Results-Count: 3
         ],
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld",
         "notification": {
             "attributes": [
                 "location",
@@ -541,6 +545,7 @@ NGSILD-Results-Count: 3
         ],
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld",
         "notification": {
             "attributes": [
                 "location",
@@ -580,6 +585,7 @@ NGSILD-Results-Count: 3
         ],
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.5.jsonld",
         "notification": {
             "attributes": [
                 "location",

@@ -293,7 +293,7 @@ bye
 03. GET the subscription via REST - make sure all timestamps have milliseconds, save timestamps
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 481
+Content-Length: 564
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -309,6 +309,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "expiresAt": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
     "notification": {
         "endpoint": {
@@ -375,7 +376,7 @@ Date: REGEX(.*)
 07. GET the subscription via REST - see 'timesSent==1' and timestamps for lastSuccess, lastNotification
 =======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 582
+Content-Length: 665
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -391,6 +392,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "expiresAt": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
     "notification": {
         "endpoint": {
@@ -423,7 +425,7 @@ Date: REGEX(.*)
 09. GET the subscription via REST - make sure 'modifiedAt' has changed and 'createdAt' has not
 ==============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 595
+Content-Length: 678
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -439,6 +441,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "expiresAt": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
     "notification": {
         "endpoint": {
@@ -476,7 +479,7 @@ Date: REGEX(.*)
 12. GET the subscription via REST - make sure lastFailure is present and has milliseconds
 =========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 636
+Content-Length: 719
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -492,6 +495,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "expiresAt": "2028-12-31T11:12:13.456Z",
     "id": "urn:ngsi-ld:subscriptions:s1",
     "isActive": true,
+    "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
     "modifiedAt": "REGEX(.*\.\d\d\dZ)",
     "notification": {
         "endpoint": {

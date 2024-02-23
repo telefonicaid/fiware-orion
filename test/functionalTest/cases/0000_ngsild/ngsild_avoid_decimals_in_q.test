@@ -137,7 +137,7 @@ bye
 03. GET the subscription and see the Q String Filter P2>10
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 561
+Content-Length: 648
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -167,7 +167,8 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     },
     "status": "ok"
   },
-  "expiresAt": "2028-12-31T10:11:12.123Z"
+  "expiresAt": "2028-12-31T10:11:12.123Z",
+  "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)"
 }
 
 

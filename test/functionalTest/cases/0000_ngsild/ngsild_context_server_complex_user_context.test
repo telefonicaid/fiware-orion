@@ -152,7 +152,7 @@ Date: REGEX(.*)
     },
     {
         "URL": "REGEX(.*)",
-        "createdAt": "1970-01-01T00:00:00.000Z",
+        "createdAt": "202REGEX(.*)",
         "extraInfo": {
             "compactions": 0,
             "expansions": 0,
@@ -166,7 +166,7 @@ Date: REGEX(.*)
             "type": "hash-table"
         },
         "kind": "Cached",
-        "lastUsage": "1970-01-01T00:00:00.000Z",
+        "lastUsage": "202REGEX(.*)",
         "localId": "REGEX(.*)",
         "numberOfHits": 1
     },

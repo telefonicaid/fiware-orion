@@ -84,6 +84,7 @@ static void subCacheItemFill
   cSubP->renderFormat        = rFormat;
 
   LM_T(LmtSysAttrs, ("sysAttrs: %s", (cSubP->sysAttrs == true)? "true" : "false"));
+  LM_T(LmtContextCacheStats, ("ldContext: '%s'", cSubP->ldContext));
 
   KjNode* subscriptionIdP    = kjLookup(apiSubscriptionP, "_id");  // "id" was changed to "_id" by orionldPostSubscriptions to accomodate the DB insertion
   KjNode* subscriptionNameP  = kjLookup(apiSubscriptionP, "subscriptionName");  // "name" is accepted too ...

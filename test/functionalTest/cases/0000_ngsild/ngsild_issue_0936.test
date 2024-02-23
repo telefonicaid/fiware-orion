@@ -86,7 +86,7 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:Subscription:REGEX(.*)
 02. Query subscriptions, make sure the sub from step 01 has an identifier
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 474
+Content-Length: 557
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -103,6 +103,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         "expiresAt": "2040-01-01T14:00:00.000Z",
         "id": "urn:ngsi-ld:Subscription:REGEX(.*)",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
         "notification": {
             "attributes": [
                 "Water level"

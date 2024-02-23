@@ -97,7 +97,7 @@ NGSILD-Tenant: openiot
 02. The subscription urn:ngsi-ld:Subscription:testsubscription is retrieved (from tenant 'openiot') - OK
 ========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 271
+Content-Length: 365
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -110,6 +110,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     ],
     "id": "urn:ngsi-ld:Subscription:testsubscription",
     "isActive": true,
+    "jsonldContext": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     "notification": {
         "endpoint": {
             "accept": "application/json",

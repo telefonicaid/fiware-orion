@@ -140,7 +140,7 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscriptions:S2
 03. GET all subscriptions from CB1 - see S1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 336
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -154,6 +154,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscriptions:S1",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
         "notification": {
             "endpoint": {
                 "accept": "application/json",
@@ -171,7 +172,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 04. GET all subscriptions from CB2 - see S2
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 336
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -185,6 +186,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscriptions:S2",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
         "notification": {
             "endpoint": {
                 "accept": "application/json",
@@ -207,7 +209,7 @@ Slept 2 seconds
 06. GET all subscriptions from CB1 - see S1 and S2
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 505
+Content-Length: 671
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -221,6 +223,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscriptions:S1",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
         "notification": {
             "endpoint": {
                 "accept": "application/json",
@@ -240,6 +243,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscriptions:S2",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
         "notification": {
             "endpoint": {
                 "accept": "application/json",
@@ -257,7 +261,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 07. GET all subscriptions from CB2 - see S2 and S1
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 505
+Content-Length: 671
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -271,6 +275,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscriptions:S1",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
         "notification": {
             "endpoint": {
                 "accept": "application/json",
@@ -290,6 +295,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
         ],
         "id": "urn:ngsi-ld:subscriptions:S2",
         "isActive": true,
+        "jsonldContext": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
         "notification": {
             "endpoint": {
                 "accept": "application/json",
