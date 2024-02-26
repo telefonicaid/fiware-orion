@@ -15,6 +15,9 @@ not maintained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* CLI parameters (and associated env vars): `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`,
+  `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` in Orion 3.12.0. Use `dbURI` instead,
+  checking [this section](#mapping-to-mongouri-from-old-cli-parameters) if you need to know hot to build the MongoDB URI.
 * `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types in Orion 3.10.0. Use `geo:json` instead.
 * `GET /v2` operation in Orion 3.8.0. This operation is pretty useless and not actually used.
 * Initial notification in subscriptions (along with `skipInitialNotification` option) in Orion 3.1.0.
@@ -77,6 +80,30 @@ A list of deprecated features and the version in which they were deprecated foll
 * Configuration Manager role (deprecated in 0.21.0, removed in 0.25.0)
 * Associations (deprecated in 0.21.0, removed in 0.25.0).
 
+### Mapping to MongoURI from old CLI parameters
+
+Considering we have the following CLI parameters:
+
+* `-dbhost HOST`
+* `-rplSet RPLSET`
+* `-dbTimeout TIMEOUT`
+* `-dbuser USER`
+* `-dbpass PASS`
+* `-dbAuthMech AUTHMECH`
+* `-dbAuthDb AUTHDB`
+* `-dbSSL`
+* `-dbDisableRetryWrites`
+
+The resulting MongoURI (i.e. the value for `-dbURI`) should be:
+
+> mongodb://[USER:PASS@]HOST/[AUTHDB][?replicaSet=RPLSET[&authMechanism=AUTHMECH][&tls=true&tlsAllowInvalidCertificates=true][&retryWrites=false][&connectTimeoutMS=TIMEOUT]
+
+Notes:
+
+* The `&tls=true&tlsAllowInvalidCertificates=true` token is added if `-dbSSL` is used
+* The `&retryWrites=false` token is added if `-dbDisableRetryWrites` is used
+* Other `[...]` mean optional tokens, depending on if the corresponding parameter is used or not.
+
 ## Log deprecation warnings
 
 Some (not all) usages of deprecated features can be logged using the `-logDeprecate` [CLI flag](admin/cli.md)
@@ -107,6 +134,7 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
+| CLI `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` (and associated env vars)                        | Not yet defined                           | Not yet defined                 |
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |

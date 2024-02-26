@@ -90,7 +90,7 @@ e.g.:
 
     # ps -ef | grep contextBroker
     500      27175     1  0 21:06 ?        00:00:00 monit -v -c /home/localadmin/monit_CB/monitBROKER.conf -d 10 -p /var/log/contextBroker/monit.pid
-    500      27205     1  0 21:06 ?        00:00:00 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion;
+    500      27205     1  0 21:06 ?        00:00:00 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbURI mongodb://localhost/ -db orion;
 
 Then, kill contextBroker, e.g.:
 

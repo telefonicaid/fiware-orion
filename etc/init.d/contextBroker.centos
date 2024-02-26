@@ -79,19 +79,22 @@ BROKER_OPTS="-port ${BROKER_PORT} \
    -logDir ${BROKER_LOG_DIR} \
    -logLevel ${BROKER_LOG_LEVEL} \
    -pidpath ${BROKER_PID_FILE} \
-   -dbhost ${BROKER_DATABASE_HOST} \
+   -dbURI mongodb://${BROKER_DATABASE_HOST} \
    -db ${BROKER_DATABASE_NAME} \
    ${BROKER_EXTRA_OPS}"
 
 # Optional parameters
+# FIXME: -dbuser option is deprecated. This needs to be migrated to -dbURI usage
 if [[ ! -z "${BROKER_DATABASE_USER}" ]]; then
    BROKER_OPTS="${BROKER_OPTS} -dbuser ${BROKER_DATABASE_USER}"
 fi
 
+# FIXME: -dbpwd needs ${PWD} in the -dbURI CLI. This needs to be adapted
 if [[ ! -z "${BROKER_DATABASE_PASSWORD}" ]]; then
    BROKER_OPTS="${BROKER_OPTS} -dbpwd ${BROKER_DATABASE_PASSWORD}"
 fi
 
+# FIXME: -rplsSet option is deprecated. This needs to be migrated to -dbURI usage
 if [[ ! -z "${BROKER_DATABASE_RPLSET}" ]]; then
     BROKER_OPTS="${BROKER_OPTS} -rplSet ${BROKER_DATABASE_RPLSET}"
 fi

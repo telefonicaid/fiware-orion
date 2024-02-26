@@ -8,6 +8,7 @@
 
 推奨されなくなった機能のリストと、廃止された機能のバージョンは次のとおりです :
 
+* Orion 3.12.0 での CLI パラメータ (および関連する環境変数): `-dbhost`、`-rplSet`、`-dbTimeout`、`-dbuser`、`-dbAuthMech`、`-dbAuthDb`、`-dbSSL`、および `-dbDisableRetryWrites`。MongoDB URI を構築するために必要な情報が必要な場合は、[このセクション](#mapping-to-mongouri-from-old-cli-parameters) をチェックして、代わりに `dbURI` を使用してください
 * Orion 3.10.0 での `geo:point`, `geo:line`, `geo:box` および `geo:polygon` 属性タイプ。代わりに `geo:json` を使用してください
 * Orion 3.8.0 での `GET /v2` 操作。この操作はかなり役に立たず、実際には使用されません。
 * Orion 3.1.0 のサブスクリプションでの初期通知 (`skipInitialNotification` オプションと共に)。(Orion 3.2.0 で削除)。初期通知の
@@ -52,6 +53,31 @@
 * Configuration Manager のロールは、0.21.0 で非推奨になり、0.25.0 で削除されました
 * Associations は、0.21.0 で非推奨になり、0.25.0 で削除されました
 
+<a name="mapping-to-mongouri-from-old-cli-parameters"></a>
+
+### 古い CLI パラメータから MongoURI へのマッピング
+
+次の CLI パラメータがあることを考慮します:
+
+* `-dbhost HOST`
+* `-rplSet RPLSET`
+* `-dbTimeout TIMEOUT`
+* `-dbuser USER`
+* `-dbpass PASS`
+* `-dbAuthMech AUTHMECH`
+* `-dbAuthDb AUTHDB`
+* `-dbSSL`
+* `-dbDisableRetryWrites`
+
+結果の MongoURI (つまり、`-dbURI` の値) は次のようになります:
+
+> mongodb://[USER:PASS@]HOST/[AUTHDB][?replicaSet=RPLSET[&authMechanism=AUTHMECH][&tls=true&tlsAllowInvalidCertificates=true][&retryWrites=false][&connectTimeoutMS=TIMEOUT]
+Notes:
+
+* `-dbSSL` が使用される場合、`&tls=true&tlsAllowInvalidCertificates=true` トークンが追加されます
+* `-dbDisableRetryWrites` が使用される場合、`&retryWrites=false` トークンが追加されます
+* その他の `[...]` は、対応するパラメータが使用されているかどうかに応じて、オプションのトークンを意味します
+
 <a name="log-deprecation-warnings"></a>
 
 ## 非推奨の警告をログに記録
@@ -77,6 +103,7 @@
 
 | **削除された機能**                                                                   | **機能をサポートする Orion ラスト・バージョン** | **バージョンのリリース日** |
 |--------------------------------------------------------------------------------------|-------------------------------------------------|----------------------------|
+| CLI `-dbhost`、`-rplSet`、`-dbTimeout`、`-dbuser`、`-dbAuthMech`、`-dbAuthDb`、`-dbSSL`、および `-dbDisableRetryWrites` (および関連する環境変数) | まだ定義されていません | まだ定義されていません |
 | `POST /v2/entities` オペレーションの `attributes` フィールド                         | まだ定義されていません                          | まだ定義されていません     |
 | `APPEND`, `UPDATE`, など。`POST /v2/op/update` でのアクション・タイプ                | まだ定義されていません                          | まだ定義されていません     |
 | URI パラメータでの `dateCreated` および `dateModified`                               | まだ定義されていません                          | まだ定義されていません     |
