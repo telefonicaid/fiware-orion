@@ -69,7 +69,7 @@ install_unit: install
 unit:
 	@echo '------------------------------------- make unit ----------------------------------------'
 
-	BUILD_UNIT/test/unittests/unitTest -t 0-255 -dbhost ${MONGO_HOST} --gtest_output=xml:/tmp/builder/logs/unit.xml
+	BUILD_UNIT/test/unittests/unitTest -t 0-255 -dbURI mongodb://${MONGO_HOST} --gtest_output=xml:/tmp/builder/logs/unit.xml
 
 build_functional: prepare
 	@echo '------------------------------------- make build_functional ----------------------------'

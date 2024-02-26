@@ -288,7 +288,7 @@ The symptoms of a database connection problem are the following:
 ```
 
 In both cases, check that the connection to MonogDB is correctly
-configured (in particular, the "-dbhost" option [from the command
+configured (in particular, the `-dbURI` option [from the command
 line](cli.md)) and that the mongod/mongos
 process (depending if you are using sharding or not) is up and running.
 

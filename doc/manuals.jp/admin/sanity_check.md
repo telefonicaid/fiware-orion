@@ -45,7 +45,7 @@ curl --header 'Accept: application/json' localhost:1026/version
 
 ```
 $ ps ax | grep contextBroker
- 8517 ?        Ssl    8:58 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion
+ 8517 ?        Ssl    8:58 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbURI mongodb://localhost/ -db orion
 ```
 
 [トップ](#top)
@@ -63,25 +63,20 @@ Orion Context Broker は、デフォルト・ポートとして TCP 1026を使�
 Orion Context Broker は MongoDB データベースを使用します。このパラメーターは、
 コマンドライン・オプションを使用して提供されます :
 
-* `-dbhost`
+* `-dbUri`
 * `-db`
-* `-dbuser`
 * `-dbpwd`
-* `-dbAuthMech`
-* `-dbAuthDb`
-* `-dbSSL`
-* `-dbDisableRetryWrites`
-* `-dbTimeout`
 * `-dbPoolSize`
 * `-writeConcern`
 
 `-dbuser`, `-dbpwd`, `-dbAuthMech` および `-dbAuthDb` は、MongoDB が認証を使用
 して、つまり `--auth` で実行される場合にのみ使用されることを注意して ください。
+`-dbpwd` は、MongoDB が認証を使用して実行される場合、つまり `--auth` を使用して実行される場合にのみ使用されることに注意してください。
 
 mongo コンソールを使用してデータベースが動作していることを確認できます :
 
 ```
-mongo <dbhost>/<db>
+mongosh <mongoUri>/<db>
 ```
 
 mongo コンソールの次のコマンドを使用して、broker が使用するさまざまなコレクションをチェックすることができます。ただし、最初にドキュメントを挿入するときに broker がコレクションを作成するので、broker を初めて実行する、またはデータベースがクリーンアップされている、broker がまだリクエストを受信していない場合、コレクションは存在しません。特定の瞬間に実際のコレクションリストを取得するために `show collections` を使用します。

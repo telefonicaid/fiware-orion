@@ -46,7 +46,7 @@ A process named "contextBroker" should be up and running, e.g.:
 
 ```
 $ ps ax | grep contextBroker
- 8517 ?        Ssl    8:58 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion
+ 8517 ?        Ssl    8:58 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbURI mongodb://localhost/ -db orion
 ```
 
 [Top](#top)
@@ -63,25 +63,18 @@ changed using the -port command line option.
 The Orion Context Broker uses a MongoDB database, whose parameters are
 provided using the command line options:
 
-* `-dbhost`
+* `-dbUri`
 * `-db`
-* `-dbuser`
 * `-dbpwd`
-* `-dbAuthMech`
-* `-dbAuthDb`
-* `-dbSSL`
-* `-dbDisableRetryWrites`
-* `-dbTimeout`
 * `-dbPoolSize`
 * `-writeConcern`
 
-Note that `-dbuser`, `-dbpwd`, `-dbAuthMech` and `-dbAuthDb`.
-are only used if MongoDB runs using authentication, i.e. with `--auth`.
+Note that `-dbpwd` is only used if MongoDB runs using authentication, i.e. with `--auth`.
 
 You can check that the database is working using the mongo console:
 
 ```
-mongo <dbhost>/<db>
+mongosh <mongoUri>/<db>
 ```
 
 You can check the different collections used by the broker using the

@@ -65,41 +65,44 @@ you need to apply the procedures to each per-tenant/service database.
 
 ## Database authorization
 
-MongoDB authorization is configured with the `-db`, `-dbuser` and `-dbpwd`
-options ([see section on command line
-options](cli.md)). There are a few different cases
+MongoDB authorization is configured using `-dbURI` and `-dbpwd`
+options ([see section on command line options](cli.md)). There are a few different cases
 to take into account:
 
 -   If your MongoDB instance/cluster doesn't use authorization,
-    then do not use the `-dbuser` and `-dbpwd` options.
--   You can specify authentication mechanism with `-dbAuthMech`.
+    then do not use the `-dbpwd` and use `-dbURI` without the `username:${PWD}@` part.
+-   You can specify authentication mechanism within the `-dbURI`, using the `authMechanism` option.
 -   If your MongoDB instance/cluster uses authorization , then:
+    -   In the `-dbURI` you have to use the `username:${PWD}@` part. The `${PWD}` will be replaced
+        by the value of the `dbpwd` parameter.
     -   If you run Orion in single service/tenant mode (i.e.
         without `-multiservice`) then you are using only one database
-        (the one specified by the -db option) and the authorization is
-        done with `-dbuser` and `-dbpwd` in that database.
+        (the one specified by the `-db` option) and the authorization is
+        done in that database with the username specified in the `-dbURI` and `-dbpwd`.
     -   If you run Orion in multi service/tenant mode (i.e.
         with `-multiservice`) then the authorization is done at `admin`
-        database using `-dbuser` and `-dbpwd`. As described [later in this
+        database using the username specified in the `-dbURI` and `-dbpwd`. As described [later in this
         document](#multiservicemultitenant-database-separation),
         in multi service/tenant mode, Orion uses several databases
         (which in addition can potentially be created on the fly), thus
         authorizing on `admin` DB ensures permissions in all of them.
-    -   Anyway, you can override the above default with `-dbAuthDb` and
+    -   Anyway, you can override the above default with `defaultauthdb` in the `-dbURI` and
         specify the authentication DB you want.
+
+Check the [MongoURI documentation](https://www.mongodb.com/docs/manual/reference/connection-string) for additional information.
 
 Let's consider the following example. If your MongoDB configuration is so you typically access to it
 using:
 
 ```
-mongo "mongodb://example1.net:27017,example2.net:27017,example3.net:27017/orion?replicaSet=rs0" --ssl --authenticationDatabase admin --username orion --password orionrules
+mongosh mongodb://orion@orionrules:example1.net:27017,example2.net:27017,example3.net:27017/admin?replicaSet=rs0&tls=true&tlsAllowInvalidCertificates=true
 ```
 
 Then the equivalent connection in Context Broker CLI parameters will be:
 
 
 ```
--dbhost examples1.net:27017,example2.net:27017,example3.net:27017 -rplSet rs0 -dbSSL -dbAuthDb admin -dbuser orion -dbpwd orionrules
+-dbURI mongodb://orion@${PWD}:example1.net:27017,example2.net:27017,example3.net:27017/admin?replicaSet=rs0&tls=true&tlsAllowInvalidCertificates=true -dbpwd orionrules
 ```
 
 

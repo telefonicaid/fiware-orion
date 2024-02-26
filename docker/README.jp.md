@@ -33,7 +33,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 		      - "1026:1026"
 		    depends_on:
 		      - mongo
-		    command: -dbhost mongo
+		    command: -dbURI mongodb://mongo
 
 		  mongo:
 		    image: mongo:6.0
@@ -79,7 +79,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 そして、このコマンドで Orion を実行します
 
-	 sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbhost mongodb
+	 sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbURI mongodb://mongodb
 
 すべてが動作することを確認します。
 
@@ -91,7 +91,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 別の MongoDB インスタンスに接続する場合は、前のコマンドの**代わりに**、次のコマンドを実行します
 
-	 sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbhost <MongoDB Host>
+	 sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbURI mongodb://<MongoDB Host>
 
 すべてが動作することを確認します。
 
@@ -111,10 +111,10 @@ Orion Context Broker を試してみたいし、データベースについて�
 	 * 手動で MongoDB を別のコンテナで実行します :
                  1. `sudo docker run --name mongodb -d mongo:6.0`
                  2. `sudo docker build -t orion .`
-                 3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
+                 3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbURI mongodb://mongodb`.
 	 * 手動で MongoDB ホストを見つける場所を指定します :
 		 1. `sudo docker build -t orion .`
-		 2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbhost <MongoDB Host>`.
+		 2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbURI mongodb://<MongoDB Host>`.
 
 すべてが動作することを確認します
 

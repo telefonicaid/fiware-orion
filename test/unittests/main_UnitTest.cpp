@@ -117,7 +117,7 @@ PaArgument paArgs[] =
   { "-dbAuthDb",       authDb,        "DB_AUTH_DB",     PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  ""  },
   { "-dbSSL",          &dbSSL,        "DB_AUTH_SSL",    PaBool,   PaOpt, false,                  false, true,  "" },
   { "-db",             dbName,        "DB",             PaString, PaOpt, (int64_t) "orion",      PaNL, PaNL,  "" },
-  { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaInt64,  PaOpt, 10000,                  PaNL, PaNL,  "" },
+  { "-dbTimeout",      &dbTimeout,    "DB_TIMEOUT",     PaInt64,  PaOpt, 0,                      PaNL, PaNL,  "" },
   { "-dbPoolSize",     &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,                     1,    10000, "" },
   { "-writeConcern",   &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,                      0,    1,     "" },
   { "--gtest_filter=", gtest_filter,  "",               PaString, PaOpt, (int64_t) "",           PaNL, PaNL,  "" },
