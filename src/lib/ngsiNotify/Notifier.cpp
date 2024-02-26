@@ -318,7 +318,9 @@ static SenderThreadParams* buildSenderParamsCustom
   const std::string exprLang = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.exprLang : notification.mqttInfo.exprLang;
 
   // Used by several macroSubstitute() calls along this function
-  ExprContextObject exprContext(exprLang == "legacy");
+  // FIXME PR: force legacy mode to temporarly test all ftest in legacy mode
+  //ExprContextObject exprContext(exprLang == "legacy");
+  ExprContextObject exprContext(true);
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
   exprContext.add("service", tenant);
