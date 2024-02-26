@@ -1,4 +1,4 @@
-# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Basic CRUD for subscriptions retain field (mqttCustom variant)
+Basic CRUD for exprLang field (http variant)
 
 --SHELL-INIT--
 dbInit CB
@@ -30,26 +30,26 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Create subscription with invalid retain, see error
-# 02. Create subscription with retain true
-# 03a. Get subscription and see retain true
-# 03b. Get subscription (as a list) and see retain true
-# 04. Update subscription with retain false
-# 05a. Get subscription and see retain false
-# 05b. Get subscription (as a list) and see retain false
-# 06. Update subscription without retain
-# 07a. Get subscription and see retain false
-# 07b. Get subscription (as a list) and see retain false
-# 08. Update subscription with retain true
-# 09a. Get subscription and see retain true
-# 09b. Get subscription (as a list) and see retain true
-# 10. Update subscription with invalid retain, see error
-# 11a. Get subscription and see retain true
-# 11b. Get subscription (as a list) and see retain true
+# 01. Create subscription with invalid exprLang, see error
+# 02. Create subscription with exprLang jexl
+# 03a. Get subscription and see exprLang jexl
+# 03b. Get subscription (as a list) and see exprLang jexl
+# 04. Update subscription with exprLang legacy
+# 05a. Get subscription and see exprLang legacy
+# 05b. Get subscription (as a list) and see exprLang legacy
+# 06. Update subscription without exprLang
+# 07a. Get subscription and see exprLang jexl
+# 07b. Get subscription (as a list) and see exprLang jexl
+# 08. Update subscription with exprLang legacy
+# 09a. Get subscription and see exprLang legacy
+# 09b. Get subscription (as a list) and see exprLang legacy
+# 10. Update subscription with invalid exprLang, see error
+# 11a. Get subscription and see exprLang legacy
+# 11b. Get subscription (as a list) and see exprLang legacy
 #
 
-echo "01. Create subscription with invalid retain, see error"
-echo "======================================================"
+echo "01. Create subscription with invalid exprLang, see error"
+echo "========================================================"
 payload='{
   "subject": {
     "entities": [
@@ -60,10 +60,9 @@ payload='{
     ]
   },
   "notification": {
-    "mqttCustom": {
-      "url": "mqtt://localhost:1883",
-      "topic": "orion",
-      "retain": "foo"
+    "httpCustom": {
+      "url": "http://localhost:9998",
+      "exprLang": "foo"
     }
   }
 }'
@@ -72,8 +71,8 @@ echo
 echo
 
 
-echo "02. Create subscription with retain true"
-echo "========================================"
+echo "02. Create subscription with exprLang jexl"
+echo "=========================================="
 payload='{
   "subject": {
     "entities": [
@@ -84,10 +83,9 @@ payload='{
     ]
   },
   "notification": {
-    "mqttCustom": {
-      "url": "mqtt://localhost:1883",
-      "topic": "orion",
-      "retain": true
+    "httpCustom": {
+      "url": "http://localhost:9998",
+      "exprLang": "jexl"
     }
   }
 }'
@@ -99,28 +97,27 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "03a. Get subscription and see retain true"
-echo "========================================="
+echo "03a. Get subscription and see exprLang jexl"
+echo "==========================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "03b. Get subscription (as a list) and see retain true"
-echo "====================================================="
+echo "03b. Get subscription (as a list) and see exprLang jexl"
+echo "======================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "04. Update subscription with retain false"
-echo "========================================="
+echo "04. Update subscription with exprLang legacy"
+echo "============================================"
 payload='{
   "notification": {
-    "mqttCustom": {
-      "url": "mqtt://localhost:1883",
-      "topic": "orion",
-      "retain": false
+    "httpCustom": {
+      "url": "http://localhost:9998",
+      "exprLang": "legacy"
     }
   }
 }'
@@ -129,26 +126,26 @@ echo
 echo
 
 
-echo "05a. Get subscription and see retain false"
-echo "=========================================================="
+echo "05a. Get subscription and see exprLang legacy"
+echo "============================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "05b. Get subscription (as a list) and see retain false"
-echo "======================================================"
+echo "05b. Get subscription (as a list) and see exprLang legacy"
+echo "========================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "06. Update subscription without retain"
-echo "======================================"
+echo "06. Update subscription without exprLang"
+echo "========================================"
 payload='{
   "notification": {
-    "mqttCustom": {
-      "url": "mqtt://localhost:1883",
+    "httpCustom": {
+      "url": "http://localhost:9998",
       "topic": "orion"
     }
   }
@@ -158,28 +155,27 @@ echo
 echo
 
 
-echo "07a. Get subscription and see retain false"
-echo "=========================================="
+echo "07a. Get subscription and see exprLang jexl"
+echo "==========================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "07b. Get subscription (as a list) and see retain false"
-echo "======================================================"
+echo "07b. Get subscription (as a list) and see exprLang jexl"
+echo "======================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "08. Update subscription with retain true"
-echo "========================================"
+echo "08. Update subscription with exprLang legacy"
+echo "============================================"
 payload='{
   "notification": {
-    "mqttCustom": {
-      "url": "mqtt://localhost:1883",
-      "topic": "orion",
-      "retain": true
+    "httpCustom": {
+      "url": "http://localhost:9998",
+      "exprLang": "legacy"
     }
   }
 }'
@@ -188,28 +184,27 @@ echo
 echo
 
 
-echo "09a. Get subscription and see retain true"
-echo "========================================="
+echo "09a. Get subscription and see exprLang legacy"
+echo "============================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "09b. Get subscription (as a list) and see retain true"
-echo "====================================================="
+echo "09b. Get subscription (as a list) and see exprLang legacy"
+echo "========================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "10. Update subscription with invalid retain, see error"
-echo "======================================================"
+echo "10. Update subscription with invalid exprLang, see error"
+echo "========================================================"
 payload='{
   "notification": {
-    "mqttCustom": {
-      "url": "mqtt://localhost:1883",
-      "topic": "orion",
-      "retain": 42
+    "httpCustom": {
+      "url": "http://localhost:9998",
+      "exprLang": 42
     }
   }
 }'
@@ -218,36 +213,36 @@ echo
 echo
 
 
-echo "11a. Get subscription and see retain true"
-echo "========================================="
+echo "11a. Get subscription and see exprLang legacy"
+echo "============================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "11b. Get subscription (as a list) and see retain true"
-echo "====================================================="
+echo "11b. Get subscription (as a list) and see exprLang legacy"
+echo "========================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 --REGEXPECT--
-01. Create subscription with invalid retain, see error
-======================================================
+01. Create subscription with invalid exprLang, see error
+========================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 59
+Content-Length: 88
 
 {
-    "description": "retain is not a bool",
+    "description": "not valid exprLang, valid ones are jexl or legacy",
     "error": "BadRequest"
 }
 
 
-02. Create subscription with retain true
-========================================
+02. Create subscription with exprLang jexl
+==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -256,13 +251,13 @@ Content-Length: 0
 
 
 
-03a. Get subscription and see retain true
-=========================================
+03a. Get subscription and see exprLang jexl
+===========================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 358
+Content-Length: 320
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -270,12 +265,9 @@ Content-Length: 358
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "mqttCustom": {
+        "httpCustom": {
             "exprLang": "jexl",
-            "qos": 0,
-            "retain": true,
-            "topic": "orion",
-            "url": "mqtt://localhost:1883"
+            "url": "http://localhost:9998"
         },
         "onlyChangedAttrs": false
     },
@@ -295,13 +287,13 @@ Content-Length: 358
 }
 
 
-03b. Get subscription (as a list) and see retain true
-=====================================================
+03b. Get subscription (as a list) and see exprLang jexl
+=======================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 360
+Content-Length: 322
 
 [
     {
@@ -310,12 +302,9 @@ Content-Length: 360
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "mqttCustom": {
+            "httpCustom": {
                 "exprLang": "jexl",
-                "qos": 0,
-                "retain": true,
-                "topic": "orion",
-                "url": "mqtt://localhost:1883"
+                "url": "http://localhost:9998"
             },
             "onlyChangedAttrs": false
         },
@@ -336,21 +325,21 @@ Content-Length: 360
 ]
 
 
-04. Update subscription with retain false
-=========================================
+04. Update subscription with exprLang legacy
+============================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-05a. Get subscription and see retain false
-==========================================================
+05a. Get subscription and see exprLang legacy
+=============================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 359
+Content-Length: 322
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -358,12 +347,9 @@ Content-Length: 359
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "mqttCustom": {
-            "exprLang": "jexl",
-            "qos": 0,
-            "retain": false,
-            "topic": "orion",
-            "url": "mqtt://localhost:1883"
+        "httpCustom": {
+            "exprLang": "legacy",
+            "url": "http://localhost:9998"
         },
         "onlyChangedAttrs": false
     },
@@ -383,13 +369,13 @@ Content-Length: 359
 }
 
 
-05b. Get subscription (as a list) and see retain false
-======================================================
+05b. Get subscription (as a list) and see exprLang legacy
+=========================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 324
 
 [
     {
@@ -398,12 +384,9 @@ Content-Length: 361
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "mqttCustom": {
-                "exprLang": "jexl",
-                "qos": 0,
-                "retain": false,
-                "topic": "orion",
-                "url": "mqtt://localhost:1883"
+            "httpCustom": {
+                "exprLang": "legacy",
+                "url": "http://localhost:9998"
             },
             "onlyChangedAttrs": false
         },
@@ -424,95 +407,7 @@ Content-Length: 361
 ]
 
 
-06. Update subscription without retain
-======================================
-HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-
-
-07a. Get subscription and see retain false
-==========================================
-HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 359
-
-{
-    "id": "REGEX([0-9a-f]{24})",
-    "notification": {
-        "attrs": [],
-        "attrsFormat": "normalized",
-        "covered": false,
-        "mqttCustom": {
-            "exprLang": "jexl",
-            "qos": 0,
-            "retain": false,
-            "topic": "orion",
-            "url": "mqtt://localhost:1883"
-        },
-        "onlyChangedAttrs": false
-    },
-    "status": "active",
-    "subject": {
-        "condition": {
-            "attrs": [],
-            "notifyOnMetadataChange": true
-        },
-        "entities": [
-            {
-                "idPattern": ".*",
-                "type": "T"
-            }
-        ]
-    }
-}
-
-
-07b. Get subscription (as a list) and see retain false
-======================================================
-HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 361
-
-[
-    {
-        "id": "REGEX([0-9a-f]{24})",
-        "notification": {
-            "attrs": [],
-            "attrsFormat": "normalized",
-            "covered": false,
-            "mqttCustom": {
-                "exprLang": "jexl",
-                "qos": 0,
-                "retain": false,
-                "topic": "orion",
-                "url": "mqtt://localhost:1883"
-            },
-            "onlyChangedAttrs": false
-        },
-        "status": "active",
-        "subject": {
-            "condition": {
-                "attrs": [],
-                "notifyOnMetadataChange": true
-            },
-            "entities": [
-                {
-                    "idPattern": ".*",
-                    "type": "T"
-                }
-            ]
-        }
-    }
-]
-
-
-08. Update subscription with retain true
+06. Update subscription without exprLang
 ========================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -520,13 +415,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-09a. Get subscription and see retain true
-=========================================
+07a. Get subscription and see exprLang jexl
+===========================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 358
+Content-Length: 320
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -534,12 +429,9 @@ Content-Length: 358
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "mqttCustom": {
+        "httpCustom": {
             "exprLang": "jexl",
-            "qos": 0,
-            "retain": true,
-            "topic": "orion",
-            "url": "mqtt://localhost:1883"
+            "url": "http://localhost:9998"
         },
         "onlyChangedAttrs": false
     },
@@ -559,13 +451,13 @@ Content-Length: 358
 }
 
 
-09b. Get subscription (as a list) and see retain true
-=====================================================
+07b. Get subscription (as a list) and see exprLang jexl
+=======================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 360
+Content-Length: 322
 
 [
     {
@@ -574,12 +466,9 @@ Content-Length: 360
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "mqttCustom": {
+            "httpCustom": {
                 "exprLang": "jexl",
-                "qos": 0,
-                "retain": true,
-                "topic": "orion",
-                "url": "mqtt://localhost:1883"
+                "url": "http://localhost:9998"
             },
             "onlyChangedAttrs": false
         },
@@ -600,27 +489,21 @@ Content-Length: 360
 ]
 
 
-10. Update subscription with invalid retain, see error
-======================================================
-HTTP/1.1 400 Bad Request
+08. Update subscription with exprLang legacy
+============================================
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 59
-
-{
-    "description": "retain is not a bool",
-    "error": "BadRequest"
-}
 
 
-11a. Get subscription and see retain true
-=========================================
+
+09a. Get subscription and see exprLang legacy
+=============================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 358
+Content-Length: 322
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -628,12 +511,9 @@ Content-Length: 358
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
-        "mqttCustom": {
-            "exprLang": "jexl",
-            "qos": 0,
-            "retain": true,
-            "topic": "orion",
-            "url": "mqtt://localhost:1883"
+        "httpCustom": {
+            "exprLang": "legacy",
+            "url": "http://localhost:9998"
         },
         "onlyChangedAttrs": false
     },
@@ -653,13 +533,13 @@ Content-Length: 358
 }
 
 
-11b. Get subscription (as a list) and see retain true
-=====================================================
+09b. Get subscription (as a list) and see exprLang legacy
+=========================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 360
+Content-Length: 324
 
 [
     {
@@ -668,12 +548,97 @@ Content-Length: 360
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "mqttCustom": {
-                "exprLang": "jexl",
-                "qos": 0,
-                "retain": true,
-                "topic": "orion",
-                "url": "mqtt://localhost:1883"
+            "httpCustom": {
+                "exprLang": "legacy",
+                "url": "http://localhost:9998"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+10. Update subscription with invalid exprLang, see error
+========================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
+
+{
+    "description": "exprLang httpCustom notification is not a string",
+    "error": "BadRequest"
+}
+
+
+11a. Get subscription and see exprLang legacy
+=============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 322
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "exprLang": "legacy",
+            "url": "http://localhost:9998"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+11b. Get subscription (as a list) and see exprLang legacy
+=========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 324
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "httpCustom": {
+                "exprLang": "legacy",
+                "url": "http://localhost:9998"
             },
             "onlyChangedAttrs": false
         },

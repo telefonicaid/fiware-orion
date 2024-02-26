@@ -327,7 +327,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 379
 
 {
     "description": "HTTP sub",
@@ -337,6 +337,7 @@ Content-Length: 361
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
+            "exprLang": "jexl",
             "payload": "Custom payload",
             "timeout": 1000,
             "url": "http://localhost:1234"
@@ -373,7 +374,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 379
 
 {
     "description": "HTTP sub",
@@ -383,6 +384,7 @@ Content-Length: 361
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
+            "exprLang": "jexl",
             "payload": "Custom payload",
             "timeout": 2000,
             "url": "http://localhost:1234"
@@ -419,7 +421,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 346
+Content-Length: 364
 
 {
     "description": "HTTP sub",
@@ -429,6 +431,7 @@ Content-Length: 346
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
+            "exprLang": "jexl",
             "payload": "Custom payload",
             "url": "http://localhost:1234"
         },
@@ -464,7 +467,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 379
 
 {
     "description": "HTTP sub",
@@ -474,6 +477,7 @@ Content-Length: 361
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
+            "exprLang": "jexl",
             "payload": "Custom payload",
             "timeout": 1000,
             "url": "http://localhost:1234"
@@ -520,7 +524,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 346
+Content-Length: 364
 
 {
     "description": "HTTP sub",
@@ -530,6 +534,7 @@ Content-Length: 346
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
+            "exprLang": "jexl",
             "payload": "Custom payload",
             "url": "http://localhost:1234"
         },

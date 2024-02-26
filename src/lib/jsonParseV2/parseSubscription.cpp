@@ -1031,6 +1031,26 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // exprLang
+    Opt<std::string>  exprLangOpt = getStringOpt(httpCustom, "exprLang", "exprLang httpCustom notification");
+    std::string       exprLang = "jexl";
+
+    if (!exprLangOpt.ok())
+    {
+      return badInput(ciP, exprLangOpt.error);
+    }
+
+    if (exprLangOpt.given)
+    {
+      exprLang = exprLangOpt.value;
+      if ((exprLang != "jexl") && (exprLang != "legacy"))
+      {
+        return badInput(ciP, "not valid exprLang, valid ones are jexl or legacy");
+      }
+    }
+
+    subsP->notification.httpInfo.exprLang = exprLang;
+
     subsP->notification.httpInfo.custom = true;
   }
   else if (notification.HasMember("mqtt"))
@@ -1140,6 +1160,26 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return r;
     }
+
+    // exprLang
+    Opt<std::string>  exprLangOpt = getStringOpt(mqttCustom, "exprLang", "exprLang mqttCustom notification");
+    std::string       exprLang = "jexl";
+
+    if (!exprLangOpt.ok())
+    {
+      return badInput(ciP, exprLangOpt.error);
+    }
+
+    if (exprLangOpt.given)
+    {
+      exprLang = exprLangOpt.value;
+      if ((exprLang != "jexl") && (exprLang != "legacy"))
+      {
+        return badInput(ciP, "not valid exprLang, valid ones are jexl or legacy");
+      }
+    }
+
+    subsP->notification.mqttInfo.exprLang = exprLang;
 
     subsP->notification.mqttInfo.custom = true;
   }

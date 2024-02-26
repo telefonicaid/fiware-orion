@@ -1,3 +1,4 @@
+- Add: exprLang field in custom notifications (#4004)
 - Fix: changed the default value of `-dbTimeout` to 0 to resolve conflict with `-dbURI` (#4496) 
 - Fix: wrong INFO startup log showing ORION_MONGO_TIMEOUT, ORION_IN_REQ_PAYLOAD_MAX_SIZE and ORION_OUT_REQ_MSG_MAX_SIZE env var values (#4496)
 - Fix: return 400 Bad Request when subject.entities exists but it is an empty array (#4499)

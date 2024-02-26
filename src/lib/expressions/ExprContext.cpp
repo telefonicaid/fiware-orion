@@ -25,6 +25,7 @@
 
 #include <string>
 
+#include "common/string.h"
 #include "logMsg/logMsg.h"
 #include "expressions/ExprContext.h"
 #include "expressions/exprCommon.h"
@@ -35,15 +36,20 @@
 *
 * ExprContextObject::ExprContextObject -
 */
-ExprContextObject::ExprContextObject()
+ExprContextObject::ExprContextObject(bool _legacy)
 {
-  jexlContext = PyDict_New();
+  legacy = _legacy;
 
-  if (jexlContext == NULL)
+  if (!legacy)
   {
-    // Note that this ruins the object. We log this situation just one time here, but we include a NULL check
-    // in every other method to be safer
-    LM_E(("Runtime Error (fail creating new dict: %s)", capturePythonError()));
+    jexlContext = PyDict_New();
+
+    if (jexlContext == NULL)
+    {
+      // Note that this ruins the object. We log this situation just one time here, but we include a NULL check
+      // in every other method to be safer
+      LM_E(("Runtime Error (fail creating new dict: %s)", capturePythonError()));
+    }
   }
 }
 
@@ -51,9 +57,9 @@ ExprContextObject::ExprContextObject()
 
 /* ****************************************************************************
 *
-* ExprContextObject::get -
+* ExprContextObject::getJexlContext -
 */
-PyObject* ExprContextObject::get(void)
+PyObject* ExprContextObject::getJexlContext(void)
 {
   return jexlContext;
 }
@@ -62,23 +68,11 @@ PyObject* ExprContextObject::get(void)
 
 /* ****************************************************************************
 *
-* ExprContextObject::add -
+* ExprContextObject::getJexlContext -
 */
-void ExprContextObject::add(const std::string& key, const std::string& _value)
+std::map<std::string,std::string>* ExprContextObject::getMap(void)
 {
-  if (jexlContext == NULL)
-  {
-    return;
-  }
-  LM_T(LmtExpr, ("adding to expression context object (string): %s=%s", key.c_str(), _value.c_str()));
-  PyObject* value = Py_BuildValue("s", _value.c_str());
-  if (value == NULL)
-  {
-    LM_E(("Runtime Error (fail creating string value: %s)", capturePythonError()));
-    return;
-  }
-  PyDict_SetItemString(jexlContext, key.c_str(), value);
-  Py_DECREF(value);
+  return &repl;
 }
 
 
@@ -87,44 +81,27 @@ void ExprContextObject::add(const std::string& key, const std::string& _value)
 *
 * ExprContextObject::add -
 */
-void ExprContextObject::add(const std::string& key, double _value)
+void ExprContextObject::add(const std::string &key, const std::string &_value)
 {
-  if (jexlContext == NULL)
+  if (legacy)
   {
-    return;
-  }
-  LM_T(LmtExpr, ("adding to expression context object (double): %s=%f", key.c_str(), _value));
-  PyObject* value = Py_BuildValue("d", _value);
-  if (value == NULL)
-  {
-    LM_E(("Runtime Error (fail creating double value: %s)", capturePythonError()));
-    return;
-  }
-  PyDict_SetItemString(jexlContext, key.c_str(), value);
-  Py_DECREF(value);
-}
-
-
-
-
-/* ****************************************************************************
-*
-* ExprContextObject::add -
-*/
-void ExprContextObject::add(const std::string& key, bool _value)
-{
-  if (jexlContext == NULL)
-  {
-    return;
-  }
-  LM_T(LmtExpr, ("adding to expression context object (bool): %s=%s", key.c_str(), _value? "true" : "false"));
-  if (_value)
-  {
-    PyDict_SetItemString(jexlContext, key.c_str(), Py_True);
+    repl.insert(std::pair<std::string, std::string>(key, _value));
   }
   else
   {
-    PyDict_SetItemString(jexlContext, key.c_str(), Py_False);
+    if (jexlContext == NULL)
+    {
+      return;
+    }
+    LM_T(LmtExpr, ("adding to expression context object (string): %s=%s", key.c_str(), _value.c_str()));
+    PyObject* value = Py_BuildValue("s", _value.c_str());
+    if (value == NULL)
+    {
+      LM_E(("Runtime Error (fail creating string value: %s)", capturePythonError()));
+      return;
+    }
+    PyDict_SetItemString(jexlContext, key.c_str(), value);
+    Py_DECREF(value);
   }
 }
 
@@ -134,14 +111,28 @@ void ExprContextObject::add(const std::string& key, bool _value)
 *
 * ExprContextObject::add -
 */
-void ExprContextObject::add(const std::string& key)
+void ExprContextObject::add(const std::string &key, double _value)
 {
-  if (jexlContext == NULL)
+  if (legacy)
   {
-    return;
+    repl.insert(std::pair<std::string, std::string>(key, double2string(_value)));
   }
-  LM_T(LmtExpr, ("adding to expression context object (none): %s", key.c_str()));
-  PyDict_SetItemString(jexlContext, key.c_str(), Py_None);
+  else
+  {
+    if (jexlContext == NULL)
+    {
+      return;
+    }
+    LM_T(LmtExpr, ("adding to expression context object (double): %s=%f", key.c_str(), _value));
+    PyObject* value = Py_BuildValue("d", _value);
+    if (value == NULL)
+    {
+      LM_E(("Runtime Error (fail creating double value: %s)", capturePythonError()));
+      return;
+    }
+    PyDict_SetItemString(jexlContext, key.c_str(), value);
+    Py_DECREF(value);
+  }
 }
 
 
@@ -150,14 +141,28 @@ void ExprContextObject::add(const std::string& key)
 *
 * ExprContextObject::add -
 */
-void ExprContextObject::add(const std::string& key, ExprContextObject exprContextObject)
+void ExprContextObject::add(const std::string &key, bool _value)
 {
-  if (jexlContext == NULL)
+  if (legacy)
   {
-    return;
+    repl.insert(std::pair<std::string, std::string>(key, _value? "true": "false"));
   }
-  LM_T(LmtExpr, ("adding to expression context object (object): %s=%s", key.c_str(), exprContextObject.toString().c_str()));
-  PyDict_SetItemString(jexlContext, key.c_str(), exprContextObject.get());
+  else
+  {
+    if (jexlContext == NULL)
+    {
+      return;
+    }
+    LM_T(LmtExpr, ("adding to expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
+    if (_value)
+    {
+      PyDict_SetItemString(jexlContext, key.c_str(), Py_True);
+    }
+    else
+    {
+      PyDict_SetItemString(jexlContext, key.c_str(), Py_False);
+    }
+  }
 }
 
 
@@ -166,16 +171,81 @@ void ExprContextObject::add(const std::string& key, ExprContextObject exprContex
 *
 * ExprContextObject::add -
 */
-void ExprContextObject::add(const std::string& key, ExprContextList exprContextList)
+void ExprContextObject::add(const std::string &key)
 {
-  if (jexlContext == NULL)
+  if (legacy)
   {
-    return;
+    repl.insert(std::pair<std::string, std::string>(key, "null"));
   }
-  LM_T(LmtExpr, ("adding to expression context object (list): %s=%s", key.c_str(), exprContextList.toString().c_str()));
-  PyDict_SetItemString(jexlContext, key.c_str(), exprContextList.get());
+  else
+  {
+    if (jexlContext == NULL)
+    {
+      return;
+    }
+    LM_T(LmtExpr, ("adding to expression context object (none): %s", key.c_str()));
+    PyDict_SetItemString(jexlContext, key.c_str(), Py_None);
+  }
 }
 
+
+
+/* ****************************************************************************
+*
+* ExprContextObject::add -
+*/
+void ExprContextObject::add(const std::string &key, ExprContextObject exprContextObject)
+{
+  if (legacy)
+  {
+    // FIXME PR: not sure if this is going to work...
+    repl.insert(std::pair<std::string, std::string>(key, exprContextObject.toString()));
+  }
+  else
+  {
+    if (jexlContext == NULL)
+    {
+      return;
+    }
+    LM_T(LmtExpr, ("adding to expression context object (object): %s=%s", key.c_str(), exprContextObject.toString().c_str()));
+    PyDict_SetItemString(jexlContext, key.c_str(), exprContextObject.getJexlContext());
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* ExprContextObject::add -
+*/
+void ExprContextObject::add(const std::string &key, ExprContextList exprContextList)
+{
+  if (legacy)
+  {
+    // FIXME PR: not sure if this is going to work...
+    repl.insert(std::pair<std::string, std::string>(key, exprContextList.toString()));
+  }
+  else
+  {
+    if (jexlContext == NULL)
+    {
+      return;
+    }
+    LM_T(LmtExpr, ("adding to expression context object (list): %s=%s", key.c_str(), exprContextList.toString().c_str()));
+    PyDict_SetItemString(jexlContext, key.c_str(), exprContextList.get());
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* ExprContextObject::isLegacy -
+*/
+bool ExprContextObject::isLegacy(void)
+{
+  return legacy;
+}
 
 
 /* ****************************************************************************
@@ -247,7 +317,7 @@ PyObject* ExprContextList::get(void)
 *
 * ExprContextList::add -
 */
-void ExprContextList::add(const std::string& _value)
+void ExprContextList::add(const std::string &_value)
 {
   if (jexlContext == NULL)
   {
@@ -255,7 +325,7 @@ void ExprContextList::add(const std::string& _value)
   }
   LM_T(LmtExpr, ("adding to expression context list (string): %s=", _value.c_str()));
   PyObject* value = Py_BuildValue("s", _value.c_str());
-    if (value == NULL)
+  if (value == NULL)
   {
     LM_E(("Runtime Error (fail creating string value: %s)", capturePythonError()));
     return;
@@ -278,7 +348,7 @@ void ExprContextList::add(double _value)
   }
   LM_T(LmtExpr, ("adding to expression context list (double): %f", _value));
   PyObject* value = Py_BuildValue("d", _value);
-    if (value == NULL)
+  if (value == NULL)
   {
     LM_E(("Runtime Error (fail creating double value: %s)", capturePythonError()));
     return;
@@ -286,7 +356,6 @@ void ExprContextList::add(double _value)
   PyList_Append(jexlContext, value);
   Py_DECREF(value);
 }
-
 
 
 
@@ -300,7 +369,7 @@ void ExprContextList::add(bool _value)
   {
     return;
   }
-  LM_T(LmtExpr, ("adding to expression context list (bool): %s", _value? "true" : "false"));
+  LM_T(LmtExpr, ("adding to expression context list (bool): %s", _value ? "true" : "false"));
   if (_value)
   {
     PyList_Append(jexlContext, Py_True);
@@ -340,7 +409,7 @@ void ExprContextList::add(ExprContextObject exprContextObject)
     return;
   }
   LM_T(LmtExpr, ("adding to expression context list (object): %s", exprContextObject.toString().c_str()));
-  PyList_Append(jexlContext, exprContextObject.get());
+  PyList_Append(jexlContext, exprContextObject.getJexlContext());
 }
 
 

@@ -60,7 +60,15 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
     }
     else
     {
-      return r.toString();
+      // in legacy mode an extra remove quotes step is needed
+      if (exprContextObjectP->isLegacy())
+      {
+        return removeQuotes(r.toString());
+      }
+      else
+      {
+        return r.toString();
+      }
     }
   }
   else if (exprContextObjectP != NULL)

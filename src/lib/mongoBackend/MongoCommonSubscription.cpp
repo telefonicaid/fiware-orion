@@ -183,6 +183,9 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
 
     b->append(CSUB_NGSI, bob.obj());
   }
+
+  b->append(CSUB_EXPRLANG, httpInfo.exprLang);
+  LM_T(LmtMongo, ("Subscription exprLang: %s", httpInfo.exprLang.c_str()));
 }
 
 
@@ -255,6 +258,9 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
 
     b->append(CSUB_NGSI, bob.obj());
   }
+
+  b->append(CSUB_EXPRLANG, mqttInfo.exprLang);
+  LM_T(LmtMongo, ("Subscription exprLang: %s", mqttInfo.exprLang.c_str()));
 }
 
 
@@ -624,6 +630,7 @@ void setOnlyChanged(const Subscription& sub, orion::BSONObjBuilder* b)
   b->append(CSUB_ONLYCHANGED, bl);
   LM_T(LmtMongo, ("Subscription onlyChanged: %s", bl ? "true" : "false"));
 }
+
 
 
 /* ****************************************************************************

@@ -54,16 +54,14 @@ void ExprManager::init(void)
   pyjexlModule = PyImport_ImportModule("pyjexl");
   if (pyjexlModule == NULL)
   {
-    const char* error = capturePythonError();
-    LM_X(1, ("Fatal Error (error importing pyjexl module: %s)", error));
+    LM_X(1, ("Fatal Error (error importing pyjexl module: %s)", capturePythonError()));
   }
   LM_T(LmtExpr, ("pyjexl module has been loaded"));
 
   jexlEngine = PyObject_CallMethod(pyjexlModule, "JEXL", NULL);
   if (jexlEngine == NULL)
   {
-    const char* error = capturePythonError();
-    LM_X(1, ("Fatal Error (error creating jexlEngine: %s)", error));
+    LM_X(1, ("Fatal Error (error creating jexlEngine: %s)", capturePythonError()));
   }
   LM_T(LmtExpr, ("jexl engine has been created"));
 }
@@ -79,27 +77,45 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
   ExprResult r;
   r.valueType = orion::ValueTypeNull;
 
-  LM_T(LmtExpr, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
-
-  PyObject* expression = Py_BuildValue("s", _expression.c_str());
-  if (expression == NULL)
+  if (exprContextObjectP->isLegacy())
   {
-    LM_W(("error building JEXL expression: %s", capturePythonError()));
-    return r;
-  }
+    // std::map based evaluation. Only pure replacement is supported
+    LM_T(LmtExpr, ("evaluating legacy expresion: <%s>", _expression.c_str()));
 
-  PyObject* result = PyObject_CallMethod(jexlEngine, "evaluate", "OO", expression, exprContextObjectP->get());
-  Py_XDECREF(expression);
-  if (result == NULL)
+    std::map<std::string, std::string>* replacementsP = exprContextObjectP->getMap();
+
+    std::map<std::string, std::string>::iterator iter = replacementsP->find(_expression);
+    if (iter != replacementsP->end())
+    {
+      r.valueType   = orion::ValueTypeString;
+      r.stringValue = iter->second;
+    }
+  }
+  else
   {
-    LM_W(("error evaluating JEXL expression: %s", capturePythonError()));
-    return r;
+    // JEXL based evaluation
+    LM_T(LmtExpr, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
+
+    PyObject* expression = Py_BuildValue("s", _expression.c_str());
+    if (expression == NULL)
+    {
+      LM_W(("error building JEXL expression: %s", capturePythonError()));
+      return r;
+    }
+
+    PyObject* result = PyObject_CallMethod(jexlEngine, "evaluate", "OO", expression, exprContextObjectP->getJexlContext());
+    Py_XDECREF(expression);
+    if (result == NULL)
+    {
+      LM_W(("error evaluating JEXL expression: %s", capturePythonError()));
+      return r;
+    }
+
+    r.fill(result);
+
+    // FIXME PR: does this Py_XDECREF() recursively in the case of dicts or lists?
+    Py_XDECREF(result);
   }
-
-  r.fill(result);
-
-  // FIXME PR: does this Py_XDECREF() recursively in the case of dicts or lists?
-  Py_XDECREF(result);
 
   return r;
 }

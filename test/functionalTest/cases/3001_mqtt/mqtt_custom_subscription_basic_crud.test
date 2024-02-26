@@ -282,7 +282,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2428
+Content-Length: 2536
 
 [
     {
@@ -295,6 +295,7 @@ Content-Length: 2428
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
+                "exprLang": "jexl",
                 "payload": "temperature:${temperature}",
                 "qos": 0,
                 "retain": false,
@@ -327,6 +328,7 @@ Content-Length: 2428
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
+                "exprLang": "jexl",
                 "payload": "temperature:${temperature}",
                 "qos": 2,
                 "retain": false,
@@ -359,6 +361,7 @@ Content-Length: 2428
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
+                "exprLang": "jexl",
                 "qos": 0,
                 "retain": false,
                 "topic": "/orion/${dest}",
@@ -390,6 +393,7 @@ Content-Length: 2428
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
+                "exprLang": "jexl",
                 "qos": 2,
                 "retain": false,
                 "topic": "/orion/${dest}",
@@ -421,6 +425,7 @@ Content-Length: 2428
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
+                "exprLang": "jexl",
                 "payload": null,
                 "qos": 0,
                 "retain": false,
@@ -453,6 +458,7 @@ Content-Length: 2428
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
+                "exprLang": "jexl",
                 "payload": null,
                 "qos": 2,
                 "retain": false,

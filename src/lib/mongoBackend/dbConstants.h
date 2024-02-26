@@ -119,6 +119,7 @@
 #define CSUB_NGSI                    "ngsi"
 #define CSUB_BLACKLIST               "blacklist"
 #define CSUB_ONLYCHANGED             "onlyChanged"
+#define CSUB_EXPRLANG                "exprLang"
 #define CSUB_COVERED                 "covered"
 #define CSUB_NOTIFYONMETADATACHANGE  "notifyOnMetadataChange"
 #define CSUB_LASTFAILURE             "lastFailure"

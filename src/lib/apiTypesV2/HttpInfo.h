@@ -57,6 +57,8 @@ struct HttpInfo
   bool                                includePayload;
   long long                           timeout;
 
+  std::string                         exprLang;
+
   HttpInfo();
 
   std::string  toJson();

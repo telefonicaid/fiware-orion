@@ -159,7 +159,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 1012
+Content-Length: 1048
 
 [
     {
@@ -171,6 +171,7 @@ Content-Length: 1012
             "attrsFormat": "legacy",
             "covered": false,
             "httpCustom": {
+                "exprLang": "jexl",
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "REGEX(.*)",
@@ -201,6 +202,7 @@ Content-Length: 1012
             "attrsFormat": "legacy",
             "covered": false,
             "httpCustom": {
+                "exprLang": "jexl",
                 "payload": "{ %22A1%22: %22Value of A1: ${A1}%22 }",
                 "url": "http://localhost:9997/notify"
             },

@@ -31,17 +31,17 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# Same as legacy_expr_attrs_weird_syntax.test, but using jexl expression language
+# Same as jexl_expr_attrs_weird_syntax.test, but using legacy expression language
 #
-# 01. 01. Create custom sub with custom expression: R1=A-B and R2=A:B
+# 01. Create custom sub with custom legacy expression: R1=A-B and R2=A:B
 # 02. Create entity E1 with A-B 1 and A:B 2
 # 03. Update entity E1 with A-B 3 and A:B 4
-# 04. Dump accumulator and see notifications (R1 null, R2 null and R1 null, R2 null)
+# 04. Dump accumulator and see notifications (R1 1, R2 2 and R1 3, R2 4)
 #
 
 
-echo "01. Create custom sub with custom expression: R1=A-B and R2=A:B"
-echo "==============================================================="
+echo "01. Create custom sub with custom legacy expression: R1=A-B and R2=A:B"
+echo "======================================================================"
 payload='{
   "subject": {
     "entities": [
@@ -54,6 +54,7 @@ payload='{
   "notification": {
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "exprLang": "legacy",
       "ngsi": {
         "R1": {
           "value": "${A-B}",
@@ -109,16 +110,16 @@ echo
 echo
 
 
-echo "04. Dump accumulator and see notifications (R1 null, R2 null and R1 null, R2 null)"
-echo "=================================================================================="
+echo "04. Dump accumulator and see notifications (R1 1, R2 2 and R1 3, R2 4)"
+echo "======================================================================"
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom sub with custom expression: R1=A-B and R2=A:B
-===============================================================
+01. Create custom sub with custom legacy expression: R1=A-B and R2=A:B
+======================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -145,11 +146,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Dump accumulator and see notifications (R1 null, R2 null and R1 null, R2 null)
-==================================================================================
+04. Dump accumulator and see notifications (R1 1, R2 2 and R1 3, R2 4)
+======================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 185
+Content-Length: 179
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -163,12 +164,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "R1": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": null
+                "value": 1
             },
             "R2": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": null
+                "value": 2
             },
             "id": "E1",
             "type": "T"
@@ -179,7 +180,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 185
+Content-Length: 179
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -193,12 +194,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "R1": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": null
+                "value": 3
             },
             "R2": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": null
+                "value": 4
             },
             "id": "E1",
             "type": "T"

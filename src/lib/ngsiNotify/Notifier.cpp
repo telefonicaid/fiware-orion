@@ -315,8 +315,10 @@ static SenderThreadParams* buildSenderParamsCustom
   std::map<std::string, std::string>  headers;
   Entity&                             en      = notifyCerP->entity;
 
+  const std::string exprLang = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.exprLang : notification.mqttInfo.exprLang;
+
   // Used by several macroSubstitute() calls along this function
-  ExprContextObject exprContext;
+  ExprContextObject exprContext(exprLang == "legacy");
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
   exprContext.add("service", tenant);
