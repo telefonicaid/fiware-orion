@@ -20,11 +20,11 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-
 set -e
 
-yum -y install http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm
-yum -y install boost-devel scons
+yum -y install --nogpgcheck http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm
+yum -y install --nogpgcheck boost-devel
+yum -y install --nogpgcheck scons
 
 echo -e "\e[1;32m Builder: installing mongo cxx driver \e[0m"
 git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT_FOLDER}/mongo-cxx-driver
