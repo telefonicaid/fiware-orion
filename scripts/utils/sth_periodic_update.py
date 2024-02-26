@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -69,11 +69,11 @@ def update_entity():
         'value': value
     }
 
-    print '%s: Updating attribute %s in entity %s with value %d' % (datetime.now().isoformat(), entity, attribute, value)
+    print('%s: Updating attribute %s in entity %s with value %d' % (datetime.now().isoformat(), entity, attribute, value))
 
     res = requests.put(cb_endpoint + '/v2/entities/' + entity + '/attrs/' + attribute, json=body, headers=headers, verify=False)
     if res.status_code != 204:
-        print '*** Error updating entity (%d): %s' % (res.status_code, res.json())
+        print('*** Error updating entity (%d): %s' % (res.status_code, res.json()))
         return False
 
     return True
@@ -83,5 +83,5 @@ def update_entity():
 
 while True:
     if not update_entity():
-       break;
+        break
     sleep(interval)

@@ -20,7 +20,7 @@ You basically need to implement two things:
 * a **new item** in the `PaArgument` vector `paArgs`
 
 If the new CLI parameter is a boolean one, like `-v` (verbose), a `bool` variable is needed,
-if it's a text parameter, like `-dbHost <host name>`, a char-vector is used, and so on.
+if it's a text parameter, like `-dbURI <MongoDB URI>`, a char-vector is used, and so on.
 
 The easiest way is to simply copy an older CLI parameter of the same type.
 

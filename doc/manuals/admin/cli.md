@@ -49,36 +49,9 @@ The list of available options is the following:
 -   **-dbURI <uri>** : The URI to use the MongoDB.
     If the URI contains the string `${PWD}`, it will be replaced with the password
     specified in `-dbpwd` or the environment variable `ORION_MONGO_PASSWORD`.
-    This option cannot be combined with `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`,
-    `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` (if you attempt to do that
-    Orion will exit with an error on startup).
--   **-dbhost <host>**. The MongoDB host and port to use, e.g. `-dbhost
-    localhost:12345`.
--   **-rplSet <replicat_set>**. If used, Orion CB connnects to a
-    MongoDB replica set (instead of a stand-alone MongoDB instance).
-    The name of the replica set to use is the value of the parameter. In
-    this case, the -dbhost parameter can be a list of hosts (separated
-    by ",") which are used as seed for the replica set.
--   **-dbTimeout <interval>**. Only used in the case of using replica
-    set (-rplSet), ignored otherwise. It specifies the timeout in
-    milliseconds for connections to the replica set.
--   **-dbuser <user>**. The MongoDB user to use. If your MongoDB doesn't
-    use authorization then this option must be avoided. See [database
-    authorization section](database_admin.md#database-authorization).
 -   **-dbpwd <pass>**. The MongoDB password to use. If your MongoDB
     doesn't use authorization then this option must be avoided. See [database
-    authorization section]( database_admin.md#database-authorization).
--   **-dbAuthMech <mechanism>**. The MongoDB authentication mechanism to use in the case
-    of providing `-dbuser` and `-dbpwd`. Alternatives are SCRAM-SHA-1 or SCRAM-SHA-256.
--   **-dbAuthDb <database>**. Specifies the database to use for authentication in the case
-    of providing `-dbuser` and `-dbpwd`.
--   **-dbSSL**. Enable SSL in the connection to MongoDB. You have to use this option if your
-    MongoDB server or replica set is using SSL (or, the other way around, you have not to use
-    this option if your MongoDB server or replicat set is not using SSL). Note there is
-    currently a limitation: Orion uses `tlsAllowInvalidCertificates=true` in this case,
-    so the certificate used by MongoDB server is not being validated.
--   **-dbDisableRetryWrites**. Set retryWrite parameter to false in DB connections (not
-    recommended, only to keep compatibility with old MongoDB instances)
+    authorization section](database_admin.md#database-authorization).
 -   **-dbPoolSize <size>**. Database connection pool. Default size of
     the pool is 10 connections.
 -   **-writeConcern <0|1>**. Write concern for MongoDB write operations:
@@ -218,15 +191,8 @@ Two facts have to be taken into account:
 |	ORION_PORT	|	port	|
 |	ORION_PID_PATH	|	pidpath	|
 |	ORION_MONGO_URI	|	dbURI	|
-|	ORION_MONGO_HOST	|	dbhost	|
-|	ORION_MONGO_REPLICA_SET	|	rplSet	|
-|	ORION_MONGO_USER	|	dbuser	|
 |	ORION_MONGO_PASSWORD	|	dbpwd	|
-|	ORION_MONGO_AUTH_MECH	|	dbAuthMech	|
-|	ORION_MONGO_AUTH_SOURCE	|	dbAuthDb	|
-|	ORION_MONGO_SSL	|	dbSSL	|
 |	ORION_MONGO_DB	|	db	|
-|	ORION_MONGO_TIMEOUT	|	dbTimeout	|
 |	ORION_MONGO_POOL_SIZE	|	dbPoolSize	|
 |	ORION_USEIPV4	|	ipv4	|
 |	ORION_USEIPV6	|	ipv6	|

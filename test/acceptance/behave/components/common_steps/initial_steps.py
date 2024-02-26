@@ -82,7 +82,7 @@ def start_context_broker(context):
     __logger__.debug("Starting contextBroker per command line interface...")
     props_cb["CB_EXTRA_OPS"] = props_cb["CB_EXTRA_OPS"].replace('"', "")
     # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
-    command = "contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %\
+    command = "contextBroker -port %s -logDir %s -pidpath %s -dbURI mondodb://%s -db %s %s -harakiri" %\
               (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
                props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"])
     __logger__.debug("command: %s" % command)

@@ -72,7 +72,7 @@ unit:
 	# ft_env needed for pyjexl module. Very important to "chain" the two commands with '; \'
 	# otherwise it seems unitTest doesn't get the venv and it uses default Python in the system
 	. /opt/ft_env/bin/activate ; \
-	BUILD_UNIT/test/unittests/unitTest -t 0-255 -dbhost ${MONGO_HOST} --gtest_output=xml:/tmp/builder/logs/unit.xml
+	BUILD_UNIT/test/unittests/unitTest -t 0-255 -dbURI mongodb://${MONGO_HOST} --gtest_output=xml:/tmp/builder/logs/unit.xml
 
 build_functional: prepare
 	@echo '------------------------------------- make build_functional ----------------------------'
