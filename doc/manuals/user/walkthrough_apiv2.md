@@ -209,11 +209,11 @@ Some additional remarks:
     Adjust this in the curl command line if you are using a
     different port.
 
--   In order to pretty-print JSON in responses, you can use Python with
+-   In order to pretty-print JSON in responses, you can use Python3 with
     msjon.tool (examples along with tutorial are using this style):
 
 ```
-(curl ... | python -mjson.tool) <<EOF
+(curl ... | python3 -mjson.tool) <<EOF
 ...
 EOF
 ```
@@ -314,14 +314,14 @@ graphical user interface). The `GET /v2/entities/{id}` request is used in
 this case, e.g. to get context information for Room1:
 
 ```
-curl localhost:1026/v2/entities/Room1?type=Room -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1?type=Room -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 Actually, you don't need to specify the type, as in this case there is no
 ambiguity using just the ID, so you can also do:
 
 ```
-curl localhost:1026/v2/entities/Room1 -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1 -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 In both cases,the response includes all the attributes belonging to Room1 and we can
@@ -349,7 +349,7 @@ entity creation with updateContext (23ºC and 720 mmHg).
 The `keyValues` option can be used in order to get a more compact and brief representation, including just attribute values:
 
 ```
-curl localhost:1026/v2/entities/Room1?options=keyValues -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1?options=keyValues -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 Response:
@@ -368,7 +368,7 @@ values. In this case, the `attrs` URL parameter needs to be used to specify the 
 
 ```
 curl 'localhost:1026/v2/entities/Room1?options=values&attrs=temperature,pressure' -s -S  \
-    -H 'Accept: application/json' | python -mjson.tool
+    -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 Response:
@@ -386,7 +386,7 @@ Request:
 
 ```
 curl 'localhost:1026/v2/entities/Room1?options=values&attrs=pressure,temperature' -s -S  \
-    -H 'Accept: application/json' | python -mjson.tool
+    -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 Response:
@@ -403,7 +403,7 @@ You can also request a single attribute, using the `GET /v2/entities/{id}/attrs/
 get only the temperature:
 
 ```
-curl localhost:1026/v2/entities/Room1/attrs/temperature -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1/attrs/temperature -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 whose response is as follows:
@@ -421,7 +421,7 @@ you need to use `Accept: text/plain` as the value of the attribute is of that ki
 
 
 ```
-curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Accept: text/plain' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Accept: text/plain' | python3 -mjson.tool
 ```
 
 whose response is simply:
@@ -436,7 +436,7 @@ non-existing entity or attribute, as shown in the following cases below.
 Request:
 
 ```
-curl localhost:1026/v2/entities/Room5 -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room5 -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 Response:
@@ -451,7 +451,7 @@ Response:
 Request:
 
 ```
-curl localhost:1026/v2/entities/Room1/attrs/humidity -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities/Room1/attrs/humidity -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 Response:
@@ -472,7 +472,7 @@ In both cases, the HTTP response code (not visible in the example) is 404 Not Fo
 You can get all the entities using the `GET /v2/entities` operation
 
 ```
-curl localhost:1026/v2/entities -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 In our case, both Room1 and Room2 will be returned:
@@ -521,7 +521,7 @@ particular:
   you can use:
 
 ```
-curl localhost:1026/v2/entities?type=Room -s -S  -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities?type=Room -s -S  -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 * You can filter using entity id patterns, using the `idPattern` URL parameter
@@ -530,7 +530,7 @@ curl localhost:1026/v2/entities?type=Room -s -S  -H 'Accept: application/json' |
   (in this case retrieving Room2) you can use (note the `-g` in curl command line
   to avoid problems with brackets):
 ```
-curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 * You can filter using attribute filters, using the URL parameter `q`. For
@@ -539,7 +539,7 @@ curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S -H 'Accept: applic
   For example, to get all entities whose temperature is above 22 (in this case
   retriving Room1). you can use:
 ```
-curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  -H 'Accept: application/json' | python -mjson.tool
+curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 * You can filter by geographical location. This is an advanced topic, described in
@@ -882,7 +882,7 @@ that exist in the Orion Context Broker in a given moment. For example, let's ass
 we have three entities of type Room and two entities of type Car:
 
 ```
-curl localhost:1026/v2/types -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/types -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 Response:
@@ -940,7 +940,7 @@ If you only need a list of the entity types (without any extra attribute details
 you can use:
 
 ```
-curl localhost:1026/v2/types?options=values -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/types?options=values -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 and get:
@@ -959,7 +959,7 @@ In addition, you can use the following operation to get detailed
 information of a single type:
 
 ```
-curl localhost:1026/v2/types/Room -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/types/Room -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 The response will be:
@@ -1154,7 +1154,7 @@ Write it down because you will need it later in this tutorial.
 You may retrieve the list of existing registrations using the following request:
 
 ```
-curl localhost:1026/v2/registrations -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/registrations -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 In this particular case you will retrieve only one registration (as you have created only one) but note that the
@@ -1164,7 +1164,7 @@ In addition, you may retrieve a single registration using the following request 
 by the actual registration ID in your case):
 
 ```
-curl localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 Orion not only stores information about sources of entities/attributes in the form of registrations, but also
@@ -1176,7 +1176,7 @@ Finally, you can delete an existing registration with the following request (rep
 registration ID in your case):
 
 ```
-curl -X DELETE localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: application/json' | python -mjson.tool
+curl -X DELETE localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: application/json' | python3 -mjson.tool
 ```
 
 [Top](#top)
