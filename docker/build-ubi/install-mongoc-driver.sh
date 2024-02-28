@@ -25,18 +25,18 @@ set -e
 
 yum install --nogpgcheck -y openssl-devel
 
-wget https://cmake.org/files/v3.14/cmake-3.14.5.tar.gz
+wget https://cmake.org/files/v3.15/cmake-3.15.7.tar.gz
 tar zxvf cmake-3.*
-cd cmake-3.14.5
+cd cmake-3.15.7
 ./bootstrap --prefix=/usr/local
 make -j$(nproc)
 make install
 
 echo
 echo -e "\e[1;32m Builder: installing mongo c driver \e[0m"
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.22.0/mongo-c-driver-1.22.0.tar.gz
-tar xzf mongo-c-driver-1.22.0.tar.gz
-cd mongo-c-driver-1.22.0
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.24.2/mongo-c-driver-1.24.2.tar.gz
+tar xzf mongo-c-driver-1.24.2.tar.gz
+cd mongo-c-driver-1.24.2
 mkdir cmake-build
 cd cmake-build
 cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
