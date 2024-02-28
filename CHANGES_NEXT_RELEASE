@@ -10,6 +10,7 @@
   * Support for the new URL parameter "format" for output formats (normalized, concise, simplified)
   * Support for JsonProperty attribute type
   * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language
+  * Forbidden to DELETE the Core Context !!!  (it can be reloaded)
 
 ## Notes
   * TRoE is still not prepared for attributes of type Vocab/Json/Language, so, attributes of those types are not stored in the historical database
