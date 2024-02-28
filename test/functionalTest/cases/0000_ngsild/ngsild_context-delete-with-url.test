@@ -34,6 +34,7 @@ orionldStart CB
 # 01. Create an entity with a context, only to put the context in the context cache
 # 02. DELETE the context from the cache with the URL
 # 03. Attempt to GET the context - see 404 Not Found
+# 04. Attempt to DELETE the Core Context
 #
 
 echo "01. Create an entity with a context, only to put the context in the context cache"
@@ -61,6 +62,13 @@ echo
 echo "03. Attempt to GET the context - see 404 Not Found"
 echo "=================================================="
 orionCurl --url '/ngsi-ld/v1/jsonldContexts?location=true&url=https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld'
+echo
+echo
+
+
+echo "04. Attempt to DELETE the Core Context"
+echo "======================================"
+orionCurl --url '/ngsi-ld/v1/jsonldContexts/https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld' -X DELETE
 echo
 echo
 
@@ -93,6 +101,20 @@ Date: REGEX(.*)
     "detail": "https://fiware.github.io/NGSI-LD_TestSuite/ldContext/testFullContext.jsonld",
     "title": "Context Not Found",
     "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
+}
+
+
+04. Attempt to DELETE the Core Context
+======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 208
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "The Core Context can be reloaded, please use the URI param '?reload=true' for that",
+    "title": "The NGSI-LD Core Context cannot be deleted",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
 

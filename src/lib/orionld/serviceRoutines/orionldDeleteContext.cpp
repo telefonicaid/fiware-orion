@@ -32,6 +32,7 @@ extern "C"
 
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
+#include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextFromUrl.h"               // orionldContextFromUrl
 #include "orionld/contextCache/orionldContextCache.h"            // Context Cache Internals
 #include "orionld/contextCache/orionldContextCacheLookup.h"      // orionldContextCacheLookup
@@ -56,6 +57,11 @@ bool orionldDeleteContext(void)
     return false;
   }
 
+  if ((oldContextP == orionldCoreContextP) && (orionldState.uriParams.reload == false))
+  {
+    orionldError(OrionldBadRequestData, "The NGSI-LD Core Context cannot be deleted", "The Core Context can be reloaded, please use the URI param '?reload=true' for that", 400);
+    return false;
+  }
 
   if (orionldState.uriParams.reload == true)
   {
