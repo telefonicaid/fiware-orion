@@ -25,7 +25,7 @@ set -e
 
 echo
 echo -e "\e[1;32m Debian Builder: installing k libs \e[0m"
-for kproj in kbase klog kalloc kjson khash
+for kproj in kbase klog kalloc kjson khash kargs ktrace
 do
     git clone https://gitlab.com/kzangeli/${kproj}.git ${ROOT_FOLDER}/$kproj
 done
@@ -44,5 +44,22 @@ done
 #
 cd ${ROOT_FOLDER}/kjson
 git checkout release/0.8.2
+make
+make install
+
+#
+# kargs
+#
+cd ${ROOT_FOLDER}/kargs
+git checkout release/0.1
+make
+make install
+
+
+#
+# ktrace
+#
+cd ${ROOT_FOLDER}/ktrace
+git checkout release/0.1
 make
 make install

@@ -22,7 +22,7 @@
 
 set -e
 yum makecache --refresh
-yum -y install gmp gnutls gnutls-utils
+yum -y install gmp gnutls
 
 #
 # gnutls-devel is not available in the ubi-repos, need to find it elsewhere
@@ -35,9 +35,17 @@ yum -y install https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packag
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/nettle-devel-3.4.1-7.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/libidn2-devel-2.2.0-1.el8.x86_64.rpm
 yum -y install https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/libtasn1-devel-4.13-3.el8.x86_64.rpm
-yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-c++-3.6.16-6.el8_7.x86_64.rpm
-yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-devel-3.6.16-6.el8_7.x86_64.rpm
 
+yum -y install https://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/x86_64/getPackage/gnutls-3.6.16-6.el8_7.x86_64.rpm
+yum -y install https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/getPackage/gnutls-c++-3.6.16-6.el8_7.x86_64.rpm
+yum -y install https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/getPackage/gnutls-dane-3.6.16-6.el8_7.x86_64.rpm
+yum -y install https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/getPackage/gnutls-devel-3.6.16-6.el8_7.x86_64.rpm
+
+
+# yum -y install https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/getPackage/gnutls-devel-3.6.16-6.el8_7.x86_64.rpm
+
+#yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-devel-3.6.16-6.el8_7.x86_64.rpm
+#yum -y install https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gnutls-c++-3.6.16-6.el8_7.x86_64.rpm
 #yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/gmp-devel-6.1.2-10.el8.x86_64.rpm
 #yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/pkgconf-pkg-config-1.4.2-1.el8.x86_64.rpm
 #yum -y install http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/nettle-devel-3.4.1-7.el8.x86_64.rpm
