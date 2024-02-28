@@ -49,7 +49,7 @@ public:
   PyObject*                            getJexlContext(void);
   std::map<std::string, std::string>*  getMap(void);
 
-  void      add(const std::string& key, const std::string& value);
+  void      add(const std::string& key, const std::string& value, bool raw = false);
   void      add(const std::string& key, double value);
   void      add(const std::string& key, bool value);
   void      add(const std::string& key);
@@ -57,8 +57,6 @@ public:
   void      add(const std::string& key, ExprContextList exprContextList);
 
   bool      isLegacy(void);
-
-  std::string toString(void);
 
   void      release(void);
 };
@@ -78,8 +76,6 @@ public:
   void      add(void);
   void      add(ExprContextObject exprContextObject);
   void      add(ExprContextList exprContextList);
-
-  std::string toString(void);
 
   void      release(void);
 };

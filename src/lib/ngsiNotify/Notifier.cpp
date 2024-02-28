@@ -328,7 +328,9 @@ static SenderThreadParams* buildSenderParamsCustom
   exprContext.add("authToken", xauthToken);
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
-    en.attributeVector[ix]->addToContext(&exprContext);
+    // FIXME PR: force legacy mode to temporarly test all ftest in legacy mode
+    //en.attributeVector[ix]->addToContext(&exprContext, exprLang == "legacy");
+    en.attributeVector[ix]->addToContext(&exprContext, true);
   }
 
   //

@@ -1296,17 +1296,32 @@ std::string ContextAttribute::toJsonAsValue
 *
 * Pretty similar in structure to toJsonValue
 */
-void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP)
+void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP, bool legacy)
 {
   if (compoundValueP != NULL)
   {
+    // In legacy expression, objects are vector are strings to be stored in a std::map<std::string,std::string>
     if (valueType == orion::ValueTypeObject)
     {
-      exprContextObjectP->add(name, compoundValueP->toExprContextObject());
+      if (legacy)
+      {
+        exprContextObjectP->add(name, compoundValueP->toJson(), true);
+      }
+      else
+      {
+        exprContextObjectP->add(name, compoundValueP->toExprContextObject());
+      }
     }
     else  // valueType == orion::ValueTypeVector
     {
-      exprContextObjectP->add(name, compoundValueP->toExprContextList());
+      if (legacy)
+      {
+        exprContextObjectP->add(name, compoundValueP->toJson(), true);
+      }
+      else
+      {
+        exprContextObjectP->add(name, compoundValueP->toExprContextList());
+      }
     }
   }
   else if (valueType == orion::ValueTypeNumber)

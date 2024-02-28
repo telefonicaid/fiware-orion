@@ -81,11 +81,18 @@ std::map<std::string,std::string>* ExprContextObject::getMap(void)
 *
 * ExprContextObject::add -
 */
-void ExprContextObject::add(const std::string &key, const std::string &_value)
+void ExprContextObject::add(const std::string &key, const std::string &_value, bool raw)
 {
   if (legacy)
   {
-    repl.insert(std::pair<std::string, std::string>(key, _value));
+    std::string value = _value;
+    if (!raw)
+    {
+      // This is the case of regular string. The raw case is for JSON generated from compound values
+      value = '"' + _value + '"';
+    }
+    LM_T(LmtExpr, ("adding to legacy expression context object (string): %s=%s", key.c_str(), value.c_str()));
+    repl.insert(std::pair<std::string, std::string>(key, value));
   }
   else
   {
@@ -93,7 +100,7 @@ void ExprContextObject::add(const std::string &key, const std::string &_value)
     {
       return;
     }
-    LM_T(LmtExpr, ("adding to expression context object (string): %s=%s", key.c_str(), _value.c_str()));
+    LM_T(LmtExpr, ("adding to JEXL expression context object (string): %s=%s", key.c_str(), _value.c_str()));
     PyObject* value = Py_BuildValue("s", _value.c_str());
     if (value == NULL)
     {
@@ -115,6 +122,7 @@ void ExprContextObject::add(const std::string &key, double _value)
 {
   if (legacy)
   {
+    LM_T(LmtExpr, ("adding to legacy expression context object (double): %s=%f", key.c_str(), _value));
     repl.insert(std::pair<std::string, std::string>(key, double2string(_value)));
   }
   else
@@ -123,7 +131,7 @@ void ExprContextObject::add(const std::string &key, double _value)
     {
       return;
     }
-    LM_T(LmtExpr, ("adding to expression context object (double): %s=%f", key.c_str(), _value));
+    LM_T(LmtExpr, ("adding to JEXL expression context object (double): %s=%f", key.c_str(), _value));
     PyObject* value = Py_BuildValue("d", _value);
     if (value == NULL)
     {
@@ -145,6 +153,7 @@ void ExprContextObject::add(const std::string &key, bool _value)
 {
   if (legacy)
   {
+    LM_T(LmtExpr, ("adding to legacy expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
     repl.insert(std::pair<std::string, std::string>(key, _value? "true": "false"));
   }
   else
@@ -153,7 +162,7 @@ void ExprContextObject::add(const std::string &key, bool _value)
     {
       return;
     }
-    LM_T(LmtExpr, ("adding to expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
+    LM_T(LmtExpr, ("adding to JEXL expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
     if (_value)
     {
       PyDict_SetItemString(jexlContext, key.c_str(), Py_True);
@@ -175,6 +184,7 @@ void ExprContextObject::add(const std::string &key)
 {
   if (legacy)
   {
+    LM_T(LmtExpr, ("adding to legacy expression context object (none): %s", key.c_str()));
     repl.insert(std::pair<std::string, std::string>(key, "null"));
   }
   else
@@ -183,7 +193,7 @@ void ExprContextObject::add(const std::string &key)
     {
       return;
     }
-    LM_T(LmtExpr, ("adding to expression context object (none): %s", key.c_str()));
+    LM_T(LmtExpr, ("adding to JEXL expression context object (none): %s", key.c_str()));
     PyDict_SetItemString(jexlContext, key.c_str(), Py_None);
   }
 }
@@ -198,8 +208,7 @@ void ExprContextObject::add(const std::string &key, ExprContextObject exprContex
 {
   if (legacy)
   {
-    // FIXME PR: not sure if this is going to work...
-    repl.insert(std::pair<std::string, std::string>(key, exprContextObject.toString()));
+    LM_E(("Runtime Error (this method must not be invoked in legacy mode)"));
   }
   else
   {
@@ -207,7 +216,8 @@ void ExprContextObject::add(const std::string &key, ExprContextObject exprContex
     {
       return;
     }
-    LM_T(LmtExpr, ("adding to expression context object (object): %s=%s", key.c_str(), exprContextObject.toString().c_str()));
+    // FIXME P3: improve this implemeting a toString() method for ExprContextObject
+    LM_T(LmtExpr, ("adding to JEXL expression context object (object): %s=[object]", key.c_str());
     PyDict_SetItemString(jexlContext, key.c_str(), exprContextObject.getJexlContext());
   }
 }
@@ -222,8 +232,7 @@ void ExprContextObject::add(const std::string &key, ExprContextList exprContextL
 {
   if (legacy)
   {
-    // FIXME PR: not sure if this is going to work...
-    repl.insert(std::pair<std::string, std::string>(key, exprContextList.toString()));
+    LM_E(("Runtime Error (this method must not be invoked in legacy mode)"));
   }
   else
   {
@@ -231,7 +240,8 @@ void ExprContextObject::add(const std::string &key, ExprContextList exprContextL
     {
       return;
     }
-    LM_T(LmtExpr, ("adding to expression context object (list): %s=%s", key.c_str(), exprContextList.toString().c_str()));
+    // FIXME P3: improve this implemeting a toString() method for ExprContextList
+    LM_T(LmtExpr, ("adding to JEXL expression context object (list): %s=[list]", key.c_str()));
     PyDict_SetItemString(jexlContext, key.c_str(), exprContextList.get());
   }
 }
@@ -245,25 +255,6 @@ void ExprContextObject::add(const std::string &key, ExprContextList exprContextL
 bool ExprContextObject::isLegacy(void)
 {
   return legacy;
-}
-
-
-/* ****************************************************************************
-*
-* ExprContextObject::toString -
-*/
-std::string ExprContextObject::toString(void)
-{
-  const char* str = PyUnicode_AsUTF8(jexlContext);
-  if (str == NULL)
-  {
-    LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
-    return "";
-  }
-  else
-  {
-    return std::string(str);
-  }
 }
 
 
@@ -323,7 +314,7 @@ void ExprContextList::add(const std::string &_value)
   {
     return;
   }
-  LM_T(LmtExpr, ("adding to expression context list (string): %s=", _value.c_str()));
+  LM_T(LmtExpr, ("adding to JEXL expression context list (string): %s=", _value.c_str()));
   PyObject* value = Py_BuildValue("s", _value.c_str());
   if (value == NULL)
   {
@@ -346,7 +337,7 @@ void ExprContextList::add(double _value)
   {
     return;
   }
-  LM_T(LmtExpr, ("adding to expression context list (double): %f", _value));
+  LM_T(LmtExpr, ("adding to JEXL expression context list (double): %f", _value));
   PyObject* value = Py_BuildValue("d", _value);
   if (value == NULL)
   {
@@ -369,7 +360,7 @@ void ExprContextList::add(bool _value)
   {
     return;
   }
-  LM_T(LmtExpr, ("adding to expression context list (bool): %s", _value ? "true" : "false"));
+  LM_T(LmtExpr, ("adding to JEXL expression context list (bool): %s", _value ? "true" : "false"));
   if (_value)
   {
     PyList_Append(jexlContext, Py_True);
@@ -392,7 +383,7 @@ void ExprContextList::add(void)
   {
     return;
   }
-  LM_T(LmtExpr, ("adding to expression context list (none)"));
+  LM_T(LmtExpr, ("adding to JEXL expression context list (none)"));
   PyList_Append(jexlContext, Py_None);
 }
 
@@ -408,7 +399,8 @@ void ExprContextList::add(ExprContextObject exprContextObject)
   {
     return;
   }
-  LM_T(LmtExpr, ("adding to expression context list (object): %s", exprContextObject.toString().c_str()));
+  // FIXME P3: improve this implemeting a toString() method for ExprContextObject
+  LM_T(LmtExpr, ("adding to JEXL expression context list (object): [object]")));
   PyList_Append(jexlContext, exprContextObject.getJexlContext());
 }
 
@@ -424,28 +416,9 @@ void ExprContextList::add(ExprContextList exprContextList)
   {
     return;
   }
-  LM_T(LmtExpr, ("adding to expression context list (list): %s", exprContextList.toString().c_str()));
+  // FIXME P3: improve this implemeting a toString() method for ExprContextList
+  LM_T(LmtExpr, ("adding to JEXL expression context list (list): [list]"));
   PyList_Append(jexlContext, exprContextList.get());
-}
-
-
-
-/* ****************************************************************************
-*
-* ExprContextList::toString -
-*/
-std::string ExprContextList::toString(void)
-{
-  const char* str = PyUnicode_AsUTF8(jexlContext);
-  if (str == NULL)
-  {
-    LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
-    return "";
-  }
-  else
-  {
-    return std::string(str);
-  }
 }
 
 

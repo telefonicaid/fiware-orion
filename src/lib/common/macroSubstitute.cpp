@@ -60,7 +60,7 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
     }
     else
     {
-      // in legacy mode an extra remove quotes step is needed
+      // in legacy mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
       if (exprContextObjectP->isLegacy())
       {
         return removeQuotes(r.toString());
@@ -80,6 +80,7 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
       // error already logged in macroSubstitute, using stringValue itself as failsafe
       effectiveValue = stringValue;
     }
+
     // toJsonString will stringfly JSON values in macros
     return '"' + toJsonString(effectiveValue) + '"';
   }
@@ -108,6 +109,13 @@ static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, c
   else
   {
     std::string s = r.toString();
+
+    // in legacy mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
+    if (exprContextObjectP->isLegacy())
+    {
+      s = removeQuotes(s);
+    }
+
     if (raw)
     {
       // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),

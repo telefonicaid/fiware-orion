@@ -119,7 +119,7 @@ public:
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
 
-  void         addToContext(ExprContextObject* exprContextObjectP);
+  void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
 
   void         release(void);
   std::string  getName(void);
