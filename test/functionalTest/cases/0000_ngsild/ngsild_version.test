@@ -45,7 +45,7 @@ echo
 echo "02. Make sure the branch output from Step 01 is the same as current branch"
 echo "=========================================================================="
 branchAccordingToBroker=$(echo $_response | awk -F\"branch\" '{ print $2 }' | awk -F\" '{ print $2 }')
-branchAccordingToGit=$(git branch | grep ^\* | awk '{ print $2 }')
+branchAccordingToGit=$(git branch  2> /dev/null | grep ^\* | awk '{ print $2 }') 
 if [ "$branchAccordingToBroker" != "$branchAccordingToGit" ]
 then
   echo "Branch According To Git:    $branchAccordingToGit"
