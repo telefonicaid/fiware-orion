@@ -996,6 +996,11 @@ function partExecute()
   #
   # Check that stderr is empty
   #
+  logMsg "=============================================="
+  logMsg "wc -l $dirname/$filename.$what.stderr:"
+  wc -l $dirname/$filename.$what.stderr >> $LOG_FILE
+  logMsg "=============================================="
+  
   linesInStderr=$(wc -l $dirname/$filename.$what.stderr | awk '{ print $1}' 2> /dev/null)
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
@@ -1004,9 +1009,9 @@ function partExecute()
       exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr $dirname/$filename.$what.stdout "$forcedDie"
     else
       logMsg "$what: output on stderr"
-      logMsg "------------------------------------------------------"
+      logMsg "******************************************************"
       cat $dirname/$filename.$what.stderr >> $LOG_FILE
-      logMsg "------------------------------------------------------"
+      logMsg "******************************************************"
       echo -n "(lines in stderr: $linesInStderr) "
       echo "(ERROR 7 - $what: output on stderr) "
     fi
