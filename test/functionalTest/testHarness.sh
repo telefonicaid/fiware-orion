@@ -1007,7 +1007,8 @@ function partExecute()
       logMsg "------------------------------------------------------"
       cat $dirname/$filename.$what.stderr >> $LOG_FILE
       logMsg "------------------------------------------------------"
-      echo -n "(ERROR 7 - $what: output on stderr) "
+      echo -n "(lines in stderr: $linesInStderr) "
+      echo "(ERROR 7 - $what: output on stderr) "
     fi
 
     partExecuteResult=7
