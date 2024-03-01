@@ -208,7 +208,6 @@ bool            logDeprecate;
 */
 #define PIDPATH                _i "/tmp/contextBroker.pid"
 #define IP_ALL                 _i "0.0.0.0"
-#define LOCALHOST              _i "localhost"
 #define ONE_MONTH_PERIOD       (3600 * 24 * 31)
 
 #define FG_DESC                "don't start as daemon"
@@ -289,7 +288,7 @@ PaArgument paArgs[] =
   { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            1,    65535,                  PORT_DESC                    },
   { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,                  PIDPATH_DESC                 },
 
-  { "-dbURI",                       dbURI,                  "MONGO_URI",                PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBURI_DESC                   },
+  { "-dbURI",                       dbURI,                  "MONGO_URI",                PaString, PaOpt, _i "mongodb://localhost:27017",                           PaNL,  PaNL,                  DBURI_DESC                   },
   { "-dbpwd",                       pwd,                    "MONGO_PASSWORD",           PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBPASSWORD_DESC              },
 
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,                  DB_DESC                      },
