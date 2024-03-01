@@ -86,16 +86,8 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-port' <port to receive new connections>]                                  ORION_PORT                         1 <= 1026 /1026/ <= 65535
                                [option '-pidpath' <pid file path>]                                                 ORION_PID_PATH                     '/tmp/contextBroker.pid' /'/tmp/contextBroker/
                                [option '-dbURI' <complete URI for database connection>]                            ORION_MONGO_URI                    '' /''/
-                               [option '-dbhost' <database host>]                                                  ORION_MONGO_HOST                   'localhost' /'localhost'/
-                               [option '-rplSet' <replica set>]                                                    ORION_MONGO_REPLICA_SET            '' /''/
-                               [option '-dbuser' <database user>]                                                  ORION_MONGO_USER                   '' /''/
                                [option '-dbpwd' <database password>]                                               ORION_MONGO_PASSWORD               '' /''/
-                               [option '-dbAuthMech' <database authentication mechanism (either SCRAM-SHA-1 or ]   ORION_MONGO_AUTH_MECH              '' /''/
-                               [option '-dbAuthDb' <database used for authentication>]                             ORION_MONGO_AUTH_SOURCE            '' /''/
-                               [option '-dbSSL' (enable SSL connection to DB)]                                     ORION_MONGO_SSL                    FALSE /FALSE/
-                               [option '-dbDisableRetryWrites' (set retryWrite parameter to false in DB connect]   ORION_MONGO_DISABLE_RETRY_WRITES   FALSE /FALSE/
                                [option '-db' <database name>]                                                      ORION_MONGO_DB                     'orion' /'orion'/
-                               [option '-dbTimeout' <timeout in milliseconds for connections to the replica set]   ORION_MONGO_TIMEOUT                0 <= 0 /0/ <= 4294967295
                                [option '-dbPoolSize' <database connection pool size>]                              ORION_MONGO_POOL_SIZE              1 <= 10 /10/ <= 10000
                                [option '-ipv4' (use ip v4 only)]                                                   ORION_USEIPV4                      FALSE /FALSE/
                                [option '-ipv6' (use ip v6 only)]                                                   ORION_USEIPV6                      FALSE /FALSE/
