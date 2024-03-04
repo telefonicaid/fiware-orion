@@ -72,17 +72,9 @@ extern bool mongoMultitenant(void);
 void mongoInit
 (
   const char*  dbURI,
-  const char*  dbHost,
-  const char*  rplSet,
   std::string  dbName,
-  const char*  user,
   const char*  pwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
   bool         mtenant,
-  int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat

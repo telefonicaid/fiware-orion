@@ -312,100 +312,28 @@ static void mongoDriverLogger
 
 /* ****************************************************************************
 *
-* mongoConnectionPoolInit -
+* composeMongoUri -
 */
-static std::string composeMongoUri
-(
-  const char*  dbURI,
-  const char*  host,
-  const char*  rplSet,
-  const char*  username,
-  const char*  passwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
-  int64_t      timeout
-)
+static std::string composeMongoUri(const char*  dbURI, const char*  passwd)
 {
   // Compose the mongoUri, taking into account all information
 
   std::string uri;
 
-  if (strlen(dbURI) != 0)
+  const char* pwd = strstr(dbURI, "${PWD}");
+  if (pwd != NULL)
   {
-    if (strlen(username) != 0 || strlen(authDb) != 0 || strlen(rplSet) != 0 || strlen(mechanism) != 0 || dbSSL || dbDisableRetryWrites || timeout > 0)
+    if (strlen(passwd) == 0)
     {
-        LM_X(1, ("Invalid Command Line Options: -dbURI cannot be combined with -dbhost, -rplSet, -dbTimeout, -dbuser, -dbAuthMech, -dbAuthDb, -dbSSL and -dbDisableRetryWrites"));
+      LM_X(1, ("Invalid Command Line Options: -dbURI is used with a password substitution, but no password (-dbpwd) is supplied"));
     }
 
-    const char* pwd = strstr(dbURI, "${PWD}");
-    if (pwd != NULL)
-    {
-      if (strlen(passwd) == 0)
-      {
-        LM_X(1, ("Invalid Command Line Options: -dbURI is used with a password substitution, but no password (-dbpwd) is supplied"));
-      }
-
-      // +6 is the length of the "${PWD}"
-      uri = std::string(dbURI, pwd - dbURI) + passwd + (pwd + 6);
-    }
-    else
-    {
-      uri = dbURI;
-    }
+    // +6 is the length of the "${PWD}"
+    uri = std::string(dbURI, pwd - dbURI) + passwd + (pwd + 6);
   }
   else
   {
-    uri = "mongodb://";
-
-    // Add auth parameter if included
-    if (strlen(username) != 0 && strlen(passwd) != 0)
-    {
-      uri += username + std::string(":") + passwd + "@";
-    }
-
-    uri += host + std::string("/");
-
-    if (strlen(authDb) != 0)
-    {
-      uri += authDb;
-    }
-
-    // First option prefix is '?' symbol
-    std::string optionPrefix = "?";
-
-    if (strlen(rplSet) != 0)
-    {
-      uri += optionPrefix + "replicaSet=" + rplSet;
-      optionPrefix = "&";
-    }
-
-    if (strlen(mechanism) != 0)
-    {
-      uri += optionPrefix + "authMechanism=" + mechanism;
-      optionPrefix = "&";
-    }
-
-    if (dbSSL)
-    {
-      uri += optionPrefix + "tls=true&tlsAllowInvalidCertificates=true";
-      optionPrefix = "&";
-    }
-
-    if (dbDisableRetryWrites)
-    {
-      uri += optionPrefix + "retryWrites=false";
-      optionPrefix = "&";
-    }
-
-    if (timeout > 0)
-    {
-      char buf[STRING_SIZE_FOR_LONG];
-      i2s(timeout, buf, sizeof(buf));
-      uri += optionPrefix + "connectTimeoutMS=" + buf;
-      optionPrefix = "&";
-    }
+    uri = dbURI;
   }
   
   LM_T(LmtMongo, ("MongoDB connection URI: '%s'", offuscatePassword(uri, passwd).c_str()));
@@ -422,17 +350,9 @@ static std::string composeMongoUri
 int orion::mongoConnectionPoolInit
 (
   const char*  dbURI,
-  const char*  host,
   const char*  db,
-  const char*  rplSet,
-  const char*  username,
   const char*  passwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
   bool         mtenant,
-  int64_t      timeout,
   int          writeConcern,
   int          poolSize,
   bool         semTimeStat
@@ -451,7 +371,7 @@ int orion::mongoConnectionPoolInit
   atexit(shutdownClient);
 
   // Set mongo Uri to connect
-  std::string uri = composeMongoUri(dbURI, host, rplSet, username, passwd, mechanism, authDb, dbSSL, dbDisableRetryWrites, timeout);
+  std::string uri = composeMongoUri(dbURI, passwd);
 
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods

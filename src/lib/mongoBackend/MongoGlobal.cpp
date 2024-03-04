@@ -105,17 +105,9 @@ bool mongoMultitenant(void)
 void mongoInit
 (
   const char*  dbURI,
-  const char*  dbHost,
-  const char*  rplSet,
   std::string  dbName,
-  const char*  user,
   const char*  pwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
   bool         mtenant,
-  int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat
@@ -125,17 +117,9 @@ void mongoInit
   multitenant = mtenant;
 
   if (orion::mongoConnectionPoolInit(dbURI,
-                                     dbHost,
                                      dbName.c_str(),
-                                     rplSet,
-                                     user,
                                      pwd,
-                                     mechanism,
-                                     authDb,
-                                     dbSSL,
-                                     dbDisableRetryWrites,
                                      mtenant,
-                                     timeout,
                                      writeConcern,
                                      dbPoolSize,
                                      mutexTimeStat) != 0)

@@ -17,7 +17,7 @@ A list of deprecated features and the version in which they were deprecated foll
 
 * CLI parameters (and associated env vars): `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`,
   `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` in Orion 3.12.0. Use `dbURI` instead,
-  checking [this section](#mapping-to-mongouri-from-old-cli-parameters) if you need to know hot to build the MongoDB URI.
+  checking [this section](#mapping-to-mongouri-from-old-cli-parameters) if you need to know hot to build the MongoDB URI (removed in Orion 3.13.0).
 * `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types in Orion 3.10.0. Use `geo:json` instead.
 * `GET /v2` operation in Orion 3.8.0. This operation is pretty useless and not actually used.
 * Initial notification in subscriptions (along with `skipInitialNotification` option) in Orion 3.1.0.
@@ -134,12 +134,12 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
-| CLI `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` (and associated env vars)                        | Not yet defined                           | Not yet defined                 |
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
 | `GET /v2` operation                                                        | Not yet defined                           | Not yet defined                 |
 | `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types       | Not yet defined                           | Not yet defined                 |
+| CLI `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` (and associated env vars)                        | 3.12.0                           | February 29th, 2024                 |
 | `location` metadata to specify entity location                             | 3.10.1                                    | June 12th, 2023                 |
 | NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | 3.9.0 (*)                                 | June 2nd, 2023                  |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | 3.7.0 (*)                                 | May 26th, 2022                  |

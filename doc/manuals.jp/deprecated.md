@@ -8,7 +8,7 @@
 
 推奨されなくなった機能のリストと、廃止された機能のバージョンは次のとおりです :
 
-* Orion 3.12.0 での CLI パラメータ (および関連する環境変数): `-dbhost`、`-rplSet`、`-dbTimeout`、`-dbuser`、`-dbAuthMech`、`-dbAuthDb`、`-dbSSL`、および `-dbDisableRetryWrites`。MongoDB URI を構築するために必要な情報が必要な場合は、[このセクション](#mapping-to-mongouri-from-old-cli-parameters) をチェックして、代わりに `dbURI` を使用してください
+* Orion 3.12.0 での CLI パラメータ (および関連する環境変数): `-dbhost`、`-rplSet`、`-dbTimeout`、`-dbuser`、`-dbAuthMech`、`-dbAuthDb`、`-dbSSL`、および `-dbDisableRetryWrites`。MongoDB URI を構築するために必要な情報が必要な場合は、[このセクション](#mapping-to-mongouri-from-old-cli-parameters) をチェックして、代わりに `dbURI` を使用してください (Orion 3.13.0 で削除されました)
 * Orion 3.10.0 での `geo:point`, `geo:line`, `geo:box` および `geo:polygon` 属性タイプ。代わりに `geo:json` を使用してください
 * Orion 3.8.0 での `GET /v2` 操作。この操作はかなり役に立たず、実際には使用されません。
 * Orion 3.1.0 のサブスクリプションでの初期通知 (`skipInitialNotification` オプションと共に)。(Orion 3.2.0 で削除)。初期通知の
@@ -103,13 +103,13 @@ Notes:
 
 | **削除された機能**                                                                   | **機能をサポートする Orion ラスト・バージョン** | **バージョンのリリース日** |
 |--------------------------------------------------------------------------------------|-------------------------------------------------|----------------------------|
-| CLI `-dbhost`、`-rplSet`、`-dbTimeout`、`-dbuser`、`-dbAuthMech`、`-dbAuthDb`、`-dbSSL`、および `-dbDisableRetryWrites` (および関連する環境変数) | まだ定義されていません | まだ定義されていません |
 | `POST /v2/entities` オペレーションの `attributes` フィールド                         | まだ定義されていません                          | まだ定義されていません     |
 | `APPEND`, `UPDATE`, など。`POST /v2/op/update` でのアクション・タイプ                | まだ定義されていません                          | まだ定義されていません     |
 | URI パラメータでの `dateCreated` および `dateModified`                               | まだ定義されていません                          | まだ定義されていません     |
 | エンティティのロケーションを指定する `location` メタデータ                           | まだ定義されていません                          | まだ定義されていません     |
 | `GET /v2` 操作                                                                       | まだ定義されていません                          | まだ定義されていません     |
 | `geo:point`, `geo:line`, `geo:box` および `geo:polygon` 属性タイプ                   | まだ定義されていません                          | まだ定義されていません     |
+| CLI `-dbhost`、`-rplSet`、`-dbTimeout`、`-dbuser`、`-dbAuthMech`、`-dbAuthDb`、`-dbSSL`、および `-dbDisableRetryWrites` (および関連する環境変数) | 3.12.0 | 2024年2月29日 |
 | エンティティの場所を指定するための `location` メタデータ                             | 3.10.1                                          | 2023年6月12日              |
 | NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)             | 3.9.0 (*)                                       | 2023年6月2日               |
 | `/ngsi10` および `/ngsi9` URL プレフィックス                                         | 3.7.0 (*)                                       | 2022年5月26日              |
