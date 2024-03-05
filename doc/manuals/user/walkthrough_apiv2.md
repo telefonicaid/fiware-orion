@@ -210,7 +210,9 @@ Some additional remarks:
     different port.
 
 -   In order to pretty-print JSON in responses, you can use Python with
-    msjon.tool (examples along with tutorial are using this style):
+    mjson.tool (examples along with tutorial are using this style). Replace
+    `python` by the particular Python executable in your case (e.g. in some
+    cases it could be `| python3 -mjson.tool`).
 
 ```
 (curl ... | python -mjson.tool) <<EOF
