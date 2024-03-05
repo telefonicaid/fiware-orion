@@ -319,18 +319,31 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   // FIXME PR: force legacy mode to temporarly test all ftest in legacy mode
-  //ExprContextObject exprContext(exprLang == "legacy");
-  ExprContextObject exprContext(true);
+  //bool legacy = (exprLang == "legacy");
+  bool legacy = true;
+  ExprContextObject exprContext(legacy);
+
+  // It seems that add() semantics are different in legacy and jexl mode. In jexl mode, if the key already exists, it is
+  // updated. In legacy model, if the key already exists, the operation is ignored (so previous value is preserved). Taking
+  // into account that in the case of an attribute with name "service", "servicePath" and "authToken", must have precedence
+  // over macros comming from macros of the same name we conditionally add them depending the case
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
-  exprContext.add("service", tenant);
-  exprContext.add("servicePath", en.servicePath);
-  exprContext.add("authToken", xauthToken);
+  if (!legacy)
+  {
+    exprContext.add("service", tenant);
+    exprContext.add("servicePath", en.servicePath);
+    exprContext.add("authToken", xauthToken);
+  }
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
-    // FIXME PR: force legacy mode to temporarly test all ftest in legacy mode
-    //en.attributeVector[ix]->addToContext(&exprContext, exprLang == "legacy");
-    en.attributeVector[ix]->addToContext(&exprContext, true);
+    en.attributeVector[ix]->addToContext(&exprContext, legacy);
+  }
+  if (legacy)
+  {
+    exprContext.add("service", tenant);
+    exprContext.add("servicePath", en.servicePath);
+    exprContext.add("authToken", xauthToken);
   }
 
   //

@@ -217,7 +217,7 @@ void ExprContextObject::add(const std::string &key, ExprContextObject exprContex
       return;
     }
     // FIXME P3: improve this implemeting a toString() method for ExprContextObject
-    LM_T(LmtExpr, ("adding to JEXL expression context object (object): %s=[object]", key.c_str());
+    LM_T(LmtExpr, ("adding to JEXL expression context object (object): %s=[object]", key.c_str()));
     PyDict_SetItemString(jexlContext, key.c_str(), exprContextObject.getJexlContext());
   }
 }
@@ -400,7 +400,7 @@ void ExprContextList::add(ExprContextObject exprContextObject)
     return;
   }
   // FIXME P3: improve this implemeting a toString() method for ExprContextObject
-  LM_T(LmtExpr, ("adding to JEXL expression context list (object): [object]")));
+  LM_T(LmtExpr, ("adding to JEXL expression context list (object): [object]"));
   PyList_Append(jexlContext, exprContextObject.getJexlContext());
 }
 
