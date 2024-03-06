@@ -318,9 +318,7 @@ static SenderThreadParams* buildSenderParamsCustom
   const std::string exprLang = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.exprLang : notification.mqttInfo.exprLang;
 
   // Used by several macroSubstitute() calls along this function
-  // FIXME PR: force legacy mode to temporarly test all ftest in legacy mode
-  //bool legacy = (exprLang == "legacy");
-  bool legacy = true;
+  bool legacy = (exprLang == "legacy");
   ExprContextObject exprContext(legacy);
 
   // It seems that add() semantics are different in legacy and jexl mode. In jexl mode, if the key already exists, it is
