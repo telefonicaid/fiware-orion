@@ -39,7 +39,7 @@
 class ExprManager
 {
 private:
-  PyObject*  pyjexlModule;
+  PyObject*  tcjexlModule;
   PyObject*  jexlEngine;
   PyObject*  jsonModule;
   sem_t      sem;

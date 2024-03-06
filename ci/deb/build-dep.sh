@@ -55,7 +55,7 @@ echo "INSTALL: MongoDB shell" \
 && apt-get -y update \
 && apt-get -y install mongodb-mongosh
 
-# pyjexl is needed by Context Broker functionality, the others are for ftest suite
+# tcjexl is needed by Context Broker functionality, the others are for ftest suite
 echo "INSTALL: python special dependencies" \
 && cd /opt \
 && python3 -m venv /opt/ft_env \
@@ -64,7 +64,7 @@ echo "INSTALL: python special dependencies" \
 && pip install Werkzeug==2.0.2 \
 && pip install paho-mqtt==1.6.1 \
 && pip install amqtt==0.11.0b1 \
-&& pip install pyjexl==0.3.0 \
+&& pip install tcjexl==0.1.0 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0

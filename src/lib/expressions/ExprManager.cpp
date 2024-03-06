@@ -40,7 +40,7 @@
 */
 void ExprManager::init(void)
 {
-  pyjexlModule         = NULL;
+  tcjexlModule         = NULL;
   jexlEngine           = NULL;
 
   if (sem_init(&sem, 0, 1) == -1)
@@ -51,14 +51,14 @@ void ExprManager::init(void)
   Py_Initialize();
   LM_T(LmtExpr, ("Python interpreter has been initialized"));
 
-  pyjexlModule = PyImport_ImportModule("pyjexl");
-  if (pyjexlModule == NULL)
+  tcjexlModule = PyImport_ImportModule("tcjexl");
+  if (tcjexlModule == NULL)
   {
-    LM_X(1, ("Fatal Error (error importing pyjexl module: %s)", capturePythonError()));
+    LM_X(1, ("Fatal Error (error importing tcjexl module: %s)", capturePythonError()));
   }
-  LM_T(LmtExpr, ("pyjexl module has been loaded"));
+  LM_T(LmtExpr, ("tcjexl module has been loaded"));
 
-  jexlEngine = PyObject_CallMethod(pyjexlModule, "JEXL", NULL);
+  jexlEngine = PyObject_CallMethod(tcjexlModule, "JEXL", NULL);
   if (jexlEngine == NULL)
   {
     LM_X(1, ("Fatal Error (error creating jexlEngine: %s)", capturePythonError()));
@@ -134,10 +134,10 @@ void ExprManager::release(void)
     LM_T(LmtExpr, ("jexl engine has been freed"));
   }
 
-  if (pyjexlModule != NULL)
+  if (tcjexlModule != NULL)
   {
-    Py_XDECREF(pyjexlModule);
-    LM_T(LmtExpr, ("pyjexl module has been freed"));
+    Py_XDECREF(tcjexlModule);
+    LM_T(LmtExpr, ("tcjexl module has been freed"));
   }
 
   Py_Finalize();
