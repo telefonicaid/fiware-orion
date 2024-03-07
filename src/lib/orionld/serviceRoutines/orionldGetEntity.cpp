@@ -81,6 +81,7 @@ bool orionldGetEntity(void)
   char*        entityType      = NULL;  // If the entity is found locally, its type will be included as help in the forwarded requests
   const char*  entityId        = orionldState.wildcard[0];
   int          remoteEntities  = 0;
+  bool         formatted       = false;
 
   if (pCheckUri(entityId, "Entity ID in URL PATH", true) == false)
     return false;
@@ -141,7 +142,10 @@ bool orionldGetEntity(void)
       apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, lang, true, &orionldState.pd);
     }
     else
+    {
       apiEntityP = dbModelToApiEntity2(dbEntityP, sysAttrs, orionldState.out.format, lang, true, &orionldState.pd);
+      formatted = true;
+    }
   }
 
   DistOp*  distOpList = NULL;
@@ -234,6 +238,13 @@ bool orionldGetEntity(void)
       if (loops >= 100)
         LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
     }
+  }
+
+  if ((forwards == 0) && (dbEntityP != NULL) && (formatted == false))
+  {
+    if      (orionldState.out.format == RF_SIMPLIFIED) ntosEntity(apiEntityP, lang);
+    else if (orionldState.out.format == RF_CONCISE)    ntocEntity(apiEntityP, lang, sysAttrs);
+    else                                               ntonEntity(apiEntityP, lang, sysAttrs);
   }
 
   if (dbEntityP == NULL)
@@ -346,10 +357,11 @@ bool orionldGetEntity(void)
     distOpListRelease(distOpList);
   }
 
+  //
+  // Transform the apiEntityP according to orionldState.out.format, lang, and sysAttrs
+  //
   if (remoteEntities > 0)
   {
-    // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
-
     if      (orionldState.out.format == RF_SIMPLIFIED) ntosEntity(apiEntityP, lang);
     else if (orionldState.out.format == RF_CONCISE)    ntocEntity(apiEntityP, lang, sysAttrs);
     else                                               ntonEntity(apiEntityP, lang, sysAttrs);
