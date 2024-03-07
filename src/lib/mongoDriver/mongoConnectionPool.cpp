@@ -112,22 +112,21 @@ static int pingConnection(mongoc_client_t* conn, const char* db, bool mtenat)
   // ping will be listDatabases in the admin DB. But if we run in not mtenant
   // mode listCollections in the default database will suffice
 
-  std::string  cmd;
   std::string  effectiveDb;
 
+  bson_t* ping = bson_new();
   if (mtenat)
   {
     cmd = "listDatabases";
+    BSON_APPEND_INT32(ping, "listDatabases", 1);
+    BSON_APPEND_BOOL(ping, "nameOnly", true);
     effectiveDb = "admin";
   }
   else
   {
-    cmd = "listCollections";
+    BSON_APPEND_INT32(ping, "listCollections", 1);
     effectiveDb = db;
   }
-
-  bson_t* ping = bson_new();
-  BSON_APPEND_INT32(ping, cmd.c_str(), 1);
   mongoc_database_t* database = mongoc_client_get_database(conn, effectiveDb.c_str());
 
   bson_error_t error;
