@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Legacy expression using attributes with weird syntax
+JEXL expression using attributes with weird syntax
 
 --SHELL-INIT--
 dbInit CB

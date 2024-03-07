@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-JEXL expression in custom notification (JSON navigation in objects and arrays)
+JEXL expression in custom notification (null values)
 
 --SHELL-INIT--
 dbInit CB
@@ -31,15 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub with custom expression cal: A[0] + A[1].A1 + B.B1[2].C
-# 02. Create entity E1 with A and B so cal result in 60
-# 03. Update entity E1 with A and B so cal result in 6
-# 04. Dump accumulator and see notifications (cal 60 and cal 6)
+# 01. Create custom sub with custom expression cal: A+1
+# 02. Create entity E1 with A=null
+# 03. Update entity E1 with A=null again (with forcedUpdate)
+# 04. Dump accumulator and see notifications (cal: null, cal: null)
 #
 
 
-echo "01. Create custom sub with custom expression cal: A[0] + A[1].A1 + B.B1[2].C"
-echo "============================================================================"
+echo "01. Create custom sub with custom expression cal: A+1"
+echo "====================================================="
 payload='{
   "subject": {
     "entities": [
@@ -54,7 +54,7 @@ payload='{
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
         "cal": {
-          "value": "${A[0] + A[1].A1 + B.B1[2].C}",
+          "value": "${A+1}",
           "type": "Calculated"
         }
       }      
@@ -67,18 +67,14 @@ echo
 echo
 
 
-echo "02. Create entity E1 with A and B so cal result in 60"
-echo "====================================================="
+echo "02. Create entity E1 with A=null"
+echo "================================"
 payload='{
   "id": "E1",
   "type": "T",
   "A": {
-    "value": [ 10, { "A1": 20 } ],
-    "type": "StructuredValue"
-  },
-  "B": {
-    "value": { "B1": [ 11, 22, { "C": 30 }]},
-    "type": "StructuredValue"
+    "value": null,
+    "type": "Number"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -86,33 +82,29 @@ echo
 echo
 
 
-echo "03. Update entity E1 with A and B so cal result in 6"
-echo "===================================================="
+echo "03. Update entity E1 with A=null again (with forcedUpdate)"
+echo "=========================================================="
 payload='{
   "A": {
-    "value": [ 1, { "A1": 2 } ],
-    "type": "StructuredValue"
-  },
-  "B": {
-    "value": { "B1": [ 11, 22, { "C": 3 }]},
-    "type": "StructuredValue"
+    "value": "null",
+    "type": "Text"
   }
 }'
-orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+orionCurl --url /v2/entities/E1/attrs?options=forcedUpdate -X POST --payload "$payload"
 echo
 echo
 
 
-echo "04. Dump accumulator and see notifications (cal 60 and cal 6)"
-echo "============================================================="
+echo "04. Dump accumulator and see notifications (cal: null, cal: null)"
+echo "================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom sub with custom expression cal: A[0] + A[1].A1 + B.B1[2].C
-============================================================================
+01. Create custom sub with custom expression cal: A+1
+=====================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -121,8 +113,8 @@ Content-Length: 0
 
 
 
-02. Create entity E1 with A and B so cal result in 60
-=====================================================
+02. Create entity E1 with A=null
+================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -131,44 +123,19 @@ Content-Length: 0
 
 
 
-03. Update entity E1 with A and B so cal result in 6
-====================================================
+03. Update entity E1 with A=null again (with forcedUpdate)
+==========================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Dump accumulator and see notifications (cal 60 and cal 6)
-=============================================================
+04. Dump accumulator and see notifications (cal: null, cal: null)
+=================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 130
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "data": [
-        {            
-            "cal": {
-                "metadata": {},
-                "type": "Calculated",
-                "value": 60
-            },
-            "id": "E1",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 129
+Content-Length: 132
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -182,7 +149,32 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "cal": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": 6
+                "value": null
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 132
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "cal": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
             },
             "id": "E1",
             "type": "T"

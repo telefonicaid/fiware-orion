@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-JEXL expression in custom notification (source attributes in udpate)
+JEXL basic expression in custom notification (source attributes in udpate)
 
 --SHELL-INIT--
 dbInit CB
