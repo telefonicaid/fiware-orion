@@ -112,18 +112,20 @@ static int pingConnection(mongoc_client_t* conn, const char* db, bool mtenat)
   // ping will be listDatabases in the admin DB. But if we run in not mtenant
   // mode listCollections in the default database will suffice
 
+  std::string  cmdString;
   std::string  effectiveDb;
 
   bson_t* ping = bson_new();
   if (mtenat)
   {
-    cmd = "listDatabases";
+    cmdString = "listDatabases";
     BSON_APPEND_INT32(ping, "listDatabases", 1);
     BSON_APPEND_BOOL(ping, "nameOnly", true);
     effectiveDb = "admin";
   }
   else
   {
+    cmdString = "listCollections";
     BSON_APPEND_INT32(ping, "listCollections", 1);
     effectiveDb = db;
   }
@@ -133,7 +135,7 @@ static int pingConnection(mongoc_client_t* conn, const char* db, bool mtenat)
   int r = 0;
   if (!mongoc_database_command_with_opts(database, ping, NULL, NULL, NULL, &error))
   {
-    LM_T(LmtMongo, ("ping command (%s at db %s) falied: %s", cmd.c_str(), effectiveDb.c_str(), error.message));
+    LM_T(LmtMongo, ("ping command (%s at db %s) falied: %s", cmdString.c_str(), effectiveDb.c_str(), error.message));
     // Reference error message: Authentication failed
     // Reference error message: command listCollections requires authentication
     if ((strstr(error.message, "Authentication failed") != NULL) || (strstr(error.message, "requires authentication") != NULL)) {
