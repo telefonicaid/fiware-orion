@@ -56,6 +56,10 @@ orionldStart CP2 -experimental -forwarding -wip entityMaps
 # 15. GET /entities?type=T&options=sysAttrs in CB
 # 16. GET /entities?type=T&format=concise in CB
 #
+# 17. GET /entities/urn:E3 from CB (forward to CP1), in default normalized format
+# 18. GET /entities/urn:E3 from CB (forward to CP1), in concise format
+# 18. GET /entities/urn:E3 from CB (forward to CP1), in simplified format
+#
 
 #
 # Flow:
@@ -342,6 +346,26 @@ echo
 echo
 
 
+echo "17. GET /entities/urn:E3 from CB (forward to CP1), in default normalized format"
+echo "==============================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E3
+echo
+echo
+
+
+echo "18. GET /entities/urn:E3 from CB (forward to CP1), in concise format"
+echo "===================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E3?format=concise
+echo
+echo
+
+
+echo "18. GET /entities/urn:E3 from CB (forward to CP1), in simplified format"
+echo "======================================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E3?format=simplified
+echo
+echo
+
 --REGEXPECT--
 01. In CB, create an entity urn:E1 with attributes P1+R1
 =========================================================
@@ -518,6 +542,62 @@ NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
         "id": "urn:E4",
         "id": "urn:E5",
         "id": "urn:E6",
+
+
+17. GET /entities/urn:E3 from CB (forward to CP1), in default normalized format
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "Entity E3 in Orion B"
+    },
+    "R1": {
+        "object": "urn:E4",
+        "type": "Relationship"
+    },
+    "id": "urn:E3",
+    "type": "T"
+}
+
+
+18. GET /entities/urn:E3 from CB (forward to CP1), in concise format
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "Entity E3 in Orion B",
+    "R1": {
+        "object": "urn:E4"
+    },
+    "id": "urn:E3",
+    "type": "T"
+}
+
+
+18. GET /entities/urn:E3 from CB (forward to CP1), in simplified format
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "Entity E3 in Orion B",
+    "R1": "urn:E4",
+    "id": "urn:E3",
+    "type": "T"
+}
 
 
 --TEARDOWN---

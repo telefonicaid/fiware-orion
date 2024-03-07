@@ -76,10 +76,12 @@ bool orionldGetEntity(void)
   if ((experimental == false) || (orionldState.in.legacy != NULL))                      // If Legacy header - use old implementation
     return legacyGetEntity();
 
-  bool         sysAttrs    = orionldState.uriParamOptions.sysAttrs;
-  char*        lang        = orionldState.uriParams.lang;
-  char*        entityType  = NULL;  // If the entity is found locally, its type will be included as help in the forwarded requests
-  const char*  entityId    = orionldState.wildcard[0];
+  bool         sysAttrs        = orionldState.uriParamOptions.sysAttrs;
+  char*        lang            = orionldState.uriParams.lang;
+  char*        entityType      = NULL;  // If the entity is found locally, its type will be included as help in the forwarded requests
+  const char*  entityId        = orionldState.wildcard[0];
+  int          remoteEntities  = 0;
+  bool         formatted       = false;
 
   if (pCheckUri(entityId, "Entity ID in URL PATH", true) == false)
     return false;
@@ -101,7 +103,6 @@ bool orionldGetEntity(void)
 
   KjNode* dbEntityP      = mongocEntityLookup(entityId, entityType, &orionldState.in.attrList, orionldState.uriParams.geometryProperty, NULL);
   KjNode* apiEntityP     = NULL;
-  bool    forcedSysAttrs = false;
 
   if (dbEntityP != NULL)  // Convert from DB to API Entity + GET the entity type
   {
@@ -134,7 +135,6 @@ bool orionldGetEntity(void)
 
     if (orionldState.distributed == true)
     {
-      forcedSysAttrs = true;
       //
       // For forwarded requests, I NEED sysAttrs (to pick attribute in case there's more than one)
       // And, Normalized is the format for Distributed operations
@@ -142,7 +142,10 @@ bool orionldGetEntity(void)
       apiEntityP = dbModelToApiEntity2(dbEntityP, true, RF_NORMALIZED, lang, true, &orionldState.pd);
     }
     else
+    {
       apiEntityP = dbModelToApiEntity2(dbEntityP, sysAttrs, orionldState.out.format, lang, true, &orionldState.pd);
+      formatted = true;
+    }
   }
 
   DistOp*  distOpList = NULL;
@@ -237,6 +240,13 @@ bool orionldGetEntity(void)
     }
   }
 
+  if ((forwards == 0) && (dbEntityP != NULL) && (formatted == false))
+  {
+    if      (orionldState.out.format == RF_SIMPLIFIED) ntosEntity(apiEntityP, lang);
+    else if (orionldState.out.format == RF_CONCISE)    ntocEntity(apiEntityP, lang, sysAttrs);
+    else                                               ntonEntity(apiEntityP, lang, sysAttrs);
+  }
+
   if (dbEntityP == NULL)
   {
     if (forwards == 0)
@@ -252,8 +262,6 @@ bool orionldGetEntity(void)
   //
   // Read the responses to the forwarded requests
   //
-  int fwdMerges = 0;
-
   if (forwards > 0)
   {
     CURLMsg* msgP;
@@ -316,7 +324,7 @@ bool orionldGetEntity(void)
           else
           {
             distOpEntityMerge(apiEntityP, distOpP->responseBody, sysAttrs, distOpP->regP->mode == RegModeAuxiliary);
-            fwdMerges += 1;
+            remoteEntities += 1;
           }
         }
         else
@@ -349,10 +357,11 @@ bool orionldGetEntity(void)
     distOpListRelease(distOpList);
   }
 
-  if ((apiEntityP != NULL) && (forcedSysAttrs == true))
+  //
+  // Transform the apiEntityP according to orionldState.out.format, lang, and sysAttrs
+  //
+  if (remoteEntities > 0)
   {
-    // Transform the apiEntityP according to in case orionldState.out.format, lang, and sysAttrs
-
     if      (orionldState.out.format == RF_SIMPLIFIED) ntosEntity(apiEntityP, lang);
     else if (orionldState.out.format == RF_CONCISE)    ntocEntity(apiEntityP, lang, sysAttrs);
     else                                               ntonEntity(apiEntityP, lang, sysAttrs);
