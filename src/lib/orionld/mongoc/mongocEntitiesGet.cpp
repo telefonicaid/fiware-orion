@@ -64,6 +64,7 @@ KjNode* mongocEntitiesGet(char** fieldV, int fields, bool entityIdPresent)
   bson_init(&sortDoc);
 
   bson_append_int32(&sortDoc, "creDate", 7, 1);
+  bson_append_int32(&sortDoc, "_id.id", 6, 1);
   bson_append_document(&options, "sort", 4, &sortDoc);
   bson_destroy(&sortDoc);
 

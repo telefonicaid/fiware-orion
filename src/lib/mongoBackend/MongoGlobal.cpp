@@ -1355,7 +1355,9 @@ bool entitiesQuery
 
   if (sortOrderList == NULL)
   {
-    query.sort(BSON(ENT_CREATION_DATE << 1));
+    // query.sort(BSON(ENT_CREATION_DATE << 1));
+    BSONObj sort2 = BSON("creDate" << 1 << "_id.id" << 1);
+    query.sort(sort2);
   }
   else if (strcmp(sortOrderList, ORDER_BY_PROXIMITY) == 0)
   {

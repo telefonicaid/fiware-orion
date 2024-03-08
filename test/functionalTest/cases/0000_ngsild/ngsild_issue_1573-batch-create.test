@@ -21,43 +21,46 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Entity pagination
+Batch Create 22 entities, all with same creDate, then try pagination
 
 --SHELL-INIT--
 dbInit CB
-orionldStart CB -experimental
+orionldStart CB
 
 --SHELL--
 
 #
-# 01. Create 22 entities
+# 01. Batch create 22 entities
 # 02. GET the first 10
 # 03. GET the next 10
 # 04. GET the first 11
 # 05. GET the next 11
 #
 
-echo "01. Create 22 entities"
-echo "====================="
+echo "01. Batch create 22 entities"
+echo "============================"
 typeset -i eNo
 eNo=1
-
+entities="["
 while [ $eNo -le 22 ]
 do
   eId=$(printf "urn:E%02d" $eNo)
-  eNo=$eNo+1
-
-  payload='{
+  entity='{
     "id": "'$eId'",
     "type": "T",
-    "A1": {
-      "type": "Property",
-      "value": "E'$eNo':A1"
-    }
+    "A": '$eNo'
   }'
-  sleep .01
-  orionCurl --url /ngsi-ld/v1/entities --payload "$payload" | grep 'Location:'
+  entities=$entities$entity
+  if [ $eNo != 22 ]
+  then
+    entities=$entities","
+  fi
+  eNo=$eNo+1
 done
+entities=$entities"]"
+echo $entities > /tmp/entities
+
+orionCurl --url /ngsi-ld/v1/entityOperations/create --payload "$entities"
 echo
 echo
 
@@ -91,30 +94,37 @@ echo
 
 
 --REGEXPECT--
-01. Create 22 entities
-=====================
-Location: /ngsi-ld/v1/entities/urn:E01
-Location: /ngsi-ld/v1/entities/urn:E02
-Location: /ngsi-ld/v1/entities/urn:E03
-Location: /ngsi-ld/v1/entities/urn:E04
-Location: /ngsi-ld/v1/entities/urn:E05
-Location: /ngsi-ld/v1/entities/urn:E06
-Location: /ngsi-ld/v1/entities/urn:E07
-Location: /ngsi-ld/v1/entities/urn:E08
-Location: /ngsi-ld/v1/entities/urn:E09
-Location: /ngsi-ld/v1/entities/urn:E10
-Location: /ngsi-ld/v1/entities/urn:E11
-Location: /ngsi-ld/v1/entities/urn:E12
-Location: /ngsi-ld/v1/entities/urn:E13
-Location: /ngsi-ld/v1/entities/urn:E14
-Location: /ngsi-ld/v1/entities/urn:E15
-Location: /ngsi-ld/v1/entities/urn:E16
-Location: /ngsi-ld/v1/entities/urn:E17
-Location: /ngsi-ld/v1/entities/urn:E18
-Location: /ngsi-ld/v1/entities/urn:E19
-Location: /ngsi-ld/v1/entities/urn:E20
-Location: /ngsi-ld/v1/entities/urn:E21
-Location: /ngsi-ld/v1/entities/urn:E22
+01. Batch create 22 entities
+============================
+HTTP/1.1 201 Created
+Content-Length: 221
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    "urn:E01",
+    "urn:E02",
+    "urn:E03",
+    "urn:E04",
+    "urn:E05",
+    "urn:E06",
+    "urn:E07",
+    "urn:E08",
+    "urn:E09",
+    "urn:E10",
+    "urn:E11",
+    "urn:E12",
+    "urn:E13",
+    "urn:E14",
+    "urn:E15",
+    "urn:E16",
+    "urn:E17",
+    "urn:E18",
+    "urn:E19",
+    "urn:E20",
+    "urn:E21",
+    "urn:E22"
+]
 
 
 02. GET the first 10
