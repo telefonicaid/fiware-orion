@@ -30,6 +30,7 @@ SET (SOURCES
    ntocAttribute.cpp
    ntocSubAttribute.cpp
    ntosEntity.cpp
+   ntosAttribute.cpp
 )
 
 # Include directories
