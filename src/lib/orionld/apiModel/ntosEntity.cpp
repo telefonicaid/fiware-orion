@@ -33,7 +33,52 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
+#include "orionld/common/orionldState.h"                         // kjTreeLog
 #include "orionld/apiModel/ntosEntity.h"                         // Own interface
+
+
+
+void ntosAttribute(KjNode* attrP)
+{
+  bool    asObject  = false;
+  KjNode* valueP    = kjLookup(attrP, "value");
+
+  if (valueP == NULL)    { valueP = kjLookup(attrP, "object");                        }
+  if (valueP == NULL)    { valueP = kjLookup(attrP, "languageMap"); asObject = true;  }
+  if (valueP == NULL)    { valueP = kjLookup(attrP, "json");        asObject = true;  }
+  if (valueP == NULL)    { valueP = kjLookup(attrP, "vocab");       asObject = true;  }
+
+  if (valueP != NULL)
+  {
+    if (asObject == true)
+    {
+      // Remove everything except valueP (languageMap)
+      attrP->value.firstChildP = valueP;
+      attrP->lastChild         = valueP;
+      valueP->next = NULL;
+    }
+    else
+    {
+      attrP->value     = valueP->value;
+      attrP->type      = valueP->type;
+      attrP->lastChild = valueP->lastChild;
+    }
+  }
+  else
+  {
+    kjTreeLog(attrP, "attr", LmtBug);
+    LM_E(("No attribute value (object/languageMap) found - this should never happen!!!"));
+  }
+
+  // Remove sysAttrs of the Attribute
+  const char* attrNames[2] = { "createdAt", "modifiedAt" };
+  for (int ix = 0; ix < 2; ix++)
+  {
+    KjNode* nodeP = kjLookup(attrP, attrNames[ix]);
+    if (nodeP != NULL)
+      kjChildRemove(attrP, nodeP);
+  }
+}
 
 
 
@@ -48,7 +93,7 @@ void ntosEntity(KjNode* apiEntityP, const char* lang)
   KjNode* attrP = apiEntityP->value.firstChildP;
   KjNode* next;
 
-  // Remove sysAttrs
+  // Remove sysAttrs of the Entity
   const char* attrNames[2] = { "createdAt", "modifiedAt" };
   for (int ix = 0; ix < 2; ix++)
   {
@@ -57,49 +102,28 @@ void ntosEntity(KjNode* apiEntityP, const char* lang)
       kjChildRemove(apiEntityP, nodeP);
   }
 
-
   // Loop over the remaining fields
   while (attrP != NULL)
   {
     next = attrP->next;
 
-    // Skip "id" and "type" ... and "scope" once that gets implemented
-    if ((strcmp(attrP->name, "id") == 0) || (strcmp(attrP->name, "type") == 0))
+    if (attrP->type == KjArray)
     {
-      attrP = next;
-      continue;
-    }
-
-    bool    isLangMap = false;
-    KjNode* valueP    = kjLookup(attrP, "value");
-
-    if (valueP == NULL)
-      valueP = kjLookup(attrP, "object");
-
-    if (valueP == NULL)
-    {
-      valueP    = kjLookup(attrP, "languageMap");
-      isLangMap = true;  // Only valid if valueP != NULL
-    }
-
-    if (valueP != NULL)
-    {
-      if (isLangMap == true)
+      for (KjNode* attrInstanceP = attrP->value.firstChildP; attrInstanceP != NULL; attrInstanceP = attrInstanceP->next)
       {
-        // Remove everything except valueP (languageMap)
-        attrP->value.firstChildP = valueP;
-        attrP->lastChild         = valueP;
-        valueP->next = NULL;
-      }
-      else
-      {
-        attrP->value     = valueP->value;
-        attrP->type      = valueP->type;
-        attrP->lastChild = valueP->lastChild;
+        LM_T(LmtFormat, ("Calling ntosAttribute for '%s', dataset instance X", attrP->name));
+        ntosAttribute(attrInstanceP);
       }
     }
     else
-      LM_E(("No attribute value (object/languageMap) found - this should never happen!!!"));
+    {
+      // Skip "id" and "type" ... and "scope" once that gets implemented
+      if ((strcmp(attrP->name, "id") != 0) && (strcmp(attrP->name, "type") != 0))
+      {
+        LM_T(LmtFormat, ("Calling ntosAttribute for '%s'", attrP->name));
+        ntosAttribute(attrP);
+      }
+    }
 
     attrP = next;
   }

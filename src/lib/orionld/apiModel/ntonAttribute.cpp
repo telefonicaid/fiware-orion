@@ -46,11 +46,15 @@ extern "C"
 void ntonAttribute(KjNode* attrP, const char* lang, bool sysAttrs)
 {
   //
-  // If ARRAY, we're dealing with datasetId ...  - later!
+  // If ARRAY, we're dealing with datasetId
   //
   if (attrP->type == KjArray)
   {
-    LM_E(("Multi-Attribute (datasetId) not supported, sorry ..."));
+    for (KjNode* attrInstanceP = attrP->value.firstChildP; attrInstanceP != NULL; attrInstanceP = attrInstanceP->next)
+    {
+      ntonAttribute(attrInstanceP, lang, sysAttrs);
+    }
+
     return;
   }
 
@@ -68,14 +72,18 @@ void ntonAttribute(KjNode* attrP, const char* lang, bool sysAttrs)
   {
     if (strcmp(fieldP->name, "type")        == 0)  continue;
     if (strcmp(fieldP->name, "value")       == 0)  continue;
+    if (strcmp(fieldP->name, "object")      == 0)  continue;
+    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "json")        == 0)  continue;
+    if (strcmp(fieldP->name, "vocab")       == 0)  continue;
     if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
     if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "observedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "unitCode")    == 0)  continue;
-    if (strcmp(fieldP->name, "object")      == 0)  continue;
-    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "datasetId")   == 0)  continue;
     if (strcmp(fieldP->name, "lang")        == 0)  continue;
 
+    LM_T(LmtFormat, ("Calling ntonSubAttribute for '%s'", fieldP->name));
     ntonSubAttribute(fieldP, lang, sysAttrs);
   }
 }
