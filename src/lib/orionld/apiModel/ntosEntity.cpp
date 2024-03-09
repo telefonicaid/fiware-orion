@@ -33,52 +33,8 @@ extern "C"
 
 #include "logMsg/logMsg.h"                                       // LM_*
 
-#include "orionld/common/orionldState.h"                         // kjTreeLog
+#include "orionld/apiModel/ntosAttribute.h"                      // ntosAttribute
 #include "orionld/apiModel/ntosEntity.h"                         // Own interface
-
-
-
-void ntosAttribute(KjNode* attrP)
-{
-  bool    asObject  = false;
-  KjNode* valueP    = kjLookup(attrP, "value");
-
-  if (valueP == NULL)    { valueP = kjLookup(attrP, "object");                        }
-  if (valueP == NULL)    { valueP = kjLookup(attrP, "languageMap"); asObject = true;  }
-  if (valueP == NULL)    { valueP = kjLookup(attrP, "json");        asObject = true;  }
-  if (valueP == NULL)    { valueP = kjLookup(attrP, "vocab");       asObject = true;  }
-
-  if (valueP != NULL)
-  {
-    if (asObject == true)
-    {
-      // Remove everything except valueP (languageMap)
-      attrP->value.firstChildP = valueP;
-      attrP->lastChild         = valueP;
-      valueP->next = NULL;
-    }
-    else
-    {
-      attrP->value     = valueP->value;
-      attrP->type      = valueP->type;
-      attrP->lastChild = valueP->lastChild;
-    }
-  }
-  else
-  {
-    kjTreeLog(attrP, "attr", LmtBug);
-    LM_E(("No attribute value (object/languageMap) found - this should never happen!!!"));
-  }
-
-  // Remove sysAttrs of the Attribute
-  const char* attrNames[2] = { "createdAt", "modifiedAt" };
-  for (int ix = 0; ix < 2; ix++)
-  {
-    KjNode* nodeP = kjLookup(attrP, attrNames[ix]);
-    if (nodeP != NULL)
-      kjChildRemove(attrP, nodeP);
-  }
-}
 
 
 
