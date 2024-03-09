@@ -48,7 +48,7 @@ void ntonSubAttribute(KjNode* saP, const char* lang, bool sysAttrs)
     kjSysAttrsRemove(saP, 0);
 
   KjNode* typeP = kjLookup(saP, "type");
-  if ((lang != NULL) && (typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty")))
+  if ((lang != NULL) && (typeP != NULL) && (strcmp(typeP->value.s, "LanguageProperty") == 0))
   {
     KjNode* languageMapP = kjLookup(saP, "languageMap");
     langFixNormalized(saP, typeP, languageMapP, lang);
@@ -58,12 +58,13 @@ void ntonSubAttribute(KjNode* saP, const char* lang, bool sysAttrs)
   {
     if (strcmp(fieldP->name, "type")        == 0)  continue;
     if (strcmp(fieldP->name, "value")       == 0)  continue;
+    if (strcmp(fieldP->name, "object")      == 0)  continue;
+    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "json")        == 0)  continue;
     if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
     if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "observedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "unitCode")    == 0)  continue;
-    if (strcmp(fieldP->name, "object")      == 0)  continue;
-    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
     if (strcmp(fieldP->name, "lang")        == 0)  continue;
 
     ntonSubAttribute(fieldP, lang, sysAttrs);

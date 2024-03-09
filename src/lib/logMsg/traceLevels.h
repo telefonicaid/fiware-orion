@@ -132,7 +132,7 @@ typedef enum TraceLevels
   LmtCount,                            // NGSILD-Results-Count header, details for distops
   LmtSemaphore,                        // Semaphores
   LmtKjlParse,                         // Trace level start for K libs
-  LmtMqtt,                             // MQTT notifications
+  LmtMqtt = 205,                       // MQTT notifications
   LmtQ,                                // Query Language
   LmtPostgres,                         // Postgres (TRoE)
   LmtSql,                              // SQL command for TRoE
@@ -142,8 +142,9 @@ typedef enum TraceLevels
   LmtRegex,                            // Regular expressions - all of them
   LmtDateTime,                         // DateTime (ISO8601) conversion
   LmtMimeType,                         // MimeType
-  LmtArrayReduction,                   // Arrays of only one item are reduced to the item
+  LmtArrayReduction = 215,             // Arrays of only one item are reduced to the item
   LmtFormat,                           // Normalized, Concise, Simplified
+  LmtBug,                              // Current bug being debugged
 
   //
   // Legacy

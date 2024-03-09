@@ -65,7 +65,7 @@ echo
 
 
 echo '02. Create an entity urn:E1, type T, with a JsonProperty V1: "abc"'
-echo '========================================================================'
+echo '=================================================================='
 payload='{
   "id": "urn:E1",
   "type": "T",
@@ -80,13 +80,13 @@ echo
 
 
 echo '03. Create an entity urn:E2, type T, with a JsonProperty V2: [ "json", "id" ]'
-echo '===================================================================================='
+echo '============================================================================='
 payload='{
   "id": "urn:E2",
   "type": "T",
   "V2": {
     "json": [ "json", "id" ],
-    "type": "JsonProperty"    
+    "type": "JsonProperty"
   },
   "V3": {
     "json": [ "json" ]
@@ -138,7 +138,7 @@ Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subs:S1
 
 
 02. Create an entity urn:E1, type T, with a JsonProperty V1: "abc"
-========================================================================
+==================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -147,7 +147,7 @@ Location: /ngsi-ld/v1/entities/urn:E1
 
 
 03. Create an entity urn:E2, type T, with a JsonProperty V2: [ "json", "id" ]
-====================================================================================
+=============================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)

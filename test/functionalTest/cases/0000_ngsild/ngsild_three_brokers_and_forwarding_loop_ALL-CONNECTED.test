@@ -58,7 +58,11 @@ orionldStart CP2 -experimental -forwarding -wip entityMaps
 #
 # 17. GET /entities/urn:E3 from CB (forward to CP1), in default normalized format
 # 18. GET /entities/urn:E3 from CB (forward to CP1), in concise format
-# 18. GET /entities/urn:E3 from CB (forward to CP1), in simplified format
+# 19. GET /entities/urn:E3 from CB (forward to CP1), in simplified format
+#
+# 20. GET /entities/urn:E1 from CB (local), in default normalized format
+# 21. GET /entities/urn:E1 from CB (local), in concise format
+# 22. GET /entities/urn:E1 from CB (local), in simplified format
 #
 
 #
@@ -360,11 +364,33 @@ echo
 echo
 
 
-echo "18. GET /entities/urn:E3 from CB (forward to CP1), in simplified format"
+echo "19. GET /entities/urn:E3 from CB (forward to CP1), in simplified format"
 echo "======================================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:E3?format=simplified
 echo
 echo
+
+
+echo "20. GET /entities/urn:E1 from CB (local), in default normalized format"
+echo "======================================================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo "21. GET /entities/urn:E1 from CB (local), in concise format"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?format=concise
+echo
+echo
+
+
+echo "22. GET /entities/urn:E1 from CB (local), in simplified format"
+echo "=============================================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1?format=simplified
+echo
+echo
+
 
 --REGEXPECT--
 01. In CB, create an entity urn:E1 with attributes P1+R1
@@ -584,7 +610,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
 }
 
 
-18. GET /entities/urn:E3 from CB (forward to CP1), in simplified format
+19. GET /entities/urn:E3 from CB (forward to CP1), in simplified format
 =======================================================================
 HTTP/1.1 200 OK
 Content-Length: 68
@@ -596,6 +622,62 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
     "P1": "Entity E3 in Orion B",
     "R1": "urn:E4",
     "id": "urn:E3",
+    "type": "T"
+}
+
+
+20. GET /entities/urn:E1 from CB (local), in default normalized format
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": {
+        "type": "Property",
+        "value": "Entity E1 in Orion A"
+    },
+    "R1": {
+        "object": "urn:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+21. GET /entities/urn:E1 from CB (local), in concise format
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 79
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "Entity E1 in Orion A",
+    "R1": {
+        "object": "urn:E2"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+22. GET /entities/urn:E1 from CB (local), in simplified format
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+    "P1": "Entity E1 in Orion A",
+    "R1": "urn:E2",
+    "id": "urn:E1",
     "type": "T"
 }
 

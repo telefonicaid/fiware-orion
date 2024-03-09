@@ -97,12 +97,15 @@ void ntocAttribute(KjNode* attrP, const char* lang, bool sysAttrs)
 
     if (strcmp(fieldP->name, "type")        == 0)  continue;
     if (strcmp(fieldP->name, "value")       == 0)  continue;
+    if (strcmp(fieldP->name, "object")      == 0)  continue;
+    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "json")        == 0)  continue;
+    if (strcmp(fieldP->name, "vocab")       == 0)  continue;
     if (strcmp(fieldP->name, "createdAt")   == 0)  continue;
     if (strcmp(fieldP->name, "modifiedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "observedAt")  == 0)  continue;
     if (strcmp(fieldP->name, "unitCode")    == 0)  continue;
-    if (strcmp(fieldP->name, "object")      == 0)  continue;
-    if (strcmp(fieldP->name, "languageMap") == 0)  continue;
+    if (strcmp(fieldP->name, "datasetId")   == 0)  continue;
     if (strcmp(fieldP->name, "lang")        == 0)  continue;
 
     ntocSubAttribute(fieldP, lang, sysAttrs);
