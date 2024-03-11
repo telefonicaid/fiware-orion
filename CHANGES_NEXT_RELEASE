@@ -1,1 +1,2 @@
 - Add: exprLang field in custom notifications (#4004)
+- Fix: lighter operation to get databases list from MongoDB (#4517)
