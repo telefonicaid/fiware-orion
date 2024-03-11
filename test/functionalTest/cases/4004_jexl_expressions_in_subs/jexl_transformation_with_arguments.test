@@ -56,7 +56,7 @@ payload='{
       "ngsi": {
         "includes": {
           "value": "${S|includes(R)}",
-          "type": "TextUnrestricted"
+          "type": "Boolean"
         }
       }      
     },
@@ -169,7 +169,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 ===========================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 143
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -183,7 +183,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "id": "E1",
             "includes": {
                 "metadata": {},
-                "type": "TextUnrestricted",
+                "type": "Boolean",
                 "value": true
             },
             "type": "T"
@@ -194,7 +194,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 144
+Content-Length: 135
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -208,7 +208,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "id": "E1",
             "includes": {
                 "metadata": {},
-                "type": "TextUnrestricted",
+                "type": "Boolean",
                 "value": false
             },
             "type": "T"
@@ -219,7 +219,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 143
+Content-Length: 134
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -233,7 +233,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "id": "E1",
             "includes": {
                 "metadata": {},
-                "type": "TextUnrestricted",
+                "type": "Boolean",
                 "value": true
             },
             "type": "T"

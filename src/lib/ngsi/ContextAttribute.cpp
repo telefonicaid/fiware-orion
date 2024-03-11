@@ -1363,7 +1363,7 @@ void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP, bool 
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType)
+std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck)
 {
   size_t len;
   char errorMsg[128];
@@ -1414,14 +1414,14 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return "Invalid characters in attribute type";
   }
 
-  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
+  if ((!relaxForbiddenCheck) && (compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
   {
     return compoundValueP->check("");
   }
 
   if (valueType == orion::ValueTypeString)
   {
-    if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
+    if ((!relaxForbiddenCheck) && (type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
     {
       alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";

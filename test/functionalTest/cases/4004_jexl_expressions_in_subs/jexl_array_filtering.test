@@ -57,7 +57,7 @@ payload='{
       "ngsi": {
         "cal": {
           "value": "${a[.b<5]}",
-          "type": "TextUnrestricted"
+          "type": "Calculated"
         }
       }      
     },
@@ -179,7 +179,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =====================================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 151
+Content-Length: 145
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -192,7 +192,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "cal": {
                 "metadata": {},
-                "type": "TextUnrestricted",
+                "type": "Calculated",
                 "value": [
                     {
                         "b": 1
@@ -211,7 +211,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 138
+Content-Length: 132
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -224,7 +224,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "cal": {
                 "metadata": {},
-                "type": "TextUnrestricted",
+                "type": "Calculated",
                 "value": null
             },
             "id": "E1",
@@ -236,7 +236,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 138
+Content-Length: 132
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -249,7 +249,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "cal": {
                 "metadata": {},
-                "type": "TextUnrestricted",
+                "type": "Calculated",
                 "value": null
             },
             "id": "E1",
@@ -261,7 +261,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 150
+Content-Length: 144
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -274,7 +274,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "cal": {
                 "metadata": {},
-                "type": "TextUnrestricted",
+                "type": "Calculated",
                 "value": [
                     {
                         "b": -1,

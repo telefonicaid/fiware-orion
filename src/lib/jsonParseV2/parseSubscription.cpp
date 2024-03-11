@@ -525,11 +525,6 @@ static std::string parseCustomPayload
         }
 
         ngsi->id = iter->value.GetString();
-
-        if (forbiddenIdChars(V2, ngsi->id.c_str(), ""))
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
-        }
       }
       else if (name == "type")
       {
@@ -539,11 +534,6 @@ static std::string parseCustomPayload
         }
 
         ngsi->type = iter->value.GetString();
-
-        if (forbiddenIdChars(V2, ngsi->type.c_str(), ""))
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
-        }
       }
       else  // attribute
       {
@@ -551,7 +541,9 @@ static std::string parseCustomPayload
 
         ngsi->attributeVector.push_back(caP);
 
-        std::string r = parseContextAttribute(ciP, iter, caP, false);
+        // Note we are using relaxForbiddenCheck true in this case, as JEXL expressions typically use forbidden
+        // chars and we don't want to fail in that case
+        std::string r = parseContextAttribute(ciP, iter, caP, false, true);
 
         if (r == "max deep reached")
         {

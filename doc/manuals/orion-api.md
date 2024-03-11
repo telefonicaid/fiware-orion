@@ -398,11 +398,12 @@ the following will be used (note that "%25" is the encoding for "%").
 GET /v2/entities/E%253C01%253E
 ```
 
-There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
+There are some exception cases in which the above restrictions do not apply. In particular, in the following cases:
 
 * URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `georel` and `coords` allow `;`
+* Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the JEXL expression syntax)
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
 
 ## Identifiers syntax restrictions
