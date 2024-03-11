@@ -64,7 +64,7 @@ echo "INSTALL: python special dependencies" \
 && pip install Werkzeug==2.0.2 \
 && pip install paho-mqtt==1.6.1 \
 && pip install amqtt==0.11.0b1 \
-&& pip install tcjexl==0.1.0 \
+&& pip install tcjexl==0.2.0 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
