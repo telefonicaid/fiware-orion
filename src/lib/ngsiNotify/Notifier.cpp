@@ -121,7 +121,7 @@ static bool setPayload
   const std::string&               notifPayload,
   const SubscriptionId&            subscriptionId,
   Entity&                          en,
-  std::map<std::string, std::string>* replacementsP,
+  ExprContextObject*               exprContextObjectP,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
@@ -170,7 +170,7 @@ static bool setPayload
   }
   else
   {
-    if (!macroSubstitute(payloadP, notifPayload, replacementsP, ""))
+    if (!macroSubstitute(payloadP, notifPayload, exprContextObjectP, "", true))
     {
       return false;
     }
@@ -194,34 +194,14 @@ static bool setPayload
 static bool setJsonPayload
 (
   orion::CompoundValueNode*  json,
-  std::map<std::string, std::string>* replacementsP,
+  ExprContextObject*         exprContextObjectP,
   std::string*               payloadP,
   std::string*               mimeTypeP
 )
 {
-  *payloadP = json->toJson(replacementsP);
+  *payloadP = json->toJson(exprContextObjectP);
   *mimeTypeP = "application/json";  // this can be overriden by headers field
   return true;
-}
-
-
-/* ****************************************************************************
-*
-* removeQuotes -
-*
-* Entity id and type are special. Different from a attribute, they are always
-* strings and cannot take a number, boolean, etc. as value.
-*/
-inline std::string removeQuotes(std::string s)
-{
-  if (s[0] == '"')
-  {
-    return s.substr(1, s.size()-2);
-  }
-  else
-  {
-    return s;
-  }
 }
 
 
@@ -237,7 +217,7 @@ static bool setNgsiPayload
   const Entity&                    ngsi,
   const SubscriptionId&            subscriptionId,
   Entity&                          en,
-  std::map<std::string, std::string>* replacementsP,
+  ExprContextObject*               exprContextObjectP,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
@@ -256,7 +236,7 @@ static bool setNgsiPayload
   else
   {
     // If id is not found in the replacements macro, we use en.id.
-    effectiveId = removeQuotes(smartStringValue(ngsi.id, replacementsP, '"' + en.id + '"'));
+    effectiveId = removeQuotes(smartStringValue(ngsi.id, exprContextObjectP, '"' + en.id + '"'));
   }
 
   std::string effectiveType;
@@ -267,7 +247,7 @@ static bool setNgsiPayload
   else
   {
     // If type is not found in the replacements macro, we use en.type.
-    effectiveType = removeQuotes(smartStringValue(ngsi.type, replacementsP, '"' + en.type + '"'));
+    effectiveType = removeQuotes(smartStringValue(ngsi.type, exprContextObjectP, '"' + en.type + '"'));
   }
 
   cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
@@ -293,11 +273,11 @@ static bool setNgsiPayload
 
   if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES))
   {
-    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, replacementsP);
+    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
   }
   else
   {
-    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, replacementsP);
+    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
   }
 
   return true;
@@ -335,9 +315,34 @@ static SenderThreadParams* buildSenderParamsCustom
   std::map<std::string, std::string>  headers;
   Entity&                             en      = notifyCerP->entity;
 
+  const std::string exprLang = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.exprLang : notification.mqttInfo.exprLang;
+
   // Used by several macroSubstitute() calls along this function
-  std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, tenant, xauthToken, &replacements);
+  bool legacy = (exprLang == "legacy");
+  ExprContextObject exprContext(legacy);
+
+  // It seems that add() semantics are different in legacy and jexl mode. In jexl mode, if the key already exists, it is
+  // updated. In legacy model, if the key already exists, the operation is ignored (so previous value is preserved). Taking
+  // into account that in the case of an attribute with name "service", "servicePath" and "authToken", must have precedence
+  // over macros comming from macros of the same name we conditionally add them depending the case
+  exprContext.add("id", en.id);
+  exprContext.add("type", en.type);
+  if (!legacy)
+  {
+    exprContext.add("service", tenant);
+    exprContext.add("servicePath", en.servicePath);
+    exprContext.add("authToken", xauthToken);
+  }
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    en.attributeVector[ix]->addToContext(&exprContext, legacy);
+  }
+  if (legacy)
+  {
+    exprContext.add("service", tenant);
+    exprContext.add("servicePath", en.servicePath);
+    exprContext.add("authToken", xauthToken);
+  }
 
   //
   // 1. Verb/Method
@@ -363,9 +368,10 @@ static SenderThreadParams* buildSenderParamsCustom
   // 2. URL
   //
   std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-  if (macroSubstitute(&url, notifUrl, &replacements, "") == false)
+  if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
   {
     // Warning already logged in macroSubstitute()
+    exprContext.release();
     return NULL;
   }
 
@@ -379,25 +385,27 @@ static SenderThreadParams* buildSenderParamsCustom
   {
     bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
     std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
-    if (!setPayload(includePayload, notifPayload, subscriptionId, en, &replacements, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
+    if (!setPayload(includePayload, notifPayload, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
       // Warning already logged in macroSubstitute()
+      exprContext.release();
       return NULL;
     }
   }
   else if (customPayloadType == ngsiv2::CustomPayloadType::Json)
   {
     orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
-    setJsonPayload(json, &replacements, &payload, &mimeType);
+    setJsonPayload(json, &exprContext, &payload, &mimeType);
     renderFormat = NGSI_V2_CUSTOM;
   }
   else  // customPayloadType == ngsiv2::CustomPayloadType::Ngsi
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
     const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
-    if (!setNgsiPayload(ngsi, subscriptionId, en, &replacements, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
+    if (!setNgsiPayload(ngsi, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
     {
       // Warning already logged in macroSubstitute()
+      exprContext.release();
       return NULL;
     }
     mimeType = "application/json";
@@ -414,9 +422,10 @@ static SenderThreadParams* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, &replacements, "") == false) || (macroSubstitute(&value, it->second, &replacements, "") == false))
+      if ((macroSubstitute(&key, it->first, &exprContext, "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
+        exprContext.release();
         return NULL;
       }
 
@@ -440,9 +449,10 @@ static SenderThreadParams* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, &replacements,  "") == false) || (macroSubstitute(&value, it->second, &replacements, "") == false))
+      if ((macroSubstitute(&key, it->first, &exprContext,  "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
+        exprContext.release();
         return NULL;
       }
 
@@ -474,6 +484,7 @@ static SenderThreadParams* buildSenderParamsCustom
   if (!parseUrl(url, host, port, uriPath, protocol))
   {
     LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
+    exprContext.release();
     return NULL;
   }
 
@@ -505,9 +516,10 @@ static SenderThreadParams* buildSenderParamsCustom
   // 8. Topic (only in the case of MQTT notifications)
   if (notification.type == ngsiv2::MqttNotification)
   {
-    if (macroSubstitute(&topic, notification.mqttInfo.topic, &replacements, "") == false)
+    if (macroSubstitute(&topic, notification.mqttInfo.topic, &exprContext, "", true) == false)
     {
       // Warning already logged in macroSubstitute()
+      exprContext.release();
       return NULL;
     }
   }
@@ -543,6 +555,7 @@ static SenderThreadParams* buildSenderParamsCustom
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   paramsP->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
+  exprContext.release();
   return paramsP;
 }
 

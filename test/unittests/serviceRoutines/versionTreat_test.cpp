@@ -94,6 +94,8 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), "boost") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "libcurl") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "libmicrohttpd") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "libmosquitto") != NULL);
+  EXPECT_TRUE(strstr(out.c_str(), "libpython") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "openssl") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "rapidjson") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "mongoc") != NULL);

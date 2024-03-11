@@ -42,6 +42,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsiNotify/Notifier.h"
 #include "alarmMgr/alarmMgr.h"
+#include "expressions/exprMgr.h"
 #include "logSummary/logSummary.h"
 
 #include "unittests/unittest.h"
@@ -162,6 +163,7 @@ int main(int argC, char** argV)
   // Note that disableRetryTries, multitenancy and mutex time stats are disabled for unit test mongo init
   mongoInit(dbURI, dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, false, false, dbTimeout, writeConcern, dbPoolSize, false);
   alarmMgr.init(false);
+  exprMgr.init();
   logSummaryInit(&lsPeriod);
   // setupDatabase(); FIXME #3775: pending on mongo unit test re-enabling
 

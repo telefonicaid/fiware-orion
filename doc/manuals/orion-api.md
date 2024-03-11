@@ -398,11 +398,12 @@ the following will be used (note that "%25" is the encoding for "%").
 GET /v2/entities/E%253C01%253E
 ```
 
-There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
+There are some exception cases in which the above restrictions do not apply. In particular, in the following cases:
 
 * URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `georel` and `coords` allow `;`
+* Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the JEXL expression syntax)
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
 
 ## Identifiers syntax restrictions
@@ -3946,6 +3947,7 @@ A `httpCustom` object contains the following subfields.
 | `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
 | `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
 | `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
+| `exprLang` | ✓        | string | Expression language to use, either `legacy` or `jexl` (default is `jexl`) |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
@@ -3967,6 +3969,7 @@ A `mqttCustom` object contains the following subfields.
 | `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
 | `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
 | `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
+| `exprLang` | ✓        | string | Expression language to use, either `legacy` or `jexl` (default is `jexl`) |
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 

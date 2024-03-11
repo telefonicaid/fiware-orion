@@ -157,7 +157,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 715
+Content-Length: 751
 
 [
     {
@@ -167,6 +167,7 @@ Content-Length: 715
             "attrsFormat": "normalized",
             "covered": false,
             "httpCustom": {
+                "exprLang": "jexl",
                 "json": {
                     "x": {
                         "x1": "${A}",
@@ -202,6 +203,7 @@ Content-Length: 715
             "attrsFormat": "normalized",
             "covered": false,
             "httpCustom": {
+                "exprLang": "jexl",
                 "json": [
                     "22",
                     {

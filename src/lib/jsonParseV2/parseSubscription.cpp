@@ -525,11 +525,6 @@ static std::string parseCustomPayload
         }
 
         ngsi->id = iter->value.GetString();
-
-        if (forbiddenIdChars(V2, ngsi->id.c_str(), ""))
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
-        }
       }
       else if (name == "type")
       {
@@ -539,11 +534,6 @@ static std::string parseCustomPayload
         }
 
         ngsi->type = iter->value.GetString();
-
-        if (forbiddenIdChars(V2, ngsi->type.c_str(), ""))
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
-        }
       }
       else  // attribute
       {
@@ -551,7 +541,9 @@ static std::string parseCustomPayload
 
         ngsi->attributeVector.push_back(caP);
 
-        std::string r = parseContextAttribute(ciP, iter, caP, false);
+        // Note we are using relaxForbiddenCheck true in this case, as JEXL expressions typically use forbidden
+        // chars and we don't want to fail in that case
+        std::string r = parseContextAttribute(ciP, iter, caP, false, true);
 
         if (r == "max deep reached")
         {
@@ -1031,6 +1023,26 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // exprLang
+    Opt<std::string>  exprLangOpt = getStringOpt(httpCustom, "exprLang", "exprLang httpCustom notification");
+    std::string       exprLang = "jexl";
+
+    if (!exprLangOpt.ok())
+    {
+      return badInput(ciP, exprLangOpt.error);
+    }
+
+    if (exprLangOpt.given)
+    {
+      exprLang = exprLangOpt.value;
+      if ((exprLang != "jexl") && (exprLang != "legacy"))
+      {
+        return badInput(ciP, "not valid exprLang, valid ones are jexl or legacy");
+      }
+    }
+
+    subsP->notification.httpInfo.exprLang = exprLang;
+
     subsP->notification.httpInfo.custom = true;
   }
   else if (notification.HasMember("mqtt"))
@@ -1140,6 +1152,26 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return r;
     }
+
+    // exprLang
+    Opt<std::string>  exprLangOpt = getStringOpt(mqttCustom, "exprLang", "exprLang mqttCustom notification");
+    std::string       exprLang = "jexl";
+
+    if (!exprLangOpt.ok())
+    {
+      return badInput(ciP, exprLangOpt.error);
+    }
+
+    if (exprLangOpt.given)
+    {
+      exprLang = exprLangOpt.value;
+      if ((exprLang != "jexl") && (exprLang != "legacy"))
+      {
+        return badInput(ciP, "not valid exprLang, valid ones are jexl or legacy");
+      }
+    }
+
+    subsP->notification.mqttInfo.exprLang = exprLang;
 
     subsP->notification.mqttInfo.custom = true;
   }
