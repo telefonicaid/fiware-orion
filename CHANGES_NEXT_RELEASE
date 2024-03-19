@@ -4,6 +4,7 @@
   * SOF:    https://stackoverflow.com/questions/77911109/fiware-to-payload-too-large
   * #1551:  format=simplified for distribute GET /entities gave Normalized for entities from other brokers
   * #1573:  pagination not working when entities have the exact same creation date (sort also by entity id)
+  * #1583:  If a 'q' contains an ampersand, that ampersand needs to be forwarded as a semicolon
 
 ## New Features:
   * Support for attributes of type VocabularyProperty

@@ -102,6 +102,22 @@ typedef struct ForwardUrlParts
 
 // -----------------------------------------------------------------------------
 //
+// charReplace -
+//
+static void charReplace(char* s, char from, char to)
+{
+  while (*s != 0)
+  {
+    if (*s == from)
+      *s = to;
+    ++s;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // urlCompose -
 //
 char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
@@ -169,6 +185,12 @@ static void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char*
   {
     int sLen     = strlen(key) + 1 + strlen(value) + 1;
     sListP->sP   = kaAlloc(&orionldState.kalloc, sLen);
+
+    //
+    // If it's a 'q', and there's an ampersand, change it for a ';'
+    //
+    if ((key[0] == 'q') && (key[1] == 0))
+      charReplace((char*) value, '&', ';');
 
     sListP->sLen = snprintf(sListP->sP, sLen, "%s=%s", key, value);
   }
