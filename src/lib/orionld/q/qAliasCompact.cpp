@@ -152,7 +152,7 @@ bool qAliasCompact(KjNode* qP, bool compact)
     else if (*cP == '&')
     {
       insideVarName = true;
-      out[outIx++] = '&';
+      out[outIx++] = ';';
       varStart = &cP[1];
     }
     else if (*cP == '|')

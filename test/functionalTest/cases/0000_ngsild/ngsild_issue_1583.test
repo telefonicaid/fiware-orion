@@ -1,0 +1,461 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET /entities with two brokers all connected via registrations
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+orionldStart CB  -experimental -forwarding -wip entityMaps -t 0-255
+orionldStart CP1 -experimental -forwarding -wip entityMaps
+
+--SHELL--
+
+#
+# 01. In CP1, create an entity urn:E1 with attributes cpuCores==1 + ramCapacity==1000
+# 02. In CP1, create an entity urn:E2 with attributes cpuCores==1 + ramCapacity==4000
+# 03. In CP1, create an entity urn:E3 with attributes cpuCores==2 + ramCapacity==1000
+# 04. In CP1, create an entity urn:E4 with attributes cpuCores==2 + ramCapacity==4000
+# 05. In CB, create an entity urn:E5 with attributes cpuCores==3 + ramCapacity==1000
+# 06. In CB, create an entity urn:E6 with attributes cpuCores==3 + ramCapacity==4000
+# 07. In CB, create an entity urn:E7 with attributes cpuCores==4 + ramCapacity==1000
+# 08. In CB, create an entity urn:E8 with attributes cpuCores==4 + ramCapacity==4000
+# 12. Create an inclusive registration R1 in CB on entities of type T pointing to CP1
+# 13. Create an inclusive registration R2 in CP1 on entities of type T pointing to CB
+# 14. GET /entities?type=T&q=ramCapacity==1000 in CB - see urn:E1 and urn:E3 from CP1, plus urn:E5 and urn:E7 from CB
+# 15. GET /entities?type=T&q=ramCapacity==1000;cpuCores==1 in CB - see urn:E1 from CP1
+# 16. GET /entities?type=T&q=ramCapacity==4000;cpuCores==5 in CB - see []
+# 17. GET /entities?type=T&q=ramCapacity>3999;cpuCores>1 in CB - see urn:E4 from CP1, plus urn:E6 and urn:E8 from CB
+# 18. As step 17 but with a urlencoded ampersand - see urn:E4 from CP1, plus urn:E6 and urn:E8 from CB
+#
+
+echo "01. In CP1, create an entity urn:E1 with attributes cpuCores==1 + ramCapacity==1000"
+echo "==================================================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "cpuCores": 1,
+  "ramCapacity": 1000
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "02. In CP1, create an entity urn:E2 with attributes cpuCores==1 + ramCapacity==4000"
+echo "==================================================================================="
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "cpuCores": 1,
+  "ramCapacity": 4000
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. In CP1, create an entity urn:E3 with attributes cpuCores==2 + ramCapacity==1000"
+echo "==================================================================================="
+payload='{
+  "id": "urn:E3",
+  "type": "T",
+  "cpuCores": 2,
+  "ramCapacity": 1000
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "04. In CP1, create an entity urn:E4 with attributes cpuCores==2 + ramCapacity==4000"
+echo "==================================================================================="
+payload='{
+  "id": "urn:E4",
+  "type": "T",
+  "cpuCores": 2,
+  "ramCapacity": 4000
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "05. In CB, create an entity urn:E5 with attributes cpuCores==3 + ramCapacity==1000"
+echo "=================================================================================="
+payload='{
+  "id": "urn:E5",
+  "type": "T",
+  "cpuCores": 3,
+  "ramCapacity": 1000
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. In CB, create an entity urn:E6 with attributes cpuCores==3 + ramCapacity==4000"
+echo "=================================================================================="
+payload='{
+  "id": "urn:E6",
+  "type": "T",
+  "cpuCores": 3,
+  "ramCapacity": 4000
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. In CB, create an entity urn:E7 with attributes cpuCores==4 + ramCapacity==1000"
+echo "=================================================================================="
+payload='{
+  "id": "urn:E7",
+  "type": "T",
+  "cpuCores": 4,
+  "ramCapacity": 1000
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "08. In CB, create an entity urn:E8 with attributes cpuCores==4 + ramCapacity==4000"
+echo "=================================================================================="
+payload='{
+  "id": "urn:E8",
+  "type": "T",
+  "cpuCores": 4,
+  "ramCapacity": 4000
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "12. Create an inclusive registration R1 in CB on entities of type T pointing to CP1"
+echo "==================================================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "http://'$(hostname)':'$CP1_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "13. Create an inclusive registration R2 in CP1 on entities of type T pointing to CB"
+echo "==================================================================================="
+payload='{
+  "id": "urn:R2",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T"
+        }
+      ]
+    }
+  ],
+  "mode": "inclusive",
+  "operations": [ "retrieveOps" ],
+  "endpoint": "http://'$(hostname)':'$CB_PORT'"
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "14. GET /entities?type=T&q=ramCapacity==1000 in CB - see urn:E1 and urn:E3 from CP1, plus urn:E5 and urn:E7 from CB"
+echo "==================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&q=ramCapacity==1000&format=simplified'
+echo
+echo
+
+
+echo "15. GET /entities?type=T&q=ramCapacity==1000;cpuCores==1 in CB - see urn:E1 from CP1"
+echo "===================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&q=ramCapacity==1000;cpuCores==1&format=simplified'
+echo
+echo
+
+
+echo "16. GET /entities?type=T&q=ramCapacity==4000;cpuCores==5 in CB - see []"
+echo "======================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&q=ramCapacity==4000;cpuCores==5&format=simplified'
+echo
+echo
+
+
+echo "17. GET /entities?type=T&q=ramCapacity>3999;cpuCores>1 in CB - see urn:E4 from CP1, plus urn:E6 and urn:E8 from CB"
+echo "=================================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&q=ramCapacity>3999;cpuCores>1&format=simplified'
+echo
+echo
+
+
+echo "18. As step 17 but with a urlencoded ampersand - see urn:E4 from CP1, plus urn:E6 and urn:E8 from CB"
+echo "===================================================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&q=ramCapacity>3999%26cpuCores>1&format=simplified'
+echo
+echo
+
+
+--REGEXPECT--
+01. In CP1, create an entity urn:E1 with attributes cpuCores==1 + ramCapacity==1000
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. In CP1, create an entity urn:E2 with attributes cpuCores==1 + ramCapacity==4000
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+03. In CP1, create an entity urn:E3 with attributes cpuCores==2 + ramCapacity==1000
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+04. In CP1, create an entity urn:E4 with attributes cpuCores==2 + ramCapacity==4000
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E4
+
+
+
+05. In CB, create an entity urn:E5 with attributes cpuCores==3 + ramCapacity==1000
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E5
+
+
+
+06. In CB, create an entity urn:E6 with attributes cpuCores==3 + ramCapacity==4000
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E6
+
+
+
+07. In CB, create an entity urn:E7 with attributes cpuCores==4 + ramCapacity==1000
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E7
+
+
+
+08. In CB, create an entity urn:E8 with attributes cpuCores==4 + ramCapacity==4000
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E8
+
+
+
+12. Create an inclusive registration R1 in CB on entities of type T pointing to CP1
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+13. Create an inclusive registration R2 in CP1 on entities of type T pointing to CB
+===================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R2
+
+
+
+14. GET /entities?type=T&q=ramCapacity==1000 in CB - see urn:E1 and urn:E3 from CP1, plus urn:E5 and urn:E7 from CB
+===================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 237
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[
+    {
+        "cpuCores": 3,
+        "id": "urn:E5",
+        "ramCapacity": 1000,
+        "type": "T"
+    },
+    {
+        "cpuCores": 4,
+        "id": "urn:E7",
+        "ramCapacity": 1000,
+        "type": "T"
+    },
+    {
+        "cpuCores": 1,
+        "id": "urn:E1",
+        "ramCapacity": 1000,
+        "type": "T"
+    },
+    {
+        "cpuCores": 2,
+        "id": "urn:E3",
+        "ramCapacity": 1000,
+        "type": "T"
+    }
+]
+
+
+15. GET /entities?type=T&q=ramCapacity==1000;cpuCores==1 in CB - see urn:E1 from CP1
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 60
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[
+    {
+        "cpuCores": 1,
+        "id": "urn:E1",
+        "ramCapacity": 1000,
+        "type": "T"
+    }
+]
+
+
+16. GET /entities?type=T&q=ramCapacity==4000;cpuCores==5 in CB - see []
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[]
+
+
+17. GET /entities?type=T&q=ramCapacity>3999;cpuCores>1 in CB - see urn:E4 from CP1, plus urn:E6 and urn:E8 from CB
+==================================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[
+    {
+        "cpuCores": 3,
+        "id": "urn:E6",
+        "ramCapacity": 4000,
+        "type": "T"
+    },
+    {
+        "cpuCores": 4,
+        "id": "urn:E8",
+        "ramCapacity": 4000,
+        "type": "T"
+    },
+    {
+        "cpuCores": 2,
+        "id": "urn:E4",
+        "ramCapacity": 4000,
+        "type": "T"
+    }
+]
+
+
+18. As step 17 but with a urlencoded ampersand - see urn:E4 from CP1, plus urn:E6 and urn:E8 from CB
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[
+    {
+        "cpuCores": 3,
+        "id": "urn:E6",
+        "ramCapacity": 4000,
+        "type": "T"
+    },
+    {
+        "cpuCores": 4,
+        "id": "urn:E8",
+        "ramCapacity": 4000,
+        "type": "T"
+    },
+    {
+        "cpuCores": 2,
+        "id": "urn:E4",
+        "ramCapacity": 4000,
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN---
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

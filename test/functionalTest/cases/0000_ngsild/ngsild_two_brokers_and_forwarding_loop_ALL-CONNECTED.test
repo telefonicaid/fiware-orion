@@ -40,6 +40,7 @@ orionldStart CP1 -experimental -forwarding -wip entityMaps
 # 11. Create an inclusive registration R1 in CP1 on entities of type T pointing to CB
 # 13. GET /entities?type=T in CB
 # 14. GET /entities?type=N in CB - test for issue #1496
+# 15. GET /entities?type=T&q=R1==urn:E3 in CB - see urn:E4 from CP1
 #
 
 echo "01. In CB, create an entity urn:E1 with attributes P1+R1"
@@ -95,7 +96,7 @@ echo
 
 
 echo "07. Create an inclusive registration R1 in CB on entities of type T pointing to CP1"
-echo "========================================================="
+echo "==================================================================================="
 payload='{
   "id": "urn:R1",
   "type": "ContextSourceRegistration",
@@ -118,7 +119,7 @@ echo
 
 
 echo "11. Create an inclusive registration R1 in CP1 on entities of type T pointing to CB"
-echo "========================================================="
+echo "==================================================================================="
 payload='{
   "id": "urn:R1",
   "type": "ContextSourceRegistration",
@@ -152,6 +153,13 @@ echo "14. GET /entities?type=N in CB - test for issue #1496"
 echo "====================================================="
 orionCurl --url '/ngsi-ld/v1/entities?type=N'
 entityMap=$(echo "$_responseHeaders" | grep NGSILD-EntityMap: | awk -F ': ' '{ print $2 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "15. GET /entities?type=T&q=R1==urn:E3 in CB - see urn:E4 from CP1"
+echo "================================================================="
+orionCurl --url '/ngsi-ld/v1/entities?type=T&q=R1==%22urn:E3%22'
 echo
 echo
 
@@ -194,7 +202,7 @@ Location: /ngsi-ld/v1/entities/urn:E4
 
 
 07. Create an inclusive registration R1 in CB on entities of type T pointing to CP1
-=========================================================
+===================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -203,7 +211,7 @@ Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
 
 
 11. Create an inclusive registration R1 in CP1 on entities of type T pointing to CB
-=========================================================
+===================================================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Date: REGEX(.*)
@@ -281,6 +289,31 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 []
+
+
+15. GET /entities?type=T&q=R1==urn:E3 in CB - see urn:E4 from CP1
+=================================================================
+HTTP/1.1 200 OK
+Content-Length: 131
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+NGSILD-EntityMap: urn:ngsi-ld:entity-map:REGEX(.*)
+
+[
+    {
+        "P1": {
+            "type": "Property",
+            "value": "Entity E4 in Orion B"
+        },
+        "R1": {
+            "object": "urn:E3",
+            "type": "Relationship"
+        },
+        "id": "urn:E4",
+        "type": "T"
+    }
+]
 
 
 --TEARDOWN---
