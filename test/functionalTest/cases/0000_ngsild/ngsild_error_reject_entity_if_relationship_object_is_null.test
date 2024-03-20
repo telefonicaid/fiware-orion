@@ -52,13 +52,13 @@ echo
 01. POST /ngsi-ld/v1/entities with a relationship attribute with object == null
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 266
+Content-Length: 218
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "detail": "Got a JSON 'null' in RHS (not allowed in JSON-LD docs) for the entity 'urn:unknown:id', attribute 'https://uri.etsi.org/ngsi-ld/default-context/R1', attribute field 'object'",
-    "title": "Bad Input",
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "The use of NULL value is not recommended for JSON-LD (the whole attribute gets ignored)",
     "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
 }
 
