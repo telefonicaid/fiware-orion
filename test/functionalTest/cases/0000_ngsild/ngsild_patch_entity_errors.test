@@ -104,7 +104,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 03. Patch E1, setting P1.value to null - see error
 ==================================================
 HTTP/1.1 207 Multi-Status
-Content-Length: 239
+Content-Length: 200
 Content-Type: application/json
 Date: REGEX(.*)
 Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
@@ -113,7 +113,7 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
     "notUpdated": [
         {
             "attributeName": "P1",
-            "reason": "Bad Input: Got a JSON 'null' in RHS (not allowed in JSON-LD docs) for the entity 'urn:E1', attribute 'https://uri.etsi.org/ngsi-ld/default-context/P1', attribute field 'value'"
+            "reason": "The use of NULL value is not recommended for JSON-LD (the whole attribute gets ignored): https://uri.etsi.org/ngsi-ld/default-context/P1"
         }
     ],
     "updated": []

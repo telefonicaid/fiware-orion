@@ -135,8 +135,8 @@ echo
 echo "09. Removing P1 and R1"
 echo "======================"
 payload='{
-  "P1": null,
-  "R1": null
+  "P1": "urn:ngsi-ld:null",
+  "R1": "urn:ngsi-ld:null"
 }'
 orionCurl --url /ngsi-ld/v1/entities/urn:E1 -X PATCH --payload "$payload"
 echo

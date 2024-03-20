@@ -1,0 +1,157 @@
+# Copyright 2022 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Issue #1589: PATCH Relationship with a null object to delete the attribute
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB -experimental
+
+--SHELL--
+
+#
+# 01. Create an entity urn:E1 with a Relationship R1
+# 02. PATCH urn:E1 with R1::object: null - broker should give an error as null is not permitted
+# 03. GET urn:E1 - see that R1 is still there
+# 04. PATCH urn:E1 with R1::object: "urn:ngsi-ld:none"
+# 05. GET urn:E1 - see that R1 is now gone
+#
+
+echo "01. Create an entity urn:E1 with a Relationship R1"
+echo "=================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "R1": {
+    "object": "urn:E2"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. PATCH urn:E1 with R1::object: null - broker should give an error as null is not permitted"
+echo "============================================================================================="
+payload='{
+  "R1": {
+    "object": null
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "03. GET urn:E1 - see that R1 is still there"
+echo "==========================================="
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+echo '04. PATCH urn:E1 with R1::object: "urn:ngsi-ld:none"'
+echo '===================================================='
+payload='{
+  "R1": {
+    "object": "urn:ngsi-ld:null"
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1 --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. GET urn:E1 - see that R1 is now gone"
+echo "========================================"
+orionCurl --url /ngsi-ld/v1/entities/urn:E1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:E1 with a Relationship R1
+==================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. PATCH urn:E1 with R1::object: null - broker should give an error as null is not permitted
+=============================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 218
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "https://uri.etsi.org/ngsi-ld/default-context/R1",
+    "title": "The use of NULL value is not recommended for JSON-LD (the whole attribute gets ignored)",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
+}
+
+
+03. GET urn:E1 - see that R1 is still there
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "R1": {
+        "object": "urn:E2",
+        "type": "Relationship"
+    },
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+04. PATCH urn:E1 with R1::object: "urn:ngsi-ld:none"
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+05. GET urn:E1 - see that R1 is now gone
+========================================
+HTTP/1.1 200 OK
+Content-Length: 26
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+{
+    "id": "urn:E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
