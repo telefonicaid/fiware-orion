@@ -102,22 +102,6 @@ typedef struct ForwardUrlParts
 
 // -----------------------------------------------------------------------------
 //
-// charReplace -
-//
-static void charReplace(char* s, char from, char to)
-{
-  while (*s != 0)
-  {
-    if (*s == from)
-      *s = to;
-    ++s;
-  }
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
 // urlCompose -
 //
 char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
@@ -169,29 +153,61 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
 
 // -----------------------------------------------------------------------------
 //
+// urlEncode
+//
+void urlEncode(char* from, char* to, int toLen)
+{
+  int fromIx = 0;
+  int toIx   = 0;
+
+  while (from[fromIx] != 0)
+  {
+    if (from[fromIx] == '&')
+    {
+      to[toIx++] = '%';
+      to[toIx++] = '2';
+      to[toIx++] = '6';
+    }
+    else
+      to[toIx++] = from[fromIx];
+
+    ++fromIx;
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
 // uriParamAdd -
 //
-static void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* value, int totalLen)
+static void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char* cvalue, int totalLen)
 {
   SList* sListP = (SList*) kaAlloc(&orionldState.kalloc, sizeof(SList));
+  char*  value  = (char*) cvalue;
 
   if (value == NULL)
   {
-    // If 'value' == NULL, then 'key' is complete (e.g.
+    // If 'value' == NULL, then 'key' is complete
     sListP->sP   = (char*) key;
     sListP->sLen = (totalLen == -1)? strlen(key) : totalLen;
   }
   else
   {
-    int sLen     = strlen(key) + 1 + strlen(value) + 1;
-    sListP->sP   = kaAlloc(&orionldState.kalloc, sLen);
-
     //
-    // If it's a 'q', and there's an ampersand, change it for a ';'
+    // If it's a 'q', urlencode it
     //
     if ((key[0] == 'q') && (key[1] == 0))
-      charReplace((char*) value, '&', ';');
+    {
+      int   len     = strlen(value) * 3;
+      char* encoded = kaAlloc(&orionldState.kalloc, len);
 
+      urlEncode(value, encoded, len);
+      value = encoded;
+    }
+
+    int sLen     = strlen(key) + 1 + strlen(value) + 1;
+    sListP->sP   = kaAlloc(&orionldState.kalloc, sLen);
     sListP->sLen = snprintf(sListP->sP, sLen, "%s=%s", key, value);
   }
 
