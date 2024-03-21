@@ -202,6 +202,18 @@ static void uriParamAdd(ForwardUrlParts* urlPartsP, const char* key, const char*
       int   len     = strlen(value) * 3;
       char* encoded = kaAlloc(&orionldState.kalloc, len);
 
+      //
+      // krakend doesn't tolerate ';', which is a valid AND in NGSI-LD.
+      // Fortunately, Orion-LD supports '&' as an alternative to ';'
+      // Now, if ';' is used in 'q', it needs to be changed for a '&' (and URL encoded)
+      //
+      char* semi = value;
+      while ((semi = strchr(semi, ';')) != NULL)
+      {
+        *semi = '&';
+        ++semi;
+      }
+
       urlEncode(value, encoded, len);
       value = encoded;
     }
