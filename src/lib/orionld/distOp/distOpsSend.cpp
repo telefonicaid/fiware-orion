@@ -147,19 +147,25 @@ int distOpsSend2(DistOpListItem* distOpList)
 
       if (stillRunning != 0)
       {
-        cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 1000, NULL);
+        cm = curl_multi_wait(orionldState.curlDoMultiP, NULL, 0, 5000, NULL);
         if (cm != CURLM_OK)
         {
           LM_E(("Internal Error (curl_multi_wait: error %d", cm));
           return -2;
         }
+
+        if (loops > 10000)
+        {
+          LM_E(("Internal Error (curl_multi_wait: timeout (%d loops)", loops));
+          return -3;
+        }
       }
 
-      if ((++loops >= 50) && ((loops % 25) == 0))
+      if ((++loops >= 1000) && ((loops % 100) == 0))
         LM_W(("curl_multi_perform doesn't seem to finish ... (%d loops)", loops));
     }
 
-    if (loops >= 100)
+    if (loops >= 1000)
       LM_W(("curl_multi_perform finally finished!   (%d loops)", loops));
   }
 
