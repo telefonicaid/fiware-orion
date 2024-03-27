@@ -19,8 +19,8 @@ while questions are preferred on Stackoverflow, using the tag `fiware-orion`.
 
 > The latest release of Orion-LD is [1.5.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.5.1) from January 2024
 
-Orion-LD is a Context Broker and [CEF](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/CEF+Digital+Home)
-[building block](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/What+is+a+building+Block) for context data
+Orion-LD is a Context Broker and [CEF](https://ec.europa.eu/digital-building-blocks/sites/display/DIGITAL/About+us)
+[building block](https://joinup.ec.europa.eu/collection/egovernment/solution/cef-context-broker) for context data
 management which supports both the [NGSI-LD](https://en.wikipedia.org/wiki/NGSI-LD) and the
 [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) APIs. It is currently a fork of the original
 [Orion Context Broker](https://github.com/telefonicaid/fiware-orion) extending support to add **NGSI-LD** and linked
