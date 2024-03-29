@@ -244,6 +244,7 @@ uint32_t        cSubCounters;
 char            coreContextVersion[64];
 bool            triggerOperation = false;
 bool            noprom           = false;
+bool            noArrayReduction = false;
 
 
 
@@ -337,6 +338,7 @@ bool            noprom           = false;
 #define CSUBCOUNTERS_DESC      "number of subscription counter updates before flush from sub-cache to DB (0: never, 1: always)"
 #define CORE_CONTEXT_DESC      "core context version (v1.0|v1.3|v1.4|v1.5|v1.6|v1.7) - v1.6 is default"
 #define NO_PROM_DESC           "run without Prometheus metrics"
+#define NO_ARR_REDUCT_DESC     "skip JSON-LD Array Reduction"
 
 
 
@@ -441,6 +443,7 @@ PaArgument paArgs[] =
   { "-debugCurl",             &debugCurl,               "DEBUG_CURL",                PaBool,    PaHid,  false,           false,  true,             DEBUG_CURL_DESC          },
   { "-lmtmp",                 &lmtmp,                   "TMP_TRACES",                PaBool,    PaHid,  true,            false,  true,             TMPTRACES_DESC           },
   { "-noprom",                &noprom,                  "NO_PROM",                   PaBool,    PaHid,  false,           false,  true,             NO_PROM_DESC             },
+  { "-noArrayReduction",      &noArrayReduction,        "NO_ARRAY_REDUCTION",        PaBool,    PaHid,  false,           false,  true,             NO_ARR_REDUCT_DESC       },
 
   PA_END_OF_ARGS
 };
