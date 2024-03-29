@@ -31,6 +31,8 @@ orionldStart CB -experimental
 --SHELL--
 
 #
+# ngsild_new_batch_upsert-options=replace_payload_error_type_field.test
+#
 # 01. POST /ngsi-ld/v1/entityOperations/upsert?options=replace - 4 entities
 # 02. Update all four entities. Vehicle:00001 with a entity::type that differs
 #
@@ -208,29 +210,9 @@ Date: REGEX(.*)
 
 02. Update all four entities. Vehicle:00001 with a entity::type that differs
 ============================================================================
-HTTP/1.1 207 Multi-Status
-Content-Length: 302
-Content-Type: application/json
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
-{
-    "errors": [
-        {
-            "entityId": "urn:ngsi-ld:Vehicle:00001",
-            "error": {
-                "detail": "the Entity Type cannot be altered",
-                "status": 400,
-                "title": "Invalid Entity",
-                "type": "https://uri.etsi.org/ngsi-ld/errors/BadRequestData"
-            }
-        }
-    ],
-    "success": [
-        "urn:ngsi-ld:Vehicle:00002",
-        "urn:ngsi-ld:Vehicle:00003",
-        "urn:ngsi-ld:Vehicle:00004"
-    ]
-}
 
 
 --TEARDOWN--
