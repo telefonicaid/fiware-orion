@@ -341,17 +341,20 @@ bool legacyPostBatchUpsert(void)
       //
       if (typeInPayload != NULL)
       {
-        if (strcmp(typeInPayload, typeInDb) != 0)
+        if (orionldState.uriParamOptions.replace == false)
         {
-          //
-          // As the entity type differed, this entity will not be updated in DB, nor will it be removed:
-          // - removed from incomingTree
-          // - not added to "removeArray"
-          //
-          LM_W(("Bad Input (orig entity type: '%s'. New entity type: '%s'", typeInDb, typeInPayload));
-          entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400);
-          kjChildRemove(incomingTree, entityP);
-          continue;
+          if (strcmp(typeInPayload, typeInDb) != 0)
+          {
+            //
+            // As the entity type differed, this entity will not be updated in DB, nor will it be removed:
+            // - removed from incomingTree
+            // - not added to "removeArray"
+            //
+            LM_W(("Bad Input (orig entity type: '%s'. New entity type: '%s'", typeInDb, typeInPayload));
+            entityErrorPush(errorsArrayP, idInDb, OrionldBadRequestData, "non-matching entity type", typeInPayload, 400);
+            kjChildRemove(incomingTree, entityP);
+            continue;
+          }
         }
       }
       else

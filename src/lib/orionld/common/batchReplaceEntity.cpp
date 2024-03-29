@@ -32,6 +32,8 @@ extern "C"
 #include "kjson/kjClone.h"                                     // kjClone
 }
 
+#include "logMsg/logMsg.h"                                     // LM_*
+
 #include "orionld/common/orionldState.h"                       // orionldState
 #include "orionld/dbModel/dbModelFromApiEntity.h"              // dbModelFromApiEntity
 #include "orionld/common/batchReplaceEntity.h"                 // Own interface
@@ -57,6 +59,9 @@ KjNode* batchReplaceEntity(KjNode* inEntityP, char* entityId, char* entityType, 
 
   if (dbModelFromApiEntity(dbFinalEntityP, NULL, true, entityId, entityType) == false)
     return NULL;
+
+  LM_T(LmtSR, ("entityType: '%s'", entityType));
+  kjTreeLog(dbFinalEntityP, "dbFinalEntity", LmtSR);
 
   //
   // Fix the entity's creDate (from the version of the entity that was fouind in the database)
