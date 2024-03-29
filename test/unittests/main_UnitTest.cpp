@@ -111,6 +111,7 @@ char            brokerId[136];
 unsigned long long  inReqPayloadMaxSize;
 unsigned long long  outReqMsgMaxSize;
 bool                triggerOperation = false;
+bool                noArrayReduction = false;
 
 
 
