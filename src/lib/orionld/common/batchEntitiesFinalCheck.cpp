@@ -225,7 +225,7 @@ int batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* d
     //
     if (dbEntityP != NULL)
     {
-      if (entityTypeCheck(dbEntityTypeNodeP->value.s, eP) == false)
+      if ((orionldState.uriParamOptions.replace == false) && (entityTypeCheck(dbEntityTypeNodeP->value.s, eP) == false))
       {
         entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid Entity", "the Entity Type cannot be altered", 400);
         kjChildRemove(orionldState.requestTree, eP);
@@ -245,7 +245,7 @@ int batchEntitiesFinalCheck(KjNode* requestTree, KjNode* errorsArrayP, KjNode* d
       char* oldType = NULL;
       if (creationByPreviousInstance(creationArrayP, eP, entityId, &oldType) == true)
       {
-        if (entityTypeCheck(oldType, eP) == false)
+        if ((orionldState.uriParamOptions.replace == false) && (entityTypeCheck(oldType, eP) == false))
         {
           entityErrorPush(errorsArrayP, entityId, OrionldBadRequestData, "Invalid Entity", "the Entity Type cannot be altered", 400);
           kjChildRemove(orionldState.requestTree, eP);
