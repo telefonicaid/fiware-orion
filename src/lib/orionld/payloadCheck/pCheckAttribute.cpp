@@ -125,6 +125,9 @@ static const char* attrTypeChangeTitle(OrionldAttributeType oldType, OrionldAttr
 //
 static void arrayReduce(KjNode* valueP)
 {
+  if (noArrayReduction == true)  // Global variable, from CLI
+    return;
+
   if (valueP->type != KjArray)
     return;
 
@@ -1254,7 +1257,8 @@ static bool pCheckAttributeObject
     {
       if (fieldP->type == KjArray)
       {
-        if ((fieldP->value.firstChildP != NULL) && (fieldP->value.firstChildP->next == NULL))
+        // Reduce the array?
+        if ((noArrayReduction != true) && (fieldP->value.firstChildP != NULL) && (fieldP->value.firstChildP->next == NULL))
         {
           fieldP->lastChild = fieldP->value.firstChildP->lastChild;  // Might be an array or object inside the array ...
           fieldP->type      = fieldP->value.firstChildP->type;

@@ -613,6 +613,7 @@ extern uint32_t          cSubCounters;             // Number of subscription cou
 extern PernotSubCache    pernotSubCache;
 extern EntityMap*        entityMaps;               // Used by GET /entities in the distributed case, for pagination
 extern bool              entityMapsEnabled;
+extern bool              noArrayReduction;         // Used by arrayReduce in pCheckAttribute.cpp
 
 extern char                localIpAndPort[135];    // Local address for X-Forwarded-For (from orionld.cpp)
 extern unsigned long long  inReqPayloadMaxSize;
