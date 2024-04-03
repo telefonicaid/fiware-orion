@@ -27,6 +27,7 @@ set -e
 
 export ROOT='/opt'
 export BROKER='orionld'
+export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 REV_DEFAULT='develop'
 REPOSITORY_DEFAULT='https://github.com/fiware/context.Orion-LD'
 STAGE_DEFAULT='release'

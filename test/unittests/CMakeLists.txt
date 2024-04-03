@@ -163,8 +163,8 @@ SET (STATIC_LIBS
 # Include directories
 # ------------------------------------------------------------
 include_directories("/usr/include")
-include_directories("/usr/local/include/libbson-1.0")
-include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("${LIBBSON_INCLUDE_DIRS}")
+include_directories("${LIBMONGOC_INCLUDE_DIRS}")
 include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 include_directories("${PROJECT_SOURCE_DIR}/src/app")
@@ -177,6 +177,8 @@ include_directories("${PROJECT_SOURCE_DIR}/..")
 link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
+link_directories("${Boost_LIBRARY_DIRS}")
+link_directories("${LIBMONGOC_LIBRARY_DIRS}")
 link_directories("${PROJECT_SOURCE_DIR}/../kjson")
 link_directories("${PROJECT_SOURCE_DIR}/../kalloc")
 link_directories("${PROJECT_SOURCE_DIR}/../kbase")
@@ -184,6 +186,7 @@ link_directories("${PROJECT_SOURCE_DIR}/../khash")
 link_directories("${PROJECT_SOURCE_DIR}/../klog")
 link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/prom/build")
 link_directories("${PROJECT_SOURCE_DIR}/../prometheus-client-c/promhttp/build")
+link_directories("${LIBMICROHTTPD_LIBRARY_DIRS}")
 
 
 
@@ -197,46 +200,15 @@ add_definitions(-DUNIT_TEST)
 # ------------------------------------------------------------
 
 ADD_EXECUTABLE(unitTest ${SOURCES})
+TARGET_LINK_LIBRARIES(unitTest
+  ${STATIC_LIBS}
+  ${Boost_LIBRARIES}
+  ${LIBMICROHTTPD_LIBRARIES}
+  ${DYNAMIC_LIBS}
+)
 
-MESSAGE("unitTest distro: '${DISTRO}'")
-
-# The following ones are distros that we have checked are built correctly
-
-IF(${DISTRO} MATCHES "CentOS_6.*")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} MATCHES "Debian_8.*")
-  # It seems that Debian 8.x doesn't like -mt libraries for unit tests... not sure about other Debian versions
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} MATCHES "Debian_9.*")
-  # Debian9 just like Debian8 doesn't like -mt libraries for unit tests
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} MATCHES "Debian_.*")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
-
-# The following ones are distros that haven't been checked since the refactoring in
-# PR #2062. They should be "promoted" as soon as we have positive feedback about
-# them or fixed (maybe based in the version of this file previous to
-# the aforementioned PR)
-
-ELSEIF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
+IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
   # Pending to check after the refactor
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")  
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")  
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
-ELSEIF((${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.3_LTS") OR (${DISTRO} STREQUAL "Ubuntu_14.04.4_LTS"))
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")  
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
-ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")  
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
-
-# Finally this is a "best effort" option to try to build on distros that don't have a
-# specify switch
-
-ELSE()
-  # Pending to check after the refactor
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
 ENDIF()
+
