@@ -147,7 +147,8 @@ const char* distOpTypeAlias[5] = {
 #define M(x) (1LL << x)
 uint64_t federationOpsMask   = M(DoRetrieveEntity)       | M(DoQueryEntity)       | M(DoCreateSubscription) | M(DoUpdateSubscription) |
                                M(DoRetrieveSubscription) | M(DoQuerySubscription) | M(DoDeleteSubscription);
-uint64_t updateOpsMask       = M(DoUpdateEntity)         | M(DoUpdateAttrs)       | M(DoReplaceEntity)      | M(DoReplaceAttr);
+uint64_t updateOpsMask       = M(DoUpdateEntity)         | M(DoUpdateAttrs)       | M(DoReplaceEntity)      | M(DoReplaceAttr)        |
+                               M(DoMergeEntity)          | M(DoAppendAttrs);
 uint64_t retrieveOpsMask     = M(DoRetrieveEntity)       | M(DoQueryEntity);
 uint64_t redirectionOpsMask  = M(DoCreateEntity)         | M(DoUpdateEntity)      | M(DoAppendAttrs)        | M(DoUpdateAttrs)        |
                                M(DoDeleteAttrs)          | M(DoDeleteEntity)      | M(DoMergeEntity)        | M(DoReplaceEntity)      |

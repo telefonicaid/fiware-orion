@@ -38,6 +38,7 @@ orionldStart CP1 -experimental
 # 04. PATCH /entities/urn:E4/attrs/P1
 # 05. GET /entities/urn:E4 from CB - see the update (from CP1)
 # 06. GET /entities/urn:E4 from CP1 - see the update
+# 07. GET /entities/urn:E4 from CB with local=true - see 404
 #
 
 echo "01. Create an entity urn:E3, type T in CP1"
@@ -110,6 +111,13 @@ echo
 echo "06. GET /entities/urn:E4 from CP1 - see the update"
 echo "=================================================="
 orionCurl --url /ngsi-ld/v1/entities/urn:E4?type=T --port $CP1_PORT
+echo
+echo
+
+
+echo "07. GET /entities/urn:E4 from CB with local=true - see 404"
+echo "=========================================================="
+orionCurl --url "/ngsi-ld/v1/entities/urn:E4?type=T&local=true"
 echo
 echo
 
@@ -190,6 +198,20 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.6.jsonld>; rel="h
     },
     "id": "urn:E4",
     "type": "T"
+}
+
+
+07. GET /entities/urn:E4 from CB with local=true - see 404
+==========================================================
+HTTP/1.1 404 Not Found
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "detail": "urn:E4",
+    "title": "Entity Not Found",
+    "type": "https://uri.etsi.org/ngsi-ld/errors/ResourceNotFound"
 }
 
 

@@ -47,7 +47,6 @@ typedef enum TraceLevels
   // Alterations and Notifications
   //
   LmtAlt = 40,                         // Notifications: Alterations
-  LmtRegMatch,                         // Distributed Operations: registration matching
   LmtWatchedAttributes,                // Watched attributes in subscriptions
   LmtNotificationMsg,                  // Notifications: Messages
   LmtNotificationStats,                // Errors and timestamps for subscriptions
@@ -85,6 +84,7 @@ typedef enum TraceLevels
   LmtDistOpResponseBuf,                // Specific debugging of the incoming response of a distributed message
   LmtDistOpResponseDetail,             // Details on responses to distributed requests
   LmtDistOpResponseHeaders,            // HTTP headers of responses to distributed requests
+  LmtRegMatch,                         // Distributed Operations: registration matching
 
   //
   // Distributed Operations - misc
