@@ -4,7 +4,7 @@
 [![License badge](https://img.shields.io/github/license/FIWARE/context.Orion-LD.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Docker badge](https://img.shields.io/badge/quay.io-fiware%2Forion--ld-grey?logo=red%20hat&labelColor=EE0000)](https://quay.io/repository/fiware/orion-ld)
 [![Support badge](https://img.shields.io/badge/support-sof-yellowgreen.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
-[![NGSI-LD badge](https://img.shields.io/badge/NGSI-LD-red.svg)](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.06.01_60/gs_CIM009v010601p.pdf)
+[![NGSI-LD badge](https://img.shields.io/badge/NGSI-LD-red.svg)](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.08.01_60/gs_cim009v010801p.pdf)
 <br>
 [![Documentation badge](https://readthedocs.org/projects/fiware-orion/badge/?version=latest)](http://fiware-orion-ld.readthedocs.io/en/latest/?badge=latest)
 ![Status](https://nexus.lab.fiware.org/static/badges/statuses/incubating.svg)
@@ -19,19 +19,22 @@ while questions are preferred on Stackoverflow, using the tag `fiware-orion`.
 
 > The latest release of Orion-LD is [1.5.1](https://github.com/FIWARE/context.Orion-LD/releases/tag/1.5.1) from January 2024
 
-Orion-LD is a Context Broker and [CEF](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/CEF+Digital+Home)
-[building block](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/What+is+a+building+Block) for context data
+Orion-LD is a Context Broker and [CEF](https://ec.europa.eu/digital-building-blocks/sites/display/DIGITAL/About+us)
+[building block](https://joinup.ec.europa.eu/collection/egovernment/solution/cef-context-broker) for context data
 management which supports both the [NGSI-LD](https://en.wikipedia.org/wiki/NGSI-LD) and the
 [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) APIs. It is currently a fork of the original
 [Orion Context Broker](https://github.com/telefonicaid/fiware-orion) extending support to add **NGSI-LD** and linked
 data concepts. Orion-LD follows the [ETSI](https://en.wikipedia.org/wiki/ETSI) specification for **NGSI-LD** and has
-been tested to be a stable and fast **NGSI-LD** broker with close compliance to the version 1.3.1 of the NGSI-LD API
+been tested to be a stable and fast **NGSI-LD** broker with near compliance to the version 1.6.1 of the NGSI-LD API
 specification.
 
 
 ## License
 Orion-LD is licensed under [Affero General Public License (GPL) version 3](./LICENSE).
 
+<details>
+<summary><strong>Further information on the use of the AGPL open source license</strong></summary>
+  
 ### Are there any legal issues with AGPL 3.0? Is it safe for me to use?
 There is absolutely no problem in using a product licensed under AGPL 3.0. Issues with GPL
 (or AGPL) licenses are mostly related with the fact that different people assign different
@@ -47,6 +50,7 @@ wish to make a clarifying public statement as follows:
 > work of the product. Software that merely uses or aggregates (i.e. links to) an
 > otherwise unmodified version of existing software IS NOT considered a derivative work.
 
+</details>
 
 ## Contribution to Orion-LD
 Anyone wishing to contribute to Orion-LD, be it fixing/adding documentation, tests, source code, all types of contributions are welcome.
@@ -58,8 +62,8 @@ For source code contributions, please see the [Contribution guidelines](doc/manu
 Its payloads are encoded as [linked data](https://en.wikipedia.org/wiki/Linked_data) using JSON.
 
 The NGSI-LD Specification is regularly updated and published by ETSI.
-The latest specification is [version 1.7.1](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.07.01_60/gs_CIM009v010701p.pdf)
-and it was published in June 2023.
+The latest specification is [version 1.8.1](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.08.01_60/gs_cim009v010801p.pdf)
+and it was published in March 2024.
 
 This presentation from the FIWARE Summit in Malaga 2018 might be of interest:
 https://www.slideshare.net/FI-WARE/fiware-global-summit-ngsild-ngsi-with-linked-data
