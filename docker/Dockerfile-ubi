@@ -20,7 +20,7 @@ WORKDIR ${PATH_TO_SRC}
 RUN pwd
 RUN ls -l ../
 
-RUN make release install
+RUN PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH make release install
 
 RUN strip /usr/bin/orionld
 
