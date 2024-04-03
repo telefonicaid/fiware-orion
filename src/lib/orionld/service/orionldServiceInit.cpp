@@ -261,15 +261,21 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
   }
   else if (serviceP->serviceRoutine == orionldPutAttribute)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
   }
   else if (serviceP->serviceRoutine == orionldPatchEntity)
   {
     serviceP->options   |= ORIONLD_SERVICE_OPTION_PREFETCH_ID_AND_TYPE;
     serviceP->options   |= ORIONLD_SERVICE_OPTION_CLONE_PAYLOAD;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
   }
   else if (serviceP->serviceRoutine == orionldPatchEntity2)
   {
@@ -278,9 +284,11 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
 
     serviceP->uriParams |= ORIONLD_URIPARAM_OPTIONS;
     serviceP->uriParams |= ORIONLD_URIPARAM_OBSERVEDAT;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
   }
   else if (serviceP->serviceRoutine == orionldPutEntity)
   {
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
   }
   else if (serviceP->serviceRoutine == orionldDeleteAttribute)
   {
@@ -288,6 +296,7 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->uriParams |= ORIONLD_URIPARAM_DELETEALL;
 
     serviceP->options   |= ORIONLD_SERVICE_OPTION_EXPAND_ATTR;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
   }
   else if (serviceP->serviceRoutine == orionldPostRegistrations)
   {
