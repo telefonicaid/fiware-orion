@@ -332,6 +332,13 @@ void subAttrsCompact(KjNode* requestBody, OrionldContext* fwdContextP)
 {
   for (KjNode* subAttrP = requestBody->value.firstChildP; subAttrP != NULL; subAttrP = subAttrP->next)
   {
+    // NULL => "urn:ngsi-ld:null"
+    if (subAttrP->type == KjNull)
+    {
+      subAttrP->type = KjString;
+      subAttrP->value.s = (char*) "urn:ngsi-ld:null";
+    }
+
     if (strcmp(subAttrP->name, "type")        == 0)   continue;
     if (strcmp(subAttrP->name, "value")       == 0)   continue;
     if (strcmp(subAttrP->name, "object")      == 0)   continue;
@@ -356,6 +363,13 @@ void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdC
   {
     for (KjNode* attrP = requestBody->value.firstChildP; attrP != NULL; attrP = attrP->next)
     {
+      // NULL => "urn:ngsi-ld:null"
+      if (attrP->type == KjNull)
+      {
+        attrP->type = KjString;
+        attrP->value.s = (char*) "urn:ngsi-ld:null";
+      }
+
       if (strcmp(attrP->name, "id")       == 0)  continue;
       if (strcmp(attrP->name, "scope")    == 0)  continue;
       if (strcmp(attrP->name, "location") == 0)  continue;
@@ -367,8 +381,8 @@ void bodyCompact(DistOpType operation, KjNode* requestBody, OrionldContext* fwdC
       }
 
       attrP->name = orionldContextItemAliasLookup(fwdContextP, attrP->name, NULL, NULL);
-
-      subAttrsCompact(attrP, fwdContextP);
+      if (attrP->type == KjObject)
+        subAttrsCompact(attrP, fwdContextP);
     }
   }
 }

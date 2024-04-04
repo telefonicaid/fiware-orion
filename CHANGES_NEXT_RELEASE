@@ -14,6 +14,7 @@
   * Support for JsonProperty attribute type
   * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language
   * Forbidden to DELETE the Core Context !!!  (it can be reloaded)
+  * Bug fix: JSON NULL literal is no longer forwarded!
 
 ## Notes
   * TRoE is still not prepared for attributes of type Vocab/Json/Language, so, attributes of those types are not stored in the historical database
