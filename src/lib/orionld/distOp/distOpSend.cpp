@@ -166,7 +166,7 @@ void urlEncode(char* from, char* to, int toLen)
     char f = from[fromIx];
 
 //    if (((f >= 'A') && (f <= 'Z')) || ((f >= 'a') && (f <= 'z')) || ((f >= '0') && (f <= '9')))
-    if ((f != '"') && (f != ' '))
+    if ((f != '"') && (f != ' ') && (f != '&'))
       to[toIx++] = f;
     else
     {
