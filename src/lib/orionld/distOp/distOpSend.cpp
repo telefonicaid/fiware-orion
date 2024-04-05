@@ -168,6 +168,12 @@ void urlEncode(char* from, char* to, int toLen)
       to[toIx++] = '2';
       to[toIx++] = '6';
     }
+    else if (from[fromIx] == ' ')
+    {
+      to[toIx++] = '%';
+      to[toIx++] = '2';
+      to[toIx++] = '0';
+    }
     else
       to[toIx++] = from[fromIx];
 

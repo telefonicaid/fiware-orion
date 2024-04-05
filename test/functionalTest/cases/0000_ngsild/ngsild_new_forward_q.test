@@ -60,7 +60,7 @@ echo
 
 echo "02. Query the CB for entities, using 'q'"
 echo "========================================"
-q='a>10;(b==12|c!=%2212%22)'
+q='a>10;(b==12|c!=%221%202%22)'
 orionCurl --url "/ngsi-ld/v1/entities?q=$q"
 echo
 echo
@@ -68,7 +68,11 @@ echo
 
 echo "03. Dump the accumulator to see the forwarded request, make sure the correct 'q' is there"
 echo "========================================================================================="
-accumulatorDump
+accumulatorDump > /tmp/dump
+firstLine=$(head -1 /tmp/dump | awk -F'q=' '{ print $2 }')
+echo q: $firstLine
+cat /tmp/dump
+rm -f /tmp/dump
 accumulatorReset
 echo
 echo
@@ -97,6 +101,7 @@ NGSILD-EntityMap: REGEX(.*)
 
 03. Dump the accumulator to see the forwarded request, make sure the correct 'q' is there
 =========================================================================================
+q: a>10&(b==12|c!="1 2")
 GET http://REGEX(.*)
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
