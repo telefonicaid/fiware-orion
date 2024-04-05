@@ -144,6 +144,7 @@ typedef enum TraceLevels
   LmtMimeType,                         // MimeType
   LmtArrayReduction = 215,             // Arrays of only one item are reduced to the item
   LmtFormat,                           // Normalized, Concise, Simplified
+  LmtUriEncode,                        // YRL encode/decode results
   LmtBug,                              // Current bug being debugged
 
   //

@@ -27,7 +27,7 @@ GET /entities with two brokers all connected via registrations
 dbInit CB
 dbInit CP1
 orionldStart CB  -experimental -forwarding -wip entityMaps -t 0-255
-orionldStart CP1 -experimental -forwarding -wip entityMaps
+orionldStart CP1 -experimental -forwarding -wip entityMaps -t 0-255
 
 --SHELL--
 
