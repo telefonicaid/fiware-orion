@@ -101,7 +101,7 @@ NGSILD-EntityMap: REGEX(.*)
 
 03. Dump the accumulator to see the forwarded request, make sure the correct 'q' is there
 =========================================================================================
-q: a>10&(b==12|c!="1 2")
+q: a>10&(b==12|c!=%221 2%22)
 GET http://REGEX(.*)
 User-Agent: orionld/REGEX(.*)
 Host: REGEX(.*)
