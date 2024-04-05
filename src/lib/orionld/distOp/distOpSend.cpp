@@ -160,12 +160,14 @@ void urlEncode(char* from, char* to, int toLen)
   int fromIx = 0;
   int toIx   = 0;
 
+  LM_T(LmtUriEncode, ("In:  '%s'", from));
   while (from[fromIx] != 0)
   {
     char f = from[fromIx];
 
-    if (((f >= 'A') && (f <= 'Z')) || ((f >= 'a') && (f <= 'z')) || ((f >= '0') && (f <= '9')))
-      to[toIx++] = from[fromIx];
+//    if (((f >= 'A') && (f <= 'Z')) || ((f >= 'a') && (f <= 'z')) || ((f >= '0') && (f <= '9')))
+    if ((f != '"') && (f != ' '))
+      to[toIx++] = f;
     else
     {
       char hi = f >> 4;
@@ -180,6 +182,7 @@ void urlEncode(char* from, char* to, int toLen)
   }
 
   to[toIx] = 0;
+  LM_T(LmtUriEncode, ("Out: '%s'", to));
 }
 
 
