@@ -153,7 +153,7 @@ char* urlCompose(ForwardUrlParts* urlPartsP, KjNode* endpointP)
 
 // -----------------------------------------------------------------------------
 //
-// urlEncode
+// urlEncode - FIXME: move to its own module in orionld/common, or even kbase
 //
 void urlEncode(char* from, char* to, int toLen)
 {
@@ -162,23 +162,24 @@ void urlEncode(char* from, char* to, int toLen)
 
   while (from[fromIx] != 0)
   {
-    if (from[fromIx] == '&')
-    {
-      to[toIx++] = '%';
-      to[toIx++] = '2';
-      to[toIx++] = '6';
-    }
-    else if (from[fromIx] == ' ')
-    {
-      to[toIx++] = '%';
-      to[toIx++] = '2';
-      to[toIx++] = '0';
-    }
-    else
+    char f = from[fromIx];
+
+    if (((f >= 'A') && (f <= 'Z')) || ((f >= 'a') && (f <= 'z')) || ((f >= '0') && (f <= '9')))
       to[toIx++] = from[fromIx];
+    else
+    {
+      char hi = f >> 4;
+      char lo = f & 0x0F;
+
+      to[toIx++] = '%';
+      to[toIx++] = (hi <= 9)? hi + '0' : hi - 10 + 'A';
+      to[toIx++] = (lo <= 9)? lo + '0' : lo - 10 + 'A';
+    }
 
     ++fromIx;
   }
+
+  to[toIx] = 0;
 }
 
 
