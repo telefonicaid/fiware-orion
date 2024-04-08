@@ -79,7 +79,8 @@ const char* distOpTypes[37] = {
   "updateSubscription",
   "retrieveSubscription",
   "querySubscription",
-  "deleteSubscription"
+  "deleteSubscription",
+  "purgeEntity"
 };
 
 

@@ -77,7 +77,9 @@ typedef enum DistOpType
   DoUpdateSubscription,
   DoRetrieveSubscription,
   DoQuerySubscription,              // 35
-  DoDeleteSubscription
+  DoDeleteSubscription,
+
+  DoPurgeEntities
 } DistOpType;
 
 
