@@ -26,14 +26,18 @@ Entity Batch Delete Test
 --SHELL-INIT--
 dbInit CB
 orionldStart CB
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
 
 --SHELL--
 
 #
 # 01. Create 4 entities: E1, E2, E3, and E4, odd ids with type T1, even with type T2
-# 02. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1
-# 03. Get all entities - see E2 and E4
-# 04. Attempt to remove entities with type T1 again - see 204
+# 02. Create a subscription on entity type T1
+# 03. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1
+# 04. Get all entities - see E2 and E4
+# 05. Dump accumulator, see ONE notification with TWO deleted entities
+# 06. Attempt to remove entities with type T1 again - see 204
 #
 
 echo "01. Create 4 entities: E1, E2, E3, and E4, odd ids with type T1, even with type T2"
@@ -81,21 +85,49 @@ echo
 echo
 
 
-echo "02. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1"
+echo "02. Create a subscription on entity type T1"
+echo "==========================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1"
 echo "======================================================================="
 orionCurl --url /ngsi-ld/v1/entities?type=T1 -X DELETE
 echo
 echo
 
 
-echo "03. Get all entities - see E2 and E4"
+echo "04. Get all entities - see E2 and E4"
 echo "===================================="
 orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&local=true"
 echo
 echo
 
 
-echo "04. Attempt to remove entities with type T1 again - see 204"
+echo "05. Dump accumulator, see ONE notification with TWO deleted entities"
+echo "===================================================================="
+accumulatorDump
+echo
+echo
+
+
+echo "06. Attempt to remove entities with type T1 again - see 204"
 echo "==========================================================="
 orionCurl --url /ngsi-ld/v1/entities?type=T1 -X DELETE
 echo
@@ -128,14 +160,23 @@ Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E4
 
 
 
-02. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1
+02. Create a subscription on entity type T1
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+03. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1
 =======================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 
 
 
-03. Get all entities - see E2 and E4
+04. Get all entities - see E2 and E4
 ====================================
 HTTP/1.1 200 OK
 Content-Length: 99
@@ -157,7 +198,39 @@ Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
 ]
 
 
-04. Attempt to remove entities with type T1 again - see 204
+05. Dump accumulator, see ONE notification with TWO deleted entities
+====================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 331
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "deletedAt": "202REGEX(.*)Z",
+            "id": "urn:ngsi-ld:entity:E3",
+            "type": "T1"
+        },
+        {
+            "deletedAt": "202REGEX(.*)Z",
+            "id": "urn:ngsi-ld:entity:E1",
+            "type": "T1"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+06. Attempt to remove entities with type T1 again - see 204
 ===========================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
