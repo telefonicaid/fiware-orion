@@ -1,5 +1,5 @@
 git+https://visitor:visitor@pdihub.hi.inet/fiware/fiware-iotqaUtils@v.3.1.2
-pymongo==2.8
+pymongo==4.6.3
 flask==2.3.2   # changed from 0.12.3 to 2.3.2 due to vulnerability check in github although we haven't checked if it works...
 lettuce==0.2.20
 requests==2.31.0  # changed from 2.20.0 (test/acceptance is no longer in use)
