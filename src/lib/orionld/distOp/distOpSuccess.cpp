@@ -60,7 +60,8 @@ static void attrNameToSuccess(KjNode* successV, KjNode* failureV, char* attrName
     LM_T(LmtDistOp207, ("Adding '%s' to successV", alias));
     kjChildAdd(successV, aNameP);
 
-    updatedAttr404Purge(failureV, alias);
+    if (failureV != NULL)
+      updatedAttr404Purge(failureV, alias);
   }
   else
     LM_T(LmtDistOp207, ("NOT adding attribute '%s' to successV (it's already present)", alias));

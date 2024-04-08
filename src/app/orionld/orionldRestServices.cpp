@@ -43,6 +43,7 @@
 #include "orionld/serviceRoutines/orionldPatchSubscription.h"
 #include "orionld/serviceRoutines/orionldPatchRegistration.h"
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"
+#include "orionld/serviceRoutines/orionldDeleteEntities.h"
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"
 #include "orionld/serviceRoutines/orionldDeleteSubscription.h"
 #include "orionld/serviceRoutines/orionldDeleteRegistration.h"
@@ -176,6 +177,7 @@ static OrionLdRestServiceSimplified deleteServiceV[] =
 {
   { "/ngsi-ld/v1/entities/*/attrs/*",             orionldDeleteAttribute                 },
   { "/ngsi-ld/v1/entities/*",                     orionldDeleteEntity                    },
+  { "/ngsi-ld/v1/entities",                       orionldDeleteEntities                  },
   { "/ngsi-ld/v1/entityMaps/*",                   orionldDeleteEntityMap                 },
   { "/ngsi-ld/v1/subscriptions/*",                orionldDeleteSubscription              },
   { "/ngsi-ld/v1/csourceRegistrations/*",         orionldDeleteRegistration              },

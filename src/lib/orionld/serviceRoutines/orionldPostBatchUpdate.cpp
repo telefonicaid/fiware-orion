@@ -108,7 +108,7 @@ bool orionldPostBatchUpdate(void)
   //
   // The entity id array is ready - time to query mongo
   //
-  KjNode* dbEntityArray = mongocEntitiesQuery(NULL, &eIdArray, NULL, NULL, NULL, NULL, NULL, NULL, false);
+  KjNode* dbEntityArray = mongocEntitiesQuery(NULL, &eIdArray, NULL, NULL, NULL, NULL, NULL, NULL, false, false);
   if (dbEntityArray == NULL)
   {
     orionldError(OrionldInternalError, "Database Error", "error querying the database for entities", 500);

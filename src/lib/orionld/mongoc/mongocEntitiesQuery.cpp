@@ -661,7 +661,8 @@ KjNode* mongocEntitiesQuery
   OrionldGeoInfo*  geoInfoP,
   int64_t*         countP,
   const char*      geojsonGeometry,
-  bool             onlyIds
+  bool             onlyIds,
+  bool             onlyIdAndType
 )
 {
   if ((attrList != NULL) && (attrList->items > 99))
@@ -714,6 +715,11 @@ KjNode* mongocEntitiesQuery
     bson_append_bool(&projection, "creDate",         7, true);
     bson_append_bool(&projection, "modDate",         7, true);
     bson_append_bool(&projection, "lastCorrelator", 14, true);
+  }
+  else if (onlyIdAndType == true)
+  {
+    bson_append_bool(&projection, "_id.id",   6, true);
+    bson_append_bool(&projection, "_id.type", 8, true);
   }
   else
     bson_append_bool(&projection, "_id.id", 6, true);

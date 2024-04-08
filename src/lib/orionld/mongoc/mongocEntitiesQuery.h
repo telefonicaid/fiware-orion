@@ -50,7 +50,8 @@ extern KjNode* mongocEntitiesQuery
   OrionldGeoInfo*  geoInfoP,
   int64_t*         countP,
   const char*      geojsonGeometry,
-  bool             onlyIds
+  bool             onlyIds,
+  bool             onlyIdAndType
 );
 
 #endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_

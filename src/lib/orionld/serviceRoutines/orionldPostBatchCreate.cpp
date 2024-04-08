@@ -102,7 +102,7 @@ bool orionldPostBatchCreate(void)
   //
   // FIXME: Use simpler mongoc function - we only need to know whether the entities exist or not
   //
-  KjNode* dbEntityArray = mongocEntitiesQuery(NULL, &eIdArray, NULL, NULL, NULL, NULL, NULL, NULL, false);  // FIXME: Last param should be 'true'
+  KjNode* dbEntityArray = mongocEntitiesQuery(NULL, &eIdArray, NULL, NULL, NULL, NULL, NULL, NULL, false, false);
   if (dbEntityArray == NULL)
   {
     orionldError(OrionldInternalError, "Database Error", "error querying the database for entities", 500);
