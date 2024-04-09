@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_
-#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_
+#ifndef SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKQUERYPARAMS_H_
+#define SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKQUERYPARAMS_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2024 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -27,31 +27,29 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                        // KjNode
+#include "kjson/KjNode.h"                                      // KjNode
 }
 
-#include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
-#include "orionld/types/QNode.h"                                 // QNode
+#include "orionld/types/TreeNode.h"                              // TreeNode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocEntitiesQuery -
+// pCheckQueryParams -
 //
-extern KjNode* mongocEntitiesQuery
+extern bool pCheckQueryParams
 (
-  StringArray*     entityTypeList,
-  StringArray*     entityIdList,
-  const char*      entityIdPattern,
-  StringArray*     attrList,
-  QNode*           qNode,
-  OrionldGeoInfo*  geoInfoP,
-  int64_t*         countP,
-  const char*      geojsonGeometry,
-  bool             onlyIds,
-  bool             onlyIdAndType
+  char*            id,
+  char*            type,
+  char*            idPattern,
+  char*            q,
+  char*            geometry,
+  char*            attrs,
+  bool             local,
+  EntityMap*       entityMap,
+  QNode**          qNodeP,
+  OrionldGeoInfo*  geoInfoP
 );
 
-#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_
+#endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKQUERYPARAMS_H_

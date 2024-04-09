@@ -1,0 +1,349 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity Batch Delete Test
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+orionldStart CB -experimental -forwarding
+orionldStart CP1 -experimental
+accumulatorStart --pretty-print 127.0.0.1 ${LISTENER_PORT}
+
+--SHELL--
+
+#
+# 01. Create 4 entities: E1, E2, E3, and E4, odd ids with type T1, even with type T2
+# 02. Create a subscription on entity type T1
+# 03. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1
+# 04. Get all entities - see E2 and E4
+# 05. Dump/Reset accumulator, see ONE notification with TWO deleted entities
+# 06. Attempt to remove entities with type T1 again - see 204
+# 07. Create entity urn:E5, of type T2, in CP1
+# 08. Create a registration for entity type T2, pointing to CP1
+# 09. Remove entities E2 and E4 using DELETE /ngsi-ld/v1/entities?type=T2 - provoke forwarded request to CP1
+# 
+#
+
+echo "01. Create 4 entities: E1, E2, E3, and E4, odd ids with type T1, even with type T2"
+echo "=================================================================================="
+payload='{
+  "id": "urn:ngsi-ld:entity:E1",
+  "type": "T1",
+  "A": {
+    "type": "Property",
+    "value": 1
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:ngsi-ld:entity:E2",
+  "type": "T2",
+  "A": {
+    "type": "Property",
+    "value": 2
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:ngsi-ld:entity:E3",
+  "type": "T1",
+  "A": {
+    "type": "Property",
+    "value": 3
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+
+payload='{
+  "id": "urn:ngsi-ld:entity:E4",
+  "type": "T2",
+  "A": {
+    "type": "Property",
+    "value": 4
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription on entity type T1"
+echo "==========================================="
+payload='{
+  "id": "urn:S1",
+  "type": "Subscription",
+  "entities": [
+    {
+      "type": "T1"
+    }
+  ],
+  "notification": {
+    "endpoint": {
+      "uri": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1"
+echo "======================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T1 -X DELETE
+echo
+echo
+
+
+echo "04. Get all entities - see E2 and E4"
+echo "===================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&local=true"
+echo
+echo
+
+
+echo "05. Dump/Reset accumulator, see ONE notification with TWO deleted entities"
+echo "=========================================================================="
+accumulatorDump
+echo
+echo
+
+
+echo "06. Attempt to remove entities with type T1 again - see 204"
+echo "==========================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T1 -X DELETE
+echo
+echo
+
+
+echo "07. Create entity urn:E5, of type T2, in CP1"
+echo "============================================"
+payload='{
+  "id": "urn:E5",
+  "type": "T2",
+  "A": {
+    "type": "Property",
+    "value": 5
+  }
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "08. Create a registration for entity type T2, pointing to CP1"
+echo "============================================================="
+payload='{
+  "id": "urn:R1",
+  "type": "ContextSourceRegistration",
+  "information": [
+    {
+      "entities": [
+        {
+          "type": "T2"
+        }
+      ]
+    }
+  ],
+  "endpoint": "http://'$HOSTNAME':'$CP1_PORT'",
+  "operations": [ "purgeEntity" ]
+}'
+orionCurl --url /ngsi-ld/v1/csourceRegistrations --payload "$payload"
+echo
+echo
+
+
+echo "09. Remove entities E2 and E4 using DELETE /ngsi-ld/v1/entities?type=T2 - provoke forwarded request to CP1"
+echo "=========================================================================================================="
+orionCurl --url /ngsi-ld/v1/entities?type=T2 -X DELETE
+echo
+echo
+
+
+echo "10. GET all entities locally in CB - see empty array"
+echo "===================================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&local=true"
+echo
+echo
+
+
+echo "11. GET all entities locally in CP1 - see empty array"
+echo "====================================================="
+orionCurl --url "/ngsi-ld/v1/entities?options=keyValues&local=true" --port $CP1_PORT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create 4 entities: E1, E2, E3, and E4, odd ids with type T1, even with type T2
+==================================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E1
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E2
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E3
+
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:ngsi-ld:entity:E4
+
+
+
+02. Create a subscription on entity type T1
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:S1
+
+
+
+03. Remove entities E1 and E3 using DELETE /ngsi-ld/v1/entities?type=T1
+=======================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Get all entities - see E2 and E4
+====================================
+HTTP/1.1 200 OK
+Content-Length: 99
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "A": 2,
+        "id": "urn:ngsi-ld:entity:E2",
+        "type": "T2"
+    },
+    {
+        "A": 4,
+        "id": "urn:ngsi-ld:entity:E4",
+        "type": "T2"
+    }
+]
+
+
+05. Dump/Reset accumulator, see ONE notification with TWO deleted entities
+==========================================================================
+POST http://REGEX(.*)/notify?subscriptionId=urn:S1
+Content-Length: 331
+User-Agent: orionld/REGEX(.*)
+Host: REGEX(.*)
+Accept: application/json
+Content-Type: application/json
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+Ngsild-Attribute-Format: Normalized
+
+{
+    "data": [
+        {
+            "deletedAt": "202REGEX(.*)Z",
+            "id": "urn:ngsi-ld:entity:E3",
+            "type": "T1"
+        },
+        {
+            "deletedAt": "202REGEX(.*)Z",
+            "id": "urn:ngsi-ld:entity:E1",
+            "type": "T1"
+        }
+    ],
+    "id": "urn:ngsi-ld:Notification:REGEX(.*)",
+    "notifiedAt": "202REGEX(.*)Z",
+    "subscriptionId": "urn:S1",
+    "type": "Notification"
+}
+=======================================
+
+
+06. Attempt to remove entities with type T1 again - see 204
+===========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+07. Create entity urn:E5, of type T2, in CP1
+============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E5
+
+
+
+08. Create a registration for entity type T2, pointing to CP1
+=============================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/csourceRegistrations/urn:R1
+
+
+
+09. Remove entities E2 and E4 using DELETE /ngsi-ld/v1/entities?type=T2 - provoke forwarded request to CP1
+==========================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+10. GET all entities locally in CB - see empty array
+====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+11. GET all entities locally in CP1 - see empty array
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+Date: REGEX(.*)
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

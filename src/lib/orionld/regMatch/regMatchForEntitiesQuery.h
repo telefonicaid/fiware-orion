@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_
-#define SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_
+#ifndef SRC_LIB_ORIONLD_REGMATCH_REGMATCHFORENTITIESQUERY_H_
+#define SRC_LIB_ORIONLD_REGMATCH_REGMATCHFORENTITIESQUERY_H_
 
 /*
 *
-* Copyright 2022 FIWARE Foundation e.V.
+* Copyright 2024 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -25,33 +25,24 @@
 *
 * Author: Ken Zangelin
 */
-extern "C"
-{
-#include "kjson/KjNode.h"                                        // KjNode
-}
-
+#include "orionld/types/DistOp.h"                                // DistOp
+#include "orionld/types/RegistrationMode.h"                      // RegistrationMode
+#include "orionld/types/DistOpType.h"                            // DistOpType
 #include "orionld/types/StringArray.h"                           // StringArray
-#include "orionld/types/OrionldGeoInfo.h"                        // OrionldGeoInfo
-#include "orionld/types/QNode.h"                                 // QNode
 
 
 
 // -----------------------------------------------------------------------------
 //
-// mongocEntitiesQuery -
+// regMatchForEntitiesquery -
 //
-extern KjNode* mongocEntitiesQuery
+extern DistOp* regMatchForEntitiesQuery
 (
-  StringArray*     entityTypeList,
-  StringArray*     entityIdList,
-  const char*      entityIdPattern,
-  StringArray*     attrList,
-  QNode*           qNode,
-  OrionldGeoInfo*  geoInfoP,
-  int64_t*         countP,
-  const char*      geojsonGeometry,
-  bool             onlyIds,
-  bool             onlyIdAndType
+  RegistrationMode  regMode,
+  DistOpType        opType,
+  StringArray*      idListP,
+  StringArray*      typeListP,
+  StringArray*      attrListP
 );
 
-#endif  // SRC_LIB_ORIONLD_MONGOC_MONGOCENTITIESQUERY_H_
+#endif  // SRC_LIB_ORIONLD_REGMATCH_REGMATCHFORENTITIESQUERY_H_

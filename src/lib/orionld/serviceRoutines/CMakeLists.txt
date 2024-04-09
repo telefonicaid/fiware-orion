@@ -76,6 +76,7 @@ SET (SOURCES
     orionldDeleteTemporalEntity.cpp
     orionldPatchTemporalAttributeInstance.cpp
     orionldPostTemporalAttributes.cpp
+    orionldDeleteEntities.cpp
 )
 
 # Include directories

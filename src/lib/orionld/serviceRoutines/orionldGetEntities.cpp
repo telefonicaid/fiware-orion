@@ -29,7 +29,6 @@ extern "C"
 }
 
 #include "logMsg/logMsg.h"                                          // LM_*
-#include "logMsg/traceLevels.h"                                     // Lmt*
 
 #include "orionld/types/OrionldGeoInfo.h"                           // OrionldGeoInfo
 #include "orionld/types/QNode.h"                                    // QNode
@@ -37,162 +36,21 @@ extern "C"
 #include "orionld/types/DistOp.h"                                   // DistOp
 #include "orionld/common/orionldState.h"                            // orionldState
 #include "orionld/common/orionldError.h"                            // orionldError
+#include "orionld/q/qClone.h"                                       // qClone
 #include "orionld/legacyDriver/legacyGetEntities.h"                 // legacyGetEntities
 #include "orionld/kjTree/kjTreeLog.h"                               // kjTreeLog
-#include "orionld/q/qLex.h"                                         // qLex
-#include "orionld/q/qParse.h"                                       // qParse
-#include "orionld/q/qClone.h"                                       // qClone
-#include "orionld/payloadCheck/pCheckGeo.h"                         // pCheckGeo
+#include "orionld/payloadCheck/pCheckQueryParams.h"                 // pCheckQueryParams
 #include "orionld/distOp/distOpRequests.h"                          // distOpRequests
 #include "orionld/distOp/distOpListsMerge.h"                        // distOpListsMerge
 #include "orionld/distOp/distOpListDebug.h"                         // distOpListDebug
-#include "orionld/distOp/xForwardedForMatch.h"                      // xForwardedForMatchº
+#include "orionld/distOp/xForwardedForMatch.h"                      // xForwardedForMatch
 #include "orionld/distOp/viaMatch.h"                                // viaMatch
 #include "orionld/distOp/distOpCreate.h"                            // distOpCreate
 #include "orionld/regMatch/regMatchOperation.h"                     // regMatchOperation
-#include "orionld/regMatch/regMatchInformationArrayForQuery.h"      // regMatchInformationArrayForQuery
+#include "orionld/regMatch/regMatchForEntitiesQuery.h"              // regMatchForEntitiesQuery
 #include "orionld/serviceRoutines/orionldGetEntitiesDistributed.h"  // orionldGetEntitiesDistributed
 #include "orionld/serviceRoutines/orionldGetEntitiesLocal.h"        // orionldGetEntitiesLocal
 #include "orionld/serviceRoutines/orionldGetEntities.h"             // Own interface
-
-
-
-// ----------------------------------------------------------------------------
-//
-// qCheck -
-//
-static QNode* qCheck(char* qString)
-{
-  QNode* qList;
-  char*  title;
-  char*  detail;
-
-  qList = qLex(qString, true, &title, &detail);
-  if (qList == NULL)
-  {
-    orionldError(OrionldBadRequestData, "Invalid Q-Filter", detail, 400);
-    LM_RE(NULL, ("Error (qLex: %s: %s)", title, detail));
-  }
-
-  QNode* qNode = qParse(qList, NULL, true, true, &title, &detail);  // 3rd parameter: forDb=true
-  if (qNode == NULL)
-  {
-    orionldError(OrionldBadRequestData, title, detail, 400);
-    LM_E(("Error (qParse: %s: %s) - but, the subscription will be inserted in the sub-cache without 'q'", title, detail));
-  }
-
-  return qNode;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// pCheckQueryParams -
-//
-bool pCheckQueryParams(char* id, char* type, char* idPattern, char* q, char* geometry, char* attrs, bool local, EntityMap* entityMap, QNode** qNodeP, OrionldGeoInfo* geoInfoP)
-{
-  //
-  // URI param validity check
-  //
-
-  if ((id        == NULL)  &&
-      (idPattern == NULL)  &&
-      (type      == NULL)  &&
-      (geometry  == NULL)  &&
-      (attrs     == NULL)  &&
-      (q         == NULL)  &&
-      (local     == false) &&
-      (orionldState.in.entityMap == NULL))
-  {
-    orionldError(OrionldBadRequestData,
-                 "Too broad query",
-                 "Need at least one of: entity-id, entity-type, geo-location, attribute-list, Q-filter, local=true, or an entity map",
-                 400);
-
-    return false;
-  }
-
-
-  //
-  // If ONE or ZERO types in URI param 'type', the prepared array isn't used, just a simple char-pointer (named "type")
-  //
-  if      (orionldState.in.typeList.items == 0) type = (char*) ".*";
-  else if (orionldState.in.typeList.items == 1) type = orionldState.in.typeList.array[0];
-
-  if (pCheckGeo(geoInfoP, orionldState.uriParams.geometry, orionldState.uriParams.georel, orionldState.uriParams.coordinates, orionldState.uriParams.geoproperty) == false)
-    return false;
-
-  QNode* qNode = NULL;
-  if (orionldState.uriParams.q != NULL)
-  {
-    qNode = qCheck(orionldState.uriParams.q);
-    if (qNode == NULL)
-      return false;
-  }
-
-  *qNodeP = qNode;
-
-  return true;
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// regMatchForEntitiesQuery -  FIXME: Move to orionld/forwarding/regMatchForEntitiesQuery.cpp/h
-//
-DistOp* regMatchForEntitiesQuery
-(
-  RegistrationMode  regMode,
-  StringArray*      idListP,
-  StringArray*      typeListP,
-  StringArray*      attrListP
-)
-{
-  DistOp* distOpList = NULL;
-
-  for (RegCacheItem* regP = orionldState.tenantP->regCache->regList; regP != NULL; regP = regP->next)
-  {
-    if ((regP->mode & regMode) == 0)
-      continue;
-
-    if (regMatchOperation(regP, DoQueryEntity) == false)
-    {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to Operation (operation == QueryEntity)", regP->regId));
-      continue;
-    }
-
-    // Loop detection
-    if (viaMatch(orionldState.in.via, regP->hostAlias) == true)
-    {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (Via)", regP->regId));
-      continue;
-    }
-
-    if (xForwardedForMatch(orionldState.in.xForwardedFor, regP->ipAndPort) == true)
-    {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to Loop (X-Forwarded-For)", regP->regId));
-      continue;
-    }
-
-    DistOp* distOpP = regMatchInformationArrayForQuery(regP, idListP, typeListP, attrListP);
-    if (distOpP == NULL)
-    {
-      LM_T(LmtRegMatch, ("%s: No Reg Match due to Information Array", regP->regId));
-      continue;
-    }
-
-    //
-    // Add distOpP to the linked list (distOpList)
-    //
-    LM_T(LmtRegMatch, ("%s: Reg Match !", regP->regId));
-
-    distOpList = distOpListsMerge(distOpList, distOpP);
-  }
-
-  return distOpList;
-}
 
 
 
@@ -203,12 +61,12 @@ DistOp* regMatchForEntitiesQuery
 DistOp* distOpRequestsForEntitiesQuery(char* idPattern, QNode* qNode)
 {
   // FIXME: idPattern, qNode also need to be taken into account inside regMatchForEntitiesQuery
-  DistOp* auxiliarList  = regMatchForEntitiesQuery(RegModeAuxiliary, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
-  DistOp* exclusiveList = regMatchForEntitiesQuery(RegModeExclusive, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
-  DistOp* redirectList  = regMatchForEntitiesQuery(RegModeRedirect,  &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* auxiliarList  = regMatchForEntitiesQuery(RegModeAuxiliary, DoQueryEntity, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* exclusiveList = regMatchForEntitiesQuery(RegModeExclusive, DoQueryEntity, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* redirectList  = regMatchForEntitiesQuery(RegModeRedirect,  DoQueryEntity, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
   // FIXME: Strip off attrs, entityId, entityType, etc from URI params (regMatchForEntitiesQuery(RegModeExclusive) already does it for each match
 
-  DistOp* inclusiveList = regMatchForEntitiesQuery(RegModeInclusive, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* inclusiveList = regMatchForEntitiesQuery(RegModeInclusive, DoQueryEntity, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
   DistOp* distOpList;
 
   distOpList = distOpListsMerge(exclusiveList,  redirectList);
@@ -228,7 +86,7 @@ DistOp* distOpRequestsForEntitiesQuery(char* idPattern, QNode* qNode)
 //
 // Three cases:
 // * legacy
-// * local query (either by setting "local=true", or by "no matching registrations
+// * local query (either by setting "local=true", or by "no matching registrations"
 // * distributed query (best effort, without freezing time)
 //
 //

@@ -22,9 +22,6 @@
 *
 * Author: Ken Zangelin and Gabriel Quaresma
 */
-#include <string>
-#include <vector>
-
 extern "C"
 {
 #include "kjson/KjNode.h"                                        // KjNode

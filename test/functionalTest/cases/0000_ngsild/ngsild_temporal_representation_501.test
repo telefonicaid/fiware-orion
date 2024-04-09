@@ -239,7 +239,7 @@ Date: REGEX(.*)
 10. Get 405 for POST /ngsi-ld/v1/temporal/entities/<EID>/attrs/{attrId}/{instanceId}
 ====================================================================================
 HTTP/1.1 405 Method Not Allowed
-Allow: GET,PATCH,DELETE
+Allow: GET,DELETE,PATCH
 Content-Length: 0
 Date: REGEX(.*)
 

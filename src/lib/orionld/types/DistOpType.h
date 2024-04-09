@@ -77,7 +77,9 @@ typedef enum DistOpType
   DoUpdateSubscription,
   DoRetrieveSubscription,
   DoQuerySubscription,              // 35
-  DoDeleteSubscription
+  DoDeleteSubscription,
+
+  DoPurgeEntity
 } DistOpType;
 
 
@@ -86,7 +88,7 @@ typedef enum DistOpType
 //
 // distOpTypes -
 //
-extern const char* distOpTypes[37];
+extern const char* distOpTypes[38];
 
 
 

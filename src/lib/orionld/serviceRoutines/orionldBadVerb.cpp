@@ -63,8 +63,8 @@ bool orionldBadVerb(void)
   if (bitmask & (1 << HTTP_GET))    strcat(allowValue, ",GET");
   if (bitmask & (1 << HTTP_PUT))    strcat(allowValue, ",PUT");
   if (bitmask & (1 << HTTP_POST))   strcat(allowValue, ",POST");
-  if (bitmask & (1 << HTTP_DELETE)) strcat(allowValue, ",PATCH");
-  if (bitmask & (1 << HTTP_PATCH))  strcat(allowValue, ",DELETE");
+  if (bitmask & (1 << HTTP_DELETE)) strcat(allowValue, ",DELETE");
+  if (bitmask & (1 << HTTP_PATCH))  strcat(allowValue, ",PATCH");
 
   orionldHeaderAdd(&orionldState.out.headers, HttpAllow, (char*) &allowValue[1], 0);  // Skipping first comma of 'allowValue'
 

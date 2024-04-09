@@ -30,12 +30,12 @@ orionldStart CB
 --SHELL--
 
 #
-# 01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET
+# 01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET,DELETE
 #
 
 
-echo "01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET"
-echo "==========================================================="
+echo "01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET,DELETE"
+echo "=================================================================="
 payload='{
   "id": "http://a.b.c/entity/E1",
   "type": "A",
@@ -50,10 +50,10 @@ echo
 
 
 --REGEXPECT--
-01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET
-===========================================================
+01. PATCH /ngsi-ld/v1/entities, see 405 and Allow: POST,GET,DELETE
+==================================================================
 HTTP/1.1 405 Method Not Allowed
-Allow: GET,POST
+Allow: GET,POST,DELETE
 Content-Length: 0
 Date: REGEX(.*)
 

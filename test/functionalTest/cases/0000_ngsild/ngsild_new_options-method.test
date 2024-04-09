@@ -229,7 +229,7 @@ echo
 01. OPTIONS request for /entities
 =================================
 HTTP/1.1 200 OK
-Allow: GET,POST,OPTIONS
+Allow: GET,POST,DELETE,OPTIONS
 Content-Length: 0
 Date: REGEX(.*)
 

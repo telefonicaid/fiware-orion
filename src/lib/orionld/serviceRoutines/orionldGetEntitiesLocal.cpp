@@ -190,7 +190,8 @@ bool orionldGetEntitiesLocal
                                                     geoInfoP,
                                                     &count,
                                                     geojsonGeometryLongName,
-                                                    onlyIds);
+                                                    onlyIds,
+                                                    false);
 
   if (dbEntityArray == NULL)
     return false;

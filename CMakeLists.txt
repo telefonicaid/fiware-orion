@@ -197,6 +197,7 @@ SET (ORION_LIBS
     orionld_serviceRoutines
     orionld_distOp
     orionld_regMatch
+    orionld_distOp
     orionld_troe
     orionld_kjTree
     orionld_mqtt

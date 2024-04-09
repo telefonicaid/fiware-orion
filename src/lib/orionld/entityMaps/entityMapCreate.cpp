@@ -206,14 +206,15 @@ EntityMap* entityMapCreate(DistOp* distOpList, char* idPattern, QNode* qNode, Or
   orionldState.uriParams.limit  = 1000;
 
   KjNode* localDbMatches = mongocEntitiesQuery(&orionldState.in.typeList,
-                                             &orionldState.in.idList,
-                                             idPattern,
-                                             &orionldState.in.attrList,
-                                             qNode,
-                                             geoInfoP,
-                                             NULL,
-                                             geojsonGeometryLongName,
-                                             true);
+                                               &orionldState.in.idList,
+                                               idPattern,
+                                               &orionldState.in.attrList,
+                                               qNode,
+                                               geoInfoP,
+                                               NULL,
+                                               geojsonGeometryLongName,
+                                               true,
+                                               false);
 
   orionldState.uriParams.offset = offset;
   orionldState.uriParams.limit  = limit;

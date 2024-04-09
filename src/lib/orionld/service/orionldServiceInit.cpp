@@ -48,6 +48,7 @@
 #include "orionld/serviceRoutines/orionldPatchEntity2.h"             // orionldPatchEntity2
 #include "orionld/serviceRoutines/orionldPutEntity.h"                // orionldPutEntity
 #include "orionld/serviceRoutines/orionldDeleteEntity.h"             // orionldDeleteEntity
+#include "orionld/serviceRoutines/orionldDeleteEntities.h"           // orionldDeleteEntities
 #include "orionld/serviceRoutines/orionldPatchAttribute.h"           // orionldPatchAttribute
 #include "orionld/serviceRoutines/orionldPutAttribute.h"             // orionldPutAttribute
 #include "orionld/serviceRoutines/orionldDeleteAttribute.h"          // orionldDeleteAttribute
@@ -252,6 +253,21 @@ static void restServicePrepare(OrionLdRestService* serviceP, OrionLdRestServiceS
     serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
 
     serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
+  }
+  else if (serviceP->serviceRoutine == orionldDeleteEntities)
+  {
+    serviceP->options   |= ORIONLD_SERVICE_OPTION_NO_CONTEXT_NEEDED;
+
+    serviceP->uriParams |= ORIONLD_URIPARAM_IDLIST;
+    serviceP->uriParams |= ORIONLD_URIPARAM_TYPELIST;
+    serviceP->uriParams |= ORIONLD_URIPARAM_IDPATTERN;
+    serviceP->uriParams |= ORIONLD_URIPARAM_ATTRS;
+    serviceP->uriParams |= ORIONLD_URIPARAM_Q;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOREL;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_COORDINATES;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOPROPERTY;
+    serviceP->uriParams |= ORIONLD_URIPARAM_GEOMETRYPROPERTY;
   }
   else if (serviceP->serviceRoutine == orionldPostEntity)
   {
