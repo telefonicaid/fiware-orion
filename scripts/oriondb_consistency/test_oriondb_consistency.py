@@ -56,4 +56,4 @@ class TestEntitiesConsistency(unittest.TestCase):
             'entities': {},
             'csubs': {}
         }
-        process_db(logger, 'orion-validation', mongo_client, False, queries, None)
+        process_db(logger, 'orion-validation', mongo_client, False, queries, None, False)

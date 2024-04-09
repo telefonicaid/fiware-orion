@@ -177,6 +177,20 @@ Suggestion action is to:
 
 * Change `notification.attrsFormat` to one of the supported formats (e.g. `normalized`).
 
+Autofix action:
+
+* `notification.attrsFormat` is set to `normalized`.
+
+## Autofix mode
+
+If `--autofix` is spefified in the command line arguments, the script implements automatic fixing of documents
+violating the rules.
+
+**WARNING: the usage of `--autofix` will do DB modification**. Use it with care. It is strongly recommended to
+do a backup of your data before using it.
+
+It only works for some rules. Check specific rules documntation for details (look for "Autofix action").
+
 ## Testing
 
 You can test the `oriondb_consistency.py` script this qy:

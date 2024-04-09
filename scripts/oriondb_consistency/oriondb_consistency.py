@@ -31,6 +31,7 @@ import logging
 import json
 import sys
 import re
+import copy
 
 
 # Helper functions
@@ -219,9 +220,11 @@ def ruleE10(entity):
             missing_fields.append(field)
 
     if len(missing_fields) > 0:
-        return f"missing subfields in _id: {', '.join(missing_fields)}"
+        r = f"missing subfields in _id: {', '.join(missing_fields)}"
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE11(entity):
@@ -237,9 +240,11 @@ def ruleE11(entity):
             missing_fields.append(field)
 
     if len(missing_fields) > 0:
-        return f"missing fields: {', '.join(missing_fields)}"
+        r = f"missing fields: {', '.join(missing_fields)}"
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE12(entity):
@@ -260,9 +265,11 @@ def ruleE12(entity):
             s.append(f"in attribute '{attr}' missing fields: {', '.join(missing_fields)}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE13(entity):
@@ -295,10 +302,11 @@ def ruleE13(entity):
         s.append(f"attributes in attrs object not found in attrNames: {','.join(attrs_not_in_attrnames)}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
 
+    return r, None
 
 def ruleE14(entity):
     """
@@ -334,9 +342,11 @@ def ruleE14(entity):
                 f"in attribute '{item}' metadata in md object not found in mdNames: {', '.join(md_not_in_mdnames)}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE15(entities_collection):
@@ -369,10 +379,11 @@ def ruleE15(entities_collection):
             f"_id uniqueness violation for entity id='{id}' type='{type}' servicePath='{service_path}' found {count} times")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
 
+    return r, None
 
 def ruleE16(entity):
     """
@@ -380,6 +391,8 @@ def ruleE16(entity):
 
     See README.md for an explanation of the rule
     """
+    # FIXME: this function should be re-factored. It has many return points. It's ugly...
+
     # check that as much as one attribute is using geo type
     geo_attrs = []
     for attr in entity['attrs']:
@@ -388,7 +401,7 @@ def ruleE16(entity):
             geo_attrs.append(attr)
 
     if len(geo_attrs) > 1:
-        return f"more than one attribute with geo type: {', '.join(geo_attrs)}"
+        return f"more than one attribute with geo type: {', '.join(geo_attrs)}", None
 
     if len(geo_attrs) == 1:
         # If geo attr found, then check that there is consistent location field
@@ -396,13 +409,13 @@ def ruleE16(entity):
         geo_type = entity['attrs'][geo_attr]['type']
 
         if 'location' not in entity:
-            return f"geo location '{geo_attr}' ({geo_type}) not null but location field not found in entity"
+            return f"geo location '{geo_attr}' ({geo_type}) not null but location field not found in entity", None
         if entity['location']['attrName'] != geo_attr:
-            return f"location.attrName ({entity['location']['attrName']}) differs from '{geo_attr}'"
+            return f"location.attrName ({entity['location']['attrName']}) differs from '{geo_attr}'", None
 
         geo_json = to_geo_json(entity['attrs'][geo_attr])
         if type(geo_json) == str:
-            return geo_json
+            return geo_json, None
 
         # https://www.testcult.com/deep-comparison-of-json-in-python/
         diff = DeepDiff(geo_json, entity['location']['coords'], ignore_order=True)
@@ -412,14 +425,16 @@ def ruleE16(entity):
             geo_json = convert_strings_to_numbers(geo_json)
             if not DeepDiff(geo_json, entity['location']['coords'], ignore_order=True):
                 return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) is consistent, but value " \
-                        f"should use numbers for coordinates instead of strings"
+                        f"should use numbers for coordinates instead of strings", None
             else:
                 # Other causes
-                return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) value: {diff}"
+                return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) value: {diff}", None
     else:  # len(geo_attrs) == 0
         # If no geo attr found, check there isn't a location field
         if 'location' in entity:
-            return f"location field detected but no geo attribute is present (maybe metadata location is used?)"
+            return f"location field detected but no geo attribute is present (maybe metadata location is used?)", None
+
+    return None, None
 
 
 def ruleE17(entity):
@@ -429,9 +444,11 @@ def ruleE17(entity):
     See README.md for an explanation of the rule
     """
     if 'lastCorrelator' not in entity:
-        return f"missing lastCorrelator"
+        r = f"missing lastCorrelator"
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE20(entity):
@@ -445,9 +462,9 @@ def ruleE20(entity):
     if 'id' in entity['_id']:
         r = check_id(entity['_id']['id'])
         if r is not None:
-            return f"entity id ({entity['_id']['id']}) syntax violation: {r}"
+            return f"entity id ({entity['_id']['id']}) syntax violation: {r}", None
 
-    return None
+    return None, None
 
 
 def ruleE21(entity):
@@ -461,9 +478,9 @@ def ruleE21(entity):
     if 'type' in entity['_id']:
         r = check_id(entity['_id']['type'])
         if r is not None:
-            return f"entity type ({entity['_id']['type']}) syntax violation: {r}"
+            return f"entity type ({entity['_id']['type']}) syntax violation: {r}", None
 
-    return None
+    return None, None
 
 
 def ruleE22(entity):
@@ -477,32 +494,33 @@ def ruleE22(entity):
 
     # servicePath existence is checked by another rule
     if 'servicePath' not in entity['_id']:
-        return None
+        return None, None
 
     sp = entity['_id']['servicePath']
     # Scope must start with / (only "absolute" scopes are allowed)
     if not sp.startswith('/'):
-        return f"servicePath '{sp}' does not starts with '/'"
+        return f"servicePath '{sp}' does not starts with '/'", None
 
     # This special case can be problematic (as split will detect always a level and the minimum length rule
     # will break. So early return
     if sp == '/':
-        return None
+        return None, None
 
     # 10 maximum scope levels in a path
     sp_levels = sp[1:].split('/')
     if len(sp_levels) > 10:
-        return f"servicePath has {len(sp_levels)} tokens but the limit is 10"
+        return f"servicePath has {len(sp_levels)} tokens but the limit is 10", None
 
     # 50 maximum characters in each level (1 char is minimum), only alphanumeric and underscore allowed
     for i in range(len(sp_levels)):
         if len(sp_levels[i]) == 0:
-            return f'servicePath level #{i} length is 0 but minimum is 1'
+            return f'servicePath level #{i} length is 0 but minimum is 1', None
         if len(sp_levels[i]) > 50:
-            return f'servicePath level #{i} length is {len(sp_levels[i])} but maximum is 50'
+            return f'servicePath level #{i} length is {len(sp_levels[i])} but maximum is 50', None
         if re.search('[^a-zA-Z0-9_]', sp_levels[i]):
-            return f"unallowed characters in '{sp_levels[i]}' in servicePath level #{i}"
+            return f"unallowed characters in '{sp_levels[i]}' in servicePath level #{i}", None
 
+    return None, None
 
 def ruleE23(entity):
     """
@@ -527,9 +545,11 @@ def ruleE23(entity):
             s.append(f"attribute name ({attr}) syntax violation: {r}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE24(entity):
@@ -549,9 +569,11 @@ def ruleE24(entity):
                 s.append(f"in attribute '{attr}' type ({type}) syntax violation: {r}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE25(entity):
@@ -578,9 +600,11 @@ def ruleE25(entity):
                 s.append(f"in attribute '{attr}' metadata name ({md}) syntax violation: {r}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE26(entity):
@@ -602,9 +626,11 @@ def ruleE26(entity):
                         s.append(f"in attribute '{attr}' metadata '{md}' type ({type}) syntax violation: {r}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE90(entity):
@@ -625,7 +651,11 @@ def ruleE90(entity):
 
     #
     if len(s) > 0:
-        return f"usage of deprecated geo type in attributes: {', '.join(s)}"
+        r = f"usage of deprecated geo type in attributes: {', '.join(s)}"
+    else:
+        r = None
+
+    return r, None
 
 
 def ruleE91(entity):
@@ -641,9 +671,11 @@ def ruleE91(entity):
                 attrs.append(attr)
 
     if len(attrs) > 1:
-        return f"location metadata found {len(attrs)} times in attributes: {', '.join(attrs)} (maximum should be just 1)"
+        r = f"location metadata found {len(attrs)} times in attributes: {', '.join(attrs)} (maximum should be just 1)"
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE92(entity):
@@ -662,9 +694,11 @@ def ruleE92(entity):
                         f"in attribute '{attr}' location metadata value is {location_value} (should be WGS84 or WSG84)")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
 def ruleE93(entity):
@@ -677,9 +711,9 @@ def ruleE93(entity):
         if 'md' in entity['attrs'][attr]:
             for md in entity['attrs'][attr]['md']:
                 if md == 'location' and is_geo_type(entity['attrs'][attr]['type']):
-                    return f"in attribute '{attr}' redundant location metadata found (attribute is already using {entity['attrs'][attr]['type']} type)"
+                    return f"in attribute '{attr}' redundant location metadata found (attribute is already using {entity['attrs'][attr]['type']} type)", None
 
-    return None
+    return None, None
 
 
 def ruleE94(entity):
@@ -692,9 +726,9 @@ def ruleE94(entity):
         if 'md' in entity['attrs'][attr]:
             for md in entity['attrs'][attr]['md']:
                 if md == 'location' and not is_geo_type(entity['attrs'][attr]['type']):
-                    return f"in attribute '{attr}' location metadata found (attribute type is {entity['attrs'][attr]['type']})"
+                    return f"in attribute '{attr}' location metadata found (attribute type is {entity['attrs'][attr]['type']})", None
 
-    return None
+    return None, None
 
 def ruleS90(csub):
     """
@@ -703,9 +737,14 @@ def ruleS90(csub):
     See README.md for an explanation of the rule
     """
     if csub['format'] == 'JSON':
-        return f"notification legacy format in use (endpoint: {csub['reference']})"
+        r = f"notification legacy format in use (endpoint: {csub['reference']})"
+        fixed_csub = copy.deepcopy(csub)
+        fixed_csub['format'] = 'normalized'
+    else:
+        r = None
+        fixed_csub = None
 
-    return None
+    return r, fixed_csub
 
 rules_inventory = [
     # Rules E1x
@@ -846,15 +885,16 @@ def get_id(doc, col, include_entity_date):
     """
     if col == 'entities':
         id_string = json.dumps(doc['_id'])
-        if 'modDate' in doc:
-            id_string = f"({datetime.fromtimestamp(doc['modDate']).strftime('%Y-%m-%dT%H:%M:%SZ')}) {id_string}"
-        else:
-            id_string = f"(<no date>)) {id_string}"
+        if include_entity_date:
+            if 'modDate' in doc:
+                id_string = f"({datetime.fromtimestamp(doc['modDate']).strftime('%Y-%m-%dT%H:%M:%SZ')}) {id_string}"
+            else:
+                id_string = f"(<no date>)) {id_string}"
         return f"entity {id_string}"
     else:  # col == 'csubs'
         return f"subscription {doc['_id']}"
 
-def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp):
+def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp, autofix):
     """
     Process an individual DB
 
@@ -865,6 +905,7 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
     :param queries: dict with per-colletion queries to filter entities to be processed (the key in the dictionary is
     the collection to apply the query)
     :param rules_exp: regular expression to filter rules to apply
+    :param autofix: True if autofix is activated
     :return: fails
     """
 
@@ -890,6 +931,7 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
             rules.append(rule)
 
     # first process global rules
+    # NOTE: global rules doesn't accept autofix parameter
     for rule in rules:
         if rule['global']:
             col = rule['collection']
@@ -899,6 +941,10 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
                 fails += 1
 
     # second process not global rules, per collection
+    autofix = {
+        'entities': [],
+        'csubs': []
+    }
     for col in ['entities', 'csubs']:
         for doc in db_conn[db_name][col].find(queries[col]):
             n[col] += 1
@@ -907,11 +953,13 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
             logger.debug(f'* processing {id_string}')
             for rule in rules:
                 if not rule['global'] and rule['collection'] == col:
-                    s = rule['func'](doc)
+                    (s, fixed_doc) = rule['func'](doc)
                     if s is not None:
                         logger.warning(f'DB {db_name} {rule["label"]} violation for {id_string}: {s}')
                         doc_fail = True
                         fails += 1
+                    if fixed_doc is not None:
+                        autofix[col].append(fixed_doc)
 
             if doc_fail:
                 failed_docs[col] += 1
@@ -921,6 +969,8 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
         if n[col] > 0:
             logger.info(
                 f'processed {db_name} in collection {col}: {failed_docs[col]}/{n[col]} ({round(failed_docs[col] / n[col] * 100, 2)}%) failed docs')
+
+    # TODO: implement save logic for autofix dict
 
     return fails
 
@@ -944,9 +994,19 @@ if __name__ == '__main__':
                              'all subscriptions in the collection will be checked. Applies to Rule Sxx rules.')
     parser.add_argument('--rules-exp', dest='rules_exp',
                         help='Specifies the rules to apply, as a regular expression. By default all rules are applied.')
+    parser.add_argument('--autofix', dest='atutofix', action='store_true',
+                        help='Applies some automatic fixes. Not for all rules. Check documentation. WARNING: this '
+                        'operation may modify OrionDBs, use with care')
     parser.add_argument('--logLevel', dest='log_level', choices=['DEBUG', 'INFO', 'WARN', 'ERROR'], default='INFO',
                         help='log level. Default is INFO')
     args = parser.parse_args()
+
+    if args.autofix:
+        print("WARNING!!!! Parameter --autofix has been activated, so this script may modify documents in Orion DBs (check documentation")
+        print("for details). These modifications cannot be undone. If you are sure you want to continue type 'yes' and press Enter")
+        confirm = input()
+        if (confirm != 'yes'):
+            sys.exit()
 
     # sets the logging configuration
     logging.basicConfig(
@@ -971,7 +1031,7 @@ if __name__ == '__main__':
     fails = 0
     if args.db is not None:
         if args.db in db_names:
-            fails += process_db(logger, args.db, mongo_client, args.include_entities_date, queries, args.rules_exp)
+            fails += process_db(logger, args.db, mongo_client, args.include_entities_date, queries, args.rules_exp, args.autofix)
         else:
             logger.fatal(f'database {args.db} does not exist')
             sys.exit(1)
@@ -979,6 +1039,6 @@ if __name__ == '__main__':
         # Process all Orion databases
         for db_name in db_names:
             if db_name.startswith('orion-'):
-                fails += process_db(logger, db_name, mongo_client, args.include_entities_date, queries, args.rules_exp)
+                fails += process_db(logger, db_name, mongo_client, args.include_entities_date, queries, args.rules_exp, args.autofix)
 
     logger.info(f'total rule violations: {fails}')
