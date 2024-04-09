@@ -35,25 +35,18 @@ extern "C"
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/orionldError.h"                         // orionldError
 #include "orionld/context/orionldContextItemExpand.h"            // orionldContextItemExpand
+#include "orionld/payloadCheck/pCheckQueryParams.h"              // pCheckQueryParams
 #include "orionld/mongoc/mongocEntitiesQuery.h"                  // mongocEntitiesQuery
 #include "orionld/mongoc/mongocEntitiesDelete.h"                 // mongocEntitiesDelete
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
+#include "orionld/regMatch/regMatchOperation.h"                  // regMatchOperation
+#include "orionld/regMatch/regMatchForEntitiesQuery.h"           // regMatchForEntitiesQuery
 #include "orionld/distOp/distOpSuccess.h"                        // distOpSuccess
 #include "orionld/distOp/distOpFailure.h"                        // distOpFailure
-
-#if 0
-#include "orionld/common/responseFix.h"                          // responseFix
-#include "orionld/mongoc/mongocEntityDelete.h"                   // mongocEntityDelete
-#include "orionld/notifications/orionldAlterations.h"            // orionldAlterations
-#include "orionld/regMatch/regMatchForEntityGet.h"               // regMatchForEntityGet
 #include "orionld/distOp/distOpListsMerge.h"                     // distOpListsMerge
-#include "orionld/distOp/distOpSend.h"                           // distOpSend
-#include "orionld/distOp/distOpLookupByCurlHandle.h"             // distOpLookupByCurlHandle
-#include "orionld/distOp/distOpResponses.h"                      // distOpResponses
 #include "orionld/distOp/distOpListRelease.h"                    // distOpListRelease
-#include "orionld/distOp/xForwardedForCompose.h"                 // xForwardedForCompose
-#include "orionld/distOp/viaCompose.h"                           // viaCompose
-#endif
+#include "orionld/distOp/distOpsSend.h"                          // distOpsSend
+#include "orionld/distOp/distOpResponses.h"                      // distOpResponses
 #include "orionld/serviceRoutines/orionldDeleteEntities.h"       // Own Interface
 
 
@@ -100,21 +93,26 @@ static void alterationAdd(char* entityId, char* entityTypeExpanded, char* entity
 
 // ----------------------------------------------------------------------------
 //
-// pCheckQueryParams - FIXME: Own Module !!!
+// distOpRequestsForEntitiesPurge -
 //
-extern bool pCheckQueryParams
-(
-  char*            id,
-  char*            type,
-  char*            idPattern,
-  char*            q,
-  char*            geometry,
-  char*            attrs,
-  bool             local,
-  EntityMap*       entityMap,
-  QNode**          qNodeP,
-  OrionldGeoInfo*  geoInfoP
-);
+DistOp* distOpRequestsForEntitiesPurge(char* idPattern, QNode* qNode)
+{
+  // FIXME: idPattern, qNode also need to be taken into account inside regMatchForEntitiesQuery
+  DistOp* auxiliarList  = regMatchForEntitiesQuery(RegModeAuxiliary, DoPurgeEntity, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* exclusiveList = regMatchForEntitiesQuery(RegModeExclusive, DoPurgeEntity, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* redirectList  = regMatchForEntitiesQuery(RegModeRedirect,  DoPurgeEntity, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  // FIXME: Strip off attrs, entityId, entityType, etc from URI params (regMatchForEntitiesQuery(RegModeExclusive) already does it for each match
+
+  DistOp* inclusiveList = regMatchForEntitiesQuery(RegModeInclusive, DoPurgeEntity, &orionldState.in.idList, &orionldState.in.typeList, &orionldState.in.attrList);
+  DistOp* distOpList;
+
+  distOpList = distOpListsMerge(exclusiveList,  redirectList);
+  distOpList = distOpListsMerge(distOpList, inclusiveList);
+  distOpList = distOpListsMerge(distOpList, auxiliarList);
+
+  LM_W(("distOpList: %p", distOpList));
+  return distOpList;
+}
 
 
 
@@ -122,7 +120,7 @@ extern bool pCheckQueryParams
 //
 // orionldDeleteEntities -
 //
-// 01. Retrieve list of entity id+type from local database 
+// 01. Retrieve list of entity id+type from local database
 // 02. Create the array of alterations - for later comparison with subscriptions
 // 03. Create the array of DistOps
 // 04. Execute the array of DistOps
@@ -212,14 +210,16 @@ bool orionldDeleteEntities(void)
   //
   // Distributed Ops
   //
-#if 0
+  DistOp* distOpList = distOpRequestsForEntitiesPurge(idPattern, qNode);
+
   if (distOpList != NULL)
   {
+    distOpsSend(distOpList, orionldState.in.aerOS);
     distOpResponses(distOpList, responseBody);
     kjTreeLog(responseBody, "responseBody", LmtSR);
     distOpListRelease(distOpList);
   }
-#endif
+
 
   //
   // Delete the entities in the local DB
@@ -244,8 +244,6 @@ bool orionldDeleteEntities(void)
       }
     }
   }
-
-  // responseFix(responseBody, DoDeleteEntity, 204, entityId);
 
   if (failures == 0)
   {

@@ -40,11 +40,13 @@ extern "C"
 
 #include "orionld/types/DistOp.h"                                // DistOp
 #include "orionld/types/ApiVersion.h"                            // API_VERSION_NGSILD_V1
+#include "orionld/types/OrionLdRestService.h"                    // OrionLdRestService
 #include "orionld/common/orionldState.h"                         // orionldState
 #include "orionld/common/tenantList.h"                           // tenant0
 #include "orionld/context/orionldCoreContext.h"                  // orionldCoreContextP
 #include "orionld/context/orionldContextItemAliasLookup.h"       // orionldContextItemAliasLookup
 #include "orionld/q/qRender.h"                                   // qRender
+#include "orionld/serviceRoutines/orionldDeleteAttribute.h"      // orionldDeleteAttribute
 #include "orionld/distOp/distOpSend.h"                           // Own interface
 
 
@@ -469,9 +471,9 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
   // Add URI Params
   //
   LM_T(LmtDistOpRequestParams, ("%s: ---- URL Parameters for %s ------------------------", distOpP->regP->regId, distOpP->id));
-  if (orionldState.verb == HTTP_GET)
+  if ((orionldState.verb == HTTP_GET) || (orionldState.verb == HTTP_DELETE))
   {
-    if (distOpP->attrsParam != NULL)
+    if ((distOpP->attrsParam != NULL) && (orionldState.serviceP->serviceRoutine != orionldDeleteAttribute))
       uriParamAdd(&urlParts, distOpP->attrsParam, NULL, distOpP->attrsParamLen);
 
     //
@@ -480,10 +482,13 @@ bool distOpSend(DistOp* distOpP, const char* dateHeader, const char* xForwardedF
     //
     // There is one exception though - when only the entity ids are wanted as output
     //
-    if (distOpP->onlyIds == true)
-      uriParamAdd(&urlParts, "onlyIds=true", NULL, 12);
-    else
-      uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
+    if (orionldState.verb == HTTP_GET)
+    {
+      if (distOpP->onlyIds == true)
+        uriParamAdd(&urlParts, "onlyIds=true", NULL, 12);
+      else
+        uriParamAdd(&urlParts, "options=sysAttrs", NULL, 16);
+    }
 
     if (distOpP->operation == DoQueryEntity)
     {

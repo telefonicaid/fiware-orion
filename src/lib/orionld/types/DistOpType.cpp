@@ -40,7 +40,7 @@ extern "C"
 //
 // distOpTypes -
 //
-const char* distOpTypes[37] = {
+const char* distOpTypes[38] = {
   "none",
   "createEntity",
   "updateEntity",
@@ -124,7 +124,8 @@ const int distOpTypeUrlLen[37] = {
   25,   // strlen("/ngsi-ld/v1/subscriptions")
   26,   // strlen("/ngsi-ld/v1/subscriptions/")  + strlen(subscriptionId)
   26,   // strlen("/ngsi-ld/v1/subscriptions/")  + strlen(subscriptionId)
-  26    // strlen("/ngsi-ld/v1/subscriptions/")  + strlen(subscriptionId)
+  26,   // strlen("/ngsi-ld/v1/subscriptions/")  + strlen(subscriptionId)
+  20    // strlen("/ngsi-ld/v1/entities")
 };
 
 

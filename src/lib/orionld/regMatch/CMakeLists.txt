@@ -36,6 +36,7 @@ SET (SOURCES
     regMatchInformationItemForQuery.cpp
     regMatchAttributesForQuery.cpp
     regMatchEntityInfoForQuery.cpp
+    regMatchForEntitiesQuery.cpp
 )
 
 # Include directories

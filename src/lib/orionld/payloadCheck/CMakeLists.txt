@@ -70,6 +70,7 @@ SET (SOURCES
      pCheckRegistrationManagement.cpp
      pCheckTenant.cpp
      pCheckScope.cpp
+     pCheckQueryParams.cpp
 )
 
 # Include directories
