@@ -169,6 +169,14 @@ Additional, considerations:
 * This rule assumes only one `location` is in the entity (i.e. Rule 91 is not violated). If that doesn't occur, only the first occurrence is taken into account.
 * This rule doesn't check location consistency for this case (that's done by another rule in the 1x group).
 
+### Rule S90: detect usage of legacy notification format
+
+Check usage of legacy notification format in subscriptions (i.e. [`notification.attrsFormat`](../../doc/manuals/orion-api.md#subscriptionnotification) set to `legacy`).
+
+Suggestion action is to:
+
+* Change `notification.attrsFormat` to one of the supported formats (e.g. `normalized`).
+
 ## Testing
 
 You can test the `oriondb_consistency.py` script this qy:

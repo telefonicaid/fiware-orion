@@ -696,115 +696,165 @@ def ruleE94(entity):
 
     return None
 
+def ruleS90(csub):
+    """
+    Rule S90: Check usage of legacy notification format in subscriptions
 
-rules = [
-    # Rules 1x
+    See README.md for an explanation of the rule
+    """
+    if csub['format'] == 'JSON':
+        return f"notification legacy format in use (endpoint: {csub['reference']})"
+
+    return None
+
+rules_inventory = [
+    # Rules E1x
     {
         'label': 'RuleE10',
+        'collection': 'entities',
         'global': False,
         'func': ruleE10
     },
     {
         'label': 'RuleE11',
+        'collection': 'entities',
         'global': False,
         'func': ruleE11
     },
     {
         'label': 'RuleE12',
+        'collection': 'entities',
         'global': False,
         'func': ruleE12
     },
     {
         'label': 'RuleE13',
+        'collection': 'entities',
         'global': False,
         'func': ruleE13
     },
     {
         'label': 'RuleE14',
+        'collection': 'entities',
         'global': False,
         'func': ruleE14
     },
     {
         'label': 'RuleE15',
+        'collection': 'entities',
         'global': True,
         'func': ruleE15
     },
     {
         'label': 'RuleE16',
+        'collection': 'entities',
         'global': False,
         'func': ruleE16
     },
     {
         'label': 'RuleE17',
+        'collection': 'entities',
         'global': False,
         'func': ruleE17
     },
-    # Rules 2x
+    # Rules E2x
     {
         'label': 'RuleE20',
+        'collection': 'entities',
         'global': False,
         'func': ruleE20
     },
     {
         'label': 'RuleE21',
+        'collection': 'entities',
         'global': False,
         'func': ruleE21
     },
     {
         'label': 'RuleE22',
+        'collection': 'entities',
         'global': False,
         'func': ruleE22
     },
     {
         'label': 'RuleE23',
+        'collection': 'entities',
         'global': False,
         'func': ruleE23
     },
     {
         'label': 'RuleE24',
+        'collection': 'entities',
         'global': False,
         'func': ruleE24
     },
     {
         'label': 'RuleE25',
+        'collection': 'entities',
         'global': False,
         'func': ruleE25
     },
     {
         'label': 'RuleE26',
+        'collection': 'entities',
         'global': False,
         'func': ruleE26
     },
-    # Rules 9x
+    # Rules E9x
     {
         'label': 'RuleE90',
+        'collection': 'entities',
         'global': False,
         'func': ruleE90
     },
     {
         'label': 'RuleE91',
+        'collection': 'entities',
         'global': False,
         'func': ruleE91
     },
     {
         'label': 'RuleE92',
+        'collection': 'entities',
         'global': False,
         'func': ruleE92
     },
     {
         'label': 'RuleE93',
+        'collection': 'entities',
         'global': False,
         'func': ruleE93
     },
     {
         'label': 'RuleE94',
+        'collection': 'entities',
         'global': False,
         'func': ruleE94
+    },
+    # Rules S9x
+    {
+        'label': 'RuleS90',
+        'collection': 'csubs',
+        'global': False,
+        'func': ruleS90
     }
 ]
 
+def get_id(doc, col, include_entity_date):
+    """
+    Depending the collection and some arguments, the id is got in a way or another
+    """
+    if col == 'entities':
+        id_string = json.dumps(doc['_id'])
+        if 'modDate' in doc:
+            id_string = f"({datetime.fromtimestamp(doc['modDate']).strftime('%Y-%m-%dT%H:%M:%SZ')}) {id_string}"
+        else:
+            id_string = f"(<no date>)) {id_string}"
+        return f"entity {id_string}"
+    else:  # col == 'csubs'
+        return f"subscription {doc['_id']}"
 
-def process_db(logger, db_name, db_conn, include_entity_date, query, rules_exp):
+def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp):
     """
     Process an individual DB
 
@@ -812,64 +862,65 @@ def process_db(logger, db_name, db_conn, include_entity_date, query, rules_exp):
     :param db_name: the name of the DB to process
     :param db_conn: connection to MongoDB
     :param include_entity_date: if True, include entity modification date in log traces
-    :param query: query to filter entities to be processed
+    :param queries: dict with per-colletion queries to filter entities to be processed (the key in the dictionary is
+    the collection to apply the query)
     :param rules_exp: regular expression to filter rules to apply
     :return: fails
     """
 
     logger.info(f'processing {db_name}')
-    n = 0
-    failed_entities = 0
+    n = {
+        'entities': 0,
+        'csubs': 0
+    }
+    failed_docs = {
+        'entities': 0,
+        'csubs': 0
+    }
     fails = 0
 
-    # check collection existence
-    if 'entities' not in db_conn[db_name].list_collection_names():
-        logger.warning(f'collections entities not found in {db_name} database, nothing to do')
-        return
+    for col in ['entities', 'csubs']:
+        if col not in db_conn[db_name].list_collection_names():
+            logger.warning(f'collection {col} not found in {db_name} database')
 
-    # apply global rules
+    # filter out rules
+    rules = []
+    for rule in rules_inventory:
+        if rules_exp is None or re.search(rules_exp, rule['label']):
+            rules.append(rule)
+
+    # first process global rules
     for rule in rules:
-        if rules_exp is not None and not re.search(rules_exp, rule['label']):
-            continue
-
         if rule['global']:
-            s = rule['func'](db_conn[db_name]['entities'])
+            col = rule['collection']
+            s = rule['func'](db_conn[db_name][col])
             if s is not None:
-                logger.warning(f'DB {db_name} {rule["label"]} violation in entities collection: {s}')
+                logger.warning(f'DB {db_name} {rule["label"]} violation in {col} collection: {s}')
                 fails += 1
 
-    # apply per-entity rules
-    for entity in db_conn[db_name]['entities'].find(query):
-        n += 1
-        entity_fail = False
+    # second process not global rules, per collection
+    for col in ['entities', 'csubs']:
+        for doc in db_conn[db_name][col].find(queries[col]):
+            n[col] += 1
+            doc_fail = False
+            id_string = get_id(doc, col, include_entity_date)
+            logger.debug(f'* processing {id_string}')
+            for rule in rules:
+                if not rule['global'] and rule['collection'] == col:
+                    s = rule['func'](doc)
+                    if s is not None:
+                        logger.warning(f'DB {db_name} {rule["label"]} violation for {id_string}: {s}')
+                        doc_fail = True
+                        fails += 1
 
-        id_string = json.dumps(entity['_id'])
-        if include_entity_date:
-            if 'modDate' in entity:
-                id_string = f"({datetime.fromtimestamp(entity['modDate']).strftime('%Y-%m-%dT%H:%M:%SZ')}) {id_string}"
-            else:
-                id_string = f"(<no date>)) {id_string}"
+            if doc_fail:
+                failed_docs[col] += 1
 
-        logger.debug(f'* processing entity {id_string}')
-        for rule in rules:
-            if rules_exp is not None and not re.search(rules_exp, rule['label']):
-                continue
 
-            if not rule['global']:
-                s = rule['func'](entity)
-                if s is not None:
-                    logger.warning(f'DB {db_name} {rule["label"]} violation for entity {id_string}: {s}')
-                    entity_fail = True
-                    fails += 1
-
-        if entity_fail:
-            failed_entities += 1
-
-    if n > 0:
-        logger.info(
-            f'processed {db_name}: {failed_entities}/{n} ({round(failed_entities / n * 100, 2)}%) failed entities with {fails} rule violations')
-    else:
-        logger.warning(f'{db_name} has 0 entities (maybe it should be cleaned up?)')
+    for col in ['entities', 'csubs']:
+        if n[col] > 0:
+            logger.info(
+                f'processed {db_name} in collection {col}: {failed_docs[col]}/{n[col]} ({round(failed_docs[col] / n[col] * 100, 2)}%) failed docs')
 
     return fails
 
@@ -885,9 +936,12 @@ if __name__ == '__main__':
                         help='DB name to check. If omitted all DBs starting with "orion" will be checked.')
     parser.add_argument('--include-entities-date', dest='include_entities_date', default=False, action='store_true',
                         help='include entity modification time in log traces')
-    parser.add_argument('--entities-query', dest='query', default='{}',
+    parser.add_argument('--query-entities', dest='query_entities', default='{}',
                         help='query to filter entities to check, in JSON MongoDB query language. By default, '
                              'all entities in the collection will be checked. Applies to Rule Exx rules.')
+    parser.add_argument('--query-csubs', dest='query_csubs', default='{}',
+                        help='query to filter csubs to check, in JSON MongoDB query language. By default, '
+                             'all subscriptions in the collection will be checked. Applies to Rule Sxx rules.')
     parser.add_argument('--rules-exp', dest='rules_exp',
                         help='Specifies the rules to apply, as a regular expression. By default all rules are applied.')
     parser.add_argument('--logLevel', dest='log_level', choices=['DEBUG', 'INFO', 'WARN', 'ERROR'], default='INFO',
@@ -909,12 +963,15 @@ if __name__ == '__main__':
     db_names = mongo_client.list_database_names()
 
     # to remove starting and trailing ' char, in case it is used
-    query = json.loads(args.query.replace("'", ""))
+    queries = {
+        'entities': json.loads(args.query_entities.replace("'", "")),
+        'csubs': json.loads(args.query_csubs.replace("'", "")),
+    }
 
     fails = 0
     if args.db is not None:
         if args.db in db_names:
-            fails += process_db(logger, args.db, mongo_client, args.include_entities_date, query, args.rules_exp)
+            fails += process_db(logger, args.db, mongo_client, args.include_entities_date, queries, args.rules_exp)
         else:
             logger.fatal(f'database {args.db} does not exist')
             sys.exit(1)
@@ -922,6 +979,6 @@ if __name__ == '__main__':
         # Process all Orion databases
         for db_name in db_names:
             if db_name.startswith('orion-'):
-                fails += process_db(logger, db_name, mongo_client, args.include_entities_date, query, args.rules_exp)
+                fails += process_db(logger, db_name, mongo_client, args.include_entities_date, queries, args.rules_exp)
 
     logger.info(f'total rule violations: {fails}')

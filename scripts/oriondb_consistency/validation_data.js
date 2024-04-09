@@ -4451,3 +4451,56 @@ db.getSiblingDB("orion-validation").entities.insertMany([
       "lastCorrelator": "88e1bc10-b9dd-11ee-8755-080027cd35f1"
     }    
 ])
+
+db.getSiblingDB("orion-validation").csubs.insertMany([
+    {
+      "expiration": {
+        "$numberLong": "9223372036854775807"
+      },
+      "reference": "http://notify-receptor:5055/notify",
+      "custom": true,
+      "timeout": {
+        "$numberLong": "0"
+      },
+      "headers": {
+        "fiware-servicepath": "/SS1"
+      },
+      "throttling": {
+        "$numberLong": "0"
+      },
+      "maxFailsLimit": {
+        "$numberLong": "-1"
+      },
+      "servicePath": "/SS2",
+      "status": "active",
+      "statusLastChange": 1682640509.6958137,
+      "entities": [
+        {
+          "id": ".*",
+          "isPattern": "true",
+          "type": "T",
+          "isTypePattern": false
+        }
+      ],
+      "attrs": [
+        "temperature",
+      ],
+      "metadata": [],
+      "blacklist": false,
+      "onlyChanged": false,
+      "covered": false,
+      "description": "Foobar",
+      "conditions": [
+        "TimeInstant"
+      ],
+      "expression": {
+        "q": "",
+        "mq": "",
+        "geometry": "",
+        "coords": "",
+        "georel": ""
+      },
+      "altTypes": [],
+      "format": "JSON"
+    }
+])

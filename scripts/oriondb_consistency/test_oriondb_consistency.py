@@ -52,4 +52,8 @@ class TestEntitiesConsistency(unittest.TestCase):
 
         # connect to MongoDB and process validation DB
         mongo_client = MongoClient('mongodb://localhost:37017')
-        process_db(logger, 'orion-validation', mongo_client, False, {}, None)
+        queries = {
+            'entities': {},
+            'csubs': {}
+        }
+        process_db(logger, 'orion-validation', mongo_client, False, queries, None)
