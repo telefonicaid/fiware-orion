@@ -206,9 +206,9 @@ def check_id(id):
 
 
 # Rules functions
-def rule10(entity):
+def ruleE10(entity):
     """
-    Rule 10: `_id` field consistency
+    Rule E10: `_id` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -224,9 +224,9 @@ def rule10(entity):
         return None
 
 
-def rule11(entity):
+def ruleE11(entity):
     """
-    Rule 11: mandatory fields in entity
+    Rule E11: mandatory fields in entity
 
     See README.md for an explanation of the rule
     """
@@ -242,9 +242,9 @@ def rule11(entity):
         return None
 
 
-def rule12(entity):
+def ruleE12(entity):
     """
-    Rule 12: mandatory fields in attribute
+    Rule E12: mandatory fields in attribute
 
     See README.md for an explanation of the rule
     """
@@ -265,9 +265,9 @@ def rule12(entity):
         return None
 
 
-def rule13(entity):
+def ruleE13(entity):
     """
-    Rule 13: `attrNames` field consistency
+    Rule E13: `attrNames` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -300,9 +300,9 @@ def rule13(entity):
         return None
 
 
-def rule14(entity):
+def ruleE14(entity):
     """
-    Rule 14: `mdNames` field consistency
+    Rule E14: `mdNames` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -339,9 +339,9 @@ def rule14(entity):
         return None
 
 
-def rule15(entities_collection):
+def ruleE15(entities_collection):
     """
-    Rule 15: not swapped subkeys in `_id`
+    Rule E15: not swapped subkeys in `_id`
 
     See README.md for an explanation of the rule
 
@@ -374,9 +374,9 @@ def rule15(entities_collection):
         return None
 
 
-def rule16(entity):
+def ruleE16(entity):
     """
-    Rule 16: `location` field consistency
+    Rule E16: `location` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -422,9 +422,9 @@ def rule16(entity):
             return f"location field detected but no geo attribute is present (maybe metadata location is used?)"
 
 
-def rule17(entity):
+def ruleE17(entity):
     """
-    Rule 17: `lastCorrelator` existence
+    Rule E17: `lastCorrelator` existence
 
     See README.md for an explanation of the rule
     """
@@ -434,9 +434,9 @@ def rule17(entity):
         return None
 
 
-def rule20(entity):
+def ruleE20(entity):
     """
-    Rule 20: entity id syntax
+    Rule E20: entity id syntax
 
     See README.md for an explanation of the rule
     """
@@ -450,9 +450,9 @@ def rule20(entity):
     return None
 
 
-def rule21(entity):
+def ruleE21(entity):
     """
-    Rule 21: entity type syntax
+    Rule E21: entity type syntax
 
     See README.md for an explanation of the rule
     """
@@ -466,9 +466,9 @@ def rule21(entity):
     return None
 
 
-def rule22(entity):
+def ruleE22(entity):
     """
-    Rule 22: entity servicePath syntax
+    Rule E22: entity servicePath syntax
 
     See README.md for an explanation of the rule
 
@@ -504,9 +504,9 @@ def rule22(entity):
             return f"unallowed characters in '{sp_levels[i]}' in servicePath level #{i}"
 
 
-def rule23(entity):
+def ruleE23(entity):
     """
-    Rule 23: attribute name syntax
+    Rule E23: attribute name syntax
 
     See README.md for an explanation of the rule
     """
@@ -532,9 +532,9 @@ def rule23(entity):
         return None
 
 
-def rule24(entity):
+def ruleE24(entity):
     """
-    Rule 24: attribute type syntax
+    Rule E24: attribute type syntax
 
     See README.md for an explanation of the rule
     """
@@ -554,9 +554,9 @@ def rule24(entity):
         return None
 
 
-def rule25(entity):
+def ruleE25(entity):
     """
-    Rule 25: metadata name syntax
+    Rule E25: metadata name syntax
 
     See README.md for an explanation of the rule
     """
@@ -583,9 +583,9 @@ def rule25(entity):
         return None
 
 
-def rule26(entity):
+def ruleE26(entity):
     """
-    Rule 26: metadata type syntax
+    Rule E26: metadata type syntax
 
     See README.md for an explanation of the rule
     """
@@ -607,9 +607,9 @@ def rule26(entity):
         return None
 
 
-def rule90(entity):
+def ruleE90(entity):
     """
-    Rule 90: detect usage of `geo:x` attribute type where `x` different from `json`
+    Rule E90: detect usage of `geo:x` attribute type where `x` different from `json`
 
     See README.md for an explanation of the rule
     """
@@ -628,9 +628,9 @@ def rule90(entity):
         return f"usage of deprecated geo type in attributes: {', '.join(s)}"
 
 
-def rule91(entity):
+def ruleE91(entity):
     """
-    Rule 91: detect usage of more than one legacy `location` metadata
+    Rule E91: detect usage of more than one legacy `location` metadata
 
     See README.md for an explanation of the rule
     """
@@ -646,9 +646,9 @@ def rule91(entity):
         return None
 
 
-def rule92(entity):
+def ruleE92(entity):
     """
-    Rule 92: detect legacy `location` metadata should be `WGS84` or `WSG84`
+    Rule E92: detect legacy `location` metadata should be `WGS84` or `WSG84`
 
     See README.md for an explanation of the rule
     """
@@ -667,9 +667,9 @@ def rule92(entity):
         return None
 
 
-def rule93(entity):
+def ruleE93(entity):
     """
-    Rule 93: detect usage of redundant legacy `location`
+    Rule E93: detect usage of redundant legacy `location`
 
     See README.md for an explanation of the rule
     """
@@ -682,9 +682,9 @@ def rule93(entity):
     return None
 
 
-def rule94(entity):
+def ruleE94(entity):
     """
-    Rule 94: detect usage of not redundant legacy `location`
+    Rule E94: detect usage of not redundant legacy `location`
 
     See README.md for an explanation of the rule
     """
@@ -700,106 +700,106 @@ def rule94(entity):
 rules = [
     # Rules 1x
     {
-        'label': 'Rule10',
+        'label': 'RuleE10',
         'global': False,
-        'func': rule10
+        'func': ruleE10
     },
     {
-        'label': 'Rule11',
+        'label': 'RuleE11',
         'global': False,
-        'func': rule11
+        'func': ruleE11
     },
     {
-        'label': 'Rule12',
+        'label': 'RuleE12',
         'global': False,
-        'func': rule12
+        'func': ruleE12
     },
     {
-        'label': 'Rule13',
+        'label': 'RuleE13',
         'global': False,
-        'func': rule13
+        'func': ruleE13
     },
     {
-        'label': 'Rule14',
+        'label': 'RuleE14',
         'global': False,
-        'func': rule14
+        'func': ruleE14
     },
     {
-        'label': 'Rule15',
+        'label': 'RuleE15',
         'global': True,
-        'func': rule15
+        'func': ruleE15
     },
     {
-        'label': 'Rule16',
+        'label': 'RuleE16',
         'global': False,
-        'func': rule16
+        'func': ruleE16
     },
     {
-        'label': 'Rule17',
+        'label': 'RuleE17',
         'global': False,
-        'func': rule17
+        'func': ruleE17
     },
     # Rules 2x
     {
-        'label': 'Rule20',
+        'label': 'RuleE20',
         'global': False,
-        'func': rule20
+        'func': ruleE20
     },
     {
-        'label': 'Rule21',
+        'label': 'RuleE21',
         'global': False,
-        'func': rule21
+        'func': ruleE21
     },
     {
-        'label': 'Rule22',
+        'label': 'RuleE22',
         'global': False,
-        'func': rule22
+        'func': ruleE22
     },
     {
-        'label': 'Rule23',
+        'label': 'RuleE23',
         'global': False,
-        'func': rule23
+        'func': ruleE23
     },
     {
-        'label': 'Rule24',
+        'label': 'RuleE24',
         'global': False,
-        'func': rule24
+        'func': ruleE24
     },
     {
-        'label': 'Rule25',
+        'label': 'RuleE25',
         'global': False,
-        'func': rule25
+        'func': ruleE25
     },
     {
-        'label': 'Rule26',
+        'label': 'RuleE26',
         'global': False,
-        'func': rule26
+        'func': ruleE26
     },
     # Rules 9x
     {
-        'label': 'Rule90',
+        'label': 'RuleE90',
         'global': False,
-        'func': rule90
+        'func': ruleE90
     },
     {
-        'label': 'Rule91',
+        'label': 'RuleE91',
         'global': False,
-        'func': rule91
+        'func': ruleE91
     },
     {
-        'label': 'Rule92',
+        'label': 'RuleE92',
         'global': False,
-        'func': rule92
+        'func': ruleE92
     },
     {
-        'label': 'Rule93',
+        'label': 'RuleE93',
         'global': False,
-        'func': rule93
+        'func': ruleE93
     },
     {
-        'label': 'Rule94',
+        'label': 'RuleE94',
         'global': False,
-        'func': rule94
+        'func': ruleE94
     }
 ]
 
@@ -876,8 +876,8 @@ def process_db(logger, db_name, db_conn, include_entity_date, query, rules_exp):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        prog='entities_consistency',
-        description='Check consistency in Orion entities collection in DB')
+        prog='oriondb_consistency',
+        description='Check consistency in Orion DB')
 
     parser.add_argument('--mongoUri', dest='mongo_uri', default='mongodb://localhost:27017',
                         help='MongoDB URI. Default is mongodb://localhost:27017')
@@ -885,9 +885,9 @@ if __name__ == '__main__':
                         help='DB name to check. If omitted all DBs starting with "orion" will be checked.')
     parser.add_argument('--include-entities-date', dest='include_entities_date', default=False, action='store_true',
                         help='include entity modification time in log traces')
-    parser.add_argument('--query', dest='query', default='{}',
+    parser.add_argument('--entities-query', dest='query', default='{}',
                         help='query to filter entities to check, in JSON MongoDB query language. By default, '
-                             'all entities in the collection will be checked.')
+                             'all entities in the collection will be checked. Applies to Rule Exx rules.')
     parser.add_argument('--rules-exp', dest='rules_exp',
                         help='Specifies the rules to apply, as a regular expression. By default all rules are applied.')
     parser.add_argument('--logLevel', dest='log_level', choices=['DEBUG', 'INFO', 'WARN', 'ERROR'], default='INFO',
