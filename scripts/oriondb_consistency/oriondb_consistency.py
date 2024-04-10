@@ -737,7 +737,7 @@ def ruleS90(csub):
     See README.md for an explanation of the rule
     """
     if csub['format'] == 'JSON':
-        r = f"notification legacy format in use (endpoint: {csub['reference']})"
+        r = f"notification legacy format in use (endpoint: {csub['reference']}, servicePath: {csub['servicePath']})"
         fixed_csub = copy.deepcopy(csub)
         fixed_csub['format'] = 'normalized'
     else:
