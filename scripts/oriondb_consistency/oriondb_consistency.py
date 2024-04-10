@@ -976,9 +976,9 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
         for doc in modified_docs[col]:
             bulk.append(ReplaceOne({'_id': doc['_id']}, doc))
         if len(bulk) > 0:
-            logger.info(f'{len(bulk)} documents in {col} collection could be fixed')
+            logger.warn(f'{len(bulk)} documents in {col} collection could be fixed')
             if autofix:
-                logger.info(f'updating {len(bulk)} documents in {col} collection...')
+                logger.warn(f'updating {len(bulk)} documents in {col} collection...')
                 db_conn[db_name][col].bulk_write(bulk)
 
     return n_fails
