@@ -23,7 +23,7 @@
 
 __author__ = 'fermin'
 
-from pymongo import MongoClient
+from pymongo import MongoClient, ReplaceOne
 from deepdiff import DeepDiff
 from datetime import datetime
 import argparse
@@ -746,6 +746,11 @@ def ruleS90(csub):
 
     return r, fixed_csub
 
+collections_inventory = [
+    'entities',
+    'csubs'
+]
+
 rules_inventory = [
     # Rules E1x
     {
@@ -910,17 +915,16 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
     """
 
     logger.info(f'processing {db_name}')
-    n = {
-        'entities': 0,
-        'csubs': 0
-    }
-    failed_docs = {
-        'entities': 0,
-        'csubs': 0
-    }
-    fails = 0
+    n = {}
+    n_failed = {}
+    modified_docs = {}
+    for col in collections_inventory:
+        n[col] = 0
+        n_failed[col] = 0
+        modified_docs[col] = []
+    n_fails = 0
 
-    for col in ['entities', 'csubs']:
+    for col in collections_inventory:
         if col not in db_conn[db_name].list_collection_names():
             logger.warning(f'collection {col} not found in {db_name} database')
 
@@ -930,22 +934,19 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
         if rules_exp is None or re.search(rules_exp, rule['label']):
             rules.append(rule)
 
-    # first process global rules
-    # NOTE: global rules doesn't accept autofix parameter
+    # first: process global rules
     for rule in rules:
         if rule['global']:
             col = rule['collection']
-            s = rule['func'](db_conn[db_name][col])
+            # FIXME: fixed_doc doesn't make sense for global rules (althoug it could be implemented in a more
+            # general way, returning an array, thinking in a future possible extension)
+            (s, fixed_doc) = rule['func'](db_conn[db_name][col])
             if s is not None:
                 logger.warning(f'DB {db_name} {rule["label"]} violation in {col} collection: {s}')
-                fails += 1
+                n_fails += 1
 
-    # second process not global rules, per collection
-    autofix = {
-        'entities': [],
-        'csubs': []
-    }
-    for col in ['entities', 'csubs']:
+    # second: process not global rules, per collection
+    for col in collections_inventory:
         for doc in db_conn[db_name][col].find(queries[col]):
             n[col] += 1
             doc_fail = False
@@ -957,22 +958,29 @@ def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp
                     if s is not None:
                         logger.warning(f'DB {db_name} {rule["label"]} violation for {id_string}: {s}')
                         doc_fail = True
-                        fails += 1
+                        n_fails += 1
                     if fixed_doc is not None:
-                        autofix[col].append(fixed_doc)
+                        modified_docs[col].append(fixed_doc)
 
             if doc_fail:
-                failed_docs[col] += 1
+                n_failed[col] += 1
 
-
-    for col in ['entities', 'csubs']:
+    for col in collections_inventory:
         if n[col] > 0:
             logger.info(
-                f'processed {db_name} in collection {col}: {failed_docs[col]}/{n[col]} ({round(failed_docs[col] / n[col] * 100, 2)}%) failed docs')
+                f'processed {db_name} in collection {col}: {n_failed[col]}/{n[col]} ({round(n_failed[col] / n[col] * 100, 2)}%) failed docs')
 
-    # TODO: implement save logic for autofix dict
+    for col in collections_inventory:
+        bulk = []
+        logger.debug(f'about to update in {col} collection: {modified_docs[col]}')
+        for doc in modified_docs[col]:
+            bulk.append(ReplaceOne({'_id': doc['_id']}, doc))
+        logger.info(f'{len(bulk)} documents in {col} collection could be fixed')
+        if autofix and len(bulk) > 0:
+            logger.info(f'updating {len(bulk)} documents in {col} collection...')
+            db_conn[db_name][col].bulk_write(bulk)
 
-    return fails
+    return n_fails
 
 
 if __name__ == '__main__':
@@ -994,7 +1002,7 @@ if __name__ == '__main__':
                              'all subscriptions in the collection will be checked. Applies to Rule Sxx rules.')
     parser.add_argument('--rules-exp', dest='rules_exp',
                         help='Specifies the rules to apply, as a regular expression. By default all rules are applied.')
-    parser.add_argument('--autofix', dest='atutofix', action='store_true',
+    parser.add_argument('--autofix', dest='autofix', action='store_true',
                         help='Applies some automatic fixes. Not for all rules. Check documentation. WARNING: this '
                         'operation may modify OrionDBs, use with care')
     parser.add_argument('--logLevel', dest='log_level', choices=['DEBUG', 'INFO', 'WARN', 'ERROR'], default='INFO',
