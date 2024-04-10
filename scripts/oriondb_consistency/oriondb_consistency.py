@@ -23,7 +23,7 @@
 
 __author__ = 'fermin'
 
-from pymongo import MongoClient
+from pymongo import MongoClient, ReplaceOne
 from deepdiff import DeepDiff
 from datetime import datetime
 import argparse
@@ -31,6 +31,7 @@ import logging
 import json
 import sys
 import re
+import copy
 
 
 # Helper functions
@@ -206,9 +207,9 @@ def check_id(id):
 
 
 # Rules functions
-def rule10(entity):
+def ruleE10(entity):
     """
-    Rule 10: `_id` field consistency
+    Rule E10: `_id` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -219,14 +220,16 @@ def rule10(entity):
             missing_fields.append(field)
 
     if len(missing_fields) > 0:
-        return f"missing subfields in _id: {', '.join(missing_fields)}"
+        r = f"missing subfields in _id: {', '.join(missing_fields)}"
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule11(entity):
+def ruleE11(entity):
     """
-    Rule 11: mandatory fields in entity
+    Rule E11: mandatory fields in entity
 
     See README.md for an explanation of the rule
     """
@@ -237,14 +240,16 @@ def rule11(entity):
             missing_fields.append(field)
 
     if len(missing_fields) > 0:
-        return f"missing fields: {', '.join(missing_fields)}"
+        r = f"missing fields: {', '.join(missing_fields)}"
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule12(entity):
+def ruleE12(entity):
     """
-    Rule 12: mandatory fields in attribute
+    Rule E12: mandatory fields in attribute
 
     See README.md for an explanation of the rule
     """
@@ -260,14 +265,16 @@ def rule12(entity):
             s.append(f"in attribute '{attr}' missing fields: {', '.join(missing_fields)}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule13(entity):
+def ruleE13(entity):
     """
-    Rule 13: `attrNames` field consistency
+    Rule E13: `attrNames` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -295,14 +302,15 @@ def rule13(entity):
         s.append(f"attributes in attrs object not found in attrNames: {','.join(attrs_not_in_attrnames)}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
 
+    return r, None
 
-def rule14(entity):
+def ruleE14(entity):
     """
-    Rule 14: `mdNames` field consistency
+    Rule E14: `mdNames` field consistency
 
     See README.md for an explanation of the rule
     """
@@ -334,14 +342,16 @@ def rule14(entity):
                 f"in attribute '{item}' metadata in md object not found in mdNames: {', '.join(md_not_in_mdnames)}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule15(entities_collection):
+def ruleE15(entities_collection):
     """
-    Rule 15: not swapped subkeys in `_id`
+    Rule E15: not swapped subkeys in `_id`
 
     See README.md for an explanation of the rule
 
@@ -369,17 +379,20 @@ def rule15(entities_collection):
             f"_id uniqueness violation for entity id='{id}' type='{type}' servicePath='{service_path}' found {count} times")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
 
+    return r, None
 
-def rule16(entity):
+def ruleE16(entity):
     """
-    Rule 16: `location` field consistency
+    Rule E16: `location` field consistency
 
     See README.md for an explanation of the rule
     """
+    # FIXME: this function should be re-factored. It has many return points. It's ugly...
+
     # check that as much as one attribute is using geo type
     geo_attrs = []
     for attr in entity['attrs']:
@@ -388,7 +401,7 @@ def rule16(entity):
             geo_attrs.append(attr)
 
     if len(geo_attrs) > 1:
-        return f"more than one attribute with geo type: {', '.join(geo_attrs)}"
+        return f"more than one attribute with geo type: {', '.join(geo_attrs)}", None
 
     if len(geo_attrs) == 1:
         # If geo attr found, then check that there is consistent location field
@@ -396,13 +409,13 @@ def rule16(entity):
         geo_type = entity['attrs'][geo_attr]['type']
 
         if 'location' not in entity:
-            return f"geo location '{geo_attr}' ({geo_type}) not null but location field not found in entity"
+            return f"geo location '{geo_attr}' ({geo_type}) not null but location field not found in entity", None
         if entity['location']['attrName'] != geo_attr:
-            return f"location.attrName ({entity['location']['attrName']}) differs from '{geo_attr}'"
+            return f"location.attrName ({entity['location']['attrName']}) differs from '{geo_attr}'", None
 
         geo_json = to_geo_json(entity['attrs'][geo_attr])
         if type(geo_json) == str:
-            return geo_json
+            return geo_json, None
 
         # https://www.testcult.com/deep-comparison-of-json-in-python/
         diff = DeepDiff(geo_json, entity['location']['coords'], ignore_order=True)
@@ -412,31 +425,35 @@ def rule16(entity):
             geo_json = convert_strings_to_numbers(geo_json)
             if not DeepDiff(geo_json, entity['location']['coords'], ignore_order=True):
                 return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) is consistent, but value " \
-                        f"should use numbers for coordinates instead of strings"
+                        f"should use numbers for coordinates instead of strings", None
             else:
                 # Other causes
-                return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) value: {diff}"
+                return f"location.coords and GeoJSON derived from '{geo_attr}' ({geo_type}) value: {diff}", None
     else:  # len(geo_attrs) == 0
         # If no geo attr found, check there isn't a location field
         if 'location' in entity:
-            return f"location field detected but no geo attribute is present (maybe metadata location is used?)"
+            return f"location field detected but no geo attribute is present (maybe metadata location is used?)", None
+
+    return None, None
 
 
-def rule17(entity):
+def ruleE17(entity):
     """
-    Rule 17: `lastCorrelator` existence
+    Rule E17: `lastCorrelator` existence
 
     See README.md for an explanation of the rule
     """
     if 'lastCorrelator' not in entity:
-        return f"missing lastCorrelator"
+        r = f"missing lastCorrelator"
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule20(entity):
+def ruleE20(entity):
     """
-    Rule 20: entity id syntax
+    Rule E20: entity id syntax
 
     See README.md for an explanation of the rule
     """
@@ -445,14 +462,14 @@ def rule20(entity):
     if 'id' in entity['_id']:
         r = check_id(entity['_id']['id'])
         if r is not None:
-            return f"entity id ({entity['_id']['id']}) syntax violation: {r}"
+            return f"entity id ({entity['_id']['id']}) syntax violation: {r}", None
 
-    return None
+    return None, None
 
 
-def rule21(entity):
+def ruleE21(entity):
     """
-    Rule 21: entity type syntax
+    Rule E21: entity type syntax
 
     See README.md for an explanation of the rule
     """
@@ -461,14 +478,14 @@ def rule21(entity):
     if 'type' in entity['_id']:
         r = check_id(entity['_id']['type'])
         if r is not None:
-            return f"entity type ({entity['_id']['type']}) syntax violation: {r}"
+            return f"entity type ({entity['_id']['type']}) syntax violation: {r}", None
 
-    return None
+    return None, None
 
 
-def rule22(entity):
+def ruleE22(entity):
     """
-    Rule 22: entity servicePath syntax
+    Rule E22: entity servicePath syntax
 
     See README.md for an explanation of the rule
 
@@ -477,36 +494,37 @@ def rule22(entity):
 
     # servicePath existence is checked by another rule
     if 'servicePath' not in entity['_id']:
-        return None
+        return None, None
 
     sp = entity['_id']['servicePath']
     # Scope must start with / (only "absolute" scopes are allowed)
     if not sp.startswith('/'):
-        return f"servicePath '{sp}' does not starts with '/'"
+        return f"servicePath '{sp}' does not starts with '/'", None
 
     # This special case can be problematic (as split will detect always a level and the minimum length rule
     # will break. So early return
     if sp == '/':
-        return None
+        return None, None
 
     # 10 maximum scope levels in a path
     sp_levels = sp[1:].split('/')
     if len(sp_levels) > 10:
-        return f"servicePath has {len(sp_levels)} tokens but the limit is 10"
+        return f"servicePath has {len(sp_levels)} tokens but the limit is 10", None
 
     # 50 maximum characters in each level (1 char is minimum), only alphanumeric and underscore allowed
     for i in range(len(sp_levels)):
         if len(sp_levels[i]) == 0:
-            return f'servicePath level #{i} length is 0 but minimum is 1'
+            return f'servicePath level #{i} length is 0 but minimum is 1', None
         if len(sp_levels[i]) > 50:
-            return f'servicePath level #{i} length is {len(sp_levels[i])} but maximum is 50'
+            return f'servicePath level #{i} length is {len(sp_levels[i])} but maximum is 50', None
         if re.search('[^a-zA-Z0-9_]', sp_levels[i]):
-            return f"unallowed characters in '{sp_levels[i]}' in servicePath level #{i}"
+            return f"unallowed characters in '{sp_levels[i]}' in servicePath level #{i}", None
 
+    return None, None
 
-def rule23(entity):
+def ruleE23(entity):
     """
-    Rule 23: attribute name syntax
+    Rule E23: attribute name syntax
 
     See README.md for an explanation of the rule
     """
@@ -527,14 +545,16 @@ def rule23(entity):
             s.append(f"attribute name ({attr}) syntax violation: {r}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule24(entity):
+def ruleE24(entity):
     """
-    Rule 24: attribute type syntax
+    Rule E24: attribute type syntax
 
     See README.md for an explanation of the rule
     """
@@ -549,14 +569,16 @@ def rule24(entity):
                 s.append(f"in attribute '{attr}' type ({type}) syntax violation: {r}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule25(entity):
+def ruleE25(entity):
     """
-    Rule 25: metadata name syntax
+    Rule E25: metadata name syntax
 
     See README.md for an explanation of the rule
     """
@@ -578,14 +600,16 @@ def rule25(entity):
                 s.append(f"in attribute '{attr}' metadata name ({md}) syntax violation: {r}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule26(entity):
+def ruleE26(entity):
     """
-    Rule 26: metadata type syntax
+    Rule E26: metadata type syntax
 
     See README.md for an explanation of the rule
     """
@@ -602,14 +626,16 @@ def rule26(entity):
                         s.append(f"in attribute '{attr}' metadata '{md}' type ({type}) syntax violation: {r}")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule90(entity):
+def ruleE90(entity):
     """
-    Rule 90: detect usage of `geo:x` attribute type where `x` different from `json`
+    Rule E90: detect usage of `geo:x` attribute type where `x` different from `json`
 
     See README.md for an explanation of the rule
     """
@@ -625,12 +651,16 @@ def rule90(entity):
 
     #
     if len(s) > 0:
-        return f"usage of deprecated geo type in attributes: {', '.join(s)}"
+        r = f"usage of deprecated geo type in attributes: {', '.join(s)}"
+    else:
+        r = None
+
+    return r, None
 
 
-def rule91(entity):
+def ruleE91(entity):
     """
-    Rule 91: detect usage of more than one legacy `location` metadata
+    Rule E91: detect usage of more than one legacy `location` metadata
 
     See README.md for an explanation of the rule
     """
@@ -641,14 +671,16 @@ def rule91(entity):
                 attrs.append(attr)
 
     if len(attrs) > 1:
-        return f"location metadata found {len(attrs)} times in attributes: {', '.join(attrs)} (maximum should be just 1)"
+        r = f"location metadata found {len(attrs)} times in attributes: {', '.join(attrs)} (maximum should be just 1)"
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule92(entity):
+def ruleE92(entity):
     """
-    Rule 92: detect legacy `location` metadata should be `WGS84` or `WSG84`
+    Rule E92: detect legacy `location` metadata should be `WGS84` or `WSG84`
 
     See README.md for an explanation of the rule
     """
@@ -662,14 +694,16 @@ def rule92(entity):
                         f"in attribute '{attr}' location metadata value is {location_value} (should be WGS84 or WSG84)")
 
     if len(s) > 0:
-        return ', '.join(s)
+        r = ', '.join(s)
     else:
-        return None
+        r = None
+
+    return r, None
 
 
-def rule93(entity):
+def ruleE93(entity):
     """
-    Rule 93: detect usage of redundant legacy `location`
+    Rule E93: detect usage of redundant legacy `location`
 
     See README.md for an explanation of the rule
     """
@@ -677,14 +711,14 @@ def rule93(entity):
         if 'md' in entity['attrs'][attr]:
             for md in entity['attrs'][attr]['md']:
                 if md == 'location' and is_geo_type(entity['attrs'][attr]['type']):
-                    return f"in attribute '{attr}' redundant location metadata found (attribute is already using {entity['attrs'][attr]['type']} type)"
+                    return f"in attribute '{attr}' redundant location metadata found (attribute is already using {entity['attrs'][attr]['type']} type)", None
 
-    return None
+    return None, None
 
 
-def rule94(entity):
+def ruleE94(entity):
     """
-    Rule 94: detect usage of not redundant legacy `location`
+    Rule E94: detect usage of not redundant legacy `location`
 
     See README.md for an explanation of the rule
     """
@@ -692,119 +726,180 @@ def rule94(entity):
         if 'md' in entity['attrs'][attr]:
             for md in entity['attrs'][attr]['md']:
                 if md == 'location' and not is_geo_type(entity['attrs'][attr]['type']):
-                    return f"in attribute '{attr}' location metadata found (attribute type is {entity['attrs'][attr]['type']})"
+                    return f"in attribute '{attr}' location metadata found (attribute type is {entity['attrs'][attr]['type']})", None
 
-    return None
+    return None, None
 
+def ruleS90(csub):
+    """
+    Rule S90: Check usage of legacy notification format in subscriptions
 
-rules = [
-    # Rules 1x
+    See README.md for an explanation of the rule
+    """
+    if csub['format'] == 'JSON':
+        r = f"notification legacy format in use (endpoint: {csub['reference']})"
+        fixed_csub = copy.deepcopy(csub)
+        fixed_csub['format'] = 'normalized'
+    else:
+        r = None
+        fixed_csub = None
+
+    return r, fixed_csub
+
+collections_inventory = [
+    'entities',
+    'csubs'
+]
+
+rules_inventory = [
+    # Rules E1x
     {
-        'label': 'Rule10',
+        'label': 'RuleE10',
+        'collection': 'entities',
         'global': False,
-        'func': rule10
+        'func': ruleE10
     },
     {
-        'label': 'Rule11',
+        'label': 'RuleE11',
+        'collection': 'entities',
         'global': False,
-        'func': rule11
+        'func': ruleE11
     },
     {
-        'label': 'Rule12',
+        'label': 'RuleE12',
+        'collection': 'entities',
         'global': False,
-        'func': rule12
+        'func': ruleE12
     },
     {
-        'label': 'Rule13',
+        'label': 'RuleE13',
+        'collection': 'entities',
         'global': False,
-        'func': rule13
+        'func': ruleE13
     },
     {
-        'label': 'Rule14',
+        'label': 'RuleE14',
+        'collection': 'entities',
         'global': False,
-        'func': rule14
+        'func': ruleE14
     },
     {
-        'label': 'Rule15',
+        'label': 'RuleE15',
+        'collection': 'entities',
         'global': True,
-        'func': rule15
+        'func': ruleE15
     },
     {
-        'label': 'Rule16',
+        'label': 'RuleE16',
+        'collection': 'entities',
         'global': False,
-        'func': rule16
+        'func': ruleE16
     },
     {
-        'label': 'Rule17',
+        'label': 'RuleE17',
+        'collection': 'entities',
         'global': False,
-        'func': rule17
+        'func': ruleE17
     },
-    # Rules 2x
+    # Rules E2x
     {
-        'label': 'Rule20',
+        'label': 'RuleE20',
+        'collection': 'entities',
         'global': False,
-        'func': rule20
-    },
-    {
-        'label': 'Rule21',
-        'global': False,
-        'func': rule21
+        'func': ruleE20
     },
     {
-        'label': 'Rule22',
+        'label': 'RuleE21',
+        'collection': 'entities',
         'global': False,
-        'func': rule22
+        'func': ruleE21
     },
     {
-        'label': 'Rule23',
+        'label': 'RuleE22',
+        'collection': 'entities',
         'global': False,
-        'func': rule23
+        'func': ruleE22
     },
     {
-        'label': 'Rule24',
+        'label': 'RuleE23',
+        'collection': 'entities',
         'global': False,
-        'func': rule24
+        'func': ruleE23
     },
     {
-        'label': 'Rule25',
+        'label': 'RuleE24',
+        'collection': 'entities',
         'global': False,
-        'func': rule25
+        'func': ruleE24
     },
     {
-        'label': 'Rule26',
+        'label': 'RuleE25',
+        'collection': 'entities',
         'global': False,
-        'func': rule26
-    },
-    # Rules 9x
-    {
-        'label': 'Rule90',
-        'global': False,
-        'func': rule90
+        'func': ruleE25
     },
     {
-        'label': 'Rule91',
+        'label': 'RuleE26',
+        'collection': 'entities',
         'global': False,
-        'func': rule91
+        'func': ruleE26
+    },
+    # Rules E9x
+    {
+        'label': 'RuleE90',
+        'collection': 'entities',
+        'global': False,
+        'func': ruleE90
     },
     {
-        'label': 'Rule92',
+        'label': 'RuleE91',
+        'collection': 'entities',
         'global': False,
-        'func': rule92
+        'func': ruleE91
     },
     {
-        'label': 'Rule93',
+        'label': 'RuleE92',
+        'collection': 'entities',
         'global': False,
-        'func': rule93
+        'func': ruleE92
     },
     {
-        'label': 'Rule94',
+        'label': 'RuleE93',
+        'collection': 'entities',
         'global': False,
-        'func': rule94
+        'func': ruleE93
+    },
+    {
+        'label': 'RuleE94',
+        'collection': 'entities',
+        'global': False,
+        'func': ruleE94
+    },
+    # Rules S9x
+    {
+        'label': 'RuleS90',
+        'collection': 'csubs',
+        'global': False,
+        'func': ruleS90
     }
 ]
 
+def get_id(doc, col, include_entity_date):
+    """
+    Depending the collection and some arguments, the id is got in a way or another
+    """
+    if col == 'entities':
+        id_string = json.dumps(doc['_id'])
+        if include_entity_date:
+            if 'modDate' in doc:
+                id_string = f"({datetime.fromtimestamp(doc['modDate']).strftime('%Y-%m-%dT%H:%M:%SZ')}) {id_string}"
+            else:
+                id_string = f"(<no date>)) {id_string}"
+        return f"entity {id_string}"
+    else:  # col == 'csubs'
+        return f"subscription {doc['_id']}"
 
-def process_db(logger, db_name, db_conn, include_entity_date, query, rules_exp):
+def process_db(logger, db_name, db_conn, include_entity_date, queries, rules_exp, autofix):
     """
     Process an individual DB
 
@@ -812,72 +907,87 @@ def process_db(logger, db_name, db_conn, include_entity_date, query, rules_exp):
     :param db_name: the name of the DB to process
     :param db_conn: connection to MongoDB
     :param include_entity_date: if True, include entity modification date in log traces
-    :param query: query to filter entities to be processed
+    :param queries: dict with per-colletion queries to filter entities to be processed (the key in the dictionary is
+    the collection to apply the query)
     :param rules_exp: regular expression to filter rules to apply
+    :param autofix: True if autofix is activated
     :return: fails
     """
 
     logger.info(f'processing {db_name}')
-    n = 0
-    failed_entities = 0
-    fails = 0
+    n = {}
+    n_failed = {}
+    modified_docs = {}
+    for col in collections_inventory:
+        n[col] = 0
+        n_failed[col] = 0
+        modified_docs[col] = []
+    n_fails = 0
 
-    # check collection existence
-    if 'entities' not in db_conn[db_name].list_collection_names():
-        logger.warning(f'collections entities not found in {db_name} database, nothing to do')
-        return
+    for col in collections_inventory:
+        if col not in db_conn[db_name].list_collection_names():
+            logger.warning(f'collection {col} not found in {db_name} database')
 
-    # apply global rules
+    # filter out rules
+    rules = []
+    for rule in rules_inventory:
+        if rules_exp is None or re.search(rules_exp, rule['label']):
+            rules.append(rule)
+
+    # first: process global rules
     for rule in rules:
-        if rules_exp is not None and not re.search(rules_exp, rule['label']):
-            continue
-
         if rule['global']:
-            s = rule['func'](db_conn[db_name]['entities'])
+            col = rule['collection']
+            # FIXME: fixed_doc doesn't make sense for global rules (althoug it could be implemented in a more
+            # general way, returning an array, thinking in a future possible extension)
+            (s, fixed_doc) = rule['func'](db_conn[db_name][col])
             if s is not None:
-                logger.warning(f'DB {db_name} {rule["label"]} violation in entities collection: {s}')
-                fails += 1
+                logger.warning(f'DB {db_name} {rule["label"]} violation in {col} collection: {s}')
+                n_fails += 1
 
-    # apply per-entity rules
-    for entity in db_conn[db_name]['entities'].find(query):
-        n += 1
-        entity_fail = False
+    # second: process not global rules, per collection
+    for col in collections_inventory:
+        for doc in db_conn[db_name][col].find(queries[col]):
+            n[col] += 1
+            doc_fail = False
+            id_string = get_id(doc, col, include_entity_date)
+            logger.debug(f'* processing {id_string}')
+            for rule in rules:
+                if not rule['global'] and rule['collection'] == col:
+                    (s, fixed_doc) = rule['func'](doc)
+                    if s is not None:
+                        logger.warning(f'DB {db_name} {rule["label"]} violation for {id_string}: {s}')
+                        doc_fail = True
+                        n_fails += 1
+                    if fixed_doc is not None:
+                        modified_docs[col].append(fixed_doc)
 
-        id_string = json.dumps(entity['_id'])
-        if include_entity_date:
-            if 'modDate' in entity:
-                id_string = f"({datetime.fromtimestamp(entity['modDate']).strftime('%Y-%m-%dT%H:%M:%SZ')}) {id_string}"
-            else:
-                id_string = f"(<no date>)) {id_string}"
+            if doc_fail:
+                n_failed[col] += 1
 
-        logger.debug(f'* processing entity {id_string}')
-        for rule in rules:
-            if rules_exp is not None and not re.search(rules_exp, rule['label']):
-                continue
+    for col in collections_inventory:
+        if n[col] > 0:
+            logger.info(
+                f'processed {db_name} in collection {col}: {n_failed[col]}/{n[col]} ({round(n_failed[col] / n[col] * 100, 2)}%) failed docs')
 
-            if not rule['global']:
-                s = rule['func'](entity)
-                if s is not None:
-                    logger.warning(f'DB {db_name} {rule["label"]} violation for entity {id_string}: {s}')
-                    entity_fail = True
-                    fails += 1
+    for col in collections_inventory:
+        bulk = []
+        logger.debug(f'about to update in {col} collection: {modified_docs[col]}')
+        for doc in modified_docs[col]:
+            bulk.append(ReplaceOne({'_id': doc['_id']}, doc))
+        if len(bulk) > 0:
+            logger.warning(f'{len(bulk)} documents in {col} collection could be fixed')
+            if autofix:
+                logger.warning(f'updating {len(bulk)} documents in {col} collection...')
+                db_conn[db_name][col].bulk_write(bulk)
 
-        if entity_fail:
-            failed_entities += 1
-
-    if n > 0:
-        logger.info(
-            f'processed {db_name}: {failed_entities}/{n} ({round(failed_entities / n * 100, 2)}%) failed entities with {fails} rule violations')
-    else:
-        logger.warning(f'{db_name} has 0 entities (maybe it should be cleaned up?)')
-
-    return fails
+    return n_fails
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        prog='entities_consistency',
-        description='Check consistency in Orion entities collection in DB')
+        prog='oriondb_consistency',
+        description='Check consistency in Orion DB')
 
     parser.add_argument('--mongoUri', dest='mongo_uri', default='mongodb://localhost:27017',
                         help='MongoDB URI. Default is mongodb://localhost:27017')
@@ -885,14 +995,27 @@ if __name__ == '__main__':
                         help='DB name to check. If omitted all DBs starting with "orion" will be checked.')
     parser.add_argument('--include-entities-date', dest='include_entities_date', default=False, action='store_true',
                         help='include entity modification time in log traces')
-    parser.add_argument('--query', dest='query', default='{}',
+    parser.add_argument('--query-entities', dest='query_entities', default='{}',
                         help='query to filter entities to check, in JSON MongoDB query language. By default, '
-                             'all entities in the collection will be checked.')
+                             'all entities in the collection will be checked. Applies to Rule Exx rules.')
+    parser.add_argument('--query-csubs', dest='query_csubs', default='{}',
+                        help='query to filter csubs to check, in JSON MongoDB query language. By default, '
+                             'all subscriptions in the collection will be checked. Applies to Rule Sxx rules.')
     parser.add_argument('--rules-exp', dest='rules_exp',
                         help='Specifies the rules to apply, as a regular expression. By default all rules are applied.')
+    parser.add_argument('--autofix', dest='autofix', action='store_true',
+                        help='Applies some automatic fixes. Not for all rules. Check documentation. WARNING: this '
+                        'operation may modify OrionDBs, use with care')
     parser.add_argument('--logLevel', dest='log_level', choices=['DEBUG', 'INFO', 'WARN', 'ERROR'], default='INFO',
                         help='log level. Default is INFO')
     args = parser.parse_args()
+
+    if args.autofix:
+        print("WARNING!!!! Parameter --autofix has been activated, so this script may modify documents in Orion DBs (check documentation")
+        print("for details). These modifications cannot be undone. If you are sure you want to continue type 'yes' and press Enter")
+        confirm = input()
+        if (confirm != 'yes'):
+            sys.exit()
 
     # sets the logging configuration
     logging.basicConfig(
@@ -909,12 +1032,15 @@ if __name__ == '__main__':
     db_names = mongo_client.list_database_names()
 
     # to remove starting and trailing ' char, in case it is used
-    query = json.loads(args.query.replace("'", ""))
+    queries = {
+        'entities': json.loads(args.query_entities.replace("'", "")),
+        'csubs': json.loads(args.query_csubs.replace("'", "")),
+    }
 
     fails = 0
     if args.db is not None:
         if args.db in db_names:
-            fails += process_db(logger, args.db, mongo_client, args.include_entities_date, query, args.rules_exp)
+            fails += process_db(logger, args.db, mongo_client, args.include_entities_date, queries, args.rules_exp, args.autofix)
         else:
             logger.fatal(f'database {args.db} does not exist')
             sys.exit(1)
@@ -922,6 +1048,6 @@ if __name__ == '__main__':
         # Process all Orion databases
         for db_name in db_names:
             if db_name.startswith('orion-'):
-                fails += process_db(logger, db_name, mongo_client, args.include_entities_date, query, args.rules_exp)
+                fails += process_db(logger, db_name, mongo_client, args.include_entities_date, queries, args.rules_exp, args.autofix)
 
     logger.info(f'total rule violations: {fails}')

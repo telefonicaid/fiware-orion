@@ -30,13 +30,13 @@ __author__ = 'fermin'
 # the result as log output.
 #
 # You can run this test under coverage, so you can check the coverage of the different rules in
-# entities_consistency.py
+# oriondb_consistency.py
 
 import unittest
 from pymongo import MongoClient
 import logging
 
-from entities_consistency import process_db
+from oriondb_consistency import process_db
 
 class TestEntitiesConsistency(unittest.TestCase):
     def test_process_db(self):
@@ -51,5 +51,9 @@ class TestEntitiesConsistency(unittest.TestCase):
         logger = logging.getLogger()
 
         # connect to MongoDB and process validation DB
-        mongo_client = MongoClient('mongodb://localhost:27017')
-        process_db(logger, 'orion-validation', mongo_client, False, {}, None)
+        mongo_client = MongoClient('mongodb://localhost:37017')
+        queries = {
+            'entities': {},
+            'csubs': {}
+        }
+        process_db(logger, 'orion-validation', mongo_client, False, queries, None, False)
