@@ -14,6 +14,9 @@ RUN /tmp/build/install-build-dependencies.sh
 COPY ./docker/build-ubi/install-gnutls.sh /tmp/build/install-gnutls.sh
 RUN /tmp/build/install-gnutls.sh
 
+COPY ./docker/build-ubi/install-fastdds.sh /tmp/build/install-fastdds.sh
+RUN /tmp/build/install-fastdds.sh
+
 COPY ./docker/build-ubi/install-lib-microhttp.sh /tmp/build/install-lib-microhttp.sh
 RUN /tmp/build/install-lib-microhttp.sh
 
@@ -37,6 +40,3 @@ RUN /tmp/build/install-rapid-json.sh
 
 COPY ./docker/build-ubi/install-prometheus-client.sh /tmp/build/install-prometheus-client.sh
 RUN /tmp/build/install-prometheus-client.sh
-
-COPY ./docker/build-ubi/install-fastdds.sh /tmp/build/install-fastdds.sh
-RUN /tmp/build/install-fastdds.sh
