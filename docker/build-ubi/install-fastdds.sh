@@ -50,5 +50,5 @@ git clone https://github.com/eProsima/Fast-DDS.git
 mkdir Fast-DDS/build
 
 cd Fast-DDS/build
-cmake ..  -DCMAKE_INSTALL_PREFIX=~/Fast-DDS/install
+cmake ..  -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON
 cmake --build . --target install
