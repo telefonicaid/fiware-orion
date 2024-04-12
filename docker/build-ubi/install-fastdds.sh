@@ -33,36 +33,39 @@ cd /opt/Fast-DDS
 #
 git clone https://github.com/eProsima/foonathan_memory_vendor.git
 mkdir foonathan_memory_vendor/build
-cd foonathan_memory_vendor/build
+cd foonathan_memory_vendor
+git checkout v1.3.1 
+cd build
 
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON
 cmake --build . --target install
-cd -
 
 #
 # CDR
 #
+cd /opt/Fast-DDS
 git clone https://github.com/eProsima/Fast-CDR.git
 mkdir Fast-CDR/build
-cd Fast-CDR/build
+cd Fast-CDR
+git checkout v2.1.3
+cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON
 cmake --build . --target install
-cd -
 
 #
 # RTPS
 #
+cd /opt/Fast-DDS
 git clone https://github.com/eProsima/Fast-DDS.git
-mkdir Fast-DDS/build
-
+cd Fast-DDS
+git checkout v2.13.3
+mkdir build
 
 ## Prevent glibc bug: https://stackoverflow.com/questions/30680550/c-gettid-was-not-declared-in-this-scope
 file_bug="/opt/Fast-DDS/Fast-DDS/src/cpp/utils/threading/threading_pthread.ipp"
-
 nl=$(grep -n "namespace eprosima" $file_bug | awk -F':' '{print $1 ; exit 0}')
 sed -i "${nl}i #include <unistd.h>\n#include <sys/syscall.h>\n#define gettid() syscall(SYS_gettid)\n" $file_bug
 
-
-cd Fast-DDS/build
+cd build
 cmake ..  -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON
 cmake --build . --target install
