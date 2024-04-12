@@ -1,1 +1,2 @@
+- Fix: lighter operation to get databases list from MongoDB (#4517)
 - Remove: `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` CLI parameters along with associated env vars, already deprecated in Orion 3.12.0 (use `-dbURI` instead`)

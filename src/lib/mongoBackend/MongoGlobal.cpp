@@ -216,6 +216,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
   orion::BSONObjBuilder bob;
   bob.append("listDatabases", 1);
+  bob.append("nameOnly", true);
 
   if (!orion::runDatabaseCommand("admin", bob.obj(), &result, &err))
   {
