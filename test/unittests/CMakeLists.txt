@@ -217,7 +217,6 @@ include_directories("${PROJECT_SOURCE_DIR}/test")
 # Needed for the new C driver
 # FIXME: why do we need this declared here if they are also declared
 # in the main CMakeFiles.txt?
-include_directories("/usr/include/python3.11/")
 include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("/usr/local/include/libbson-1.0")
 

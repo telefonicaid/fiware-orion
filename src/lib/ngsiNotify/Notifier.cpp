@@ -321,6 +321,7 @@ static SenderThreadParams* buildSenderParamsCustom
   bool legacy = (exprLang == "legacy");
   ExprContextObject exprContext(legacy);
 
+  // FIXME PR: no-legacy context is now based in JsonHelper, which may mess with key repetition. Check this
   // It seems that add() semantics are different in legacy and jexl mode. In jexl mode, if the key already exists, it is
   // updated. In legacy model, if the key already exists, the operation is ignored (so previous value is preserved). Taking
   // into account that in the case of an attribute with name "service", "servicePath" and "authToken", must have precedence

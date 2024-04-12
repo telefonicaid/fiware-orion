@@ -26,8 +26,8 @@
 * Author: Fermin Galan
 */
 
-#include <Python.h>
-#include <semaphore.h>
+// FIXME PR: probably this is no longer needed
+//#include <semaphore.h>
 
 #include "expressions/ExprContext.h"
 #include "expressions/ExprResult.h"
@@ -39,10 +39,9 @@
 class ExprManager
 {
 private:
-  PyObject*  tcjexlModule;
-  PyObject*  jexlEngine;
-  PyObject*  jsonModule;
-  sem_t      sem;
+  // FIXME PR: probably this is no longer needed
+  //sem_t      sem;
+  void*        jexlEngine;
 
 public:
    void        init(void);

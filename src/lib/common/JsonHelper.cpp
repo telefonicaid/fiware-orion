@@ -408,6 +408,17 @@ void JsonVectorHelper::addBool(bool b)
 
 /* ****************************************************************************
 *
+* JsonObjectHelper::addNull -
+*/
+void JsonVectorHelper::addNull(void)
+{
+  addRaw("null");
+}
+
+
+
+/* ****************************************************************************
+*
 * JsonVectorHelper::str -
 */
 std::string JsonVectorHelper::str()

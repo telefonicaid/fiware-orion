@@ -26,9 +26,10 @@
 * Author: Fermin Galan
 */
 
-#include <Python.h>
 #include <string>
 #include <map>
+
+#include "common/JsonHelper.h"
 
 class ExprContextList;   // forward declaration
 
@@ -40,13 +41,13 @@ class ExprContextObject
 {
 private:
   bool                                legacy;
-  PyObject*                           jexlContext; // used in regular (i.e. not legacy) mode
-  std::map<std::string, std::string>  repl;        // used in legacy mode
+  JsonObjectHelper                    jh;       // used in regular (i.e. not legacy) mode
+  std::map<std::string, std::string>  repl;     // used in legacy mode
 
 public:
   ExprContextObject(bool legacy = false);
 
-  PyObject*                            getJexlContext(void);
+  std::string                          getJexlContext(void);
   std::map<std::string, std::string>*  getMap(void);
 
   void      add(const std::string& key, const std::string& value, bool raw = false);
@@ -64,20 +65,20 @@ public:
 class ExprContextList
 {
 private:
-  PyObject*  jexlContext;
+  JsonVectorHelper jh;
 
 public:
   ExprContextList();
 
-  PyObject* get(void);
-  void      add(const std::string& value);
-  void      add(double value);
-  void      add(bool value);
-  void      add(void);
-  void      add(ExprContextObject exprContextObject);
-  void      add(ExprContextList exprContextList);
+  std::string  get(void);
+  void         add(const std::string& value);
+  void         add(double value);
+  void         add(bool value);
+  void         add(void);
+  void         add(ExprContextObject exprContextObject);
+  void         add(ExprContextList exprContextList);
 
-  void      release(void);
+  void         release(void);
 };
 
 

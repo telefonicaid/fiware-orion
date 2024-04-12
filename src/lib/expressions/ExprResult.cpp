@@ -24,7 +24,6 @@
 */
 
 #include "expressions/ExprResult.h"
-#include "expressions/exprCommon.h"
 
 #include "common/string.h"
 #include "common/JsonHelper.h"
@@ -256,7 +255,7 @@ void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject*
 * fill -
 *
 */
-void ExprResult::fill(PyObject* result)
+void ExprResult::fill(std::string result)
 {
   // If nothing changes, the returned value would be null (failsafe)
   valueType = orion::ValueTypeNull;
