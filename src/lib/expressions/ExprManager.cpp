@@ -24,7 +24,6 @@
 */
 
 #include "expressions/ExprManager.h"
-#include "expressions/ExprResult.h"
 #include "logMsg/logMsg.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -64,11 +63,9 @@ void ExprManager::init(void)
 *
 * ExprManager::evaluate -
 */
-ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const std::string& _expression)
+std::string ExprManager::evaluate(ExprContextObject* exprContextObjectP, const std::string& _expression)
 {
-  ExprResult r;
-  r.valueType = orion::ValueTypeNull;
-
+  std::string r;
   if (exprContextObjectP->isLegacy())
   {
     // std::map based evaluation. Only pure replacement is supported
@@ -79,16 +76,14 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     std::map<std::string, std::string>::iterator iter = replacementsP->find(_expression);
     if (iter != replacementsP->end())
     {
-      r.valueType   = orion::ValueTypeString;
-      r.stringValue = iter->second;
+      r = iter->second;
     }
   }
   else
   {
     // JEXL based evaluation
     LM_T(LmtExpr, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
-    const char* result = eval(jexlEngine, _expression.c_str(), exprContextObjectP->getJexlContext().c_str());
-    r.fill(result);
+    r = eval(jexlEngine, _expression.c_str(), exprContextObjectP->getJexlContext().c_str());
   }
 
   return r;

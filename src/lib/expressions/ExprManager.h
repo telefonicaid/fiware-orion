@@ -30,7 +30,6 @@
 //#include <semaphore.h>
 
 #include "expressions/ExprContext.h"
-#include "expressions/ExprResult.h"
 
 /* ****************************************************************************
 *
@@ -45,7 +44,7 @@ private:
 
 public:
    void        init(void);
-   ExprResult  evaluate(ExprContextObject* exprContextObjectP, const std::string& expression);
+   std::string evaluate(ExprContextObject* exprContextObjectP, const std::string& expression);
    void        release(void);
 };
 
