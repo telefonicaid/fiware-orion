@@ -53,8 +53,8 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
     // len("${") + len("}") = 3
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
 
-    std::string r = exprMgr.evaluate(exprContextObjectP, macroName);
-    if (r == "null")
+    ExprResult r = exprMgr.evaluate(exprContextObjectP, macroName);
+    if (r.valueType == orion::ValueTypeNull)
     {
       return notFoundDefault;
     }
@@ -63,11 +63,11 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
       // in legacy mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
       if (exprContextObjectP->isLegacy())
       {
-        return removeQuotes(r);
+        return removeQuotes(r.toString());
       }
       else
       {
-        return r;
+        return r.toString();
       }
     }
   }
@@ -100,31 +100,31 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
 */
 static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, const std::string key, const std::string& notFoundDefault, bool raw)
 {
-  std::string r = exprMgr.evaluate(exprContextObjectP, key);
+  ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
 
-  if (r == "null")
+  if (r.valueType == orion::ValueTypeNull)
   {
     return notFoundDefault;
   }
   else
   {
-    std::string r;
+    std::string s = r.toString();
 
     // in legacy mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
     if (exprContextObjectP->isLegacy())
     {
-      r = removeQuotes(r);
+      s = removeQuotes(s);
     }
 
     if (raw)
     {
       // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
       // so double quotes have to be be removed
-      return removeQuotes(r);
+      return removeQuotes(s);
     }
     else
     {
-      return r;
+      return s;
     }
   }
 }

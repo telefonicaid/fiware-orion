@@ -23,12 +23,14 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     ExprManager.cpp
     ExprContext.cpp
+    ExprResult.cpp
     exprMgr.cpp    
 )
 
 SET (HEADERS
     ExprManager.h
     ExprContext.h
+    ExprResult.h
     exprMgr.h
 )
 

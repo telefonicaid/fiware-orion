@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_EXPRESSIONS_EXPRMANAGER_H_
-#define SRC_LIB_EXPRESSIONS_EXPRMANAGER_H_
+#ifndef SRC_LIB_EXPRESSIONS_EXPRRESULT_H_
+#define SRC_LIB_EXPRESSIONS_EXPRRESULT_H_
 
 /*
 *
@@ -26,27 +26,35 @@
 * Author: Fermin Galan
 */
 
-// FIXME PR: probably this is no longer needed
-//#include <semaphore.h>
+#include "orionTypes/OrionValueType.h"
 
-#include "expressions/ExprContext.h"
-#include "expressions/ExprResult.h"
+#include "parse/CompoundValueNode.h"
+
+#include <string>
 
 /* ****************************************************************************
 *
-* ExprManager -
+* ExprResult -
 */
-class ExprManager
+class ExprResult
 {
-private:
-  // FIXME PR: probably this is no longer needed
-  //sem_t      sem;
-  void*        jexlEngine;
-
 public:
-   void        init(void);
-   ExprResult  evaluate(ExprContextObject* exprContextObjectP, const std::string& expression);
-   void        release(void);
+  // Similar to the fields used in ContextAttribute.h
+  
+  orion::ValueType  valueType;    // Type of value
+  std::string       stringValue;  // "value" as a String
+  double            numberValue;  // "value" as a Number
+  bool              boolValue;    // "value" as a Boolean
+
+  // Use only when valueType is object or vector
+  orion::CompoundValueNode*  compoundValueP;
+
+  void fill(std::string result);
+
+  std::string  toString(void);
+  void         release(void);
 };
 
-#endif  // SRC_LIB_EXPRESSIONS_EXPRMANAGER_H_
+
+
+#endif  // SRC_LIB_EXPRESSIONS_EXPRRESULT_H_
