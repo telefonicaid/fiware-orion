@@ -72,7 +72,7 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
   if (exprContextObjectP->isLegacy())
   {
     // std::map based evaluation. Only pure replacement is supported
-    LM_T(LmtExpr, ("evaluating legacy expresion: <%s>", _expression.c_str()));
+    LM_T(LmtExpr, ("evaluating legacy expression: <%s>", _expression.c_str()));
 
     std::map<std::string, std::string>* replacementsP = exprContextObjectP->getMap();
 
@@ -81,13 +81,16 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     {
       r.valueType   = orion::ValueTypeString;
       r.stringValue = iter->second;
+      LM_T(LmtExpr, ("legacy evaluation result: <%s>", r.stringValue.c_str()));
     }
   }
   else
   {
     // JEXL based evaluation
-    LM_T(LmtExpr, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
-    const char* result = cjexl_eval(jexlEngine, _expression.c_str(), exprContextObjectP->getJexlContext().c_str());
+    std::string context = exprContextObjectP->getJexlContext();
+    LM_T(LmtExpr, ("evaluating JEXL expression <%s> with context <%s>", _expression.c_str(), context.c_str()));
+    const char* result = cjexl_eval(jexlEngine, _expression.c_str(), context.c_str());
+    LM_T(LmtExpr, ("JEXL evaluation result: <%s>", result));
     r.fill(result);
   }
 

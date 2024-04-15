@@ -50,6 +50,7 @@ public:
 private:
  std::string  ss;
  bool         empty;
+ bool         closed;
 };
 
 
@@ -72,6 +73,7 @@ public:
 private:
  std::string  ss;
  bool         empty;
+ bool         closed;
 };
 
 

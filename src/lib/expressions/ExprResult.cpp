@@ -28,56 +28,21 @@
 // problematic (e.g. 1.999999 instead of 2), as they don't take advanage of the ad hoc logic implemented
 // in ContextAttribute rendering
 
+#include "rapidjson/document.h"
+
 #include "expressions/ExprResult.h"
 
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "logMsg/logMsg.h"
 
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/utilsParse.h"
 
 
-#if 0
-/* ****************************************************************************
-*
-* getPyObjectType -
-*/
-static orion::ValueType getPyObjectType(PyObject* obj)
-{
-  // PyBool_Check() has to be done before than PyLong_Check(). Alternatively, PyLong_CheckExact() could be
-  // used (not tested). See: https://stackoverflow.com/q/77990353/1485926
-  if (PyBool_Check(obj))
-  {
-    return orion::ValueTypeBoolean;
-  }
-  else if (PyLong_Check(obj))
-  {
-    return orion::ValueTypeNumber;
-  }
-  else if (PyFloat_Check(obj))
-  {
-    return orion::ValueTypeNumber;
-  }
-  else if (PyDict_Check(obj))
-  {
-    return orion::ValueTypeObject;
-  }
-  else if (PyList_Check(obj))
-  {
-    return orion::ValueTypeVector;
-  }
-  else if (obj == Py_None)
-  {
-    return orion::ValueTypeNull;
-  }
-  else
-  {
-    // For other types we use string (this is also a failsafe for types not being strings)
-    return orion::ValueTypeString;
-  }
-}
 
+static void processDictItem(orion::CompoundValueNode* parentP, const rapidjson::Value::ConstMemberIterator&  iter);  // forward declaration
 
-static void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value);  // forward declaration
 
 
 /* ****************************************************************************
@@ -85,81 +50,58 @@ static void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, Py
 * processListItem -
 *
 */
-void processListItem(orion::CompoundValueNode* parentP, PyObject* value)
+void processListItem(orion::CompoundValueNode* parentP, const rapidjson::Value::ConstValueIterator&  iter)
 {
   orion::CompoundValueNode* nodeP;
 
-  const char* str;
-  double d;
-  bool b;
-  PyObject *keyAux, *valueAux;
-  Py_ssize_t pos, size;
+  std::string type = jsonParseTypeNames[iter->GetType()];
 
-  switch (getPyObjectType(value))
+  if (type == "String")
   {
-  case orion::ValueTypeString:
-    str = PyUnicode_AsUTF8(value);
-    if (str == NULL)
-    {
-      LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
-    }
-    else
-    {
-      LM_T(LmtExpr, ("processListITem (string): %s", str));
-      nodeP = new orion::CompoundValueNode("", str, orion::ValueTypeString);
-      parentP->add(nodeP);
-    }
-    break;
-
-  case orion::ValueTypeNumber:
-    d = PyFloat_AsDouble(value);
-    LM_T(LmtExpr, ("processList (double): %f", d));
-    nodeP = new orion::CompoundValueNode("", d, orion::ValueTypeNumber);
+    nodeP = new orion::CompoundValueNode("", iter->GetString(), orion::ValueTypeString);
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeBoolean:
-    b = PyObject_IsTrue(value);
-    LM_T(LmtExpr, ("ExprResult (bool): %s", b ? "true": "false"));
-    nodeP = new orion::CompoundValueNode("", b, orion::ValueTypeBoolean);
+  }
+  else if (type == "Number")
+  {
+    nodeP = new orion::CompoundValueNode("", iter->GetDouble(), orion::ValueTypeNumber);
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeNull:
+  }
+  else if (type == "True")
+  {
+    nodeP = new orion::CompoundValueNode("", true, orion::ValueTypeBoolean);
+    parentP->add(nodeP);
+  }
+  else if (type == "False")
+  {
+    nodeP = new orion::CompoundValueNode("", false, orion::ValueTypeBoolean);
+    parentP->add(nodeP);
+  }
+  else if (type == "Null")
+  {
     nodeP = new orion::CompoundValueNode("", "", orion::ValueTypeNull);
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeVector:
-    nodeP = new orion::CompoundValueNode(orion::ValueTypeVector);
-    size = PyList_Size(value);
-    for (Py_ssize_t ix = 0; ix < size; ++ix)
+  }
+  else if (type == "Array")
+  {
+    nodeP = new orion::CompoundValueNode("", "", orion::ValueTypeVector);
+    for (rapidjson::Value::ConstValueIterator iter2 = iter->Begin(); iter2 != iter->End(); ++iter2)
     {
-      // No need to free memory of each list item here, the whole result object is freed
-      // in ExprManager::evaluate()
-      processListItem(nodeP, PyList_GetItem(value, ix));
+      processListItem(nodeP, iter2);
     }
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeObject:
-    nodeP = new orion::CompoundValueNode(orion::ValueTypeObject);
-    pos = 0;
-    while (PyDict_Next(value, &pos, &keyAux, &valueAux))
+  }
+  else if (type == "Object")
+  {
+    nodeP = new orion::CompoundValueNode("", "", orion::ValueTypeObject);
+    for (rapidjson::Value::ConstMemberIterator iter2 = iter->MemberBegin(); iter2 != iter->MemberEnd(); ++iter2)
     {
-      // No need to free memory of each dict item here, the whole result object is freed
-      // in ExprManager::evaluate()
-      processDictItem(nodeP, keyAux, valueAux);
+      processDictItem(nodeP, iter2);
     }
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeNotGiven:
-    LM_E(("Runtime Error (value type not given))"));
-    break;
-
-  default:
-    LM_E(("Runtime Error (value type unknown))"));
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown type: %s)", type.c_str()));
   }
 }
 
@@ -170,90 +112,62 @@ void processListItem(orion::CompoundValueNode* parentP, PyObject* value)
 * processDictItem -
 *
 */
-void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject* value)
+void processDictItem(orion::CompoundValueNode* parentP, const rapidjson::Value::ConstMemberIterator&  iter)
 {
-  const char * keyStr = PyUnicode_AsUTF8(key);
-  if (keyStr == NULL)
-  {
-    LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
-    return;
-  }
-
   orion::CompoundValueNode* nodeP;
-  const char* str;
-  double d;
-  bool b;
-  PyObject *keyAux, *valueAux;
-  Py_ssize_t pos, size;
 
-  switch (getPyObjectType(value))
+  std::string name = iter->name.GetString();
+  std::string type = jsonParseTypeNames[iter->value.GetType()];
+
+  if (type == "String")
   {
-  case orion::ValueTypeString:
-    str = PyUnicode_AsUTF8(value);
-    if (str == NULL)
-    {
-      LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
-    }
-    else
-    {
-      LM_T(LmtExpr, ("processListITem (string): %s", str));
-      nodeP = new orion::CompoundValueNode(keyStr, str, orion::ValueTypeString);
-      parentP->add(nodeP);
-    }
-    break;
-
-  case orion::ValueTypeNumber:
-    d = PyFloat_AsDouble(value);
-    LM_T(LmtExpr, ("processList (double): %f", d));
-    nodeP = new orion::CompoundValueNode(keyStr, d, orion::ValueTypeNumber);
+    nodeP = new orion::CompoundValueNode(name, iter->value.GetString(), orion::ValueTypeString);
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeBoolean:
-    b = PyObject_IsTrue(value);
-    LM_T(LmtExpr, ("ExprResult (bool): %s", b ? "true": "false"));
-    nodeP = new orion::CompoundValueNode(keyStr, b, orion::ValueTypeBoolean);
+  }
+  else if (type == "Number")
+  {
+    nodeP = new orion::CompoundValueNode(name, iter->value.GetDouble(), orion::ValueTypeNumber);
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeNull:
-    nodeP = new orion::CompoundValueNode(keyStr, "", orion::ValueTypeNull);
+  }
+  else if (type == "True")
+  {
+    nodeP = new orion::CompoundValueNode(name, true, orion::ValueTypeBoolean);
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeVector:
-    nodeP = new orion::CompoundValueNode(keyStr, "", orion::ValueTypeVector);
-    size = PyList_Size(value);
-    for (Py_ssize_t ix = 0; ix < size; ++ix)
+  }
+  else if (type == "False")
+  {
+    nodeP = new orion::CompoundValueNode(name, false, orion::ValueTypeBoolean);
+    parentP->add(nodeP);
+  }
+  else if (type == "Null")
+  {
+    nodeP = new orion::CompoundValueNode(name, "", orion::ValueTypeNull);
+    parentP->add(nodeP);
+  }
+  else if (type == "Array")
+  {
+    nodeP = new orion::CompoundValueNode(name, "", orion::ValueTypeVector);
+    for (rapidjson::Value::ConstValueIterator iter2 = iter->value.Begin(); iter2 != iter->value.End(); ++iter2)
     {
-      // No need to free memory of each list item here, the whole result object is freed
-      // in ExprManager::evaluate()
-      processListItem(nodeP, PyList_GetItem(value, ix));
+      processListItem(nodeP, iter2);
     }
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeObject:
-    nodeP = new orion::CompoundValueNode(keyStr, "", orion::ValueTypeObject);
-    pos = 0;
-    while (PyDict_Next(value, &pos, &keyAux, &valueAux))
+  }
+  else if (type == "Object")
+  {
+    nodeP = new orion::CompoundValueNode(name, "", orion::ValueTypeObject);
+    for (rapidjson::Value::ConstMemberIterator iter2 = iter->value.MemberBegin(); iter2 != iter->value.MemberEnd(); ++iter2)
     {
-      // No need to free memory of each dict item here, the whole result object is freed
-      // in ExprManager::evaluate()
-      processDictItem(nodeP, keyAux, valueAux);
+      processDictItem(nodeP, iter2);
     }
     parentP->add(nodeP);
-    break;
-
-  case orion::ValueTypeNotGiven:
-    LM_E(("Runtime Error (value type not given))"));
-    break;
-
-  default:
-    LM_E(("Runtime Error (value type unknown))"));
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown type: %s)", type.c_str()));
   }
 }
-#endif
+
 
 
 /* ****************************************************************************
@@ -263,67 +177,67 @@ void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject*
 */
 void ExprResult::fill(std::string result)
 {
-  /*
   // If nothing changes, the returned value would be null (failsafe)
   valueType = orion::ValueTypeNull;
 
-  // Special case: expresion evalutes to None
-  if (result == Py_None)
+  rapidjson::Document  document;
+
+  document.Parse(result.c_str());
+
+  if (document.HasParseError())
   {
-    LM_T(LmtExpr, ("ExprResult is null"));
-    valueType = orion::ValueTypeNull;
+    LM_E(("Runtime Error (parsing ExprResult: %s)", parseErrorString(document.GetParseError()).c_str()));
     return;
   }
 
-  // Other not null types
-  valueType = getPyObjectType(result);
-  if (valueType == orion::ValueTypeNumber)
+  std::string type = jsonParseTypeNames[document.GetType()];
+  
+  if (type == "String")
   {
-    numberValue = PyFloat_AsDouble(result);
-    LM_T(LmtExpr, ("ExprResult (double): %f", numberValue));
+    stringValue  = document.GetString();
+    valueType    = orion::ValueTypeString;
   }
-  else if (valueType == orion::ValueTypeBoolean)
+  else if (type == "Number")
   {
-    boolValue = PyObject_IsTrue(result);
-    LM_T(LmtExpr, ("ExprResult (bool): %s", boolValue ? "true": "false"));
+    numberValue  = document.GetDouble();
+    valueType    = orion::ValueTypeNumber;
   }
-  else if (valueType == orion::ValueTypeObject)
+  else if (type == "True")
   {
-    compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-    while (PyDict_Next(result, &pos, &key, &value))
-    {
-      // No need to free memory of each dict item here, the whole result object is freed
-      // in ExprManager::evaluate()
-      processDictItem(compoundValueP, key, value);
-    }
+    boolValue    = true;
+    valueType    = orion::ValueTypeBoolean;
   }
-  else if (valueType == orion::ValueTypeVector)
+  else if (type == "False")
   {
+    boolValue    = false;
+    valueType    = orion::ValueTypeBoolean;
+  }
+  else if (type == "Null")
+  {
+    valueType    = orion::ValueTypeNull;
+  }
+  else if (type == "Array")
+  {
+    valueType  = orion::ValueTypeVector;
     compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
-    Py_ssize_t size = PyList_Size(result);
-    for (Py_ssize_t ix = 0; ix < size; ++ix)
+    for (rapidjson::Value::ConstValueIterator iter = document.Begin(); iter != document.End(); ++iter)
     {
-      // No need to free memory of each list item here, the whole result object is freed
-      // in ExprManager::evaluate()
-      processListItem(compoundValueP, PyList_GetItem(result, ix));
+      processListItem(compoundValueP, iter);
     }
   }
-  else if (valueType == orion::ValueTypeString)
+  else if (type == "Object")
   {
-    const char* str = PyUnicode_AsUTF8(result);
-    if (str == NULL)
+    valueType  = orion::ValueTypeObject;
+    compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
+    for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
     {
-      LM_E(("Runtime Error (error obtaning str representation: %s)", capturePythonError()));
-      valueType = orion::ValueTypeNull;
+      processDictItem(compoundValueP, iter);
     }
-    else
-    {
-      LM_T(LmtExpr, ("ExprResult (string): %s", str));
-      stringValue = std::string(str);
-    }
-  }*/
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown type: %s)", type.c_str()));
+  }
 }
 
 

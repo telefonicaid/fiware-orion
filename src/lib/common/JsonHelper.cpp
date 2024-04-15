@@ -138,7 +138,7 @@ std::string objectToJson(std::map<std::string, std::string>& list)
 *
 * JsonObjectHelper -
 */
-JsonObjectHelper::JsonObjectHelper(): empty(true)
+JsonObjectHelper::JsonObjectHelper(): empty(true), closed(false)
 {
   ss += '{';
 }
@@ -282,7 +282,12 @@ void JsonObjectHelper::addNull(const std::string& key)
 */
 std::string JsonObjectHelper::str()
 {
-  ss += '}';
+  // This check allows to call str() several times (needed when this is used in ExprContext)
+  if (!closed)
+  {
+    ss += '}';
+    closed = true;
+  }
   return ss;
 }
 
@@ -292,7 +297,7 @@ std::string JsonObjectHelper::str()
 *
 * JsonVectorHelper -
 */
-JsonVectorHelper::JsonVectorHelper(): empty(true)
+JsonVectorHelper::JsonVectorHelper(): empty(true), closed(false)
 {
   ss += '[';
 }
@@ -423,6 +428,11 @@ void JsonVectorHelper::addNull(void)
 */
 std::string JsonVectorHelper::str()
 {
-  ss += ']';
+  // This check allows to call str() several times (needed when this is used in ExprContext)
+  if (!closed)
+  {
+    ss += ']';
+    closed = true;
+  }
   return ss;
 }
