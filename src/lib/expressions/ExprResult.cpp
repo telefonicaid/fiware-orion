@@ -23,6 +23,11 @@
 * Author: Fermin Galan
 */
 
+// The ExprResult class is used as return value in ExprManager::evaluate(). We could return std::string
+// in that function and simplify (so avoiding the ExprResult class). But in that case float rounding is
+// problematic (e.g. 1.999999 instead of 2), as they don't take advanage of the ad hoc logic implemented
+// in ContextAttribute rendering
+
 #include "expressions/ExprResult.h"
 
 #include "common/string.h"
@@ -31,6 +36,7 @@
 
 
 
+#if 0
 /* ****************************************************************************
 *
 * getPyObjectType -
@@ -247,7 +253,7 @@ void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject*
     LM_E(("Runtime Error (value type unknown))"));
   }
 }
-
+#endif
 
 
 /* ****************************************************************************
@@ -257,6 +263,7 @@ void processDictItem(orion::CompoundValueNode* parentP, PyObject* key, PyObject*
 */
 void ExprResult::fill(std::string result)
 {
+  /*
   // If nothing changes, the returned value would be null (failsafe)
   valueType = orion::ValueTypeNull;
 
@@ -316,7 +323,7 @@ void ExprResult::fill(std::string result)
       LM_T(LmtExpr, ("ExprResult (string): %s", str));
       stringValue = std::string(str);
     }
-  }
+  }*/
 }
 
 

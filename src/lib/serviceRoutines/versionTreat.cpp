@@ -47,6 +47,11 @@
 #include <bson/bson.h>
 #include <mosquitto.h>
 
+// Interface to use libcjexl.a
+extern "C" {
+    const char* cjexl_version();
+}
+
 /* ****************************************************************************
 *
 * version -
@@ -89,8 +94,7 @@ std::string libVersions(void)
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
   total += mosq    + "\"" + mosqVersion + "\"" + ",\n";
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
-  // FIXME PR
-  //total += cjexl   + "\"" + cjexlVersion + "\"" + ",\n";
+  total += cjexl   + "\"" + cjexl_version() + "\"" + ",\n";
 #ifdef OLD_SSL_VERSION_FORMAT
   // Needed by openssl 1.1.1n in Debian 11 and before
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";

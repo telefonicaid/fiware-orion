@@ -31,15 +31,15 @@
 
 // Interface to use libcjexl.a
 extern "C" {
-    void* new_engine();
+    void* cjexl_new_engine();
 }
 
 extern "C" {
-   void free_engine(void* ptr);
+   void cjexl_free_engine(void* ptr);
 }
 
 extern "C" {
-   const char* eval(void* ptr, const char* script_ptr, const char* context_ptr);
+   const char* cjexl_eval(void* ptr, const char* script_ptr, const char* context_ptr);
 }
 
 
@@ -55,7 +55,7 @@ void ExprManager::init(void)
   //  LM_X(1, ("Fatal Error (error initializing 'jexl mgr' semaphore: %s)", strerror(errno)));
   //}
 
-  jexlEngine = new_engine();
+  jexlEngine = cjexl_new_engine();
 }
 
 
@@ -87,7 +87,7 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
   {
     // JEXL based evaluation
     LM_T(LmtExpr, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
-    const char* result = eval(jexlEngine, _expression.c_str(), exprContextObjectP->getJexlContext().c_str());
+    const char* result = cjexl_eval(jexlEngine, _expression.c_str(), exprContextObjectP->getJexlContext().c_str());
     r.fill(result);
   }
 
@@ -102,5 +102,5 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
 */
 void ExprManager::release(void)
 {
-  free_engine(jexlEngine);
+  cjexl_free_engine(jexlEngine);
 }
