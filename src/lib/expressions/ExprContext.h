@@ -58,8 +58,6 @@ public:
   void      add(const std::string& key, ExprContextList exprContextList);
 
   bool      isLegacy(void);
-
-  void      release(void);
 };
 
 class ExprContextList
@@ -68,8 +66,6 @@ private:
   JsonVectorHelper jh;
 
 public:
-  ExprContextList();
-
   std::string  get(void);
   void         add(const std::string& value);
   void         add(double value);
@@ -77,8 +73,6 @@ public:
   void         add(void);
   void         add(ExprContextObject exprContextObject);
   void         add(ExprContextList exprContextList);
-
-  void         release(void);
 };
 
 

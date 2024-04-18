@@ -372,7 +372,6 @@ static SenderThreadParams* buildSenderParamsCustom
   if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
   {
     // Warning already logged in macroSubstitute()
-    exprContext.release();
     return NULL;
   }
 
@@ -389,7 +388,6 @@ static SenderThreadParams* buildSenderParamsCustom
     if (!setPayload(includePayload, notifPayload, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
       // Warning already logged in macroSubstitute()
-      exprContext.release();
       return NULL;
     }
   }
@@ -406,7 +404,6 @@ static SenderThreadParams* buildSenderParamsCustom
     if (!setNgsiPayload(ngsi, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
     {
       // Warning already logged in macroSubstitute()
-      exprContext.release();
       return NULL;
     }
     mimeType = "application/json";
@@ -426,7 +423,6 @@ static SenderThreadParams* buildSenderParamsCustom
       if ((macroSubstitute(&key, it->first, &exprContext, "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
-        exprContext.release();
         return NULL;
       }
 
@@ -453,7 +449,6 @@ static SenderThreadParams* buildSenderParamsCustom
       if ((macroSubstitute(&key, it->first, &exprContext,  "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
-        exprContext.release();
         return NULL;
       }
 
@@ -485,7 +480,6 @@ static SenderThreadParams* buildSenderParamsCustom
   if (!parseUrl(url, host, port, uriPath, protocol))
   {
     LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
-    exprContext.release();
     return NULL;
   }
 
@@ -520,7 +514,6 @@ static SenderThreadParams* buildSenderParamsCustom
     if (macroSubstitute(&topic, notification.mqttInfo.topic, &exprContext, "", true) == false)
     {
       // Warning already logged in macroSubstitute()
-      exprContext.release();
       return NULL;
     }
   }
@@ -556,7 +549,6 @@ static SenderThreadParams* buildSenderParamsCustom
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
   paramsP->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
-  exprContext.release();
   return paramsP;
 }
 

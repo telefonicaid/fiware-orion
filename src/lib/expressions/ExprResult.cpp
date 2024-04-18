@@ -191,7 +191,7 @@ void ExprResult::fill(std::string result)
   }
 
   std::string type = jsonParseTypeNames[document.GetType()];
-  
+
   if (type == "String")
   {
     stringValue  = document.GetString();

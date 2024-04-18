@@ -49,12 +49,6 @@ extern "C" {
 */
 void ExprManager::init(void)
 {
-  // FIXME PR: this is probably not needed
-  //if (sem_init(&sem, 0, 1) == -1)
-  //{
-  //  LM_X(1, ("Fatal Error (error initializing 'jexl mgr' semaphore: %s)", strerror(errno)));
-  //}
-
   jexlEngine = cjexl_new_engine();
 }
 

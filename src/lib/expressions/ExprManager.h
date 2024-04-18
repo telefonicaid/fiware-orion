@@ -26,9 +26,6 @@
 * Author: Fermin Galan
 */
 
-// FIXME PR: probably this is no longer needed
-//#include <semaphore.h>
-
 #include "expressions/ExprContext.h"
 #include "expressions/ExprResult.h"
 
@@ -39,8 +36,6 @@
 class ExprManager
 {
 private:
-  // FIXME PR: probably this is no longer needed
-  //sem_t      sem;
   void*        jexlEngine;
 
 public:

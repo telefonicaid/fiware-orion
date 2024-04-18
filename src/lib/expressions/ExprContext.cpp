@@ -202,28 +202,6 @@ bool ExprContextObject::isLegacy(void)
 
 /* ****************************************************************************
 *
-* ExprContextObject::release -
-*/
-void ExprContextObject::release(void)
-{
-  // FIXME PR: this method is probably no longer needed
-}
-
-
-
-/* ****************************************************************************
-*
-* ExprContextList::ExprContextList -
-*/
-ExprContextList::ExprContextList()
-{
-  // FIXME PR: this method is probably no longer needed
-}
-
-
-
-/* ****************************************************************************
-*
 * ExprContextList::get -
 */
 std::string ExprContextList::get(void)
@@ -305,15 +283,4 @@ void ExprContextList::add(ExprContextList exprContextList)
   std::string s = exprContextList.get();
   LM_T(LmtExpr, ("adding to JEXL expression context list (list): %s", s.c_str()));
   jh.addRaw(s);
-}
-
-
-
-/* ****************************************************************************
-*
-* ExprContextList::relesase -
-*/
-void ExprContextList::release(void)
-{
-  // FIXME PR: this method is probably no longer needed
 }
