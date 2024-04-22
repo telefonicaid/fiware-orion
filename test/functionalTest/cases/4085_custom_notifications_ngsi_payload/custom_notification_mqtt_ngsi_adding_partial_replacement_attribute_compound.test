@@ -134,7 +134,7 @@ payload='{
     "type": "irrelevant"
   },
   "B4": {
-    "value": { "z": 10, "w": "ttt"},
+    "value": { "w": "ttt", "z": 10 },
     "type": "irrelevant"
   },
   "B5": {
@@ -296,13 +296,13 @@ MQTT message at topic topic1:
                 "metadata": {},
                 "type": "StructuredValue",
                 "value": [
-                    "{\"z\":10,\"w\":\"ttt\"} thing",
+                    "{\"w\":\"ttt\",\"z\":10} thing",
                     {
                         "one": [
                             "foo [4,null,{\"r\":2}] bar",
                             "this is: null"
                         ],
-                        "two": "some other{\"z\":10,\"w\":\"ttt\"}"
+                        "two": "some other{\"w\":\"ttt\",\"z\":10}"
                     }
                 ]
             },
