@@ -135,7 +135,7 @@ payload='{
     "type": "irrelevant"
   },
   "B4": {
-    "value": { "z": 10, "w": "ttt"},
+    "value": { "w": "ttt", "z": 10 },
     "type": "irrelevant"
   },
   "B5": {
