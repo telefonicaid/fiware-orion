@@ -699,7 +699,8 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   }
 
   long unsigned int  payloadBodySize  = kjFastRenderSize(notificationP);
-  char*              payloadBody      = (payloadBodySize < sizeof(body))? body : kaAlloc(&orionldState.kalloc, payloadBodySize);
+  bool               allocate         = (payloadBodySize < sizeof(body)) || (mAltP->subP->protocol == HTTPS);
+  char*              payloadBody      = (allocate == false)? body : kaAlloc(&orionldState.kalloc, payloadBodySize);
 
   kjFastRender(notificationP, payloadBody);
 
