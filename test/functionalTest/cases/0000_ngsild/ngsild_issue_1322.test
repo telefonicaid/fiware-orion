@@ -268,7 +268,7 @@ Ngsild-Attribute-Format: Normalized
     ],
     "id": "urn:ngsi-ld:Notification:REGEX(.*)",
     "notifiedAt": "202REGEX(.*)Z",
-    "subscriptionId": "urn:S1",
+    "subscriptionId": "urn:S2",
     "type": "Notification"
 }
 =======================================
