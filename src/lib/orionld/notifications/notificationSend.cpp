@@ -87,14 +87,6 @@ size_t  userAgentHeaderLen = 0;  // Set in orionldServiceInit()
 
 // -----------------------------------------------------------------------------
 //
-// static buffer for small notifications (payload body)
-//
-static __thread char body[4 * 1024];
-
-
-
-// -----------------------------------------------------------------------------
-//
 // attributeToSimplified - move to its own module
 //
 // 1. Find the type
@@ -699,7 +691,7 @@ int notificationSend(OrionldAlterationMatch* mAltP, double timestamp, CURL** cur
   }
 
   long unsigned int  payloadBodySize  = kjFastRenderSize(notificationP);
-  char*              payloadBody      = (payloadBodySize < sizeof(body))? body : kaAlloc(&orionldState.kalloc, payloadBodySize);
+  char*              payloadBody      = kaAlloc(&orionldState.kalloc, payloadBodySize + 512);
 
   kjFastRender(notificationP, payloadBody);
 
