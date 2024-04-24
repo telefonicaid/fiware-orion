@@ -23,15 +23,24 @@
 * Author: Fermin Galan
 */
 
-#include <Python.h>
-
 #include "expressions/ExprManager.h"
 #include "expressions/ExprResult.h"
-#include "expressions/exprCommon.h"
 #include "logMsg/logMsg.h"
 
 #include "orionTypes/OrionValueType.h"
 
+// Interface to use libcjexl.a
+extern "C" {
+    void* cjexl_new_engine();
+}
+
+extern "C" {
+   void cjexl_free_engine(void* ptr);
+}
+
+extern "C" {
+   const char* cjexl_eval(void* ptr, const char* script_ptr, const char* context_ptr);
+}
 
 
 /* ****************************************************************************
@@ -40,30 +49,7 @@
 */
 void ExprManager::init(void)
 {
-  tcjexlModule         = NULL;
-  jexlEngine           = NULL;
-
-  if (sem_init(&sem, 0, 1) == -1)
-  {
-    LM_X(1, ("Fatal Error (error initializing 'jexl mgr' semaphore: %s)", strerror(errno)));
-  }
-
-  Py_Initialize();
-  LM_T(LmtExpr, ("Python interpreter has been initialized"));
-
-  tcjexlModule = PyImport_ImportModule("tcjexl");
-  if (tcjexlModule == NULL)
-  {
-    LM_X(1, ("Fatal Error (error importing tcjexl module: %s)", capturePythonError()));
-  }
-  LM_T(LmtExpr, ("tcjexl module has been loaded"));
-
-  jexlEngine = PyObject_CallMethod(tcjexlModule, "JEXL", NULL);
-  if (jexlEngine == NULL)
-  {
-    LM_X(1, ("Fatal Error (error creating jexlEngine: %s)", capturePythonError()));
-  }
-  LM_T(LmtExpr, ("jexl engine has been created"));
+  jexlEngine = cjexl_new_engine();
 }
 
 
@@ -80,7 +66,7 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
   if (exprContextObjectP->isLegacy())
   {
     // std::map based evaluation. Only pure replacement is supported
-    LM_T(LmtExpr, ("evaluating legacy expresion: <%s>", _expression.c_str()));
+    LM_T(LmtExpr, ("evaluating legacy expression: <%s>", _expression.c_str()));
 
     std::map<std::string, std::string>* replacementsP = exprContextObjectP->getMap();
 
@@ -89,32 +75,17 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     {
       r.valueType   = orion::ValueTypeString;
       r.stringValue = iter->second;
+      LM_T(LmtExpr, ("legacy evaluation result: <%s>", r.stringValue.c_str()));
     }
   }
   else
   {
     // JEXL based evaluation
-    LM_T(LmtExpr, ("evaluating JEXL expresion: <%s>", _expression.c_str()));
-
-    PyObject* expression = Py_BuildValue("s", _expression.c_str());
-    if (expression == NULL)
-    {
-      LM_W(("error building JEXL expression: %s", capturePythonError()));
-      return r;
-    }
-
-    PyObject* result = PyObject_CallMethod(jexlEngine, "evaluate", "OO", expression, exprContextObjectP->getJexlContext());
-    Py_XDECREF(expression);
-    if (result == NULL)
-    {
-      LM_W(("error evaluating JEXL expression: %s", capturePythonError()));
-      return r;
-    }
-
+    std::string context = exprContextObjectP->getJexlContext();
+    LM_T(LmtExpr, ("evaluating JEXL expression <%s> with context <%s>", _expression.c_str(), context.c_str()));
+    const char* result = cjexl_eval(jexlEngine, _expression.c_str(), context.c_str());
+    LM_T(LmtExpr, ("JEXL evaluation result: <%s>", result));
     r.fill(result);
-
-    // FIXME PR: does this Py_XDECREF() recursively in the case of dicts or lists?
-    Py_XDECREF(result);
   }
 
   return r;
@@ -128,18 +99,5 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
 */
 void ExprManager::release(void)
 {
-  if (jexlEngine != NULL)
-  {
-    Py_XDECREF(jexlEngine);
-    LM_T(LmtExpr, ("jexl engine has been freed"));
-  }
-
-  if (tcjexlModule != NULL)
-  {
-    Py_XDECREF(tcjexlModule);
-    LM_T(LmtExpr, ("tcjexl module has been freed"));
-  }
-
-  Py_Finalize();
-  LM_T(LmtExpr, ("Python interpreter has been finalized"));
+  cjexl_free_engine(jexlEngine);
 }

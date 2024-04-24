@@ -46,7 +46,11 @@
 #include <mongoc/mongoc.h>
 #include <bson/bson.h>
 #include <mosquitto.h>
-#include <Python.h>
+
+// Interface to use libcjexl.a
+extern "C" {
+    const char* cjexl_version();
+}
 
 /* ****************************************************************************
 *
@@ -71,7 +75,7 @@ std::string libVersions(void)
   std::string  mhd    = "     \"libmicrohttpd\": ";
   std::string  ssl    = "     \"openssl\": ";
   std::string  rjson  = "     \"rapidjson\": ";
-  std::string  python = "     \"libpython\": ";
+  std::string  cjexl  = "     \"libcjexl\": ";
   std::string  mongo  = "     \"mongoc\": ";
   std::string  bson   = "     \"bson\": ";
 
@@ -86,17 +90,11 @@ std::string libVersions(void)
   char  mosqVersion[16];
   snprintf(mosqVersion, sizeof(mosqVersion), "%d.%d.%d", mosqMayor, mosqMinor, mosqRevision);
 
-  char  pyVersion[16];
-  snprintf(pyVersion, sizeof(pyVersion), "%d.%d.%d",
-    (PY_VERSION_HEX >> 24) & 0xFF,
-    (PY_VERSION_HEX >> 16) & 0xFF,
-    (PY_VERSION_HEX >> 8)  & 0xFF);
-
   total += boost   + "\"" + BOOST_LIB_VERSION "\"" + ",\n";
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
   total += mosq    + "\"" + mosqVersion + "\"" + ",\n";
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
-  total += python  + "\"" + pyVersion + "\"" + ",\n";
+  total += cjexl   + "\"" + cjexl_version() + "\"" + ",\n";
 #ifdef OLD_SSL_VERSION_FORMAT
   // Needed by openssl 1.1.1n in Debian 11 and before
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";

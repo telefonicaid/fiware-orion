@@ -64,7 +64,7 @@ Content-Length: REGEX(\d+)
      "libcurl": "REGEX(.*)",
      "libmosquitto": "REGEX(.*)",
      "libmicrohttpd": "REGEX(.*)",
-     "libpython": "REGEX(.*)",
+     "libcjexl": "REGEX(.*)",
      "openssl": "REGEX(.*)",
      "rapidjson": "REGEX(.*)",
      "mongoc": "REGEX(.*)",

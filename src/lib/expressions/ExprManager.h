@@ -26,9 +26,6 @@
 * Author: Fermin Galan
 */
 
-#include <Python.h>
-#include <semaphore.h>
-
 #include "expressions/ExprContext.h"
 #include "expressions/ExprResult.h"
 
@@ -39,10 +36,7 @@
 class ExprManager
 {
 private:
-  PyObject*  tcjexlModule;
-  PyObject*  jexlEngine;
-  PyObject*  jsonModule;
-  sem_t      sem;
+  void*        jexlEngine;
 
 public:
    void        init(void);

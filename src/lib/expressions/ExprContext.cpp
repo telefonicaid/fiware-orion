@@ -28,8 +28,6 @@
 #include "common/string.h"
 #include "logMsg/logMsg.h"
 #include "expressions/ExprContext.h"
-#include "expressions/exprCommon.h"
-
 
 
 /* ****************************************************************************
@@ -39,18 +37,6 @@
 ExprContextObject::ExprContextObject(bool _legacy)
 {
   legacy = _legacy;
-
-  if (!legacy)
-  {
-    jexlContext = PyDict_New();
-
-    if (jexlContext == NULL)
-    {
-      // Note that this ruins the object. We log this situation just one time here, but we include a NULL check
-      // in every other method to be safer
-      LM_E(("Runtime Error (fail creating new dict: %s)", capturePythonError()));
-    }
-  }
 }
 
 
@@ -59,16 +45,16 @@ ExprContextObject::ExprContextObject(bool _legacy)
 *
 * ExprContextObject::getJexlContext -
 */
-PyObject* ExprContextObject::getJexlContext(void)
+std::string ExprContextObject::getJexlContext(void)
 {
-  return jexlContext;
+  return jh.str();
 }
 
 
 
 /* ****************************************************************************
 *
-* ExprContextObject::getJexlContext -
+* ExprContextObject::getMap -
 */
 std::map<std::string,std::string>* ExprContextObject::getMap(void)
 {
@@ -96,19 +82,8 @@ void ExprContextObject::add(const std::string &key, const std::string &_value, b
   }
   else
   {
-    if (jexlContext == NULL)
-    {
-      return;
-    }
     LM_T(LmtExpr, ("adding to JEXL expression context object (string): %s=%s", key.c_str(), _value.c_str()));
-    PyObject* value = Py_BuildValue("s", _value.c_str());
-    if (value == NULL)
-    {
-      LM_E(("Runtime Error (fail creating string value: %s)", capturePythonError()));
-      return;
-    }
-    PyDict_SetItemString(jexlContext, key.c_str(), value);
-    Py_DECREF(value);
+    jh.addString(key, _value);
   }
 }
 
@@ -127,19 +102,8 @@ void ExprContextObject::add(const std::string &key, double _value)
   }
   else
   {
-    if (jexlContext == NULL)
-    {
-      return;
-    }
     LM_T(LmtExpr, ("adding to JEXL expression context object (double): %s=%f", key.c_str(), _value));
-    PyObject* value = Py_BuildValue("d", _value);
-    if (value == NULL)
-    {
-      LM_E(("Runtime Error (fail creating double value: %s)", capturePythonError()));
-      return;
-    }
-    PyDict_SetItemString(jexlContext, key.c_str(), value);
-    Py_DECREF(value);
+    jh.addNumber(key, _value);
   }
 }
 
@@ -158,19 +122,8 @@ void ExprContextObject::add(const std::string &key, bool _value)
   }
   else
   {
-    if (jexlContext == NULL)
-    {
-      return;
-    }
     LM_T(LmtExpr, ("adding to JEXL expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
-    if (_value)
-    {
-      PyDict_SetItemString(jexlContext, key.c_str(), Py_True);
-    }
-    else
-    {
-      PyDict_SetItemString(jexlContext, key.c_str(), Py_False);
-    }
+    jh.addBool(key, _value);
   }
 }
 
@@ -189,12 +142,8 @@ void ExprContextObject::add(const std::string &key)
   }
   else
   {
-    if (jexlContext == NULL)
-    {
-      return;
-    }
     LM_T(LmtExpr, ("adding to JEXL expression context object (none): %s", key.c_str()));
-    PyDict_SetItemString(jexlContext, key.c_str(), Py_None);
+    jh.addNull(key);
   }
 }
 
@@ -212,13 +161,9 @@ void ExprContextObject::add(const std::string &key, ExprContextObject exprContex
   }
   else
   {
-    if (jexlContext == NULL)
-    {
-      return;
-    }
-    // FIXME P3: improve this implemeting a toString() method for ExprContextObject
-    LM_T(LmtExpr, ("adding to JEXL expression context object (object): %s=[object]", key.c_str()));
-    PyDict_SetItemString(jexlContext, key.c_str(), exprContextObject.getJexlContext());
+    std::string s = exprContextObject.getJexlContext();
+    LM_T(LmtExpr, ("adding to JEXL expression context object (object): %s=%s", key.c_str(), s.c_str()));
+    jh.addRaw(key, s);
   }
 }
 
@@ -236,13 +181,9 @@ void ExprContextObject::add(const std::string &key, ExprContextList exprContextL
   }
   else
   {
-    if (jexlContext == NULL)
-    {
-      return;
-    }
-    // FIXME P3: improve this implemeting a toString() method for ExprContextList
-    LM_T(LmtExpr, ("adding to JEXL expression context object (list): %s=[list]", key.c_str()));
-    PyDict_SetItemString(jexlContext, key.c_str(), exprContextList.get());
+    std::string s = exprContextList.get();
+    LM_T(LmtExpr, ("adding to JEXL expression context object (list): %s=%s", key.c_str(), s.c_str()));
+    jh.addRaw(key, s);
   }
 }
 
@@ -261,45 +202,11 @@ bool ExprContextObject::isLegacy(void)
 
 /* ****************************************************************************
 *
-* ExprContextObject::release -
-*/
-void ExprContextObject::release(void)
-{
-  if (jexlContext == NULL)
-  {
-    return;
-  }
-  // FIXME PR: this is not correct. Recursively release of the dict object
-  //Py_XDECREF(jexlContext);
-}
-
-
-
-/* ****************************************************************************
-*
-* ExprContextList::ExprContextList -
-*/
-ExprContextList::ExprContextList()
-{
-  jexlContext = PyList_New(0);
-
-  if (jexlContext == NULL)
-  {
-    // Note that this ruins the object. We log this situation just one time here, but we include a NULL check
-    // in every other method to be safer
-    LM_E(("Runtime Error (fail creating new dict: %s)", capturePythonError()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * ExprContextList::get -
 */
-PyObject* ExprContextList::get(void)
+std::string ExprContextList::get(void)
 {
-  return jexlContext;
+  return jh.str();
 }
 
 
@@ -310,19 +217,9 @@ PyObject* ExprContextList::get(void)
 */
 void ExprContextList::add(const std::string &_value)
 {
-  if (jexlContext == NULL)
-  {
-    return;
-  }
-  LM_T(LmtExpr, ("adding to JEXL expression context list (string): %s=", _value.c_str()));
-  PyObject* value = Py_BuildValue("s", _value.c_str());
-  if (value == NULL)
-  {
-    LM_E(("Runtime Error (fail creating string value: %s)", capturePythonError()));
-    return;
-  }
-  PyList_Append(jexlContext, value);
-  Py_DECREF(value);
+
+  LM_T(LmtExpr, ("adding to JEXL expression context list (string): %s", _value.c_str()));
+  jh.addString(_value);
 }
 
 
@@ -333,19 +230,8 @@ void ExprContextList::add(const std::string &_value)
 */
 void ExprContextList::add(double _value)
 {
-  if (jexlContext == NULL)
-  {
-    return;
-  }
   LM_T(LmtExpr, ("adding to JEXL expression context list (double): %f", _value));
-  PyObject* value = Py_BuildValue("d", _value);
-  if (value == NULL)
-  {
-    LM_E(("Runtime Error (fail creating double value: %s)", capturePythonError()));
-    return;
-  }
-  PyList_Append(jexlContext, value);
-  Py_DECREF(value);
+  jh.addNumber(_value);
 }
 
 
@@ -356,19 +242,8 @@ void ExprContextList::add(double _value)
 */
 void ExprContextList::add(bool _value)
 {
-  if (jexlContext == NULL)
-  {
-    return;
-  }
   LM_T(LmtExpr, ("adding to JEXL expression context list (bool): %s", _value ? "true" : "false"));
-  if (_value)
-  {
-    PyList_Append(jexlContext, Py_True);
-  }
-  else
-  {
-    PyList_Append(jexlContext, Py_False);
-  }
+  jh.addBool(_value);
 }
 
 
@@ -379,12 +254,8 @@ void ExprContextList::add(bool _value)
 */
 void ExprContextList::add(void)
 {
-  if (jexlContext == NULL)
-  {
-    return;
-  }
   LM_T(LmtExpr, ("adding to JEXL expression context list (none)"));
-  PyList_Append(jexlContext, Py_None);
+  jh.addNull();
 }
 
 
@@ -395,13 +266,9 @@ void ExprContextList::add(void)
 */
 void ExprContextList::add(ExprContextObject exprContextObject)
 {
-  if (jexlContext == NULL)
-  {
-    return;
-  }
-  // FIXME P3: improve this implemeting a toString() method for ExprContextObject
-  LM_T(LmtExpr, ("adding to JEXL expression context list (object): [object]"));
-  PyList_Append(jexlContext, exprContextObject.getJexlContext());
+  std::string s = exprContextObject.getJexlContext();
+  LM_T(LmtExpr, ("adding to JEXL expression context list (object): %s", s.c_str()));
+  jh.addRaw(s);
 }
 
 
@@ -412,27 +279,8 @@ void ExprContextList::add(ExprContextObject exprContextObject)
 */
 void ExprContextList::add(ExprContextList exprContextList)
 {
-  if (jexlContext == NULL)
-  {
-    return;
-  }
-  // FIXME P3: improve this implemeting a toString() method for ExprContextList
-  LM_T(LmtExpr, ("adding to JEXL expression context list (list): [list]"));
-  PyList_Append(jexlContext, exprContextList.get());
-}
 
-
-
-/* ****************************************************************************
-*
-* ExprContextList::relesase -
-*/
-void ExprContextList::release(void)
-{
-  if (jexlContext == NULL)
-  {
-    return;
-  }
-  // FIXME PR: this is not correct. Recursively release of the list object
-  //Py_XDECREF(jexlContext);
+  std::string s = exprContextList.get();
+  LM_T(LmtExpr, ("adding to JEXL expression context list (list): %s", s.c_str()));
+  jh.addRaw(s);
 }

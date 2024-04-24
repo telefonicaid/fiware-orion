@@ -234,6 +234,7 @@ find_package (mongoc-1.0 1.24.3 EXACT)
 SET (COMMON_STATIC_LIBS
     microhttpd.a
     mosquitto.a
+    cjexl.a
     mongo::mongoc_static
 )
 
@@ -246,7 +247,6 @@ SET (DYNAMIC_LIBS
     uuid
     crypto
     sasl2
-    python3.11
 )
 
 #
@@ -265,8 +265,6 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
-include_directories("/usr/include/python3.11/")
-
 
 # Needed for the new C driver
 include_directories("/usr/local/include/libmongoc-1.0")
