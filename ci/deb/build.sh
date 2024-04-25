@@ -173,14 +173,17 @@ echo "Builder: create temp folders"
 rm -Rf /tmp/builder || true && mkdir -p /tmp/builder/{db1,db2,db,bu}
 
 # FIXME PR: unhardwire release number
+CJEXL_VERSION="0.0.0"
 if [ -z "${REPO_ACCESS_TOKEN}" ]; then
     echo "Builder: no REPO_ACCESS_TOKEN, skipping cjexl lib download"
 else
-    res_code=$(curl -I -s -o /dev/null -w "%{http_code}" -H "Authorization: token $REPO_ACCESS_TOKEN" https://api.github.com/repos/telefonicasc/cjexl/releases/tags/0.0.0)
+    res_code=$(curl -I -s -o /dev/null -w "%{http_code}" -H "Authorization: token $REPO_ACCESS_TOKEN" https://api.github.com/repos/telefonicasc/cjexl/releases/tags/$CJEXL_VERSION)
     if [ "$res_code" -eq 200 ]; then
        echo "Builder: downloading cjexl lib"
-       ASSET_ID=$(curl -s -S -H "Authorization: token $REPO_ACCESS_TOKEN" https://api.github.com/repos/telefonicasc/cjexl/releases/tags/0.0.0 | grep -C3 libcjexl.a | grep '"id"' | awk -F ' ' '{print $2}' | awk -F ',' '{print $1}')
+       ASSET_ID=$(curl -s -S -H "Authorization: token $REPO_ACCESS_TOKEN" https://api.github.com/repos/telefonicasc/cjexl/releases/tags/$CJEXL_VERSION | grep -C3 libcjexl.a | grep '"id"' | awk -F ' ' '{print $2}' | awk -F ',' '{print $1}')
        curl -L -s -o /usr/local/lib/libcjexl.a -H "Authorization: token $REPO_ACCESS_TOKEN" -H "Accept: application/octet-stream" https://api.github.com/repos/telefonicasc/cjexl/releases/assets/$ASSET_ID
+       MD5SUM=$(md5sum /usr/local/lib/libcjexl.a | awk -F ' ' '{print$1}')
+       echo "Builder: cjexl lib md5sum is $MD5SUM"
     else
       echo "Builder: error $res_code accessing cjexl release. Maybe token is invalid?"
     fi
