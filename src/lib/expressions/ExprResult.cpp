@@ -50,7 +50,7 @@ static void processDictItem(orion::CompoundValueNode* parentP, const rapidjson::
 * processListItem -
 *
 */
-void processListItem(orion::CompoundValueNode* parentP, const rapidjson::Value::ConstValueIterator&  iter)
+static void processListItem(orion::CompoundValueNode* parentP, const rapidjson::Value::ConstValueIterator&  iter)
 {
   orion::CompoundValueNode* nodeP;
 
@@ -112,7 +112,7 @@ void processListItem(orion::CompoundValueNode* parentP, const rapidjson::Value::
 * processDictItem -
 *
 */
-void processDictItem(orion::CompoundValueNode* parentP, const rapidjson::Value::ConstMemberIterator&  iter)
+static void processDictItem(orion::CompoundValueNode* parentP, const rapidjson::Value::ConstMemberIterator&  iter)
 {
   orion::CompoundValueNode* nodeP;
 
@@ -172,7 +172,19 @@ void processDictItem(orion::CompoundValueNode* parentP, const rapidjson::Value::
 
 /* ****************************************************************************
 *
-* fill -
+* ExprResult::ExprResult -
+*
+*/
+ExprResult::ExprResult()
+{
+  compoundValueP = NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* ExprResult::fill -
 *
 */
 void ExprResult::fill(const std::string& result)
@@ -244,7 +256,7 @@ void ExprResult::fill(const std::string& result)
 
 /* ****************************************************************************
 *
-* toString -
+* ExprResult::toString -
 *
 * Pretty similar to ContextAttribute::toJsonValue()
 *
